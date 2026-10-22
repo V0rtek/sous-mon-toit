@@ -91,11 +91,14 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .picks i { color: #ffb3c6; font-style: normal; font-weight: 800; }
 .credits { font-size: 1.3em; color: #9c93aa; margin: 1.2em 0 0; }
 /* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
-#qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; width: 5.2em; height: 5.2em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
-#qrBtn svg { width: 2.6em; height: 2.6em; }
+#qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#qrBtn svg { width: 4em; height: 4em; }
 #qrBtn:focus-visible { outline: .25em solid #fff; }
+#eyes { position: absolute; top: calc(2.2% + 1.2em); right: calc(4% + 9.2em); z-index: 30; height: 5.6em; padding: 0 1.8em; border-radius: 2.8em; background: rgba(15,12,20,.6); color: #fff; display: flex; align-items: center; gap: .8em; pointer-events: none; }
+#eyes svg { width: 2.8em; height: 2.8em; }
+#eyes span { font-size: 2.6em; font-weight: 800; }
 #qrCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.92); display: grid; place-items: center; cursor: pointer; }
-#qrBox { width: 72%; aspect-ratio: 1; background: #fff; border-radius: 2.4em; padding: 4%; box-sizing: border-box; }
+#qrBox { width: 50%; aspect-ratio: 1; background: #fff; border-radius: 1.8em; padding: 3%; box-sizing: border-box; }
 #qrBox svg { width: 100%; height: 100%; display: block; }
 body.watch #stage { cursor: default; }
 body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
@@ -145,6 +148,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <p class="credits" id="credits"></p>
   </div>
   <button id="qrBtn" type="button" hidden aria-label="Faire regarder quelqu'un"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
+  <div id="eyes" hidden aria-label="Spectateurs"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
@@ -437,15 +441,42 @@ function share() {
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
 
+// spectator count: each spectator keeps a retained "seat" (its timestamp, refreshed every 20 s) under <topic>/w/;
+// the broker clears it when the spectator drops (will), and the host forgets any seat silent for 50 s
+const watchers = new Map();
+function countEyes() {
+  const now = Date.now();
+  for (const [id, t] of watchers) if (now - t > 50000) watchers.delete(id);
+  $('#eyes span').textContent = watchers.size;
+  $('#eyes').hidden = !watchers.size;
+}
+
 async function goLive() {
   if (ROLE === 'host') room = roomCode();
   try { await loadScript('https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'); } catch { return; }
-  live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000 });
+  const me = 'smt-' + Math.random().toString(16).slice(2, 10), seat = `${topic()}/w/${me}`;
+  const here = () => { if (live.connected) live.publish(seat, String(Date.now()), { retain: true }); };
+  live = mqtt.connect(BROKER, { clientId: me, reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
+    will: ROLE === 'watch' ? { topic: seat, payload: '', retain: true, qos: 0 } : undefined });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); }
-    else live.subscribe(topic(), { qos: 1 });
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe(`${topic()}/w/+`); }
+    else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
-  if (ROLE === 'watch') live.on('message', (t, buf) => { try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
+  if (ROLE === 'watch') {
+    live.on('message', (t, buf) => { try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
+    setInterval(here, 20000);
+    addEventListener('pagehide', () => { if (live.connected) live.publish(seat, '', { retain: true }); });
+  } else {
+    live.on('message', (t, buf, packet) => {
+      const id = t.split('/w/')[1];
+      if (!id) return;
+      const now = Date.now();
+      // a retained seat may be old: trust its own timestamp; a live refresh is fresh by definition
+      if (buf.length) watchers.set(id, packet.retain ? Math.min(now, +buf.toString() || 0) : now); else watchers.delete(id);
+      countEyes();
+    });
+    setInterval(countEyes, 5000);
+  }
 }
 
 $('#qrBtn').onclick = async (e) => {
