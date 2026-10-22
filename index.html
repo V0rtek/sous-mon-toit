@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0a0f">
+</head>
+<body>
+<title>Sous mon toit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&display=swap" media="print" onload="this.media='all'">
+<style>
+/* Layout: one 9:16 phone stage, centred on black. 1em inside the stage = 1% of its height, so it scales as a whole.
+   Inside, one "world" in decor pixels (photo + people + foreground); the camera is a transform on it. */
+:root {
+  --night: #0b0a0f;
+  --paper: #fffdf9;
+  --ink: #1d1a24;
+  --rim: #cdbdf0;
+  --choice: #34516d;
+  --choice-hi: #46698b;
+  --rose: #e2557a;
+  --ui: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --display: 'Yeseva One', Georgia, 'Times New Roman', serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; margin: 0; background: var(--night); overflow: hidden; }
+[hidden] { display: none !important; }
+body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: transparent; user-select: none; }
+#stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: hidden; background: #1a1620; cursor: pointer; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#world > * { position: absolute; }
+#bgimg { left: 0; top: 0; display: block; }
+.actor img { width: 100%; height: 100%; display: block; }
+.actor.talk { animation: talk .38s ease-out; }
+@keyframes talk { 40% { transform: translateY(-1.5%); } }
+.actor.pop img { animation: pop .22s ease-out; }
+@keyframes pop { from { opacity: .55; } }
+#shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 60%, rgba(0,0,0,.28)); }
+
+#ui { position: absolute; left: 7%; right: 7%; top: 53%; display: flex; flex-direction: column; gap: 1.4em; }
+#bubble { position: relative; background: var(--paper); border: .3em solid var(--rim); border-radius: 2em; padding: 2.4em 2.2em 1.9em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); }
+#bubble.narr { background: rgba(22,18,30,.9); border-color: rgba(255,255,255,.14); color: #f4eefc; padding-top: 1.8em; }
+#bubble.narr #text { font-style: italic; font-weight: 600; text-align: center; }
+#bubble.think { border-style: dashed; background: #f6f2ff; }
+#bubble.think #text, #bubble.whisper #text { font-style: italic; }
+#bubble.whisper #text { font-size: 2.1em; }
+#tag { position: absolute; left: 1.6em; top: -1.9em; padding: .55em 1.3em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: 2em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
+#tag small { font-size: .62em; font-weight: 700; letter-spacing: .02em; text-transform: none; opacity: .85; margin-left: .4em; }
+#text { font-size: 2.35em; line-height: 1.32; font-weight: 600; min-height: 1.32em; }
+#tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
+#tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
+#choices { display: flex; flex-direction: column; gap: 1.1em; }
+#choices button { font: inherit; font-size: 2.3em; font-weight: 800; color: #fff; text-align: left; background: var(--choice); border: 0; border-radius: 1.4em; padding: .85em 1.2em; cursor: pointer; box-shadow: 0 .25em .7em rgba(0,0,0,.3); animation: rise .28s ease-out backwards; }
+#choices button:nth-child(2) { animation-delay: .06s; }
+#choices button:nth-child(3) { animation-delay: .12s; }
+#choices button:hover, #choices button:focus-visible { background: var(--choice-hi); outline: none; }
+#choices button:focus-visible { box-shadow: 0 0 0 .2em #fff; }
+@keyframes rise { from { opacity: 0; transform: translateY(1em); } }
+
+#caption { position: absolute; left: 5%; top: 4%; padding: .7em 1.4em; border-radius: 1em; background: rgba(15,12,20,.72); color: #fff; font-size: 1.9em; font-weight: 800; letter-spacing: .02em; opacity: 0; transition: opacity .6s; pointer-events: none; }
+#caption.on { opacity: 1; }
+#hint { position: absolute; left: 0; right: 0; bottom: 3.5%; text-align: center; color: rgba(255,255,255,.85); font-size: 1.8em; font-weight: 800; text-shadow: 0 .1em .4em rgba(0,0,0,.6); pointer-events: none; animation: blink 1.6s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+#black { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 1s; }
+
+/* full-screen cards: cover, Isa's look, end */
+.card { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 7% 9%; color: #fff; cursor: default; background: #000; overflow: hidden; }
+.card .art { position: absolute; inset: 0; background-size: cover; background-position: 62% center; filter: brightness(.55) saturate(1.1); }
+.card .hero { position: absolute; right: -6%; bottom: 21%; height: 74%; filter: drop-shadow(0 1em 2em rgba(0,0,0,.6)); }
+.card .veil { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,8,14,0) 30%, rgba(10,8,14,.92) 72%); }
+.card > *:not(.art):not(.veil):not(.hero) { position: relative; }
+.kicker { font-size: 1.8em; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #ffb3c6; }
+.title { font-family: var(--display); font-size: 7.4em; line-height: .95; margin: .12em 0 .25em; text-wrap: balance; }
+.lede { font-size: 2.2em; line-height: 1.35; font-weight: 600; color: #e9e2f2; margin: 0 0 1.6em; max-width: 26em; }
+.field { display: flex; flex-direction: column; gap: .7em; margin-bottom: 1.6em; }
+.field label { font-size: 1.8em; font-weight: 800; color: #cfc6dc; }
+.field input { font: inherit; font-size: 2.6em; font-weight: 800; padding: .6em .8em; border-radius: .7em; border: .12em solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; outline: none; user-select: text; }
+.field input:focus { border-color: #ffb3c6; }
+.go { display: block; width: 100%; font: inherit; font-size: 2.6em; font-weight: 900; padding: .8em; border-radius: 1.1em; border: 0; background: var(--rose); color: #fff; cursor: pointer; box-shadow: 0 .3em 1em rgba(226,85,122,.45); }
+.go:hover, .go:focus-visible { filter: brightness(1.08); outline: none; }
+.go:focus-visible { box-shadow: 0 0 0 .2em #fff; }
+.looks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2em; margin: 1.2em 0 2em; }
+.looks button { font: inherit; background: rgba(255,255,255,.07); border: .25em solid transparent; border-radius: 1.4em; padding: 1em .4em .8em; cursor: pointer; color: #fff; display: flex; flex-direction: column; align-items: center; gap: .6em; }
+.looks button img { height: 30em; max-width: 100%; object-fit: contain; }
+.looks button span { font-size: 1.9em; font-weight: 800; }
+.looks button[aria-pressed="true"] { border-color: var(--rose); background: rgba(226,85,122,.18); }
+.picks { list-style: none; padding: 0; margin: 0 0 2em; display: flex; flex-direction: column; gap: .7em; font-size: 1.9em; color: #ddd3ea; }
+.picks b { color: #fff; }
+.picks i { color: #ffb3c6; font-style: normal; font-weight: 800; }
+.credits { font-size: 1.3em; color: #9c93aa; margin: 1.2em 0 0; }
+/* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
+#qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; width: 5.2em; height: 5.2em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#qrBtn svg { width: 2.6em; height: 2.6em; }
+#qrBtn:focus-visible { outline: .25em solid #fff; }
+#qrCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.92); display: grid; place-items: center; cursor: pointer; }
+#qrBox { width: 72%; aspect-ratio: 1; background: #fff; border-radius: 2.4em; padding: 4%; box-sizing: border-box; }
+#qrBox svg { width: 100%; height: 100%; display: block; }
+body.watch #stage { cursor: default; }
+body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
+body.watch #choices button, body.watch .looks button { pointer-events: none; }
+#choices button.picked { background: var(--choice-hi); box-shadow: 0 0 0 .2em #fff; }
+@media (prefers-reduced-motion: reduce) { .actor.talk, .actor.pop img, #choices button, #hint { animation: none; } }
+</style>
+
+<div id="stage">
+  <div id="world"><img id="bgimg" alt=""><div id="cast"></div><div id="front"></div></div>
+  <div id="shade"></div>
+  <div id="ui">
+    <div id="bubble" hidden><div id="tag"></div><div id="tail"></div><div id="text"></div></div>
+    <div id="choices" hidden></div>
+  </div>
+  <div id="caption"></div>
+  <div id="hint" hidden>Touche pour continuer</div>
+  <div id="black"></div>
+  <div id="cover" class="card">
+    <div class="art" style="background-image:url(bg/terrasse.jpg)"></div>
+    <img class="hero" src="chars/isa_nuit/listen.webp" alt="">
+    <div class="veil"></div>
+    <div class="kicker">Chapitre 1</div>
+    <div class="title">Sous mon toit</div>
+    <p class="lede">Ton père part un mois. Une amie à lui emménage ce soir. Ta blonde ne l'a pas encore vue.</p>
+    <form id="start">
+      <div class="field"><label for="name">Ton nom</label><input id="name" maxlength="16" value="Justin" autocomplete="off"></div>
+      <button class="go" type="submit">Commencer</button>
+    </form>
+  </div>
+  <div id="looks" class="card" hidden>
+    <div class="art" style="background-image:url(bg/salon.jpg)"></div>
+    <div class="veil"></div>
+    <div class="kicker">Personnalise</div>
+    <div class="title" style="font-size:6em">Isa</div>
+    <div class="looks" id="lookList"></div>
+    <button class="go" id="lookGo" type="button">C'est elle</button>
+  </div>
+  <div id="end" class="card" hidden>
+    <div class="art" style="background-image:url(bg/salon.jpg)"></div>
+    <div class="veil"></div>
+    <div class="kicker">Fin du chapitre 1</div>
+    <div class="title">À suivre…</div>
+    <p class="lede">Isa allait dire quelque chose. Chapitre 2 bientôt.</p>
+    <ul class="picks" id="picks"></ul>
+    <button class="go" id="again" type="button">Rejouer</button>
+    <p class="credits" id="credits"></p>
+  </div>
+  <button id="qrBtn" type="button" hidden aria-label="Faire regarder quelqu'un"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
+  <div id="qrCard" hidden><div id="qrBox"></div></div>
+</div>
+
+<script src="chars.js"></script>
+<script src="story.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), castEl = $('#cast'), frontEl = $('#front'),
+  bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
+  black = $('#black'), caption = $('#caption'), hint = $('#hint');
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// camera height per framing, in standing heights of the framed people (it grows if they do not fit side by side),
+// and the space left above the highest head (share of the frame)
+const FRAME = { one: [0.86, .08], close: [0.55, .06], two: [0.9, .1], three: [1.0, .12] };
+const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3 };   // decor blur on screen, x stage height / 800
+
+let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST = false, run = 0;
+let sc = null, actors = {}, camNow = null;
+const state = { name: 'Justin', isa: ISA_LOOKS[0].sprite, picks: [] };
+const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
+const fill = (t) => t.replaceAll('{N}', state.name);
+const spriteOf = (id) => (id === 'isa' ? state.isa : CAST[id].sprite);
+const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${pose}.webp`;
+
+function fit() {
+  const bw = document.body.clientWidth, bh = document.body.clientHeight;
+  H = Math.min(bh, bw * 16 / 9); W = H * 9 / 16;
+  Object.assign(stage.style, { width: W + 'px', height: H + 'px', fontSize: H / 100 + 'px' });
+  if (camNow) applyCam(camNow, 0);
+}
+
+// ---- people, in decor pixels ----
+function box(a) {
+  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[a.pose];
+  const ih = p[1] / sp.refH * a.h * (CAST[a.id].scale || 1);
+  return { w: p[0] / p[1] * ih, h: ih };
+}
+function placeActor(a) {
+  const b = box(a);
+  Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: a.x - b.w / 2 + 'px', top: a.feet - b.h + 'px', zIndex: Math.round(a.feet) });
+  const nat = FACE[spriteOf(a.id)][a.pose];
+  a.el.firstChild.style.transform = a.face && nat !== 'f' && a.face !== nat ? 'scaleX(-1)' : '';
+}
+function enter(id, pose) {
+  const [x, feet, h] = sc.spots[id];
+  const a = actors[id] = { id, pose, x, feet, h, face: sc.face[id], el: document.createElement('div') };
+  a.el.className = 'actor'; a.el.style.position = 'absolute';
+  const img = new Image(); img.alt = ''; img.src = poseSrc(id, pose); a.el.appendChild(img);
+  castEl.appendChild(a.el); placeActor(a);
+}
+function exit(id) { if (actors[id]) { actors[id].el.remove(); delete actors[id]; } }
+function setPose(id, pose) {
+  const a = actors[id]; if (!a || a.pose === pose) return;
+  a.pose = pose; a.el.firstChild.src = poseSrc(id, pose); placeActor(a);
+  a.el.classList.remove('pop'); void a.el.offsetWidth; a.el.classList.add('pop');
+}
+function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
+
+function setScene(id, cast) {
+  sc = SCENES[id]; actors = {}; castEl.innerHTML = ''; frontEl.innerHTML = '';
+  const [bw, bh] = sc.size;
+  bgImg.src = sc.image; Object.assign(bgImg.style, { width: bw + 'px', height: bh + 'px' });
+  Object.assign(world.style, { width: bw + 'px', height: bh + 'px' });
+  for (const [who, pose] of Object.entries(cast)) enter(who, pose);
+  for (const r of sc.front) {
+    const d = document.createElement('div');
+    Object.assign(d.style, { position: 'absolute', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px',
+      background: r.color, borderRadius: (r.r || 0) + 'px', filter: r.blur ? `blur(${r.blur}px)` : '' });
+    frontEl.appendChild(d);
+  }
+  frontEl.style.zIndex = 5000;
+}
+
+// ---- camera: a size + who to frame (or a point for wide shots) ----
+function frameOf(c) {
+  const [bw, bh] = sc.size;
+  let camH, cx, top;
+  const who = (c.who || []).map((id) => actors[id]).filter(Boolean);
+  if (c.size === 'wide' || !who.length) {
+    camH = bh; top = 0;
+    const all = Object.values(actors);
+    cx = c.at ?? (all.length ? (Math.min(...all.map((a) => a.x)) + Math.max(...all.map((a) => a.x))) / 2 : bw / 2);
+  } else {
+    const [k, margin] = FRAME[c.size];
+    const boxes = who.map((a) => ({ a, b: box(a) }));
+    const left = Math.min(...boxes.map(({ a, b }) => a.x - b.w / 2)), right = Math.max(...boxes.map(({ a, b }) => a.x + b.w / 2));
+    const tall = Math.max(...who.map((a) => a.h)), head = Math.min(...boxes.map(({ a, b }) => a.feet - b.h));
+    camH = Math.min(bh, Math.max(k * tall, (right - left) * 1.08 * 16 / 9));
+    cx = (left + right) / 2; top = head - margin * camH;
+  }
+  if (c.lift !== undefined) top = c.lift;
+  const camW = camH * 9 / 16;
+  return { camH, left: Math.min(Math.max(0, cx - camW / 2), bw - camW), top: Math.min(Math.max(0, top), bh - camH) };
+}
+function applyCam(c, ms) {
+  camNow = c;
+  const f = c.frame || frameOf(c), s = H / f.camH;
+  world.style.transition = ms ? `transform ${ms}ms cubic-bezier(.45,0,.25,1)` : 'none';
+  world.style.transform = `translate(${-f.left * s}px,${-f.top * s}px) scale(${s})`;
+  const blur = (BLUR[c.size] || 0) * H / 800 / s;
+  bgImg.style.filter = blur ? `blur(${blur}px)` : 'none';
+  camNow.frame = f;
+}
+function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; applyCam({ ...c, frame: null }, ms); }
+
+// ---- text ----
+let typingFull = '';   // the whole line, shown at once when someone taps while it types
+function typeText(t) {
+  clearInterval(typing); textEl.textContent = ''; typingFull = t;
+  if (REDUCED || FAST) { textEl.textContent = t; typing = null; return; }
+  let i = 0;
+  typing = setInterval(() => { textEl.textContent = t.slice(0, ++i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
+}
+function line(s) {
+  const who = s.say || s.think || null, kind = s.narr ? 'narr' : s.think ? 'think' : s.whisper ? 'whisper' : 'say';
+  if (s.say && s.pose) setPose(s.say, s.pose);
+  bubble.className = kind;
+  tagEl.hidden = !who;
+  if (who) {
+    tagEl.innerHTML = '';
+    tagEl.append(fill(CAST[who].name));
+    if (kind !== 'say') { const sm = document.createElement('small'); sm.textContent = kind === 'think' ? 'pense' : 'chuchote'; tagEl.append(sm); }
+    tagEl.style.background = CAST[who].color;
+  }
+  // the tail points at the speaker if the camera sees them
+  const a = who && actors[who], f = camNow && camNow.frame;
+  const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : -1;
+  tail.hidden = kind === 'narr' || sx < .05 || sx > .95;
+  if (!tail.hidden) tail.style.left = Math.min(86, Math.max(14, (sx - .07) / .86 * 100)) + '%';
+  if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
+  bubble.hidden = false; choicesEl.hidden = true;
+  typeText(fill(s.text || s.narr));
+  if (firstLine) { hint.hidden = false; firstLine = false; }
+}
+let options = null;
+function choose(opts) {
+  options = opts; choicesEl.innerHTML = ''; choicesEl.hidden = false;
+  opts.forEach((o, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = fill(o.t);
+    b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') pickChoice(i); };
+    choicesEl.appendChild(b);
+    if (i === 0 && ROLE === 'host' && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
+  });
+}
+// a spectator sees the player's pick light up for a moment before the story goes on
+function pickChoice(i) {
+  const o = options && options[i]; if (!o || waiting !== 'choice') return;
+  record('c' + i);
+  const go = () => { state.picks.push(o); choicesEl.hidden = true; q.unshift(...o.then); waiting = null; next(); };
+  if (ROLE === 'watch' && !FAST && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
+  else go();
+}
+
+function fade(dir, ms) {
+  bubble.hidden = true;
+  black.style.transition = `opacity ${FAST ? 0 : ms}ms`;
+  black.style.opacity = dir === 'out' ? 1 : 0;
+  return sleep(ms);
+}
+function showCaption(t) {
+  caption.textContent = t; caption.classList.add('on');
+  clearTimeout(showCaption.t); showCaption.t = setTimeout(() => caption.classList.remove('on'), 3200);
+}
+// toes to head: a close shot that starts on the feet and rises to the face
+async function reveal(id, ms) {
+  setCam({ size: 'close', who: [id] });
+  const end = camNow.frame, a = actors[id];
+  applyCam({ size: 'close', who: [id], frame: { ...end, top: Math.min(a.feet - end.camH * .92, sc.size[1] - end.camH) } }, 0);
+  void world.offsetWidth;
+  applyCam({ size: 'close', who: [id], frame: end }, FAST || REDUCED ? 0 : ms);
+  await sleep(ms + 250);
+}
+
+let lookDone = null;
+function selectLook(i) {
+  state.isa = ISA_LOOKS[i].sprite;
+  $('#lookList').querySelectorAll('button').forEach((x, k) => x.setAttribute('aria-pressed', String(k === i)));
+}
+function pickLook(i) {
+  if (!lookDone) return;
+  selectLook(i);
+  const done = lookDone; lookDone = null;
+  setTimeout(done, ROLE === 'watch' && !FAST ? 700 : 0);
+}
+const CUSTOM = {
+  isaLook() {
+    return new Promise((done) => {
+      const card = $('#looks'), list = $('#lookList');
+      list.innerHTML = '';
+      ISA_LOOKS.forEach((l, i) => {
+        const b = document.createElement('button'); b.type = 'button';
+        b.innerHTML = `<img src="chars/${l.sprite}/listen.webp" alt=""><span>${l.label}</span>`;
+        b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') selectLook(i); };
+        list.appendChild(b);
+      });
+      selectLook(Math.max(0, ISA_LOOKS.findIndex((l) => l.sprite === state.isa)));
+      card.hidden = false; bubble.hidden = true;
+      lookDone = () => {
+        card.hidden = true;
+        if (actors.isa) { actors.isa.el.firstChild.src = poseSrc('isa', actors.isa.pose); placeActor(actors.isa); }
+        done();
+      };
+      $('#lookGo').onclick = (e) => {
+        e.stopPropagation();
+        const i = ISA_LOOKS.findIndex((l) => l.sprite === state.isa);
+        record('l' + i); pickLook(i);
+      };
+    });
+  },
+};
+
+function endCard() {
+  bubble.hidden = true;
+  const ul = $('#picks'); ul.innerHTML = '';
+  const head = document.createElement('li'); head.innerHTML = '<b>Tes choix</b>'; ul.appendChild(head);
+  for (const p of state.picks) {
+    const li = document.createElement('li');
+    li.append(`« ${fill(p.t)} » `); const i = document.createElement('i'); i.textContent = p.intent; li.append(i);
+    ul.appendChild(li);
+  }
+  $('#credits').textContent = CREDITS;
+  $('#end').hidden = false;
+}
+
+// one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
+async function next() {
+  const r = run;
+  while (q.length && r === run) {
+    const s = q.shift();
+    if (s.scene) setScene(s.scene, s.cast);
+    else if (s.cam) setCam({ size: s.cam, who: s.who, at: s.at });
+    else if (s.pan !== undefined) { setCam({ size: 'wide', at: s.pan }, FAST || REDUCED ? 0 : s.ms); await sleep(s.ms); }
+    else if (s.enter) for (const [id, pose] of Object.entries(s.enter)) enter(id, pose);
+    else if (s.exit) exit(s.exit);
+    else if (s.face) setFace(s.face);
+    else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
+    else if (s.reveal) await reveal(s.reveal, s.ms);
+    else if (s.fade) await fade(s.fade, s.ms);
+    else if (s.caption) showCaption(s.caption);
+    else if (s.wait) await sleep(s.wait);
+    else if (s.custom) await CUSTOM[s.custom]();
+    else if (s.say || s.narr || s.think) { line(s); waiting = 'click'; return; }
+    else if (s.choice) { choose(s.choice); waiting = 'choice'; return; }
+    else if (s.end) { endCard(); return; }
+  }
+}
+
+function advance() {
+  if (ROLE === 'watch') return;
+  if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
+  if (waiting !== 'click') return;
+  record('a'); waiting = null; hint.hidden = true; next();
+}
+stage.addEventListener('click', (e) => { if (!e.target.closest('.card')) advance(); });
+addEventListener('keydown', (e) => {
+  if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('input, button')) { e.preventDefault(); advance(); }
+});
+
+function begin() {
+  run++; state.picks = []; state.isa = ISA_LOOKS[0].sprite; firstLine = true; waiting = null; lookDone = null;
+  q = STORY.slice(); black.style.transition = 'none'; black.style.opacity = 1;
+  $('#cover').hidden = true; $('#end').hidden = true; $('#looks').hidden = true;
+  if (ROLE === 'host') { game = Date.now().toString(36); tape = []; share(); }
+  next();
+}
+$('#start').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.name = $('#name').value.trim().slice(0, 16) || 'Justin';
+  begin();
+});
+$('#again').onclick = (e) => { e.stopPropagation(); begin(); };
+
+// ---- live: someone scans the player's QR and watches. The player's taps go to a public MQTT relay as one retained
+// message (game id + name + every tap so far); a spectator replays them on the same story, so a late joiner catches up.
+const BROKER = 'wss://broker.emqx.io:8084/mqtt';
+const WATCH = new URLSearchParams(location.search).get('watch');
+const ROLE = WATCH && /^[a-z0-9]{4,12}$/.test(WATCH) ? 'watch' : 'host';
+let live = null, room = ROLE === 'watch' ? WATCH : null, game = null, tape = [];
+const topic = () => `sousmontoit/v1/${room}`;
+function loadScript(src) {
+  return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
+}
+function roomCode() {
+  const fresh = () => Math.random().toString(36).slice(2, 8).padEnd(6, '0');
+  try { let c = localStorage.getItem('smt-room'); if (!c) { c = fresh(); localStorage.setItem('smt-room', c); } return c; } catch { return fresh(); }
+}
+function share() {
+  if (ROLE === 'host' && live && live.connected) live.publish(topic(), JSON.stringify({ g: game, n: state.name, t: tape }), { retain: true, qos: 1 });
+}
+function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
+
+async function goLive() {
+  if (ROLE === 'host') room = roomCode();
+  try { await loadScript('https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'); } catch { return; }
+  live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000 });
+  live.on('connect', () => {
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); }
+    else live.subscribe(topic(), { qos: 1 });
+  });
+  if (ROLE === 'watch') live.on('message', (t, buf) => { try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
+}
+
+$('#qrBtn').onclick = async (e) => {
+  e.stopPropagation();
+  if (!window.qrcode) { try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'); } catch { return; } }
+  const qr = qrcode(0, 'M'); qr.addData(`${location.origin}${location.pathname}?watch=${room}`); qr.make();
+  $('#qrBox').innerHTML = qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
+  $('#qrCard').hidden = false;
+};
+$('#qrCard').onclick = (e) => { e.stopPropagation(); $('#qrCard').hidden = true; };
+
+// spectator: replay the player's taps in order, each one when the story is ready for it; far behind = no animation
+let remote = null, applied = 0, pumping = false;
+const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, 40)); t(); });
+function follow(msg) {
+  if (!msg || !msg.g) { remote = null; toCover(); return; }
+  if (!remote || remote.g !== msg.g) { remote = msg; applied = 0; state.name = String(msg.n || 'Justin').slice(0, 16); begin(); }
+  else remote = msg;
+  pump();
+}
+function toCover() {
+  run++; q = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
+  $('#end').hidden = true; $('#looks').hidden = true; $('#cover').hidden = false;
+}
+async function pump() {
+  if (pumping) return;
+  pumping = true;
+  while (remote && applied < remote.t.length) {
+    const g = remote.g, ev = String(remote.t[applied]);
+    FAST = remote.t.length - applied > 2;
+    await until(() => !remote || remote.g !== g || (ev === 'a' ? waiting === 'click' : ev[0] === 'c' ? waiting === 'choice' : !!lookDone));
+    if (!remote || remote.g !== g) break;
+    applied++;
+    if (ev === 'a') { clearInterval(typing); typing = null; textEl.textContent = typingFull; waiting = null; next(); }
+    else if (ev[0] === 'c') pickChoice(+ev.slice(1));
+    else if (ev[0] === 'l') pickLook(+ev.slice(1));
+  }
+  FAST = false; pumping = false;
+  if (remote && applied < remote.t.length) pump();
+}
+
+// index.html#t40 = start and jump to the 40th tap (first option on every choice), to check a shot without playing
+async function skipTo(n) {
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  FAST = true; begin();
+  for (let k = 0; k < n; k++) {
+    for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
+    if (!$('#end').hidden) break;
+    if (!$('#looks').hidden) { $('#lookGo').click(); continue; }
+    if (waiting === 'choice') choicesEl.querySelector('button').click();
+    else advance();
+  }
+  FAST = false;
+}
+
+addEventListener('resize', fit);
+if (ROLE === 'watch') document.body.classList.add('watch');
+fit();
+goLive();
+const jump = location.hash.match(/^#t(\d+)$/);
+if (jump) skipTo(+jump[1]);
+// warm the cache so cuts never flash
+for (const s of Object.values(SCENES)) new Image().src = s.image;
+for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = `chars/${id}/${pose}.webp`;
+</script>
+</body>
+</html>
