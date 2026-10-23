@@ -20,10 +20,20 @@ GALLERY.push({ sprite: 'james_noir', name: 'Stranger', recolor: 'james' });
 // subtler); what he doesn't have yet plays with his closest pose
 FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
   pee: 'f', pee_relief: 'f', pee_look: 'r' };
-window.POSE_ALIAS = { brooke: {
-  listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
-  drunk_flirt: 'drunk_point', phone_shock: 'texting',
-} };
+// Justin: his new sheet (bar, 23/10) is the only one he plays with here — never the old urban sheets
+FACE.justin_bar = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_flirt: 'r', texting: 'r' };
+window.POSE_ALIAS = {
+  brooke: {
+    listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
+    drunk_flirt: 'drunk_point', phone_shock: 'texting',
+  },
+  justin_bar: {
+    listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
+    thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
+  },
+};
+// the gallery shows the new Justin (the old sheet only plays in the older stories)
+GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar'] };
 GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] });
 
 // ---------- decors, rectangles only (decor px) ----------
@@ -57,15 +67,14 @@ const BAR_BACK = [
 // the counter in front of them (hip height), their drinks on it
 const TOP = 866;
 const shot = (x) => R(x, TOP - 38, 26, 40, 'rgba(255,255,255,.22)', { r: '3px 3px 6px 6px', line: '2px solid rgba(255,255,255,.45)' });
-const pint = (x) => [R(x, TOP - 84, 48, 86, 'rgba(240,170,60,.88)', { r: '4px 4px 10px 10px' }), R(x, TOP - 92, 48, 16, '#f6efdd', { r: 6 })];
 const BAR_FRONT = [
   R(-10, TOP, 1940, 30, '#a8774c', { r: 4 }), R(0, TOP + 30, 1920, 12, '#5c3b25'), R(0, TOP + 42, 1920, 400, '#33201a'),
   ...[60, 380, 700, 1020, 1340, 1660].map((x) => R(x, TOP + 66, 260, 360, '#3b261e', { r: 10, line: '4px solid #2a1912' })),
-  // Justin: a pint + two empty shots · Cam: a cocktail · Brooke: a pint + two shots · the bill
-  ...pint(670), shot(810), shot(846),
+  // Justin: two empty shots (his red cup is in his hand) · Cam: a cocktail · Brooke: two shots · the bill
+  shot(810), shot(846),
   R(990, TOP - 70, 40, 44, 'rgba(220,60,90,.85)', { r: '4px 4px 20px 20px' }), R(1007, TOP - 28, 6, 28, 'rgba(255,255,255,.55)'),
   R(1100, TOP - 12, 74, 12, '#111', { r: 2 }),
-  ...pint(1290), shot(1200), shot(1236),
+  shot(1200), shot(1236),
 ];
 // the bathroom: tiles, 3 urinals, mirror + sink on the left, the emergency exit on the right
 const TILE = 64;
@@ -496,7 +505,7 @@ BAR.credits = '';   // no photos: rectangles only
 BAR.seats = ['pa', 'pb'];
 BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // the other character's player name when you play both
 BAR.cast = {
-  pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin' },
+  pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' },
   pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'ruby', scale: 0.95 },
   suit: { name: 'Stranger', color: '#26262b', sprite: 'james_noir', aside: true },
