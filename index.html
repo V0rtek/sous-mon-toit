@@ -38,6 +38,17 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .actor.pop img { animation: pop .22s ease-out; }
 @keyframes pop { from { opacity: .55; } }
 #shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 60%, rgba(0,0,0,.28)); }
+/* text messages: a stack beside the character's head, newest at the bottom, every bubble against his side (its sharp
+   corner points at him); received = grey, sent = blue */
+#texts { position: absolute; inset: 0; pointer-events: none; }
+.stack { position: absolute; display: flex; flex-direction: column; align-items: flex-start; gap: .5em; width: 42%; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+.stack.l { align-items: flex-end; }
+.sms { max-width: 84%; font-size: 2.1em; line-height: 1.25; font-weight: 500; padding: .42em .75em; border-radius: .95em; box-shadow: 0 .15em .5em rgba(0,0,0,.3); overflow-wrap: anywhere; border-bottom-left-radius: .3em; }
+.stack.l .sms { border-bottom-left-radius: .95em; border-bottom-right-radius: .3em; }
+.sms.in { background: #e9e9eb; color: #000; }
+.sms.out { background: #0a84ff; color: #fff; }
+.sms.fresh { animation: smsIn .32s ease-out backwards; }
+@keyframes smsIn { from { opacity: 0; transform: translateY(.7em) scale(.96); } }
 
 #ui { position: absolute; left: 7%; right: 7%; top: 53%; display: flex; flex-direction: column; gap: 1.4em; }
 #bubble { position: relative; background: var(--paper); border: .3em solid var(--rim); border-radius: 2em; padding: 2.4em 2.2em 1.9em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); }
@@ -137,6 +148,9 @@ body.watch #solo { display: none !important; }
 #poseCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2em; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
 #poseCard img { height: 76%; max-width: 90%; object-fit: contain; }
 #poseCard span { font-size: 2.4em; font-weight: 600; color: #f5f5f7; }
+/* home: the tiles scroll when there are more stories than fit (centred while they fit) */
+#hub { justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; }
+#hub .tiles { margin: auto 0; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
 .tiles > * { font: inherit; aspect-ratio: 1; box-sizing: border-box; display: flex; align-items: flex-start; padding: 2.4em; border: 0; border-radius: 2.6em; background: #1c1c1e; color: #f5f5f7; text-decoration: none; text-align: left; cursor: pointer; }
 .tiles span { font-size: 2.6em; font-weight: 600; letter-spacing: -.01em; }
@@ -169,19 +183,20 @@ body.watch #stage { cursor: default; }
 body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
 body.watch #choices button, body.watch .looks button { pointer-events: none; }
 #choices button.picked { background: var(--choice-hi); box-shadow: 0 0 0 .2em #fff; }
-@media (prefers-reduced-motion: reduce) { .actor.talk, .actor.pop img, #choices button, #hint { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .actor.talk, .actor.pop img, #choices button, #hint, .sms.fresh { animation: none; } }
 </style>
 
 <div id="stage">
-  <div id="world"><img id="bgimg" alt=""><div id="cast"></div><div id="front"></div></div>
+  <div id="world"><img id="bgimg" alt=""><div id="backdrop"></div><div id="cast"></div><div id="front"></div></div>
   <div id="shade"></div>
+  <div id="texts"></div>
   <div id="ui">
     <div id="bubble" hidden><div id="tag"></div><div id="tail"></div><div id="text"></div></div>
     <div id="choices" hidden></div>
   </div>
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
-  <div id="waitOther" hidden><span id="otherName"></span> choisit<i>.</i><i>.</i><i>.</i></div>
+  <div id="waitOther" hidden><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="black"></div>
   <div id="who" class="card menu">
     <form id="whoForm" class="ask">
@@ -191,8 +206,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="hub" class="card menu" hidden>
     <div class="tiles">
-      <button type="button" id="play"><span>Playthrough</span></button>
-      <button type="button" id="test1"><span>Test 1</span></button>
+      <button type="button" id="bar"><span>Last call</span></button>
+      <button type="button" id="play"><span>Le café</span></button>
+      <button type="button" id="test1"><span>Sous mon toit</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
       <a href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener"><span>Info</span></a>
     </div>
@@ -256,11 +272,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="chars.js"></script>
 <script src="story.js"></script>
 <script src="play.js"></script>
+<script src="bar.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
-const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), castEl = $('#cast'), frontEl = $('#front'),
+const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
-  black = $('#black'), caption = $('#caption'), hint = $('#hint');
+  black = $('#black'), caption = $('#caption'), hint = $('#hint'), textsEl = $('#texts');
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // camera height per framing, in standing heights of the framed people (it grows if they do not fit side by side),
@@ -270,17 +287,28 @@ const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3 };   // decor blur
 
 let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST = false, run = 0;
 let sc = null, actors = {}, camNow = null;
-// story: 't1' (chapter 1) or 'play' (2 players); f = what the choices decided (read by the story's `when` steps)
-const STORIES = { t1: STORY, play: PLAY };
-// seats = who took each Playthrough character in the waiting room: {pa: {id, n}, pb: {id, n}}
+// story: 't1' (chapter 1, solo) or a 2-player one ('play' = the café, 'bar' = Last call: they list their seats);
+// f = what the choices decided (read by the story's `when` steps)
+const STORIES = { t1: STORY, play: PLAY, bar: BAR };
+// seats = who took each character of a 2-player story in the waiting room: {pa: {id, n}, pb: {id, n}}
 const state = { name: 'Justin', seats: {}, story: 't1', f: {}, isa: ISA_LOOKS[0].sprite, picks: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
+const story = () => STORIES[state.story];
+const seatsOf = (id = state.story) => STORIES[id].seats || [];
+const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
-// {N} = the host, {PA} / {PB} = whoever took that character, any other {WORD} comes from the story (WORDS)
+// a 2-player story brings its own players (its cast), the rest of the cast is shared
+const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
+// {N} = the host, {PA} / {PB} = whoever took that character, any other {WORD} comes from the story (its words)
 const fill = (t) => t.replaceAll('{N}', state.name).replace(/\{P([AB])\}/g, (m, k) => seatName('p' + k.toLowerCase()))
-  .replace(/\{([A-Z]+)\}/g, (m, k) => (window.WORDS && WORDS[k] ? WORDS[k](state.f) : m));
-const spriteOf = (id) => (id === 'isa' ? state.isa : CAST[id].sprite);
-const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${pose}.webp`;
+  .replace(/\{([A-Z]+)\}/g, (m, k) => (story().words && story().words[k] ? story().words[k](state.f) : m));
+const spriteOf = (id) => (id === 'isa' ? state.isa : castOf(id).sprite);
+// a pose the character's sheet does not have yet plays as its stand-in (POSE_FALLBACK, from the stories), else listen
+const poseOf = (id, pose) => {
+  const has = SPRITES[spriteOf(id)].poses, alt = (window.POSE_FALLBACK || {})[pose];
+  return has[pose] ? pose : has[alt] ? alt : 'listen';
+};
+const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${poseOf(id, pose)}.webp`;
 
 function fit() {
   const bw = document.body.clientWidth, bh = document.body.clientHeight;
@@ -291,14 +319,14 @@ function fit() {
 
 // ---- people, in decor pixels ----
 function box(a) {
-  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[a.pose];
-  const ih = p[1] / sp.refH * a.h * (CAST[a.id].scale || 1);
+  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[poseOf(a.id, a.pose)];
+  const ih = p[1] / sp.refH * a.h * (castOf(a.id).scale || 1);
   return { w: p[0] / p[1] * ih, h: ih };
 }
 function placeActor(a) {
   const b = box(a);
   Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: a.x - b.w / 2 + 'px', top: a.feet - b.h + 'px', zIndex: Math.round(a.feet) });
-  const nat = FACE[spriteOf(a.id)][a.pose];
+  const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.pose)];
   a.el.firstChild.style.transform = a.face && nat !== 'f' && a.face !== nat ? 'scaleX(-1)' : '';
 }
 function enter(id, pose) {
@@ -316,19 +344,28 @@ function setPose(id, pose) {
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
 
-function setScene(id, cast) {
-  sc = SCENES[id]; actors = {}; castEl.innerHTML = ''; frontEl.innerHTML = '';
-  const [bw, bh] = sc.size;
-  bgImg.src = sc.image; Object.assign(bgImg.style, { width: bw + 'px', height: bh + 'px' });
-  Object.assign(world.style, { width: bw + 'px', height: bh + 'px' });
-  for (const [who, pose] of Object.entries(cast)) enter(who, pose);
-  for (const r of sc.front) {
+// a decor = a photo and/or rectangles behind the people (back) and in front of them (front), in decor px:
+// {x, y, w, h, color, r: radius (px or css), line: css border, glow: css shadow, blur}
+function rects(list, el) {
+  for (const r of list || []) {
     const d = document.createElement('div');
-    Object.assign(d.style, { position: 'absolute', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px',
-      background: r.color, borderRadius: (r.r || 0) + 'px', filter: r.blur ? `blur(${r.blur}px)` : '' });
-    frontEl.appendChild(d);
+    Object.assign(d.style, { position: 'absolute', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px', boxSizing: 'border-box',
+      background: r.color, borderRadius: typeof r.r === 'string' ? r.r : (r.r || 0) + 'px', border: r.line || '', boxShadow: r.glow || '',
+      filter: r.blur ? `blur(${r.blur}px)` : '' });
+    el.appendChild(d);
   }
+}
+function setScene(id, cast) {
+  sc = SCENES[id]; actors = {}; castEl.innerHTML = ''; frontEl.innerHTML = ''; backEl.innerHTML = '';
+  const [bw, bh] = sc.size;
+  bgImg.hidden = !sc.image;
+  if (sc.image) { bgImg.src = sc.image; Object.assign(bgImg.style, { width: bw + 'px', height: bh + 'px' }); }
+  Object.assign(world.style, { width: bw + 'px', height: bh + 'px' });
+  rects(sc.back, backEl);
+  for (const [who, pose] of Object.entries(cast)) enter(who, pose);
+  rects(sc.front, frontEl);
   frontEl.style.zIndex = 5000;
+  textsEl.innerHTML = '';
 }
 
 // ---- camera: a size + who to frame (or a point for wide shots) ----
@@ -358,8 +395,43 @@ function applyCam(c, ms) {
   world.style.transition = ms ? `transform ${ms}ms cubic-bezier(.45,0,.25,1)` : 'none';
   world.style.transform = `translate(${-f.left * s}px,${-f.top * s}px) scale(${s})`;
   const blur = (BLUR[c.size] || 0) * H / 800 / s;
-  bgImg.style.filter = blur ? `blur(${blur}px)` : 'none';
+  bgImg.style.filter = backEl.style.filter = blur ? `blur(${blur}px)` : 'none';
   camNow.frame = f;
+  drawTexts(ms);
+}
+
+// ---- text messages: {sms: {from, to, text}} stacks the message beside both phones' owners (sent beside the sender,
+// received beside the receiver), the last 3, wherever they are on screen; they stay for the rest of the story ----
+let texts = {};
+function textMsg(m) {
+  const t = fill(m.text);
+  (texts[m.from] = texts[m.from] || []).push({ t, out: true, fresh: true });
+  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true });
+  drawTexts();
+}
+function drawTexts(wait = 0) {
+  clearTimeout(drawTexts.t); textsEl.innerHTML = '';
+  if (wait && !FAST) { drawTexts.t = setTimeout(drawTexts, wait); return; }   // the camera is moving: once it lands
+  const f = camNow && camNow.frame; if (!f) return;
+  const s = H / f.camH;
+  for (const a of Object.values(actors)) {
+    const list = (texts[a.id] || []).slice(-3); if (!list.length) continue;
+    const b = box(a), x = (a.x - f.left) * s;
+    if (x < 0 || x > W) continue;
+    const st = document.createElement('div'); st.className = 'stack';
+    // beside him, on the side of the frame with more room; the bottom of the stack at his chest (below the faces of
+    // whoever stands next to him)
+    const gap = b.w * s * 0.2;
+    if (x < W / 2) st.style.left = Math.min(x + gap, W * 0.56) + 'px';
+    else { st.style.right = Math.min(W - x + gap, W * 0.56) + 'px'; st.classList.add('l'); }
+    const chest = (a.feet - b.h * 0.6 - f.top) * s;
+    st.style.bottom = H - Math.min(Math.max(chest, H * 0.2), H * 0.5) + 'px';
+    for (const m of list) {
+      const d = document.createElement('div'); d.className = `sms ${m.out ? 'out' : 'in'}${m.fresh ? ' fresh' : ''}`;
+      d.textContent = m.t; st.appendChild(d); m.fresh = false;
+    }
+    textsEl.appendChild(st);
+  }
 }
 function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; applyCam({ ...c, frame: null }, ms); }
 
@@ -372,14 +444,16 @@ function typeText(t) {
   typing = setInterval(() => { textEl.textContent = t.slice(0, ++i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
 }
 // a story that stages itself (STORY.gaze): when someone speaks, the others stop their talking gesture and turn to them,
-// and the speaker turns to whom they talk to (s.to, else whoever spoke last)
+// and the speaker turns to whom they talk to (s.to, else whoever spoke last). Someone `aside` (a stranger in the back)
+// keeps looking where the story put him
 let lastSpeaker = null;
+const REST = () => ({ explaining: 'listen', ...(window.POSE_REST || {}) });
 function gaze(s) {
   const sp = actors[s.say];
   if (!sp) return;
   if (!s.whisper) for (const a of Object.values(actors)) {
-    if (a === sp) continue;
-    if (a.pose === 'explaining') setPose(a.id, 'listen');
+    if (a === sp || castOf(a.id).aside) continue;
+    const rest = REST()[a.pose]; if (rest) setPose(a.id, rest);
     if (a.x !== sp.x) { a.face = sp.x < a.x ? 'l' : 'r'; placeActor(a); }
   }
   const to = actors[s.to || lastSpeaker];
@@ -388,15 +462,15 @@ function gaze(s) {
 }
 function line(s) {
   const who = s.say || s.think || null, kind = s.narr ? 'narr' : s.think ? 'think' : s.whisper ? 'whisper' : 'say';
-  if (s.say && STORIES[state.story].gaze) gaze(s);
+  if (s.say && story().gaze) gaze(s);
   if (s.say && s.pose) setPose(s.say, s.pose);
   bubble.className = kind;
   tagEl.hidden = !who;
   if (who) {
     tagEl.innerHTML = '';
-    tagEl.append(fill(CAST[who].name));
+    tagEl.append(fill(castOf(who).name));
     if (kind !== 'say') { const sm = document.createElement('small'); sm.textContent = kind === 'think' ? 'pense' : 'chuchote'; tagEl.append(sm); }
-    tagEl.style.background = CAST[who].color;
+    tagEl.style.background = castOf(who).color;
   }
   // the tail points at the speaker if the camera sees them
   const a = who && actors[who], f = camNow && camNow.frame;
@@ -408,19 +482,21 @@ function line(s) {
   typeText(fill(s.text || s.narr));
   if (firstLine) { hint.hidden = false; firstLine = false; }
 }
-let options = null, optionsBy = 'p1';
-// each choice belongs to a character (by = its seat; none = the host's, as in chapter 1). If whoever took it left,
-// the host makes the choice so the story never gets stuck
+let options = null, optionsBy = 'p1', optionsLane = null;
+// each choice belongs to a character (by = its seat; none = the host's, as in chapter 1, or in a split the seat whose
+// scene it is). If whoever took it left, the host makes the choice so the story never gets stuck
 const ownerOf = (by) => (by && state.seats[by] ? state.seats[by].id : ROLE === 'host' ? myId : hostId);
 const seated = () => Object.values(state.seats).some((s) => s.id === myId);
 const mineFor = (by) => { const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
-// a Playthrough player whose turn it is not stays on the shot they were on, with "<name> choisit…" at the bottom
-const waitsFor = (by) => state.story === 'play' && seated() && !mineFor(by);
+// a 2-player story's player whose turn it is not stays on the shot they were on, with "<name> choisit…" at the bottom
+const waitsFor = (by) => duo() && seated() && !mineFor(by);
+const byOf = (s) => s.by || laneNow;
 let held = [];   // the steps that lead into the other player's choice: they run once that player has picked
+function waitNote(t) { $('#waitText').textContent = t; $('#waitOther').hidden = !t; }
 function choose(opts, by) {
-  options = opts; optionsBy = by; choicesEl.innerHTML = '';
+  options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = '';
   const mine = mineFor(by);
-  if (waitsFor(by)) { choicesEl.hidden = true; $('#otherName').textContent = seatName(by); $('#waitOther').hidden = false; }
+  if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(by)} choisit`); }
   else choicesEl.hidden = false;
   opts.forEach((o, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = fill(o.t);
@@ -429,7 +505,7 @@ function choose(opts, by) {
       e.stopPropagation();
       if (!mine || waiting !== 'choice') return;
       if (ROLE === 'host') pickChoice(i);
-      else if (!choicesEl.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i); }
+      else if (!choicesEl.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
     };
     choicesEl.appendChild(b);
     if (i === 0 && ROLE === 'host' && mine && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
@@ -438,11 +514,11 @@ function choose(opts, by) {
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
   const o = options && options[i]; if (!o || waiting !== 'choice') return;
-  record('c' + i);
+  record('c' + i + tag(optionsLane));
   const by = optionsBy;
   const go = () => {
     state.picks.push({ ...o, by }); if (o.set) Object.assign(state.f, o.set);
-    choicesEl.hidden = true; $('#waitOther').hidden = true;
+    choicesEl.hidden = true; waitNote('');
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
   if ((ROLE === 'watch' || afar) && !FAST && !choicesEl.hidden && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
@@ -510,7 +586,7 @@ const CUSTOM = {
 // the end card: chapter 1's own text, or the story's ({end: {kicker, title, lede}}); a 2-player story names who chose what
 const END0 = { kicker: $('#endKicker').textContent, title: $('#endTitle').textContent, lede: $('#endLede').textContent };
 function endCard(d) {
-  const e = typeof d === 'object' ? d : END0, two = state.story === 'play';
+  const e = typeof d === 'object' ? d : END0, two = duo();
   bubble.hidden = true;
   $('#endKicker').textContent = fill(e.kicker || ''); $('#endTitle').textContent = fill(e.title || '');
   $('#endLede').textContent = fill(e.lede || ''); $('#endLede').hidden = !e.lede;
@@ -522,19 +598,78 @@ function endCard(d) {
     const i = document.createElement('i'); i.textContent = p.intent; li.append(i);
     ul.appendChild(li);
   }
-  $('#credits').textContent = CREDITS;
-  $('#end .art').style.backgroundImage = `url(${e.art || 'bg/salon.jpg'})`;
+  $('#credits').textContent = story().credits ?? CREDITS;
+  $('#end .art').style.backgroundImage = e.art === null ? 'none' : `url(${e.art || 'bg/salon.jpg'})`;   // null = plain black
   show('#end');
+}
+
+// ---- a split ({split: f => ({pa: steps, pb: steps}), watch: f => seat, hold: f => ({seat: text})}): each player
+// plays his own scene on his own phone at the same time and never sees the other one. This phone shows its player's
+// scene; the other one runs here as a "ghost" (its taps, choices and texts, no picture). Solo plays the scenes one after
+// the other; a spectator shows the `watch` seat. Taps in a split carry their seat ('a@pb', 'c1@pa'). The story goes on
+// together once both scenes are over; whoever is done first waits on his last shot with the `hold` line ----
+let split = null;     // {view: the seat shown here (null = all, one after the other), ghosts: {seat: ghost}, hold}
+let laneNow = null;   // the seat whose scene the screen is playing (null outside a split)
+const tag = (lane) => (lane ? '@' + lane : '');
+const laneCount = (list, lane) => list.filter((e) => String(e).endsWith('@' + lane)).length;
+function startSplit(s) {
+  const lanes = s.split(state.f), seats = Object.keys(lanes);
+  const mine = seats.filter((k) => state.seats[k] && state.seats[k].id === myId);
+  const view = mine.length === 1 ? mine[0] : mine.length ? null : s.watch ? s.watch(state.f) : seats[0];
+  const shown = view ? [view] : seats;
+  split = { view, ghosts: {}, hold: s.hold ? s.hold(state.f) : {} };
+  q.unshift(...shown.flatMap((k) => [{ lane: k }, ...lanes[k]]), { join: true });
+  for (const k of seats) if (!shown.includes(k)) split.ghosts[k] = { seat: k, q: lanes[k].slice(), waiting: null, options: null, done: false };
+  for (const g of Object.values(split.ghosts)) ghostRun(g);
+}
+const joined = () => !split || Object.values(split.ghosts).every((g) => g.done);
+function ghostRun(g) {
+  while (g.q.length) {
+    const s = g.q.shift();
+    if (s.when) g.q.unshift(...(s.when(state.f) ? s.then : s.else || []));
+    else if (s.fn) g.q.unshift(...s.fn(state.f));
+    else if (s.set) Object.assign(state.f, s.set);
+    else if (s.sms) textMsg(s.sms);
+    else if (s.say || s.narr || s.think) { g.waiting = 'click'; autoGhost(g); return; }
+    else if (s.choice) { g.waiting = 'choice'; g.options = s.choice; autoGhost(g); return; }
+  }
+  g.done = true; g.waiting = null;
+  if (waiting === 'join' && joined()) { split = null; waiting = null; waitNote(''); next(); }
+}
+function ghostTap(g) {
+  if (g.waiting !== 'click') return;
+  record('a@' + g.seat); g.waiting = null; ghostRun(g);
+}
+function ghostPick(g, i) {
+  const o = g.options && g.options[i]; if (!o || g.waiting !== 'choice') return;
+  record(`c${i}@${g.seat}`);
+  state.picks.push({ ...o, by: g.seat }); if (o.set) Object.assign(state.f, o.set);
+  g.waiting = null; g.q.unshift(...o.then); ghostRun(g);
+}
+// the host plays a ghost scene whose player left (first option, a tap every 1.6 s), so the story never gets stuck
+function autoGhost(g) {
+  if (ROLE !== 'host' || !g.waiting) return;
+  const o = ownerOf(g.seat); if (o === myId || watchers.has(o)) return;
+  clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, 0)), 1600);
 }
 
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
 async function next() {
   const r = run;
   const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
-  if (k > 0 && q[k].choice && waitsFor(q[k].by)) held = q.splice(0, k);
+  if (k > 0 && q[k].choice && waitsFor(byOf(q[k]))) held = q.splice(0, k);
   while (q.length && r === run) {
     const s = q.shift();
     if (s.when) q.unshift(...(s.when(state.f) ? s.then : s.else || []));
+    else if (s.fn) q.unshift(...s.fn(state.f));
+    else if (s.split) startSplit(s);
+    else if (s.lane) laneNow = s.lane;
+    else if (s.join) {
+      laneNow = null;
+      if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); return; }
+      split = null;
+    }
+    else if (s.sms) textMsg(s.sms);
     else if (s.set) Object.assign(state.f, s.set);
     else if (s.scene) setScene(s.scene, s.cast);
     else if (s.cam) setCam({ size: s.cam, who: s.who, at: s.at });
@@ -549,22 +684,25 @@ async function next() {
     else if (s.wait) await sleep(s.wait);
     else if (s.custom) await CUSTOM[s.custom]();
     else if (s.say || s.narr || s.think) { line(s); waiting = 'click'; return; }
-    else if (s.choice) { choose(s.choice, s.by); waiting = 'choice'; return; }
+    else if (s.choice) { choose(s.choice, byOf(s)); waiting = 'choice'; return; }
     else if (s.end) { endCard(s.end); return; }
   }
 }
 
 function advance() {
   if (ROLE === 'watch') {
-    // in the Playthrough the two players move the story; the host checks the tap is for the line it is on
-    if (!seated() || state.story !== 'play') return;
+    // in a 2-player story the two players move the story (in a split, each his own scene); the host checks the tap is
+    // for the line it is on (its count of taps so far, or of this scene's taps)
+    if (!seated() || !duo()) return;
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
-    if (waiting === 'click' && remote && applied === remote.t.length && sentK !== applied) { sentK = applied; sendIn('a'); }
+    if (waiting !== 'click' || !remote || applied !== remote.t.length || (laneNow && !mineFor(laneNow))) return;
+    const k = laneNow ? laneCount(remote.t, laneNow) : applied, key = tag(laneNow) + k;
+    if (sentK !== key) { sentK = key; sendIn('a', laneNow ? { lane: laneNow, k } : {}); }
     return;
   }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
-  if (waiting !== 'click') return;
-  record('a'); waiting = null; hint.hidden = true; next();
+  if (waiting !== 'click' || (laneNow && !mineFor(laneNow))) return;
+  record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next();
 }
 stage.addEventListener('click', (e) => { if (!e.target.closest('.card')) advance(); });
 addEventListener('keydown', (e) => {
@@ -583,15 +721,22 @@ function show(id) {
   document.body.classList.toggle('home', id === '#hub');
   $('#back').hidden = ROLE !== 'host' || !UP[id];
 }
-function halt() { run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true; $('#waitOther').hidden = true; $('#looks').hidden = true; }
+function halt() {
+  run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
+  waitNote(''); $('#looks').hidden = true; endSplit();
+}
+function endSplit() {
+  if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
+  split = null; laneNow = null; texts = {}; textsEl.innerHTML = '';
+}
 
 function begin(id = state.story) {
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
-  held = []; lastSpeaker = null; $('#waitOther').hidden = true;
-  firstLine = id === 't1';   // the "tap to continue" hint is chapter 1's; the Playthrough has none
+  held = []; lastSpeaker = null; waitNote(''); endSplit();
+  firstLine = id === 't1';   // the "tap to continue" hint is chapter 1's; the 2-player stories have none
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
-  if (id !== 'play') state.seats = {};
+  if (!seatsOf(id).length) state.seats = {};
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
   next();
 }
@@ -602,23 +747,23 @@ function toHub() {
   waitRoom = false; state.seats = {}; game = null; tape = []; share();
 }
 
-// ---- Playthrough waiting room: a dot over each character, red = free, green = taken (the name above it).
+// ---- a 2-player story's waiting room: a dot over each character, red = free, green = taken (the name above it).
 // Tap a free one to take it (it frees the one you had), tap yours to let it go. Two taken = the story starts ----
 let waitRoom = false;   // host: the waiting room is open
-function openWait() {
-  // another phone's waiting room is open: join it instead of opening a second one
-  if (openRoom && openRoom.room !== room && Date.now() - openRoom.t < 30000) { joinRoom(openRoom.room); return; }
-  halt(); waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); announce(true);
+function openWait(id) {
+  // another phone's waiting room for this story is open: join it instead of opening a second one
+  if (openRoom && openRoom.room !== room && (openRoom.s || 'play') === id && Date.now() - openRoom.t < 30000) { joinRoom(openRoom.room); return; }
+  halt(); state.story = id; waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); announce(true);
 }
 function renderWait() {
   show('#wait');
   const list = $('#seatList'); list.innerHTML = '';
-  for (const k of PLAY_SEATS) {
+  for (const k of seatsOf()) {
     const s = state.seats[k], b = document.createElement('button'); b.type = 'button';
     if (s) b.classList.add('on');
     const who = document.createElement('span'); who.className = 'who'; who.textContent = s ? s.n : '';
     const dot = document.createElement('span'); dot.className = 'dot';
-    const img = new Image(); img.alt = ''; img.src = `chars/${CAST[k].sprite}/listen.webp`;
+    const img = new Image(); img.alt = ''; img.src = `chars/${castOf(k).sprite}/listen.webp`;
     b.append(who, dot, img);
     b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') takeSeat(k, myId, state.name); else sendIn('seat', { s: k }); };
     list.appendChild(b);
@@ -627,23 +772,23 @@ function renderWait() {
 // solo: you play every character nobody took (the first one gets your name, the other its own)
 function playSolo() {
   if (!waitRoom) return;
-  let me = PLAY_SEATS.find((k) => state.seats[k] && state.seats[k].id === myId);
-  for (const k of PLAY_SEATS) if (!state.seats[k]) { state.seats[k] = { id: myId, n: me ? SEAT_NAMES[k] : state.name }; me = me || k; }
-  clearTimeout(takeSeat.t); begin('play');
+  let me = seatsOf().find((k) => state.seats[k] && state.seats[k].id === myId);
+  for (const k of seatsOf()) if (!state.seats[k]) { state.seats[k] = { id: myId, n: me ? story().solo[k] : state.name }; me = me || k; }
+  clearTimeout(takeSeat.t); begin();
 }
 $('#solo').onclick = (e) => { e.stopPropagation(); playSolo(); };
 function takeSeat(k, id, n) {
-  if (!waitRoom || !PLAY_SEATS.includes(k)) return;
+  if (!waitRoom || !seatsOf().includes(k)) return;
   const s = state.seats[k];
   if (s && s.id === id) delete state.seats[k];
   else if (!s) {
-    for (const j of PLAY_SEATS) if (state.seats[j] && state.seats[j].id === id) delete state.seats[j];
+    for (const j of seatsOf()) if (state.seats[j] && state.seats[j].id === id) delete state.seats[j];
     state.seats[k] = { id, n: String(n || 'Kev').slice(0, 16) };
   } else return;
   renderWait(); share();
   clearTimeout(takeSeat.t);
-  const full = () => PLAY_SEATS.every((j) => state.seats[j]);
-  if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin('play'); }, 900);
+  const full = () => seatsOf().every((j) => state.seats[j]);
+  if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin(); }, 900);
 }
 $('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -653,7 +798,8 @@ $('#whoForm').addEventListener('submit', (e) => {
   if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); }
   else { myName = v || 'Kev'; show('#lobby'); goLive(); }
 });
-$('#play').onclick = (e) => { e.stopPropagation(); openWait(); };
+$('#play').onclick = (e) => { e.stopPropagation(); openWait('play'); };
+$('#bar').onclick = (e) => { e.stopPropagation(); openWait('bar'); };
 $('#test1').onclick = (e) => { e.stopPropagation(); show('#cover'); };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); show('#about3d'); };
@@ -732,7 +878,7 @@ function roomCode() {
 function share() {
   if (ROLE !== 'host' || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? 'play' : null, seats: state.seats, t: tape }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
 
@@ -742,7 +888,7 @@ const OPEN = 'sousmontoit/v1/open';
 let openRoom = null;   // the last announcement heard: {room, n, t}
 function announce(on) {
   if (ROLE !== 'host' || !live || !live.connected) return;
-  if (on) live.publish(OPEN, JSON.stringify({ room, n: state.name, t: Date.now() }), { retain: true });
+  if (on) live.publish(OPEN, JSON.stringify({ room, s: state.story, n: state.name, t: Date.now() }), { retain: true });
   else if (openRoom && openRoom.room === room) live.publish(OPEN, '', { retain: true });
 }
 function joinRoom(r) {
@@ -760,19 +906,27 @@ function countEyes() {
   $('#eyes span').textContent = watchers.size;
   $('#eyes').hidden = !watchers.size;
   let changed = false;
-  if (waitRoom) for (const k of PLAY_SEATS) { const s = state.seats[k]; if (s && s.id !== myId && !watchers.has(s.id)) { delete state.seats[k]; changed = true; } }
+  if (waitRoom) for (const k of seatsOf()) { const s = state.seats[k]; if (s && s.id !== myId && !watchers.has(s.id)) { delete state.seats[k]; changed = true; } }
   if (changed) renderWait();
+  if (split) for (const g of Object.values(split.ghosts)) autoGhost(g);   // a player left in the middle of his scene
   const now2 = [...watchers.values()].map((w) => w.n).join('|');
   if (changed || now2 !== heard) { heard = now2; share(); }
 }
 function fromJoiner(m) {
   if (m.e === 'seat') { const w = watchers.get(m.id); takeSeat(m.s, m.id, (w && w.n) || m.n); return; }
   if (!game || m.g !== game || !Object.values(state.seats).some((s) => s.id === m.id)) return;
+  // in a split, a player's tap goes to his scene: a ghost here, or the scene this phone shows (a host who watches)
+  const g = m.lane && split && split.ghosts[m.lane];
+  if (m.lane && ownerOf(m.lane) !== m.id) return;
   if (m.e === 'a') {
-    if (m.k !== tape.length) return;
+    if (g) { if (m.k === laneCount(tape, m.lane)) ghostTap(g); return; }
+    if (m.lane ? m.lane !== laneNow || m.k !== laneCount(tape, m.lane) : m.k !== tape.length) return;
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
-    if (waiting === 'click') { record('a'); waiting = null; hint.hidden = true; next(); }
-  } else if (/^c\d$/.test(m.e) && ownerOf(optionsBy) === m.id) pickChoice(+m.e.slice(1), true);
+    if (waiting === 'click') { record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
+  } else if (/^c\d$/.test(m.e)) {
+    if (g) ghostPick(g, +m.e.slice(1));
+    else if (ownerOf(optionsBy) === m.id) pickChoice(+m.e.slice(1), true);
+  }
 }
 function sendIn(e, more) {
   if (live && live.connected) live.publish(`${topic()}/in`, JSON.stringify({ id: myId, n: myName, g: remote ? remote.g : null, k: applied, e, ...more }), { qos: 1 });
@@ -831,7 +985,7 @@ function follow(msg) {
   hostId = msg && msg.h;
   if (!msg || !msg.g) {
     remote = null;
-    if (msg && msg.w === 'play') { if (screen !== '#wait') halt(); state.seats = msg.seats || {}; renderWait(); }
+    if (msg && STORIES[msg.w]) { if (screen !== '#wait') halt(); state.story = msg.w; state.seats = msg.seats || {}; renderWait(); }
     else toLobby(msg || {});
     return;
   }
@@ -851,12 +1005,17 @@ async function pump() {
   if (pumping) return;
   pumping = true;
   while (remote && applied < remote.t.length) {
-    const g = remote.g, ev = String(remote.t[applied]);
+    const g = remote.g, [ev, lane] = String(remote.t[applied]).split('@');
     FAST = remote.t.length - applied > 2;
-    await until(() => !remote || remote.g !== g || (ev === 'a' ? waiting === 'click' : ev[0] === 'c' ? waiting === 'choice' : !!lookDone));
+    // a tap of the other player's scene goes to its ghost; one of the scene shown here waits for that scene's line
+    const ghost = () => lane && split && split.ghosts[lane];
+    const ready = (w) => (ev === 'a' ? w === 'click' : ev[0] === 'c' ? w === 'choice' : !!lookDone);
+    await until(() => !remote || remote.g !== g || (ghost() ? ready(ghost().waiting) : ready(waiting) && (!lane || laneNow === lane)));
     if (!remote || remote.g !== g) break;
     applied++;
-    if (ev === 'a') { clearInterval(typing); typing = null; textEl.textContent = typingFull; waiting = null; next(); }
+    const gh = ghost();
+    if (gh) { if (ev === 'a') ghostTap(gh); else ghostPick(gh, +ev.slice(1)); }
+    else if (ev === 'a') { clearInterval(typing); typing = null; textEl.textContent = typingFull; waiting = null; next(); }
     else if (ev[0] === 'c') pickChoice(+ev.slice(1));
     else if (ev[0] === 'l') pickLook(+ev.slice(1));
   }
@@ -869,12 +1028,12 @@ async function pump() {
 async function skipTo(n, id) {
   const tick = () => new Promise((r) => setTimeout(r, 0));
   FAST = true;
-  if (id === 'play') state.seats = { pa: { id: myId, n: state.name }, pb: { id: myId, n: 'Kev' } };   // a jump plays both
+  if (seatsOf(id).length) state.seats = { pa: { id: myId, n: state.name }, pb: { id: myId, n: 'Kev' } };   // a jump plays both
   begin(id);
   for (let k = 0; k < n; k++) {
     for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
     if (!$('#end').hidden) break;
-    if (!$('#looks').hidden) { $('#lookGo').click(); continue; }
+    if (!$('#looks').hidden) { $('#lookGo').click(); await tick(); continue; }   // let the card close before the next tap
     if (waiting === 'choice') choicesEl.querySelector('button').click();
     else advance();
   }
@@ -889,10 +1048,10 @@ try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /*
 fit();
 if (ROLE === 'host') goLive();
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
-const jump = location.hash.match(/^#([tp])(\d+)$/);
-if (jump) skipTo(+jump[2], jump[1] === 'p' ? 'play' : 't1');
+const jump = location.hash.match(/^#([tpb])(\d+)$/);
+if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
 // warm the cache so cuts never flash
-for (const s of Object.values(SCENES)) new Image().src = s.image;
+for (const s of Object.values(SCENES)) if (s.image) new Image().src = s.image;
 for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = `chars/${id}/${pose}.webp`;
 </script>
 </body>

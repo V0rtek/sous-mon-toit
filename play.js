@@ -1,13 +1,7 @@
 // Playthrough — 2 joueurs, ~2 min. Dans la salle d'attente, chacun prend un perso : pa (le gars urbain) ou pb (le lion) ;
 // {PA} / {PB} = le nom de celui qui l'a pris. Chaque choix appartient à un perso (by) ; la fin dépend des deux.
 
-window.PLAY_SEATS = ['pa', 'pb'];
-window.SEAT_NAMES = { pa: 'Alex', pb: 'Kev' };   // the character's name when you play it in solo on top of your own
-Object.assign(CAST, {
-  pa: { name: '{PA}', color: '#1f7a74', sprite: 'justin' },
-  pb: { name: '{PB}', color: '#d0632a', sprite: 'candy', scale: 0.93 },
-  rocco: { name: 'Rocco', color: '#5a2d8c', sprite: 'amare', scale: 1.04 },
-});
+CAST.rocco = { name: 'Rocco', color: '#5a2d8c', sprite: 'amare', scale: 1.04 };
 // the friends' table (same café as chapter 1); outside = the same photo, no table, face to face
 SCENES.cafe = {
   image: 'bg/terrasse.jpg', size: [1920, 1440],
@@ -23,11 +17,6 @@ SCENES.dehors = {
 };
 
 const FOOD = { poutine: ['la poutine', 'MA POUTINE'], brocoli: ['le poulet-brocoli', 'MON POULET'], shake: ['le shake', 'MON SHAKE'] };
-window.WORDS = {
-  FOOD: (f) => (FOOD[f.food] || FOOD.poutine)[0],
-  MYFOOD: (f) => (FOOD[f.food] || FOOD.poutine)[1],
-  TITLE: (f) => f.title || 'Fin',
-};
 // a fight goes outside: same photo, face to face. pb = how the lion stands in it (backs his friend up or films)
 const outside = (pb, ...steps) => [
   { fade: 'out', ms: 250 },
@@ -162,4 +151,15 @@ window.PLAY = [
   { end: { kicker: 'Fin', title: '{TITLE}', art: 'bg/terrasse.jpg' } },
 ];
 // this story stages itself: listeners turn to the speaker and stop gesturing (see line() in index.html)
-window.PLAY.gaze = true;
+PLAY.gaze = true;
+PLAY.seats = ['pa', 'pb'];
+PLAY.solo = { pa: 'Alex', pb: 'Kev' };   // the other character's name when you play both
+PLAY.cast = {
+  pa: { name: '{PA}', color: '#1f7a74', sprite: 'justin' },
+  pb: { name: '{PB}', color: '#d0632a', sprite: 'candy', scale: 0.93 },
+};
+PLAY.words = {
+  FOOD: (f) => (FOOD[f.food] || FOOD.poutine)[0],
+  MYFOOD: (f) => (FOOD[f.food] || FOOD.poutine)[1],
+  TITLE: (f) => f.title || 'Fin',
+};
