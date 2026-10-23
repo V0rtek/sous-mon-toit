@@ -16,13 +16,15 @@ window.POSE_REST = { drunk_talk: 'drunk_listen', drunk_happy: 'drunk_listen', dr
 // the stand-in is a recolour: same sheet, so same facing
 Object.assign(FACE, { james_noir: FACE.james });
 GALLERY.push({ sprite: 'james_noir', name: 'Stranger', recolor: 'james' });
-// Brooke: his first sheet (bar, 23/10) from his photo; what it doesn't have yet plays with his closest pose
-FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'f', texting: 'f', thinking: 'r' };
+// Brooke: 2 sheets from his photo (23/10): the bar one, then the bathroom one (which also redid his happy and sad,
+// subtler); what he doesn't have yet plays with his closest pose
+FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
+  pee: 'f', pee_relief: 'f', pee_look: 'r' };
 window.POSE_ALIAS = { brooke: {
   listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
-  drunk_flirt: 'drunk_talk', pee: 'drunk_sad', pee_relief: 'drunk_listen', pee_look: 'drunk_listen', phone_shock: 'texting',
+  drunk_flirt: 'drunk_point', phone_shock: 'texting',
 } };
-GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar'] });
+GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] });
 
 // ---------- decors, rectangles only (decor px) ----------
 const R = (x, y, w, h, color, more) => ({ x, y, w, h, color, ...more });
@@ -443,7 +445,7 @@ window.BAR = [
     ] },
     { t: 'Cheers to nothing.', intent: 'with him', then: [
       say('pa', 'drunk_happy', 'Cheers to nothing tomorrow.', { to: 'pb' }),
-      one('pb'), say('pb', 'drunk_happy', 'THAT’S my brother.', { to: 'pa' }),
+      one('pb'), say('pb', 'drunk_point', 'THAT’S my brother.', { to: 'pa' }),
       one('cam'), say('cam', 'amused', 'You two are gonna die in this bar.', { to: 'pa' }),
     ] },
   ] },
@@ -480,7 +482,7 @@ window.BAR = [
   say('pb', 'drunk_flirt', 'Yeah. Just…', { to: 'cam' }),
   one('cam'), { poses: { cam: 'awkward' } }, hush(1600),
   one('pb'), { poses: { pb: 'drunk_sad' } }, hush(1000),
-  say('pb', 'drunk_sad', '…I gotta pee.'),
+  say('pb', 'drunk_sad', '…I gotta pee.', { to: 'cam' }),
   { exit: 'pb' }, { aside: { pa: false } },
   // from here to the end, each one plays his own scene on his own phone and only sees what his character sees;
   // a spectator follows Brooke; solo plays the counter up to "twenty minutes later", then Brooke, then the end
