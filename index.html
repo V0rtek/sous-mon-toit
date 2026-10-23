@@ -549,19 +549,24 @@ function begin(id = state.story) {
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
   if (id !== 'play') state.seats = {};
-  if (ROLE === 'host') { waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
+  if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
   next();
 }
 // leaving a story or the waiting room sends the joiners back to the lobby
 function toHub() {
   halt(); show('#hub');
+  if (waitRoom) announce(false);
   waitRoom = false; state.seats = {}; game = null; tape = []; share();
 }
 
 // ---- Playthrough waiting room: a dot over each character, red = free, green = taken (the name above it).
 // Tap a free one to take it (it frees the one you had), tap yours to let it go. Two taken = the story starts ----
 let waitRoom = false;   // host: the waiting room is open
-function openWait() { halt(); waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); }
+function openWait() {
+  // another phone's waiting room is open: join it instead of opening a second one
+  if (openRoom && openRoom.room !== room && Date.now() - openRoom.t < 30000) { joinRoom(openRoom.room); return; }
+  halt(); waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); announce(true);
+}
 function renderWait() {
   show('#wait');
   const list = $('#seatList'); list.innerHTML = '';
@@ -673,6 +678,20 @@ function share() {
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
 
+// no QR needed for the Playthrough: an open waiting room is announced under sousmontoit/v1/open (refreshed every 10 s,
+// cleared when it closes); a phone that taps Playthrough while another one's room is open joins that room
+const OPEN = 'sousmontoit/v1/open';
+let openRoom = null;   // the last announcement heard: {room, n, t}
+function announce(on) {
+  if (ROLE !== 'host' || !live || !live.connected) return;
+  if (on) live.publish(OPEN, JSON.stringify({ room, n: state.name, t: Date.now() }), { retain: true });
+  else if (openRoom && openRoom.room === room) live.publish(OPEN, '', { retain: true });
+}
+function joinRoom(r) {
+  try { sessionStorage.setItem('smt-auto', '1'); } catch { /* private window */ }
+  location.href = `${location.pathname}?watch=${r}`;
+}
+
 // joiners keep a retained presence under <topic>/w/ ({t: time, n: name, j: joined}, refreshed every 10 s); the broker
 // clears it when they drop (will), and the host forgets anyone silent for 35 s (and frees their character in the waiting room)
 const watchers = new Map();
@@ -709,7 +728,7 @@ async function goLive() {
   live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
     will: ROLE === 'watch' ? { topic: seat, payload: '', retain: true, qos: 0 } : undefined });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`]); }
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, OPEN]); if (waitRoom) announce(true); }
     else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
@@ -718,6 +737,7 @@ async function goLive() {
     addEventListener('pagehide', () => { if (live.connected) live.publish(seat, '', { retain: true }); });
   } else {
     live.on('message', (t, buf, packet) => {
+      if (t === OPEN) { try { openRoom = buf.length ? JSON.parse(buf.toString()) : null; } catch { openRoom = null; } return; }
       if (t === `${topic()}/in`) { try { fromJoiner(JSON.parse(buf.toString())); } catch { /* not ours */ } return; }
       const id = t.split('/w/')[1];
       if (!id) return;
@@ -732,6 +752,8 @@ async function goLive() {
       countEyes();
     });
     setInterval(countEyes, 5000);
+    setInterval(() => { if (waitRoom) announce(true); }, 10000);
+    addEventListener('pagehide', () => { if (waitRoom) announce(false); });
   }
 }
 
@@ -803,9 +825,12 @@ async function skipTo(n, id) {
 
 addEventListener('resize', fit);
 if (ROLE === 'watch') document.body.classList.add('watch');
+let auto = false;
+try { auto = ROLE === 'watch' && sessionStorage.getItem('smt-auto') === '1'; sessionStorage.removeItem('smt-auto'); } catch { /* private window */ }
 try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /* private window */ }
 fit();
 if (ROLE === 'host') goLive();
+else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 const jump = location.hash.match(/^#([tp])(\d+)$/);
 if (jump) skipTo(+jump[2], jump[1] === 'p' ? 'play' : 't1');
 // warm the cache so cuts never flash
