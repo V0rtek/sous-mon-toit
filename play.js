@@ -2,6 +2,7 @@
 // {PA} / {PB} = le nom de celui qui l'a pris. Chaque choix appartient à un perso (by) ; la fin dépend des deux.
 
 window.PLAY_SEATS = ['pa', 'pb'];
+window.SEAT_NAMES = { pa: 'Alex', pb: 'Kev' };   // the character's name when you play it in solo on top of your own
 Object.assign(CAST, {
   pa: { name: '{PA}', color: '#1f7a74', sprite: 'justin' },
   pb: { name: '{PB}', color: '#d0632a', sprite: 'candy', scale: 0.93 },

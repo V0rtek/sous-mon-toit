@@ -106,6 +106,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .seats .dot { width: 3.6em; height: 3.6em; border-radius: 50%; background: #ff3b30; transition: background .2s; }
 .seats .on .dot { background: #34c759; }
 .seats img { height: 44em; max-width: 100%; object-fit: contain; }
+#solo { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); padding: .7em 1.6em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; }
+body.watch #solo { display: none !important; }
 #gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
@@ -188,7 +190,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
-  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div></div>
+  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button></div>
   <div id="gallery" class="card menu" hidden>
     <div class="grid3" id="galList"></div>
   </div>
@@ -608,6 +610,14 @@ function renderWait() {
     list.appendChild(b);
   }
 }
+// solo: you play every character nobody took (the first one gets your name, the other its own)
+function playSolo() {
+  if (!waitRoom) return;
+  let me = PLAY_SEATS.find((k) => state.seats[k] && state.seats[k].id === myId);
+  for (const k of PLAY_SEATS) if (!state.seats[k]) { state.seats[k] = { id: myId, n: me ? SEAT_NAMES[k] : state.name }; me = me || k; }
+  clearTimeout(takeSeat.t); begin('play');
+}
+$('#solo').onclick = (e) => { e.stopPropagation(); playSolo(); };
 function takeSeat(k, id, n) {
   if (!waitRoom || !PLAY_SEATS.includes(k)) return;
   const s = state.seats[k];
