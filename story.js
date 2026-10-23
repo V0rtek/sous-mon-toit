@@ -290,3 +290,25 @@ window.STORY = [
   say('james', 'surprised', "LA PIZZA!"),
   { end: true },
 ];
+
+// menu gallery: every pose of each look, and the sheet it was cut from (a recolor shows its original sheet)
+window.GALLERY = [
+  { sprite: 'justin', name: 'Justin', ref: ['urban', 'urban_action'] },
+  { sprite: 'ruby', name: 'Ruby', ref: ['elf'] },
+  { sprite: 'melissa', name: 'Melissa', ref: ['elf'] },
+  { sprite: 'candy', name: 'Candy', ref: ['feline'] },
+  { sprite: 'amare', name: 'Amare', ref: ['feline'] },
+  { sprite: 'james', name: 'James', ref: ['tv'] },
+  { sprite: 'isa_nuit', name: 'Isa · Minuit', ref: ['elf'] },
+  { sprite: 'isa_or', name: 'Isa · Doré', ref: ['elf'] },
+  { sprite: 'isa_noir', name: 'Isa · Braise', ref: ['elf'] },
+];
+// the prompt that makes a new character's sheet (an image generator), in the layout tools/cut.py cuts into poses
+window.SHEET_PROMPT = `Create a character pose sheet for this character: [describe the character, or attach a picture of them].
+
+Format: portrait image, 2:3. A grid of 6 equal panels, 3 columns × 2 rows. Each panel is framed by a thin dark border and has a plain light background.
+
+In every panel: the same character, full body from head to feet, same size, same outfit, same art style (clean anime game illustration). No text, no labels, no props, no floor shadow.
+
+Row 1, left to right: listening (neutral, relaxed) · surprised · thinking (hand on chin).
+Row 2, left to right: explaining (open hand gesture) · concerned / angry · holding back (arms crossed, restrained).`;

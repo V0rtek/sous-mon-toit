@@ -90,6 +90,46 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .picks b { color: #fff; }
 .picks i { color: #ffb3c6; font-style: normal; font-weight: 800; }
 .credits { font-size: 1.3em; color: #9c93aa; margin: 1.2em 0 0; }
+/* menu screens (name, home, lobby, gallery): black, system font. Home = 4 tiles; Test 2 is empty for now */
+.menu { justify-content: center; padding: 0 7%; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; color: #f5f5f7; }
+.ask { display: flex; flex-direction: column; gap: 2em; }
+.ask input { font: inherit; font-size: 3em; font-weight: 600; padding: .7em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; user-select: text; }
+.ask input::placeholder { color: #86868b; }
+.pill { font: inherit; font-size: 2.6em; font-weight: 600; padding: .8em; border-radius: 2em; border: 0; background: #f5f5f7; color: #000; cursor: pointer; }
+.names { text-align: center; }
+.names div { font-size: 4.4em; font-weight: 600; letter-spacing: -.02em; }
+.names div + div { color: #86868b; }
+#gallery, #charView { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
+.prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; margin-bottom: 3em; }
+.prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
+.prompt button { position: absolute; top: 1.4em; right: 1.4em; font: inherit; width: 6em; height: 6em; border-radius: 50%; border: 0; background: #2c2c2e; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.prompt button svg { width: 2.8em; height: 2.8em; }
+.prompt button .ok, .prompt button.done .cp { display: none; }
+.prompt button.done .ok { display: block; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4em; }
+.grid3 > * { font: inherit; background: #1c1c1e; border: 0; border-radius: 2em; padding: 1.4em 1em 1.2em; color: #f5f5f7; display: flex; flex-direction: column; align-items: center; gap: .8em; cursor: pointer; }
+.grid3 img { height: 22em; max-width: 100%; object-fit: contain; }
+.grid3 span { font-size: 1.7em; font-weight: 600; }
+#charView h2 { font-size: 4.4em; font-weight: 600; letter-spacing: -.02em; margin: 0 0 .6em; }
+.refs img { display: block; width: 100%; border-radius: 2em; margin-top: 3em; }
+#poseCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2em; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+#poseCard img { height: 76%; max-width: 90%; object-fit: contain; }
+#poseCard span { font-size: 2.4em; font-weight: 600; color: #f5f5f7; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
+.tiles > * { font: inherit; aspect-ratio: 1; box-sizing: border-box; display: flex; align-items: flex-start; padding: 2.4em; border: 0; border-radius: 2.6em; background: #1c1c1e; color: #f5f5f7; text-decoration: none; text-align: left; cursor: pointer; }
+.tiles span { font-size: 2.6em; font-weight: 600; letter-spacing: -.01em; }
+.tiles .off { opacity: .4; cursor: default; }
+.tiles > *:focus-visible { outline: .25em solid #fff; }
+#back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#back svg { width: 3.6em; height: 3.6em; }
+#back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
+#galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#galBtn svg { width: 3.8em; height: 3.8em; }
+/* the QR, the spectator count and the gallery live in the menu only */
+body:not(.home) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
+/* two players: the other player's choices are shown dimmed */
+#choices button.off { opacity: .45; pointer-events: none; }
+body.watch #choices button.mine { pointer-events: auto; }
 /* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
 #qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #qrBtn svg { width: 4em; height: 4em; }
@@ -117,7 +157,31 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
   <div id="black"></div>
-  <div id="cover" class="card">
+  <div id="who" class="card menu">
+    <form id="whoForm" class="ask">
+      <input id="whoName" maxlength="16" autocomplete="off" placeholder="Ton nom" aria-label="Ton nom">
+      <button class="pill" type="submit">Entrer</button>
+    </form>
+  </div>
+  <div id="hub" class="card menu" hidden>
+    <div class="tiles">
+      <button type="button" id="play"><span>Playthrough</span></button>
+      <button type="button" id="test1"><span>Test 1</span></button>
+      <button type="button" class="off"><span>Test 2</span></button>
+      <a href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener"><span>Info</span></a>
+    </div>
+  </div>
+  <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
+  <div id="gallery" class="card menu" hidden>
+    <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+    <div class="grid3" id="galList"></div>
+  </div>
+  <div id="charView" class="card menu" hidden>
+    <h2 id="charName"></h2>
+    <div class="grid3" id="poseList"></div>
+    <div class="refs" id="refList"></div>
+  </div>
+  <div id="cover" class="card" hidden>
     <div class="art" style="background-image:url(bg/terrasse.jpg)"></div>
     <img class="hero" src="chars/isa_nuit/listen.webp" alt="">
     <div class="veil"></div>
@@ -125,7 +189,6 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="title">Sous mon toit</div>
     <p class="lede">Ton père part un mois. Une amie à lui emménage ce soir. Ta blonde ne l'a pas encore vue.</p>
     <form id="start">
-      <div class="field"><label for="name">Ton nom</label><input id="name" maxlength="16" value="Justin" autocomplete="off"></div>
       <button class="go" type="submit">Commencer</button>
     </form>
   </div>
@@ -140,20 +203,24 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="end" class="card" hidden>
     <div class="art" style="background-image:url(bg/salon.jpg)"></div>
     <div class="veil"></div>
-    <div class="kicker">Fin du chapitre 1</div>
-    <div class="title">À suivre…</div>
-    <p class="lede">Isa allait dire quelque chose. Chapitre 2 bientôt.</p>
+    <div class="kicker" id="endKicker">Fin du chapitre 1</div>
+    <div class="title" id="endTitle">À suivre…</div>
+    <p class="lede" id="endLede">Isa allait dire quelque chose. Chapitre 2 bientôt.</p>
     <ul class="picks" id="picks"></ul>
     <button class="go" id="again" type="button">Rejouer</button>
     <p class="credits" id="credits"></p>
   </div>
   <button id="qrBtn" type="button" hidden aria-label="Faire regarder quelqu'un"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
   <div id="eyes" hidden aria-label="Spectateurs"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
+  <button id="galBtn" type="button" aria-label="Personnages"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
+  <div id="poseCard" hidden><img id="poseImg" alt=""><span id="poseName"></span></div>
+  <button id="back" type="button" hidden aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
 <script src="chars.js"></script>
 <script src="story.js"></script>
+<script src="play.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), castEl = $('#cast'), frontEl = $('#front'),
@@ -168,9 +235,13 @@ const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3 };   // decor blur
 
 let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST = false, run = 0;
 let sc = null, actors = {}, camNow = null;
-const state = { name: 'Justin', isa: ISA_LOOKS[0].sprite, picks: [] };
+// story: 't1' (chapter 1) or 'play' (2 players); f = what the choices decided (read by the story's `when` steps)
+const STORIES = { t1: STORY, play: PLAY };
+const state = { name: 'Justin', p2: 'Kev', story: 't1', f: {}, isa: ISA_LOOKS[0].sprite, picks: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
-const fill = (t) => t.replaceAll('{N}', state.name);
+// {N} = player 1, {P2} = player 2, any other {WORD} comes from the story (WORDS)
+const fill = (t) => t.replaceAll('{N}', state.name).replaceAll('{P2}', state.p2)
+  .replace(/\{([A-Z]+)\}/g, (m, k) => (window.WORDS && WORDS[k] ? WORDS[k](state.f) : m));
 const spriteOf = (id) => (id === 'isa' ? state.isa : CAST[id].sprite);
 const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${pose}.webp`;
 
@@ -284,22 +355,36 @@ function line(s) {
   typeText(fill(s.text || s.narr));
   if (firstLine) { hint.hidden = false; firstLine = false; }
 }
-let options = null;
-function choose(opts) {
-  options = opts; choicesEl.innerHTML = ''; choicesEl.hidden = false;
+let options = null, optionsBy = 'p1';
+// each choice belongs to a player (by); the host also plays player 2's choices when nobody is player 2
+function choose(opts, by = 'p1') {
+  options = opts; optionsBy = by; choicesEl.innerHTML = ''; choicesEl.hidden = false;
+  const mine = ROLE === 'host' ? !(by === 'p2' && p2Here()) : amP2() && by === 'p2';
+  const player = ROLE === 'host' || amP2();
   opts.forEach((o, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = fill(o.t);
-    b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') pickChoice(i); };
+    if (player && !mine) b.classList.add('off');
+    if (mine && ROLE === 'watch') b.classList.add('mine');
+    b.onclick = (e) => {
+      e.stopPropagation();
+      if (!mine || waiting !== 'choice') return;
+      if (ROLE === 'host') pickChoice(i);
+      else if (!choicesEl.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i); }
+    };
     choicesEl.appendChild(b);
-    if (i === 0 && ROLE === 'host' && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
+    if (i === 0 && ROLE === 'host' && mine && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   });
 }
-// a spectator sees the player's pick light up for a moment before the story goes on
-function pickChoice(i) {
+// the pick lights up for a moment on the other phones before the story goes on
+function pickChoice(i, afar = false) {
   const o = options && options[i]; if (!o || waiting !== 'choice') return;
   record('c' + i);
-  const go = () => { state.picks.push(o); choicesEl.hidden = true; q.unshift(...o.then); waiting = null; next(); };
-  if (ROLE === 'watch' && !FAST && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
+  const by = optionsBy;
+  const go = () => {
+    state.picks.push({ ...o, by }); if (o.set) Object.assign(state.f, o.set);
+    choicesEl.hidden = true; q.unshift(...o.then); waiting = null; next();
+  };
+  if ((ROLE === 'watch' || afar) && !FAST && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
   else go();
 }
 
@@ -361,17 +446,24 @@ const CUSTOM = {
   },
 };
 
-function endCard() {
+// the end card: chapter 1's own text, or the story's ({end: {kicker, title, lede}}); a 2-player story names who chose what
+const END0 = { kicker: $('#endKicker').textContent, title: $('#endTitle').textContent, lede: $('#endLede').textContent };
+function endCard(d) {
+  const e = typeof d === 'object' ? d : END0, two = state.story === 'play';
   bubble.hidden = true;
+  $('#endKicker').textContent = fill(e.kicker || ''); $('#endTitle').textContent = fill(e.title || '');
+  $('#endLede').textContent = fill(e.lede || ''); $('#endLede').hidden = !e.lede;
   const ul = $('#picks'); ul.innerHTML = '';
-  const head = document.createElement('li'); head.innerHTML = '<b>Tes choix</b>'; ul.appendChild(head);
+  const head = document.createElement('li'); head.innerHTML = two ? '<b>Vos choix</b>' : '<b>Tes choix</b>'; ul.appendChild(head);
   for (const p of state.picks) {
     const li = document.createElement('li');
-    li.append(`« ${fill(p.t)} » `); const i = document.createElement('i'); i.textContent = p.intent; li.append(i);
+    li.append(`${two ? (p.by === 'p2' ? state.p2 : state.name) + ' · ' : ''}« ${fill(p.t)} » `);
+    const i = document.createElement('i'); i.textContent = p.intent; li.append(i);
     ul.appendChild(li);
   }
   $('#credits').textContent = CREDITS;
-  $('#end').hidden = false;
+  $('#end .art').style.backgroundImage = `url(${e.art || 'bg/salon.jpg'})`;
+  show('#end');
 }
 
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
@@ -379,7 +471,9 @@ async function next() {
   const r = run;
   while (q.length && r === run) {
     const s = q.shift();
-    if (s.scene) setScene(s.scene, s.cast);
+    if (s.when) q.unshift(...(s.when(state.f) ? s.then : s.else || []));
+    else if (s.set) Object.assign(state.f, s.set);
+    else if (s.scene) setScene(s.scene, s.cast);
     else if (s.cam) setCam({ size: s.cam, who: s.who, at: s.at });
     else if (s.pan !== undefined) { setCam({ size: 'wide', at: s.pan }, FAST || REDUCED ? 0 : s.ms); await sleep(s.ms); }
     else if (s.enter) for (const [id, pose] of Object.entries(s.enter)) enter(id, pose);
@@ -392,13 +486,19 @@ async function next() {
     else if (s.wait) await sleep(s.wait);
     else if (s.custom) await CUSTOM[s.custom]();
     else if (s.say || s.narr || s.think) { line(s); waiting = 'click'; return; }
-    else if (s.choice) { choose(s.choice); waiting = 'choice'; return; }
-    else if (s.end) { endCard(); return; }
+    else if (s.choice) { choose(s.choice, s.by); waiting = 'choice'; return; }
+    else if (s.end) { endCard(s.end); return; }
   }
 }
 
 function advance() {
-  if (ROLE === 'watch') return;
+  if (ROLE === 'watch') {
+    // player 2 moves the story too in the Playthrough; the host checks it is still on the same line
+    if (!amP2() || state.story !== 'play') return;
+    if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
+    if (waiting === 'click' && remote && applied === remote.t.length && sentK !== applied) { sentK = applied; sendIn('a'); }
+    return;
+  }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
   if (waiting !== 'click') return;
   record('a'); waiting = null; hint.hidden = true; next();
@@ -408,26 +508,92 @@ addEventListener('keydown', (e) => {
   if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('input, button')) { e.preventDefault(); advance(); }
 });
 
-function begin() {
-  run++; state.picks = []; state.isa = ISA_LOOKS[0].sprite; firstLine = true; waiting = null; lookDone = null;
-  q = STORY.slice(); black.style.transition = 'none'; black.style.opacity = 1;
-  $('#cover').hidden = true; $('#end').hidden = true; $('#looks').hidden = true;
-  if (ROLE === 'host') { game = Date.now().toString(36); tape = []; share(); }
+// ---- screens: name -> home (4 tiles) -> a story; a joiner: name -> lobby -> the host's story ----
+const SCREENS = ['#who', '#hub', '#lobby', '#gallery', '#charView', '#cover', '#end'];
+const UP = { '#gallery': '#hub', '#charView': '#gallery', '#cover': '#hub', '#end': '#hub' };   // where ‹ goes
+let screen = '#who';
+function show(id) {
+  for (const s of SCREENS) $(s).hidden = s !== id;
+  screen = id;
+  document.body.classList.toggle('home', id === '#hub');
+  $('#back').hidden = ROLE !== 'host' || !UP[id];
+}
+function halt() { run++; q = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true; $('#looks').hidden = true; }
+
+function begin(id = state.story) {
+  run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
+  firstLine = id === 't1';   // the "tap to continue" hint is chapter 1's; the Playthrough has none
+  q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
+  show(null); $('#looks').hidden = true;
+  if (ROLE === 'host') { gp2 = p2; state.p2 = gp2 ? gp2.n : 'Kev'; game = Date.now().toString(36); tape = []; share(); }
   next();
 }
-$('#start').addEventListener('submit', (e) => {
+// leaving a story sends the joiners back to the lobby
+function toHub() {
+  halt(); show('#hub');
+  if (game) { game = null; tape = []; share(); }
+}
+$('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
-  state.name = $('#name').value.trim().slice(0, 16) || 'Justin';
-  begin();
+  const v = $('#whoName').value.trim().slice(0, 16);
+  try { localStorage.setItem('smt-name', v); } catch { /* private window */ }
+  $('#whoName').blur();
+  if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); }
+  else { myName = v || 'Kev'; show('#lobby'); goLive(); }
 });
-$('#again').onclick = (e) => { e.stopPropagation(); begin(); };
+$('#play').onclick = (e) => { e.stopPropagation(); begin('play'); };
+$('#test1').onclick = (e) => { e.stopPropagation(); show('#cover'); };
+$('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
+$('#back').onclick = (e) => { e.stopPropagation(); const up = UP[screen]; if (up === '#hub') toHub(); else if (up) show(up); };
+$('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
+$('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
 
-// ---- live: someone scans the player's QR and watches. The player's taps go to a public MQTT relay as one retained
-// message (game id + name + every tap so far); a spectator replays them on the same story, so a late joiner catches up.
+// ---- gallery: each character, every pose on its own, the sheet it was cut from, and the prompt that makes a new sheet ----
+const POSE_ORDER = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
+const rank = (p) => (POSE_ORDER.includes(p) ? POSE_ORDER.indexOf(p) : 99);
+function tile(src, label) {
+  const b = document.createElement('button'); b.type = 'button';
+  const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = src;
+  const span = document.createElement('span'); span.textContent = label;
+  b.append(img, span); return b;
+}
+function openChar(g) {
+  $('#charName').textContent = g.name;
+  const list = $('#poseList'); list.innerHTML = '';
+  for (const pose of Object.keys(SPRITES[g.sprite].poses).sort((a, b) => rank(a) - rank(b))) {
+    const b = tile(`chars/${g.sprite}/${pose}.webp`, pose);
+    b.onclick = (e) => { e.stopPropagation(); $('#poseImg').src = b.firstChild.src; $('#poseName').textContent = pose; $('#poseCard').hidden = false; };
+    list.appendChild(b);
+  }
+  $('#refList').innerHTML = '';
+  for (const r of g.ref) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
+  show('#charView'); $('#charView').scrollTop = 0;
+}
+for (const g of GALLERY) { const b = tile(`chars/${g.sprite}/listen.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
+$('#poseCard').onclick = (e) => { e.stopPropagation(); $('#poseCard').hidden = true; };
+$('#promptText').textContent = SHEET_PROMPT;
+$('#copy').onclick = async (e) => {
+  e.stopPropagation();
+  try { await navigator.clipboard.writeText(SHEET_PROMPT); } catch {
+    const r = document.createRange(); r.selectNodeContents($('#promptText'));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges();
+  }
+  $('#copy').classList.add('done'); setTimeout(() => $('#copy').classList.remove('done'), 1400);
+};
+
+// ---- live: whoever scans the QR in the menu joins. The host's taps go to a public MQTT relay as one retained message
+// (story + game id + names + every tap so far); a joiner replays them on the same story, so a late joiner catches up.
+// The first joiner who typed a name is player 2: in the Playthrough they make their own choices and can move the story.
 const BROKER = 'wss://broker.emqx.io:8084/mqtt';
 const WATCH = new URLSearchParams(location.search).get('watch');
 const ROLE = WATCH && /^[a-z0-9]{4,12}$/.test(WATCH) ? 'watch' : 'host';
 let live = null, room = ROLE === 'watch' ? WATCH : null, game = null, tape = [];
+let p2 = null, gp2 = null;       // host: player 2 in the menu / in the running game, {id, n}
+let myName = '', sentK = -1;     // joiner: its name, the last line it asked the host to move past
+const myId = (() => {
+  const fresh = () => Math.random().toString(36).slice(2, 10);
+  try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
+})();
 const topic = () => `sousmontoit/v1/${room}`;
 function loadScript(src) {
   return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
@@ -437,42 +603,67 @@ function roomCode() {
   try { let c = localStorage.getItem('smt-room'); if (!c) { c = fresh(); localStorage.setItem('smt-room', c); } return c; } catch { return fresh(); }
 }
 function share() {
-  if (ROLE === 'host' && live && live.connected) live.publish(topic(), JSON.stringify({ g: game, n: state.name, t: tape }), { retain: true, qos: 1 });
+  if (ROLE !== 'host' || !live || !live.connected) return;
+  const who = game ? gp2 : p2;
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, n: state.name, m: game ? state.p2 : who ? who.n : '', p: who ? who.id : '', t: tape }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
+const p2Here = () => !!gp2 && watchers.has(gp2.id);
+const amP2 = () => ROLE === 'watch' && !!remote && !!remote.p && remote.p === myId;
 
-// spectator count: each spectator keeps a retained "seat" (its timestamp, refreshed every 20 s) under <topic>/w/;
-// the broker clears it when the spectator drops (will), and the host forgets any seat silent for 50 s
+// joiners keep a retained "seat" under <topic>/w/ ({t: time, n: name, j: joined}, refreshed every 10 s); the broker
+// clears it when they drop (will), and the host forgets any seat silent for 35 s
 const watchers = new Map();
 function countEyes() {
   const now = Date.now();
-  for (const [id, t] of watchers) if (now - t > 50000) watchers.delete(id);
+  for (const [id, w] of watchers) if (now - w.t > 35000) watchers.delete(id);
   $('#eyes span').textContent = watchers.size;
   $('#eyes').hidden = !watchers.size;
+  const first = [...watchers].filter(([, w]) => w.n).sort((a, b) => a[1].j - b[1].j)[0];
+  const pick = first ? { id: first[0], n: first[1].n } : null;
+  if (JSON.stringify(pick) !== JSON.stringify(p2)) { p2 = pick; if (!game) share(); }
+}
+// player 2's taps and picks reach the host, which plays them into the tape like its own
+function fromP2(m) {
+  if (!game || m.g !== game || !gp2 || m.id !== gp2.id) return;
+  if (m.e === 'a') {
+    if (m.k !== tape.length) return;
+    if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
+    if (waiting === 'click') { record('a'); waiting = null; hint.hidden = true; next(); }
+  } else if (/^c\d$/.test(m.e) && optionsBy === 'p2') pickChoice(+m.e.slice(1), true);
+}
+function sendIn(e) {
+  if (live && live.connected && remote) live.publish(`${topic()}/in`, JSON.stringify({ id: myId, g: remote.g, k: applied, e }), { qos: 1 });
 }
 
 async function goLive() {
   if (ROLE === 'host') room = roomCode();
   try { await loadScript('https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'); } catch { return; }
-  const me = 'smt-' + Math.random().toString(16).slice(2, 10), seat = `${topic()}/w/${me}`;
-  const here = () => { if (live.connected) live.publish(seat, String(Date.now()), { retain: true }); };
-  live = mqtt.connect(BROKER, { clientId: me, reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
+  const seat = `${topic()}/w/${myId}`, joined = Date.now();
+  const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined }), { retain: true }); };
+  live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
     will: ROLE === 'watch' ? { topic: seat, payload: '', retain: true, qos: 0 } : undefined });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe(`${topic()}/w/+`); }
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`]); }
     else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
     live.on('message', (t, buf) => { try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
-    setInterval(here, 20000);
+    setInterval(here, 10000);
     addEventListener('pagehide', () => { if (live.connected) live.publish(seat, '', { retain: true }); });
   } else {
     live.on('message', (t, buf, packet) => {
+      if (t === `${topic()}/in`) { try { fromP2(JSON.parse(buf.toString())); } catch { /* not ours */ } return; }
       const id = t.split('/w/')[1];
       if (!id) return;
       const now = Date.now();
-      // a retained seat may be old: trust its own timestamp; a live refresh is fresh by definition
-      if (buf.length) watchers.set(id, packet.retain ? Math.min(now, +buf.toString() || 0) : now); else watchers.delete(id);
+      if (!buf.length) watchers.delete(id);
+      else {
+        let v = null; try { v = JSON.parse(buf.toString()); } catch { /* not ours */ }
+        if (!v || typeof v !== 'object') v = { t: +v };
+        // a retained seat may be old: trust its own timestamp; a live refresh is fresh by definition
+        watchers.set(id, { t: packet.retain ? Math.min(now, +v.t || 0) : now, n: String(v.n || '').slice(0, 16), j: +v.j || now });
+      }
       countEyes();
     });
     setInterval(countEyes, 5000);
@@ -488,18 +679,22 @@ $('#qrBtn').onclick = async (e) => {
 };
 $('#qrCard').onclick = (e) => { e.stopPropagation(); $('#qrCard').hidden = true; };
 
-// spectator: replay the player's taps in order, each one when the story is ready for it; far behind = no animation
+// joiner: replay the host's taps in order, each one when the story is ready for it; far behind = no animation
 let remote = null, applied = 0, pumping = false;
 const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, 40)); t(); });
 function follow(msg) {
-  if (!msg || !msg.g) { remote = null; toCover(); return; }
-  if (!remote || remote.g !== msg.g) { remote = msg; applied = 0; state.name = String(msg.n || 'Justin').slice(0, 16); begin(); }
-  else remote = msg;
+  if (!msg || !msg.g) { remote = null; toLobby(msg || {}); return; }
+  if (!remote || remote.g !== msg.g) {
+    remote = msg; applied = 0; sentK = -1;
+    state.name = String(msg.n || 'Justin').slice(0, 16); state.p2 = String(msg.m || 'Kev').slice(0, 16);
+    begin(STORIES[msg.s] ? msg.s : 't1');
+  } else remote = msg;
   pump();
 }
-function toCover() {
-  run++; q = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
-  $('#end').hidden = true; $('#looks').hidden = true; $('#cover').hidden = false;
+function toLobby(msg) {
+  halt(); show('#lobby');
+  const box = $('#names'); box.innerHTML = '';
+  for (const n of [msg.n, msg.m]) if (n) { const d = document.createElement('div'); d.textContent = n; box.appendChild(d); }
 }
 async function pump() {
   if (pumping) return;
@@ -518,10 +713,11 @@ async function pump() {
   if (remote && applied < remote.t.length) pump();
 }
 
-// index.html#t40 = start and jump to the 40th tap (first option on every choice), to check a shot without playing
-async function skipTo(n) {
+// index.html#t40 / #p12 = start chapter 1 / the Playthrough and jump to the 40th / 12th tap (first option on every
+// choice), to check a shot without playing
+async function skipTo(n, id) {
   const tick = () => new Promise((r) => setTimeout(r, 0));
-  FAST = true; begin();
+  FAST = true; begin(id);
   for (let k = 0; k < n; k++) {
     for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
     if (!$('#end').hidden) break;
@@ -534,10 +730,11 @@ async function skipTo(n) {
 
 addEventListener('resize', fit);
 if (ROLE === 'watch') document.body.classList.add('watch');
+try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /* private window */ }
 fit();
-goLive();
-const jump = location.hash.match(/^#t(\d+)$/);
-if (jump) skipTo(+jump[1]);
+if (ROLE === 'host') goLive();
+const jump = location.hash.match(/^#([tp])(\d+)$/);
+if (jump) skipTo(+jump[2], jump[1] === 'p' ? 'play' : 't1');
 // warm the cache so cuts never flash
 for (const s of Object.values(SCENES)) new Image().src = s.image;
 for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = `chars/${id}/${pose}.webp`;
