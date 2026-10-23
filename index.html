@@ -155,6 +155,10 @@ body.watch #solo { display: none !important; }
 .tiles > * { font: inherit; aspect-ratio: 1; box-sizing: border-box; display: flex; align-items: flex-start; padding: 2.4em; border: 0; border-radius: 2.6em; background: #1c1c1e; color: #f5f5f7; text-decoration: none; text-align: left; cursor: pointer; }
 .tiles span { font-size: 2.6em; font-weight: 600; letter-spacing: -.01em; }
 .tiles .off { opacity: .4; cursor: default; }
+.tiles > * { position: relative; }
+.tiles .here { position: absolute; left: 2.4em; right: 2.4em; bottom: 2.4em; display: flex; align-items: center; gap: .9em; }
+.tiles .here i { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; background: #34c759; }
+.tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #back svg { width: 3.6em; height: 3.6em; }
@@ -712,14 +716,14 @@ addEventListener('keydown', (e) => {
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
 const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#cover', '#end'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub' };   // where ‹ goes
+const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
   screen = id;
   document.body.classList.toggle('home', id === '#hub');
-  $('#back').hidden = ROLE !== 'host' || !UP[id];
+  $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
 function halt() {
   run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
@@ -740,7 +744,7 @@ function begin(id = state.story) {
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
   next();
 }
-// leaving a story or the waiting room sends the joiners back to the lobby
+// leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)
 function toHub() {
   halt(); show('#hub');
   if (waitRoom) announce(false);
@@ -752,7 +756,8 @@ function toHub() {
 let waitRoom = false;   // host: the waiting room is open
 function openWait(id) {
   // another phone's waiting room for this story is open: join it instead of opening a second one
-  if (openRoom && openRoom.room !== room && (openRoom.s || 'play') === id && Date.now() - openRoom.t < 30000) { joinRoom(openRoom.room); return; }
+  const other = roomFor(id);
+  if (other) { joinRoom(other.room); return; }
   halt(); state.story = id; waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); announce(true);
 }
 function renderWait() {
@@ -809,7 +814,7 @@ $('#watch3d').onclick = (e) => {
   show('#video3d');
 };
 $('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
-$('#back').onclick = (e) => { e.stopPropagation(); const up = UP[screen]; if (up === '#hub') toHub(); else if (up) show(up); };
+$('#back').onclick = (e) => { e.stopPropagation(); const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
 $('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
 
@@ -882,18 +887,36 @@ function share() {
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
 
-// no QR needed for the Playthrough: an open waiting room is announced under sousmontoit/v1/open (refreshed every 10 s,
-// cleared when it closes); a phone that taps Playthrough while another one's room is open joins that room
+// no QR needed for a 2-player story: an open waiting room is announced under sousmontoit/v1/open/<room> with the names
+// of everyone in it (refreshed every 10 s, cleared when it closes or the phone drops). Every other phone's menu shows it
+// as a green dot + those names on that story's tile; tapping the tile joins that room
 const OPEN = 'sousmontoit/v1/open';
-let openRoom = null;   // the last announcement heard: {room, n, t}
+const rooms = new Map();   // room -> its last announcement {room, s, n: [names], t}
+const roomFor = (s) => [...rooms.values()].filter((r) => r.room !== room && r.s === s && Date.now() - r.t < 30000).sort((a, b) => b.t - a.t)[0];
 function announce(on) {
   if (ROLE !== 'host' || !live || !live.connected) return;
-  if (on) live.publish(OPEN, JSON.stringify({ room, s: state.story, n: state.name, t: Date.now() }), { retain: true });
-  else if (openRoom && openRoom.room === room) live.publish(OPEN, '', { retain: true });
+  const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
+  live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now() }) : '', { retain: true });
+}
+const TILES = { play: '#play', bar: '#bar' };
+function showRooms() {
+  for (const [s, sel] of Object.entries(TILES)) {
+    const r = roomFor(s), tile = $(sel);
+    let tag = tile && tile.querySelector('.here');
+    if (!r) { if (tag) tag.remove(); continue; }
+    if (!tile) continue;
+    if (!tag) { tag = document.createElement('div'); tag.className = 'here'; tag.append(document.createElement('i'), document.createElement('em')); tile.appendChild(tag); }
+    tag.lastChild.textContent = r.n.join(', ');
+  }
 }
 function joinRoom(r) {
   try { sessionStorage.setItem('smt-auto', '1'); } catch { /* private window */ }
   location.href = `${location.pathname}?watch=${r}`;
+}
+// a joiner leaves the room for its own menu (a fresh page that keeps the name, so no name screen)
+function goHome() {
+  try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ }
+  location.href = location.pathname;
 }
 
 // joiners keep a retained presence under <topic>/w/ ({t: time, n: name, j: joined}, refreshed every 10 s); the broker
@@ -910,7 +933,7 @@ function countEyes() {
   if (changed) renderWait();
   if (split) for (const g of Object.values(split.ghosts)) autoGhost(g);   // a player left in the middle of his scene
   const now2 = [...watchers.values()].map((w) => w.n).join('|');
-  if (changed || now2 !== heard) { heard = now2; share(); }
+  if (changed || now2 !== heard) { heard = now2; share(); if (waitRoom) announce(true); }
 }
 function fromJoiner(m) {
   if (m.e === 'seat') { const w = watchers.get(m.id); takeSeat(m.s, m.id, (w && w.n) || m.n); return; }
@@ -938,9 +961,9 @@ async function goLive() {
   const seat = `${topic()}/w/${myId}`, joined = Date.now();
   const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined }), { retain: true }); };
   live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
-    will: ROLE === 'watch' ? { topic: seat, payload: '', retain: true, qos: 0 } : undefined });
+    will: { topic: ROLE === 'watch' ? seat : `${OPEN}/${room}`, payload: '', retain: true, qos: 0 } });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, OPEN]); if (waitRoom) announce(true); }
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${OPEN}/+`]); if (waitRoom) announce(true); }
     else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
@@ -949,7 +972,13 @@ async function goLive() {
     addEventListener('pagehide', () => { if (live.connected) live.publish(seat, '', { retain: true }); });
   } else {
     live.on('message', (t, buf, packet) => {
-      if (t === OPEN) { try { openRoom = buf.length ? JSON.parse(buf.toString()) : null; } catch { openRoom = null; } return; }
+      if (t.startsWith(OPEN + '/')) {
+        const r = t.slice(OPEN.length + 1);
+        let v = null; try { v = buf.length ? JSON.parse(buf.toString()) : null; } catch { /* not ours */ }
+        if (v && v.room === r) rooms.set(r, { room: r, s: v.s || 'play', n: [].concat(v.n || []).map((x) => String(x).slice(0, 16)), t: +v.t || 0 });
+        else rooms.delete(r);
+        showRooms(); return;
+      }
       if (t === `${topic()}/in`) { try { fromJoiner(JSON.parse(buf.toString())); } catch { /* not ours */ } return; }
       const id = t.split('/w/')[1];
       if (!id) return;
@@ -964,6 +993,7 @@ async function goLive() {
       countEyes();
     });
     setInterval(countEyes, 5000);
+    setInterval(showRooms, 5000);   // a room that stopped refreshing fades from the menu
     setInterval(() => { if (waitRoom) announce(true); }, 10000);
     addEventListener('pagehide', () => { if (waitRoom) announce(false); });
   }
@@ -997,6 +1027,7 @@ function follow(msg) {
   pump();
 }
 function toLobby(msg) {
+  if (auto) { if (screen !== '#end') goHome(); return; }
   halt(); show('#lobby');
   const box = $('#names'); box.innerHTML = '';
   for (const n of [msg.n, ...(msg.r || [])]) if (n) { const d = document.createElement('div'); d.textContent = n; box.appendChild(d); }
@@ -1042,11 +1073,14 @@ async function skipTo(n, id) {
 
 addEventListener('resize', fit);
 if (ROLE === 'watch') document.body.classList.add('watch');
-let auto = false;
-try { auto = ROLE === 'watch' && sessionStorage.getItem('smt-auto') === '1'; sessionStorage.removeItem('smt-auto'); } catch { /* private window */ }
+let auto = false, home = false;
+try {
+  auto = ROLE === 'watch' && sessionStorage.getItem('smt-auto') === '1'; home = ROLE === 'host' && sessionStorage.getItem('smt-home') === '1';
+  sessionStorage.removeItem('smt-auto'); sessionStorage.removeItem('smt-home');
+} catch { /* private window */ }
 try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /* private window */ }
 fit();
-if (ROLE === 'host') goLive();
+if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 const jump = location.hash.match(/^#([tpb])(\d+)$/);
 if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
