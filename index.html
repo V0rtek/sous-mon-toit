@@ -35,8 +35,6 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .actor img { width: 100%; height: 100%; display: block; }
 .actor.talk { animation: talk .38s ease-out; }
 @keyframes talk { 40% { transform: translateY(-1.5%); } }
-.actor.pop img { animation: pop .22s ease-out; }
-@keyframes pop { from { opacity: .55; } }
 #shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 60%, rgba(0,0,0,.28)); }
 /* text messages: a stack beside the character's head, newest at the bottom, every bubble against his side (its sharp
    corner points at him); received = grey, sent = blue */
@@ -48,6 +46,9 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .sms.in { background: #e9e9eb; color: #000; }
 .sms.out { background: #0a84ff; color: #fff; }
 .sms.fresh { animation: smsIn .32s ease-out backwards; }
+.sms.draft { opacity: .8; }
+.sms.draft::after { content: ''; display: inline-block; width: .09em; height: 1.05em; margin-left: .1em; vertical-align: -.15em; background: currentColor; animation: blink .9s steps(1) infinite; }
+.receipt { font-size: 1.35em; font-weight: 600; color: rgba(255,255,255,.85); text-shadow: 0 .1em .35em rgba(0,0,0,.7); padding: 0 .35em; margin-top: -.25em; }
 @keyframes smsIn { from { opacity: 0; transform: translateY(.7em) scale(.96); } }
 /* a text that arrived but is not read yet: his phone, buzzing, with the count */
 .ping { position: relative; width: 5.2em; height: 5.2em; border-radius: 50%; background: #e9e9eb; display: grid; place-items: center; box-shadow: 0 .15em .5em rgba(0,0,0,.3); }
@@ -209,7 +210,7 @@ body.watch #stage { cursor: default; }
 body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
 body.watch #choices button, body.watch .looks button { pointer-events: none; }
 #choices button.picked { background: var(--choice-hi); box-shadow: 0 0 0 .2em #fff; }
-@media (prefers-reduced-motion: reduce) { .actor.talk, .actor.pop img, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .actor.talk, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
 </style>
 
 <div id="stage">
@@ -298,10 +299,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023165403"></script>
-<script src="story.js?v=20261023165403"></script>
-<script src="play.js?v=20261023165403"></script>
-<script src="bar.js?v=20261023165403"></script>
+<script src="chars.js?v=20261023192205"></script>
+<script src="story.js?v=20261023192205"></script>
+<script src="play.js?v=20261023192205"></script>
+<script src="bar.js?v=20261023192205"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -327,7 +328,7 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { choosing: 'choisit', choices: 'Vos choix', again: 'Rejouer' };
+const UI = { choosing: 'choisit', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -357,29 +358,37 @@ function fit() {
 }
 
 // ---- people, in decor pixels ----
+// sized from the pose on screen (a.shown): a new pose takes its place once its picture is ready (setPose)
 function box(a) {
-  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[poseOf(a.id, a.pose)];
+  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[poseOf(a.id, a.shown)];
   const ih = p[1] / sp.refH * a.h * (castOf(a.id).scale || 1);
   return { w: p[0] / p[1] * ih, h: ih };
 }
 function placeActor(a) {
   const b = box(a);
   Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: a.x - b.w / 2 + 'px', top: a.feet - b.h + 'px', zIndex: Math.round(a.feet) });
-  const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.pose)];
+  const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.shown)];
   a.el.firstChild.style.transform = a.face && nat !== 'f' && a.face !== nat ? 'scaleX(-1)' : '';
 }
 function enter(id, pose) {
   const [x, feet, h] = sc.spots[id];
-  const a = actors[id] = { id, pose, x, feet, h, face: sc.face[id], el: document.createElement('div') };
+  const a = actors[id] = { id, pose, shown: pose, x, feet, h, face: sc.face[id], el: document.createElement('div') };
   a.el.className = 'actor'; a.el.style.position = 'absolute';
   const img = new Image(); img.alt = ''; img.src = poseSrc(id, pose); a.el.appendChild(img);
   castEl.appendChild(a.el); placeActor(a);
 }
 function exit(id) { if (actors[id]) { actors[id].el.remove(); delete actors[id]; } }
+// the new pose's picture is decoded off screen, then replaces the old one and resizes the box in the same frame
+// (swapping the src of the picture on screen showed him empty for a frame, or the old pose stretched to the new size)
 function setPose(id, pose) {
   const a = actors[id]; if (!a || a.pose === pose) return;
-  a.pose = pose; a.el.firstChild.src = poseSrc(id, pose); placeActor(a);
-  a.el.classList.remove('pop'); void a.el.offsetWidth; a.el.classList.add('pop');
+  a.pose = pose;
+  const img = new Image(); img.alt = ''; img.src = poseSrc(id, pose);
+  const swap = () => {
+    if (a.pose !== pose || actors[id] !== a) return;   // a newer pose came first, or he left the scene
+    a.el.replaceChild(img, a.el.firstChild); a.shown = pose; placeActor(a);
+  };
+  img.decode().then(swap, swap);
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
 
@@ -442,22 +451,53 @@ function applyCam(c, ms) {
 }
 
 // ---- text messages: {sms: {from, to, text}} stacks the message beside both phones' owners, the last 3, wherever they
-// are on screen; they stay for the rest of the story. Sent = shown at once beside the sender. Received = his phone
-// buzzes (sound + vibration + a phone with the count beside him), but he reads it only when the story has him check
-// it ({check: id}) ----
+// are on screen; they stay for the rest of the story. Sent: the sender, on screen, types it (a blue bubble that fills),
+// it goes out with "Delivered" under it, "Read" once the other one read it. Received = his phone buzzes (sound +
+// vibration + a phone with the count beside him), but he reads it only when the story has him check it ({check: id}):
+// he looks at his phone, then each text shows, held long enough to read, then the story goes on ----
 let texts = {};
-function textMsg(m) {
+function textMsg(m, sent) {
   const t = fill(m.text);
-  (texts[m.from] = texts[m.from] || []).push({ t, out: true, fresh: true });
-  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true });
+  if (sent) Object.assign(sent, { t, draft: false, status: 'delivered' });   // the bubble he typed goes out as it is
+  else (texts[m.from] = texts[m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
+  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent });
   if (actors[m.to] && !afar(m.to) && !FAST) buzz();
   drawTexts();
 }
-// someone of the other scene (seen from afar): you see him talk, not his phone
-const afar = (id) => !!(split && split.ghosts[id]);
+// someone of the other scene (seen from afar): you see him talk, not his phone. In solo the scenes play one after
+// the other, so the other player is the one whose scene is not playing
+const afar = (id) => !!(split && (split.ghosts[id] || (laneNow && id !== laneNow && seatsOf().includes(id))));
+const onScreen = (id) => actors[id] && !afar(id) && !FAST;
+function readOne(m) { m.unread = false; m.fresh = true; if (m.sent) m.sent.status = 'read'; }
 function checkTexts(id) {
-  for (const m of texts[id] || []) if (m.unread) { m.unread = false; m.fresh = true; }
+  for (const m of texts[id] || []) if (m.unread) readOne(m);
   drawTexts();
+}
+// the timed versions, for the scene this phone shows (a ghost scene and a fast catch-up use the instant ones above);
+// false = the story restarted meanwhile
+async function sendText(m, r) {
+  if (!onScreen(m.from)) { textMsg(m); return true; }
+  setPose(m.from, 'texting');
+  const t = fill(m.text), d = { t: '', out: true, fresh: true, draft: true };
+  (texts[m.from] = texts[m.from] || []).push(d); drawTexts();
+  const each = Math.min(Math.max(t.length * 65, 700), 2000) / t.length;
+  for (let i = 1; i <= t.length; i++) {
+    await sleep(each); if (r !== run) return false;
+    d.t = t.slice(0, i); const el = textsEl.querySelector('.sms.draft'); if (el) el.textContent = d.t;
+  }
+  await sleep(350); if (r !== run) return false;
+  textMsg(m, d);
+  await sleep(700); return r === run;
+}
+async function readTexts(id, r) {
+  if (!onScreen(id)) { checkTexts(id); return true; }
+  setPose(id, 'texting');
+  await sleep(900); if (r !== run) return false;   // he looks at his phone
+  for (const m of (texts[id] || []).filter((x) => x.unread)) {
+    readOne(m); drawTexts();
+    await sleep(Math.min(700 + m.t.length * 45, 2600)); if (r !== run) return false;
+  }
+  return true;
 }
 const PHONE = '<svg viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm3 14.5h2v1h-2z"/></svg>';
 function drawTexts(wait = 0) {
@@ -479,9 +519,11 @@ function drawTexts(wait = 0) {
     const chest = (a.feet - b.h * 0.6 - f.top) * s;
     st.style.bottom = H - Math.min(Math.max(chest, H * 0.2), H * 0.5) + 'px';
     for (const m of list) {
-      const d = document.createElement('div'); d.className = `sms ${m.out ? 'out' : 'in'}${m.fresh ? ' fresh' : ''}`;
+      const d = document.createElement('div'); d.className = `sms ${m.out ? 'out' : 'in'}${m.draft ? ' draft' : ''}${m.fresh ? ' fresh' : ''}`;
       d.textContent = m.t; st.appendChild(d); m.fresh = false;
     }
+    const last = list[list.length - 1];
+    if (last && last.status) { const d = document.createElement('div'); d.className = 'receipt'; d.textContent = ui(last.status); st.appendChild(d); }
     if (unread.length) {
       const d = document.createElement('div'); d.className = 'ping' + (unread.some((m) => m.fresh) ? ' fresh' : '');
       d.innerHTML = PHONE; const n = document.createElement('b'); n.textContent = unread.length; d.appendChild(n);
@@ -820,8 +862,8 @@ async function next() {
     else if (s.waitMark) {
       if (split && !split.marks.has(s.waitMark)) { split.waitOn = s.waitMark; waiting = 'mark'; waitNote(fill(split.hold[split.view] || '')); return; }
     }
-    else if (s.sms) textMsg(s.sms);
-    else if (s.check) checkTexts(s.check);
+    else if (s.sms) { if (!(await sendText(s.sms, r))) return; }
+    else if (s.check) { if (!(await readTexts(s.check, r))) return; }
     else if (s.sfx) sfx(s.sfx, s.loop);
     else if (s.stop) stopSfx(s.stop);
     else if (s.hush) { bubble.hidden = true; await sleep(s.hush); }   // a silence: no bubble, the shot holds
@@ -1048,7 +1090,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023165403';
+const BUILD = '20261023192205';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -1215,7 +1257,7 @@ async function pump() {
   pumping = true;
   while (remote && applied < remote.t.length) {
     const g = remote.g, [ev, lane] = String(remote.t[applied]).split('@');
-    FAST = remote.t.length - applied > 2;
+    FAST = remote.t.slice(applied).filter((e) => { const l = String(e).split('@')[1]; return !(l && split && split.ghosts[l]); }).length > 2;
     // a tap of the other player's scene goes to its ghost; one of the scene shown here waits for that scene's line
     const ghost = () => lane && split && split.ghosts[lane];
     const ready = (w) => (ev === 'a' ? w === 'click' : ev[0] === 'c' ? w === 'choice' : !!lookDone);

@@ -32,12 +32,12 @@ window.POSE_ALIAS = {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
     thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
   },
-  cam: { holding: 'worried', surprised: 'awkward', angry: 'worried' },
+  cam: { holding: 'worried', surprised: 'awkward', angry: 'worried', amused: 'explaining' },   // her amused looked at the camera
   suit: { shush: 'adjust', explaining: 'offer', holding: 'listen', surprised: 'listen', thinking: 'listen', pee_talk: 'pee' },
 };
 // Cam: her own sheets (23/10), in place of Ruby's. She looked like she was always flirting: the neutral sheet (listen,
 // explaining, thinking, worried, amused, sip) is her base; the first one keeps only her laugh, her awkward and her flirt
-FACE.cam = { listen: 'r', explaining: 'r', thinking: 'r', worried: 'r', amused: 'r', sip: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l' };
+FACE.cam = { listen: 'r', explaining: 'r', thinking: 'r', worried: 'r', sip: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l' };
 // the gallery shows the new Justin (the old sheet only plays in the older stories)
 GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar'] };
 GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] },
@@ -271,7 +271,9 @@ const counter = [
   { by: 'pa', choice: [
     { t: 'Check your phone.', intent: 'checks', then: [{ poses: { pa: 'texting' } }, { check: 'pa' }, hush(1600)] },
     { t: 'Text him: “where u at?”', intent: 'worried', set: { ping: true }, then: [
-      { poses: { pa: 'texting' } }, { check: 'pa' }, sms('pa', 'pb', 'where u at?'), hush(1200),
+      { poses: { pa: 'texting' } }, { check: 'pa' }, sms('pa', 'pb', 'where u at?'), hush(1600),
+      { poses: { pa: 'drunk_listen' } }, two('pa', 'cam'), hush(1800),
+      { poses: { pa: 'texting' } }, one('pa'), hush(1000),
       say('pa', 'texting', 'He’s not answering.', { to: 'cam' }),
     ] },
     { t: 'Stay with Cam.', intent: 'stays', then: [say('pa', 'drunk_happy', 'He’s a big boy.', { to: 'cam' })] },
@@ -518,6 +520,6 @@ BAR.cast = {
   suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
 };
 BAR.words = { TITLE: (f) => f.title || 'Last call' };
-BAR.ui = { choosing: 'is choosing', choices: 'Your choices', again: 'Play again' };
+BAR.ui = { choosing: 'is choosing', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read' };
 // what's known to be off, behind the "?" of the waiting room (so testers know)
 BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction'] };
