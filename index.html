@@ -139,8 +139,11 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #galBtn svg { width: 3.8em; height: 3.8em; }
 /* the QR, the spectator count and the gallery live in the menu only */
 body:not(.home) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
-/* two players: the other player's choices are shown dimmed */
-#choices button.off { opacity: .45; pointer-events: none; }
+/* two players: the one whose turn it is not waits on the last shot */
+#waitOther { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 20; padding: .7em 1.4em; border-radius: 2em; background: rgba(15,12,20,.75); color: #fff; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; }
+#waitOther i { font-style: normal; animation: blink 1.2s infinite; }
+#waitOther i:nth-child(3) { animation-delay: .2s; }
+#waitOther i:nth-child(4) { animation-delay: .4s; }
 body.watch #choices button.mine { pointer-events: auto; }
 /* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
 #qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -168,6 +171,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
+  <div id="waitOther" hidden><span id="otherName"></span> choisit<i>.</i><i>.</i><i>.</i></div>
   <div id="black"></div>
   <div id="who" class="card menu">
     <form id="whoForm" class="ask">
@@ -352,8 +356,24 @@ function typeText(t) {
   let i = 0;
   typing = setInterval(() => { textEl.textContent = t.slice(0, ++i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
 }
+// a story that stages itself (STORY.gaze): when someone speaks, the others stop their talking gesture and turn to them,
+// and the speaker turns to whom they talk to (s.to, else whoever spoke last)
+let lastSpeaker = null;
+function gaze(s) {
+  const sp = actors[s.say];
+  if (!sp) return;
+  if (!s.whisper) for (const a of Object.values(actors)) {
+    if (a === sp) continue;
+    if (a.pose === 'explaining') setPose(a.id, 'listen');
+    if (a.x !== sp.x) { a.face = sp.x < a.x ? 'l' : 'r'; placeActor(a); }
+  }
+  const to = actors[s.to || lastSpeaker];
+  if (to && to !== sp && to.x !== sp.x) { sp.face = to.x < sp.x ? 'l' : 'r'; placeActor(sp); }
+  lastSpeaker = s.say;
+}
 function line(s) {
   const who = s.say || s.think || null, kind = s.narr ? 'narr' : s.think ? 'think' : s.whisper ? 'whisper' : 'say';
+  if (s.say && STORIES[state.story].gaze) gaze(s);
   if (s.say && s.pose) setPose(s.say, s.pose);
   bubble.className = kind;
   tagEl.hidden = !who;
@@ -378,14 +398,17 @@ let options = null, optionsBy = 'p1';
 // the host makes the choice so the story never gets stuck
 const ownerOf = (by) => (by && state.seats[by] ? state.seats[by].id : ROLE === 'host' ? myId : hostId);
 const seated = () => Object.values(state.seats).some((s) => s.id === myId);
+const mineFor = (by) => { const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
+// a Playthrough player whose turn it is not stays on the shot they were on, with "<name> choisit…" at the bottom
+const waitsFor = (by) => state.story === 'play' && seated() && !mineFor(by);
+let held = [];   // the steps that lead into the other player's choice: they run once that player has picked
 function choose(opts, by) {
-  options = opts; optionsBy = by; choicesEl.innerHTML = ''; choicesEl.hidden = false;
-  const owner = ownerOf(by);
-  const mine = owner === myId || (ROLE === 'host' && owner !== myId && !watchers.has(owner));
-  const player = seated() || (ROLE === 'host' && state.story === 't1');
+  options = opts; optionsBy = by; choicesEl.innerHTML = '';
+  const mine = mineFor(by);
+  if (waitsFor(by)) { choicesEl.hidden = true; $('#otherName').textContent = seatName(by); $('#waitOther').hidden = false; }
+  else choicesEl.hidden = false;
   opts.forEach((o, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = fill(o.t);
-    if (player && !mine) b.classList.add('off');
     if (mine && ROLE === 'watch') b.classList.add('mine');
     b.onclick = (e) => {
       e.stopPropagation();
@@ -404,9 +427,10 @@ function pickChoice(i, afar = false) {
   const by = optionsBy;
   const go = () => {
     state.picks.push({ ...o, by }); if (o.set) Object.assign(state.f, o.set);
-    choicesEl.hidden = true; q.unshift(...o.then); waiting = null; next();
+    choicesEl.hidden = true; $('#waitOther').hidden = true;
+    q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
-  if ((ROLE === 'watch' || afar) && !FAST && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
+  if ((ROLE === 'watch' || afar) && !FAST && !choicesEl.hidden && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
   else go();
 }
 
@@ -491,6 +515,8 @@ function endCard(d) {
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
 async function next() {
   const r = run;
+  const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
+  if (k > 0 && q[k].choice && waitsFor(q[k].by)) held = q.splice(0, k);
   while (q.length && r === run) {
     const s = q.shift();
     if (s.when) q.unshift(...(s.when(state.f) ? s.then : s.else || []));
@@ -541,10 +567,11 @@ function show(id) {
   document.body.classList.toggle('home', id === '#hub');
   $('#back').hidden = ROLE !== 'host' || !UP[id];
 }
-function halt() { run++; q = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true; $('#looks').hidden = true; }
+function halt() { run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true; $('#waitOther').hidden = true; $('#looks').hidden = true; }
 
 function begin(id = state.story) {
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
+  held = []; lastSpeaker = null; $('#waitOther').hidden = true;
   firstLine = id === 't1';   // the "tap to continue" hint is chapter 1's; the Playthrough has none
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
