@@ -140,11 +140,23 @@ const counter = [
   say('cam', 'thinking', 'What was he gonna say?', { to: 'pa' }),
   one('pa'),
   { by: 'pa', choice: [
+    // Cam never says who she prefers: "idk, he's funny" / "still deciding" keeps it open, and opens a door for Justin
     { t: 'Talk about Brooke.', intent: 'his friend', then: [
       say('pa', 'drunk_talk', 'He’s wasted. He won’t remember any of this tomorrow.', { to: 'cam' }),
       one('cam'), say('cam', 'holding', 'Or he’ll remember all of it.', { to: 'pa' }),
       one('pa'), hush(800), say('pa', 'drunk_listen', '…You think he meant it?', { to: 'cam' }),
-      one('cam'), say('cam', 'amused', 'I think he says it to the bartender too.', { to: 'pa' }),
+      one('cam'), hush(700), say('cam', 'amused', 'Idk. He’s funny.', { to: 'pa' }),
+      one('pa'),
+      { by: 'pa', choice: [
+        { t: 'Try your luck.', intent: 'takes the door', then: [
+          say('pa', 'drunk_flirt', 'Funny’s not a type.', { to: 'cam' }),
+          one('cam'), hush(600), say('cam', 'flirty', 'Oh? And what’s my type?', { to: 'pa' }),
+        ] },
+        { t: 'Be his wingman.', intent: 'wingman', then: [
+          say('pa', 'drunk_happy', 'Funniest guy I know.', { to: 'cam' }),
+          one('cam'), hush(700), say('cam', 'thinking', 'Noted.', { to: 'pa' }),
+        ] },
+      ] },
     ] },
     { t: 'Get to know her.', intent: 'curious', then: [
       say('pa', 'drunk_talk', 'Six years… and I don’t even know where you’re from.', { to: 'cam' }),
@@ -156,7 +168,18 @@ const counter = [
       say('pa', 'drunk_talk', 'And you? How’d that make you feel?', { to: 'cam' }),
       one('cam'), hush(1000), say('cam', 'awkward', '…Depends who’s saying it.', { to: 'pa' }),
       one('pa'), say('pa', 'drunk_listen', 'And if it’s him?', { to: 'cam' }),
-      one('cam'), hush(800), say('cam', 'holding', 'Then I pretend I didn’t hear it. Again.', { to: 'pa' }),
+      one('cam'), hush(1000), say('cam', 'thinking', 'Still deciding.', { to: 'pa' }),
+      one('pa'),
+      { by: 'pa', choice: [
+        { t: 'And if it’s me?', intent: 'takes the door', then: [
+          say('pa', 'drunk_flirt', 'And if it’s me?', { to: 'cam' }),
+          one('cam'), hush(900), say('cam', 'tipsy_laugh', 'Ask me when you’re sober.', { to: 'pa' }),
+        ] },
+        { t: 'He’s a good guy.', intent: 'wingman', then: [
+          say('pa', 'drunk_talk', 'He’s a good guy, Cam.', { to: 'cam' }),
+          one('cam'), hush(800), say('cam', 'thinking', 'I know.', { to: 'pa' }),
+        ] },
+      ] },
     ] },
     { t: 'Flirt.', intent: 'flirt', then: [
       say('pa', 'drunk_happy', 'I would’ve finished the sentence.', { to: 'cam' }),
