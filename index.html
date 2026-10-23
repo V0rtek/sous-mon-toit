@@ -99,8 +99,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .names { text-align: center; }
 .names div { font-size: 4.4em; font-weight: 600; letter-spacing: -.02em; }
 .names div + div { color: #86868b; }
-#gallery, #charView { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
-.prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; margin-bottom: 3em; }
+#gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
+.prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
 .prompt button { position: absolute; top: 1.4em; right: 1.4em; font: inherit; width: 6em; height: 6em; border-radius: 50%; border: 0; background: #2c2c2e; display: grid; place-items: center; cursor: pointer; padding: 0; }
 .prompt button svg { width: 2.8em; height: 2.8em; }
@@ -110,6 +110,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .grid3 > * { font: inherit; background: #1c1c1e; border: 0; border-radius: 2em; padding: 1.4em 1em 1.2em; color: #f5f5f7; display: flex; flex-direction: column; align-items: center; gap: .8em; cursor: pointer; }
 .grid3 img { height: 22em; max-width: 100%; object-fit: contain; }
 .grid3 span { font-size: 1.7em; font-weight: 600; }
+.grid3 .add { justify-content: center; min-height: 27em; }
+.grid3 .add span { font-size: 7em; font-weight: 300; color: #86868b; }
 #charView h2 { font-size: 4.4em; font-weight: 600; letter-spacing: -.02em; margin: 0 0 .6em; }
 .refs img { display: block; width: 100%; border-radius: 2em; margin-top: 3em; }
 #poseCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2em; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
@@ -173,8 +175,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
   <div id="gallery" class="card menu" hidden>
-    <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
     <div class="grid3" id="galList"></div>
+  </div>
+  <div id="newChar" class="card menu" hidden>
+    <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
   </div>
   <div id="charView" class="card menu" hidden>
     <h2 id="charName"></h2>
@@ -509,8 +513,8 @@ addEventListener('keydown', (e) => {
 });
 
 // ---- screens: name -> home (4 tiles) -> a story; a joiner: name -> lobby -> the host's story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#gallery', '#charView', '#cover', '#end'];
-const UP = { '#gallery': '#hub', '#charView': '#gallery', '#cover': '#hub', '#end': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#gallery', '#charView', '#newChar', '#cover', '#end'];
+const UP = { '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
@@ -548,7 +552,8 @@ $('#back').onclick = (e) => { e.stopPropagation(); const up = UP[screen]; if (up
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
 $('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
 
-// ---- gallery: each character, every pose on its own, the sheet it was cut from, and the prompt that makes a new sheet ----
+// ---- gallery: each character, every pose on its own, the picture it started from and the sheet it was cut from;
+// the + card at the end holds the prompt that makes a new character's sheet ----
 const POSE_ORDER = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
 const rank = (p) => (POSE_ORDER.includes(p) ? POSE_ORDER.indexOf(p) : 99);
 function tile(src, label) {
@@ -566,10 +571,16 @@ function openChar(g) {
     list.appendChild(b);
   }
   $('#refList').innerHTML = '';
-  for (const r of g.ref) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
+  for (const r of [g.src, ...g.ref]) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
   show('#charView'); $('#charView').scrollTop = 0;
 }
-for (const g of GALLERY) { const b = tile(`chars/${g.sprite}/listen.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
+for (const g of GALLERY.filter((x) => !x.recolor)) { const b = tile(`chars/${g.sprite}/listen.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
+{
+  const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'Nouveau personnage');
+  const plus = document.createElement('span'); plus.textContent = '+'; add.appendChild(plus);
+  add.onclick = (e) => { e.stopPropagation(); show('#newChar'); };
+  $('#galList').appendChild(add);
+}
 $('#poseCard').onclick = (e) => { e.stopPropagation(); $('#poseCard').hidden = true; };
 $('#promptText').textContent = SHEET_PROMPT;
 $('#copy').onclick = async (e) => {

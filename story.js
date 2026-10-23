@@ -291,17 +291,18 @@ window.STORY = [
   { end: true },
 ];
 
-// menu gallery: every pose of each look, and the sheet it was cut from (a recolor shows its original sheet)
+// menu gallery: every pose of each character, the picture it started from (src) and the sheet it was cut from (ref).
+// The recolors (recolor: their original) stay out of the gallery
 window.GALLERY = [
-  { sprite: 'justin', name: 'Justin', ref: ['urban', 'urban_action'] },
-  { sprite: 'ruby', name: 'Ruby', ref: ['elf'] },
-  { sprite: 'melissa', name: 'Melissa', ref: ['elf'] },
-  { sprite: 'candy', name: 'Candy', ref: ['feline'] },
-  { sprite: 'amare', name: 'Amare', ref: ['feline'] },
-  { sprite: 'james', name: 'James', ref: ['tv'] },
-  { sprite: 'isa_nuit', name: 'Isa · Minuit', ref: ['elf'] },
-  { sprite: 'isa_or', name: 'Isa · Doré', ref: ['elf'] },
-  { sprite: 'isa_noir', name: 'Isa · Braise', ref: ['elf'] },
+  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action'] },
+  { sprite: 'ruby', name: 'Ruby', src: 'perso_ruby', ref: ['elf'] },
+  { sprite: 'candy', name: 'Candy', src: 'perso_candy', ref: ['feline'] },
+  { sprite: 'james', name: 'James', src: 'perso_james', ref: ['tv'] },
+  { sprite: 'melissa', name: 'Melissa', recolor: 'ruby' },
+  { sprite: 'amare', name: 'Amare', recolor: 'candy' },
+  { sprite: 'isa_nuit', name: 'Isa · Minuit', recolor: 'ruby' },
+  { sprite: 'isa_or', name: 'Isa · Doré', recolor: 'ruby' },
+  { sprite: 'isa_noir', name: 'Isa · Braise', recolor: 'ruby' },
 ];
 // the prompt that makes a new character's sheet (an image generator), in the layout tools/cut.py cuts into poses
 window.SHEET_PROMPT = `Create a character pose sheet for this character: [describe the character, or attach a picture of them].
