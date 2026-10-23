@@ -31,10 +31,14 @@ window.POSE_ALIAS = {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
     thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
   },
+  cam: { thinking: 'listen', holding: 'worried', surprised: 'awkward', angry: 'worried', explaining: 'amused' },
 };
+// Cam: her own sheet (bar, 23/10), in place of Ruby's
+FACE.cam = { listen: 'r', amused: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l', worried: 'r' };
 // the gallery shows the new Justin (the old sheet only plays in the older stories)
 GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar'] };
-GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] });
+GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] },
+  { sprite: 'cam', name: 'Cam', src: 'perso_cam', ref: ['cam_bar'] });
 
 // ---------- decors, rectangles only (decor px) ----------
 const R = (x, y, w, h, color, more) => ({ x, y, w, h, color, ...more });
@@ -70,9 +74,8 @@ const shot = (x) => R(x, TOP - 38, 26, 40, 'rgba(255,255,255,.22)', { r: '3px 3p
 const BAR_FRONT = [
   R(-10, TOP, 1940, 30, '#a8774c', { r: 4 }), R(0, TOP + 30, 1920, 12, '#5c3b25'), R(0, TOP + 42, 1920, 400, '#33201a'),
   ...[60, 380, 700, 1020, 1340, 1660].map((x) => R(x, TOP + 66, 260, 360, '#3b261e', { r: 10, line: '4px solid #2a1912' })),
-  // Justin: two empty shots (his red cup is in his hand) · Cam: a cocktail · Brooke: two shots · the bill
+  // empty shots in front of the guys (their red cups are in their hands) · the bill
   shot(810), shot(846),
-  R(990, TOP - 70, 40, 44, 'rgba(220,60,90,.85)', { r: '4px 4px 20px 20px' }), R(1007, TOP - 28, 6, 28, 'rgba(255,255,255,.55)'),
   R(1100, TOP - 12, 74, 12, '#111', { r: 2 }),
   shot(1200), shot(1236),
 ];
@@ -294,7 +297,7 @@ const bathroom = [
       one('pb'), say('pb', 'pee_look', 'Do I… know you?', { to: 'suit' }),
       one('suit'), hush(1100), say('suit', 'pee', 'No.', { to: 'pb' }),
     ] },
-    { t: 'Say nothing.', intent: 'stares at the wall', then: [one('pb'), hush(1200), narr('Brooke stares at the wall. Very hard.')] },
+    { t: 'Say nothing.', intent: 'stares at the wall', then: [{ poses: { pb: 'pee' } }, one('pb'), hush(1200), narr('Brooke stares at the wall. Very hard.')] },
   ] },
   // they stop, zip up, turn around: now they talk for real
   two('pb', 'suit'), hush(900),
@@ -408,13 +411,13 @@ const justinAfter = (f) => [
     say('pa', 'texting', 'He said he’d be right back.', { to: 'cam' }),
     one('cam'), say('cam', 'holding', 'That was twenty minutes ago.', { to: 'pa' }),
     hush(1200),
-    say('cam', 'awkward', 'Justin… the guy in the suit.', { to: 'pa' }),
+    say('cam', 'worried', 'Justin… the guy in the suit.', { to: 'pa' }),
     { set: { title: 'brb' } },
   ] : [
     one('cam'), say('cam', 'surprised', 'Where’s Brooke?', { to: 'pa' }),
     one('pa'), { poses: { pa: 'phone_shock' } }, hush(1100),
     narr('No message. Nothing.'),
-    one('cam'), hush(900), say('cam', 'awkward', 'Justin… the guy in the suit.', { to: 'pa' }),
+    one('cam'), hush(900), say('cam', 'worried', 'Justin… the guy in the suit.', { to: 'pa' }),
     { set: { title: 'Not a word' } },
   ]),
 ];
@@ -507,7 +510,7 @@ BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // the other character's player nam
 BAR.cast = {
   pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' },
   pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
-  cam: { name: 'Cam', color: '#3b1f6e', sprite: 'ruby', scale: 0.95 },
+  cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 },
   suit: { name: 'Stranger', color: '#26262b', sprite: 'james_noir', aside: true },
 };
 BAR.words = { TITLE: (f) => f.title || 'Last call' };
