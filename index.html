@@ -140,6 +140,14 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .seats .on .dot { background: #34c759; }
 .seats img { height: 44em; max-width: 100%; object-fit: contain; }
 #solo { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); padding: .7em 1.6em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; }
+/* the story's known problems, behind a "?" in the waiting room's corner (tap = open, tap anywhere = close) */
+#todoBtn { position: absolute; top: 2.2%; right: 4%; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: #e8e8ed; color: #1d1d1f; display: grid; place-items: center; cursor: pointer; padding: 0; }
+#todoBtn span { font-size: 3.6em; font-weight: 600; }
+#todoCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.55); display: grid; place-items: center; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+.todo { width: 72%; box-sizing: border-box; background: #fff; color: #1d1d1f; border-radius: 2.4em; padding: 3.2em 3.4em; }
+.todo b { font-size: 2.8em; font-weight: 600; }
+.todo ul { margin: 1.4em 0 0; padding-left: 1.3em; }
+.todo li { font-size: 2.5em; line-height: 1.4; }
 body.watch #solo { display: none !important; }
 #gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
@@ -239,7 +247,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
-  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button></div>
+  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
+  <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul></div></div>
   <div id="gallery" class="card menu" hidden>
     <div class="grid3" id="galList"></div>
   </div>
@@ -289,10 +298,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023163237"></script>
-<script src="story.js?v=20261023163237"></script>
-<script src="play.js?v=20261023163237"></script>
-<script src="bar.js?v=20261023163237"></script>
+<script src="chars.js?v=20261023165403"></script>
+<script src="story.js?v=20261023165403"></script>
+<script src="play.js?v=20261023165403"></script>
+<script src="bar.js?v=20261023165403"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -876,7 +885,7 @@ function halt() {
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   split = null; laneNow = null; texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
-  asides.clear();
+  asides.clear(); $('#todoCard').hidden = true;
 }
 
 function begin(id = state.story) {
@@ -907,6 +916,7 @@ function openWait(id) {
 }
 function renderWait() {
   show('#wait');
+  $('#todoBtn').hidden = !story().todo;
   const list = $('#seatList'); list.innerHTML = '';
   for (const k of seatsOf()) {
     const s = state.seats[k], b = document.createElement('button'); b.type = 'button';
@@ -927,6 +937,15 @@ function playSolo() {
   clearTimeout(takeSeat.t); begin();
 }
 $('#solo').onclick = (e) => { e.stopPropagation(); playSolo(); };
+$('#todoBtn').onclick = (e) => {
+  e.stopPropagation();
+  const t = story().todo; if (!t) return;
+  $('#todoTitle').textContent = t.title;
+  $('#todoList').innerHTML = '';
+  for (const it of t.items) { const li = document.createElement('li'); li.textContent = it; $('#todoList').appendChild(li); }
+  $('#todoCard').hidden = false;
+};
+$('#todoCard').onclick = (e) => { e.stopPropagation(); $('#todoCard').hidden = true; };
 function takeSeat(k, id, n) {
   if (!waitRoom || !seatsOf().includes(k)) return;
   const s = state.seats[k];
@@ -1029,7 +1048,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023163237';
+const BUILD = '20261023165403';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

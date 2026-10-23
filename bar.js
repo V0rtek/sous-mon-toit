@@ -32,15 +32,16 @@ window.POSE_ALIAS = {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
     thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
   },
-  cam: { thinking: 'listen', holding: 'worried', surprised: 'awkward', angry: 'worried', explaining: 'amused' },
+  cam: { holding: 'worried', surprised: 'awkward', angry: 'worried' },
   suit: { shush: 'adjust', explaining: 'offer', holding: 'listen', surprised: 'listen', thinking: 'listen', pee_talk: 'pee' },
 };
-// Cam: her own sheet (bar, 23/10), in place of Ruby's
-FACE.cam = { listen: 'r', amused: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l', worried: 'r' };
+// Cam: her own sheets (23/10), in place of Ruby's. She looked like she was always flirting: the neutral sheet (listen,
+// explaining, thinking, worried, amused, sip) is her base; the first one keeps only her laugh, her awkward and her flirt
+FACE.cam = { listen: 'r', explaining: 'r', thinking: 'r', worried: 'r', amused: 'r', sip: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l' };
 // the gallery shows the new Justin (the old sheet only plays in the older stories)
 GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar'] };
 GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] },
-  { sprite: 'cam', name: 'Cam', src: 'perso_cam', ref: ['cam_bar'] });
+  { sprite: 'cam', name: 'Cam', src: 'perso_cam', ref: ['cam_neutral', 'cam_bar'] });
 
 // ---------- decors, rectangles only (decor px) ----------
 const R = (x, y, w, h, color, more) => ({ x, y, w, h, color, ...more });
@@ -155,10 +156,10 @@ const hush = (ms = 900) => ({ hush: ms });
 // when Brooke's text arrives)
 const counter = [
   { slate: 'Brooke heads to the bathroom. It’s just you and Cam now.' },
-  scene('bar', { pa: 'drunk_listen', cam: 'listen' }),
+  scene('bar', { pa: 'drunk_listen', cam: 'sip' }),
   two('pa', 'cam'),
   { fade: 'in', ms: 500 },
-  hush(1100),   // Brooke's empty spot between them
+  hush(1100),   // Brooke's empty spot between them, Cam takes a sip
   one('cam'),
   say('cam', 'thinking', 'What was he gonna say?', { to: 'pa' }),
   one('pa'),
@@ -388,7 +389,7 @@ const bathroom = [
 // Justin, twenty minutes later at the counter, reads what Brooke sent (or didn't)
 const justinAfter = (f) => [
   { fade: 'out', ms: 600 },
-  scene('bar', { pa: 'texting', cam: 'listen' }),
+  scene('bar', { pa: 'texting', cam: 'sip' }),
   two('pa', 'cam'),
   { fade: 'in', ms: 600 },
   { caption: 'Twenty minutes later' },
@@ -490,12 +491,13 @@ window.BAR = [
   { aside: { pa: true } }, face({ pa: 'l' }), hush(700),
   two('cam', 'pb'), hush(1600),
   say('cam', 'amused', '…What?', { to: 'pb' }),
-  one('pb'), hush(900),
+  hush(900),
+  // the last two, Brooke and Cam together in the frame
   say('pb', 'drunk_flirt', 'Cam. You’re just…', { to: 'cam' }),
   hush(1000),
   say('pb', 'drunk_flirt', 'Yeah. Just…', { to: 'cam' }),
-  one('cam'), { poses: { cam: 'awkward' } }, hush(1600),
-  one('pb'), { poses: { pb: 'drunk_sad' } }, hush(1000),
+  { poses: { cam: 'awkward' } }, hush(1600),
+  { poses: { pb: 'drunk_sad' } }, hush(1000),
   say('pb', 'drunk_sad', '…I gotta pee.', { to: 'cam' }),
   { exit: 'pb' }, { aside: { pa: false } },
   // from here to the end, each one plays his own scene on his own phone and only sees what his character sees;
@@ -517,3 +519,5 @@ BAR.cast = {
 };
 BAR.words = { TITLE: (f) => f.title || 'Last call' };
 BAR.ui = { choosing: 'is choosing', choices: 'Your choices', again: 'Play again' };
+// what's known to be off, behind the "?" of the waiting room (so testers know)
+BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction'] };
