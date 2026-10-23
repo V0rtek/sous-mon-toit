@@ -16,7 +16,7 @@ window.POSE_REST = { drunk_talk: 'drunk_listen', drunk_happy: 'drunk_listen', dr
 // the stranger: from 2 sheets (23/10) — from behind at the urinal, the tie he fixes looking over his shoulder, hands
 // joined (calm, then cold), open hands (the deal); he has no "shush" yet: the tie plays it
 FACE.suit = { pee: 'f', adjust: 'l', listen: 'r', offer: 'r', angry: 'r' };
-GALLERY.push({ sprite: 'suit', name: 'Stranger', ref: ['suit_fiche', 'suit_negociation'] });
+GALLERY.push({ sprite: 'suit', name: 'Stranger', src: 'perso_suit', ref: ['suit_fiche', 'suit_negociation'] });
 // Brooke: 2 sheets from his photo (23/10): the bar one, then the bathroom one (which also redid his happy and sad,
 // subtler); what he doesn't have yet plays with his closest pose
 FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
@@ -269,7 +269,6 @@ const counter = [
   say('cam', 'thinking', 'He’s taking forever.', { to: 'pa' }),
   one('pa'),
   { by: 'pa', choice: [
-    { t: 'Check your phone.', intent: 'checks', then: [{ poses: { pa: 'texting' } }, { check: 'pa' }, hush(1600)] },
     { t: 'Text him: “where u at?”', intent: 'worried', set: { ping: true }, then: [
       { poses: { pa: 'texting' } }, { check: 'pa' }, sms('pa', 'pb', 'where u at?'), hush(1600),
       { poses: { pa: 'drunk_listen' } }, two('pa', 'cam'), hush(1800),
@@ -278,9 +277,9 @@ const counter = [
     ] },
     { t: 'Stay with Cam.', intent: 'stays', then: [say('pa', 'drunk_happy', 'He’s a big boy.', { to: 'cam' })] },
   ] },
-  // twenty minutes later, once Brooke has decided what to text (or not)
+  // live: as soon as Brooke has decided what to text (or not)
   { waitMark: 'texted' },
-  { fn: (f) => justinAfter(f) },
+  { fn: (f) => justinReads(f) },
 ];
 
 // split: Brooke in the bathroom, the stranger at the next urinal. They pee and talk, then stop and talk for real
@@ -392,15 +391,18 @@ const bathroom = [
   narr('Brooke gets in the car.'),
 ];
 
-// Justin, twenty minutes later at the counter, reads what Brooke sent (or didn't)
-const justinAfter = (f) => [
-  { fade: 'out', ms: 600 },
-  scene('bar', { pa: 'texting', cam: 'sip' }),
-  two('pa', 'cam'),
-  { fade: 'in', ms: 600 },
-  { caption: 'Twenty minutes later' },
-  hush(1400),
-  one('pa'), { check: 'pa' }, hush(1200),
+// Justin at the counter, live (no time skip): Brooke's text buzzed his phone the moment Brooke sent it, or nothing
+// came. Nobody asks him to check: he takes his phone out, reads it, and only then chooses
+const justinReads = (f) => f.sms === 'none' ? [
+  one('cam'), say('cam', 'surprised', 'Where’s Brooke?', { to: 'pa' }),
+  one('pa'), { check: 'pa' }, { poses: { pa: 'phone_shock' } }, hush(1100),
+  narr('No message. Nothing.'),
+  one('cam'), hush(900), say('cam', 'worried', 'Justin… the guy in the suit.', { to: 'pa' }),
+  { set: { title: 'Not a word' } },
+] : [
+  two('pa', 'cam'), { poses: { pa: 'texting' } }, hush(900),   // his phone, Brooke's name on it
+  say('pa', 'texting', 'Omg. What’s up with Brooke?', { to: 'cam' }),
+  one('pa'), { check: 'pa' }, hush(600),   // he reads it
   ...(f.sms === 'invite' ? [
     { poses: { pa: 'phone_shock' } },
     one('cam'), say('cam', 'surprised', 'Who’s “some guy”?', { to: 'pa' }),
@@ -416,18 +418,11 @@ const justinAfter = (f) => [
         two('pa', 'cam'), hush(1500), narr('He never came back.'),
       ] },
     ] },
-  ] : f.sms === 'brb' ? [
+  ] : [
     say('pa', 'texting', 'He said he’d be right back.', { to: 'cam' }),
-    one('cam'), say('cam', 'holding', 'That was twenty minutes ago.', { to: 'pa' }),
-    hush(1200),
+    one('cam'), hush(1200),
     say('cam', 'worried', 'Justin… the guy in the suit.', { to: 'pa' }),
     { set: { title: 'brb' } },
-  ] : [
-    one('cam'), say('cam', 'surprised', 'Where’s Brooke?', { to: 'pa' }),
-    one('pa'), { poses: { pa: 'phone_shock' } }, hush(1100),
-    narr('No message. Nothing.'),
-    one('cam'), hush(900), say('cam', 'worried', 'Justin… the guy in the suit.', { to: 'pa' }),
-    { set: { title: 'Not a word' } },
   ]),
 ];
 
@@ -507,7 +502,7 @@ window.BAR = [
   say('pb', 'drunk_sad', '…I gotta pee.', { to: 'cam' }),
   { exit: 'pb' }, { aside: { pa: false } },
   // from here to the end, each one plays his own scene on his own phone and only sees what his character sees;
-  // a spectator follows Brooke; solo plays the counter up to "twenty minutes later", then Brooke, then the end
+  // a spectator follows Brooke; solo plays the counter up to Brooke's text, then all of Brooke, then back to the counter
   { split: () => ({ pa: counter, pb: bathroom }), watch: () => 'pb',
     hold: () => ({ pa: 'Brooke is still in the bathroom', pb: 'Justin is still with Cam' }) },
   { fade: 'out', ms: 900 },

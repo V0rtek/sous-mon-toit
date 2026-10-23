@@ -324,11 +324,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023194912"></script>
-<script src="story.js?v=20261023194912"></script>
-<script src="play.js?v=20261023194912"></script>
-<script src="bar.js?v=20261023194912"></script>
-<script src="games.js?v=20261023194912"></script>
+<script src="chars.js?v=20261023195942"></script>
+<script src="story.js?v=20261023195942"></script>
+<script src="play.js?v=20261023195942"></script>
+<script src="bar.js?v=20261023195942"></script>
+<script src="games.js?v=20261023195942"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -830,7 +830,7 @@ function startSplit(s) {
   const mine = seats.filter((k) => state.seats[k] && state.seats[k].id === myId);
   const view = mine.length === 1 ? mine[0] : mine.length ? null : s.watch ? s.watch(state.f) : seats[0];
   const shown = view ? [view] : seats;
-  split = { view, ghosts: {}, hold: s.hold ? s.hold(state.f) : {}, marks: new Set(), waitOn: null };
+  split = { view, ghosts: {}, hold: s.hold ? s.hold(state.f) : {}, marks: new Set(), waitOn: null, shots: {} };
   q.unshift(...(view ? [{ lane: view }, ...lanes[view]] : soloOrder(lanes)), { join: true });
   for (const k of seats) if (!shown.includes(k)) split.ghosts[k] = { seat: k, q: lanes[k].slice(), waiting: null, options: null, done: false };
   for (const g of Object.values(split.ghosts)) ghostRun(g);
@@ -850,6 +850,18 @@ function soloOrder(lanes) {
   };
   for (const k of Object.keys(lanes)) if (!pos[k]) play(k);
   return out;
+}
+// solo: coming back to a scene puts it back as it was left (decor, poses, facing, shot), so a story that runs live
+// never has to set its scene a second time. false = the story restarted meanwhile
+async function toLane(k, r) {
+  const now = laneNow; laneNow = k;
+  if (!split || split.view || !now || now === k) return true;
+  if (sc) split.shots[now] = { scene: Object.keys(SCENES).find((id) => SCENES[id] === sc), cam: camNow,
+    cast: Object.fromEntries(Object.entries(actors).map(([id, a]) => [id, a.pose])), face: Object.fromEntries(Object.entries(actors).map(([id, a]) => [id, a.face])) };
+  const back = split.shots[k]; if (!back || SCENES[back.scene] === sc) return true;   // same decor: nothing to put back
+  await fade('out', 400); if (r !== run) return false;
+  setScene(back.scene, back.cast); setFace(back.face); setCam(back.cam);
+  await fade('in', 400); return r === run;
 }
 function markReached(m) {
   split.marks.add(m);
@@ -919,7 +931,7 @@ async function next() {
     if (s.when) q.unshift(...(s.when(state.f) ? s.then : s.else || []));
     else if (s.fn) q.unshift(...s.fn(state.f));
     else if (s.split) startSplit(s);
-    else if (s.lane) laneNow = s.lane;
+    else if (s.lane) { if (!(await toLane(s.lane, r))) return; }
     else if (s.join) {
       laneNow = null;
       if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); return; }
@@ -1176,7 +1188,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023194912';
+const BUILD = '20261023195942';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
