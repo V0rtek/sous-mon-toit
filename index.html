@@ -145,10 +145,32 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #todoBtn { position: absolute; top: 2.2%; right: 4%; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: #e8e8ed; color: #1d1d1f; display: grid; place-items: center; cursor: pointer; padding: 0; }
 #todoBtn span { font-size: 3.6em; font-weight: 600; }
 #todoCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.55); display: grid; place-items: center; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
-.todo { width: 72%; box-sizing: border-box; background: #fff; color: #1d1d1f; border-radius: 2.4em; padding: 3.2em 3.4em; }
+.todo { width: 76%; max-height: 82%; overflow-y: auto; box-sizing: border-box; background: #fff; color: #1d1d1f; border-radius: 2.4em; padding: 3.2em 3.4em; }
 .todo b { font-size: 2.8em; font-weight: 600; }
 .todo ul { margin: 1.4em 0 0; padding-left: 1.3em; }
 .todo li { font-size: 2.5em; line-height: 1.4; }
+.todo li + li { margin-top: .35em; }
+.todo li.sub { list-style: none; margin-left: .6em; margin-top: .1em; font-size: 2.2em; color: #6e6e73; }
+/* mini-games: the home's tiles, its own "?" (the ideas) in the corner */
+#labScreen { justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; }
+#labScreen .tiles { margin: auto 0; }
+#labNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
+#labNote span { font-size: 3.6em; font-weight: 600; }
+/* an incoming call: the caller's name, then decline (red) and answer (green) */
+#ringCard { position: absolute; inset: 0; z-index: 25; background: rgba(12,12,16,.86); display: flex; flex-direction: column; align-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; color: #f5f5f7; cursor: default; }
+#ringName { margin-top: 30%; font-size: 5em; font-weight: 600; letter-spacing: -.02em; }
+#ringSub { margin-top: .6em; font-size: 2.2em; color: #a1a1a6; }
+#ringBtns { margin-top: auto; margin-bottom: 18%; display: flex; gap: 14em; }
+#ringBtns button { font: inherit; background: none; border: 0; padding: 0; color: #f5f5f7; display: flex; flex-direction: column; align-items: center; gap: 1.4em; cursor: pointer; }
+#ringBtns i { width: 11em; height: 11em; border-radius: 50%; display: grid; place-items: center; background: #ff3b30; }
+#ringBtns button:last-child i { background: #34c759; animation: ringPulse 1.2s ease-in-out infinite; }
+#ringBtns svg { width: 5em; height: 5em; }
+#ringBtns span { font-size: 2.2em; }
+#ringBtns button:first-child svg { transform: rotate(135deg); }
+#ringBtns .picked i { box-shadow: 0 0 0 .5em #fff; }
+@keyframes ringPulse { 50% { transform: scale(1.06); } }
+body.watch #ringBtns button { pointer-events: none; }
+body.watch #ringBtns button.mine { pointer-events: auto; }
 body.watch #solo { display: none !important; }
 #gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
@@ -225,6 +247,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
   <div id="waitOther" hidden><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
+  <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="black"></div>
   <div id="slate" hidden></div>
   <div id="who" class="card menu">
@@ -238,6 +261,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="bar"><span>Last call</span></button>
       <button type="button" id="play"><span>Le café</span></button>
       <button type="button" id="test1"><span>Sous mon toit</span></button>
+      <button type="button" id="lab"><span>Mini-jeux</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
       <a href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener"><span>Info</span></a>
     </div>
@@ -249,6 +273,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
   <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
+  <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul></div></div>
   <div id="gallery" class="card menu" hidden>
     <div class="grid3" id="galList"></div>
@@ -299,10 +324,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023192205"></script>
-<script src="story.js?v=20261023192205"></script>
-<script src="play.js?v=20261023192205"></script>
-<script src="bar.js?v=20261023192205"></script>
+<script src="chars.js?v=20261023194912"></script>
+<script src="story.js?v=20261023194912"></script>
+<script src="play.js?v=20261023194912"></script>
+<script src="bar.js?v=20261023194912"></script>
+<script src="games.js?v=20261023194912"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -319,7 +345,7 @@ let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST 
 let sc = null, actors = {}, camNow = null;
 // story: 't1' (chapter 1, solo) or a 2-player one ('play' = the café, 'bar' = Last call: they list their seats);
 // f = what the choices decided (read by the story's `when` steps)
-const STORIES = { t1: STORY, play: PLAY, bar: BAR };
+const STORIES = { t1: STORY, play: PLAY, bar: BAR, ...GAMES };   // + the mini-games (games.js), 2-player each
 // seats = who took each character of a 2-player story in the waiting room: {pa: {id, n}, pb: {id, n}}
 const state = { name: 'Justin', seats: {}, story: 't1', f: {}, isa: ISA_LOOKS[0].sprite, picks: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
@@ -328,7 +354,7 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { choosing: 'choisit', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu' };
+const UI = { choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -386,7 +412,9 @@ function setPose(id, pose) {
   const img = new Image(); img.alt = ''; img.src = poseSrc(id, pose);
   const swap = () => {
     if (a.pose !== pose || actors[id] !== a) return;   // a newer pose came first, or he left the scene
+    const phone = PHONE_POSES.includes(a.shown) !== PHONE_POSES.includes(pose);
     a.el.replaceChild(img, a.el.firstChild); a.shown = pose; placeActor(a);
+    if (phone) drawTexts();   // he took his phone out, or put it away: his texts come or go
   };
   img.decode().then(swap, swap);
 }
@@ -456,13 +484,17 @@ function applyCam(c, ms) {
 // vibration + a phone with the count beside him), but he reads it only when the story has him check it ({check: id}):
 // he looks at his phone, then each text shows, held long enough to read, then the story goes on ----
 let texts = {};
+// a character's texts show while he is on his phone (one of these poses); a text that just came in shows his buzzing
+// phone for a moment, then it waits, unread, until he looks
+const PHONE_POSES = ['texting', 'phone_shock', 'phone_call'], PING_MS = 3500;
 function textMsg(m, sent) {
   const t = fill(m.text);
   if (sent) Object.assign(sent, { t, draft: false, status: 'delivered' });   // the bubble he typed goes out as it is
   else (texts[m.from] = texts[m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
-  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent });
+  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now() });
   if (actors[m.to] && !afar(m.to) && !FAST) buzz();
   drawTexts();
+  setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
 }
 // someone of the other scene (seen from afar): you see him talk, not his phone. In solo the scenes play one after
 // the other, so the other player is the one whose scene is not playing
@@ -506,7 +538,8 @@ function drawTexts(wait = 0) {
   const f = camNow && camNow.frame; if (!f) return;
   const s = H / f.camH;
   for (const a of Object.values(actors)) {
-    const all = texts[a.id] || [], list = all.filter((m) => !m.unread).slice(-3), unread = all.filter((m) => m.unread);
+    const all = texts[a.id] || [], onPhone = PHONE_POSES.includes(a.pose);
+    const list = onPhone ? all.filter((m) => !m.unread).slice(-3) : [], unread = all.filter((m) => m.unread && (onPhone || Date.now() - m.at < PING_MS));
     if ((!list.length && !unread.length) || afar(a.id)) continue;
     const b = box(a), x = (a.x - f.left) * s;
     if (x < 0 || x > W) continue;
@@ -637,23 +670,51 @@ const waitsFor = (by) => duo() && seated() && !mineFor(by);
 const byOf = (s) => s.by || laneNow;
 let held = [];   // the steps that lead into the other player's choice: they run once that player has picked
 function waitNote(t) { $('#waitText').textContent = t; $('#waitOther').hidden = !t; }
-function choose(opts, by) {
-  options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = '';
+// {ring: 'Justin', choice: [answer, decline]}: the choice is an incoming call (the caller's name, a ringtone and the
+// phone's vibration; the green button = the 1st option, the red = the 2nd). Only the player it rings for sees it
+const ICON_PHONE = '<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>';
+let ringing = null;
+function ringTone(on) {
+  clearInterval(ringing); ringing = null;
+  if (!on || FAST) return;
+  const beep = () => {
+    try { if (navigator.vibrate) navigator.vibrate([400, 200, 400]); } catch { /* no vibration here */ }
+    const c = audio(); if (!c) return;
+    for (const [t0, f] of [[0, 880], [0.2, 660], [0.5, 880], [0.7, 660]]) {
+      const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
+      o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18); o.connect(g).connect(c.destination); o.start(t); o.stop(t + 0.2);
+    }
+  };
+  beep(); ringing = setInterval(beep, 2400);
+}
+const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
+function choose(opts, by, ring) {
+  options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
   const mine = mineFor(by);
   if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(by)} ${ui('choosing')}`); }
-  else choicesEl.hidden = false;
-  opts.forEach((o, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = fill(o.t);
+  else if (ring) {
+    bubble.hidden = true; choicesEl.hidden = true;
+    $('#ringName').textContent = fill(ring); $('#ringSub').textContent = ui('calling'); $('#ringCard').hidden = false;
+    if (mine) ringTone(true);
+  } else choicesEl.hidden = false;
+  const holder = ring && !waitsFor(by) ? $('#ringBtns') : choicesEl;
+  const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
+  for (const i of order) {
+    const o = opts[i], b = document.createElement('button'); b.type = 'button';
+    if (holder === choicesEl) b.textContent = fill(o.t);
+    else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
+    b.dataset.i = i;
     if (mine && ROLE === 'watch') b.classList.add('mine');
     b.onclick = (e) => {
       e.stopPropagation();
       if (!mine || waiting !== 'choice') return;
       if (ROLE === 'host') pickChoice(i);
-      else if (!choicesEl.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
+      else if (!holder.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
     };
-    choicesEl.appendChild(b);
-    if (i === 0 && ROLE === 'host' && mine && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
-  });
+    holder.appendChild(b);
+    if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
+  }
 }
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
@@ -662,10 +723,12 @@ function pickChoice(i, afar = false) {
   const by = optionsBy;
   const go = () => {
     state.picks.push({ ...o, by }); if (o.set) Object.assign(state.f, o.set);
-    choicesEl.hidden = true; waitNote('');
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote('');
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
-  if ((ROLE === 'watch' || afar) && !FAST && !choicesEl.hidden && choicesEl.children[i]) { choicesEl.children[i].classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
+  const btn = [...optionButtons()].find((b) => +b.dataset.i === i);
+  const shown = !choicesEl.hidden || !$('#ringCard').hidden;
+  if ((ROLE === 'watch' || afar) && !FAST && shown && btn) { btn.classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
   else go();
 }
 
@@ -842,9 +905,13 @@ function autoGhost(g) {
 }
 
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
+let onlyNow = null;   // the seat the line on screen belongs to, when only that player sees it
+// a player sees a private line if it's his (solo plays both); a spectator sees everything
+const sees = (seat) => !seated() || (state.seats[seat] && state.seats[seat].id === myId);
 async function next() {
   const r = run;
   slateEl.hidden = true;   // a slate stays until the tap that moves past it (black stays until the next fade in)
+  if (onlyNow) { onlyNow = null; waitNote(''); }
   const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
   if (k > 0 && q[k].choice && waitsFor(byOf(q[k]))) held = q.splice(0, k);
   while (q.length && r === run) {
@@ -882,8 +949,14 @@ async function next() {
     else if (s.caption) showCaption(s.caption);
     else if (s.wait) await sleep(s.wait);
     else if (s.custom) await CUSTOM[s.custom]();
-    else if (s.say || s.narr || s.think) { line(s); waiting = 'click'; return; }
-    else if (s.choice) { choose(s.choice, byOf(s)); waiting = 'choice'; return; }
+    else if (s.say || s.narr || s.think) {
+      // {only: seat}: a line only that player sees (a secret, his own version of the facts); the other one gets
+      // "<name> is reading…" until that player taps on
+      onlyNow = s.only || null;
+      if (onlyNow && !sees(onlyNow)) { bubble.hidden = true; waitNote(`${seatName(onlyNow)} ${ui('reading')}`); } else line(s);
+      waiting = 'click'; return;
+    }
+    else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.end) { endCard(s.end); return; }
   }
 }
@@ -894,13 +967,13 @@ function advance() {
     // for the line it is on (its count of taps so far, or of this scene's taps)
     if (!seated() || !duo()) return;
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
-    if (waiting !== 'click' || !remote || applied !== remote.t.length || (laneNow && !mineFor(laneNow))) return;
+    if (waiting !== 'click' || !remote || applied !== remote.t.length || (laneNow && !mineFor(laneNow)) || (onlyNow && !mineFor(onlyNow))) return;
     const k = laneNow ? laneCount(remote.t, laneNow) : applied, key = tag(laneNow) + k;
     if (sentK !== key) { sentK = key; sendIn('a', laneNow ? { lane: laneNow, k } : {}); }
     return;
   }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
-  if (waiting !== 'click' || (laneNow && !mineFor(laneNow))) return;
+  if (waiting !== 'click' || (laneNow && !mineFor(laneNow)) || (onlyNow && !mineFor(onlyNow))) return;
   record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next();
 }
 stage.addEventListener('click', (e) => { if (!e.target.closest('.card')) advance(); });
@@ -910,8 +983,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#cover', '#end'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#cover', '#end', '#labScreen'];
+const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
@@ -927,7 +1000,7 @@ function halt() {
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   split = null; laneNow = null; texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
-  asides.clear(); $('#todoCard').hidden = true;
+  asides.clear(); $('#todoCard').hidden = true; $('#ringCard').hidden = true; ringTone(false); onlyNow = null;
 }
 
 function begin(id = state.story) {
@@ -979,15 +1052,28 @@ function playSolo() {
   clearTimeout(takeSeat.t); begin();
 }
 $('#solo').onclick = (e) => { e.stopPropagation(); playSolo(); };
-$('#todoBtn').onclick = (e) => {
-  e.stopPropagation();
-  const t = story().todo; if (!t) return;
+// a note behind a "?": a title and its points ("- " = a sub-point), tap anywhere to close
+function openNote(t) {
   $('#todoTitle').textContent = t.title;
   $('#todoList').innerHTML = '';
-  for (const it of t.items) { const li = document.createElement('li'); li.textContent = it; $('#todoList').appendChild(li); }
-  $('#todoCard').hidden = false;
-};
+  for (const it of t.items) {
+    const li = document.createElement('li'); li.textContent = it.replace(/^- /, '');
+    if (it.startsWith('- ')) li.className = 'sub';
+    $('#todoList').appendChild(li);
+  }
+  $('#todoCard').hidden = false; $('#todoCard .todo').scrollTop = 0;
+}
+$('#todoBtn').onclick = (e) => { e.stopPropagation(); if (story().todo) openNote(story().todo); };
 $('#todoCard').onclick = (e) => { e.stopPropagation(); $('#todoCard').hidden = true; };
+// mini-games: one tile each (its 2-player waiting room); the "?" = the ideas they come from
+for (const g of GAME_LIST) {
+  const b = document.createElement('button'); b.type = 'button'; b.id = 'game-' + g.id;
+  const sp = document.createElement('span'); sp.textContent = g.name; b.appendChild(sp);
+  b.onclick = (e) => { e.stopPropagation(); openWait(g.id); };
+  $('#labTiles').appendChild(b);
+}
+$('#lab').onclick = (e) => { e.stopPropagation(); show('#labScreen'); };
+$('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
 function takeSeat(k, id, n) {
   if (!waitRoom || !seatsOf().includes(k)) return;
   const s = state.seats[k];
@@ -1090,7 +1176,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023192205';
+const BUILD = '20261023194912';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -1116,7 +1202,7 @@ function announce(on) {
   const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
   live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now(), v: BUILD }) : '', { retain: true });
 }
-const TILES = { play: '#play', bar: '#bar' };
+const TILES = { play: '#play', bar: '#bar', ...Object.fromEntries(GAME_LIST.map((g) => [g.id, '#game-' + g.id])) };
 function showRooms() {
   for (const [s, sel] of Object.entries(TILES)) {
     const r = roomFor(s), tile = $(sel);
@@ -1162,6 +1248,7 @@ function fromJoiner(m) {
   if (m.e === 'a') {
     if (g) { if (m.k === laneCount(tape, m.lane)) ghostTap(g); return; }
     if (m.lane ? m.lane !== laneNow || m.k !== laneCount(tape, m.lane) : m.k !== tape.length) return;
+    if (onlyNow && ownerOf(onlyNow) !== m.id) return;   // a private line: only its owner moves past it
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
     if (waiting === 'click') { record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
   } else if (/^c\d$/.test(m.e)) {
@@ -1285,7 +1372,7 @@ async function skipTo(n, id) {
     for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
     if (!$('#end').hidden) break;
     if (!$('#looks').hidden) { $('#lookGo').click(); await tick(); continue; }   // let the card close before the next tap
-    if (waiting === 'choice') choicesEl.querySelector('button').click();
+    if (waiting === 'choice') [...optionButtons()].find((b) => b.dataset.i === '0').click();
     else advance();
   }
   FAST = false;

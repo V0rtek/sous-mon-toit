@@ -140,7 +140,7 @@ SCENES.wc = {
 };
 SCENES.street = {
   size: [1920, 1440], back: STREET_BACK, front: STREET_FRONT,
-  spots: { pa: [470, 880, 300], cam: [770, 880, 300], pb: [1120, 1250, 700], suit: [1400, 1250, 720] },
+  spots: { pa: [430, 880, 300], cam: [545, 880, 300], pb: [1040, 1250, 700], suit: [1400, 1250, 720] },
   face: { pa: 'r', cam: 'l', pb: 'l', suit: 'l' },
 };
 
@@ -290,9 +290,11 @@ const bathroom = [
   cam('two', 'pb', 'suit'),
   { fade: 'in', ms: 500 },
   { enter: { pb: 'pee' } }, two('pb', 'suit'),
-  { sfx: 'zip' }, { wait: 500 }, { sfx: 'pee', loop: true }, { wait: 700 },
-  { poses: { pb: 'pee_relief' } }, hush(1400),   // two men peeing side by side, nobody talks
-  say('suit', 'pee', 'Long night?', { to: 'pb' }),
+  { sfx: 'zip' }, { wait: 500 }, { sfx: 'pee', loop: true }, hush(1300),   // Brooke pees a little
+  { poses: { pb: 'pee_relief' } }, hush(1600),   // then the relief
+  { poses: { pb: 'pee_look' } }, hush(700),   // then he looks at the guy at the next urinal, and he's the one who starts
+  one('pb'), say('pb', 'pee_look', 'Nice suit.', { to: 'suit' }),
+  one('suit'), hush(600), say('suit', 'pee', 'Long night?', { to: 'pb' }),
   { by: 'pb', choice: [
     { t: 'Best night of my life.', intent: 'happy', then: [
       one('pb'), say('pb', 'pee_look', 'Best night of my life, man.', { to: 'suit' }),
@@ -304,10 +306,12 @@ const bathroom = [
     ] },
     { t: 'Say nothing.', intent: 'stares at the wall', then: [{ poses: { pb: 'pee' } }, one('pb'), hush(1200), narr('Brooke stares at the wall. Very hard.')] },
   ] },
-  // they stop, zip up, turn around: now they talk for real
+  // they don't finish together: the suit first (zips, turns, fixes his tie, eyes on Brooke) while Brooke keeps going,
+  // then Brooke zips up and turns to him: now they talk for real
   two('pb', 'suit'), hush(900),
-  { stop: 'pee' }, { sfx: 'zip' }, { wait: 600 }, { sfx: 'zip' },
-  { poses: { pb: 'drunk_listen', suit: 'adjust' } }, face({ pb: 'r', suit: 'l' }),   // he fixes his tie, eyes on Brooke
+  { sfx: 'zip' }, { poses: { suit: 'adjust' } }, face({ suit: 'l' }), hush(1700),
+  { stop: 'pee' }, { sfx: 'zip' }, { wait: 500 },
+  { poses: { pb: 'drunk_listen' } }, face({ pb: 'r' }),
   hush(900),
   one('suit'),
   say('suit', 'listen', 'I’ve got a job for you.', { to: 'pb' }),
@@ -379,8 +383,8 @@ const bathroom = [
       one('suit'), hush(900), say('suit', 'angry', 'Then keep it off.', { to: 'pb' }),
     ] },
   ] },
-  // he looks back at the bar's window
-  { cam: 'wide', at: 780 }, hush(1800),
+  // he turns his back to the suit and looks at the bar's window: Justin and Cam inside, still talking
+  face({ pb: 'l' }), { cam: 'wide', at: 775 }, hush(1800),
   think('pb', '…He’s right there.'),
   two('pb', 'suit'), hush(600),
   say('suit', 'shush', 'Get in.', { to: 'pb' }),
@@ -522,4 +526,5 @@ BAR.cast = {
 BAR.words = { TITLE: (f) => f.title || 'Last call' };
 BAR.ui = { choosing: 'is choosing', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read' };
 // what's known to be off, behind the "?" of the waiting room (so testers know)
-BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction'] };
+BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction',
+  'Make the style uniform, between characters, backgrounds. Tone (music / sounds)'] };
