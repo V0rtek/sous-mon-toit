@@ -289,10 +289,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js"></script>
-<script src="story.js"></script>
-<script src="play.js"></script>
-<script src="bar.js"></script>
+<script src="chars.js?v=20261023142512"></script>
+<script src="story.js?v=20261023142512"></script>
+<script src="play.js?v=20261023142512"></script>
+<script src="bar.js?v=20261023142512"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -524,12 +524,13 @@ function typeText(t) {
 // and the speaker turns to whom they talk to (s.to, else whoever spoke last). Someone `aside` (a stranger in the back)
 // keeps looking where the story put him
 let lastSpeaker = null;
+const asides = new Set();   // {aside: {pa: true}}: he looks away for a while (turned to the bartender), {pa: false} = back
 const REST = () => ({ explaining: 'listen', ...(window.POSE_REST || {}) });
 function gaze(s) {
   const sp = actors[s.say];
   if (!sp) return;
   if (!s.whisper) for (const a of Object.values(actors)) {
-    if (a === sp || castOf(a.id).aside) continue;
+    if (a === sp || castOf(a.id).aside || asides.has(a.id)) continue;
     const rest = REST()[a.pose]; if (rest) setPose(a.id, rest);
     if (a.x !== sp.x) { a.face = sp.x < a.x ? 'l' : 'r'; placeActor(a); }
   }
@@ -556,6 +557,14 @@ function line(s) {
   if (!tail.hidden) tail.style.left = Math.min(86, Math.max(14, (sx - .07) / .86 * 100)) + '%';
   if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
   bubble.hidden = false; choicesEl.hidden = true;
+  // the name tag never sits on the tail: if they meet, the tag moves just past the tail (still on the speaker's side)
+  tagEl.style.left = '';
+  if (who && !tail.hidden) {
+    const em = H / 100, tx = parseFloat(tail.style.left) / 100 * bubble.clientWidth;
+    if (tx - 1.4 * em < tagEl.offsetLeft + tagEl.offsetWidth) {
+      tagEl.style.left = Math.min(tx + 1.6 * em, bubble.clientWidth - tagEl.offsetWidth - 1.6 * em) + 'px';
+    }
+  }
   typeText(fill(s.text || s.narr));
   if (firstLine) { hint.hidden = false; firstLine = false; }
 }
@@ -799,6 +808,8 @@ async function next() {
     else if (s.check) checkTexts(s.check);
     else if (s.sfx) sfx(s.sfx, s.loop);
     else if (s.stop) stopSfx(s.stop);
+    else if (s.hush) { bubble.hidden = true; await sleep(s.hush); }   // a silence: no bubble, the shot holds
+    else if (s.aside) for (const [id, on] of Object.entries(s.aside)) asides[on ? 'add' : 'delete'](id);
     else if (s.slate) { await fade('out', s.ms || 500); if (r !== run) return; slateEl.textContent = fill(s.slate); slateEl.hidden = false; waiting = 'click'; return; }
     else if (s.set) Object.assign(state.f, s.set);
     else if (s.scene) setScene(s.scene, s.cast);
@@ -858,6 +869,7 @@ function halt() {
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   split = null; laneNow = null; texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
+  asides.clear();
 }
 
 function begin(id = state.story) {
@@ -1006,10 +1018,21 @@ function roomCode() {
   const fresh = () => Math.random().toString(36).slice(2, 8).padEnd(6, '0');
   try { let c = localStorage.getItem('smt-room'); if (!c) { c = fresh(); localStorage.setItem('smt-room', c); } return c; } catch { return fresh(); }
 }
+// the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
+// GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
+// stories (never in the middle of one)
+const BUILD = '20261023142512';
+function newer(v) {
+  if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
+  if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
+  newer.done = true;
+  try { sessionStorage.setItem(ROLE === 'watch' ? 'smt-auto' : 'smt-home', '1'); } catch { /* private window */ }
+  location.replace(`${location.pathname}?${ROLE === 'watch' ? `watch=${room}&` : ''}v=${v}`);
+}
 function share() {
   if (ROLE !== 'host' || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, v: BUILD }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
 
@@ -1022,7 +1045,7 @@ const roomFor = (s) => [...rooms.values()].filter((r) => r.room !== room && r.s 
 function announce(on) {
   if (ROLE !== 'host' || !live || !live.connected) return;
   const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
-  live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now() }) : '', { retain: true });
+  live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now(), v: BUILD }) : '', { retain: true });
 }
 const TILES = { play: '#play', bar: '#bar' };
 function showRooms() {
@@ -1085,7 +1108,7 @@ async function goLive() {
   if (ROLE === 'host') room = roomCode();
   try { await loadScript('https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'); } catch { return; }
   const seat = `${topic()}/w/${myId}`, joined = Date.now();
-  const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined }), { retain: true }); };
+  const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined, v: BUILD }), { retain: true }); };
   live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
     will: { topic: ROLE === 'watch' ? seat : `${OPEN}/${room}`, payload: '', retain: true, qos: 0 } });
   live.on('connect', () => {
@@ -1101,7 +1124,7 @@ async function goLive() {
       if (t.startsWith(OPEN + '/')) {
         const r = t.slice(OPEN.length + 1);
         let v = null; try { v = buf.length ? JSON.parse(buf.toString()) : null; } catch { /* not ours */ }
-        if (v && v.room === r) rooms.set(r, { room: r, s: v.s || 'play', n: [].concat(v.n || []).map((x) => String(x).slice(0, 16)), t: +v.t || 0 });
+        if (v && v.room === r) { rooms.set(r, { room: r, s: v.s || 'play', n: [].concat(v.n || []).map((x) => String(x).slice(0, 16)), t: +v.t || 0 }); newer(v.v); }
         else rooms.delete(r);
         showRooms(); return;
       }
@@ -1115,6 +1138,7 @@ async function goLive() {
         if (!v || typeof v !== 'object') v = { t: +v };
         // a retained presence may be old: trust its own timestamp; a live refresh is fresh by definition
         watchers.set(id, { t: packet.retain ? Math.min(now, +v.t || 0) : now, n: String(v.n || '').slice(0, 16), j: +v.j || now });
+        newer(v.v);
       }
       countEyes();
     });
@@ -1139,6 +1163,7 @@ let remote = null, applied = 0, pumping = false;
 const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, 40)); t(); });
 function follow(msg) {
   hostId = msg && msg.h;
+  newer(msg && msg.v);
   if (!msg || !msg.g) {
     remote = null;
     if (msg && STORIES[msg.w]) { if (screen !== '#wait') halt(); state.story = msg.w; state.seats = msg.seats || {}; renderWait(); }

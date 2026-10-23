@@ -1,7 +1,7 @@
-// Last call — 2 players, ~2 min, a thriller in a bar, in English. Justin (pa) and Brooke (pb), roommates, + Cam.
+// Last call — 2 players, ~3 min, a thriller in a bar, in English. Justin (pa) and Brooke (pb), roommates, + Cam.
 // Brooke goes to the bathroom: from there each player plays HIS scene on his own phone at the same time, without seeing
 // the other's (split). Texts go from one scene to the other. Decors = rectangles only (mock-up, pictures later).
-// Writing rules learned from Justin's feedback: _Techniques.md · assets still to make: _Assets.md
+// Writing rules learned from Justin's feedback: Claude Doc « Techniques d'écriture · épisodes » · assets: « Assets à faire »
 
 const sms = (from, to, text) => ({ sms: { from, to, text } });
 
@@ -121,85 +121,110 @@ SCENES.street = {
 };
 
 // ---------- the story ----------
+// the camera talks like a film: a single on whoever speaks or takes the hit, a two-shot for the exchange, and
+// silences (hush: no bubble, the shot holds) after what hurts or what's new
+const one = (who) => cam('one', who);
+const two = (a, b) => cam('two', a, b);
+const hush = (ms = 900) => ({ hush: ms });
+
 // split: Justin stays at the counter with Cam — a real conversation, as long as Brooke's scene: what Brooke meant
 // (tension), why Justin keeps paying for him (stakes), and the guy in a suit asking about Brooke (curiosity, paid off
 // when Brooke's text arrives)
 const counter = [
   { slate: 'Brooke heads to the bathroom. It’s just you and Cam now.' },
   scene('bar', { pa: 'drunk_listen', cam: 'listen' }),
-  cam('two', 'pa', 'cam'),
+  two('pa', 'cam'),
   { fade: 'in', ms: 500 },
+  hush(1100),   // Brooke's empty spot between them
+  one('cam'),
   say('cam', 'thinking', 'What was he gonna say?', { to: 'pa' }),
+  one('pa'),
   { by: 'pa', choice: [
     { t: 'Talk about Brooke.', intent: 'his friend', then: [
       say('pa', 'drunk_talk', 'He’s wasted. He won’t remember any of this tomorrow.', { to: 'cam' }),
-      say('cam', 'holding', 'Or he’ll remember all of it.', { to: 'pa' }),
-      say('pa', 'drunk_listen', '…You think he meant it?', { to: 'cam' }),
-      say('cam', 'amused', 'I think he says it to the bartender too.', { to: 'pa' }),
+      one('cam'), say('cam', 'holding', 'Or he’ll remember all of it.', { to: 'pa' }),
+      one('pa'), hush(800), say('pa', 'drunk_listen', '…You think he meant it?', { to: 'cam' }),
+      one('cam'), say('cam', 'amused', 'I think he says it to the bartender too.', { to: 'pa' }),
     ] },
     { t: 'Get to know her.', intent: 'curious', then: [
       say('pa', 'drunk_talk', 'Six years… and I don’t even know where you’re from.', { to: 'cam' }),
-      say('cam', 'tipsy_laugh', 'You never asked.', { to: 'pa' }),
-      say('pa', 'drunk_happy', 'I’m asking.', { to: 'cam' }),
-      say('cam', 'amused', 'Sudbury. Tell anyone and you’re dead.', { to: 'pa' }),
+      one('cam'), say('cam', 'tipsy_laugh', 'You never asked.', { to: 'pa' }),
+      one('pa'), say('pa', 'drunk_happy', 'I’m asking.', { to: 'cam' }),
+      one('cam'), hush(700), say('cam', 'amused', 'Sudbury. Tell anyone and you’re dead.', { to: 'pa' }),
     ] },
     { t: 'Ask how she feels.', intent: 'honest', then: [
       say('pa', 'drunk_talk', 'And you? How’d that make you feel?', { to: 'cam' }),
-      say('cam', 'awkward', '…Depends who’s saying it.', { to: 'pa' }),
-      say('pa', 'drunk_listen', 'And if it’s him?', { to: 'cam' }),
-      say('cam', 'holding', 'Then I pretend I didn’t hear it. Again.', { to: 'pa' }),
+      one('cam'), hush(1000), say('cam', 'awkward', '…Depends who’s saying it.', { to: 'pa' }),
+      one('pa'), say('pa', 'drunk_listen', 'And if it’s him?', { to: 'cam' }),
+      one('cam'), hush(800), say('cam', 'holding', 'Then I pretend I didn’t hear it. Again.', { to: 'pa' }),
     ] },
     { t: 'Flirt.', intent: 'flirt', then: [
       say('pa', 'drunk_happy', 'I would’ve finished the sentence.', { to: 'cam' }),
-      say('cam', 'flirty', 'Oh yeah? Go ahead. Finish it.', { to: 'pa' }),
-      say('pa', 'drunk_flirt', 'You’re just…', { to: 'cam' }),
-      say('cam', 'tipsy_laugh', 'Wow. You two share a brain.', { to: 'pa' }),
+      one('cam'), say('cam', 'flirty', 'Oh yeah? Go ahead. Finish it.', { to: 'pa' }),
+      one('pa'), hush(700), say('pa', 'drunk_flirt', 'You’re just…', { to: 'cam' }),
+      two('pa', 'cam'), hush(600), say('cam', 'tipsy_laugh', 'Wow. You two share a brain.', { to: 'pa' }),
     ] },
   ] },
   // Cam turns it on him: the rent
+  two('pa', 'cam'), hush(1300),
+  one('cam'),
   say('cam', 'thinking', 'Can I ask you something?', { to: 'pa' }),
+  one('pa'),
   say('pa', 'drunk_listen', 'Mm.', { to: 'cam' }),
+  one('cam'),
   say('cam', 'holding', 'Why do you keep paying his rent?', { to: 'pa' }),
+  one('pa'), hush(1000),
   { by: 'pa', choice: [
     { t: 'He’s my brother.', intent: 'loyal', then: [
       say('pa', 'drunk_talk', 'He’s my brother.', { to: 'cam' }),
-      say('cam', 'thinking', 'He’s your roommate.', { to: 'pa' }),
-      say('pa', 'drunk_happy', 'Same thing at 2 a.m.', { to: 'cam' }),
+      one('cam'), say('cam', 'thinking', 'He’s your roommate.', { to: 'pa' }),
+      one('pa'), say('pa', 'drunk_happy', 'Same thing at 2 a.m.', { to: 'cam' }),
     ] },
     { t: 'Because no one else will.', intent: 'tired', then: [
       say('pa', 'drunk_sad', 'Because no one else will.', { to: 'cam' }),
-      say('cam', 'awkward', 'That’s not a reason. That’s a trap.', { to: 'pa' }),
+      one('cam'), hush(900), say('cam', 'awkward', 'That’s not a reason. That’s a trap.', { to: 'pa' }),
     ] },
     { t: 'I’m done. Monday, he’s on his own.', intent: 'done', then: [
       say('pa', 'drunk_talk', 'I’m done. Monday, he’s on his own.', { to: 'cam' }),
-      say('cam', 'surprised', 'You’ve never said that before.', { to: 'pa' }),
+      one('cam'), hush(700), say('cam', 'surprised', 'You’ve never said that before.', { to: 'pa' }),
     ] },
   ] },
   // the guy in the suit
+  two('pa', 'cam'), hush(1100),
+  one('cam'),
   say('cam', 'thinking', 'Did he tell you about the guy?', { to: 'pa' }),
+  one('pa'),
   say('pa', 'drunk_listen', 'What guy?', { to: 'cam' }),
+  one('cam'),
   say('cam', 'holding', 'Guy in a suit. Came to my work twice this week.', { to: 'pa' }),
+  hush(900),
   say('cam', 'holding', 'Asked if I knew Brooke.', { to: 'pa' }),
+  one('pa'), hush(1300),
   say('pa', 'surprised', '…What’d you say?', { to: 'cam' }),
+  one('cam'), hush(800),
   say('cam', 'awkward', 'That I didn’t.', { to: 'pa' }),
+  one('pa'),
   { by: 'pa', choice: [
     { t: 'Why’d you lie?', intent: 'presses', then: [
       say('pa', 'drunk_talk', 'Why’d you lie?', { to: 'cam' }),
-      say('cam', 'holding', 'Because he knew where I work. I never told him.', { to: 'pa' }),
+      one('cam'), hush(700), say('cam', 'holding', 'Because he knew where I work. I never told him.', { to: 'pa' }),
     ] },
     { t: 'Probably a debt collector.', intent: 'brushes it off', then: [
       say('pa', 'drunk_happy', 'Probably a debt collector. Brooke owes everybody.', { to: 'cam' }),
-      say('cam', 'thinking', 'Debt collectors don’t wear Tom Ford.', { to: 'pa' }),
+      one('cam'), say('cam', 'thinking', 'Debt collectors don’t wear Tom Ford.', { to: 'pa' }),
     ] },
     { t: '[Look at the bathroom door]', intent: 'worried', then: [
-      { poses: { pa: 'drunk_listen' } }, narr('Justin looks at the bathroom door. Nobody comes out.'),
+      { poses: { pa: 'drunk_listen' } }, face({ pa: 'r' }), hush(1400),
+      narr('Justin looks at the bathroom door. Nobody comes out.'),
     ] },
   ] },
+  two('pa', 'cam'), hush(1500),
   say('cam', 'thinking', 'He’s taking forever.', { to: 'pa' }),
+  one('pa'),
   { by: 'pa', choice: [
-    { t: 'Check your phone.', intent: 'checks', then: [{ poses: { pa: 'texting' } }, { check: 'pa' }, { wait: 1400 }] },
+    { t: 'Check your phone.', intent: 'checks', then: [{ poses: { pa: 'texting' } }, { check: 'pa' }, hush(1600)] },
     { t: 'Text him: “where u at?”', intent: 'worried', set: { ping: true }, then: [
-      { poses: { pa: 'texting' } }, { check: 'pa' }, sms('pa', 'pb', 'where u at?'),
+      { poses: { pa: 'texting' } }, { check: 'pa' }, sms('pa', 'pb', 'where u at?'), hush(1200),
       say('pa', 'texting', 'He’s not answering.', { to: 'cam' }),
     ] },
     { t: 'Stay with Cam.', intent: 'stays', then: [say('pa', 'drunk_happy', 'He’s a big boy.', { to: 'cam' })] },
@@ -215,95 +240,102 @@ const bathroom = [
   scene('wc', { suit: 'pee' }),
   cam('two', 'pb', 'suit'),
   { fade: 'in', ms: 500 },
-  { enter: { pb: 'pee' } }, cam('two', 'pb', 'suit'),
+  { enter: { pb: 'pee' } }, two('pb', 'suit'),
   { sfx: 'zip' }, { wait: 500 }, { sfx: 'pee', loop: true }, { wait: 700 },
-  { poses: { pb: 'pee_relief' } }, { wait: 900 },
+  { poses: { pb: 'pee_relief' } }, hush(1400),   // two men peeing side by side, nobody talks
   say('suit', 'pee', 'Long night?', { to: 'pb' }),
   { by: 'pb', choice: [
     { t: 'Best night of my life.', intent: 'happy', then: [
-      say('pb', 'pee_look', 'Best night of my life, man.', { to: 'suit' }),
-      say('suit', 'pee', 'Doesn’t sound like it.', { to: 'pb' }),
+      one('pb'), say('pb', 'pee_look', 'Best night of my life, man.', { to: 'suit' }),
+      one('suit'), hush(700), say('suit', 'pee', 'Doesn’t sound like it.', { to: 'pb' }),
     ] },
     { t: 'Do I know you?', intent: 'suspicious', then: [
-      say('pb', 'pee_look', 'Do I… know you?', { to: 'suit' }),
-      say('suit', 'pee', 'No.', { to: 'pb' }),
+      one('pb'), say('pb', 'pee_look', 'Do I… know you?', { to: 'suit' }),
+      one('suit'), hush(1100), say('suit', 'pee', 'No.', { to: 'pb' }),
     ] },
-    { t: 'Say nothing.', intent: 'stares at the wall', then: [narr('Brooke stares at the wall. Very hard.')] },
+    { t: 'Say nothing.', intent: 'stares at the wall', then: [one('pb'), hush(1200), narr('Brooke stares at the wall. Very hard.')] },
   ] },
   // they stop, zip up, turn around: now they talk for real
+  two('pb', 'suit'), hush(900),
   { stop: 'pee' }, { sfx: 'zip' }, { wait: 600 }, { sfx: 'zip' },
   { poses: { pb: 'drunk_listen', suit: 'listen' } }, face({ pb: 'r', suit: 'l' }),
-  cam('two', 'pb', 'suit'), { wait: 500 },
-  cam('one', 'suit'),
+  hush(900),
+  one('suit'),
   say('suit', 'listen', 'I’ve got a job for you.', { to: 'pb' }),
-  cam('one', 'pb'),
+  one('pb'), hush(500),
   say('pb', 'drunk_talk', 'Huh?', { to: 'suit' }),
-  cam('one', 'suit'),
+  one('suit'),
   say('suit', 'offer', 'Five thousand cash. One night.', { to: 'pb' }),
+  one('pb'), hush(1400),   // it lands
   { when: (f) => f.rent === 'universe', then: [think('pb', '…The universe provides.')] },
   { by: 'pb', choice: [
     { t: '[Laugh]', intent: 'laughs', then: [
-      cam('one', 'pb'), say('pb', 'drunk_happy', 'Hah. Hahaha. Okay.', { to: 'suit' }),
-      cam('one', 'suit'), say('suit', 'listen', 'Rent’s due Monday, Brooke.', { to: 'pb' }),
+      say('pb', 'drunk_happy', 'Hah. Hahaha. Okay.', { to: 'suit' }),
+      one('suit'), hush(1000), say('suit', 'listen', 'Rent’s due Monday, Brooke.', { to: 'pb' }),
     ] },
     { t: 'You’re shady.', intent: 'shady', then: [
-      cam('one', 'pb'), say('pb', 'drunk_talk', 'Man… you a shady ass bitch.', { to: 'suit' }),
-      cam('one', 'suit'), say('suit', 'listen', 'And you’re broke. Rent’s due Monday, Brooke.', { to: 'pb' }),
+      say('pb', 'drunk_talk', 'Man… you a shady ass bitch.', { to: 'suit' }),
+      one('suit'), hush(800), say('suit', 'listen', 'And you’re broke. Rent’s due Monday, Brooke.', { to: 'pb' }),
     ] },
     { t: 'Keep going.', intent: 'listening', then: [
-      cam('one', 'pb'), say('pb', 'drunk_listen', 'I’m listening.', { to: 'suit' }),
-      cam('one', 'suit'), say('suit', 'listen', 'Good. Rent’s due Monday, Brooke.', { to: 'pb' }),
+      say('pb', 'drunk_listen', 'I’m listening.', { to: 'suit' }),
+      one('suit'), say('suit', 'listen', 'Good. Rent’s due Monday, Brooke.', { to: 'pb' }),
     ] },
   ] },
-  cam('one', 'pb'),
+  one('pb'), hush(1400),   // he never said his name
   say('pb', 'surprised', '…How do you know my name?', { to: 'suit' }),
-  cam('one', 'suit'),
+  one('suit'), hush(700),
   say('suit', 'shush', 'We leave now. You don’t tell anyone.', { to: 'pb' }),
-  cam('one', 'pb'), { poses: { pb: 'texting' } }, { check: 'pb' },
+  one('pb'), hush(900), { poses: { pb: 'texting' } }, { check: 'pb' },
   { by: 'pb', choice: [
     { t: 'Text Justin: “brb”', intent: 'lies', set: { sms: 'brb' }, then: [
       sms('pb', 'pa', 'brb'),
-      cam('one', 'suit'), say('suit', 'listen', 'Good.', { to: 'pb' }),
+      one('suit'), hush(600), say('suit', 'listen', 'Good.', { to: 'pb' }),
     ] },
     { t: 'Text Justin: “leaving w some guy. u coming?”', intent: 'invites him', set: { sms: 'invite' }, then: [
       sms('pb', 'pa', 'leaving w some guy. u coming?'),
-      cam('one', 'suit'), say('suit', 'angry', 'I said no one.', { to: 'pb' }),
+      one('suit'), hush(900), say('suit', 'angry', 'I said no one.', { to: 'pb' }),
     ] },
     { t: 'Say nothing.', intent: 'obeys', set: { sms: 'none' }, then: [
-      { poses: { pb: 'drunk_listen' } },
-      cam('one', 'suit'), say('suit', 'listen', 'Good boy.', { to: 'pb' }),
+      { poses: { pb: 'drunk_listen' } }, hush(1000),
+      one('suit'), say('suit', 'listen', 'Good boy.', { to: 'pb' }),
     ] },
   ] },
   { mark: 'texted' },
-  cam('two', 'pb', 'suit'),
+  two('pb', 'suit'),
   narr('Brooke follows the stranger out the emergency exit.'),
   // outside: the car, the phone, and through the window Justin and Cam, still talking (seen from afar: no words)
   { fade: 'out', ms: 500 },
   scene('street', { pa: 'drunk_listen', cam: 'listen', pb: 'drunk_listen', suit: 'listen' }),
   { cam: 'wide', at: 1260 },
   { fade: 'in', ms: 700 },
+  hush(1200),   // the engine running
   narr('Outside. A black car, engine running.'),
-  cam('two', 'pb', 'suit'),
+  two('pb', 'suit'), hush(700),
   say('suit', 'listen', 'Phone.', { to: 'pb' }),
+  one('pb'),
   say('pb', 'drunk_talk', 'What?', { to: 'suit' }),
+  one('suit'),
   say('suit', 'offer', 'Your phone. You get it back after.', { to: 'pb' }),
+  one('pb'), hush(800),
   { by: 'pb', choice: [
     { t: 'Hand it over.', intent: 'gives it', set: { phone: 'given' }, then: [narr('Brooke hands it over. The screen is still lit.')] },
     { t: 'Why?', intent: 'asks', set: { phone: 'given' }, then: [
       say('pb', 'drunk_talk', 'Why?', { to: 'suit' }),
-      say('suit', 'listen', 'Because the job starts now.', { to: 'pb' }),
+      one('suit'), hush(700), say('suit', 'listen', 'Because the job starts now.', { to: 'pb' }),
       narr('Brooke hands it over.'),
     ] },
     { t: 'Keep it.', intent: 'keeps it', set: { phone: 'kept' }, then: [
       say('pb', 'drunk_talk', 'Nah. Phone stays with me.', { to: 'suit' }),
-      say('suit', 'angry', 'Then keep it off.', { to: 'pb' }),
+      one('suit'), hush(900), say('suit', 'angry', 'Then keep it off.', { to: 'pb' }),
     ] },
   ] },
   // he looks back at the bar's window
-  { cam: 'wide', at: 780 }, { wait: 900 },
+  { cam: 'wide', at: 780 }, hush(1800),
   think('pb', '…He’s right there.'),
-  cam('two', 'pb', 'suit'),
+  two('pb', 'suit'), hush(600),
   say('suit', 'shush', 'Get in.', { to: 'pb' }),
+  hush(700),
   narr('Brooke gets in the car.'),
 ];
 
@@ -311,35 +343,37 @@ const bathroom = [
 const justinAfter = (f) => [
   { fade: 'out', ms: 600 },
   scene('bar', { pa: 'texting', cam: 'listen' }),
-  cam('two', 'pa', 'cam'),
+  two('pa', 'cam'),
   { fade: 'in', ms: 600 },
   { caption: 'Twenty minutes later' },
-  { wait: 900 }, { check: 'pa' }, { wait: 700 },
+  hush(1400),
+  one('pa'), { check: 'pa' }, hush(1200),
   ...(f.sms === 'invite' ? [
     { poses: { pa: 'phone_shock' } },
-    say('cam', 'surprised', 'Who’s “some guy”?', { to: 'pa' }),
-    say('pa', 'phone_shock', '…The suit.', { to: 'cam' }),
+    one('cam'), say('cam', 'surprised', 'Who’s “some guy”?', { to: 'pa' }),
+    one('pa'), hush(1000), say('pa', 'phone_shock', '…The suit.', { to: 'cam' }),
     { by: 'pa', choice: [
       { t: 'I’m coming.', intent: 'follows him', set: { title: 'U coming?' }, then: [
         sms('pa', 'pb', 'coming. where r u?'),
         say('pa', 'drunk_talk', 'I gotta go.', { to: 'cam' }),
-        say('cam', 'angry', 'You don’t even know where he is.', { to: 'pa' }),
+        one('cam'), say('cam', 'angry', 'You don’t even know where he is.', { to: 'pa' }),
       ] },
       { t: 'Stay with Cam.', intent: 'stays', set: { title: 'Some guy' }, then: [
         say('pa', 'drunk_listen', 'Nobody. He’ll be back.', { to: 'cam' }),
-        narr('He never came back.'),
+        two('pa', 'cam'), hush(1500), narr('He never came back.'),
       ] },
     ] },
   ] : f.sms === 'brb' ? [
     say('pa', 'texting', 'He said he’d be right back.', { to: 'cam' }),
-    say('cam', 'holding', 'That was twenty minutes ago.', { to: 'pa' }),
+    one('cam'), say('cam', 'holding', 'That was twenty minutes ago.', { to: 'pa' }),
+    hush(1200),
     say('cam', 'awkward', 'Justin… the guy in the suit.', { to: 'pa' }),
     { set: { title: 'brb' } },
   ] : [
-    say('cam', 'surprised', 'Where’s Brooke?', { to: 'pa' }),
-    { poses: { pa: 'phone_shock' } },
+    one('cam'), say('cam', 'surprised', 'Where’s Brooke?', { to: 'pa' }),
+    one('pa'), { poses: { pa: 'phone_shock' } }, hush(1100),
     narr('No message. Nothing.'),
-    say('cam', 'awkward', 'Justin… the guy in the suit.', { to: 'pa' }),
+    one('cam'), hush(900), say('cam', 'awkward', 'Justin… the guy in the suit.', { to: 'pa' }),
     { set: { title: 'Not a word' } },
   ]),
 ];
@@ -351,56 +385,73 @@ window.BAR = [
   { caption: 'Saturday, 1:40 a.m.' },
   { wait: 900 },
   { pan: 1010, ms: 2400 },
-  cam('three', 'pa', 'cam', 'pb'),
+  cam('three', 'pa', 'cam', 'pb'), hush(800),
   // who they are, shown by how they talk: Justin feels old, Brooke is broke and loving it, Cam sees through both
+  one('pa'),
   say('pa', 'drunk_happy', 'Man… I think…'),
+  hush(700),
   say('pa', 'drunk_talk', 'I think we’re getting too old for this shit.'),
+  one('pb'),
   say('pb', 'drunk_talk', 'Man… I think…'),
+  hush(700),
   say('pb', 'drunk_happy', 'I think I’m having my best fucking life, man.'),
+  two('cam', 'pb'),
   say('cam', 'amused', 'Thought you had a job interview tomorrow.', { to: 'pb' }),
+  one('pb'),
   say('pb', 'drunk_happy', 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', { to: 'cam' }),
+  one('pa'),
   { by: 'pa', choice: [
     { t: 'You skipped it?', intent: 'worried', then: [
       say('pa', 'drunk_talk', 'You skipped it? Again?', { to: 'pb' }),
-      say('pb', 'drunk_happy', 'Bro. They wanted me to wear a tie.', { to: 'pa' }),
-      say('cam', 'amused', 'The horror.', { to: 'pb' }),
+      one('pb'), say('pb', 'drunk_happy', 'Bro. They wanted me to wear a tie.', { to: 'pa' }),
+      one('cam'), say('cam', 'amused', 'The horror.', { to: 'pb' }),
     ] },
     { t: 'Then this round’s on you.', intent: 'teases', then: [
       say('pa', 'drunk_happy', 'Then this round’s on you.', { to: 'pb' }),
-      say('pb', 'drunk_talk', 'With what, man? I got lint. And a guitar pick.', { to: 'pa' }),
-      say('cam', 'amused', 'He’s not lying. I’ve seen his bank app.', { to: 'pa' }),
+      one('pb'), say('pb', 'drunk_talk', 'With what, man? I got lint. And a guitar pick.', { to: 'pa' }),
+      two('cam', 'pb'), say('cam', 'amused', 'He’s not lying. I’ve seen his bank app.', { to: 'pa' }),
     ] },
     { t: 'Cheers to nothing.', intent: 'with him', then: [
       say('pa', 'drunk_happy', 'Cheers to nothing tomorrow.', { to: 'pb' }),
-      say('pb', 'drunk_happy', 'THAT’S my brother.', { to: 'pa' }),
-      say('cam', 'amused', 'You two are gonna die in this bar.', { to: 'pa' }),
+      one('pb'), say('pb', 'drunk_happy', 'THAT’S my brother.', { to: 'pa' }),
+      one('cam'), say('cam', 'amused', 'You two are gonna die in this bar.', { to: 'pa' }),
     ] },
   ] },
+  hush(800),   // the laugh dies down
+  one('pa'),
   say('pa', 'drunk_talk', 'Rent’s due Monday, man. I’m not covering you again.', { to: 'pb' }),
+  one('pb'), hush(1100),   // Brooke takes it
   { by: 'pb', choice: [
     { t: 'Something’ll come up.', intent: 'the universe', set: { rent: 'universe' }, then: [
       say('pb', 'drunk_happy', 'Something’ll come up, man. The universe provides.', { to: 'pa' }),
-      say('pa', 'drunk_talk', 'The universe doesn’t take e-transfer.', { to: 'pb' }),
+      one('pa'), say('pa', 'drunk_talk', 'The universe doesn’t take e-transfer.', { to: 'pb' }),
     ] },
     { t: 'I’ll sell the guitar.', intent: 'the guitar', set: { rent: 'guitar' }, then: [
       say('pb', 'drunk_sad', 'I’ll sell the guitar.', { to: 'pa' }),
-      say('pa', 'drunk_talk', 'You said that in June.', { to: 'pb' }),
+      one('pa'), hush(700), say('pa', 'drunk_talk', 'You said that in June.', { to: 'pb' }),
     ] },
     { t: 'Spot me, brother?', intent: 'begs', set: { rent: 'spot' }, then: [
       say('pb', 'drunk_happy', 'Justin. My brother. My rock.', { to: 'pa' }),
-      say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
-      say('pb', 'drunk_talk', 'You didn’t even let me finish.', { to: 'pa' }),
-      say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
+      one('pa'), say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
+      one('pb'), say('pb', 'drunk_talk', 'You didn’t even let me finish.', { to: 'pa' }),
+      one('pa'), say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
     ] },
   ] },
-  // Brooke to Cam, and the empty moment after
-  cam('two', 'cam', 'pb'),
+  // the way in: Justin turns to the bartender, and Brooke is left looking at Cam a beat too long
+  hush(800),
+  one('pa'),
+  say('pa', 'drunk_talk', 'I need water. Like… a lot of water.'),
+  { aside: { pa: true } }, face({ pa: 'l' }), hush(700),
+  two('cam', 'pb'), hush(1600),
+  say('cam', 'amused', '…What?', { to: 'pb' }),
+  one('pb'), hush(900),
   say('pb', 'drunk_flirt', 'Cam. You’re just…', { to: 'cam' }),
+  hush(1000),
   say('pb', 'drunk_flirt', 'Yeah. Just…', { to: 'cam' }),
-  cam('one', 'cam'), { poses: { cam: 'awkward' } }, { wait: 1300 },
-  cam('one', 'pb'), { poses: { pb: 'drunk_sad' } }, { wait: 700 },
+  one('cam'), { poses: { cam: 'awkward' } }, hush(1600),
+  one('pb'), { poses: { pb: 'drunk_sad' } }, hush(1000),
   say('pb', 'drunk_sad', '…I gotta pee.'),
-  { exit: 'pb' },
+  { exit: 'pb' }, { aside: { pa: false } },
   // from here to the end, each one plays his own scene on his own phone and only sees what his character sees;
   // a spectator follows Brooke; solo plays the counter up to "twenty minutes later", then Brooke, then the end
   { split: () => ({ pa: counter, pb: bathroom }), watch: () => 'pb',
