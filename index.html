@@ -289,10 +289,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023144740"></script>
-<script src="story.js?v=20261023144740"></script>
-<script src="play.js?v=20261023144740"></script>
-<script src="bar.js?v=20261023144740"></script>
+<script src="chars.js?v=20261023150235"></script>
+<script src="story.js?v=20261023150235"></script>
+<script src="play.js?v=20261023150235"></script>
+<script src="bar.js?v=20261023150235"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -327,10 +327,17 @@ const fill = (t) => t.replaceAll('{N}', state.name).replace(/\{P([AB])\}/g, (m, 
   .replace(/\{([A-Z]+)\}/g, (m, k) => (story().words && story().words[k] ? story().words[k](state.f) : m));
 const spriteOf = (id) => (id === 'isa' ? state.isa : castOf(id).sprite);
 // a pose the character's sheet does not have yet plays as its stand-in (POSE_FALLBACK, from the stories), else listen
-const poseOf = (id, pose) => {
-  const has = SPRITES[spriteOf(id)].poses, alt = (window.POSE_FALLBACK || {})[pose];
-  return has[pose] ? pose : has[alt] ? alt : 'listen';
+// ...first the sheet's own stand-in (POSE_ALIAS[sprite], for a character whose sheets are still coming), then the shared
+// one, then listen, then whatever pose the sheet has
+const spritePose = (sprite, pose) => {
+  const has = SPRITES[sprite].poses, alias = (window.POSE_ALIAS || {})[sprite] || {};
+  for (const p of [pose, (window.POSE_FALLBACK || {})[pose], 'listen']) {
+    if (p && has[p]) return p;
+    if (p && has[alias[p]]) return alias[p];
+  }
+  return Object.keys(has)[0];
 };
+const poseOf = (id, pose) => spritePose(spriteOf(id), pose);
 const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${poseOf(id, pose)}.webp`;
 
 function fit() {
@@ -906,7 +913,7 @@ function renderWait() {
     if (s) b.classList.add('on');
     const who = document.createElement('span'); who.className = 'who'; who.textContent = s ? s.n : '';
     const dot = document.createElement('span'); dot.className = 'dot';
-    const img = new Image(); img.alt = ''; img.src = `chars/${castOf(k).sprite}/listen.webp`;
+    const img = new Image(); img.alt = ''; img.src = poseSrc(k, 'listen');
     b.append(who, dot, img);
     b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') takeSeat(k, myId, state.name); else sendIn('seat', { s: k }); };
     list.appendChild(b);
@@ -979,7 +986,7 @@ function openChar(g) {
   for (const r of g.ref) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
   show('#charView'); $('#charView').scrollTop = 0;
 }
-for (const g of GALLERY.filter((x) => !x.recolor)) { const b = tile(`chars/${g.sprite}/listen.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
+for (const g of GALLERY.filter((x) => !x.recolor)) { const b = tile(`chars/${g.sprite}/${spritePose(g.sprite, 'listen')}.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
 {
   const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'Nouveau personnage');
   const plus = document.createElement('span'); plus.textContent = '+'; add.appendChild(plus);
@@ -1021,7 +1028,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023144740';
+const BUILD = '20261023150235';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

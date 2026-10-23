@@ -13,9 +13,16 @@ window.POSE_FALLBACK = {
 };
 // a talking pose -> the pose its owner falls back to while someone else talks
 window.POSE_REST = { drunk_talk: 'drunk_listen', drunk_happy: 'drunk_listen', drunk_flirt: 'drunk_listen' };
-// the stand-ins are recolours: same sheet, so same facing
-Object.assign(FACE, { justin_b: FACE.justin, james_noir: FACE.james });
-GALLERY.push({ sprite: 'justin_b', name: 'Brooke', recolor: 'justin' }, { sprite: 'james_noir', name: 'Stranger', recolor: 'james' });
+// the stand-in is a recolour: same sheet, so same facing
+Object.assign(FACE, { james_noir: FACE.james });
+GALLERY.push({ sprite: 'james_noir', name: 'Stranger', recolor: 'james' });
+// Brooke: his first sheet (bar, 23/10) from his photo; what it doesn't have yet plays with his closest pose
+FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'f', texting: 'f', thinking: 'r' };
+window.POSE_ALIAS = { brooke: {
+  listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
+  drunk_flirt: 'drunk_talk', pee: 'drunk_sad', pee_relief: 'drunk_listen', pee_look: 'drunk_listen', phone_shock: 'texting',
+} };
+GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar'] });
 
 // ---------- decors, rectangles only (decor px) ----------
 const R = (x, y, w, h, color, more) => ({ x, y, w, h, color, ...more });
@@ -488,7 +495,7 @@ BAR.seats = ['pa', 'pb'];
 BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // the other character's player name when you play both
 BAR.cast = {
   pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin' },
-  pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'justin_b' },
+  pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'ruby', scale: 0.95 },
   suit: { name: 'Stranger', color: '#26262b', sprite: 'james_noir', aside: true },
 };
