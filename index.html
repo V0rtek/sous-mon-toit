@@ -289,10 +289,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023161301"></script>
-<script src="story.js?v=20261023161301"></script>
-<script src="play.js?v=20261023161301"></script>
-<script src="bar.js?v=20261023161301"></script>
+<script src="chars.js?v=20261023163237"></script>
+<script src="story.js?v=20261023163237"></script>
+<script src="play.js?v=20261023163237"></script>
+<script src="bar.js?v=20261023163237"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -982,7 +982,8 @@ function openChar(g) {
     list.appendChild(b);
   }
   $('#refList').innerHTML = '';
-  $('#fromImg').src = `ref/${g.src}.webp`;
+  $('#charView .from').hidden = !g.src;   // a character made without a photo has no "Provient de"
+  if (g.src) $('#fromImg').src = `ref/${g.src}.webp`;
   for (const r of g.ref) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
   show('#charView'); $('#charView').scrollTop = 0;
 }
@@ -1028,7 +1029,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023161301';
+const BUILD = '20261023163237';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

@@ -13,9 +13,10 @@ window.POSE_FALLBACK = {
 };
 // a talking pose -> the pose its owner falls back to while someone else talks
 window.POSE_REST = { drunk_talk: 'drunk_listen', drunk_happy: 'drunk_listen', drunk_flirt: 'drunk_listen' };
-// the stand-in is a recolour: same sheet, so same facing
-Object.assign(FACE, { james_noir: FACE.james });
-GALLERY.push({ sprite: 'james_noir', name: 'Stranger', recolor: 'james' });
+// the stranger: from 2 sheets (23/10) — from behind at the urinal, the tie he fixes looking over his shoulder, hands
+// joined (calm, then cold), open hands (the deal); he has no "shush" yet: the tie plays it
+FACE.suit = { pee: 'f', adjust: 'l', listen: 'r', offer: 'r', angry: 'r' };
+GALLERY.push({ sprite: 'suit', name: 'Stranger', ref: ['suit_fiche', 'suit_negociation'] });
 // Brooke: 2 sheets from his photo (23/10): the bar one, then the bathroom one (which also redid his happy and sad,
 // subtler); what he doesn't have yet plays with his closest pose
 FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
@@ -32,6 +33,7 @@ window.POSE_ALIAS = {
     thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
   },
   cam: { thinking: 'listen', holding: 'worried', surprised: 'awkward', angry: 'worried', explaining: 'amused' },
+  suit: { shush: 'adjust', explaining: 'offer', holding: 'listen', surprised: 'listen', thinking: 'listen', pee_talk: 'pee' },
 };
 // Cam: her own sheet (bar, 23/10), in place of Ruby's
 FACE.cam = { listen: 'r', amused: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l', worried: 'r' };
@@ -302,7 +304,7 @@ const bathroom = [
   // they stop, zip up, turn around: now they talk for real
   two('pb', 'suit'), hush(900),
   { stop: 'pee' }, { sfx: 'zip' }, { wait: 600 }, { sfx: 'zip' },
-  { poses: { pb: 'drunk_listen', suit: 'listen' } }, face({ pb: 'r', suit: 'l' }),
+  { poses: { pb: 'drunk_listen', suit: 'adjust' } }, face({ pb: 'r', suit: 'l' }),   // he fixes his tie, eyes on Brooke
   hush(900),
   one('suit'),
   say('suit', 'listen', 'I’ve got a job for you.', { to: 'pb' }),
@@ -463,7 +465,7 @@ window.BAR = [
   ] },
   hush(800),   // the laugh dies down
   one('pa'),
-  say('pa', 'drunk_talk', 'Rent’s due Monday, man. I’m not covering you again.', { to: 'pb' }),
+  say('pa', 'drunk_listen', 'Rent’s due Monday, man. I’m not covering you again.', { to: 'pb' }),   // serious: not his happy talking pose
   one('pb'), hush(1100),   // Brooke takes it
   { by: 'pb', choice: [
     { t: 'Something’ll come up.', intent: 'the universe', set: { rent: 'universe' }, then: [
@@ -511,7 +513,7 @@ BAR.cast = {
   pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' },
   pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 },
-  suit: { name: 'Stranger', color: '#26262b', sprite: 'james_noir', aside: true },
+  suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
 };
 BAR.words = { TITLE: (f) => f.title || 'Last call' };
 BAR.ui = { choosing: 'is choosing', choices: 'Your choices', again: 'Play again' };
