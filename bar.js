@@ -36,9 +36,9 @@ window.POSE_ALIAS = {
     fake_smile: 'drunk_happy', shocked: 'drunk_listen', knock: 'drunk_talk', wine: 'drunk_listen', sit_fire: 'drunk_sad', sit_hurt: 'drunk_sad',
   },
   cam: { holding: 'worried', surprised: 'awkward', angry: 'worried', amused: 'explaining',   // her amused looked at the camera
-    wine: 'sip', dizzy: 'awkward', sit_fire: 'worried', cold_stare: 'thinking' },
+    wine: 'sip', dizzy: 'awkward', scared: 'worried', sit_fire: 'worried', cold_stare: 'thinking' },
   suit: { shush: 'adjust', explaining: 'offer', holding: 'listen', surprised: 'listen', thinking: 'listen', pee_talk: 'pee',
-    envelope: 'offer', texting: 'adjust', smile: 'listen', point: 'angry' },
+    tray: 'offer', balcony: 'listen', envelope: 'offer', texting: 'adjust', smile: 'listen', point: 'angry' },
   // Julian: his own sheet (24/10: listen, talk, smirk, offer, cold, hands up); Diane plays on the silver-haired elf in
   // black (stand-in until her sheet)
   julian: { offer_wine: 'offer', lead: 'offer', cuffs: 'cold', smile: 'smirk', angry: 'cold', explaining: 'talk', holding: 'listen',
@@ -616,9 +616,9 @@ const houseDoor = [
   { cam: 'wide', at: 900 }, { fade: 'in', ms: 900 }, { caption: '2:50 a.m.' }, hush(1400),
   { enter: { pa: 'drunk_listen', cam: 'listen' } }, hush(700),
   two('suit', 'pa'),
-  say('suit', 'listen', 'Phones.', { to: 'pa' }),
+  say('suit', 'tray', 'Phones.', { to: 'pa' }),
   one('pa'), hush(500), say('pa', 'drunk_talk', '…What?', { to: 'suit' }),
-  one('suit'), say('suit', 'offer', 'You get them back when you leave.', { to: 'pa' }),
+  one('suit'), say('suit', 'tray', 'You get them back when you leave.', { to: 'pa' }),
   two('pa', 'cam'), hush(800), narr('Cam drops hers in a black pouch. The stranger seals it.'),
   one('pa'),
   { by: 'pa', choice: [
@@ -708,7 +708,7 @@ const houseMeet = (f) => [
     ] },
   ] },
   // high on the balcony, the stranger saw all of it
-  { enter: { suit: 'listen' } }, { cam: 'wide', at: 1500 }, hush(1500),
+  { enter: { suit: 'balcony' } }, { cam: 'wide', at: 1500 }, hush(1500),
   // Justin's turn at the tray
   two('pa', 'pb'), hush(500), narr('The waiter turns to Justin.'),
   one('pa'),
@@ -737,7 +737,7 @@ const houseMeet = (f) => [
   ] },
   // the stranger, from the balcony
   { exit: 'diane' }, one('suit'), hush(900),
-  say('suit', 'listen', 'Brooke. A word.', { to: 'pb' }),
+  say('suit', 'balcony', 'Brooke. A word.', { to: 'pb' }),
   one('pb'), hush(1200),
   ...(f.tried ? [two('cam', 'julian'), hush(600), face({ cam: 'l' }), hush(1100)] : []),   // Cam looks for Justin, a second
 ];
@@ -968,14 +968,14 @@ const redDoor = (f) => [
     ] },
   ] },
   // in: Cam
-  { fade: 'out', ms: 300 }, scene('redroom', { pa: 'angry', pb: 'scared', cam: f.wine === 'red' ? 'dizzy' : 'worried' }),
+  { fade: 'out', ms: 300 }, scene('redroom', { pa: 'angry', pb: 'scared', cam: f.wine === 'red' ? 'dizzy' : 'scared' }),
   cam('wide'), { fade: 'in', ms: 300 }, hush(1300),
   narr('A red room. A bed. A camera on a tripod, its light on.'),
   one('cam'),
   ...(f.wine === 'red' ? [
     say('cam', 'dizzy', 'Justin? He said…', { to: 'pa' }), hush(900), say('cam', 'dizzy', 'He said you guys knew.', { to: 'pa' }),
   ] : [
-    say('cam', 'worried', 'He locked the door.', { to: 'pa' }), hush(700), say('cam', 'worried', 'He just… locked the door.', { to: 'pa' }),
+    say('cam', 'scared', 'He locked the door.', { to: 'pa' }), hush(700), say('cam', 'scared', 'He just… locked the door.', { to: 'pa' }),
   ]),
   two('pa', 'pb'), hush(900),
   say('pa', 'angry', 'We’re going. Now.', { to: 'cam' }),
