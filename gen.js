@@ -13,12 +13,17 @@ Reply with ONE JSON object and nothing else, shaped exactly like this:
 {"title": "2-4 words",
  "scene": "terrasse" | "maison" | "salon",
  "steps": [ {"who": "<character id>", "pose": "<pose>", "to": "<who they talk to>", "text": "<one spoken line>"}, {"hush": true}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","to","text"}, ... ]}, {...}, {...} ]}, ... ],
- "end": "one closing sentence"}
+ "next": ["what happens next, bullet 1", "bullet 2", ...]}
 
 Decors and who is in them besides justin: terrasse = melissa, candy, ruby (a café terrace) · maison = ruby, james (inside a house) · salon = isa, amare, james (a living room). Pick the decor that fits the idea and only use its characters (ruby and melissa are elves, candy is a feline woman, amare is a lion-man).
 Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Use them lightly and subtly, not every line. "to" = the character spoken to (or "justin"): people look at who they talk to.
 
-LENGTH. A mini-story, not a sketch: about 30-40 spoken lines in all (counting one branch of each choice). Open with 6-8 lines that plant a want and a tension, then 3 or 4 choices spread through the story (3 options each, 2-4 lines per branch). Each choice must push the story forward: something new comes out, the stakes rise, a turn or a reveal lands, until a last choice that decides how it ends. The lines that follow a choice are shared by every option, so they must hold whatever the player picked; the branches themselves must really differ in how the others react. End with 2-3 lines and "end". In "steps", justin only speaks inside a choice. Never write justin's name in a line, no stage directions, no narration.
+STRUCTURE: the start of a story, built on the first three steps of the story circle. Write only these three, in order, never the middle of a film:
+1. STATUS QUO: who justin and the others are in their normal life, one ordinary moment that shows their relationships and what each wants (3-6 lines, one choice may come inside it). Nothing has happened yet. No thriller, no threat, no secret in the first lines.
+2. WANT: someone wants something specific, and what it would cost is clear (4-8 lines, then a choice).
+3. UNFAMILIAR SITUATION: a new situation enters that challenges what they believe (the offer, the visitor, the news), delivered in steps with reactions between the pieces; it ends on a hook, with a last choice that commits justin to going in (6-10 lines).
+About 18-26 spoken lines in all (counting one branch of each choice), 2-3 choices (3 options each, 2-4 lines per branch). Each choice must push the story forward. The lines that follow a choice are shared by every option, so they must hold whatever the player picked; the branches themselves must really differ in how the others react. In "steps", justin only speaks inside a choice. Never write justin's name in a line, no stage directions, no narration. Then STOP: do not play the rest.
+"next" = the rest of the story as 4-6 short bullets (one act, always), for the steps you did not write: adapt, get what they want, pay a price, return, changed. Specific to these characters and to what you set up, not generic ("Ruby gets the money and learns who paid", not "they face consequences").
 
 PACE: packed to the max. This matters most. Every line must earn its place with one of: curiosity, humour, a payoff, relatability, stakes, a surprise. A line that only carries information, greets, repeats or explains is cut. Lines are short: 4-12 words, 70 characters at most. People answer with a word, a question, a joke, a half-sentence, not a paragraph.
   Before: STRANGER: "Bring your friends." BROOKE: "Justin?" STRANGER: "And the girl." BROOKE: "What's Cam got to do with—" STRANGER: "Tell them it's a party. Nothing else." (five lines to move one piece of information)
@@ -52,6 +57,9 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
   const fits = (vs) => { const all = (Array.isArray(vs) ? vs : [vs]).map((v) => clip(v, 200)).filter(Boolean); return all.find((v) => len(v) <= LABEL) || all.sort((a, b) => len(a) - len(b))[0]; };
   const labels = (j) => (Array.isArray(j.steps) ? j.steps : []).flatMap((s) => (s && Array.isArray(s.choice) ? s.choice.filter((o) => o && o.t) : []));
 
+  // the end card: what should happen in the rest of the act, as bullets (an older story only has one closing sentence)
+  const NL = String.fromCharCode(10);
+  const ahead = (j) => (Array.isArray(j.next) && j.next.length ? j.next.map((b) => clip(b, 160)).filter(Boolean).slice(0, 7).map((b) => '• ' + b).join(NL) : clip(j.end, 200));
   // json from the model -> steps the player plays. Throws a sentence the model is shown on its retry.
   function build(j) {
     const sc = SCENE_CAST[j.scene] ? j.scene : 'maison', cast = SCENE_CAST[sc];
@@ -84,13 +92,13 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
         if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 3) }); choices.n++; last = null; }
       } else { const l = line(s, cast); steps.push(...l); saysN.n += l.some((x) => x.say) ? 1 : 0; }
     }
-    if (saysN.n < 12) throw new Error('This must be a mini-story: at least 12 spoken lines outside the choices (about 30-40 in all), from the characters of the decor you picked.');
-    if (choices.n < 3) throw new Error('There must be 3 or 4 "choice" steps spread through the story, each with 3 options and a "then" list.');    return [
+    if (saysN.n < 8) throw new Error('At least 8 spoken lines outside the choices (about 18-26 in all), from the characters of the decor you picked.');
+    if (choices.n < 2) throw new Error('There must be 2 or 3 "choice" steps spread through the three steps, each with 3 options and a "then" list.');    return [
       scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
       cam('wide'), { fade: 'in', ms: 700 },
       ...steps,
       { fade: 'out', ms: 800 },
-      { end: { kicker: 'Ton histoire', title: clip(j.title, 40) || 'Ton histoire', lede: clip(j.end, 200), art: null } },
+      { end: { kicker: 'Ton histoire · la suite', title: clip(j.title, 40) || 'Ton histoire', lede: ahead(j), art: null } },
     ];
   }
 
@@ -144,7 +152,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     for (const s of steps) {
       if (s.say) lines([s], '');
       else if (s.choice) { out.push(''); s.choice.forEach((o, i) => { out.push('CHOIX ' + (i + 1) + ' : ' + o.t); lines(o.then.slice(1), '    '); }); out.push(''); }
-      else if (s.end) out.push('', 'FIN : ' + s.end.lede);
+      else if (s.end) out.push('', 'LA SUITE :', s.end.lede);
     }
     return out.join(nl).trim();
   }

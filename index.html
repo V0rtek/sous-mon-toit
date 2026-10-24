@@ -105,7 +105,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .card > *:not(.art):not(.veil):not(.hero) { position: relative; }
 .kicker { font-size: 1.8em; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #ffb3c6; }
 .title { font-family: var(--display); font-size: 7.4em; line-height: .95; margin: .12em 0 .25em; text-wrap: balance; }
-.lede { font-size: 2.2em; line-height: 1.35; font-weight: 600; color: #e9e2f2; margin: 0 0 1.6em; max-width: 26em; }
+.lede { white-space: pre-line; font-size: 2.2em; line-height: 1.35; font-weight: 600; color: #e9e2f2; margin: 0 0 1.6em; max-width: 26em; }
 .field { display: flex; flex-direction: column; gap: .7em; margin-bottom: 1.6em; }
 .field label { font-size: 1.8em; font-weight: 800; color: #cfc6dc; }
 .field input { font: inherit; font-size: 2.6em; font-weight: 800; padding: .6em .8em; border-radius: .7em; border: .12em solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; outline: none; user-select: text; }
@@ -460,12 +460,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024160137"></script>
-<script src="story.js?v=20261024160137"></script>
-<script src="play.js?v=20261024160137"></script>
-<script src="bar.js?v=20261024160137"></script>
-<script src="games.js?v=20261024160137"></script>
-<script src="gen.js?v=20261024160137"></script>
+<script src="chars.js?v=20261024163129"></script>
+<script src="story.js?v=20261024163129"></script>
+<script src="play.js?v=20261024163129"></script>
+<script src="bar.js?v=20261024163129"></script>
+<script src="games.js?v=20261024163129"></script>
+<script src="gen.js?v=20261024163129"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1697,7 +1697,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024160137';
+const BUILD = '20261024163129';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
