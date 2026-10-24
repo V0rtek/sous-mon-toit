@@ -1129,8 +1129,8 @@ window.BAR = [
   hush(1000),
   say('pb', 'drunk_flirt', 'Yeah. Just…', { to: 'cam' }),
   { poses: { cam: 'awkward' } }, hush(1600),
-  { poses: { pb: 'drunk_sad' } }, hush(1000),
-  say('pb', 'drunk_sad', '…I gotta pee.', { to: 'cam' }),
+  { poses: { pb: 'drunk_letdown' } }, hush(1000),
+  say('pb', 'drunk_letdown', '…I gotta pee.', { to: 'cam' }),
   { exit: 'pb' }, { aside: { pa: false } },
   // from here to the end, each one plays his own scene on his own phone and only sees what his character sees;
   // a spectator follows Brooke; solo plays the counter up to Brooke's text, then all of Brooke, then back to the counter
