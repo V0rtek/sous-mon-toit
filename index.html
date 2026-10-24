@@ -158,6 +158,16 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #labScreen { justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; }
 #labScreen .tiles { margin: auto 0; }
 #labNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
+#genNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
+#genNote span { font-size: 3.6em; font-weight: 600; }
+#storyNote { position: absolute; top: 2.2%; right: 4%; z-index: 35; font: inherit; width: 5.4em; height: 5.4em; border: 0; border-radius: 50%; background: rgba(0,0,0,.35); color: rgba(255,255,255,.8); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#storyNote span { font-size: 2.6em; font-weight: 600; }
+.todo li.mine { color: #1d1d1f; }
+.obs { margin-top: 1.6em; cursor: default; }
+.obs textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 2.3em; padding: .6em .7em; border-radius: .6em; border: .06em solid #d2d2d7; background: #f5f5f7; color: #1d1d1f; outline: none; resize: none; user-select: text; }
+.obsBtns { display: flex; gap: 1em; margin-top: .8em; }
+.obsBtns button { font: inherit; font-size: 2.3em; font-weight: 600; padding: .5em 1em; border-radius: 2em; border: 0; background: #1d1d1f; color: #fff; cursor: pointer; }
+.obsBtns button + button { background: #e8e8ed; color: #1d1d1f; }
 #labNote span { font-size: 3.6em; font-weight: 600; }
 /* an incoming call: the caller's name, then decline (red) and answer (green) */
 #ringCard { position: absolute; inset: 0; z-index: 25; background: rgba(12,12,16,.86); display: flex; flex-direction: column; align-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; color: #f5f5f7; cursor: default; }
@@ -304,7 +314,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
   <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><div id="soloPick" hidden><button class="pill" id="soloBoth" type="button">Jouer les deux</button><button class="pill" id="soloBot" type="button">L’autre au hasard</button></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
-  <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul></div></div>
+  <button id="storyNote" type="button" aria-label="Notes" hidden><span>?</span></button>
+  <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul>
+    <div class="obs" id="obsBox" hidden><textarea id="obsText" rows="2" maxlength="300" placeholder="Une observation…" aria-label="Une observation"></textarea>
+      <div class="obsBtns"><button type="button" id="obsAdd">Ajouter</button><button type="button" id="obsCopy">Copier tout</button></div></div></div></div>
   <div id="gallery" class="card menu" hidden>
     <div class="grid3" id="galList"></div>
   </div>
@@ -317,6 +330,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button class="pill" id="genGo" type="button">Écrire l'histoire</button>
       <p class="lead" id="genMsg"></p>
     </div>
+    <button id="genNote" type="button" aria-label="Notes"><span>?</span></button>
   </div>
   <div id="newChar" class="card menu" hidden>
     <div class="step" id="nc1">
@@ -389,12 +403,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023205308"></script>
-<script src="story.js?v=20261023205308"></script>
-<script src="play.js?v=20261023205308"></script>
-<script src="bar.js?v=20261023205308"></script>
-<script src="games.js?v=20261023205308"></script>
-<script src="gen.js?v=20261023205308"></script>
+<script src="chars.js?v=20261023205801"></script>
+<script src="story.js?v=20261023205801"></script>
+<script src="play.js?v=20261023205801"></script>
+<script src="bar.js?v=20261023205801"></script>
+<script src="games.js?v=20261023205801"></script>
+<script src="gen.js?v=20261023205801"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -657,16 +671,28 @@ function audio() {
 addEventListener('pointerdown', () => audio(), true);
 const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3`)
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
+// how loud each file plays (the files are levelled alike): a room's sound stays under the voices, the campfire lowest
+const SFX_VOL = { bar: 0.22, bathroom: 0.2, dark: 0.18, campfire: 0.1 };
 async function sfx(name, loop = false) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
   if (loop === 'scene' && (!sc || sc.ambience !== name)) return;   // the scene changed while the file loaded
   if (loop) stopSfx(name);
-  const src = actx.createBufferSource(); src.buffer = buf; src.loop = !!loop; src.connect(actx.destination); src.start();
+  const src = actx.createBufferSource(), g = actx.createGain(), vol = SFX_VOL[name] ?? 1;
+  src.buffer = buf; src.loop = !!loop; src.connect(g).connect(actx.destination);
+  // a loop fades in, so a room's sound arrives with the room instead of cutting in
+  if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
+  else g.gain.value = vol;
+  src.start(); src.gain = g;
   if (loop) sfxLoops[name] = src;
 }
 function stopSfx(name) {
-  for (const k of name ? [name] : Object.keys(sfxLoops)) { try { sfxLoops[k].stop(); } catch { /* not started */ } delete sfxLoops[k]; }
+  for (const k of name ? [name] : Object.keys(sfxLoops)) {
+    const src = sfxLoops[k], t = actx ? actx.currentTime : 0;
+    try { src.gain.gain.cancelScheduledValues(t); src.gain.gain.setValueAtTime(src.gain.gain.value, t); src.gain.gain.linearRampToValueAtTime(0, t + 0.6); src.stop(t + 0.65); }
+    catch { /* not started */ }
+    delete sfxLoops[k];
+  }
 }
 function buzz() {
   try { if (navigator.vibrate) navigator.vibrate([90, 70, 90]); } catch { /* no vibration here */ }
@@ -1124,6 +1150,7 @@ const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#ga
 const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
+  $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
   screen = id;
@@ -1203,7 +1230,7 @@ $('#solo').onclick = (e) => { e.stopPropagation(); $('#solo').hidden = true; $('
 $('#soloBoth').onclick = (e) => { e.stopPropagation(); playSolo(); };
 $('#soloBot').onclick = (e) => { e.stopPropagation(); playSoloBot(); };
 // a note behind a "?": a title and its points ("- " = a sub-point), tap anywhere to close
-function openNote(t) {
+function openNote(t, obs) {
   $('#todoTitle').textContent = t.title;
   $('#todoList').innerHTML = '';
   for (const it of t.items) {
@@ -1211,8 +1238,25 @@ function openNote(t) {
     if (it.startsWith('- ')) li.className = 'sub';
     $('#todoList').appendChild(li);
   }
+  noteObs = !!obs; $('#obsBox').hidden = !obs;
+  if (obs) for (const o of getObs()) { const li = document.createElement('li'); li.className = 'mine'; li.textContent = o; $('#todoList').appendChild(li); }
   $('#todoCard').hidden = false; $('#todoCard .todo').scrollTop = 0;
 }
+// the observations typed in a note (the generated stories'): kept on this phone, "Copier tout" to hand them over
+let noteObs = false;
+const getObs = () => { try { return JSON.parse(localStorage.getItem('smt-obs')) || []; } catch { return []; } };
+$('#obsAdd').onclick = (e) => {
+  e.stopPropagation(); const v = $('#obsText').value.trim(); if (!v) return;
+  try { localStorage.setItem('smt-obs', JSON.stringify([...getObs(), v])); } catch { /* private window */ }
+  $('#obsText').value = ''; openNote({ title: $('#todoTitle').textContent, items: GEN.TODO.items }, true);
+};
+$('#obsCopy').onclick = async (e) => {
+  e.stopPropagation(); const all = [...GEN.TODO.items, ...getObs()].join(String.fromCharCode(10));
+  try { await navigator.clipboard.writeText(all); $('#obsCopy').textContent = 'Copié'; setTimeout(() => { $('#obsCopy').textContent = 'Copier tout'; }, 1400); } catch { /* clipboard blocked */ }
+};
+$('#obsBox').onclick = (e) => e.stopPropagation();
+$('#genNote').onclick = (e) => { e.stopPropagation(); openNote(GEN.TODO, true); };
+$('#storyNote').onclick = (e) => { e.stopPropagation(); openNote(GEN.TODO, true); };
 $('#todoBtn').onclick = (e) => { e.stopPropagation(); if (story().todo) openNote(story().todo); };
 $('#todoCard').onclick = (e) => { e.stopPropagation(); $('#todoCard').hidden = true; };
 // mini-games: one tile each (its 2-player waiting room); the "?" = the ideas they come from
@@ -1449,7 +1493,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023205308';
+const BUILD = '20261023205801';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

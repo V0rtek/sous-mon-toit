@@ -83,5 +83,11 @@ Structure: 4-5 lines to set up a want or a tension, then a choice (3 options, 2-
     }
   }
 
-  return { MODEL, SYSTEM, build, make, ask };
+  // what to fix next in the generated stories: shown behind the "?" (menu screen and during the story), where Justin adds his observations
+  const TODO = { title: 'Ton histoire : à régler', items: [
+    'Les choix sont trop longs.',
+    'On ne sait pas quel personnage on est.',
+  ] };
+
+  return { TODO, MODEL, SYSTEM, build, make, ask };
 })();
