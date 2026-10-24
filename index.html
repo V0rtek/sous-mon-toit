@@ -91,6 +91,10 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #caption.on { opacity: 1; }
 #hint { position: absolute; left: 0; right: 0; bottom: 3.5%; text-align: center; color: rgba(255,255,255,.85); font-size: 1.8em; font-weight: 800; text-shadow: 0 .1em .4em rgba(0,0,0,.6); pointer-events: none; animation: blink 1.6s ease-in-out infinite; }
 @keyframes blink { 50% { opacity: .35; } }
+#intro { position: absolute; inset: 0; z-index: 36; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.4em; opacity: 1; transition: opacity .9s; cursor: pointer; }
+#intro[hidden] { display: none; }
+#introTxt { font-size: 4.6em; font-weight: 800; color: #fff; letter-spacing: .01em; }
+#introImg { height: 60%; max-width: 86%; object-fit: contain; }
 #black { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 1s; }
 
 /* full-screen cards: cover, Isa's look, end */
@@ -313,6 +317,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
   <div id="black"></div>
+  <div id="intro" hidden><div id="introTxt"></div><img id="introImg" alt=""></div>
   <div id="slate" hidden></div>
   <div id="who" class="card menu">
     <form id="whoForm" class="ask">
@@ -443,12 +448,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024005322"></script>
-<script src="story.js?v=20261024005322"></script>
-<script src="play.js?v=20261024005322"></script>
-<script src="bar.js?v=20261024005322"></script>
-<script src="games.js?v=20261024005322"></script>
-<script src="gen.js?v=20261024005322"></script>
+<script src="chars.js?v=20261024130832"></script>
+<script src="story.js?v=20261024130832"></script>
+<script src="play.js?v=20261024130832"></script>
+<script src="bar.js?v=20261024130832"></script>
+<script src="games.js?v=20261024130832"></script>
+<script src="gen.js?v=20261024130832"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -474,7 +479,7 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé' };
+const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -1214,7 +1219,26 @@ function endSplit() {
   clearInterval(callNow && callNow.tick); callNow = null; $('#callBar').hidden = true;
 }
 
+// every story opens on who the player is: a black screen, "You are Brooke" and her picture, then it fades out into the game.
+// Solo stories: the player is Justin. 2-player ones: the seat this phone holds (none, or both when one phone plays both: no card)
+function myCharacter(id) {
+  const seats = seatsOf(id);
+  if (!seats.length) return ROLE === 'host' ? 'justin' : null;
+  const mine = seats.filter((k) => state.seats[k] && state.seats[k].id === myId);
+  return mine.length === 1 ? mine[0] : null;
+}
+async function introCard(who, at) {
+  const img = $('#introImg'); img.src = poseSrc(who, 'listen');
+  $('#introTxt').textContent = `${ui('you')} ${fill(castOf(who).name || '')}`;
+  await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
+  if (run !== at) return;
+  const box = $('#intro'); box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
+  await new Promise((ok) => { const t = setTimeout(ok, 2400); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
+  box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
+  await sleep(950); box.hidden = true;
+}
 function begin(id = state.story) {
+  const replay = screen === '#end';
   bump((st) => { st.s = st.s || {}; const r = (st.s[id] = st.s[id] || {}); r.plays = (r.plays || 0) + 1; });
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
@@ -1223,7 +1247,8 @@ function begin(id = state.story) {
   show(null); $('#looks').hidden = true;
   if (!seatsOf(id).length) state.seats = {};
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
-  next();
+  const me = FAST || replay ? null : myCharacter(id), at = run;
+  if (me) introCard(me, at).then(() => { if (run === at) next(); }); else next();
 }
 // leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)
 function toHub() {
@@ -1638,7 +1663,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024005322';
+const BUILD = '20261024130832';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

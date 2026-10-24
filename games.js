@@ -30,7 +30,7 @@ const MG_CAST = {
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 },
   suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
 };
-const MG_UI = { choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
+const MG_UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
   again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended' };
 const mg = (steps) => Object.assign(steps, { gaze: true, credits: '', seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
   cast: MG_CAST, ui: MG_UI });

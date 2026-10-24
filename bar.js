@@ -1164,7 +1164,7 @@ BAR.words = {
   LEDE: (f) => `${f.confess === 'yes' ? 'Brooke said the number out loud.' : f.confess === 'no' ? 'Brooke lied at the red door.' : 'Brooke threw a punch instead of an answer.'} ${f.jend === 'forgives' ? 'Justin forgave him.' : f.jend === 'hard' ? 'Justin didn’t.' : 'Justin stayed by him.'}`,
 };
 // a private line (Brooke remembering the rule) shows the other player "<name> is thinking…"
-BAR.ui = { choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read' };
+BAR.ui = { you: 'You are', choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read' };
 // what's known to be off, behind the "?" of the waiting room (so testers know)
 BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction',
   'Make the style uniform, between characters, backgrounds. Tone (music / sounds)'] };
