@@ -178,7 +178,7 @@ body.watch #solo, body.watch #soloPick { display: none !important; }
 /* after "Jouer seul": play both characters, or yours with the other one simulated (random choices) */
 #soloPick { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); display: flex; gap: 1.4em; }
 #soloPick .pill { padding: .7em 1.4em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; font-size: 2.3em; }
-#gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
+#gallery, #charView, #newChar, #genScreen { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
 .prompt button { position: absolute; top: 1.4em; right: 1.4em; font: inherit; width: 6em; height: 6em; border-radius: 50%; border: 0; background: #2c2c2e; display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -190,6 +190,7 @@ body.watch #solo, body.watch #soloPick { display: none !important; }
 .step h2 { margin: 0; font-size: 3em; }
 .step .lead { margin: 0; font-size: 2em; color: #c7c7cc; line-height: 1.35; }
 .step textarea { font: inherit; font-size: 2.2em; padding: .8em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; resize: none; user-select: text; }
+.step input { font: inherit; font-size: 2em; padding: .8em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; user-select: text; }
 .step textarea::placeholder { color: #86868b; }
 .ghost { font: inherit; font-size: 2.2em; background: none; border: 0; color: #86868b; cursor: pointer; padding: .4em; }
 .sheetUp { display: flex; flex-direction: column; gap: 1.6em; margin-top: 2em; }
@@ -278,6 +279,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="play"><span>Le café</span></button>
       <button type="button" id="test1"><span>Sous mon toit</span></button>
       <button type="button" id="lab"><span>Mini-jeux</span></button>
+      <button type="button" id="mine"><span>Ton histoire</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
       <a href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener"><span>Info</span></a>
     </div>
@@ -293,6 +295,16 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul></div></div>
   <div id="gallery" class="card menu" hidden>
     <div class="grid3" id="galList"></div>
+  </div>
+  <div id="genScreen" class="card menu" hidden>
+    <div class="step">
+      <h2>Ton histoire</h2>
+      <p class="lead">Décris l'idée en une ou deux phrases. Haiku écrit une histoire courte avec des choix.</p>
+      <textarea id="genIdea" rows="5" maxlength="600" placeholder="Ex. : Ruby découvre que James a menti sur où il était hier soir." aria-label="Ton idée"></textarea>
+      <input id="genKey" type="password" autocomplete="off" placeholder="Ta clé API Anthropic (reste sur cet appareil)" aria-label="Clé API Anthropic">
+      <button class="pill" id="genGo" type="button">Écrire l'histoire</button>
+      <p class="lead" id="genMsg"></p>
+    </div>
   </div>
   <div id="newChar" class="card menu" hidden>
     <div class="step" id="nc1">
@@ -365,11 +377,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023203203"></script>
-<script src="story.js?v=20261023203203"></script>
-<script src="play.js?v=20261023203203"></script>
-<script src="bar.js?v=20261023203203"></script>
-<script src="games.js?v=20261023203203"></script>
+<script src="chars.js?v=20261023203445"></script>
+<script src="story.js?v=20261023203445"></script>
+<script src="play.js?v=20261023203445"></script>
+<script src="bar.js?v=20261023203445"></script>
+<script src="games.js?v=20261023203445"></script>
+<script src="gen.js?v=20261023203445"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1064,8 +1077,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#cover', '#end', '#labScreen'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#cover', '#end', '#labScreen'];
+const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
@@ -1190,6 +1203,18 @@ $('#whoForm').addEventListener('submit', (e) => {
 });
 $('#play').onclick = (e) => { e.stopPropagation(); openWait('play'); };
 $('#bar').onclick = (e) => { e.stopPropagation(); openWait('bar'); };
+// "Ton histoire": the idea goes to Haiku (gen.js) with the key typed here, and the story plays like any other
+try { $('#genKey').value = localStorage.getItem('smt-key') || ''; $('#genIdea').value = localStorage.getItem('smt-idea') || ''; } catch { /* private window */ }
+$('#mine').onclick = (e) => { e.stopPropagation(); $('#genMsg').textContent = ''; show('#genScreen'); };
+$('#genGo').onclick = async (e) => {
+  e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
+  if (!idea || !key) { $(idea ? '#genKey' : '#genIdea').focus(); return; }
+  try { localStorage.setItem('smt-key', key); localStorage.setItem('smt-idea', idea); } catch { /* private window */ }
+  $('#genGo').disabled = true; $('#genMsg').textContent = 'Haiku écrit…';
+  try { STORIES.gen = await GEN.make(idea, key); STORIES.gen.credits = ''; begin('gen'); }
+  catch (err) { $('#genMsg').textContent = err.message || "Ça n'a pas marché."; }
+  $('#genGo').disabled = false;
+};
 $('#test1').onclick = (e) => { e.stopPropagation(); show('#cover'); };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); show('#about3d'); };
@@ -1380,7 +1405,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023203203';
+const BUILD = '20261023203445';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
