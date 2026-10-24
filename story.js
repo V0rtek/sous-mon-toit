@@ -307,9 +307,15 @@ window.GALLERY = [
 // the prompt that makes a new character's sheet (an image generator), in the layout tools/cut.py cuts into poses
 window.SHEET_PROMPT = `Create a character pose sheet for this character: [describe the character, or attach a picture of them].
 
-Format: portrait image, 2:3. A grid of 6 equal panels, 3 columns × 2 rows. Each panel is framed by a thin dark border and has a plain light background.
+Format: portrait image, 2:3. An invisible grid of 6 equal cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.
 
-In every panel: the same character, full body from head to feet, same size, same outfit, same art style (clean anime game illustration). No text, no labels, no props, no floor shadow.
+Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no floor, no shadow, no glow. The character wears nothing green.
 
-Row 1, left to right: listening (neutral, relaxed) · surprised · thinking (hand on chin).
-Row 2, left to right: explaining (open hand gesture) · concerned / angry · holding back (arms crossed, restrained).`;
+In every cell: the same character, full body from head to feet, centered, same size, with a clear margin of green on all sides (nothing touches the edge of its cell, nothing overlaps another cell). Same outfit, same art style (clean anime game illustration). No text, no labels, no props.
+
+Row 1, left to right: listening (neutral, relaxed), slighty surprised, thinking.
+Row 2, left to right: explaining, slightly concerned / angry, holding back.
+
+do not exagerate too much the poses
+
+all poses must be faced to the side, a little angled toward the camera (its an interaction with someone).`;

@@ -171,7 +171,10 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 @keyframes ringPulse { 50% { transform: scale(1.06); } }
 body.watch #ringBtns button { pointer-events: none; }
 body.watch #ringBtns button.mine { pointer-events: auto; }
-body.watch #solo { display: none !important; }
+body.watch #solo, body.watch #soloPick { display: none !important; }
+/* after "Jouer seul": play both characters, or yours with the other one simulated (random choices) */
+#soloPick { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); display: flex; gap: 1.4em; }
+#soloPick .pill { padding: .7em 1.4em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; font-size: 2.3em; }
 #gallery, #charView, #newChar { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
@@ -179,6 +182,9 @@ body.watch #solo { display: none !important; }
 .prompt button svg { width: 2.8em; height: 2.8em; }
 .prompt button .ok, .prompt button.done .cp { display: none; }
 .prompt button.done .ok { display: block; }
+.sheetUp { display: flex; flex-direction: column; gap: 1.6em; margin-top: 2em; }
+.sheetUp p { margin: 0; font-size: 1.8em; color: #c7c7cc; }
+.sheetUp .ask { display: flex; flex-direction: column; gap: 1em; }
 .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4em; }
 .grid3 > * { font: inherit; background: #1c1c1e; border: 0; border-radius: 2em; padding: 1.4em 1em 1.2em; color: #f5f5f7; display: flex; flex-direction: column; align-items: center; gap: .8em; cursor: pointer; }
 .grid3 img { height: 22em; max-width: 100%; object-fit: contain; }
@@ -272,7 +278,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
-  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
+  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><div id="soloPick" hidden><button class="pill" id="soloBoth" type="button">Jouer les deux</button><button class="pill" id="soloBot" type="button">L’autre au hasard</button></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul></div></div>
   <div id="gallery" class="card menu" hidden>
@@ -280,12 +286,20 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="newChar" class="card menu" hidden>
     <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+    <div class="sheetUp">
+      <input id="sheetFile" type="file" accept="image/*" hidden>
+      <button class="pill" id="sheetPick" type="button">Ajouter la feuille de poses</button>
+      <p id="sheetMsg"></p>
+      <div class="grid3" id="sheetPrev" hidden></div>
+      <div class="ask" id="sheetSave" hidden><input id="sheetName" maxlength="16" autocomplete="off" placeholder="Nom du personnage" aria-label="Nom du personnage"><button class="pill" id="sheetOk" type="button">Créer le personnage</button></div>
+    </div>
   </div>
   <div id="charView" class="card menu" hidden>
     <h2 id="charName"></h2>
     <div class="from"><span>Provient de :</span><img id="fromImg" alt=""></div>
     <div class="grid3" id="poseList"></div>
     <div class="refs" id="refList"></div>
+    <button class="pill" id="charDel" type="button" hidden>Supprimer ce personnage</button>
   </div>
   <div id="cover" class="card" hidden>
     <div class="art" style="background-image:url(bg/terrasse.jpg)"></div>
@@ -324,11 +338,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023195942"></script>
-<script src="story.js?v=20261023195942"></script>
-<script src="play.js?v=20261023195942"></script>
-<script src="bar.js?v=20261023195942"></script>
-<script src="games.js?v=20261023195942"></script>
+<script src="chars.js?v=20261023200738"></script>
+<script src="story.js?v=20261023200738"></script>
+<script src="play.js?v=20261023200738"></script>
+<script src="bar.js?v=20261023200738"></script>
+<script src="games.js?v=20261023200738"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -374,7 +388,10 @@ const spritePose = (sprite, pose) => {
   return Object.keys(has)[0];
 };
 const poseOf = (id, pose) => spritePose(spriteOf(id), pose);
-const poseSrc = (id, pose) => `chars/${spriteOf(id)}/${poseOf(id, pose)}.webp`;
+// characters added from a sheet in the menu live in this browser (IndexedDB): sprite id -> pose -> object URL
+const MADE = {};
+const charUrl = (sprite, pose) => (MADE[sprite] && MADE[sprite][pose]) || `chars/${sprite}/${pose}.webp`;
+const poseSrc = (id, pose) => charUrl(spriteOf(id), poseOf(id, pose));
 
 function fit() {
   const bw = document.body.clientWidth, bh = document.body.clientHeight;
@@ -491,7 +508,8 @@ function textMsg(m, sent) {
   const t = fill(m.text);
   if (sent) Object.assign(sent, { t, draft: false, status: 'delivered' });   // the bubble he typed goes out as it is
   else (texts[m.from] = texts[m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
-  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now() });
+  // {sms: {…, only: seat}}: a private text — the others see his phone buzz and him read it, never the words
+  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only });
   if (actors[m.to] && !afar(m.to) && !FAST) buzz();
   drawTexts();
   setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
@@ -539,7 +557,7 @@ function drawTexts(wait = 0) {
   const s = H / f.camH;
   for (const a of Object.values(actors)) {
     const all = texts[a.id] || [], onPhone = PHONE_POSES.includes(a.pose);
-    const list = onPhone ? all.filter((m) => !m.unread).slice(-3) : [], unread = all.filter((m) => m.unread && (onPhone || Date.now() - m.at < PING_MS));
+    const list = onPhone ? all.filter((m) => !m.unread && (!m.only || sees(m.only))).slice(-3) : [], unread = all.filter((m) => m.unread && (onPhone || Date.now() - m.at < PING_MS));
     if ((!list.length && !unread.length) || afar(a.id)) continue;
     const b = box(a), x = (a.x - f.left) * s;
     if (x < 0 || x > W) continue;
@@ -664,7 +682,19 @@ let options = null, optionsBy = 'p1', optionsLane = null;
 // scene it is). If whoever took it left, the host makes the choice so the story never gets stuck
 const ownerOf = (by) => (by && state.seats[by] ? state.seats[by].id : ROLE === 'host' ? myId : hostId);
 const seated = () => Object.values(state.seats).some((s) => s.id === myId);
-const mineFor = (by) => { const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
+// a simulated player ("L'autre au hasard"): its seat's owner is BOT; it is nobody's to play, the host plays it by itself
+const BOT = 'bot';
+const isBot = (seat) => !!(seat && state.seats[seat] && state.seats[seat].id === BOT);
+const mineFor = (by) => { if (isBot(by)) return false; const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
+// the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
+function botPick() {
+  const at = run, n = options.length;
+  setTimeout(() => { if (run === at && waiting === 'choice') pickChoice(Math.floor(Math.random() * n)); }, FAST ? 0 : 1400);
+}
+function botTap() {
+  const at = run;
+  setTimeout(() => { if (run === at && waiting === 'click' && isBot(onlyNow)) { record('a' + tag(laneNow)); waiting = null; next(); } }, FAST ? 0 : 1500);
+}
 // a 2-player story's player whose turn it is not stays on the shot they were on, with "<name> choisit…" at the bottom
 const waitsFor = (by) => duo() && seated() && !mineFor(by);
 const byOf = (s) => s.by || laneNow;
@@ -715,6 +745,7 @@ function choose(opts, by, ring) {
     holder.appendChild(b);
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   }
+  if (isBot(by) && ROLE === 'host') botPick();
 }
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
@@ -913,7 +944,8 @@ function ghostPick(g, i) {
 function autoGhost(g) {
   if (ROLE !== 'host' || !g.waiting) return;
   const o = ownerOf(g.seat); if (o === myId || watchers.has(o)) return;
-  clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, 0)), 1600);
+  const pick = () => (isBot(g.seat) ? Math.floor(Math.random() * g.options.length) : 0);   // a bot picks at random
+  clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, pick())), FAST ? 0 : 1600);
 }
 
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
@@ -966,7 +998,9 @@ async function next() {
       // "<name> is reading…" until that player taps on
       onlyNow = s.only || null;
       if (onlyNow && !sees(onlyNow)) { bubble.hidden = true; waitNote(`${seatName(onlyNow)} ${ui('reading')}`); } else line(s);
-      waiting = 'click'; return;
+      waiting = 'click';
+      if (isBot(onlyNow) && ROLE === 'host') botTap();
+      return;
     }
     else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.end) { endCard(s.end); return; }
@@ -1044,6 +1078,7 @@ function openWait(id) {
 function renderWait() {
   show('#wait');
   $('#todoBtn').hidden = !story().todo;
+  $('#solo').hidden = false; $('#soloPick').hidden = true;
   const list = $('#seatList'); list.innerHTML = '';
   for (const k of seatsOf()) {
     const s = state.seats[k], b = document.createElement('button'); b.type = 'button';
@@ -1063,7 +1098,18 @@ function playSolo() {
   for (const k of seatsOf()) if (!state.seats[k]) { state.seats[k] = { id: myId, n: me ? story().solo[k] : state.name }; me = me || k; }
   clearTimeout(takeSeat.t); begin();
 }
-$('#solo').onclick = (e) => { e.stopPropagation(); playSolo(); };
+// solo against a simulated player: you keep the character you took (else the first free one); every other free one
+// is played by a "bot": random choices, its lines and private lines go by on their own
+function playSoloBot() {
+  if (!waitRoom) return;
+  const me = seatsOf().find((k) => state.seats[k] && state.seats[k].id === myId) || seatsOf().find((k) => !state.seats[k]);
+  if (me && !state.seats[me]) state.seats[me] = { id: myId, n: state.name };
+  for (const k of seatsOf()) if (!state.seats[k]) state.seats[k] = { id: BOT, n: story().solo[k] };
+  clearTimeout(takeSeat.t); begin();
+}
+$('#solo').onclick = (e) => { e.stopPropagation(); $('#solo').hidden = true; $('#soloPick').hidden = false; };
+$('#soloBoth').onclick = (e) => { e.stopPropagation(); playSolo(); };
+$('#soloBot').onclick = (e) => { e.stopPropagation(); playSoloBot(); };
 // a note behind a "?": a title and its points ("- " = a sub-point), tap anywhere to close
 function openNote(t) {
   $('#todoTitle').textContent = t.title;
@@ -1133,10 +1179,11 @@ function tile(src, label) {
   b.append(img, span); return b;
 }
 function openChar(g) {
+  openG = g; $('#charDel').hidden = !g.custom;
   $('#charName').textContent = g.name;
   const list = $('#poseList'); list.innerHTML = '';
   for (const pose of Object.keys(SPRITES[g.sprite].poses).sort((a, b) => rank(a) - rank(b))) {
-    const b = tile(`chars/${g.sprite}/${pose}.webp`, pose);
+    const b = tile(charUrl(g.sprite, pose), pose);
     b.onclick = (e) => { e.stopPropagation(); $('#poseImg').src = b.firstChild.src; $('#poseName').textContent = pose; $('#poseCard').hidden = false; };
     list.appendChild(b);
   }
@@ -1146,7 +1193,12 @@ function openChar(g) {
   for (const r of g.ref) { const img = new Image(); img.alt = ''; img.loading = 'lazy'; img.src = `ref/${r}.webp`; $('#refList').appendChild(img); }
   show('#charView'); $('#charView').scrollTop = 0;
 }
-for (const g of GALLERY.filter((x) => !x.recolor)) { const b = tile(`chars/${g.sprite}/${spritePose(g.sprite, 'listen')}.webp`, g.name); b.onclick = (e) => { e.stopPropagation(); openChar(g); }; $('#galList').appendChild(b); }
+function galTile(g) {
+  const b = tile(charUrl(g.sprite, spritePose(g.sprite, 'listen')), g.name);
+  b.onclick = (e) => { e.stopPropagation(); openChar(g); };
+  const add = $('#galList .add'); add ? $('#galList').insertBefore(b, add) : $('#galList').appendChild(b);
+}
+for (const g of GALLERY.filter((x) => !x.recolor)) galTile(g);
 {
   const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'Nouveau personnage');
   const plus = document.createElement('span'); plus.textContent = '+'; add.appendChild(plus);
@@ -1163,6 +1215,105 @@ $('#copy').onclick = async (e) => {
   }
   $('#copy').classList.add('done'); setTimeout(() => $('#copy').classList.remove('done'), 1400);
 };
+
+// ---- a new character from a sheet, cut in the browser: 6 poses on a flat backdrop (green screen), 3 columns x 2 rows of
+// equal cells. Each cell is keyed out, the figure is the biggest blobs left (a frame line is a thin ring: dropped), and
+// all poses share one scale so the character keeps its size from pose to pose. Saved in this browser (IndexedDB) ----
+const CUT_H = 700;
+const idb = () => new Promise((ok, ko) => { const r = indexedDB.open('smt-chars', 1); r.onupgradeneeded = () => r.result.createObjectStore('chars', { keyPath: 'id' }); r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error); });
+const idbDo = async (mode, f) => { const db = await idb(); return new Promise((ok, ko) => { const t = db.transaction('chars', mode), q = f(t.objectStore('chars')); t.oncomplete = () => ok(q && q.result); t.onerror = () => ko(t.error); }); };
+function figureOf(W, x0, y0, x1, y1, alpha) {
+  // blobs of alpha > .5 in the cell; keep the ones that are a body (not specks, not a thin frame ring)
+  const w = x1 - x0, h = y1 - y0, lab = new Int32Array(w * h), stack = [], comps = [];
+  for (let i = 0; i < w * h; i++) {
+    if (lab[i] || alpha[(y0 + ((i / w) | 0)) * W + x0 + (i % w)] <= 0.5) continue;
+    const id = comps.length + 1; let area = 0, bx0 = w, by0 = h, bx1 = 0, by1 = 0; lab[i] = id; stack.push(i);
+    while (stack.length) {
+      const q = stack.pop(), x = q % w, y = (q / w) | 0; area++;
+      if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const n = ny * w + nx; if (!lab[n] && alpha[(y0 + ny) * W + x0 + nx] > 0.5) { lab[n] = id; stack.push(n); }
+      }
+    }
+    comps.push({ id, area, bx0, by0, bx1, by1 });
+  }
+  const keep = comps.filter((c) => c.area > w * h * 0.001 && c.area / ((c.bx1 - c.bx0 + 1) * (c.by1 - c.by0 + 1)) > 0.06);
+  if (!keep.length) return null;
+  return { lab, w, ids: new Set(keep.map((c) => c.id)), bx0: Math.min(...keep.map((c) => c.bx0)), by0: Math.min(...keep.map((c) => c.by0)), bx1: Math.max(...keep.map((c) => c.bx1)), by1: Math.max(...keep.map((c) => c.by1)) };
+}
+async function cutSheet(file) {
+  const bmp = await createImageBitmap(file), k = Math.min(1, 2400 / bmp.width);
+  const W = Math.round(bmp.width * k), H = Math.round(bmp.height * k);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0, W, H);
+  const px = cx.getImageData(0, 0, W, H), d = px.data;
+  // the backdrop = the median of 4 corner patches
+  const med = (c) => { const v = []; for (const [ox, oy] of [[0, 0], [W - 8, 0], [0, H - 8], [W - 8, H - 8]]) for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) v.push(d[((oy + y) * W + ox + x) * 4 + c]); return v.sort((a, b) => a - b)[v.length >> 1]; };
+  const bg = [med(0), med(1), med(2)], chroma = bg[1] - Math.max(bg[0], bg[2]);
+  const alpha = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) {
+    const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+    if (chroma > 60) {   // green screen: how green the pixel is against the backdrop; the spill on the edge is pulled back to grey
+      const t = (g - Math.max(r, b)) / chroma;
+      alpha[i] = Math.min(1, Math.max(0, (0.75 - t) / 0.4));
+      if (t > 0) d[i * 4 + 1] = Math.min(g, Math.max(r, b));
+    } else alpha[i] = Math.min(1, Math.max(0, (Math.max(Math.abs(r - bg[0]), Math.abs(g - bg[1]), Math.abs(b - bg[2])) - 25) / 35));
+  }
+  const cells = [];
+  for (let n = 0; n < POSE_ORDER.length; n++) {
+    const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2, x0 = Math.round(c * cw + cw * 0.015), y0 = Math.round(r * ch + ch * 0.015);
+    const f = figureOf(W, x0, y0, Math.round((c + 1) * cw - cw * 0.015), Math.round((r + 1) * ch - ch * 0.015), alpha);
+    if (!f) throw new Error(`Je ne vois personne dans la case ${n + 1} (3 colonnes × 2 rangées, un fond uni).`);
+    cells.push({ ...f, x0, y0 });
+  }
+  const scale = CUT_H / Math.max(...cells.map((c) => c.by1 - c.by0 + 1)), out = [];
+  for (let n = 0; n < cells.length; n++) {
+    const c = cells[n], w = c.bx1 - c.bx0 + 1, h = c.by1 - c.by0 + 1, src = cx.createImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const l = c.lab[(c.by0 + y) * c.w + c.bx0 + x], o = (y * w + x) * 4, i = (c.y0 + c.by0 + y) * W + c.x0 + c.bx0 + x;
+      src.data[o] = d[i * 4]; src.data[o + 1] = d[i * 4 + 1]; src.data[o + 2] = d[i * 4 + 2];
+      src.data[o + 3] = l && !c.ids.has(l) ? 0 : Math.round(alpha[i] * 255);
+    }
+    const a = document.createElement('canvas'); a.width = w; a.height = h; a.getContext('2d').putImageData(src, 0, 0);
+    const ow = Math.max(1, Math.round(w * scale)), oh = Math.max(1, Math.round(h * scale)), o = document.createElement('canvas'); o.width = ow; o.height = oh;
+    const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(a, 0, 0, ow, oh);
+    out.push({ pose: POSE_ORDER[n], w: ow, h: oh, blob: await new Promise((ok) => o.toBlob(ok, 'image/webp', 0.9)) });
+  }
+  return out;
+}
+function registerChar(rec) {
+  MADE[rec.id] = {}; SPRITES[rec.id] = { refH: Math.max(...rec.poses.map((p) => p.h)), poses: {} }; FACE[rec.id] = {};
+  for (const p of rec.poses) { MADE[rec.id][p.pose] = URL.createObjectURL(p.blob); SPRITES[rec.id].poses[p.pose] = [p.w, p.h]; FACE[rec.id][p.pose] = 'r'; new Image().src = MADE[rec.id][p.pose]; }
+  const g = { sprite: rec.id, name: rec.name, ref: [], custom: true }; GALLERY.push(g); galTile(g);
+}
+let cutNow = null, openG = null;
+$('#sheetPick').onclick = (e) => { e.stopPropagation(); $('#sheetFile').click(); };
+$('#sheetFile').onchange = async () => {
+  const f = $('#sheetFile').files[0]; if (!f) return;
+  $('#sheetMsg').textContent = 'Découpe…'; $('#sheetPrev').hidden = $('#sheetSave').hidden = true; cutNow = null;
+  try {
+    cutNow = await cutSheet(f); $('#sheetPrev').innerHTML = '';
+    for (const p of cutNow) $('#sheetPrev').appendChild(tile(URL.createObjectURL(p.blob), p.pose));
+    $('#sheetPrev').hidden = $('#sheetSave').hidden = false; $('#sheetMsg').textContent = "Les 6 poses sont découpées. Un nom, et c'est fait.";
+  } catch (err) { $('#sheetMsg').textContent = err.message || "Cette image ne s'ouvre pas."; }
+  $('#sheetFile').value = '';
+};
+$('#sheetOk').onclick = async (e) => {
+  e.stopPropagation(); const name = $('#sheetName').value.trim(); if (!cutNow || !name) { $('#sheetName').focus(); return; }
+  const rec = { id: 'c_' + Date.now().toString(36), name, poses: cutNow };
+  try { await idbDo('readwrite', (st) => st.put(rec)); } catch { /* private window: it lives until the page closes */ }
+  registerChar(rec); cutNow = null; $('#sheetName').value = ''; $('#sheetPrev').hidden = $('#sheetSave').hidden = true; $('#sheetMsg').textContent = '';
+  show('#gallery');
+};
+$('#charDel').onclick = async (e) => {
+  e.stopPropagation(); if (!openG || !openG.custom) return;
+  try { await idbDo('readwrite', (st) => st.delete(openG.sprite)); } catch { /* nothing stored */ }
+  const i = GALLERY.indexOf(openG), tiles = [...$('#galList').children].filter((b) => !b.classList.contains('add'));
+  const shown = GALLERY.filter((x) => !x.recolor); tiles[shown.indexOf(openG)]?.remove(); GALLERY.splice(i, 1);
+  show('#gallery');
+};
+idbDo('readonly', (st) => st.getAll()).then((all) => (all || []).forEach(registerChar)).catch(() => { /* no storage: only the built-in characters */ });
 
 // ---- live: whoever scans the QR in the menu joins. The host's phone runs the story: its state goes to a public MQTT
 // relay as one retained message (story + game id + names + waiting-room seats + every tap so far); a joiner replays the
@@ -1188,7 +1339,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023195942';
+const BUILD = '20261023200738';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -1405,7 +1556,7 @@ const jump = location.hash.match(/^#([tpb])(\d+)$/);
 if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
 // warm the cache so cuts never flash
 for (const s of Object.values(SCENES)) if (s.image) new Image().src = s.image;
-for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = `chars/${id}/${pose}.webp`;
+for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = charUrl(id, pose);
 </script>
 </body>
 </html>

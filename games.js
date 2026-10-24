@@ -86,15 +86,15 @@ SCENES.call = { size: [1920, 1240], spots: { pa: [480, 1180, 700], pb: [1440, 11
     R(954, 0, 12, 1240, '#000'),
   ], front: [] };
 
-// ---------- 1. the secret: a line only one player sees ----------
+// ---------- 1. the secret: a private text (Justin sees the phone buzz, not the words) + a line only Justin sees ----------
 const mgSecret = mg([
   scene('bar', { pa: 'drunk_listen', cam: 'listen', pb: 'drunk_listen' }),
   cam('three', 'pa', 'cam', 'pb'), { fade: 'in', ms: 700 }, hush(700),
   one('cam'), say('cam', 'worried', 'Okay. Who finished my drink?'),
-  one('pb'), { poses: { pb: 'texting' } }, hush(600),
-  { narr: 'Your phone buzzes. Unknown number.', only: 'pb' },
-  { narr: '“Say nothing about tonight. — S.”', only: 'pb' },
-  { narr: 'Brooke looks at his phone. His face changes.', only: 'pa' },
+  one('pb'), hush(600),
+  { sms: { from: 'suit', to: 'pb', text: 'Say nothing about tonight. — S', only: 'pb' } },
+  hush(700), { check: 'pb' }, hush(900),
+  { narr: 'Brooke reads a text. His face changes.', only: 'pa' },
   two('cam', 'pb'), hush(500),
   say('cam', 'thinking', 'Brooke? You good?', { to: 'pb' }),
   one('pb'),
