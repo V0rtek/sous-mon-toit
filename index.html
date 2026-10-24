@@ -460,12 +460,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024152026"></script>
-<script src="story.js?v=20261024152026"></script>
-<script src="play.js?v=20261024152026"></script>
-<script src="bar.js?v=20261024152026"></script>
-<script src="games.js?v=20261024152026"></script>
-<script src="gen.js?v=20261024152026"></script>
+<script src="chars.js?v=20261024152209"></script>
+<script src="story.js?v=20261024152209"></script>
+<script src="play.js?v=20261024152209"></script>
+<script src="bar.js?v=20261024152209"></script>
+<script src="games.js?v=20261024152209"></script>
+<script src="gen.js?v=20261024152209"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -723,9 +723,14 @@ let actx = null;
 const sfxBuf = {}, sfxLoops = {};
 function audio() {
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
-  if (actx.state === 'suspended') actx.resume();
+  if (actx.state === 'suspended' && !document.hidden) actx.resume();
   return actx;
 }
+// no sound while the phone is locked or the page is in another tab: everything pauses, then picks up where it was
+const hearing = () => { if (!actx) return; if (document.hidden) actx.suspend(); else actx.resume(); };
+document.addEventListener('visibilitychange', hearing);
+addEventListener('pagehide', () => { if (actx) actx.suspend(); });
+addEventListener('pageshow', hearing);
 addEventListener('pointerdown', () => audio(), true);
 const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3`)
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
@@ -1689,7 +1694,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024152026';
+const BUILD = '20261024152209';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
