@@ -161,6 +161,17 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #labNote span { font-size: 3.6em; font-weight: 600; }
 /* an incoming call: the caller's name, then decline (red) and answer (green) */
 #ringCard { position: absolute; inset: 0; z-index: 25; background: rgba(12,12,16,.86); display: flex; flex-direction: column; align-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; color: #f5f5f7; cursor: default; }
+/* during a call: a bar on top (who is on the line, for how long); the other one's lines come through the phone */
+#callBar { position: absolute; top: 2.4%; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 1.1em; padding: .8em 2.2em .8em .8em; border-radius: 3.2em; background: #000; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; box-shadow: 0 .3em 1.2em rgba(0,0,0,.45); white-space: nowrap; pointer-events: none; }
+#callBar i { width: 4.4em; height: 4.4em; border-radius: 50%; background: #34c759; display: grid; place-items: center; }
+#callBar i svg { width: 2.3em; height: 2.3em; }
+#callBar b { font-size: 2.4em; font-weight: 600; letter-spacing: -.01em; }
+#callBar span { font-size: 2.2em; color: #34c759; font-variant-numeric: tabular-nums; }
+#callBar.ended i { background: #ff3b30; }
+#callBar.ended i svg { transform: rotate(135deg); }
+#callBar.ended span { color: #ff453a; }
+#bubble.phone { background: #1c1c1e; border-color: #3a3a3c; color: #f5f5f7; }
+#tag small svg { width: 1em; height: 1em; vertical-align: -.12em; }
 #ringName { margin-top: 30%; font-size: 5em; font-weight: 600; letter-spacing: -.02em; }
 #ringSub { margin-top: .6em; font-size: 2.2em; color: #a1a1a6; }
 #ringBtns { margin-top: auto; margin-bottom: 18%; display: flex; gap: 14em; }
@@ -265,6 +276,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="hint" hidden>Touche pour continuer</div>
   <div id="waitOther" hidden><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
+  <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
   <div id="black"></div>
   <div id="slate" hidden></div>
   <div id="who" class="card menu">
@@ -377,12 +389,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023203445"></script>
-<script src="story.js?v=20261023203445"></script>
-<script src="play.js?v=20261023203445"></script>
-<script src="bar.js?v=20261023203445"></script>
-<script src="games.js?v=20261023203445"></script>
-<script src="gen.js?v=20261023203445"></script>
+<script src="chars.js?v=20261023204110"></script>
+<script src="story.js?v=20261023204110"></script>
+<script src="play.js?v=20261023204110"></script>
+<script src="bar.js?v=20261023204110"></script>
+<script src="games.js?v=20261023204110"></script>
+<script src="gen.js?v=20261023204110"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -408,7 +420,7 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu' };
+const UI = { choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -699,18 +711,20 @@ function line(s) {
   const who = s.say || s.think || null, kind = s.narr ? 'narr' : s.think ? 'think' : s.whisper ? 'whisper' : 'say';
   if (s.say && story().gaze) gaze(s);
   if (s.say && s.pose) setPose(s.say, s.pose);
-  bubble.className = kind;
+  const side = callSide(), voice = !!(side && s.say && s.say !== side && seatsOf().includes(s.say));   // through the phone
+  bubble.className = voice ? 'say phone' : kind;
   tagEl.hidden = !who;
   if (who) {
     tagEl.innerHTML = '';
     tagEl.append(fill(castOf(who).name));
     if (kind !== 'say') { const sm = document.createElement('small'); sm.textContent = kind === 'think' ? 'pense' : 'chuchote'; tagEl.append(sm); }
+    if (voice) { const sm = document.createElement('small'); sm.innerHTML = ICON_PHONE; tagEl.append(sm); }
     tagEl.style.background = castOf(who).color;
   }
   // the tail points at the speaker if the camera sees them
   const a = who && actors[who], f = camNow && camNow.frame;
   const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : -1;
-  tail.hidden = kind === 'narr' || sx < .05 || sx > .95;
+  tail.hidden = kind === 'narr' || voice || sx < .05 || sx > .95;
   if (!tail.hidden) tail.style.left = Math.min(86, Math.max(14, (sx - .07) / .86 * 100)) + '%';
   if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
   bubble.hidden = false; choicesEl.hidden = true;
@@ -765,6 +779,34 @@ function ringTone(on) {
     }
   };
   beep(); ringing = setInterval(beep, 2400);
+}
+// {call: {watch: seat}} … {call: false}: a phone call between the story's two players. Each phone shows only its own
+// player (the camera never cuts to the other one), with a bar on top: who is on the line and for how long. The other
+// one's lines come through the phone. A spectator follows `watch`; solo (both players yours) cuts between the two
+let callNow = null;
+function callSide() {
+  if (!callNow) return null;
+  const mine = seatsOf().filter((k) => state.seats[k] && state.seats[k].id === myId);
+  return mine.length === 1 ? mine[0] : mine.length ? null : callNow.watch;
+}
+function startCall(c) {
+  clearInterval(callNow && callNow.tick); clearTimeout(startCall.t);
+  if (!c) {   // hung up: "Call ended" for a moment
+    if (!callNow) return;
+    callNow = null; $('#callBar').classList.add('ended'); $('#callTime').textContent = ui('callEnded');
+    startCall.t = setTimeout(() => { if (!callNow) $('#callBar').hidden = true; }, 1800);
+    return;
+  }
+  callNow = { at: Date.now(), watch: c.watch || seatsOf()[1] };
+  callNow.tick = setInterval(drawCall, 1000);
+  $('#callBar i').innerHTML = ICON_PHONE; $('#callBar').classList.remove('ended'); $('#callBar').hidden = false; drawCall();
+}
+function drawCall() {
+  if (!callNow) return;
+  const seats = seatsOf(), view = callSide() || (camNow && camNow.who && camNow.who[0]);
+  $('#callName').textContent = fill(castOf(seats.find((k) => k !== view) || seats[1]).name);
+  const t = Math.floor((Date.now() - callNow.at) / 1000);
+  $('#callTime').textContent = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
 }
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
@@ -1030,7 +1072,8 @@ async function next() {
     else if (s.slate) { await fade('out', s.ms || 500); if (r !== run) return; slateEl.textContent = fill(s.slate); slateEl.hidden = false; waiting = 'click'; return; }
     else if (s.set) Object.assign(state.f, s.set);
     else if (s.scene) setScene(s.scene, s.cast);
-    else if (s.cam) setCam({ size: s.cam, who: s.who, at: s.at });
+    else if (s.call !== undefined) startCall(s.call);
+    else if (s.cam) { const v = callSide(); setCam(v ? { size: 'one', who: [v] } : { size: s.cam, who: s.who, at: s.at }); drawCall(); }
     else if (s.pan !== undefined) { setCam({ size: 'wide', at: s.pan }, FAST || REDUCED ? 0 : s.ms); await sleep(s.ms); }
     else if (s.enter) for (const [id, pose] of Object.entries(s.enter)) enter(id, pose);
     else if (s.exit) exit(s.exit);
@@ -1095,6 +1138,7 @@ function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   split = null; laneNow = null; texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
   asides.clear(); $('#todoCard').hidden = true; $('#ringCard').hidden = true; ringTone(false); onlyNow = null;
+  clearInterval(callNow && callNow.tick); callNow = null; $('#callBar').hidden = true;
 }
 
 function begin(id = state.story) {
@@ -1405,7 +1449,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023203445';
+const BUILD = '20261023204110';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

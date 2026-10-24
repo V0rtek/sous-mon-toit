@@ -31,7 +31,7 @@ const MG_CAST = {
   suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
 };
 const MG_UI = { choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
-  again: 'Play again', delivered: 'Delivered', read: 'Read' };
+  again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended' };
 const mg = (steps) => Object.assign(steps, { gaze: true, credits: '', seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
   cast: MG_CAST, ui: MG_UI });
 const mgEnd = (title, lede) => [{ fade: 'out', ms: 800 }, { end: { kicker: 'Mini-game', title, lede, art: null } }];
@@ -224,11 +224,12 @@ const mgCallB = [   // Brooke, outside with the stranger
 const mgCall = mg([
   { split: () => ({ pa: mgCallA, pb: mgCallB }), watch: () => 'pb', hold: () => ({ pa: 'Waiting for Brooke', pb: 'Waiting for Justin' }) },
   { fn: (f) => (f.call && f.answered ? [
-    { fade: 'out', ms: 400 }, scene('call', { pa: 'texting', pb: 'texting' }), one('pa'), { fade: 'in', ms: 400 },
-    say('pa', 'drunk_talk', 'Brooke? Where are you?'),
-    one('pb'), hush(1000), say('pb', 'drunk_listen', 'I can’t talk right now.'),
-    one('pa'), say('pa', 'drunk_talk', 'Who are you with?'),
-    one('pb'), hush(1200), narr('Brooke hangs up.'),
+    // each phone only sees its own player on the call (a spectator follows Brooke); the other one is a voice
+    { fade: 'out', ms: 400 }, scene('call', { pa: 'texting', pb: 'texting' }), { call: { watch: 'pb' } }, one('pa'), { fade: 'in', ms: 400 },
+    say('pa', 'texting', 'Brooke? Where are you?'),
+    one('pb'), hush(1000), say('pb', 'texting', 'I can’t talk right now.'),
+    one('pa'), say('pa', 'texting', 'Who are you with?'),
+    one('pb'), hush(1200), { call: false }, narr('Brooke hangs up.'),
     ...mgEnd('Picked up', 'Brooke answered. He didn’t say much.'),
   ] : mgEnd(f.call ? 'Declined' : 'Left on read', f.call ? 'Brooke let it ring.' : 'Justin texted. Brooke saw it.')) },
 ]);
