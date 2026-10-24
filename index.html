@@ -182,6 +182,13 @@ body.watch #solo, body.watch #soloPick { display: none !important; }
 .prompt button svg { width: 2.8em; height: 2.8em; }
 .prompt button .ok, .prompt button.done .cp { display: none; }
 .prompt button.done .ok { display: block; }
+.step { display: flex; flex-direction: column; gap: 1.6em; }
+.step[hidden] { display: none; }
+.step h2 { margin: 0; font-size: 3em; }
+.step .lead { margin: 0; font-size: 2em; color: #c7c7cc; line-height: 1.35; }
+.step textarea { font: inherit; font-size: 2.2em; padding: .8em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; resize: none; user-select: text; }
+.step textarea::placeholder { color: #86868b; }
+.ghost { font: inherit; font-size: 2.2em; background: none; border: 0; color: #86868b; cursor: pointer; padding: .4em; }
 .sheetUp { display: flex; flex-direction: column; gap: 1.6em; margin-top: 2em; }
 .sheetUp p { margin: 0; font-size: 1.8em; color: #c7c7cc; }
 .sheetUp .ask { display: flex; flex-direction: column; gap: 1em; }
@@ -285,13 +292,30 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="grid3" id="galList"></div>
   </div>
   <div id="newChar" class="card menu" hidden>
+    <div class="step" id="nc1">
+      <h2>Étape 1 sur 3</h2>
+      <p class="lead">Décris ton acteur : son look et son langage corporel.</p>
+      <textarea id="actorDesc" rows="6" maxlength="600" placeholder="Ex. : homme début trentaine, cheveux courts bruns, veston bleu marine. Posé, regarde en coin, parle avec les mains." aria-label="Décris ton acteur"></textarea>
+      <button class="pill" id="nc1Go" type="button">Suivant</button>
+    </div>
+    <div class="step" id="nc2" hidden>
+      <h2>Étape 2 sur 3</h2>
+      <p class="lead">Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l'image qu'il te donne.</p>
     <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <button class="pill" id="nc2Go" type="button">J'ai mon image</button>
+      <button class="ghost" id="nc2Back" type="button">Retour</button>
+    </div>
+    <div class="step" id="nc3" hidden>
+      <h2>Étape 3 sur 3</h2>
+      <p class="lead">Dépose la feuille de poses.</p>
     <div class="sheetUp">
       <input id="sheetFile" type="file" accept="image/*" hidden>
       <button class="pill" id="sheetPick" type="button">Ajouter la feuille de poses</button>
       <p id="sheetMsg"></p>
       <div class="grid3" id="sheetPrev" hidden></div>
       <div class="ask" id="sheetSave" hidden><input id="sheetName" maxlength="16" autocomplete="off" placeholder="Nom du personnage" aria-label="Nom du personnage"><button class="pill" id="sheetOk" type="button">Créer le personnage</button></div>
+    </div>
+      <button class="ghost" id="nc3Back" type="button">Retour</button>
     </div>
   </div>
   <div id="charView" class="card menu" hidden>
@@ -338,11 +362,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023200738"></script>
-<script src="story.js?v=20261023200738"></script>
-<script src="play.js?v=20261023200738"></script>
-<script src="bar.js?v=20261023200738"></script>
-<script src="games.js?v=20261023200738"></script>
+<script src="chars.js?v=20261023201014"></script>
+<script src="story.js?v=20261023201014"></script>
+<script src="play.js?v=20261023201014"></script>
+<script src="bar.js?v=20261023201014"></script>
+<script src="games.js?v=20261023201014"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1202,14 +1226,20 @@ for (const g of GALLERY.filter((x) => !x.recolor)) galTile(g);
 {
   const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'Nouveau personnage');
   const plus = document.createElement('span'); plus.textContent = '+'; add.appendChild(plus);
-  add.onclick = (e) => { e.stopPropagation(); show('#newChar'); };
+  add.onclick = (e) => { e.stopPropagation(); ncStep(1); show('#newChar'); };
   $('#galList').appendChild(add);
 }
 $('#poseCard').onclick = (e) => { e.stopPropagation(); $('#poseCard').hidden = true; };
-$('#promptText').textContent = SHEET_PROMPT;
+// "+" = 3 screens: describe the actor, the prompt (with that description in it) to copy into ChatGPT, drop the sheet + name
+const sheetPrompt = () => SHEET_PROMPT.replace('[describe the character, or attach a picture of them]', $('#actorDesc').value.trim() || '[describe the character, or attach a picture of them]');
+function ncStep(n) { for (const k of [1, 2, 3]) $('#nc' + k).hidden = k !== n; if (n === 2) $('#promptText').textContent = sheetPrompt(); $('#newChar').scrollTop = 0; }
+$('#nc1Go').onclick = (e) => { e.stopPropagation(); ncStep(2); };
+$('#nc2Go').onclick = (e) => { e.stopPropagation(); ncStep(3); };
+$('#nc2Back').onclick = (e) => { e.stopPropagation(); ncStep(1); };
+$('#nc3Back').onclick = (e) => { e.stopPropagation(); ncStep(2); };
 $('#copy').onclick = async (e) => {
   e.stopPropagation();
-  try { await navigator.clipboard.writeText(SHEET_PROMPT); } catch {
+  try { await navigator.clipboard.writeText(sheetPrompt()); } catch {
     const r = document.createRange(); r.selectNodeContents($('#promptText'));
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges();
   }
@@ -1339,7 +1369,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023200738';
+const BUILD = '20261023201014';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
