@@ -20,7 +20,7 @@ GALLERY.push({ sprite: 'suit', name: 'Stranger', src: 'perso_suit', ref: ['suit_
 // Brooke: 2 sheets from his photo (23/10): the bar one, then the bathroom one (which also redid his happy and sad,
 // subtler); what he doesn't have yet plays with his closest pose
 FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
-  pee: 'f', pee_relief: 'f', pee_look: 'r' };
+  pee: 'f', pee_relief: 'f', pee_look: 'r', drunk_smile: 'r', drunk_joke: 'r', drunk_letdown: 'r', nervous: 'r', sit_fire: 'r', shoulder_hit: 'r' };
 // Justin: his new sheet (bar, 23/10) is the only one he plays with here — never the old urban sheets
 FACE.justin_bar = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_flirt: 'r', texting: 'r' };
 // the house's poses (sheets to come, 23/10) play meanwhile as the closest pose each one has
@@ -28,7 +28,7 @@ window.POSE_ALIAS = {
   brooke: {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
     drunk_flirt: 'drunk_point', phone_shock: 'texting',
-    nervous: 'thinking', scared: 'thinking', pleading: 'drunk_talk', punch: 'drunk_point', sit_fire: 'drunk_sad', confess: 'drunk_sad',
+    scared: 'thinking', pleading: 'drunk_talk', punch: 'shoulder_hit', confess: 'drunk_sad',
   },
   justin_bar: {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
@@ -638,17 +638,17 @@ const houseMeet = (f) => [
   { fade: 'out', ms: 400 }, scene('house', { pa: 'drunk_listen', pb: 'drunk_listen', cam: 'listen' }),
   cam('three', 'pa', 'pb', 'cam'), { fade: 'in', ms: 400 }, hush(600),
   ...(f.sms === 'invite' ? [
-    one('pb'), say('pb', 'drunk_happy', 'You came!', { to: 'pa' }),
+    one('pb'), say('pb', 'drunk_smile', 'You came!', { to: 'pa' }),
     one('pa'), say('pa', 'drunk_talk', 'Open bar, huh?', { to: 'pb' }),
     one('cam'), say('cam', 'thinking', 'Whose house is this?', { to: 'pb' }),
     one('pb'), hush(900), say('pb', 'nervous', '…A friend’s.', { to: 'cam' }),
     one('cam'), say('cam', 'explaining', 'You don’t have friends with houses.', { to: 'pb' }),
-    one('pb'), say('pb', 'drunk_happy', 'I have one now.', { to: 'cam' }),
+    one('pb'), say('pb', 'drunk_smile', 'I have one now.', { to: 'cam' }),
   ] : f.sms === 'half' ? [
     one('pa'), say('pa', 'drunk_talk', 'Five K. For what?', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_talk', 'Talking to people.', { to: 'pa' }),
     one('pa'), hush(600), say('pa', 'drunk_listen', 'Talking to people.', { to: 'pb' }),
-    one('pb'), say('pb', 'drunk_happy', 'I’m a great talker.', { to: 'pa' }),
+    one('pb'), say('pb', 'drunk_smile', 'I’m a great talker.', { to: 'pa' }),
     one('cam'), say('cam', 'explaining', 'You’re a great drinker.', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_point', 'Same skill set.', { to: 'cam' }),
     one('pa'), hush(700), say('pa', 'drunk_talk', 'Brooke.', { to: 'pb' }),
@@ -666,7 +666,7 @@ const houseMeet = (f) => [
   two('pa', 'pb'), hush(1400),
   say('pb', 'drunk_talk', 'So yeah… I guess we gotta talk to people now.', { to: 'pa' }),
   one('pa'), say('pa', 'drunk_listen', 'I’m wearing a hoodie, man.', { to: 'pb' }),
-  one('pb'), say('pb', 'drunk_happy', 'Confidence is the outfit.', { to: 'pa' }),
+  one('pb'), say('pb', 'drunk_smile', 'Confidence is the outfit.', { to: 'pa' }),
   // Julian
   { enter: { julian: 'listen' } }, two('cam', 'julian'), hush(900),
   say('julian', 'talk', 'You look lost.', { to: 'cam' }),
@@ -677,7 +677,7 @@ const houseMeet = (f) => [
   one('julian'), say('julian', 'talk', 'Julian.', { to: 'cam' }),
   one('cam'), hush(500), say('cam', 'flirty', 'Cam.', { to: 'julian' }),
   two('pa', 'pb'), hush(1600),   // the two of them, watching
-  say('pb', 'drunk_sad', '…He has a jawline, man.', { to: 'pa' }),
+  say('pb', 'drunk_letdown', '…He has a jawline, man.', { to: 'pa' }),
   one('pa'), say('pa', 'drunk_listen', 'We have… personalities.', { to: 'pb' }),
   one('pb'), hush(500), say('pb', 'drunk_talk', 'Speak for yourself.', { to: 'pa' }),
   // the tray: Julian takes two reds
@@ -767,7 +767,7 @@ const office = [
   one('pb'), hush(1200), say('pb', 'drunk_listen', 'Chose her for what?', { to: 'suit' }),
   one('suit'), hush(1400), say('suit', 'listen', 'Red means yes, here.', { to: 'pb' }),
   one('pb'), hush(1900),   // it lands
-  say('pb', 'drunk_sad', '…She doesn’t know that.', { to: 'suit' }),
+  say('pb', 'drunk_letdown', '…She doesn’t know that.', { to: 'suit' }),
   one('suit'), hush(800), say('suit', 'listen', 'Neither did you.', { to: 'pb' }),
   // the envelope, and the wound again
   two('pb', 'suit'), hush(900), narr('An envelope on the desk. Thick.'),
@@ -1073,16 +1073,16 @@ window.BAR = [
   one('pb'),
   say('pb', 'drunk_talk', 'Man… I think…'),
   hush(700),
-  say('pb', 'drunk_happy', 'I think I’m having my best fucking life, man.'),
+  say('pb', 'drunk_smile', 'I think I’m having my best fucking life, man.'),
   two('cam', 'pb'),
   say('cam', 'amused', 'Thought you had a job interview tomorrow.', { to: 'pb' }),
   one('pb'),
-  say('pb', 'drunk_happy', 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', { to: 'cam' }),
+  say('pb', 'drunk_smile', 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', { to: 'cam' }),
   one('pa'),
   { by: 'pa', choice: [
     { t: 'You skipped it?', intent: 'worried', then: [
       say('pa', 'drunk_talk', 'You skipped it? Again?', { to: 'pb' }),
-      one('pb'), say('pb', 'drunk_happy', 'Bro. They wanted me to wear a tie.', { to: 'pa' }),
+      one('pb'), say('pb', 'drunk_smile', 'Bro. They wanted me to wear a tie.', { to: 'pa' }),
       one('cam'), say('cam', 'amused', 'The horror.', { to: 'pb' }),
     ] },
     { t: 'Then this round’s on you.', intent: 'teases', then: [
@@ -1102,15 +1102,15 @@ window.BAR = [
   one('pb'), hush(1100),   // Brooke takes it
   { by: 'pb', choice: [
     { t: 'Something’ll come up.', intent: 'the universe', set: { rent: 'universe' }, then: [
-      say('pb', 'drunk_happy', 'Something’ll come up, man. The universe provides.', { to: 'pa' }),
+      say('pb', 'drunk_smile', 'Something’ll come up, man. The universe provides.', { to: 'pa' }),
       one('pa'), say('pa', 'drunk_talk', 'The universe doesn’t take e-transfer.', { to: 'pb' }),
     ] },
     { t: 'I’ll sell the guitar.', intent: 'the guitar', set: { rent: 'guitar' }, then: [
-      say('pb', 'drunk_sad', 'I’ll sell the guitar.', { to: 'pa' }),
+      say('pb', 'drunk_letdown', 'I’ll sell the guitar.', { to: 'pa' }),
       one('pa'), hush(700), say('pa', 'drunk_talk', 'You said that in June.', { to: 'pb' }),
     ] },
     { t: 'Spot me, brother?', intent: 'begs', set: { rent: 'spot' }, then: [
-      say('pb', 'drunk_happy', 'Justin. My brother. My rock.', { to: 'pa' }),
+      say('pb', 'drunk_smile', 'Justin. My brother. My rock.', { to: 'pa' }),
       one('pa'), say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
       one('pb'), say('pb', 'drunk_talk', 'You didn’t even let me finish.', { to: 'pa' }),
       one('pa'), say('pa', 'drunk_talk', 'No.', { to: 'pb' }),
