@@ -460,12 +460,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024151006"></script>
-<script src="story.js?v=20261024151006"></script>
-<script src="play.js?v=20261024151006"></script>
-<script src="bar.js?v=20261024151006"></script>
-<script src="games.js?v=20261024151006"></script>
-<script src="gen.js?v=20261024151006"></script>
+<script src="chars.js?v=20261024152026"></script>
+<script src="story.js?v=20261024152026"></script>
+<script src="play.js?v=20261024152026"></script>
+<script src="bar.js?v=20261024152026"></script>
+<script src="games.js?v=20261024152026"></script>
+<script src="gen.js?v=20261024152026"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -730,7 +730,7 @@ addEventListener('pointerdown', () => audio(), true);
 const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3`)
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
 // how loud each file plays (the files are levelled alike): a room's sound stays under the voices, the campfire lowest
-const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.05 };
+const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02 };
 async function sfx(name, loop = false) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -1689,7 +1689,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024151006';
+const BUILD = '20261024152026';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
