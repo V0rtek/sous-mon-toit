@@ -163,6 +163,10 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #labNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
 #genNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
 #genNote span { font-size: 3.6em; font-weight: 600; }
+/* next to it: the prompt Haiku gets, word for word */
+#genPromptBtn { position: absolute; top: 2.2%; right: calc(4% + 9.6em); z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#genPromptBtn svg { width: 3.4em; height: 3.4em; }
+#genPrompt .prompt { position: relative; }
 #storyNote { position: absolute; top: 2.2%; right: 4%; z-index: 35; font: inherit; width: 5.4em; height: 5.4em; border: 0; border-radius: 50%; background: rgba(0,0,0,.35); color: rgba(255,255,255,.8); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #storyNote span { font-size: 2.6em; font-weight: 600; }
 .todo li.mine { color: #1d1d1f; }
@@ -228,7 +232,7 @@ body.watch #solo, body.watch #soloPick { display: none !important; }
 /* after "Jouer seul": play both characters, or yours with the other one simulated (random choices) */
 #soloPick { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); display: flex; gap: 1.4em; }
 #soloPick .pill { padding: .7em 1.4em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; font-size: 2.3em; }
-#gallery, #charView, #newChar, #genScreen, #genHist, #statsScreen { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
+#gallery, #charView, #newChar, #genScreen, #genHist, #genPrompt, #statsScreen { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
 .prompt button { position: absolute; top: 1.4em; right: 1.4em; font: inherit; width: 6em; height: 6em; border-radius: 50%; border: 0; background: #2c2c2e; display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -368,6 +372,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button class="ghost" id="genHistBtn" type="button">Dernières histoires</button>
     </div>
     <button id="genNote" type="button" aria-label="Notes"><span>?</span></button>
+    <button id="genPromptBtn" type="button" aria-label="Le prompt"><svg viewBox="0 0 24 24" fill="none" stroke="#f5f5f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9.5 12.5h5M9.5 16.5h5"/></svg></button>
+  </div>
+  <div id="genPrompt" class="card menu" hidden>
+    <div class="step"><h2>Le prompt</h2>
+      <div class="prompt"><p id="genPromptText"></p><button type="button" class="genCopy" aria-label="Copier"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <p class="lead">Si un bouton dépasse 27 caractères :</p>
+      <div class="prompt"><p id="genShortText"></p><button type="button" class="genCopy" aria-label="Copier"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+    </div>
   </div>
   <div id="statsScreen" class="card menu" hidden>
     <div class="step"><h2>Stats</h2><p class="lead">Sur cet appareil seulement.</p><div id="statsBody"></div>
@@ -448,12 +460,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024130832"></script>
-<script src="story.js?v=20261024130832"></script>
-<script src="play.js?v=20261024130832"></script>
-<script src="bar.js?v=20261024130832"></script>
-<script src="games.js?v=20261024130832"></script>
-<script src="gen.js?v=20261024130832"></script>
+<script src="chars.js?v=20261024132231"></script>
+<script src="story.js?v=20261024132231"></script>
+<script src="play.js?v=20261024132231"></script>
+<script src="bar.js?v=20261024132231"></script>
+<script src="games.js?v=20261024132231"></script>
+<script src="gen.js?v=20261024132231"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1197,8 +1209,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#statsScreen', '#cover', '#end', '#labScreen'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#genHist': '#genScreen', '#statsScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen'];
+const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -1464,6 +1476,20 @@ function renderHist() {
   }
 }
 $('#genHistBtn').onclick = (e) => { e.stopPropagation(); renderHist(); show('#genHist'); };
+// the prompt as sent: the instructions + "The idea: " and what's typed right now; below, the small call that shortens a button
+$('#genPromptBtn').onclick = (e) => {
+  e.stopPropagation();
+  $('#genPromptText').textContent = GEN.SYSTEM + String.fromCharCode(10, 10) + 'The idea: ' + ($('#genIdea').value.trim() || '[ton idée]');
+  $('#genShortText').textContent = GEN.SHORTEN; show('#genPrompt'); $('#genPrompt').scrollTop = 0;
+};
+for (const b of document.querySelectorAll('.genCopy')) b.onclick = async (e) => {
+  e.stopPropagation(); const p = b.parentNode.querySelector('p');
+  try { await navigator.clipboard.writeText(p.textContent); } catch {
+    const r = document.createRange(); r.selectNodeContents(p);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges();
+  }
+  b.classList.add('done'); setTimeout(() => b.classList.remove('done'), 1400);
+};
 $('#genGo').onclick = async (e) => {
   e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
   if (!idea || !key) { $(idea ? '#genKey' : '#genIdea').focus(); return; }
@@ -1663,7 +1689,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024130832';
+const BUILD = '20261024132231';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
