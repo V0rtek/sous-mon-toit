@@ -7,22 +7,35 @@ window.GEN = (() => {
   // each decor and who is standing in it (the player, justin, is always there: his lines only come as choices)
   const SCENE_CAST = { terrasse: ['melissa', 'candy', 'ruby'], maison: ['ruby', 'james'], salon: ['isa', 'amare', 'james'] };
   const POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
-  const SYSTEM = `You write a very short interactive story for a phone game: dialogue only, shown one line at a time over a picture of the characters. The player plays "justin". Write every line, button and title in the same language as the player's idea: an idea written in English gets an English story, an idea written in French gets a French story.
+  const SYSTEM = `You write a short interactive mini-story for a phone game: dialogue only, shown one line at a time over a picture of the characters, with 3-4 choices. The player plays "justin". Write every line, button and title in the same language as the player's idea: an idea written in English gets an English story, an idea written in French gets a French story. Natural spoken language, never an imitation of an accent.
 
 Reply with ONE JSON object and nothing else, shaped exactly like this:
 {"title": "2-4 words",
  "scene": "terrasse" | "maison" | "salon",
- "steps": [ {"who": "<character id>", "pose": "<pose>", "text": "<one spoken line>"}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","text"}, ... ]}, {...}, {...} ]}, ... ],
+ "steps": [ {"who": "<character id>", "pose": "<pose>", "to": "<who they talk to>", "text": "<one spoken line>"}, {"hush": true}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","to","text"}, ... ]}, {...}, {...} ]}, ... ],
  "end": "one closing sentence"}
 
 Decors and who is in them besides justin: terrasse = melissa, candy, ruby (a café terrace) · maison = ruby, james (inside a house) · salon = isa, amare, james (a living room). Pick the decor that fits the idea and only use its characters (ruby and melissa are elves, candy is a feline woman, amare is a lion-man).
-Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Use them lightly, not every line.
+Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Use them lightly and subtly, not every line. "to" = the character spoken to (or "justin"): people look at who they talk to.
 
-Structure: 4-5 lines to set up a want or a tension, then a choice (3 options, 2-3 lines each branch), then 2-3 lines, then a second choice (3 options, 2 lines each branch), then 2 lines, then "end". The branches must really differ in how the others react. Lines are short, spoken, human: under 90 characters, no stage directions, no narration, never write justin's name. In "steps", justin only speaks inside a choice.
+LENGTH. A mini-story, not a sketch: about 30-40 spoken lines in all (counting one branch of each choice). Open with 6-8 lines that plant a want and a tension, then 3 or 4 choices spread through the story (3 options each, 2-4 lines per branch). Each choice must push the story forward: something new comes out, the stakes rise, a turn or a reveal lands, until a last choice that decides how it ends. The lines that follow a choice are shared by every option, so they must hold whatever the player picked; the branches themselves must really differ in how the others react. End with 2-3 lines and "end". In "steps", justin only speaks inside a choice. Never write justin's name in a line, no stage directions, no narration.
 
-A choice option has two texts:
+PACE: packed to the max. This matters most. Every line must earn its place with one of: curiosity, humour, a payoff, relatability, stakes, a surprise. A line that only carries information, greets, repeats or explains is cut. Lines are short: 4-12 words, 70 characters at most. People answer with a word, a question, a joke, a half-sentence, not a paragraph.
+  Before: STRANGER: "Bring your friends." BROOKE: "Justin?" STRANGER: "And the girl." BROOKE: "What's Cam got to do with—" STRANGER: "Tell them it's a party. Nothing else." (five lines to move one piece of information)
+  After: the same thing in 2-3 lines where each one adds something (a reaction, a joke, a new question), never a line that only passes information.
+
+TECHNIQUES (the author's own, apply them silently):
+1. Show, don't tell. Never a line that explains a relationship or a feeling ("fifteen years of friendship and you still fight over the bill"). Show it in how they talk: the friends tease each other, interrupt, finish each other's sentences, let a joke carry the truth.
+2. A new piece of information is a piece of curiosity, delivered in steps and reacted to between the pieces: "I've got a job for you." / "Huh?" / "Five thousand cash, one night." Never two pieces of information in a row without the other person reacting. An offer or a revelation is a conversation, not an info dump: the other asks questions ("Doing what?", "What's the catch?"), jokes, pushes back.
+3. A character has one personality: you know who speaks without the name in front. Their state shows in how they talk (a drunk hesitates and restarts: "Man... I think... I think..."; a nervous one jokes too much).
+4. Do not decide a desire too early. "He's funny", "still deciding", "ask me when you're sober" open a door and give justin a move; "I don't like him" or "I'm ignoring him" close it.
+5. A big moment has an entrance: a look, a gesture or a silence opens it, you never jump into it cold. After a revelation or a sentence that hurts, use {"hush": true} as its own step: a silence, no line, the picture of whoever takes the hit holds. Use it 3-4 times in the whole story at the right moments, never as filler.
+6. A character's real motive must be understood by the end, planted by the wound someone presses, and echoed later (a sentence that hurt comes back).
+7. Conflict, goal and stakes in every scene; people want something from each other and it costs.
+
+CHOICES. A choice option has two texts:
 - "t" = the button the player taps. 27 characters max, spaces included (aim for about 20). It is a short line in justin's voice, something he could say, never a description of what he does: "You're shady." not "Call him out".
-- "say" = what justin actually says out loud after the tap: the same intent, in his voice, under 90 characters. It does not have to repeat the button's words. Ways to do it: he warms up before getting to it, he says it rawer or funnier than the button, he lands it as a question, he gets there sideways.
+- "say" = what justin actually says out loud after the tap: the same intent, in his voice, under 70 characters. It does not have to repeat the button's words. Ways to do it: he warms up before getting to it, he says it rawer or funnier than the button, he lands it as a question, he gets there sideways.
 Examples:
   "t": "Spot me, brother?" -> "say": "Bro. My brother. My rock." (he is acting like he's about to ask for a favor)
   "t": "You're shady." -> "say": "Man... you a shady ass bitch."
@@ -44,28 +57,35 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     const sc = SCENE_CAST[j.scene] ? j.scene : 'maison', cast = SCENE_CAST[sc];
     if (!Array.isArray(j.steps)) throw new Error('"steps" must be a list.');
     let last = null;
+    let turns = 0;
     const line = (s, ok) => {
+      if (s && s.hush === true) return last ? [{ hush: 1500 }] : [];   // a silence: the shot holds, no bubble
       if (!s || !ok.includes(s.who) || !clip(s.text, 200)) return [];
-      const out = last === s.who ? [] : [cam('one', s.who)]; last = s.who;
-      return [...out, say(s.who, POSES.includes(s.pose) ? s.pose : 'listen', clip(s.text, 160))];
+      // the camera cuts on whoever speaks: mostly a single, a two-shot every third change
+      let out = [];
+      if (last !== s.who) out = [last && ++turns % 3 === 0 ? cam('two', last, s.who) : cam('one', s.who)];
+      const to = ok.includes(s.to) && s.to !== s.who ? { to: s.to } : last && last !== s.who ? { to: last } : undefined;
+      last = s.who;
+      return [...out, say(s.who, POSES.includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
     };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 };
     for (const s of j.steps) {
       if (s && Array.isArray(s.choice)) {
+        const prev = last && last !== 'justin' ? last : undefined;   // who justin answers
         const opts = s.choice.map((o) => {
-          const full = clip(o && o.t, 200), then = [];
+          const full = clip(o && o.t, 200), then = [], pre = prev;
           if (!full || !o || !Array.isArray(o.then)) return null;
           const t = shorten(full);
           last = null;
-          then.push(cam('one', 'justin'), say('justin', 'explaining', clip(o.say, 160) || full)); last = 'justin';
+          then.push(cam('one', 'justin'), say('justin', 'explaining', clip(o.say, 160) || full, pre ? { to: pre } : undefined)); last = 'justin';
           for (const l of o.then) then.push(...line(l, [...cast, 'justin']));
           return then.length > 2 ? { t, intent: clip(o.tone, 20), then } : null;
         }).filter(Boolean);
         if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 3) }); choices.n++; last = null; }
-      } else { const l = line(s, cast); steps.push(...l); saysN.n += l.length ? 1 : 0; }
+      } else { const l = line(s, cast); steps.push(...l); saysN.n += l.some((x) => x.say) ? 1 : 0; }
     }
-    if (saysN.n < 3) throw new Error('There must be at least 3 spoken lines outside the choices, from the characters of the decor you picked.');
-    if (!choices.n) throw new Error('There must be at least one "choice" step with 2-3 options, each with a "then" list.');    return [
+    if (saysN.n < 12) throw new Error('This must be a mini-story: at least 12 spoken lines outside the choices (about 30-40 in all), from the characters of the decor you picked.');
+    if (choices.n < 3) throw new Error('There must be 3 or 4 "choice" steps spread through the story, each with 3 options and a "then" list.');    return [
       scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
       cam('wide'), { fade: 'in', ms: 700 },
       ...steps,
@@ -74,7 +94,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     ];
   }
 
-  async function ask(key, messages, system = SYSTEM, max = 3000) {
+  async function ask(key, messages, system = SYSTEM, max = 8000) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },

@@ -35,7 +35,7 @@ window.POSE_ALIAS = {
     thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
     fake_smile: 'drunk_happy', shocked: 'drunk_listen', knock: 'drunk_talk', wine: 'drunk_listen', sit_fire: 'drunk_sad', sit_hurt: 'drunk_sad',
   },
-  cam: { holding: 'worried', surprised: 'awkward', angry: 'worried', amused: 'explaining',   // her amused looked at the camera
+  cam: { holding: 'worried', surprised: 'awkward', angry: 'worried', amused: 'tipsy_laugh',   // her own smile (a laugh behind her hand); her "amused" sheet pose looked at the camera
     wine: 'sip', dizzy: 'awkward', scared: 'worried', sit_fire: 'worried', cold_stare: 'thinking' },
   suit: { shush: 'adjust', explaining: 'offer', holding: 'listen', surprised: 'listen', thinking: 'listen', pee_talk: 'pee',
     tray: 'offer', balcony: 'listen', envelope: 'offer', texting: 'adjust', smile: 'listen', point: 'angry' },
@@ -642,14 +642,14 @@ const houseMeet = (f) => [
     one('pa'), say('pa', 'drunk_talk', 'Open bar, huh?', { to: 'pb' }),
     one('cam'), say('cam', 'thinking', 'Whose house is this?', { to: 'pb' }),
     one('pb'), hush(900), say('pb', 'nervous', '…A friend’s.', { to: 'cam' }),
-    one('cam'), say('cam', 'explaining', 'You don’t have friends with houses.', { to: 'pb' }),
+    one('cam'), say('cam', 'tipsy_laugh', 'You don’t have friends with houses.', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_smile', 'I have one now.', { to: 'cam' }),
   ] : f.sms === 'half' ? [
     one('pa'), say('pa', 'drunk_talk', 'Five K. For what?', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_talk', 'Talking to people.', { to: 'pa' }),
     one('pa'), hush(600), say('pa', 'drunk_listen', 'Talking to people.', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_smile', 'I’m a great talker.', { to: 'pa' }),
-    one('cam'), say('cam', 'explaining', 'You’re a great drinker.', { to: 'pb' }),
+    one('cam'), say('cam', 'tipsy_laugh', 'You’re a great drinker.', { to: 'pb' }),
     one('pb'), say('pb', 'drunk_point', 'Same skill set.', { to: 'cam' }),
     one('pa'), hush(700), say('pa', 'drunk_talk', 'Brooke.', { to: 'pb' }),
     one('pb'), hush(900), say('pb', 'nervous', '…Later. Okay? Later.', { to: 'pa' }),
