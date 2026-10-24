@@ -48,11 +48,14 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .sms.fresh { animation: smsIn .32s ease-out backwards; }
 .sms.draft { opacity: .8; }
 .sms.draft::after { content: ''; display: inline-block; width: .09em; height: 1.05em; margin-left: .1em; vertical-align: -.15em; background: currentColor; animation: blink .9s steps(1) infinite; }
+/* who a received text is from: his name above the first of his bubbles */
+.stack .who { font-size: 1.8em; font-weight: 700; color: #fff; text-shadow: 0 .1em .35em rgba(0,0,0,.75); padding: 0 .35em; margin-bottom: -.2em; }
 .receipt { font-size: 1.35em; font-weight: 600; color: rgba(255,255,255,.85); text-shadow: 0 .1em .35em rgba(0,0,0,.7); padding: 0 .35em; margin-top: -.25em; }
 @keyframes smsIn { from { opacity: 0; transform: translateY(.7em) scale(.96); } }
 /* a text that arrived but is not read yet: his phone, buzzing, with the count */
-.ping { position: relative; width: 5.2em; height: 5.2em; border-radius: 50%; background: #e9e9eb; display: grid; place-items: center; box-shadow: 0 .15em .5em rgba(0,0,0,.3); }
-.ping svg { width: 2.6em; height: 2.6em; }
+.ping { position: relative; height: 5.2em; min-width: 5.2em; box-sizing: border-box; padding: 0 1.9em 0 1.1em; border-radius: 2.6em; background: #e9e9eb; display: flex; align-items: center; justify-content: center; gap: .6em; box-shadow: 0 .15em .5em rgba(0,0,0,.3); }
+.ping svg { flex: none; width: 2.6em; height: 2.6em; }
+.ping span { font-size: 2em; font-weight: 700; color: #1d1d1f; white-space: nowrap; padding-right: .3em; }
 .ping b { position: absolute; top: -.4em; right: -.4em; min-width: 2.3em; height: 2.3em; padding: 0 .5em; box-sizing: border-box; border-radius: 1.15em; background: #ff3b30; color: #fff; font-size: 1.5em; font-weight: 700; display: grid; place-items: center; }
 .ping.fresh { animation: buzz .5s linear; }
 @keyframes buzz { 20%, 60% { transform: translateX(-.3em) rotate(-7deg); } 40%, 80% { transform: translateX(.3em) rotate(7deg); } }
@@ -362,11 +365,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261023201014"></script>
-<script src="story.js?v=20261023201014"></script>
-<script src="play.js?v=20261023201014"></script>
-<script src="bar.js?v=20261023201014"></script>
-<script src="games.js?v=20261023201014"></script>
+<script src="chars.js?v=20261023203203"></script>
+<script src="story.js?v=20261023203203"></script>
+<script src="play.js?v=20261023203203"></script>
+<script src="bar.js?v=20261023203203"></script>
+<script src="games.js?v=20261023203203"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -533,7 +536,7 @@ function textMsg(m, sent) {
   if (sent) Object.assign(sent, { t, draft: false, status: 'delivered' });   // the bubble he typed goes out as it is
   else (texts[m.from] = texts[m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
   // {sms: {…, only: seat}}: a private text — the others see his phone buzz and him read it, never the words
-  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only });
+  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from });
   if (actors[m.to] && !afar(m.to) && !FAST) buzz();
   drawTexts();
   setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
@@ -574,6 +577,7 @@ async function readTexts(id, r) {
   return true;
 }
 const PHONE = '<svg viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm3 14.5h2v1h-2z"/></svg>';
+const nameOf = (id) => (id && castOf(id) && castOf(id).name) || '';
 function drawTexts(wait = 0) {
   clearTimeout(drawTexts.t); textsEl.innerHTML = '';
   if (wait && !FAST) { drawTexts.t = setTimeout(drawTexts, wait); return; }   // the camera is moving: once it lands
@@ -593,15 +597,22 @@ function drawTexts(wait = 0) {
     else { st.style.right = Math.min(W - x + gap, W * 0.56) + 'px'; st.classList.add('l'); }
     const chest = (a.feet - b.h * 0.6 - f.top) * s;
     st.style.bottom = H - Math.min(Math.max(chest, H * 0.2), H * 0.5) + 'px';
-    for (const m of list) {
+    list.forEach((m, i) => {
+      if (!m.out && nameOf(m.from) && (i === 0 || list[i - 1].out || list[i - 1].from !== m.from)) {   // a new sender: his name
+        const n = document.createElement('div'); n.className = 'who'; n.textContent = nameOf(m.from); st.appendChild(n);
+      }
       const d = document.createElement('div'); d.className = `sms ${m.out ? 'out' : 'in'}${m.draft ? ' draft' : ''}${m.fresh ? ' fresh' : ''}`;
       d.textContent = m.t; st.appendChild(d); m.fresh = false;
-    }
+    });
     const last = list[list.length - 1];
     if (last && last.status) { const d = document.createElement('div'); d.className = 'receipt'; d.textContent = ui(last.status); st.appendChild(d); }
     if (unread.length) {
       const d = document.createElement('div'); d.className = 'ping' + (unread.some((m) => m.fresh) ? ' fresh' : '');
-      d.innerHTML = PHONE; const n = document.createElement('b'); n.textContent = unread.length; d.appendChild(n);
+      d.innerHTML = PHONE;
+      // who it's from, like a notification (not for a private text the viewer isn't meant to see)
+      const names = [...new Set(unread.filter((m) => m.from && (!m.only || sees(m.only))).map((m) => nameOf(m.from)).filter(Boolean))];
+      if (names.length) { const w = document.createElement('span'); w.textContent = names.join(', '); d.appendChild(w); }
+      const n = document.createElement('b'); n.textContent = unread.length; d.appendChild(n);
       st.appendChild(d); for (const m of unread) m.fresh = false;
     }
     textsEl.appendChild(st);
@@ -1369,7 +1380,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261023201014';
+const BUILD = '20261023203203';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
