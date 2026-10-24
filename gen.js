@@ -68,15 +68,19 @@ Structure: 4-5 lines to set up a want or a tension, then a choice (3 options, 2-
     const text = (d.content || []).map((b) => b.text || '').join('');
     const a = text.indexOf('{'), b = text.lastIndexOf('}');
     if (a < 0 || b < a) throw new Error('No JSON in the reply.');
-    return { text, json: JSON.parse(text.slice(a, b + 1)) };
+    return { text, usage: d.usage || {}, json: JSON.parse(text.slice(a, b + 1)) };
   }
 
   // one retry: the validator's sentence goes back to the model (the fix lives in the prompt and the validator, not in a bigger model)
   async function make(idea, key) {
     const messages = [{ role: 'user', content: `The idea: ${clip(idea, 600)}` }];
+    const used = { in: 0, out: 0 };   // tokens of every call, the retry too
     for (let i = 0; ; i++) {
       let got;
-      try { got = await ask(key, messages); return build(got.json); } catch (e) {
+      try {
+        got = await ask(key, messages); used.in += got.usage.input_tokens || 0; used.out += got.usage.output_tokens || 0;
+        const st = build(got.json); st.src = got.json; st.used = used; return st;
+      } catch (e) {
         if (i || /401|Clé|Erreur/.test(e.message)) throw e;
         messages.push({ role: 'assistant', content: (got && got.text) || '{}' }, { role: 'user', content: `That does not work: ${e.message} Reply again with the full corrected JSON only.` });
       }
@@ -89,5 +93,22 @@ Structure: 4-5 lines to set up a want or a tension, then a choice (3 options, 2-
     'On ne sait pas quel personnage on est.',
   ] };
 
-  return { TODO, MODEL, SYSTEM, build, make, ask };
+  // the story as plain text: who says what, and each choice with what follows it
+  function text(steps) {
+    const name = (id) => (id === 'justin' ? 'TOI' : ((window.CAST && CAST[id] && CAST[id].name) || id).toUpperCase());
+    const out = [], nl = String.fromCharCode(10);
+    const lines = (list, ind) => { for (const s of list) if (s.say) out.push(ind + name(s.say) + ' : ' + s.text); };
+    for (const s of steps) {
+      if (s.say) lines([s], '');
+      else if (s.choice) { out.push(''); s.choice.forEach((o, i) => { out.push('CHOIX ' + (i + 1) + ' : ' + o.t); lines(o.then.slice(2), '    '); }); out.push(''); }
+      else if (s.end) out.push('', 'FIN : ' + s.end.lede);
+    }
+    return out.join(nl).trim();
+  }
+
+  // Haiku 4.5 list price per million tokens (USD) and a rough USD -> CAD rate: a cost to the cent, not an invoice
+  const PRICE = { in: 1, out: 5, cad: 1.4 };
+  const cost = (u) => (u.in * PRICE.in + u.out * PRICE.out) / 1e6 * PRICE.cad;
+
+  return { cost, text, TODO, MODEL, SYSTEM, build, make, ask };
 })();
