@@ -45,7 +45,7 @@ window.POSE_ALIAS = {
     thinking: 'smirk', surprised: 'listen' },
   diane: { talk: 'explaining', take_hand: 'explaining', laugh: 'surprised', look_up: 'thinking', whisper: 'holding' },
 };
-FACE.julian = { listen: 'l', talk: 'l', smirk: 'l', offer: 'l', cold: 'l', hands_up: 'l' };
+FACE.julian = { listen: 'r', talk: 'r', smirk: 'r', offer: 'r', cold: 'r', hands_up: 'r' };   // all 6 look to the right
 GALLERY.push({ sprite: 'julian', name: 'Julian', src: 'perso_julian', ref: ['julian_fiche'] });
 FACE.diane = { listen: 'r', surprised: 'r', thinking: 'r', explaining: 'r', angry: 'r', holding: 'r' };
 // Cam: her own sheets (23/10), in place of Ruby's. She looked like she was always flirting: the neutral sheet (listen,
