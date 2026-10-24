@@ -460,12 +460,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261024154016"></script>
-<script src="story.js?v=20261024154016"></script>
-<script src="play.js?v=20261024154016"></script>
-<script src="bar.js?v=20261024154016"></script>
-<script src="games.js?v=20261024154016"></script>
-<script src="gen.js?v=20261024154016"></script>
+<script src="chars.js?v=20261024154450"></script>
+<script src="story.js?v=20261024154450"></script>
+<script src="play.js?v=20261024154450"></script>
+<script src="bar.js?v=20261024154450"></script>
+<script src="games.js?v=20261024154450"></script>
+<script src="gen.js?v=20261024154450"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -656,22 +656,22 @@ async function sendText(m, r) {
   setPose(hand, 'texting');
   const t = fill(m.text), d = { t: '', out: true, fresh: true, draft: true };
   (texts[hand] = texts[hand] || []).push(d); drawTexts();
-  const each = Math.min(Math.max(t.length * 65, 700), 2000) / t.length;
+  const each = Math.min(Math.max(t.length * 40, 400), 1200) / t.length;
   for (let i = 1; i <= t.length; i++) {
     await sleep(each); if (r !== run) return false;
     d.t = t.slice(0, i); const el = textsEl.querySelector('.sms.draft'); if (el) el.textContent = d.t;
   }
-  await sleep(350); if (r !== run) return false;
+  await sleep(150); if (r !== run) return false;
   textMsg(m, d);
-  await sleep(700); return r === run;
+  await sleep(300); return r === run;
 }
 async function readTexts(id, r) {
   if (!onScreen(id)) { checkTexts(id); return true; }
   setPose(id, 'texting');
-  await sleep(900); if (r !== run) return false;   // he looks at his phone
+  await sleep(400); if (r !== run) return false;   // he looks at his phone
   for (const m of (texts[id] || []).filter((x) => x.unread)) {
     readOne(m); drawTexts();
-    await sleep(Math.min(700 + m.t.length * 45, 2600)); if (r !== run) return false;
+    await sleep(Math.min(400 + m.t.length * 30, 1800)); if (r !== run) return false;
   }
   return true;
 }
@@ -776,7 +776,7 @@ function typeText(t) {
   clearInterval(typing); textEl.textContent = ''; typingFull = t;
   if (REDUCED || FAST) { textEl.textContent = t; typing = null; return; }
   let i = 0;
-  typing = setInterval(() => { textEl.textContent = t.slice(0, ++i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
+  typing = setInterval(() => { i += 2; textEl.textContent = t.slice(0, i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
 }
 // a story that stages itself (STORY.gaze): when someone speaks, the others stop their talking gesture and turn to them,
 // and the speaker turns to whom they talk to (s.to, else whoever spoke last). Someone `aside` (a stranger in the back)
@@ -840,11 +840,11 @@ const mineFor = (by) => { if (isBot(by)) return false; const o = ownerOf(by); re
 // the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
 function botPick() {
   const at = run, n = options.length;
-  setTimeout(() => { if (run === at && waiting === 'choice') pickChoice(Math.floor(Math.random() * n)); }, FAST ? 0 : 1400);
+  setTimeout(() => { if (run === at && waiting === 'choice') pickChoice(Math.floor(Math.random() * n)); }, FAST ? 0 : 800);
 }
 function botTap() {
   const at = run;
-  setTimeout(() => { if (run === at && waiting === 'click' && isBot(onlyNow)) { record('a' + tag(laneNow)); waiting = null; next(); } }, FAST ? 0 : 1500);
+  setTimeout(() => { if (run === at && waiting === 'click' && isBot(onlyNow)) { record('a' + tag(laneNow)); waiting = null; next(); } }, FAST ? 0 : 700);
 }
 // a 2-player story's player whose turn it is not stays on the shot they were on, with "<name> choisit…" at the bottom
 const waitsFor = (by) => duo() && seated() && !mineFor(by);
@@ -1129,9 +1129,12 @@ function autoGhost(g) {
   if (ROLE !== 'host' || !g.waiting) return;
   const o = ownerOf(g.seat); if (o === myId || watchers.has(o)) return;
   const pick = () => (isBot(g.seat) ? Math.floor(Math.random() * g.options.length) : 0);   // a bot picks at random
-  clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, pick())), FAST ? 0 : 1600);
+  clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, pick())), FAST ? 0 : 800);
 }
 
+// pacing: a tap gets its answer at once. A short pause between two lines is just a beat (a fifth of what was written, 150-250 ms);
+// only a silence written at 1200 ms or more is meant to be felt, and it plays as written
+const silence = (ms) => (ms >= 1200 ? ms : Math.min(250, Math.max(150, ms * 0.2)));
 // one story runner at a time: a restart (run++) stops the one still waiting on a fade or a pan
 let onlyNow = null;   // the seat the line on screen belongs to, when only that player sees it
 // a player sees a private line if it's his (solo plays both); a spectator sees everything
@@ -1161,7 +1164,7 @@ async function next() {
     else if (s.check) { if (!(await readTexts(s.check, r))) return; }
     else if (s.sfx) sfx(s.sfx, s.loop);
     else if (s.stop) stopSfx(s.stop);
-    else if (s.hush) { bubble.hidden = true; await sleep(s.hush); }   // a silence: no bubble, the shot holds
+    else if (s.hush) { bubble.hidden = true; await sleep(silence(s.hush)); }   // a silence: no bubble, the shot holds
     else if (s.aside) for (const [id, on] of Object.entries(s.aside)) asides[on ? 'add' : 'delete'](id);
     else if (s.slate) { await fade('out', s.ms || 500); if (r !== run) return; slateEl.textContent = fill(s.slate); slateEl.hidden = false; waiting = 'click'; return; }
     else if (s.set) Object.assign(state.f, s.set);
@@ -1694,7 +1697,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261024154016';
+const BUILD = '20261024154450';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
