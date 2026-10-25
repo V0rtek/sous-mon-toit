@@ -55,8 +55,8 @@ body.tabs-pill .view { padding-bottom: 14em; }
 #tabs button.on { color: var(--fg); }
 #tabs svg { width: 3.4em; height: 3.4em; }
 #tabs span { font-size: 1.6em; font-weight: 600; }
-#tabs .add i { width: 6em; height: 4.4em; border-radius: 1.4em; background: var(--fg); color: #000; display: grid; place-items: center; }
-#tabs .add i svg { width: 3em; height: 3em; }
+#tabs .main i { width: 6em; height: 4.4em; border-radius: 1.4em; background: var(--fg); color: #000; display: grid; place-items: center; }
+#tabs .main i svg { width: 3em; height: 3em; }
 #tabs .count { position: absolute; top: 1.3em; left: 54%; min-width: 2.2em; height: 2.2em; border-radius: 1.1em; background: var(--rose); color: #fff; font-size: 1.3em; font-weight: 800; display: grid; place-items: center; padding: 0 .4em; box-sizing: border-box; }
 body.tabs-icons #tabs span { display: none; }
 body.tabs-pill #tabs { left: 12%; right: 12%; bottom: 2.6em; height: 8em; border-radius: 4em; border: .1em solid rgba(255,255,255,.12); background: rgba(30,30,34,.82); backdrop-filter: blur(1.5em); -webkit-backdrop-filter: blur(1.5em); box-shadow: 0 1em 3em rgba(0,0,0,.6); }
@@ -323,15 +323,31 @@ body.tabs-pill #tabs span { display: none; }
 .still .sline.nar { background: none; color: #fff; font-style: italic; text-align: center; text-shadow: 0 .1em .5em #000; padding: 0; }
 .sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 .car.home .withs { top: 4%; bottom: auto; }
-.dots { display: flex; justify-content: center; gap: .8em; margin: 1.6em 0 .4em; }
-.dots i { width: .9em; height: .9em; border-radius: 50%; background: rgba(255,255,255,.3); }
-.dots i.on { background: #fff; }
+#home .carInfo { padding-top: 2.4em; }
 #home .carInfo .btn { width: 70%; }
 .where { font-size: 1.8em; color: #d1d1d6; margin: 0 0 1.2em; display: flex; justify-content: center; align-items: center; gap: .4em; }
 .where .av { width: 1.6em; height: 1.6em; }
 .pbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: .7em; background: rgba(255,255,255,.25); }
 .pbar i { display: block; height: 100%; background: var(--rose); }
 .shelf .withs { bottom: calc(4% + .7em); }
+/* ---- All › Test bulles ---- */
+.tlead { font-size: 1.8em; color: var(--mute); margin: 0 6% 1em; line-height: 1.35; }
+.tf { position: relative; width: 78%; margin: 0 auto 1.4em; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 2em; background: #000; cursor: pointer; container-type: inline-size; }
+.tw { position: absolute; inset: 0; transition: transform .4s ease; }
+.tbg { position: absolute; inset: 0; }
+.ta { position: absolute; bottom: 3%; height: 64%; transform: translateX(-50%); }
+.tc { position: absolute; top: 3%; right: 5%; z-index: 5; font-size: 3.4cqw; font-weight: 600; color: rgba(255,255,255,.75); text-shadow: 0 0 .4em #000; }
+.tn { position: absolute; left: 7%; right: 7%; bottom: 7%; z-index: 4; text-align: center; font-family: 'Nunito', var(--ui); font-style: italic; font-size: 5cqw; font-weight: 700; color: #fff; text-shadow: 0 .1em .6em #000; }
+.tn.g { top: 7%; bottom: auto; background: rgba(22,18,30,.9); border: .3cqw solid rgba(255,255,255,.14); border-radius: 2.6cqw; padding: 3cqw 4cqw; font-size: 3.6cqw; font-weight: 600; text-shadow: none; }
+/* 3: Full demo's bubble (big, bold), just above the heads, tail down */
+.tb { position: absolute; bottom: 69%; z-index: 4; box-sizing: border-box; background: #fffdf9; color: #1d1a24; border-radius: 4cqw; padding: 4.6cqw 4.4cqw 3.4cqw; font-family: 'Nunito', var(--ui); font-size: 4.6cqw; font-weight: 700; line-height: 1.3; box-shadow: 0 1em 3em rgba(0,0,0,.35); }
+.tb b { position: absolute; top: -3.4cqw; left: 4cqw; font-size: 3.4cqw; font-weight: 800; background: #e2557a; color: #fff; padding: .35em .9em; border-radius: 1em; }
+.tb::after { content: ''; position: absolute; top: 100%; left: var(--t); margin-left: -2.4cqw; border: 2.4cqw solid transparent; border-top-color: #fffdf9; }
+/* 2: like the game's: chest height, smaller text, coloured name tag, tail up to the speaker */
+.tb.g { bottom: auto; top: 54%; border-radius: 2.4cqw; border: .35cqw solid #e6dff5; padding: 3.6cqw 3.4cqw 2.6cqw; font-size: 3.6cqw; font-weight: 600; }
+.tb.g b { font-style: italic; text-transform: uppercase; letter-spacing: .05em; font-size: 2.6cqw; top: -2.8cqw; }
+.tb.g::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #fffdf9; }
+
 /* ---- Social ---- */
 .prof { margin: 0 3.5%; border-radius: 2.4em; background: #141416; overflow: hidden; }
 .prof .me { width: 100%; display: flex; align-items: center; gap: 2em; padding: 2.4em; text-align: left; }
@@ -696,7 +712,7 @@ const SHELVES = [
 const shelf = (pick) => typeof pick === 'function' ? all().filter(pick) : pick.map(byId).filter(Boolean);
 
 // ---- every alternative: L = layouts (‹ › at the top), the rest in ⚙ ----
-const LAYOUTS = [['rows', 'Rangées'], ['grid2', 'Grille 2'], ['grid3', 'Mur d\'affiches'], ['feed', 'Plein écran'], ['carousel', 'Carrousel'], ['stack', 'Pile à swiper'], ['list', 'Liste'], ['magazine', 'Magazine'], ['live', 'En direct d\'abord'], ['spotlight', 'Projecteur']];
+const LAYOUTS = [['rows', 'Rangées'], ['grid2', 'Grille 2'], ['grid3', 'Mur d\'affiches'], ['feed', 'Plein écran'], ['carousel', 'Carrousel'], ['stack', 'Pile à swiper'], ['list', 'Liste'], ['magazine', 'Magazine'], ['live', 'En direct d\'abord'], ['spotlight', 'Projecteur'], ['bubbles', 'Test bulles']];
 const OPTIONS = [
   ['layout', 'Mise en page', 'Aussi avec ‹ › en haut.', LAYOUTS],
   ['live', 'Quelqu\'un attend dans une salle', 'Sur l\'affiche. Vert = un inconnu, rose = un ami.', [['dot', 'Point qui clignote'], ['badge', 'Étiquette'], ['ring', 'Contour lumineux'], ['avatar', 'Avatar']]],
@@ -857,6 +873,15 @@ const R = {
       <div class="h2">Amis en ligne</div><div class="chips">${online.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}<button class="chip" data-act="tab" data-tab="add">${I.plus.replace('<svg', '<svg style="width:1em;height:1em"')}Inviter</button></div>
       <div class="h2">Ouvre une salle</div><div class="grid g2">${all().filter((d) => !d.live).map((d) => card(d)).join('')}</div>`;
   },
+  // the same preview three ways, to pick one: 1 the game's engine (demos.js), 2 an imitation of it here, 3 Full demo's bubble
+  // moved up next to whoever talks. Tap a frame to go on.
+  bubbles() {
+    const d = byId(TEST.id), n = total(d);
+    const frame = (m, title, sub) => `<div class="h2">${title}<small>${sub}</small></div>
+      <div class="tf" data-m="${m}">${m === 1 ? `<iframe class="gframe" src="index.html?preview=${TEST.engine}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div><div class="tc">1/${n}</div>` : stageHtml(d, TEST.at[m], m)}</div>`;
+    return `<p class="tlead">Le même aperçu (${esc(d.title)}) dans les 3 formats. Touche une image pour avancer.</p>`
+      + frame(1, '1 · Le moteur du jeu', 'comme Last call') + frame(2, '2 · Imitation', 'dans Full demo') + frame(3, '3 · Ma bulle, rapprochée', 'plus lisible');
+  },
   spotlight() {
     const a = all(); const d = byId(spotSel) || a[0]; spotSel = d.id;
     return `<div class="spot"><div class="blur" style="${blurOf(d, 'blur(3.5em) brightness(.45)')}"></div>
@@ -865,6 +890,35 @@ const R = {
       <div class="strip">${a.map((x) => `<div class="card${x.id === d.id ? ' sel' : ''}" data-act="spot" data-id="${x.id}">${cover(x).replace(/<div class="cvt">.*?<\/div>/, '')}</div>`).join('')}</div></div>`;
   },
 };
+const TEST = { id: 'verre', engine: 'd_verre', at: { 1: 0, 2: 0, 3: 0 } };
+// a demo's colour per character (the bubble's name tag), like the game's
+const TINT = { brooke: '#2a4f8f', cam: '#3b1f6e', justin: '#1f7a74', justin_bar: '#1f7a74', ruby: '#3b1f6e', james: '#6e2b2b', diane: '#5a2a3a', julian: '#6b5a3a', suit: '#26262b' };
+const XS = { 1: [50], 2: [32, 68], 3: [20, 50, 80], 4: [15, 38, 62, 85] };
+function stageHtml(d, i, mode) {
+  const cast = castOf(d), n = total(d), at = Math.min(i, n - 1);
+  for (const [w, , p] of d.lines.slice(0, at + 1)) if (w >= 0 && p && cast[w]) cast[w] = { ...cast[w], p };
+  const [who, text] = d.lines[at], xs = XS[cast.length] || XS[3], x = who >= 0 ? xs[who] : 50;
+  const people = cast.map((m, k) => `<img class="ta" style="left:${xs[k]}%" src="${srcOf(m, m.p)}" alt="">`).join('');
+  // 2: the camera closes in on whoever talks, the bubble at chest height with its tail up to them
+  const zoom = mode === 2 && who >= 0 ? `transform:scale(1.8);transform-origin:${x}% 28%` : '';
+  const w = mode === 2 ? 84 : 72, left = Math.min(100 - w - 4, Math.max(4, x - w / 2)), tail = ((x - left) / w) * 100;
+  const name = who >= 0 ? cast[who].name : '', tint = who >= 0 ? TINT[cast[who].s] || '#e2557a' : '';
+  const say = who < 0 ? `<div class="tn${mode === 2 ? ' g' : ''}">${esc(text)}</div>`
+    : `<div class="tb${mode === 2 ? ' g' : ''}" style="left:${left}%;width:${w}%;--t:${tail}%"><b${mode === 2 ? ` style="background:${tint}"` : ''}>${esc(name)}</b>${esc(text)}</div>`;
+  return `<div class="tw" style="${zoom}"><div class="tbg" style="${place(d)}"></div>${people}</div>${say}<div class="tc">${at + 1}/${n}</div>`;
+}
+function tapTest(tf, e) {
+  const m = +tf.dataset.m, d = byId(TEST.id), n = total(d);
+  if (m === 1) {
+    const f = $('iframe', tf);
+    if (TEST.at[1] >= n - 1) { TEST.at[1] = 0; f.src = f.src; $('.tc', tf).textContent = `1/${n}`; return; }
+    const r = f.getBoundingClientRect();
+    f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
+    return;
+  }
+  TEST.at[m] = TEST.at[m] >= n - 1 ? 0 : TEST.at[m] + 1;
+  tf.innerHTML = stageHtml(d, TEST.at[m], m);
+}
 const FILTERS = [['all', 'Tout'], ['live', '● En direct'], ['solo', 'Solo'], ['multi', 'À plusieurs'], ['byoc', 'Ton perso']];
 const filters = () => `<div class="chips">${FILTERS.map(([k, n]) => `<button class="chip${filter === k ? ' on' : ''}" data-act="filter" data-f="${k}">${n}</button>`).join('')}</div>`;
 const filtered = () => all().filter((d) => filter === 'all' || (filter === 'live' && d.live) || (filter === 'solo' && d.players === 1) || (filter === 'multi' && d.players > 1) || (filter === 'byoc' && d.byoc));
@@ -904,7 +958,7 @@ function renderTabs() {
   const n = Object.keys(saved).length;
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
   // En cours, the main tab, in the middle
-  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', I.home, 'En cours') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('social', I.people, 'Social');
+  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', `<i>${I.home}</i>`, 'En cours', 'main') + t('add', I.plus, 'Ajouter') + t('social', I.people, 'Social');
 }
 function renderMenu() {
   $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
@@ -925,7 +979,6 @@ function render() {
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
 // alone or with someone. Every preview you tapped into is one; one you finished stays (the story is started). ----
-const ago = (t) => { const m = Math.round((Date.now() - t) / 60000); return m < 60 ? `il y a ${Math.max(1, m)} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const prog = keep.get('prog', (() => {   // a first visit already has a few (fake) ones going
   const now = Date.now();
   return { mensonge: { i: 5, with: ['Max'], at: now - 40 * 60000 }, nuit: { i: 3, with: [], at: now - 5 * 3600000 }, cles: { i: 6, with: ['Léa', 'Inès'], at: now - 2 * 86400000 }, table: { i: 4, with: [], at: now - 4 * 86400000 } };
@@ -957,13 +1010,12 @@ function renderHome() {
     return `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${still(d, p.i)}${done(id) ? '<span class="sdone">Aperçu fini</span>' : ''}${withs}${pbar(id)}</div></div>`;
   };
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
-    <div class="dots">${ids.map((id) => `<i data-id="${id}"></i>`).join('')}</div><div class="carInfo" id="homeInfo"></div>`;
+    <div class="carInfo" id="homeInfo"></div>`;
   snap($('#homeCar'), (id) => {
-    const d = byId(id), p = prog[id], n = total(d);
-    $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))} · ` : 'Solo · '}${done(id) ? 'Aperçu fini' : `${Math.min(p.i + 1, n)}/${n}`} · ${ago(p.at)}</p>
+    const d = byId(id), p = prog[id];
+    $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
       <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Jouer' : 'Continuer'}</button>`;
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
-    $$('#home .dots i').forEach((x) => x.classList.toggle('on', x.dataset.id === id));
   });
 }
 
@@ -1040,6 +1092,8 @@ function reached(d, i) {
 }
 addEventListener('message', (e) => {
   if (e.origin !== location.origin || !e.data || e.data.pos == null) return;
+  const t = $$('.tf iframe').find((x) => x.contentWindow === e.source);
+  if (t) { const n = total(byId(TEST.id)); TEST.at[1] = Math.min(e.data.pos, n - 1); $('.tc', t.parentNode).textContent = `${TEST.at[1] + 1}/${n}`; return; }
   const f = $$('#current iframe').find((x) => x.contentWindow === e.source), ci = f && f.closest('.ci');
   if (!ci) return;
   const d = byId(ci.dataset.id), was = at[d.id] || 0, i = Math.min(e.data.pos, total(d));
@@ -1335,6 +1389,8 @@ stage.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el) {
     if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(); return; }
+    const tf = e.target.closest('.tf');
+    if (tf) { tapTest(tf, e); return; }
     const ci = e.target.closest('.ci');
     if (ci) tapCurrent(ci, e);
     return;
