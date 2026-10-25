@@ -153,7 +153,10 @@ window.PLAY = [
 // this story stages itself: listeners turn to the speaker and stop gesturing (see line() in index.html)
 PLAY.gaze = true;
 PLAY.seats = ['pa', 'pb'];
-PLAY.solo = { pa: 'Alex', pb: 'Kev' };   // the other character's name when you play both
+PLAY.solo = { pa: 'Alex', pb: 'Kev' };   // a seat's name when nobody plays it under their own
+// the waiting room: each character in the pose that sums them up, and one line of them
+PLAY.pick = { pa: { pose: 'explaining', line: 'Faux. On parle aussi de protéines.' },
+  pb: { pose: 'explaining', line: "Trois semaines de cut. Ce soir, je mange." } };
 PLAY.cast = {
   pa: { name: '{PA}', color: '#1f7a74', sprite: 'justin' },
   pb: { name: '{PB}', color: '#d0632a', sprite: 'candy', scale: 0.93 },

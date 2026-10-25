@@ -33,7 +33,8 @@ const MG_CAST = {
 const MG_UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
   again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended' };
 const mg = (steps) => Object.assign(steps, { gaze: true, credits: '', seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
-  cast: MG_CAST, ui: MG_UI });
+  cast: MG_CAST, ui: MG_UI,
+  pick: { pa: { pose: 'drunk_talk', line: 'I need water. Like… a lot of water.' }, pb: { pose: 'drunk_point', line: 'THAT’S my brother.' } } });
 const mgEnd = (title, lede) => [{ fade: 'out', ms: 800 }, { end: { kicker: 'Mini-game', title, lede, art: null } }];
 
 // ---------- decors ----------

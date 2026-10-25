@@ -139,14 +139,29 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #video3d { padding: 0; }
 .frame16 { width: 100%; aspect-ratio: 16 / 9; }
 .frame16 iframe { width: 100%; height: 100%; border: 0; display: block; }
-#wait { background: #fff; color: #1d1d1f; padding: 0 6%; }
-.seats { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
-.seats button { font: inherit; color: inherit; background: none; border: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 1.6em; cursor: pointer; }
-.seats .who { font-size: 2.6em; font-weight: 600; min-height: 1.3em; }
-.seats .dot { width: 3.6em; height: 3.6em; border-radius: 50%; background: #ff3b30; transition: background .2s; }
-.seats .on .dot { background: #34c759; }
-.seats img { height: 44em; max-width: 100%; object-fit: contain; }
-#solo { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); padding: .7em 1.6em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; }
+/* a 2-player story's waiting room: the two characters side by side (their pose, their line), who has them, the ways in */
+#wait { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 12em 5% 0; }
+.wr-kick { text-align: center; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; }
+.wr-title { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .5em; }
+.wr-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; }
+.wr-seat { font: inherit; color: inherit; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 2.4em; padding: 1.6em 1em 1.4em; display: flex; flex-direction: column; align-items: center; gap: .5em; cursor: pointer; transition: border-color .2s, background .2s; }
+.wr-seat img { height: 33em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 1em 1.5em rgba(0,0,0,.6)); transition: opacity .3s; }
+.wr-seat b { font-family: var(--display); font-weight: 400; font-size: 2.8em; margin-top: .2em; }
+.wr-seat q { font-size: 1.55em; font-style: italic; line-height: 1.35; color: #c7c7cc; text-align: center; min-height: 2.7em; }
+.wr-who { display: flex; align-items: center; gap: .45em; font-size: 1.6em; font-weight: 700; color: #8e8e93; margin-top: .3em; text-align: center; }
+.wr-who i { flex: none; width: .7em; height: .7em; border-radius: 50%; background: #48484a; }
+.wr-seat.me { border-color: #34c759; background: rgba(52,199,89,.08); }
+.wr-seat.me .wr-who, .wr-seat.taken .wr-who { color: #fff; }
+.wr-seat.me .wr-who i, .wr-seat.taken .wr-who i { background: #34c759; }
+.wr-seat.waiting img { opacity: .5; }
+.wr-seat.waiting .wr-who i { background: #ff9f0a; animation: blink 1s infinite; }
+.wr-opts { display: flex; gap: 1em; margin-top: 2em; }
+.wr-opts button { flex: 1; font: inherit; font-size: 1.75em; font-weight: 700; padding: .85em .3em; border-radius: 1.4em; border: 0; background: #2c2c2e; color: #fff; cursor: pointer; }
+.wr-opts button:first-child { background: #f5f5f7; color: #000; }
+.wr-friends { display: flex; gap: 1em; justify-content: center; margin-top: 1.4em; }
+.wr-friends button { font: inherit; font-size: 1.9em; font-weight: 700; padding: .55em 1.2em; border-radius: 2em; border: .1em solid #48484a; background: none; color: #fff; cursor: pointer; }
+.wr-hint { text-align: center; font-size: 1.9em; color: #8e8e93; margin-top: 2em; }
+.wr-hint.wr-go { color: #34c759; font-weight: 800; }
 /* the story's known problems, behind a "?" in the waiting room's corner (tap = open, tap anywhere = close) */
 #todoBtn { position: absolute; top: 2.2%; right: 4%; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: #e8e8ed; color: #1d1d1f; display: grid; place-items: center; cursor: pointer; padding: 0; }
 #todoBtn span { font-size: 3.6em; font-weight: 600; }
@@ -230,10 +245,6 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 body.preview #back, body.preview #qrBtn, body.preview #eyes, body.preview #galBtn, body.preview #storyNote, body.preview #hint { display: none !important; }
 body.watch #ringBtns button { pointer-events: none; }
 body.watch #ringBtns button.mine { pointer-events: auto; }
-body.watch #solo, body.watch #soloPick { display: none !important; }
-/* after "Jouer seul": play both characters, or yours with the other one simulated (random choices) */
-#soloPick { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); display: flex; gap: 1.4em; }
-#soloPick .pill { padding: .7em 1.4em; background: #e8e8ed; color: #1d1d1f; white-space: nowrap; font-size: 2.3em; }
 #gallery, #charView, #newChar, #genScreen, #genHist, #genPrompt, #statsScreen { justify-content: flex-start; padding: 13em 5% 6em; overflow-y: auto; }
 .prompt { background: #1c1c1e; border-radius: 2em; padding: 2em 9em 2em 2.2em; }
 .prompt p { margin: 0; font-size: 1.8em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; }
@@ -378,7 +389,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
-  <div id="wait" class="card menu" hidden><div class="seats" id="seatList"></div><button class="pill" id="solo" type="button">Jouer seul</button><div id="soloPick" hidden><button class="pill" id="soloBoth" type="button">Jouer les deux</button><button class="pill" id="soloBot" type="button">L’autre au hasard</button></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
+  <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="fbCard" hidden><div class="fb">
     <b>Ton avis</b>
@@ -1355,43 +1366,61 @@ function openWait(id) {
   // another phone's waiting room for this story is open: join it instead of opening a second one
   const other = roomFor(id);
   if (other) { joinRoom(other.room); return; }
-  halt(); state.story = id; waitRoom = true; state.seats = {}; game = null; tape = []; renderWait(); share(); announce(true);
+  halt(); state.story = id; waitRoom = true; state.seats = {}; invite = null; clearTimeout(callFor.t); game = null; tape = []; renderWait(); share(); announce(true);
 }
+// ---- a 2-player story's waiting room: you pick your character (the pose that sums them up, one line of them); for the
+// other one, invite a friend, open it to anyone or play alone (it plays itself: random choices). It starts once both are
+// taken. Real players still join by the code / QR; a friend or a stranger joining is simulated for now ----
+const SIM_FRIENDS = ['Léa', 'Max', 'Sam'], SIM_STRANGERS = ['Nico', 'Zoé', 'Malik', 'Jade', 'Hugo'];
+let invite = null;   // the host's call for the other seat: { seat, kind: 'friend' | 'public', n }
+const storyTitle = (id = state.story) => (STORIES[id] && STORIES[id].title) || { bar: 'Last call', play: 'Le café' }[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || '';
+const seatLabel = (k) => { const c = castOf(k); return c && c.name && !c.name.includes('{') ? c.name : (story().solo || {})[k] || k; };
 function renderWait() {
   show('#wait');
   $('#todoBtn').hidden = !story().todo;
-  $('#solo').hidden = false; $('#soloPick').hidden = true;
-  const list = $('#seatList'); list.innerHTML = '';
-  for (const k of seatsOf()) {
-    const s = state.seats[k], b = document.createElement('button'); b.type = 'button';
-    if (s) b.classList.add('on');
-    const who = document.createElement('span'); who.className = 'who'; who.textContent = s ? s.n : '';
-    const dot = document.createElement('span'); dot.className = 'dot';
-    const img = new Image(); img.alt = ''; img.src = poseSrc(k, 'listen');
-    b.append(who, dot, img);
-    b.onclick = (e) => { e.stopPropagation(); if (ROLE === 'host') takeSeat(k, myId, state.name); else sendIn('seat', { s: k }); };
-    list.appendChild(b);
-  }
+  const seats = seatsOf(), mine = seats.find((k) => state.seats[k] && state.seats[k].id === myId), pick = story().pick || {};
+  const card = (k, i) => {
+    const s = state.seats[k], p = pick[k] || { pose: 'listen' };
+    const nat = (FACE[spriteOf(k)] || {})[poseOf(k, p.pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');   // they face each other
+    const [cls, who] = s && s.id === myId ? ['me', 'Toi'] : s ? ['taken', s.n]
+      : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invitation envoyée à ${invite.n}…` : 'En attente d’un joueur…'] : ['free', 'Libre'];
+    return `<button type="button" class="wr-seat ${cls}" data-seat="${k}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
+      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
+  };
+  const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
+  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}</h2><div class="wr-seats">${seats.map(card).join('')}</div>
+    ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="friend">Inviter un ami</button><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
+    <div class="wr-friends" hidden>${SIM_FRIENDS.map((n) => `<button type="button" data-f="${n}">${n}</button>`).join('')}</div>
+    ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
+  document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
+    e.stopPropagation(); const k = b.dataset.seat;
+    if (ROLE !== 'host') return sendIn('seat', { s: k });
+    if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
+  });
+  document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); otherSeat(b.dataset.o); });
+  document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); const k = seatsOf().find((j) => !state.seats[j]); if (k) callFor(k, 'friend', b.dataset.f); });
 }
-// solo: you play every character nobody took (the first one gets your name, the other its own)
-function playSolo() {
-  if (!waitRoom) return;
-  let me = seatsOf().find((k) => state.seats[k] && state.seats[k].id === myId);
-  for (const k of seatsOf()) if (!state.seats[k]) { state.seats[k] = { id: myId, n: me ? story().solo[k] : state.name }; me = me || k; }
-  clearTimeout(takeSeat.t); begin();
+function otherSeat(o) {
+  const k = seatsOf().find((j) => !state.seats[j]); if (!k) return;
+  if (o === 'friend') { $('.wr-friends').hidden = false; return; }
+  if (o === 'public') { callFor(k, 'public', SIM_STRANGERS[Math.floor(Math.random() * SIM_STRANGERS.length)]); return; }
+  state.seats[k] = { id: BOT, n: seatLabel(k) }; renderWait(); share(); startWhenFull();   // alone: the other one plays itself
 }
-// solo against a simulated player: you keep the character you took (else the first free one); every other free one
-// is played by a "bot": random choices, its lines and private lines go by on their own
-function playSoloBot() {
-  if (!waitRoom) return;
-  const me = seatsOf().find((k) => state.seats[k] && state.seats[k].id === myId) || seatsOf().find((k) => !state.seats[k]);
-  if (me && !state.seats[me]) state.seats[me] = { id: myId, n: state.name };
-  for (const k of seatsOf()) if (!state.seats[k]) state.seats[k] = { id: BOT, n: story().solo[k] };
-  clearTimeout(takeSeat.t); begin();
+// simulated for now: the friend accepts after a moment, a stranger shows up a bit later; they play like the bot
+function callFor(k, kind, n) {
+  invite = { seat: k, kind, n }; renderWait();
+  clearTimeout(callFor.t);
+  callFor.t = setTimeout(() => {
+    if (!waitRoom || !invite || state.seats[k]) return;
+    invite = null; state.seats[k] = { id: BOT, n }; renderWait(); share(); startWhenFull();
+  }, kind === 'friend' ? 2200 + Math.random() * 1000 : 3000 + Math.random() * 2000);
 }
-$('#solo').onclick = (e) => { e.stopPropagation(); $('#solo').hidden = true; $('#soloPick').hidden = false; };
-$('#soloBoth').onclick = (e) => { e.stopPropagation(); playSolo(); };
-$('#soloBot').onclick = (e) => { e.stopPropagation(); playSoloBot(); };
+// both seats taken: a beat ("Ça commence…"), then the story
+function startWhenFull() {
+  clearTimeout(takeSeat.t);
+  const full = () => seatsOf().every((j) => state.seats[j]);
+  if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin(); }, 1600);
+}
 // a note behind a "?": a title and its points ("- " = a sub-point), tap anywhere to close
 function openNote(t, obs) {
   $('#todoTitle').textContent = t.title;
@@ -1444,10 +1473,7 @@ function takeSeat(k, id, n) {
     for (const j of seatsOf()) if (state.seats[j] && state.seats[j].id === id) delete state.seats[j];
     state.seats[k] = { id, n: String(n || 'Kev').slice(0, 16) };
   } else return;
-  renderWait(); share();
-  clearTimeout(takeSeat.t);
-  const full = () => seatsOf().every((j) => state.seats[j]);
-  if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin(); }, 900);
+  renderWait(); share(); startWhenFull();
 }
 // Full demo's Play on a real story (index.html#open=bar): its waiting room once the name is in; its ‹ goes back there.
 // #open=histoire: the story writer, #open=perso: a new character (Full demo's + tab sends you there)
