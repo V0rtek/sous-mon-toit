@@ -419,19 +419,20 @@ const bathroom = [
   { enter: { pb: 'pee' } }, two('pb', 'suit'),
   { sfx: 'zip' }, { wait: 500 }, { sfx: 'pee', loop: true }, hush(1300),   // Brooke pees a little
   { poses: { pb: 'pee_relief' } }, hush(1600),   // then the relief
-  { poses: { pb: 'pee_look' } }, hush(700),   // then he looks at the guy at the next urinal, and he's the one who starts
-  one('pb'), say('pb', 'pee_look', 'Nice suit.', { to: 'suit' }),
+  { poses: { pb: 'pee_look' } }, hush(2600),   // then he looks at the guy at the next urinal — a long look — and he's the one who starts
+  say('pb', 'pee_look', 'Nice suit.', { to: 'suit' }),
   one('suit'), hush(600), say('suit', 'pee', 'Long night?', { to: 'pb' }),
+  two('pb', 'suit'),
   { by: 'pb', choice: [
     { t: 'Best night of my life.', intent: 'happy', then: [
-      one('pb'), say('pb', 'pee_look', 'Best night of my life, man.', { to: 'suit' }),
-      one('suit'), hush(700), say('suit', 'pee', 'Doesn’t sound like it.', { to: 'pb' }),
+      say('pb', 'pee_look', 'Best night of my life, man.', { to: 'suit' }),
+      hush(700), say('suit', 'pee', 'Doesn’t sound like it.', { to: 'pb' }),
     ] },
     { t: 'Do I know you?', intent: 'suspicious', then: [
-      one('pb'), say('pb', 'pee_look', 'Do I… know you?', { to: 'suit' }),
+      say('pb', 'pee_look', 'Do I… know you?', { to: 'suit' }),
       one('suit'), hush(1100), say('suit', 'pee', 'No.', { to: 'pb' }),
     ] },
-    { t: 'Say nothing.', intent: 'stares at the wall', then: [{ poses: { pb: 'pee' } }, one('pb'), hush(1200), narr('Brooke stares at the wall. Very hard.')] },
+    { t: 'Say nothing.', intent: 'stares at the wall', then: [{ poses: { pb: 'pee' } }, hush(1200), narr('Brooke stares at the wall. Very hard.')] },
   ] },
   // they don't finish together: the suit first (zips, turns, fixes his tie, eyes on Brooke) while Brooke keeps going,
   // then Brooke zips up and turns to him: now they talk for real
