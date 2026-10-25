@@ -985,7 +985,7 @@ function render() {
 }
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
-// alone or with someone. Every preview you tapped into is one; one you finished stays (the story is started). ----
+// alone or with someone. Only playing counts (Jouer), not watching a preview in the feed; a finished one stays. ----
 const prog = keep.get('prog', (() => {   // a first visit already has a few (fake) ones going
   const now = Date.now();
   return { mensonge: { i: 5, with: ['Max'], at: now - 40 * 60000 }, nuit: { i: 3, with: [], at: now - 5 * 3600000 }, cles: { i: 6, with: ['Léa', 'Inès'], at: now - 2 * 86400000 }, table: { i: 4, with: [], at: now - 4 * 86400000 } };
@@ -1014,14 +1014,14 @@ function renderHome() {
   const cardOf = (id) => {
     const d = byId(id), p = prog[id], w = p.with;
     const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
-    return `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${still(d, p.i)}${done(id) ? '<span class="sdone">Aperçu fini</span>' : ''}${withs}${pbar(id)}</div></div>`;
+    return `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${still(d, p.i)}${done(id) ? '<span class="sdone">Fini</span>' : ''}${withs}${pbar(id)}</div></div>`;
   };
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
     <div class="carInfo" id="homeInfo"></div>`;
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id];
     $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Jouer' : 'Continuer'}</button>`;
+      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}</button>`;
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
 }
@@ -1067,7 +1067,6 @@ function renderCurrent() {
 }
 function line(ci, i) {
   const d = byId(ci.dataset.id), n = total(d); at[d.id] = i;
-  if (i > 0) track(d.id, Math.min(i, n));
   if (i >= n) {
     $('.cline', ci).innerHTML = d.full ? '' : `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;   // the game's last line stays on screen
     $('.pc-corner', ci).textContent = `${n}/${n}`; return;
@@ -1160,7 +1159,7 @@ function setTab(t) {
 }
 function openPlayer(id, host = false, from = 0) {
   const d = byId(id);
-  if (d.full) { location.href = `index.html#open=${d.full}`; return; }   // the real game; its back comes here
+  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
@@ -1376,7 +1375,7 @@ function progress() {
 function step() {
   const d = P.d; P.i++;
   if (P.i >= d.lines.length) { track(d.id, d.lines.length, P.with); return end(); }
-  if (P.i > 0) track(d.id, P.i, P.with);
+  track(d.id, P.i, P.with);
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
   $$('#player .pcast .sp').forEach((img, i) => { const s = srcOf(P.cast[i], P.poses[i]); if (img.getAttribute('src') !== s) img.src = s; img.classList.toggle('talk', i === who); });
