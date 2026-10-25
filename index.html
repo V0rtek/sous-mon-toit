@@ -308,6 +308,32 @@ body.watch #stage { cursor: default; }
 body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
 body.watch #choices button, body.watch .looks button { pointer-events: none; }
 #choices button.picked { background: var(--choice-hi); box-shadow: 0 0 0 .2em #fff; }
+/* the end of an episode: shake, a silhouette, the reveal; then the next episode's picture */
+#epCard { position: absolute; inset: 0; z-index: 50; background: radial-gradient(circle at 50% 45%, #2a0a10, #000 70%); color: #fff; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; overflow: hidden; cursor: default; }
+.ep-a { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
+.ep-kick { margin-top: 12%; font-size: 1.9em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.75); animation: epIn 1.2s ease-out both; }
+.ep-glow { position: absolute; left: 50%; top: 55%; width: 90%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(rgba(255,40,70,.45), transparent 65%); opacity: .4; transition: opacity 2.5s, background 2.5s; }
+.ep-fig { position: absolute; left: 50%; bottom: 20%; height: 58%; transform: translateX(-50%) scale(.9); filter: brightness(0) drop-shadow(0 0 1.5em rgba(255,40,70,.9)); transition: filter 3.2s ease-in, transform 3.2s ease-out; }
+.quake .ep-a { animation: epShake .11s steps(2) infinite; }
+.quake .ep-glow { opacity: 1; animation: epPulse .9s ease-in-out infinite; }
+.reveal .ep-fig { filter: brightness(1) drop-shadow(0 0 2.2em rgba(255,200,140,.55)); transform: translateX(-50%) scale(1); }
+.reveal .ep-glow { opacity: .9; background: radial-gradient(rgba(255,190,120,.4), transparent 65%); }
+.ep-won { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; opacity: 0; transform: translateY(1.5em); transition: opacity .8s, transform .8s; }
+.named .ep-won { opacity: 1; transform: none; }
+.ep-won small { display: block; font-size: 1.8em; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.ep-won b { display: block; font-family: var(--display); font-weight: 400; font-size: 5.6em; line-height: 1.1; }
+.ep-won span { font-size: 1.8em; color: #ffcf8a; }
+@keyframes epShake { 0% { transform: translate(.5em, -.3em) rotate(.4deg); } 50% { transform: translate(-.6em, .4em) rotate(-.5deg); } 100% { transform: translate(.3em, .5em) rotate(.2deg); } }
+@keyframes epPulse { 50% { transform: translate(-50%, -50%) scale(1.15); } }
+@keyframes epIn { from { opacity: 0; letter-spacing: .6em; } }
+.ep-t { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 0 9%; animation: epIn .8s ease-out both; }
+.ep-t .ep-kick { margin-top: 13%; }
+.ep-t h2 { font-family: var(--display); font-weight: 400; font-size: 4.6em; margin: .2em 0 .5em; text-align: center; }
+.ep-img { width: 72%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 2em; box-shadow: 0 2em 5em rgba(0,0,0,.8); }
+.ep-t p { font-size: 2.1em; line-height: 1.4; color: #d1d1d6; text-align: center; margin: 1.2em 0 auto; }
+.ep-t button { font: inherit; font-size: 2.4em; font-weight: 700; width: 100%; padding: .75em; border-radius: 2em; border: 0; cursor: pointer; margin-bottom: .6em; }
+.ep-go { background: #fff; color: #000; }
+.ep-home { background: rgba(255,255,255,.12); color: #fff; margin-bottom: 9% !important; }
 @media (prefers-reduced-motion: reduce) { .actor.talk, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
 </style>
 
@@ -448,6 +474,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="looks" id="lookList"></div>
     <button class="go" id="lookGo" type="button">C'est elle</button>
   </div>
+  <div id="epCard" hidden></div>
   <div id="end" class="card" hidden>
     <div class="art" style="background-image:url(bg/salon.jpg)"></div>
     <div class="veil"></div>
@@ -498,7 +525,8 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé' };
+const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé',
+  epEnd: "Fin de l'épisode", won: 'Tu gagnes', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -1017,6 +1045,37 @@ const CUSTOM = {
 
 // the end card: chapter 1's own text, or the story's ({end: {kicker, title, lede}}); a 2-player story names who chose what
 const END0 = { kicker: $('#endKicker').textContent, title: $('#endTitle').textContent, lede: $('#endLede').textContent };
+// {episode: {n, win: {sprite, pose, name}, next: {n, title, img, tease}}}: the end of an episode. The screen shakes, a black
+// silhouette slowly turns into the actor you won (they join your characters: localStorage smt-won, Full demo shows them),
+// then the next episode's picture: Continue goes on, the other button goes home. Resolves true to go on
+function episodeEnd(ep, r) {
+  return new Promise((done) => {
+    const box = $('#epCard'), w = ep.win, timers = [];
+    const later = (ms, f) => timers.push(setTimeout(() => { if (run !== r) { box.hidden = true; done(false); return; } f(); }, ms));
+    try {
+      const won = JSON.parse(localStorage.getItem('smt-won') || '[]');
+      if (!won.some((x) => x.sprite === w.sprite)) localStorage.setItem('smt-won', JSON.stringify([...won, { sprite: w.sprite, name: w.name, from: state.story, ep: ep.n }]));
+    } catch { /* private window */ }
+    bubble.hidden = true; choicesEl.hidden = true; hint.hidden = true;
+    box.innerHTML = `<div class="ep-a"><div class="ep-kick">${ui('epEnd')} ${ep.n}</div><div class="ep-glow"></div>
+      <img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""><div class="ep-won"><small>${ui('won')}</small><b>${w.name}</b><span>${ui('added')}</span></div></div>`;
+    box.className = ''; box.hidden = false; box.onclick = null;
+    const tease = () => {
+      timers.forEach(clearTimeout); box.onclick = null;
+      const nx = ep.next;
+      box.className = 'teasing';
+      box.innerHTML = `<div class="ep-t">${nx ? `<div class="ep-kick">${ui('episode')} ${nx.n}</div><h2>${nx.title}</h2><img class="ep-img" src="${nx.img}" alt=""><p>${nx.tease}</p>` : ''}
+        <button type="button" class="ep-go">${nx ? ui('next') : ui('finale')}</button><button type="button" class="ep-home">${ui('home')}</button></div>`;
+      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(true); };
+      $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
+    };
+    later(60, () => box.className = 'quake');                      // the dark, the shaking, the silhouette
+    later(2600, () => box.className = 'quake reveal');             // it slowly takes its colours
+    later(4300, () => box.className = 'reveal');                   // the shaking stops
+    later(5600, () => { box.className = 'reveal named'; box.onclick = (e) => { e.stopPropagation(); tease(); }; });   // who it is
+    later(9500, tease);
+  });
+}
 function endCard(d) {
   bump((st) => { st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.done = (r.done || 0) + 1; });
   const e = typeof d === 'object' ? d : END0, two = duo();
@@ -1202,6 +1261,7 @@ async function next() {
       return;
     }
     else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.episode) { if (FAST || PREVIEW) continue; if (!(await episodeEnd(s.episode, r))) return; }   // not while jumping, not in Full demo's previews
     else if (s.end) { endCard(s.end); return; }
   }
 }
