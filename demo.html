@@ -381,10 +381,10 @@ body.tabs-pill #tabs span { display: none; }
 .tb.g b { font-style: italic; text-transform: uppercase; letter-spacing: .05em; font-size: 2.6cqw; top: -2.8cqw; }
 .tb.g::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #fffdf9; }
 /* 4: the game's own bubble (index.html #bubble), its sizes turned into the frame's width */
-.gb { position: absolute; left: 7%; right: 7%; top: 53%; z-index: 4; background: #fffdf9; color: #1d1a24; border: .53cqw solid #cdbdf0; border-radius: 3.6cqw; padding: 4.3cqw 3.9cqw 3.4cqw; box-shadow: 0 1.1cqw 2.8cqw rgba(0,0,0,.35); font-family: 'Nunito', var(--ui); }
+.gb { position: absolute; left: 7%; right: 7%; top: 53%; z-index: 4; background: #fffdf9; color: #1d1a24; border: .53cqw solid var(--rim, #cdbdf0); border-radius: 3.6cqw; padding: 4.3cqw 3.9cqw 3.4cqw; box-shadow: 0 1.1cqw 2.8cqw rgba(0,0,0,.35); font-family: 'Nunito', var(--ui); }
 .gb p { margin: 0; font-size: 4.18cqw; line-height: 1.32; font-weight: 600; }
-.gb b { position: absolute; left: 2.85cqw; top: -3.38cqw; font-size: 3.56cqw; padding: .55em 1.3em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
-.gb i { position: absolute; top: -3.02cqw; margin-left: -1.96cqw; border-left: 1.96cqw solid transparent; border-right: 1.96cqw solid transparent; border-bottom: 3.2cqw solid #cdbdf0; }
+.gb b { position: absolute; left: 2.85cqw; top: -5cqw; font-size: 3.56cqw; padding: .32em 1.1em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
+.gb i { position: absolute; top: -3.02cqw; margin-left: -1.96cqw; border-left: 1.96cqw solid transparent; border-right: 1.96cqw solid transparent; border-bottom: 3.2cqw solid var(--rim, #cdbdf0); }
 .gb i::after { content: ''; position: absolute; left: -1.33cqw; top: .8cqw; border-left: 1.33cqw solid transparent; border-right: 1.33cqw solid transparent; border-bottom: 2.31cqw solid #fffdf9; }
 .gb.narr { background: rgba(22,18,30,.9); border-color: rgba(255,255,255,.14); color: #f4eefc; padding-top: 3.2cqw; }
 .gb.narr p { font-style: italic; text-align: center; }
@@ -968,7 +968,7 @@ function stageHtml(d, i, mode, feed) {
     const sx = s * x + tx, tail = Math.min(86, Math.max(14, (sx - 7) / 86 * 100));
     const name = who >= 0 ? cast[who].name : '', tint = who >= 0 ? TINT[cast[who].s] || '#e2557a' : '';
     return `<div class="tw" style="transform-origin:0 0;transform:translate(${tx}%,${ty}%) scale(${s})"><div class="tbg" style="${place(d)}"></div>${people}</div>
-      <div class="gb${who < 0 ? ' narr' : ''}">${who >= 0 ? `<b style="background:${tint}">${esc(name)}</b><i style="left:${tail}%"></i>` : ''}<p>${esc(text)}</p></div>${feed ? '' : `<div class="tc">${at + 1}/${n}</div>`}`;
+      <div class="gb${who < 0 ? ' narr' : ''}"${who >= 0 ? ` style="--rim:color-mix(in srgb, ${tint} 45%, #fff)"` : ''}>${who >= 0 ? `<b style="background:${tint}">${esc(name)}</b><i style="left:${tail}%"></i>` : ''}<p>${esc(text)}</p></div>${feed ? '' : `<div class="tc">${at + 1}/${n}</div>`}`;
   }
   // 2: the camera closes in on whoever talks, the bubble at chest height with its tail up to them
   const zoom = mode === 2 && who >= 0 ? `transform:scale(1.8);transform-origin:${x}% 28%` : '';

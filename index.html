@@ -74,7 +74,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #bubble.think { border-style: dashed; background: #f6f2ff; }
 #bubble.think #text, #bubble.whisper #text { font-style: italic; }
 #bubble.whisper #text { font-size: 2.1em; }
-#tag { position: absolute; left: 1.6em; top: -1.9em; padding: .55em 1.3em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: 2em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
+#tag { position: absolute; left: 1.6em; top: -1.55em; padding: .32em 1.1em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: 2em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
 #tag small { font-size: .62em; font-weight: 700; letter-spacing: .02em; text-transform: none; opacity: .85; margin-left: .4em; }
 #text { font-size: 2.35em; line-height: 1.32; font-weight: 600; min-height: 1.32em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
@@ -862,6 +862,8 @@ function line(s) {
     if (voice) { const sm = document.createElement('small'); sm.innerHTML = ICON_PHONE; tagEl.append(sm); }
     tagEl.style.background = castOf(who).color;
   }
+  // the bubble's rim (and its tail) in the speaker's colour, lighter
+  bubble.style.setProperty('--rim', who ? `color-mix(in srgb, ${castOf(who).color} 45%, #fff)` : '');
   // the tail points at the speaker if the camera sees them
   const a = who && actors[who], f = camNow && camNow.frame;
   const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : -1;
