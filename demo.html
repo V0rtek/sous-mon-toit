@@ -497,6 +497,7 @@ const I = {
   byoc: '<svg viewBox="0 0 24 24"><circle cx="10" cy="7.5" r="4"/><path d="M2 21c0-4.5 3.6-7.4 8-7.4 1.3 0 2.5.2 3.6.7A6.5 6.5 0 0 0 12.6 21z"/><path d="M19 13.5v7M15.5 17h7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>',
   bookmark: '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   bookmarkOn: '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+  saveWho: '<svg viewBox="0 0 24 24"><path d="M5.5 3.5h10v16l-5-3.6-5 3.6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="18" cy="16.5" r="5.2" fill="#000" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="15" r="1.5"/><path d="M15.4 19.4c.4-1.4 1.4-2.1 2.6-2.1s2.2.7 2.6 2.1" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
   heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   heartOn: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
@@ -683,7 +684,7 @@ function saveIcon(on) {
 const saveCls = () => ({ heart: '', bookmark: ' bm', plus: ' pl' })[O.save];
 function saveBtn(d) {
   const on = !!saved[d.id];
-  return `<button class="save${on ? ' on' : ''}${saveCls()}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(on)}</button>`;
+  return `<button class="save${on ? ' on' : ''}${saveCls()}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>`;
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
 // (solo is the default: only 2-3 players get a mark)
@@ -718,7 +719,7 @@ function liveLine(d) {
   if (f) return `<p class="liveLine f" style="--c:${f.c}"><i></i>${esc(f.n)} t'attend dans une salle${ago}${l.strangers ? ` (+${l.strangers})` : ''}</p>`;
   return `<p class="liveLine s" style="--c:var(--stranger)"><i></i>${l.strangers === 1 ? 'Un joueur attend' : l.strangers + ' joueurs attendent'} dans une salle${ago}</p>`;
 }
-const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}${saved[d.id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver')}</button>`;
+const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}${saveWord(d.id)}</button>`;
 const actions = (d) => `${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
 
 // ---- explore: one renderer per layout ----
@@ -740,7 +741,7 @@ const R = {
   feed() {
     return `<div class="feedhint">Glisse vers le haut ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="background-image:url(bg/${d.bg || 'salon'}.jpg);filter:blur(3em) ${d.fx || ''}"></div>
       <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}</div>
-      <div class="side"><button data-act="save" data-id="${d.id}"><i class="${saved[d.id] ? 'on' : ''}">${saveIcon(!!saved[d.id])}</i><span>${saved[d.id] ? 'Sauvé' : 'Sauver'}</span></button>
+      <div class="side"><button data-act="save" data-id="${d.id}"><i>${saveIconOf(d.id)}</i><span>${saveWord(d.id)}</span></button>
         <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button></div>
       <div class="txt"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}</div></div></div>`).join('');
   },
@@ -804,7 +805,7 @@ function renderExplore() {
 }
 function renderSaved() {
   const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
-  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.<br><br>Une démo à plusieurs se sauve <b>avec quelqu'un</b>, pour la regarder ensemble plus tard.</p></div>`; return; }
+  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.<br><br>Une démo à plusieurs : touche encore pour choisir <b>avec qui</b> tu veux la jouer.</p></div>`; return; }
   const who = [...new Set(ids.flatMap((id) => saved[id].with))];
   if (savedWho !== 'all' && savedWho !== 'me' && !who.includes(savedWho)) savedWho = 'all';
   const show = ids.filter((id) => savedWho === 'all' || (savedWho === 'me' ? !saved[id].with.length : saved[id].with.includes(savedWho)));
@@ -905,7 +906,7 @@ function renderCurrent() {
       : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${castOf(d).length}">${actors(castOf(d))}</div><div class="pshade"></div>`}
     <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
-      <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}</button>
+      <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>
       <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`).join('');
   $$('.ci', box).forEach((ci) => line(ci, at[ci.dataset.id] || 0));
   if (seen) seen.disconnect();
@@ -949,7 +950,7 @@ function lineHtml(d, who, text) {
   return `<div class="pbub"><b>${esc(m.name)}${m.me ? '<small>(toi)</small>' : ''}</b><p>${esc(text)}</p></div>`;
 }
 function syncCurrent() {
-  $$('#current .sv').forEach((b) => { const on = !!saved[b.dataset.id]; b.classList.toggle('on', on); b.innerHTML = saveIcon(on); });
+  $$('#current .sv').forEach((b) => { b.classList.toggle('on', !!saved[b.dataset.id]); b.innerHTML = saveIconOf(b.dataset.id); });
 }
 
 // ---- navigation: every level is a history entry, so the phone's back and ‹ do the same thing.
@@ -1040,7 +1041,7 @@ function swipe(yes) {
   const el = $('#deck .card.k0'); if (!el) return;
   const id = el.dataset.id;
   el.style.transform = `translateX(${yes ? 140 : -140}%) rotate(${yes ? 24 : -24}deg)`; el.style.opacity = 0;
-  setTimeout(() => { deckGone.push(id); if (yes && !saved[id]) askSave(id, renderExplore); else renderExplore(); }, 230);
+  setTimeout(() => { deckGone.push(id); if (yes && !saved[id]) toggleSave(id); else renderExplore(); }, 230);
 }
 
 // ---- details: veil (full screen, black at the bottom) / zoomed cover / bottom sheet ----
@@ -1065,24 +1066,28 @@ function setSaved(id, w) {
   if (w === null) delete saved[id]; else saved[id] = { with: w, at: (saved[id] && saved[id].at) || Date.now() };
   keep.set('saved', saved);
 }
+// a tap saves right away. On a multiplayer one, the icon then asks "with who?": the next tap opens
+// "Je veux jouer avec…" (pick friends, or take it out of the saved ones); a solo one just comes back out
 function toggleSave(id) {
-  if (saved[id]) { setSaved(id, null); toast('Retiré'); after(); return; }
-  askSave(id, after);
-}
-function askSave(id, done) {
   const d = byId(id);
-  if (d.players === 1) { setSaved(id, []); toast(`${saveIcon(true)}Sauvé`); done(); return; }
-  people(id, true, done);
+  if (!saved[id]) { setSaved(id, []); toast(d.players > 1 ? 'Sauvé · touche encore pour choisir avec qui' : `${saveIcon(true)}Sauvé`); after(); return; }
+  if (d.players > 1) { people(id); return; }
+  setSaved(id, null); toast('Retiré'); after();
 }
-function people(id, fresh, done = after) {
+function people(id) {
   const d = byId(id), pick = new Set(saved[id] ? saved[id].with : []);
-  const box = sheet(`<h3>${fresh ? 'Sauver pour jouer avec…' : 'Avec qui ?'}</h3><p class="lead">« ${esc(d.title)} » se joue à ${d.players === 3 ? '2 ou 3' : '2'}. Choisis avec qui tu veux le regarder plus tard — on le retrouvera dans tes Sauvés, sous leur nom.</p>
+  const ok = () => pick.size ? `Jouer avec ${[...pick].join(', ')}` : 'Personne pour l\'instant';
+  const box = sheet(`<h3>Je veux jouer avec…</h3><p class="lead">« ${esc(d.title)} » se joue à ${d.players === 3 ? '2 ou 3' : '2'}. Tu la retrouveras dans tes Sauvés, sous leur nom.</p>
     <div class="people">${FRIENDS.map((f) => `<button data-n="${esc(f.n)}" class="${pick.has(f.n) ? 'on' : ''}">${av(f.n)}<span>${esc(f.n)}</span>${f.on ? '<small>● en ligne</small>' : ''}</button>`).join('')}</div>
-    <div class="row"><button class="btn main wide" id="pplOk">Sauver</button><button class="btn" id="pplMe">Juste pour moi</button></div>`);
-  $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); pick[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); $('#pplOk').textContent = pick.size ? `Sauver avec ${[...pick].join(', ')}` : 'Sauver'; });
-  $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); toast(pick.size ? `Sauvé · avec ${[...pick].join(', ')}` : 'Sauvé'); done(); };
-  $('#pplMe').onclick = () => { setSaved(id, []); closeSheet(); toast('Sauvé · pour toi'); done(); };
+    <div class="row"><button class="btn main wide" id="pplOk">${ok()}</button><button class="btn" id="pplOut">Retirer</button></div>`);
+  $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); pick[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); $('#pplOk').textContent = ok(); });
+  $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); if (pick.size) toast(`Avec ${[...pick].join(', ')}`); after(); };
+  $('#pplOut').onclick = () => { setSaved(id, null); closeSheet(); toast('Retiré'); after(); };
 }
+// saved, multiplayer, nobody yet: the icon says "with who?"
+const asksWho = (id) => saved[id] && !saved[id].with.length && byId(id).players > 1;
+const saveIconOf = (id) => asksWho(id) ? I.saveWho : saveIcon(!!saved[id]);
+const saveWord = (id) => asksWho(id) ? 'Jouer avec…' : saved[id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver');
 function after() {
   renderTabs();
   const v = page();
