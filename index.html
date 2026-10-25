@@ -344,12 +344,33 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 .ep-done small { display: block; font-size: 2em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.7); }
 .ep-done b { display: block; font-family: var(--display); font-weight: 400; font-size: 7em; line-height: 1.1; }
 .ep-glow { position: absolute; left: 50%; top: 55%; width: 90%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(rgba(255,40,70,.45), transparent 65%); opacity: .4; transition: opacity 2.5s, background 2.5s; }
-.ep-fig { position: absolute; left: 50%; bottom: 20%; height: 58%; opacity: 0; transform: translateX(-50%) scale(.9); filter: brightness(0) drop-shadow(0 0 1.5em rgba(255,40,70,.9)); transition: opacity .5s, filter 3.2s ease-in, transform 3.2s ease-out; }
-.quake .ep-fig, .reveal .ep-fig { opacity: 1; }
-.quake .ep-a { animation: epShake .11s steps(2) infinite; }
+/* only the silhouette and its light shake (the words stay still) */
+.ep-shake { position: absolute; inset: 0; }
+.ep-fig { position: absolute; left: 50%; bottom: 20%; height: 58%; opacity: 0; transform: translateX(-50%) scale(.9); filter: brightness(0) drop-shadow(0 0 1.5em rgba(255,40,70,.9)); transition: opacity .5s, filter 1.6s ease-in, transform 3.2s ease-out; }
+.quake .ep-fig, .burst .ep-fig { opacity: 1; }
+.quake .ep-shake { animation: epShake .11s steps(2) infinite; }
 .quake .ep-glow { opacity: 1; animation: epPulse .9s ease-in-out infinite; }
-.reveal .ep-fig { filter: brightness(1) drop-shadow(0 0 2.2em rgba(255,200,140,.55)); transform: translateX(-50%) scale(1); }
-.reveal .ep-glow { opacity: .9; background: radial-gradient(rgba(255,190,120,.4), transparent 65%); }
+.hint .ep-fig { filter: brightness(.16) drop-shadow(0 0 2.6em rgba(255,110,90,1)); }   /* something's coming through */
+.burst .ep-fig { filter: brightness(1) drop-shadow(0 0 2.2em rgba(255,200,140,.55)); transform: translateX(-50%) scale(1); transition: opacity .5s, filter .7s ease-out, transform 1.1s cubic-bezier(.2,.9,.25,1.15); }
+.burst .ep-glow { opacity: .9; background: radial-gradient(rgba(255,190,120,.4), transparent 65%); }
+/* the reveal: a flash, a shockwave, slow light rays behind him, and fine embers drifting up around him */
+.ep-rays { position: absolute; left: 50%; top: 52%; width: 170%; aspect-ratio: 1; transform: translate(-50%, -50%); background: repeating-conic-gradient(rgba(255,214,160,.14) 0 3deg, transparent 3deg 15deg); -webkit-mask: radial-gradient(closest-side, #000 15%, transparent 72%); mask: radial-gradient(closest-side, #000 15%, transparent 72%); opacity: 0; transition: opacity 1.4s; }
+.burst .ep-rays { opacity: 1; animation: epSpin 50s linear infinite; }
+.ep-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 52%, #fff, rgba(255,226,180,.65) 35%, transparent 75%); }
+.burst .ep-flash { animation: epFlash 1.2s ease-out; }
+.ep-ring { position: absolute; left: 50%; top: 52%; width: 34%; aspect-ratio: 1; border-radius: 50%; border: .35em solid rgba(255,228,190,.95); box-shadow: 0 0 1.4em rgba(255,200,140,.7), inset 0 0 1.4em rgba(255,200,140,.5); transform: translate(-50%, -50%) scale(0); opacity: 0; }
+.burst .ep-ring { animation: epRing 1.3s cubic-bezier(.15,.75,.3,1); }
+.ep-sparks i { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; background: #ffe9c2; box-shadow: 0 0 .7em .15em rgba(255,196,120,.85); opacity: 0; }
+.ep-sparks i.g { width: 3em; height: 3em; background: none; box-shadow: none; }
+.ep-sparks i.g::before, .ep-sparks i.g::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: .14em; margin-top: -.07em; background: linear-gradient(90deg, transparent, #fff, transparent); }
+.ep-sparks i.g::after { transform: rotate(90deg); }
+.burst .ep-sparks i { animation: epSpark var(--d) ease-out var(--w) infinite; }
+.burst .ep-sparks i.g { animation: epGlint var(--d) ease-in-out var(--w) infinite; }
+@keyframes epSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes epFlash { 6% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes epRing { 0% { opacity: 1; transform: translate(-50%, -50%) scale(.15); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(4.2); border-width: .04em; } }
+@keyframes epSpark { 0% { opacity: 0; transform: translate(0, 0) scale(.5); } 12% { opacity: 1; } 70% { opacity: .8; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1); } }
+@keyframes epGlint { 0%, 100% { opacity: 0; transform: scale(.2) rotate(0); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } }
 .ep-won { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; opacity: 0; transform: translateY(1.5em); transition: opacity .8s, transform .8s; }
 .named .ep-won { opacity: 1; transform: none; }
 .ep-won b { display: block; font-family: var(--display); font-weight: 400; font-size: 5.6em; line-height: 1.1; }
@@ -1129,6 +1150,14 @@ async function startStory() {
   await skipTo(at, state.story);
   state.seats = seats; share();
 }
+// the embers around the one you won: fine sparks drifting up and a few glints, each on its own timing
+function sparks() {
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  return Array.from({ length: 30 }, (_, k) => {
+    const g = k % 6 === 0;   // one in six: a glint, the rest embers
+    return `<i class="${g ? 'g' : ''}" style="left:${rnd(18, 82)}%;top:${rnd(g ? 22 : 35, g ? 70 : 80)}%;--s:${rnd(.25, .7).toFixed(2)}em;--d:${rnd(2.2, 4.6).toFixed(2)}s;--w:${rnd(0, 2).toFixed(2)}s;--x:${rnd(-4, 4).toFixed(1)}em;--y:${rnd(-22, -9).toFixed(1)}em"></i>`;
+  }).join('');
+}
 function episodeEnd(ep, r) {
   return new Promise((done) => {
     const box = $('#epCard'), w = ep.win, timers = [];
@@ -1140,8 +1169,8 @@ function episodeEnd(ep, r) {
     saveEp(ep.next ? ep.next.n : null);   // where you are now: the next episode (Full demo's En cours shows it)
     bubble.hidden = true; choicesEl.hidden = true; hint.hidden = true;
     box.innerHTML = `<div class="ep-a"><div class="ep-done"><small>${ui('finished')}</small><b>${ui('episode')} ${ep.n}</b></div>
-      <div class="ep-kick">${ui('won')}</div><div class="ep-glow"></div>
-      <img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""><div class="ep-won"><b>${w.name}</b><span>${ui('added')}</span></div></div>`;
+      <div class="ep-kick">${ui('won')}</div><div class="ep-rays"></div><div class="ep-shake"><div class="ep-glow"></div><img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""></div>
+      <div class="ep-ring"></div><div class="ep-sparks">${sparks()}</div><div class="ep-flash"></div><div class="ep-won"><b>${w.name}</b><span>${ui('added')}</span></div></div>`;
     box.className = ''; box.hidden = false; box.onclick = null;
     const tease = () => {
       timers.forEach(clearTimeout); box.onclick = null;
@@ -1155,9 +1184,9 @@ function episodeEnd(ep, r) {
     later(60, () => box.className = 'done');                             // "you finished episode N"
     later(2000, () => box.className = 'won');                            // "you won…"
     later(3300, () => box.className = 'won quake');                      // the silhouette comes, everything shakes
-    later(5700, () => box.className = 'won quake reveal');               // it slowly takes its colours
-    later(7300, () => box.className = 'won reveal');                     // the shaking stops
-    later(8300, () => { box.className = 'won reveal named'; box.onclick = (e) => { e.stopPropagation(); tease(); }; });   // who it is
+    later(5700, () => box.className = 'won quake hint');                 // a light starts coming through him
+    later(7300, () => box.className = 'won burst');                      // the shaking stops: flash, shockwave, there he is
+    later(8300, () => { box.className = 'won burst named'; box.onclick = (e) => { e.stopPropagation(); tease(); }; });   // who it is
     later(12500, tease);
   });
 }
