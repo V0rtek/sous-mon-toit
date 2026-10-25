@@ -316,6 +316,32 @@ body.tabs-pill #tabs span { display: none; }
 #home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 #home .carInfo { padding-top: 2.4em; }
 #home .carInfo .btn { width: 70%; }
+/* slide down: the infos and the episodes of the centred one, and taking it out of En cours */
+.hfirst { min-height: 100%; display: flex; flex-direction: column; }
+.hfirst .carInfo { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.hdown { margin-top: auto; padding: 1.4em 0 0; display: flex; flex-direction: column; align-items: center; gap: .2em; color: rgba(255,255,255,.6); font-size: 1.5em; font-weight: 600; }
+.hdown svg { width: 1.6em; height: 1.6em; animation: hdown 1.8s ease-in-out infinite; }
+@keyframes hdown { 50% { transform: translateY(.3em); } }
+.hmore { position: relative; z-index: 3; margin: 2em 0 0; padding: 2.6em 6% 2em; background: #0c0c0e; border-radius: 2.4em 2.4em 0 0; border-top: .1em solid var(--line); }
+.hmore .pitch { font-size: 2em; line-height: 1.45; color: #d1d1d6; margin: 1em 0 0; }
+.hmore .meta { justify-content: flex-start; }
+.eps { display: flex; flex-direction: column; gap: 1.2em; margin: 1em 0 3em; }
+.ep { display: flex; gap: 1.6em; align-items: center; text-align: left; width: 100%; padding: 1em; border-radius: 1.6em; background: var(--card); color: var(--fg); }
+.ep .th { width: 7em; aspect-ratio: 3 / 4; flex: none; border-radius: .9em; overflow: hidden; container-type: inline-size; }
+.ep .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ep .th .cv { border-radius: 0; height: 100%; }
+.ep > div { flex: 1; min-width: 0; }
+.ep small { display: block; font-size: 1.4em; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.ep b { display: block; font-size: 2.2em; margin: .15em 0; }
+.ep p { margin: 0; font-size: 1.6em; line-height: 1.35; color: var(--mute); }
+.ep .st { flex: none; width: 4.4em; height: 4.4em; display: grid; place-items: center; color: var(--mute); }
+.ep .st svg { width: 2.4em; height: 2.4em; }
+.ep.now { box-shadow: inset 0 0 0 .2em #fff; }
+.ep.now .st { color: #fff; }
+.ep.done .st { color: #8be2a2; }
+.ep.lock { opacity: .4; pointer-events: none; }
+.hout { display: flex; align-items: center; justify-content: center; gap: .6em; width: 100%; padding: 1.2em; border-radius: 1.6em; border: .1em solid var(--line); color: #ff6b6b; font-size: 1.9em; font-weight: 600; }
+.hout svg { width: 1.2em; height: 1.2em; }
 .where { font-size: 1.8em; color: #d1d1d6; margin: 0 0 1.2em; display: flex; justify-content: center; align-items: center; gap: .4em; }
 .where .av { width: 1.6em; height: 1.6em; }
 .shelf .withs { bottom: calc(4% + .7em); }
@@ -530,6 +556,8 @@ const I = {
   check: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>',
   info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.4"/></svg>',
+  down: '<svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  lock: '<svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>',
   close: '<svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
   home: '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>',
   explore: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="10" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="10" rx="1.6"/><rect x="3" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/><rect x="13.5" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/></svg>',
@@ -560,6 +588,9 @@ const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
   { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 13, cut: '14-19,53-61',
     cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
+    eps: [{ title: 'Last call', img: 'covers/lastcall.jpg', tease: 'One last drink. Then Brooke goes to the bathroom — someone is already waiting.' },
+      { title: 'The house', img: 'covers/lastcall_ep2.jpg', tease: 'Every window is lit. Every glass of red means something.' },
+      { title: 'The red door', img: 'covers/lastcall_ep3.jpg', tease: 'Third door. The red light. Someone is already inside.' }],
     pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
   // a series: the island (its poster is the beach of day 1; the preview, night 3 in the forest)
@@ -1040,7 +1071,9 @@ const prog = keep.get('prog', (() => {   // a first visit already has a few (fak
   const now = Date.now();
   return { mensonge: { i: 5, with: ['Max'], at: now - 40 * 60000 }, nuit: { i: 3, with: [], at: now - 5 * 3600000 }, cles: { i: 6, with: ['Léa', 'Inès'], at: now - 2 * 86400000 }, table: { i: 4, with: [], at: now - 4 * 86400000 } };
 })());
+const gone = keep.get('gone', {});   // taken out of En cours by hand (Last call's episode would put it back otherwise)
 function track(id, i, w) {
+  if (i !== null && gone[id]) { delete gone[id]; keep.set('gone', gone); }
   if (i === null) delete prog[id];
   else prog[id] = { i, with: w || (prog[id] && prog[id].with) || [], at: Date.now() };
   keep.set('prog', prog);
@@ -1062,12 +1095,12 @@ function replay(stage, d, i, step = 0) {
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
 let homeOpen = null;
 function renderHome() {
-  if (epOf(byId('lastcall')) && !prog.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
+  if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
   const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
-  $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
-    <div class="hx" id="homeX"></div><div class="carInfo" id="homeInfo"></div>`;
+  $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
+    <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
   let centre = ids[0];
   const close = () => { clearTimeout(homeOpen); const x = $('#homeX'); if (x) x.className = 'hx'; };
   const open = () => {
@@ -1086,10 +1119,24 @@ function renderHome() {
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = id;
     $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) ? ` · Épisode ${epOf(d)}` : ''}</button>`;
+      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) ? ` · Épisode ${epOf(d)}` : ''}</button>
+      <button class="hdown" data-act="hdown">Infos et épisodes${I.down}</button>`;
+    $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
   wait();
+}
+
+// under it (slide down): what it is, its episodes (the one you're at, the ones done, the ones to come), and out of En cours
+function moreHtml(d) {
+  const eps = d.eps || [{ title: d.title }], now = d.eps ? epOf(d) || 1 : done(d.id) ? 2 : 1;
+  const ep = (e, k) => {
+    const n = k + 1, st = n < now ? 'done' : n === now ? 'now' : 'lock';
+    return `<button class="ep ${st}" data-act="ep" data-id="${d.id}" data-n="${n}"><span class="th">${e.img ? `<img src="${e.img}" alt="">` : cover({ ...d, title: '' })}</span>
+      <div><small>Épisode ${n}</small><b>${esc(e.title)}</b>${e.tease ? `<p>${esc(e.tease)}</p>` : ''}</div><span class="st">${st === 'done' ? I.check : st === 'now' ? I.play : I.lock}</span></button>`;
+  };
+  return `${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="h2">Épisodes</div><div class="eps">${eps.map(ep).join('')}</div>
+    <button class="hout" data-act="unlist" data-id="${d.id}">${I.close}Retirer de En cours</button>`;
 }
 
 // ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
@@ -1275,9 +1322,9 @@ function setTab(t) {
   if (t === BASE && cur().tabFrom === BASE) return back();
   if (tab === BASE) push({ tab: t, ov: null, tabFrom: BASE }); else swap({ tab: t, ov: null });
 }
-function openPlayer(id, host = false, from = 0) {
-  const d = byId(id);
-  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}${epOf(d) ? '&ep=' + epOf(d) : ''}`; return; }   // the real game; its back comes here
+function openPlayer(id, host = false, from = 0, ep = null) {
+  const d = byId(id), n = ep || epOf(d);
+  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
@@ -1499,6 +1546,9 @@ stage.addEventListener('click', (e) => {
     case 'play': openPlayer(id); break;
     case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;
+    case 'hdown': $('#home').scrollTo({ top: $('#homeMore').offsetTop - 40, behavior: 'smooth' }); break;
+    case 'ep': if (byId(id).full) openPlayer(id, false, 0, +el.dataset.n); else $('#homeInfo [data-act="resume"]').click(); break;   // an episode you did: again from its start
+    case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
     case 'pick': keep.set('me', el.dataset.c); renderSocial(); break;
