@@ -515,7 +515,7 @@ const I = {
 
 // ---- the community's demos (fake). cast: [sprite, pose]; you: which cast member the player brings their own
 // character into (-1 = the player isn't on screen); lines: [who (-1 = narration), text, pose?] ----
-const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy' };
+const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', on: true },
@@ -528,6 +528,23 @@ const DEMOS = [
     cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
     pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
+  // drawn from one sheet (25/10): one pose each, so their lines carry none
+  { id: 'beliers', title: "Deux béliers", by: '@colline', plays: '2,1 k', bg: 'maison', pos: '70% 50%', fx: 'saturate(.7) brightness(.55) hue-rotate(50deg)', glow: '#e8dcc0',
+    cast: [['belier_noir', 'stand'], ['belier_blanc', 'stand']], players: 2, byoc: false, live: { strangers: 1, since: 4 }, you: 0,
+    pitch: "Depuis dix ans, Ébène et Neige se disputent le sommet de la colline. Ce matin, quelqu'un a gravé un nom sur le vieux chêne — et ce n'est aucun des deux.",
+    lines: [[-1, "La colline. L'aube. Deux béliers, un seul sommet."], [0, "Tu es en retard, Neige."], [1, "Je suis en avance. C'est toi qui as dormi ici."], [0, "Quelqu'un doit garder le sommet."], [1, "Garder, ou empêcher les autres de monter ?"], [-1, "Sur l'écorce du vieux chêne : un nom, fraîchement gravé."], [0, "…Ce n'est pas mon écriture."], [1, "Ni la mienne."], [-1, "En bas, dans la brume, tout le troupeau les regarde."]] },
+  { id: 'ombre', title: "Ce qui dort sous la ville", by: '@nuitblanche', plays: '9,8 k', bg: 'maison', pos: '40% 50%', fx: 'hue-rotate(320deg) saturate(2) brightness(.28)', glow: '#ff3b3b',
+    cast: [['ombre', 'stand']], players: 1, byoc: true, live: null, you: -1,
+    pitch: "3 h du matin, station vide, et les rails vibrent encore. Ce qui dort sous la ville vient de prononcer ton nom.",
+    lines: [[-1, "Station Berri, 3 h 12. Le dernier métro est passé il y a une heure."], [-1, "Pourtant, les rails vibrent."], [0, "Tu m'entends. Personne ne m'entend, d'habitude."], [-1, "La voix vient de partout. Et de juste derrière toi."], [0, "J'ai dormi sous cette ville cent ans. Tu m'as réveillé."], [0, "Alors tu vas m'aider. Ou tu vas me nourrir."], [-1, "Les néons s'éteignent un par un, jusqu'à ton quai."], [0, "Choisis vite."]] },
+  { id: 'serment', title: "Le serment brisé", by: '@kunai', plays: '15,3 k', bg: 'terrasse', pos: '15% 50%', fx: 'grayscale(.4) brightness(.4) hue-rotate(160deg)', glow: '#ff6a3d',
+    cast: [['exile', 'stand'], ['ninja', 'stand']], players: 2, byoc: false, live: { strangers: 2, since: 1 }, you: 0,
+    pitch: "Six ans qu'il cherche son frère d'armes. Ce soir, il le retrouve sur le pont — et c'est l'autre qui a les réponses.",
+    lines: [[-1, "Le pont du village. Minuit. La pluie vient de s'arrêter."], [1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
+  { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'terrasse', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
+    cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
+    pitch: "Cinq ans après, tu retrouves Maya sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière elle.",
+    lines: [[-1, "Août. La terrasse du chalet. Il fait 34 degrés."], [0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
   { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
     cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
     pitch: "Cam a enfin osé s'asseoir à côté de toi. Son téléphone vibre pour la troisième fois — et elle refuse de dire qui c'est.",
@@ -585,7 +602,10 @@ const total = (d) => d.taps || d.lines.length;
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
 const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare']]
   .map(([id, name]) => ({ id, name, poses: Object.fromEntries(STD.map((p) => [p, `chars/${id}/${p}.webp`])) }));
-const CHARS = [...BASIC];
+// one pose each: it plays every line
+const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L'Ombre"], ['exile', 'Itsuki'], ['ninja', 'Sora'], ['plage', 'Maya']]
+  .map(([id, name]) => ({ id, name, poses: { listen: `chars/${id}/stand.webp` } }));
+const CHARS = [...BASIC, ...ONE];
 const me = () => CHARS.find((c) => c.id === keep.get('me', 'justin')) || CHARS[0];
 new Promise((ok, ko) => {
   const r = indexedDB.open('smt-chars', 1);
@@ -619,12 +639,12 @@ const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS];
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
-  ['Tendances', ['lastcall', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Tendances', ['lastcall', 'serment', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
   ['Quelqu\'un t\'attend', (d) => d.live],
   ['À plusieurs', (d) => d.players > 1],
   ['Amène ton perso', (d) => d.byoc],
   ['Solo', (d) => d.players === 1],
-  ['Nouveautés', ['candy', 'nuit', 'contrat', 'coloc', 'appel', 'table']],
+  ['Nouveautés', ['beliers', 'ombre', 'serment', 'ete', 'candy', 'nuit', 'contrat', 'coloc', 'appel', 'table']],
 ];
 const shelf = (pick) => typeof pick === 'function' ? all().filter(pick) : pick.map(byId).filter(Boolean);
 
