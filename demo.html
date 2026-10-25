@@ -500,6 +500,7 @@ body.tabs-pill #tabs span { display: none; }
   <div id="sheet" hidden></div>
   <div id="player" hidden></div>
 </div>
+<script src="chars.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -669,7 +670,11 @@ const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L
   .map(([id, name]) => ({ id, name, poses: { listen: `chars/${id}/stand.webp` } }))
   .concat([['alex', 'Alex', { listen: 'beach' }], ['mila', 'Mila', { listen: 'beach' }], ['dan', 'Dan', { listen: 'stand', surprised: 'scared' }], ['rae', 'Rae', { listen: 'kneel', angry: 'possessed' }]]
     .map(([id, name, ps]) => ({ id, name, poses: Object.fromEntries(Object.entries(ps).map(([k, f]) => [k, `chars/${id}/${f}.webp`])) })));
-const CHARS = [...BASIC, ...ONE];
+// the actors won at the end of an episode (the game's episodeEnd, localStorage smt-won): every pose they have
+const WON = (() => { try { return JSON.parse(localStorage.getItem('smt-won')) || []; } catch { return []; } })()
+  .filter((w) => window.SPRITES && SPRITES[w.sprite])
+  .map((w) => ({ id: w.sprite, name: w.name, won: true, poses: Object.fromEntries(Object.keys(SPRITES[w.sprite].poses).map((p) => [p, `chars/${w.sprite}/${p}.webp`])) }));
+const CHARS = [...WON, ...BASIC, ...ONE];
 const me = () => CHARS.find((c) => c.id === keep.get('me', 'justin')) || CHARS[0];
 new Promise((ok, ko) => {
   const r = indexedDB.open('smt-chars', 1);

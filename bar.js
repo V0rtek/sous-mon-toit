@@ -1057,6 +1057,14 @@ const fire = (f) => [
   one('pb'), hush(2400),
 ];
 
+// three episodes: the bar, the house, the red door. Each one ends on an actor you win (index.html episodeEnd) and a look at the next
+const EPISODES = [
+  { n: 1, win: { sprite: 'cam', pose: 'listen', name: 'Cam' },
+    next: { n: 2, title: 'The house', img: 'covers/lastcall_ep2.jpg', tease: 'Every window is lit. Every glass of red means something.' } },
+  { n: 2, win: { sprite: 'julian', pose: 'smirk', name: 'Julian' },
+    next: { n: 3, title: 'The red door', img: 'covers/lastcall_ep3.jpg', tease: 'Third door. The red light. Someone is already inside.' } },
+  { n: 3, win: { sprite: 'suit', pose: 'adjust', name: 'The stranger' } },
+];
 window.BAR = [
   scene('bar', { pa: 'drunk_listen', cam: 'listen', pb: 'drunk_listen' }),
   { cam: 'wide', at: 1500 },
@@ -1136,16 +1144,19 @@ window.BAR = [
   // a spectator follows Brooke; solo plays the counter up to Brooke's text, then all of Brooke, then back to the counter
   { split: () => ({ pa: counter, pb: bathroom }), watch: () => 'pb',
     hold: () => ({ pa: 'Brooke is still in the bathroom', pb: 'Justin is still with Cam' }) },
+  { episode: EPISODES[0] },
   // the house: together at the door and in the salon, then apart (upstairs / downstairs), then the red door, the woods
   { fade: 'out', ms: 900 },
   ...houseDoor,
   { fn: houseMeet },
   { split: () => ({ pa: downstairs, pb: office }), watch: () => 'pb',
     hold: () => ({ pa: 'Brooke is still upstairs', pb: 'Justin is still downstairs' }) },
+  { episode: EPISODES[1] },
   { fn: redDoor },
   { fn: fire },
+  { episode: EPISODES[2] },
   { fade: 'out', ms: 1600 },
-  { end: { kicker: 'End of episode 1', title: '{TITLE}', lede: '{LEDE}', art: null } },
+  { end: { kicker: 'End of episode 3', title: '{TITLE}', lede: '{LEDE}', art: null } },
 ];
 BAR.gaze = true;
 BAR.credits = '';   // no photos: rectangles only
@@ -1164,7 +1175,8 @@ BAR.words = {
   LEDE: (f) => `${f.confess === 'yes' ? 'Brooke said the number out loud.' : f.confess === 'no' ? 'Brooke lied at the red door.' : 'Brooke threw a punch instead of an answer.'} ${f.jend === 'forgives' ? 'Justin forgave him.' : f.jend === 'hard' ? 'Justin didn’t.' : 'Justin stayed by him.'}`,
 };
 // a private line (Brooke remembering the rule) shows the other player "<name> is thinking…"
-BAR.ui = { you: 'You are', choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read' };
+BAR.ui = { you: 'You are', choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read',
+  epEnd: 'End of episode', won: 'You won', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending' };
 // what's known to be off, behind the "?" of the waiting room (so testers know)
 BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction',
   'Make the style uniform, between characters, backgrounds. Tone (music / sounds)'] };
