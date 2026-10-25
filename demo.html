@@ -410,6 +410,12 @@ body.tabs-pill #tabs span { display: none; }
 .mc.on { box-shadow: inset 0 0 0 .3em #fff; }
 .mc.add { justify-content: center; color: var(--mute); }
 .mc.add svg { width: 4em; height: 4em; }
+/* still to win: his silhouette, and where he's won */
+.mc.lock { cursor: default; }
+.mc.lock img { height: 10.5em; filter: brightness(0) drop-shadow(0 0 .5em rgba(255,60,80,.45)); opacity: .8; }
+.mc.lock span { color: var(--mute); font-size: 1.4em; }
+.mc.lock small { display: flex; align-items: center; gap: .3em; font-size: 1.2em; color: var(--mute); white-space: nowrap; }
+.mc.lock small svg { width: 1em; height: 1em; fill: currentColor; }
 .frs { display: flex; flex-direction: column; padding: 0 3.5%; }
 .fr { display: flex; align-items: center; gap: 1.6em; padding: 1.4em 0; border-bottom: .1em solid #1c1c1e; cursor: pointer; }
 .fr.still { cursor: default; }
@@ -601,9 +607,9 @@ const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
   { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 13, cut: '14-19,53-61',
     cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
-    eps: [{ title: 'Last call', img: 'covers/lastcall.jpg', tease: 'One last drink. Then Brooke goes to the bathroom — someone is already waiting.' },
-      { title: 'The house', img: 'covers/lastcall_ep2.jpg', tease: 'Every window is lit. Every glass of red means something.' },
-      { title: 'The red door', img: 'covers/lastcall_ep3.jpg', tease: 'Third door. The red light. Someone is already inside.' }],
+    eps: [{ title: 'Last call', img: 'covers/lastcall.jpg', win: { sprite: 'cam', pose: 'listen', name: 'Cam' }, tease: 'One last drink. Then Brooke goes to the bathroom — someone is already waiting.' },
+      { title: 'The house', img: 'covers/lastcall_ep2.jpg', win: { sprite: 'julian', pose: 'smirk', name: 'Julian' }, tease: 'Every window is lit. Every glass of red means something.' },
+      { title: 'The red door', img: 'covers/lastcall_ep3.jpg', win: { sprite: 'suit', pose: 'adjust', name: 'The stranger' }, tease: 'Third door. The red light. Someone is already inside.' }],
     pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
   // a series: the island (its poster is the beach of day 1; the preview, night 3 in the forest)
@@ -719,7 +725,12 @@ const WON = (() => { try { return JSON.parse(localStorage.getItem('smt-won')) ||
   .filter((w) => window.SPRITES && SPRITES[w.sprite])
   .map((w) => ({ id: w.sprite, name: w.name, won: true, poses: Object.fromEntries(Object.keys(SPRITES[w.sprite].poses).map((p) => [p, `chars/${w.sprite}/${p}.webp`])) }));
 const CHARS = [...WON, ...BASIC, ...ONE];
-const me = () => CHARS.find((c) => c.id === keep.get('me', 'justin')) || CHARS[0];
+// yours to play: the ones you made, the ones you won (episodes), and Justin to start with — not every character there is
+const STARTER = 'justin';
+const owned = () => CHARS.filter((c) => c.custom || c.won || c.id === STARTER);
+const me = () => owned().find((c) => c.id === keep.get('me', STARTER)) || CHARS.find((c) => c.id === STARTER);
+// the ones still to win: each episode's actor (Last call's), a dark silhouette until you've finished it
+const toWin = () => DEMOS.flatMap((d) => (d.eps || []).map((e, k) => e.win && { ...e.win, from: d.title, ep: k + 1 })).filter((w) => w && !CHARS.some((c) => c.won && c.id === w.sprite));
 new Promise((ok, ko) => {
   const r = indexedDB.open('smt-chars', 1);
   r.onupgradeneeded = () => r.result.createObjectStore('chars', { keyPath: 'id' });
@@ -1169,7 +1180,8 @@ const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; }
 const face = (c) => `<span class="pp"><img src="${poseOf(c, 'listen')}" alt=""></span>`;
 function renderSocial() {
   const m = me();
-  const chars = CHARS.map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
+  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
+  const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Épisode ${w.ep}</small></div>`).join('');
   const row = (f) => {
     const d = f.doing && byId(f.doing);
     const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
@@ -1180,7 +1192,7 @@ function renderSocial() {
   const rank = (f) => f.doing && f.waits ? 0 : f.doing ? 1 : f.on ? 2 : 3;
   const order = [...FRIENDS].sort((a, b) => rank(a) - rank(b));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
-      ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a></div>` : ''}</div>
+      ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a>${locked}</div>` : ''}</div>
     <div class="h2">Amis <small>${FRIENDS.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
 }
 
