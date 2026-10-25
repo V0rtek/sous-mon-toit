@@ -917,7 +917,7 @@ function render() {
 }
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
-// alone or with someone. A preview you finish leaves the list. ----
+// alone or with someone. Every preview you tapped into is one; one you finished stays (the story is started). ----
 const ago = (t) => { const m = Math.round((Date.now() - t) / 60000); return m < 60 ? `il y a ${Math.max(1, m)} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const prog = keep.get('prog', (() => {   // a first visit already has a few (fake) ones going
   const now = Date.now();
@@ -928,7 +928,8 @@ function track(id, i, w) {
   else prog[id] = { i, with: w || (prog[id] && prog[id].with) || [], at: Date.now() };
   keep.set('prog', prog);
 }
-const pbar = (id) => { const d = byId(id), p = prog[id]; return `<div class="pbar"><i style="width:${Math.round(100 * (p.i + 1) / total(d))}%"></i></div>`; };
+const done = (id) => prog[id].i >= total(byId(id));
+const pbar = (id) => { const d = byId(id), p = prog[id]; return `<div class="pbar"><i style="width:${Math.min(100, Math.round(100 * (p.i + 1) / total(d)))}%"></i></div>`; };
 function going(id) {   // a started story as a card: tap = pick it up
   const w = prog[id].with;
   const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>${esc(w.join(', '))}</span></span>` : '';
@@ -941,8 +942,8 @@ function renderHome() {
   const solo = rest.filter((id) => !prog[id].with.length), duo = rest.filter((id) => prog[id].with.length);
   $('#home').innerHTML = `<div class="cont"><div class="blur" style="${blurOf(d)}"></div>
       <div class="cvw" data-act="resume" data-id="${top}">${cover(d)}${pbar(top)}</div>
-      <div class="info"><h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))} · ` : ''}${p.i + 1}/${n} · ${ago(p.at)}</p>
-      <button class="btn main" data-act="resume" data-id="${top}">${I.play}Continuer</button></div></div>
+      <div class="info"><h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))} · ` : ''}${done(top) ? 'Aperçu fini' : `${p.i + 1}/${n}`} · ${ago(p.at)}</p>
+      <button class="btn main" data-act="resume" data-id="${top}">${I.play}${done(top) ? 'Jouer' : 'Continuer'}</button></div></div>
     ${duo.length ? `<div class="h2">Avec d'autres</div><div class="shelf">${duo.map(going).join('')}</div>` : ''}
     ${solo.length ? `<div class="h2">Solo</div><div class="shelf">${solo.map(going).join('')}</div>` : ''}`;
 }
@@ -988,7 +989,7 @@ function renderCurrent() {
 }
 function line(ci, i) {
   const d = byId(ci.dataset.id), n = total(d); at[d.id] = i;
-  if (i >= n) track(d.id, null); else if (i > 0) track(d.id, i);
+  if (i > 0) track(d.id, Math.min(i, n));
   if (i >= n) {
     $('.cline', ci).innerHTML = d.full ? '' : `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;   // the game's last line stays on screen
     $('.pc-corner', ci).textContent = `${n}/${n}`; return;
@@ -1291,7 +1292,7 @@ function progress() {
 }
 function step() {
   const d = P.d; P.i++;
-  if (P.i >= d.lines.length) { track(d.id, null); return end(); }
+  if (P.i >= d.lines.length) { track(d.id, d.lines.length, P.with); return end(); }
   if (P.i > 0) track(d.id, P.i, P.with);
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
@@ -1326,7 +1327,7 @@ stage.addEventListener('click', (e) => {
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); break;
     case 'play': openPlayer(id); break;
-    case 'resume': openPlayer(id, false, byId(id).full ? 0 : (prog[id] ? prog[id].i : 0)); break;
+    case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
