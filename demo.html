@@ -1046,6 +1046,9 @@ function track(id, i, w) {
   keep.set('prog', prog);
 }
 const done = (id) => prog[id].i >= total(byId(id));
+// the real game's episodes (index.html keeps the next one to play in smt-ep): Last call at episode 2 shows it, with its cover
+const epOf = (d) => { try { return d.full && (JSON.parse(localStorage.getItem('smt-ep')) || {})[d.full] || 0; } catch { return 0; } };
+const epd = (d) => { const n = epOf(d); return n > 1 ? { ...d, img: `covers/${d.id}_ep${n}.jpg` } : d; };
 // where you stopped, as a still: the setting, everyone in the pose they had there, the line on screen
 // (Last call runs in the game: its picture stands in)
 // replays the 3 lines that brought you where you are (the last 3 of a finished one), one after the other as the game plays
@@ -1059,9 +1062,10 @@ function replay(stage, d, i, step = 0) {
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
 let homeOpen = null;
 function renderHome() {
+  if (epOf(byId('lastcall')) && !prog.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
-  const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(byId(id))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
+  const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
     <div class="hx" id="homeX"></div><div class="carInfo" id="homeInfo"></div>`;
   let centre = ids[0];
@@ -1071,7 +1075,7 @@ function renderHome() {
     if (!card || !x || page() !== 'home') return;
     const r = card.getBoundingClientRect(), h = home.getBoundingClientRect(), d = byId(centre);
     const lines = !d.full && d.lines && d.lines.length;   // Last call plays in the game: its cover stays
-    x.innerHTML = `<div class="hx-cover">${cover(d)}</div>${lines ? '<div class="hx-scene"></div>' : ''}`;
+    x.innerHTML = `<div class="hx-cover">${cover(epd(d))}</div>${lines ? '<div class="hx-scene"></div>' : ''}`;
     if (lines) homeOpen = setTimeout(() => replay($('.hx-scene', x), d, prog[centre].i), 650);   // once it's opened up
     Object.assign(x.style, { left: r.left - h.left + 'px', top: r.top - h.top + home.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
     x.className = 'hx on';
@@ -1082,7 +1086,7 @@ function renderHome() {
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = id;
     $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}</button>`;
+      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) ? ` · Épisode ${epOf(d)}` : ''}</button>`;
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
   wait();
@@ -1273,7 +1277,7 @@ function setTab(t) {
 }
 function openPlayer(id, host = false, from = 0) {
   const d = byId(id);
-  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}`; return; }   // the real game; its back comes here
+  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}${epOf(d) ? '&ep=' + epOf(d) : ''}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
