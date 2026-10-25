@@ -1379,12 +1379,14 @@ function takeSeat(k, id, n) {
   const full = () => seatsOf().every((j) => state.seats[j]);
   if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin(); }, 900);
 }
+// Full demo's Play on a real story (index.html#open=bar): its waiting room once the name is in; its ‹ goes back there
+let openAfterName = null, fromDemo = false;
 $('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const v = $('#whoName').value.trim().slice(0, 16);
   try { localStorage.setItem('smt-name', v); } catch { /* private window */ }
   $('#whoName').blur();
-  if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); }
+  if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openWait(id); } }
   else { myName = v || 'Kev'; show('#lobby'); goLive(); }
 });
 $('#play').onclick = (e) => { e.stopPropagation(); openWait('play'); };
@@ -1519,7 +1521,10 @@ $('#watch3d').onclick = (e) => {
   show('#video3d');
 };
 $('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
-$('#back').onclick = (e) => { e.stopPropagation(); const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
+$('#back').onclick = (e) => {
+  e.stopPropagation();
+  if (fromDemo && (screen === '#wait' || screen === '#end')) { toHub(); history.back(); return; }   // opened from Full demo: back there
+  const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
 $('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
 
@@ -1913,6 +1918,13 @@ try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /*
 fit();
 if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
+{
+  const o = location.hash.match(/^#open=(\w+)$/);
+  if (o && ROLE === 'host' && STORIES[o[1]]) {
+    openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
+    if (screen === '#hub') { openAfterName = null; openWait(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();
+  }
+}
 const jump = location.hash.match(/^#([tpb])(\d+)$/);
 if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
 // warm the cache so cuts never flash

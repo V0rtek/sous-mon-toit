@@ -83,6 +83,8 @@ body.tabs-pill #tabs span { display: none; }
 .ppl svg + svg { margin-left: -.85em; }
 .mk.solo { color: #fff; } .mk.multi { color: #9fd3ff; }
 .mk.byoc { color: var(--gold); }
+.mk.full { background: var(--gold); color: #000; }
+.ftag { position: absolute; top: 3.4em; left: 50%; transform: translateX(-50%); z-index: 6; font-size: 1.7em; font-weight: 800; padding: .35em .9em; border-radius: 1.2em; background: var(--gold); color: #000; white-space: nowrap; }
 .mk span { font-size: 1.5em; }
 .ribbon { position: absolute; left: -18%; top: 9%; width: 70%; transform: rotate(-38deg); background: var(--gold); color: #000; text-align: center; font-weight: 900; font-size: max(.9em, 3.3cqw); letter-spacing: .06em; padding: .35em 0; z-index: 2; box-shadow: 0 .3em .8em rgba(0,0,0,.4); }
 .ribbon + .marks { left: 4%; top: auto; bottom: 4%; }
@@ -472,6 +474,11 @@ const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', 
 const FRIENDS = [{ n: 'Léa', c: '#ff4f8b', on: true }, { n: 'Max', c: '#4f9dff', on: true }, { n: 'Sam', c: '#ff9f2e', on: true }, { n: 'Inès', c: '#9b6bff', on: false }, { n: 'Noé', c: '#25c48a', on: false }];
 const friend = (n) => FRIENDS.find((f) => f.n === n) || { n, c: '#636366' };
 const DEMOS = [
+  // the real one: Play opens the game's own waiting room (index.html), the whole episode
+  { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', bg: 'terrasse', pos: '45% 50%', fx: 'sepia(.5) saturate(1.5) hue-rotate(-15deg) brightness(.55)', glow: '#ff9a4d',
+    cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
+    pitch: "Samedi, 1 h 40 : Justin, Brooke et Cam au bar, un verre de trop. Ce soir, Brooke va finir sa phrase — et un inconnu en complet l'attend aux toilettes.",
+    lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
   { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
     cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
     pitch: "Il reste une heure avant la fermeture et Cam a enfin osé s'asseoir à côté de toi. Tout ce que tu dis ce soir, elle va s'en souvenir demain.",
@@ -526,7 +533,7 @@ const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS];
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
-  ['Tendances', ['cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Tendances', ['lastcall', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
   ['Quelqu\'un t\'attend', (d) => d.live],
   ['À plusieurs', (d) => d.players > 1],
   ['Amène ton perso', (d) => d.byoc],
@@ -602,12 +609,12 @@ function saveBtn(d) {
 function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '' } = {}) {
   const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
   return `<div class="card${ringCls(d)}" data-act="open" data-id="${d.id}">
-    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
+    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.full ? '<span class="mk full"><span>Complet</span></span>' : ''}${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
   </div>`;
 }
 function meta(d) {
-  return `<div class="meta">${players(d, true)}${byoc(d, true)}</div>`;
+  return `<div class="meta">${d.full ? '<span class="mk full"><span>Histoire complète · EN</span></span>' : ''}${players(d, true)}${byoc(d, true)}</div>`;
 }
 // Play: a stranger or a friend waiting changes it (3 ways, ⚙)
 const playDot = (d) => {
@@ -636,9 +643,9 @@ const actions = (d) => `${O.play === 'label' ? liveLine(d) : ''}<div class="row"
 // ---- explore: one renderer per layout ----
 const R = {
   rows() {
-    const h = byId('cles');
+    const h = byId('lastcall');
     let s = `<div class="hero"><div class="blur" style="background-image:url(bg/${h.bg}.jpg);filter:blur(3em) ${h.fx}"></div>
-      <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
+      <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${h.full ? '<span class="mk full"><span>Complet</span></span>' : ''}${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
       <div class="info"><div class="row">${playBtn(h)}${saveWide(h)}</div></div></div>`;
     SHELVES.forEach(([name, pick], i) => {
       const list = shelf(pick); if (!list.length) return;
@@ -743,7 +750,7 @@ function renderTabs() {
   $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés');
 }
 function renderMenu() {
-  $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('verre'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
+  $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
     <button class="mtile" data-act="mode" data-s="all"><div class="mgrid">${['cles', 'pacte', 'gala', 'nuit', 'table', 'feu'].map((id) => cover({ ...byId(id), title: '' })).join('')}</div><b>All</b><span>Toutes les versions : A à J, et ⚙ pour les variantes.</span></button>`;
 }
 // which page shows: Full demo's menu, or one of the tabs (Explorer = the Current scroll or the All layouts)
@@ -764,7 +771,7 @@ let seen = null;
 function renderCurrent() {
   const box = $('#current');
   box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}"><div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div>
-    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
+    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div>${d.full ? '<div class="ftag">Histoire complète</div>' : ''}<div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
       <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}</button>
       <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`).join('');
@@ -840,6 +847,8 @@ function setTab(t) {
   if (tab === 'explore') push({ tab: t, ov: null, tabFrom: 'explore' }); else swap({ tab: t, ov: null });
 }
 function openPlayer(id, host = false) {
+  const d = byId(id);
+  if (d.full) { location.href = `index.html#open=${d.full}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host };
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
