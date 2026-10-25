@@ -33,7 +33,7 @@ svg { display: block; fill: currentColor; }
 #switch .round { width: 5.2em; height: 5.2em; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
-body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
+body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
 body.s-current.t-explore #top { background: none; }
 body.s-menu #tabs { display: none; }
 body.s-menu #views { bottom: 0; }
@@ -328,6 +328,39 @@ body.tabs-pill #tabs span { display: none; }
 .pbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: .7em; background: rgba(255,255,255,.25); }
 .pbar i { display: block; height: 100%; background: var(--rose); }
 .shelf .withs { bottom: calc(4% + .7em); }
+/* ---- Social ---- */
+.prof { margin: 0 3.5%; border-radius: 2.4em; background: #141416; overflow: hidden; }
+.prof .me { width: 100%; display: flex; align-items: center; gap: 2em; padding: 2.4em; text-align: left; }
+.pp { width: 10em; height: 10em; border-radius: 50%; overflow: hidden; background: #2c2c2e; flex: none; }
+.pp img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
+.prof .me div { flex: 1; min-width: 0; }
+.prof .me b { display: block; font-size: 3em; font-weight: 800; }
+.prof .me span { font-size: 1.8em; color: var(--mute); }
+.prof .me i { font-style: normal; font-size: 2.4em; color: var(--mute); }
+.mcs { display: flex; gap: 1.2em; overflow-x: auto; padding: 0 2.4em 2.4em; scrollbar-width: none; }
+.mcs::-webkit-scrollbar { display: none; }
+.mc { flex: none; width: 12em; height: 17em; border-radius: 1.6em; background: #222225; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .4em; padding: 1em .4em .9em; box-sizing: border-box; color: inherit; text-decoration: none; }
+.mc img { height: 12em; max-width: 100%; object-fit: contain; }
+.mc span { font-size: 1.6em; font-weight: 700; }
+.mc.on { box-shadow: inset 0 0 0 .3em #fff; }
+.mc.add { justify-content: center; color: var(--mute); }
+.mc.add svg { width: 4em; height: 4em; }
+.frs { display: flex; flex-direction: column; padding: 0 3.5%; }
+.fr { display: flex; align-items: center; gap: 1.6em; padding: 1.4em 0; border-bottom: .1em solid #1c1c1e; cursor: pointer; }
+.fr.still { cursor: default; }
+.fav { position: relative; flex: none; }
+.fav .av { width: 6em; height: 6em; font-size: 1.1em; }
+.fav .av b { font-size: 2.4em; }
+.fav i { position: absolute; right: 0; bottom: 0; width: 1.8em; height: 1.8em; border-radius: 50%; border: .3em solid #000; background: #48484a; }
+.fav i.on { background: var(--stranger); }
+.fav i.play { background: var(--rose); animation: blink 1.2s infinite; }
+.fr > div { flex: 1; min-width: 0; }
+.fr > div b { display: block; font-size: 2.2em; }
+.fr > div span { font-size: 1.7em; color: var(--mute); }
+.fr > div span.on { color: #8be2a2; }
+.fr > div span.busy { color: #ff9ec0; }
+.fr .th { width: 6.5em; flex: none; }
+.fr .th .cv { border-radius: .8em; }
 .acts { display: flex; flex-direction: column; gap: 1.4em; padding: 0 3.5%; }
 .act { display: flex; align-items: center; gap: 2em; padding: 2.2em; border-radius: 2.2em; background: #141416; text-align: left; }
 .act i { width: 8em; height: 8em; border-radius: 2em; background: var(--c, #2c2c2e); display: grid; place-items: center; flex: none; }
@@ -427,6 +460,7 @@ body.tabs-pill #tabs span { display: none; }
     <section id="explore" class="view" hidden></section>
     <section id="saved" class="view" hidden></section>
     <section id="add" class="view" hidden></section>
+    <section id="social" class="view" hidden></section>
   </div>
   <header id="top">
     <button class="round" data-act="back" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -483,7 +517,11 @@ const I = {
 // ---- the community's demos (fake). cast: [sprite, pose]; you: which cast member the player brings their own
 // character into (-1 = the player isn't on screen); lines: [who (-1 = narration), text, pose?] ----
 const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy' };
-const FRIENDS = [{ n: 'Léa', c: '#ff4f8b', on: true }, { n: 'Max', c: '#4f9dff', on: true }, { n: 'Sam', c: '#ff9f2e', on: true }, { n: 'Inès', c: '#9b6bff', on: false }, { n: 'Noé', c: '#25c48a', on: false }];
+// on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
+const FRIENDS = [
+  { n: 'Léa', c: '#ff4f8b', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', on: true },
+  { n: 'Sam', c: '#ff9f2e', on: true, doing: 'pacte' }, { n: 'Inès', c: '#9b6bff', on: false, seen: 'il y a 3 h' }, { n: 'Noé', c: '#25c48a', on: false, seen: 'hier' },
+];
 const friend = (n) => FRIENDS.find((f) => f.n === n) || { n, c: '#636366' };
 const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
@@ -544,6 +582,39 @@ const DEMOS = [
 const CUT = { table: 9, cles: 10, pacte: 8, mensonge: 11, nuit: 7, coloc: 9, feu: 10, candy: 8, contrat: 7 };
 for (const d of DEMOS) if (CUT[d.id]) d.lines = d.lines.slice(0, CUT[d.id]);
 const total = (d) => d.taps || d.lines.length;
+// ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
+const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
+const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare']]
+  .map(([id, name]) => ({ id, name, poses: Object.fromEntries(STD.map((p) => [p, `chars/${id}/${p}.webp`])) }));
+const CHARS = [...BASIC];
+const me = () => CHARS.find((c) => c.id === keep.get('me', 'justin')) || CHARS[0];
+new Promise((ok, ko) => {
+  const r = indexedDB.open('smt-chars', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('chars', { keyPath: 'id' });
+  r.onsuccess = () => { const q = r.result.transaction('chars').objectStore('chars').getAll(); q.onsuccess = () => ok(q.result || []); q.onerror = ko; };
+  r.onerror = ko;
+}).then((recs) => {
+  CHARS.unshift(...recs.map((x) => ({ id: x.id, name: x.name, custom: true, poses: Object.fromEntries(x.poses.map((p) => [p.pose, URL.createObjectURL(p.blob)])) })));
+  if (recs.length && cur()) { viewKey = ''; apply(cur()); }   // yours just arrived: redraw with it
+}).catch(() => { /* no storage: the built-in ones */ });
+// a story's pose -> the closest one a character has (a made one has the 6 standard poses)
+const TALKS = ['drunk_talk', 'talk', 'offer', 'drunk_happy', 'drunk_point', 'drunk_joke', 'drunk_flirt', 'flirty', 'adjust', 'sit_fire', 'nervous', 'smirk', 'hands_up', 'tipsy_laugh', 'phone_call', 'drunk_smile'];
+function poseOf(c, pose) {
+  if (c.poses[pose]) return c.poses[pose];
+  const alt = TALKS.includes(pose) ? 'explaining' : ['drunk_sad', 'worried', 'drunk_letdown'].includes(pose) ? 'holding' : pose === 'phone_shock' ? 'surprised' : 'listen';
+  return c.poses[alt] || Object.values(c.poses)[0];
+}
+// who's on screen in a preview: in a "Ton perso" story your character takes its part (or joins the scene)
+function castOf(d) {
+  const c = d.cast.map(([s, p]) => ({ s, p, name: NAMES[s] }));
+  if (!d.byoc) return c;
+  const m = me(), mine = { s: m.id, p: 'listen', name: m.name, me: m };
+  if (d.you >= 0) c[d.you] = { ...mine, p: c[d.you].p }; else c.push(mine);
+  return c;
+}
+const srcOf = (m, pose) => m.me ? poseOf(m.me, pose) : `chars/${m.s}/${pose}.webp`;
+const actors = (cast) => cast.map((m, i) => `<img class="sp p${i}" src="${srcOf(m, m.p)}" alt="" draggable="false">`).join('');
+
 // the player's own demos (from the + tab) go first
 const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS];
@@ -753,13 +824,13 @@ function renderAdd() {
   $('#add').innerHTML = `<div class="h2" style="margin-top:0">Ajouter</div><div class="acts">
     <button class="act" data-act="create" style="--c:#e2557a"><i>${I.pen}</i><div><b>Créer une démo</b><span>Un titre, deux phrases qui accrochent, une affiche.</span></div></button>
     <button class="act" data-act="room" style="--c:#34c759"><i>${I.door}</i><div><b>Ouvrir une salle</b><span>Choisis une démo à plusieurs et attends quelqu'un — ou invite un ami.</span></div></button>
-    <a class="act" href="index.html" style="--c:#4f9dff;color:inherit;text-decoration:none"><i>${I.byoc}</i><div><b>Amener ton perso</b><span>Crée ton personnage dans la galerie du menu, puis joue-le dans les démos marquées « Ton perso ».</span></div></a>
+    <button class="act" data-act="mychars" style="--c:#4f9dff"><i>${I.byoc}</i><div><b>Choisir ton perso</b><span>Il joue ta part dans les démos « Ton perso ». Les tiens se créent dans la galerie du jeu.</span></div></button>
   </div>${mine.length ? `<div class="h2">Tes démos</div><div class="grid g3">${mine.map((d) => card(d)).join('')}</div>` : ''}`;
 }
 function renderTabs() {
   const n = Object.keys(saved).length;
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
-  $('#tabs').innerHTML = t('home', I.home, 'En cours') + t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés');
+  $('#tabs').innerHTML = t('home', I.home, 'En cours') + t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('social', I.people, 'Social');
 }
 function renderMenu() {
   $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
@@ -773,9 +844,9 @@ function render() {
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
-  for (const x of ['menu', 'home', 'current', 'explore', 'saved', 'add']) $('#' + x).hidden = x !== v;
+  for (const x of ['menu', 'home', 'current', 'explore', 'saved', 'add', 'social']) $('#' + x).hidden = x !== v;
   renderTabs();
-  ({ menu: renderMenu, home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd })[v]();
+  ({ menu: renderMenu, home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial })[v]();
 }
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
@@ -809,13 +880,32 @@ function renderHome() {
     ${solo.length ? `<div class="h2">Solo</div><div class="shelf">${solo.map(going).join('')}</div>` : ''}`;
 }
 
+// ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
+let charsOpen = false;
+const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; } catch { return 'Toi'; } };
+const face = (c) => `<span class="pp"><img src="${poseOf(c, 'listen')}" alt=""></span>`;
+function renderSocial() {
+  const m = me();
+  const chars = CHARS.map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
+  const row = (f) => {
+    const d = f.doing && byId(f.doing);
+    const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
+    return `<div class="fr${d ? '' : ' still'}"${d ? ` data-act="open" data-id="${d.id}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
+      <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
+  };
+  const order = [...FRIENDS].sort((a, b) => (b.on ? 1 : 0) - (a.on ? 1 : 0));
+  $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b><span>Ton perso : ${esc(m.name)}</span></div><i>${charsOpen ? '▴' : '▾'}</i></button>
+      ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a></div>` : ''}</div>
+    <div class="h2">Amis <small>${FRIENDS.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
+}
+
 // ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
 const at = {};   // demo id -> line shown
 let seen = null;
 function renderCurrent() {
   const box = $('#current');
   box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}">${d.full ? `<iframe class="gframe" data-src="index.html?preview=${d.full}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
-      : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div>`}
+      : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${castOf(d).length}">${actors(castOf(d))}</div><div class="pshade"></div>`}
     <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
       <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}</button>
@@ -839,7 +929,7 @@ function line(ci, i) {
   $('.pc-corner', ci).innerHTML = `<b>${i + 1}</b>/${n}`;
   if (d.full) { $('.cline', ci).innerHTML = ''; return; }
   const [who, text, pose] = d.lines[i], sp = $$('.pcast .sp', ci);
-  if (who >= 0 && pose && sp[who]) sp[who].src = `chars/${d.cast[who][0]}/${pose}.webp`;
+  if (who >= 0 && pose && sp[who]) sp[who].src = srcOf(castOf(d)[who], pose);
   sp.forEach((img, k) => img.classList.toggle('talk', k === who));
   $('.cline', ci).innerHTML = lineHtml(d, who, text);
 }
@@ -858,8 +948,8 @@ function tapCurrent(ci, e) {
 const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : `background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || 'none'}`;
 function lineHtml(d, who, text) {
   if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
-  const name = NAMES[d.cast[who][0]], yours = d.byoc && who === d.you;
-  return `<div class="pbub"><b>${yours ? 'Ton perso' : esc(name)}${yours ? `<small>(${esc(name)} pour l'aperçu)</small>` : ''}</b><p>${esc(text)}</p></div>`;
+  const m = castOf(d)[who];
+  return `<div class="pbub"><b>${esc(m.name)}${m.me ? '<small>(toi)</small>' : ''}</b><p>${esc(text)}</p></div>`;
 }
 function syncCurrent() {
   $$('#current .sv').forEach((b) => { const on = !!saved[b.dataset.id]; b.classList.toggle('on', on); b.innerHTML = saveIcon(on); });
@@ -1073,13 +1163,14 @@ function openRoom() {
 let P = null;
 function play(id, host = false, from = 0) {
   const d = byId(id), box = $('#player'), was = prog[id];
-  P = { d, i: from - 1, poses: d.cast.map((c) => c[1]), with: from && was ? was.with : [] };
+  const cast = castOf(d);
+  P = { d, cast, i: from - 1, poses: cast.map((c) => c.p), with: from && was ? was.with : [] };
   // picking up where you left off: everyone's last pose up to there
   for (const [who, , pose] of d.lines.slice(0, from)) if (who >= 0 && pose) P.poses[who] = pose;
   box.innerHTML = `<div class="pbg" style="background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || ''}"></div>
-    <div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div><div id="pProg"></div>
+    <div class="pcast n${cast.length}">${actors(cast)}</div><div class="pshade"></div><div id="pProg"></div>
     <button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button><div id="pLine"></div>`;
-  $$('.pcast .sp', box).forEach((img, k) => { img.src = `chars/${d.cast[k][0]}/${P.poses[k]}.webp`; });
+  $$('.pcast .sp', box).forEach((img, k) => { img.src = srcOf(cast[k], P.poses[k]); });
   if (d.img) $('.pbg', box).style.cssText = `background:url(${d.img}) center/cover`;
   box.hidden = false;
   if (from && P.with.length) withChip(P.with);
@@ -1116,7 +1207,7 @@ function step() {
   if (P.i > 0) track(d.id, P.i, P.with);
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
-  $$('#player .pcast .sp').forEach((img, i) => { const s = `chars/${d.cast[i][0]}/${P.poses[i]}.webp`; if (!img.src.endsWith(s)) img.src = s; img.classList.toggle('talk', i === who); });
+  $$('#player .pcast .sp').forEach((img, i) => { const s = srcOf(P.cast[i], P.poses[i]); if (img.getAttribute('src') !== s) img.src = s; img.classList.toggle('talk', i === who); });
   $('#pLine').innerHTML = lineHtml(d, who, text);
   progress();
 }
@@ -1150,6 +1241,10 @@ stage.addEventListener('click', (e) => {
     case 'resume': openPlayer(id, false, byId(id).full ? 0 : (prog[id] ? prog[id].i : 0)); break;
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
+    case 'chars': charsOpen = !charsOpen; renderSocial(); break;
+    case 'mychars': charsOpen = true; setTab('social'); break;
+    case 'pick': keep.set('me', el.dataset.c); renderSocial(); toast(`Ton perso : ${esc(me().name)}`); break;
+    case 'newchar': e.preventDefault(); leave(); break;   // made in the game's gallery
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
       O.layout = LAYOUTS[(i + (act === 'vnext' ? 1 : n - 1)) % n][0]; keep.set('opts', O); $('#explore').scrollTop = 0; render(); break;
@@ -1176,7 +1271,7 @@ addEventListener('keydown', (e) => {
 });
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
-  const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add))?$/);
+  const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add|social))?$/);
   const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'menu', tab: (m && m[2]) || BASE, ov: null, tabFrom: null, depth: 0 };
   if (st.ov && st.ov.k === 'sheet') st.ov = st.ov.under;   // a sheet can't come back from a reload
   history.replaceState(st, '', hashOf(st));
