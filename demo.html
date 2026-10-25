@@ -425,11 +425,11 @@ body.tabs-pill #tabs span { display: none; }
 .ci .pbub { bottom: 3.5%; right: 5%; }
 .ci .pnar { bottom: 6%; }
 .ci .pc-corner { top: 3em; }
-.rail { position: absolute; right: 4%; bottom: 25%; z-index: 6; display: flex; flex-direction: column; gap: 2.2em; }
-.rb { position: relative; width: 7.6em; height: 7.6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .5em rgba(0,0,0,.75)); }
-.rb svg { width: 4em; height: 4em; }
-.rb.play svg { width: 5em; height: 5em; }
-.rb .pd { position: absolute; top: .4em; right: .2em; width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
+.rail { position: absolute; right: 2.5%; bottom: 27%; z-index: 6; display: flex; flex-direction: column; gap: 1em; opacity: .8; }
+.rb { position: relative; width: 6em; height: 6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .35em rgba(0,0,0,.6)); }
+.rb svg { width: 3em; height: 3em; }
+.rb.play svg { width: 3.5em; height: 3.5em; }
+.rb .pd { position: absolute; top: .7em; right: .6em; transform: scale(.75); width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
 .rb .pd.f { width: 3.4em; height: 3.4em; display: grid; place-items: center; color: #fff; animation: pulse 1.3s infinite; }
 .rb .pd.f b { font-size: 1.5em; font-weight: 900; }
 .ci .cend { position: absolute; left: 6%; right: 6%; bottom: 7%; text-align: center; font-size: 2.2em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em #000; }
@@ -442,7 +442,6 @@ body.tabs-pill #tabs span { display: none; }
 .imm .txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 6% 4em; }
 .gframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
 .catch { position: absolute; inset: 0; z-index: 4; }
-.cend.dark { inset: 0; bottom: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); }
 
 #toast { position: absolute; left: 50%; top: 10em; z-index: 100; transform: translate(-50%, 2em); opacity: 0; transition: .25s; background: #f5f5f7; color: #000; font-size: 1.9em; font-weight: 700; padding: .7em 1.3em; border-radius: 2em; white-space: nowrap; pointer-events: none; display: flex; align-items: center; gap: .5em; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
@@ -515,7 +514,7 @@ const I = {
 
 // ---- the community's demos (fake). cast: [sprite, pose]; you: which cast member the player brings their own
 // character into (-1 = the player isn't on screen); lines: [who (-1 = narration), text, pose?] ----
-const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
+const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', on: true },
@@ -532,10 +531,15 @@ function waiting(d) {
 }
 const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
-  { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 14,
+  { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 13, cut: '14-19,53-61',
     cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
     pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
+  // a series: the island (its poster is the beach of day 1; the preview, night 3 in the forest)
+  { id: 'ile', title: "Ce qui reste de l'île", by: '@ileperdue', plays: '19,7 k', bg: 'forest', glow: '#ff3b3b',
+    cast: [['dan', 'stand'], ['rae', 'kneel']], players: 2, byoc: false, live: { strangers: 1, since: 2 }, you: 0,
+    pitch: "Quatre amis, une île, une semaine de soleil. Le bateau devait revenir il y a deux jours — et Mila, qu'ils ont vue tomber, chante encore dans la forêt.",
+    lines: [[-1, "Jour 3 sur l'île. Le bateau devait revenir hier."], [0, 'Rae. Faut bouger. Il fait presque nuit.'], [1, 'Deux minutes. Juste… deux minutes.'], [0, "T'as entendu ça ?", 'scared'], [1, "Arrête. Y a rien."], [-1, 'Derrière les arbres, quelqu\'un chante. La voix de Mila.'], [0, "Mila est morte, Rae. On l'a vue tomber.", 'scared'], [1, "…Alors pourquoi elle m'appelle ?"], [-1, 'Rae se relève. Lentement. Trop lentement.'], [1, "Elle dit qu'il y a de la place pour nous deux.", 'possessed']] },
   // drawn from one sheet (25/10): one pose each, so their lines carry none
   { id: 'beliers', title: "Deux béliers", by: '@colline', plays: '2,1 k', bg: 'maison', pos: '70% 50%', fx: 'saturate(.7) brightness(.55) hue-rotate(50deg)', glow: '#e8dcc0',
     cast: [['belier_noir', 'stand'], ['belier_blanc', 'stand']], players: 2, byoc: false, live: { strangers: 1, since: 4 }, you: 0,
@@ -602,17 +606,46 @@ const DEMOS = [
     pitch: "Un dernier boulot : facile, payant, sans risque. C'est exactement ce que Julian avait dit la dernière fois.",
     lines: [[-1, 'Un café désert. Julian est déjà là. Il a commandé pour toi.'], [0, "T'as l'air bien. Reposé. Ça te va pas.", 'smirk'], [0, "J'ai un boulot. Un dernier.", 'talk'], [-1, 'La dernière fois, il a dit exactement ça.'], [0, "Je sais ce que tu penses. Cette fois, c'est propre.", 'hands_up'], [0, 'Une livraison. Une enveloppe. Point A, point B.', 'offer'], [-1, 'Il glisse l\'enveloppe. Elle est lourde. Trop pour du papier.'], [0, "Pose pas de questions, c'est inclus dans le prix.", 'cold'], [0, 'Dix mille. La moitié maintenant.', 'offer'], [-1, 'Derrière lui, un homme en complet ne lit pas son journal.'], [0, 'Fais pas ça. Regarde-moi, pas lui.', 'cold'], [0, 'Alors ? On a un deal ?', 'listen']] },
 ];
+// drawn settings (no photo for these): a beach in full sun, a forest at night
+const pines = (n, y0, h, fill, seed) => Array.from({ length: n }, (_, k) => { const x = (k + .5) * 400 / n + ((seed * (k + 3)) % 17) - 8, t = h * (.7 + ((seed * k) % 5) / 10); return `<path d="M${x} ${y0 - t}l${t * .28} ${t}h${-t * .56}z" fill="${fill}"/>`; }).join('');
+const svgUrl = (body) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300' preserveAspectRatio='xMidYMax slice'>${body}</svg>`)}")`;
+const DECOR = {
+  beach: `radial-gradient(circle at 76% 16%, #fffbe6 0 3%, rgba(255,244,190,.55) 6%, transparent 13%), linear-gradient(#6fbde9 0%, #c7ebfb 40%, #2a8cc2 40.4%, #45b0dc 55%, #a8e3ee 57%, #f3dfae 57.4%, #e3c387 100%)`,
+  forest: `${svgUrl(`<circle cx='300' cy='60' r='16' fill='#dfe6d8' opacity='.85'/>${pines(9, 250, 170, '#13241d', 7)}${pines(7, 290, 230, '#08110d', 11)}<rect y='285' width='400' height='15' fill='#050906'/>`)} center bottom / cover no-repeat, linear-gradient(#0d1c26, #1b3030 60%, #0b1410)`,
+};
 // each preview has its own length (it stops on a hook, not on a round number)
 const CUT = { table: 9, cles: 10, pacte: 8, mensonge: 11, nuit: 7, coloc: 9, feu: 10, candy: 8, contrat: 7 };
 for (const d of DEMOS) if (CUT[d.id]) d.lines = d.lines.slice(0, CUT[d.id]);
 const total = (d) => d.taps || d.lines.length;
+const POSTER = {
+  verre: { bg: 'salon', pos: '30% 50%', fx: 'hue-rotate(200deg) brightness(.45)', cast: [['cam', 'worried'], ['brooke', 'drunk_sad']] },
+  table: { bg: 'maison', pos: '80% 50%', fx: 'hue-rotate(200deg) saturate(.6) brightness(.35)', cast: [['suit', 'angry']] },
+  cles: { bg: 'salon', pos: '70% 50%', fx: 'hue-rotate(330deg) saturate(1.6) brightness(.4)', cast: [['ruby', 'surprised'], ['james', 'surprised'], ['diane', 'angry']] },
+  appel: { bg: 'salon', pos: '40% 50%', fx: 'grayscale(.5) brightness(.35) hue-rotate(190deg)', cast: [['justin', 'punch']] },
+  pacte: { bg: 'maison', pos: '20% 50%', fx: 'hue-rotate(210deg) brightness(.4)', cast: [['cam', 'flirty'], ['justin_bar', 'drunk_sad']] },
+  mensonge: { bg: 'terrasse', pos: '75% 50%', fx: 'sepia(.6) hue-rotate(-30deg) brightness(.55)', cast: [['james', 'surprised'], ['ruby', 'holding']] },
+  nuit: { bg: 'maison', pos: '50% 50%', fx: 'hue-rotate(300deg) saturate(1.8) brightness(.35)', cast: [['isa_nuit', 'angry']] },
+  gala: { bg: 'terrasse', pos: '30% 50%', fx: 'hue-rotate(220deg) brightness(.35)', cast: [['julian', 'smirk'], ['isa_or', 'angry']] },
+  coloc: { bg: 'salon', pos: '85% 50%', fx: 'hue-rotate(160deg) brightness(.3)', cast: [['amare', 'surprised']] },
+  feu: { bg: 'forest', fx: 'sepia(.5) hue-rotate(-30deg) saturate(1.6)', cast: [['justin', 'surprised'], ['brooke', 'nervous']] },
+  candy: { bg: 'salon', pos: '10% 50%', fx: 'saturate(1.4) brightness(.95)', cast: [['candy', 'angry']] },
+  contrat: { bg: 'terrasse', pos: '90% 50%', fx: 'grayscale(1) brightness(.4)', cast: [['suit', 'offer'], ['julian', 'cold']] },
+  beliers: { bg: 'forest', fx: 'hue-rotate(60deg) brightness(.9)', cast: [['belier_noir', 'stand']] },
+  ombre: { bg: 'forest', fx: 'hue-rotate(320deg) saturate(3) brightness(.7)', cast: [['ombre', 'stand']] },
+  serment: { bg: 'maison', pos: '30% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-30deg) brightness(.4)', cast: [['exile', 'stand']] },
+  ete: { bg: 'beach', cast: [['plage', 'stand']] },
+  ile: { bg: 'beach', cast: [['alex', 'beach'], ['mila', 'beach']] },
+};
+for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
 const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare']]
   .map(([id, name]) => ({ id, name, poses: Object.fromEntries(STD.map((p) => [p, `chars/${id}/${p}.webp`])) }));
 // one pose each: it plays every line
 const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L'Ombre"], ['exile', 'Itsuki'], ['ninja', 'Sora'], ['plage', 'Maya']]
-  .map(([id, name]) => ({ id, name, poses: { listen: `chars/${id}/stand.webp` } }));
+  .map(([id, name]) => ({ id, name, poses: { listen: `chars/${id}/stand.webp` } }))
+  .concat([['alex', 'Alex', { listen: 'beach' }], ['mila', 'Mila', { listen: 'beach' }], ['dan', 'Dan', { listen: 'stand', surprised: 'scared' }], ['rae', 'Rae', { listen: 'kneel', angry: 'possessed' }]]
+    .map(([id, name, ps]) => ({ id, name, poses: Object.fromEntries(Object.entries(ps).map(([k, f]) => [k, `chars/${id}/${f}.webp`])) })));
 const CHARS = [...BASIC, ...ONE];
 const me = () => CHARS.find((c) => c.id === keep.get('me', 'justin')) || CHARS[0];
 new Promise((ok, ko) => {
@@ -647,7 +680,7 @@ const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS];
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
-  ['Tendances', ['lastcall', 'serment', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Tendances', ['lastcall', 'ile', 'serment', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
   ['Quelqu\'un t\'attend', (d) => d.live],
   ['À plusieurs', (d) => d.players > 1],
   ['Amène ton perso', (d) => d.byoc],
@@ -680,10 +713,17 @@ const av = (n, extra = '') => { const f = friend(n); return `<span class="av" st
 function sprites(d, cls = '') {
   return d.cast.map(([s, p], i) => `<img class="sp p${i}${cls}" src="chars/${s}/${p}.webp" alt="" loading="lazy" draggable="false">`).join('');
 }
+// the cover: its poster (another moment of the story) when it has one, else the preview's own setting
 function cover(d) {
-  const art = d.img ? `<img class="cvimg" src="${d.img}" alt="">` : `<div class="cvbg" style="background-image:url(bg/${d.bg}.jpg);background-position:${d.pos};filter:${d.fx}"></div>${sprites(d)}`;
-  return `<div class="cv n${d.img ? 0 : d.cast.length}" style="--glow:${d.glow || '#fff'}">${art}<div class="cvfade"></div>${O.title === 'over' ? `<div class="cvt">${esc(d.title)}</div>` : ''}</div>`;
+  const v = posterOf(d);
+  const art = v.img ? `<img class="cvimg" src="${v.img}" alt="">` : `<div class="cvbg" style="${place(v)}"></div>${sprites(v)}`;
+  return `<div class="cv n${v.img ? 0 : v.cast.length}" style="--glow:${v.glow || '#fff'}">${art}<div class="cvfade"></div>${O.title === 'over' ? `<div class="cvt">${esc(d.title)}</div>` : ''}</div>`;
 }
+const posterOf = (d) => d.poster ? { ...d, ...d.poster } : d;
+// the blurred backdrop behind a big cover: the cover's own picture
+const blurOf = (d, f = 'blur(3em) brightness(.5)') => `${bgOf(posterOf(d))};filter:${f}`;
+// a setting: one of the photos (bg/*.jpg) or a drawn one (DECOR)
+const place = (v) => DECOR[v.bg] ? `background:${DECOR[v.bg]};filter:${v.fx || 'none'}` : `background-image:url(bg/${v.bg || 'salon'}.jpg);background-size:cover;background-position:${v.pos || 'center'};filter:${v.fx || 'none'}`;
 // how many play it: a user icon and the number ("Solo" for one)
 function players(d) {
   const n = d.players;
@@ -755,7 +795,7 @@ const actions = (d) => `${O.play === 'label' ? liveLine(d) : ''}<div class="row"
 const R = {
   rows() {
     const h = byId('lastcall');
-    let s = `<div class="hero"><div class="blur" style="background-image:url(bg/${h.bg}.jpg);filter:blur(3em) ${h.fx}"></div>
+    let s = `<div class="hero"><div class="blur" style="${blurOf(h, 'blur(3em) brightness(.55)')}"></div>
       <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
       <div class="info"><div class="row">${playBtn(h)}${saveWide(h)}</div></div></div>`;
     SHELVES.forEach(([name, pick], i) => {
@@ -768,7 +808,7 @@ const R = {
   grid2() { return filters() + `<div class="grid g2">${filtered().map((d) => card(d)).join('')}</div>`; },
   grid3() { return filters() + `<div class="grid g3">${filtered().map((d) => card(d)).join('')}</div>`; },
   feed() {
-    return `<div class="feedhint">Glisse vers le haut ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="background-image:url(bg/${d.bg || 'salon'}.jpg);filter:blur(3em) ${d.fx || ''}"></div>
+    return `<div class="feedhint">Glisse vers le haut ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="${blurOf(d)}"></div>
       <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}</div>
       <div class="side"><button data-act="save" data-id="${d.id}"><i>${saveIconOf(d.id)}</i><span>${saveWord(d.id)}</span></button>
         <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button></div>
@@ -813,7 +853,7 @@ const R = {
   },
   spotlight() {
     const a = all(); const d = byId(spotSel) || a[0]; spotSel = d.id;
-    return `<div class="spot"><div class="blur" style="background-image:url(bg/${d.bg || 'salon'}.jpg);filter:blur(3.5em) ${d.fx || ''} brightness(.6)"></div>
+    return `<div class="spot"><div class="blur" style="${blurOf(d, 'blur(3.5em) brightness(.45)')}"></div>
       <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}<div class="marks">${players(d)}${byoc(d)}</div>${liveMark(d)}</div>
       <div class="info"><h3>${esc(d.title)}</h3><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>
       <div class="strip">${a.map((x) => `<div class="card${x.id === d.id ? ' sel' : ''}" data-act="spot" data-id="${x.id}">${cover(x).replace(/<div class="cvt">.*?<\/div>/, '')}</div>`).join('')}</div></div>`;
@@ -899,7 +939,7 @@ function renderHome() {
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
   const [top, ...rest] = ids, d = byId(top), p = prog[top], n = total(d);
   const solo = rest.filter((id) => !prog[id].with.length), duo = rest.filter((id) => prog[id].with.length);
-  $('#home').innerHTML = `<div class="cont"><div class="blur" style="${bgOf(d)}"></div>
+  $('#home').innerHTML = `<div class="cont"><div class="blur" style="${blurOf(d)}"></div>
       <div class="cvw" data-act="resume" data-id="${top}">${cover(d)}${pbar(top)}</div>
       <div class="info"><h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))} · ` : ''}${p.i + 1}/${n} · ${ago(p.at)}</p>
       <button class="btn main" data-act="resume" data-id="${top}">${I.play}Continuer</button></div></div>
@@ -931,7 +971,7 @@ const at = {};   // demo id -> line shown
 let seen = null;
 function renderCurrent() {
   const box = $('#current');
-  box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}">${d.full ? `<iframe class="gframe" data-src="index.html?preview=${d.full}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
+  box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}">${d.full ? `<iframe class="gframe" data-src="index.html?preview=${d.full}${d.cut ? '&cut=' + d.cut : ''}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
       : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${castOf(d).length}">${actors(castOf(d))}</div><div class="pshade"></div>`}
     <div class="pc-corner"></div><div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
@@ -950,7 +990,7 @@ function line(ci, i) {
   const d = byId(ci.dataset.id), n = total(d); at[d.id] = i;
   if (i >= n) track(d.id, null); else if (i > 0) track(d.id, i);
   if (i >= n) {
-    $('.cline', ci).innerHTML = `<div class="cend${d.full ? ' dark' : ''}">Fin de l'aperçu · ▶ pour jouer</div>`;
+    $('.cline', ci).innerHTML = d.full ? '' : `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;   // the game's last line stays on screen
     $('.pc-corner', ci).textContent = `${n}/${n}`; return;
   }
   $('.pc-corner', ci).textContent = `${i + 1}/${n}`;
@@ -963,16 +1003,30 @@ function line(ci, i) {
 // a tap in the feed: the next line; on Last call it goes to the game, where it landed (a choice is a choice)
 function tapCurrent(ci, e) {
   const d = byId(ci.dataset.id), i = at[d.id] || 0, over = i >= total(d), f = d.full && $('iframe', ci);
-  if (f && over) f.src = f.dataset.src;
-  else if (f && f.getAttribute('src')) {
-    const r = f.getBoundingClientRect();
-    f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
+  if (f) {   // the game moves on (or not: a tap beside a choice does nothing) and says where it is
+    if (over) { f.src = f.dataset.src; line(ci, 0); }
+    else if (f.getAttribute('src')) {
+      const r = f.getBoundingClientRect();
+      f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
+    }
+    return;
   }
   line(ci, over ? 0 : i + 1);
-  // the last tap: the infos open by themselves (what it is, Jouer, Sauver)
-  if (!over && i + 1 >= total(d)) setTimeout(() => { if (!cur().ov && page() === 'current') push({ ov: { k: 'detail', id: d.id, cur: true } }); }, 700);
+  if (!over) reached(d, i + 1);
 }
-const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : `background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || 'none'}`;
+// the last tap: the infos open by themselves (what it is, Jouer, Sauver)
+function reached(d, i) {
+  if (i >= total(d)) setTimeout(() => { if (!cur().ov && page() === 'current') push({ ov: { k: 'detail', id: d.id, cur: true } }); }, d.full ? 2000 : 700);
+}
+addEventListener('message', (e) => {
+  if (e.origin !== location.origin || !e.data || e.data.pos == null) return;
+  const f = $$('#current iframe').find((x) => x.contentWindow === e.source), ci = f && f.closest('.ci');
+  if (!ci) return;
+  const d = byId(ci.dataset.id), was = at[d.id] || 0, i = Math.min(e.data.pos, total(d));
+  if (i === was) return;
+  line(ci, i); if (i > was) reached(d, i);
+});
+const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : place(d);
 function lineHtml(d, who, text) {
   if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
   const m = castOf(d)[who];
@@ -1043,7 +1097,7 @@ function carousel() {
     if (best && best.dataset.id !== cur) {
       cur = best.dataset.id; const d = byId(cur);
       $('#carInfo').innerHTML = `<h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${actions(d)}`;
-      $('#carBg').style.backgroundImage = `url(bg/${d.bg || 'salon'}.jpg)`;
+      $('#carBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
     }
   };
   car.onscroll = upd; upd();
@@ -1198,7 +1252,7 @@ function play(id, host = false, from = 0) {
   P = { d, cast, i: from - 1, poses: cast.map((c) => c.p), with: from && was ? was.with : [] };
   // picking up where you left off: everyone's last pose up to there
   for (const [who, , pose] of d.lines.slice(0, from)) if (who >= 0 && pose) P.poses[who] = pose;
-  box.innerHTML = `<div class="pbg" style="background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || ''}"></div>
+  box.innerHTML = `<div class="pbg" style="${bgOf(d)}"></div>
     <div class="pcast n${cast.length}">${actors(cast)}</div><div class="pshade"></div><div id="pProg"></div>
     <button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button><div id="pLine"></div>`;
   $$('.pcast .sp', box).forEach((img, k) => { img.src = srcOf(cast[k], P.poses[k]); });

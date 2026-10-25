@@ -1923,11 +1923,24 @@ if (PREVIEW) {
   // one phone plays both seats, offline; Full demo forwards each tap as where it landed (so choices work too)
   document.body.classList.add('preview'); state.name = 'Toi';
   if (seatsOf(PREVIEW).length) state.seats = Object.fromEntries(seatsOf(PREVIEW).map((k) => [k, { id: myId, n: 'Toi' }]));
-  begin(PREVIEW);
+  // &cut=14-19,53-62: only those stretches of the story (in taps), the jumps behind a black card
+  const cut = (new URLSearchParams(location.search).get('cut') || '').split(',').map((x) => x.split('-').map(Number)).filter((x) => x.length === 2 && x.every((n) => n >= 0));
+  const veil = document.createElement('div');
+  veil.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;transition:opacity .5s;pointer-events:none';
+  document.body.appendChild(veil);
+  let part = 0, jumping = false;
+  // where the preview is, in its own taps (the cut stretches end to end), for Full demo's n/N
+  const report = () => {
+    const pos = cut.length ? cut.slice(0, part).reduce((t, [a, b]) => t + b - a, 0) + Math.max(0, tape.length - cut[part][0]) : tape.length;
+    if (parent !== window) parent.postMessage({ pos }, location.origin);
+  };
+  const goTo = async (n) => { jumping = true; veil.style.opacity = 1; await skipTo(n, PREVIEW); await sleep(150); veil.style.opacity = 0; jumping = false; report(); };
+  if (cut.length) goTo(cut[0][0]); else { veil.style.opacity = 0; begin(PREVIEW); }
   addEventListener('message', (e) => {
-    if (e.origin !== location.origin || !e.data || !e.data.tap) return;
+    if (e.origin !== location.origin || !e.data || !e.data.tap || jumping) return;
     const [fx, fy] = e.data.tap, el = document.elementFromPoint(fx * innerWidth, fy * innerHeight);
     if (el) el.click();
+    setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
 } else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
