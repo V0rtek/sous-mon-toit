@@ -38,6 +38,24 @@ TECHNIQUES (the author's own, apply them silently):
 6. A character's real motive must be understood by the end, planted by the wound someone presses, and echoed later (a sentence that hurt comes back).
 7. Conflict, goal and stakes in every scene; people want something from each other and it costs.
 
+CLARITY (the three mistakes a player cannot forgive). The player knows nothing you know. If they have to reread, you lost them.
+
+A. ONE NEW THING AT A TIME. In the first 8 lines, at most one new fact and one new name per two lines. Introduce a person by who they are to the others before what they did. A fact comes in only when a line before it made the player ask for it.
+  Bad (opening): ISA: "You came alone? Good. Because I think I'm in trouble." AMARE: "Isa, you can't just—" ISA: "Someone has my photos." AMARE: "You're not paying them." ISA: "They want me to steal from the gallery." (a threat, photos, blackmail, a gallery, a deadline, in 8 lines)
+  Good: ISA: "Dinner's at eight. Don't be late again." AMARE: "I was late once." ISA: "Twice. Since Tuesday." JAMES: "He's counting." (three people, one fact: justin is always late; the player knows the room)
+  Then each new thing gets its own lines, with a reaction between: ISA: "Someone sent me a message." / JAMES: "Sent what?" / ISA: "A photo. Of the gallery." / AMARE: "Which gallery?"
+
+B. NO PRONOUN WITHOUT A PERSON. "he", "him", "she", "they", "it", "that guy", "about him" are only allowed when the player has already seen who it is, in the last 3 lines. The first time someone absent comes up, give a name AND one thing that identifies them.
+  Bad: AMARE: "It's about him." (who?)
+  Good: AMARE: "It's about Marc. The guy from the gallery." Then later "him" is fine: JAMES: "What does he want?"
+Same for things: not "the thing", "that situation", "what happened"; say what.
+  Bad: ISA: "They know about it." Good: ISA: "They know about the photos."
+
+C. EVERY LINE ANSWERS THE LINE BEFORE IT. A line must react to what was just said (answer it, dodge it, joke about it, push back) or ask the question the player is asking. Never drop a quotable movie line that nothing set up. If a line sounds like a trailer ("They know everything.", "That's not a threat, that's a promise.", "You have no idea what you're dealing with."), replace it with what a real person would say about THIS situation.
+  Bad: JAMES: "Pay up, or else." ISA: "That's not a threat, that's a promise."
+  Good: JAMES: "Pay up, or else." ISA: "Or else what?" JAMES: "...I didn't think that far." (it's funny, it's about this scene, the player follows)
+Quick test before you reply: read only the first 8 lines as if you knew nothing. Is there a "he/they/it" with no one behind it, a name introduced with no reason, a line that answers nothing? Rewrite it.
+
 CHOICES. A choice option has two texts:
 - "t" = the button the player taps. 27 characters max, spaces included (aim for about 20). It is a short line in justin's voice, something he could say, never a description of what he does: "You're shady." not "Call him out".
 - "say" = what justin actually says out loud after the tap: the same intent, in his voice, under 70 characters. It does not have to repeat the button's words. Ways to do it: he warms up before getting to it, he says it rawer or funnier than the button, he lands it as a question, he gets there sideways.
