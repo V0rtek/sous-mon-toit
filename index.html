@@ -105,10 +105,17 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #caption.on { opacity: 1; }
 #hint { position: absolute; left: 0; right: 0; bottom: 3.5%; text-align: center; color: rgba(255,255,255,.85); font-size: 1.8em; font-weight: 800; text-shadow: 0 .1em .4em rgba(0,0,0,.6); pointer-events: none; animation: blink 1.6s ease-in-out infinite; }
 @keyframes blink { 50% { opacity: .35; } }
-#intro { position: absolute; inset: 0; z-index: 36; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.4em; opacity: 1; transition: opacity .9s; cursor: pointer; }
+#intro { position: absolute; inset: 0; z-index: 36; --c: #ff9a4d; background: radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--c) 28%, #000), #000 72%); color: #fff; overflow: hidden; opacity: 1; transition: opacity .9s; cursor: pointer; }
 #intro[hidden] { display: none; }
-#introTxt { font-size: 4.6em; font-weight: 800; color: #fff; letter-spacing: .01em; }
-#introImg { height: 60%; max-width: 86%; object-fit: contain; }
+#intro .ep-glow { background: radial-gradient(color-mix(in srgb, var(--c) 55%, transparent), transparent 65%); }
+#intro .ep-rays { background: repeating-conic-gradient(color-mix(in srgb, var(--c) 30%, transparent) 0 3deg, transparent 3deg 15deg); -webkit-mask: radial-gradient(closest-side, #000 15%, transparent 72%); mask: radial-gradient(closest-side, #000 15%, transparent 72%); }
+.in-kick { position: absolute; left: 0; right: 0; top: 11%; text-align: center; font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: .7em; text-indent: .7em; color: rgba(255,255,255,.8); opacity: 0; transition: opacity .8s, letter-spacing 1.4s ease-out, text-indent 1.4s ease-out; }
+.in .in-kick { opacity: 1; letter-spacing: .32em; text-indent: .32em; }
+.in-fig { position: absolute; left: 50%; bottom: 17%; height: 60%; opacity: 0; transform: translateX(-50%) translateY(4em) scale(.92); filter: brightness(0) drop-shadow(0 0 1.6em var(--c)); transition: opacity .7s, filter 1s ease-in, transform 1.6s ease-out; }
+.rise .in-fig { opacity: 1; transform: translateX(-50%); }
+.burst .in-fig { filter: brightness(1) drop-shadow(0 0 2.2em color-mix(in srgb, var(--c) 70%, transparent)); transform: translateX(-50%) scale(1.03); transition: opacity .4s, filter .6s ease-out, transform 1.2s cubic-bezier(.2,.9,.25,1.15); }
+.in-name { position: absolute; left: 0; right: 0; bottom: 5%; text-align: center; font-family: var(--display); font-size: 8em; line-height: 1.1; opacity: 0; transform: translateY(1.2em) scale(.9); text-shadow: 0 .05em .5em color-mix(in srgb, var(--c) 60%, transparent); transition: opacity .6s, transform .8s cubic-bezier(.2,.9,.25,1.2); }
+.named .in-name { opacity: 1; transform: none; }
 #black { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 1s; }
 
 /* full-screen cards: cover, Isa's look, end */
@@ -404,7 +411,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
   <div id="black"></div>
-  <div id="intro" hidden><div id="introTxt"></div><img id="introImg" alt=""></div>
+  <div id="intro" hidden></div>
   <div id="slate" hidden></div>
   <div id="who" class="card menu">
     <form id="whoForm" class="ask">
@@ -1142,6 +1149,7 @@ function saveEp(n) {
   const all = getEp(); if (n) all[state.story] = n; else delete all[state.story];
   try { localStorage.setItem('smt-ep', JSON.stringify(all)); } catch { /* private window */ }
 }
+let withFriend = null;   // #open=id&with=Léa (Full demo's friend sheet): once you've taken your character, they get invited to the other
 let resumeEp = null;   // #open=bar&ep=2 (Full demo's Continuer): once both are in, the story starts at that episode
 async function startStory() {
   const at = resumeEp && (story().episodeAt || {})[resumeEp];
@@ -1435,13 +1443,17 @@ function myCharacter(id) {
   return mine.length === 1 ? mine[0] : null;
 }
 async function introCard(who, at) {
-  const img = $('#introImg'); img.src = poseSrc(who, 'listen');
-  $('#introTxt').textContent = `${ui('you')} ${fill(castOf(who).name || '')}`;
+  const img = new Image(); img.src = poseSrc(who, 'listen'); img.className = 'in-fig';
+  const name = fill(castOf(who).name || ''), box = $('#intro');
+  box.className = ''; box.style.setProperty('--c', castOf(who).color || '#ff9a4d');
+  box.innerHTML = `<div class="ep-rays"></div><div class="ep-glow"></div><div class="in-kick">${ui('you')}</div><div class="ep-ring"></div><div class="ep-sparks">${sparks()}</div><div class="ep-flash"></div><div class="in-name">${name}</div>`;
+  box.insertBefore(img, $('.ep-ring', box));
   await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
   if (run !== at) return;
-  const box = $('#intro'); box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
-  await new Promise((ok) => { const t = setTimeout(ok, 2400); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
-  box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
+  box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
+  const timers = [[150, 'in'], [650, 'in rise'], [1900, 'in rise burst'], [2500, 'in rise burst named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
+  await new Promise((ok) => { const t = setTimeout(ok, 4200); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
+  timers.forEach(clearTimeout); box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
   await sleep(950); box.hidden = true;
 }
 function begin(id = state.story) {
@@ -1461,7 +1473,7 @@ function begin(id = state.story) {
 function toHub() {
   halt(); show('#hub');
   if (waitRoom) announce(false);
-  waitRoom = false; state.seats = {}; game = null; tape = []; share();
+  waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; invite = null;
 }
 
 // ---- a 2-player story's waiting room: a dot over each character, red = free, green = taken (the name above it).
@@ -1577,6 +1589,8 @@ function takeSeat(k, id, n) {
   else if (!s) {
     for (const j of seatsOf()) if (state.seats[j] && state.seats[j].id === id) delete state.seats[j];
     state.seats[k] = { id, n: String(n || 'Kev').slice(0, 16) };
+    const free = seatsOf().find((j) => !state.seats[j]);
+    if (withFriend && ROLE === 'host' && id === myId && free && !invite) { callFor(free, 'friend', withFriend); share(); return; }
   } else return;
   renderWait(); share(); startWhenFull();
 }
@@ -2150,8 +2164,9 @@ if (PREVIEW) {
 } else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
-  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?$/);
+  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?$/);
   if (o && o[2]) resumeEp = +o[2];
+  if (o && o[3]) withFriend = decodeURIComponent(o[3]);
   if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire' || o[1] === 'perso')) {
     openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
     if (screen === '#hub') { openAfterName = null; openFromDemo(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();

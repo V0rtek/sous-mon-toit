@@ -306,10 +306,6 @@ body.tabs-pill #tabs span { display: none; }
 .empty { text-align: center; padding: 14em 10% 0; color: var(--mute); }
 .empty svg { width: 8em; height: 8em; margin: 0 auto 2em; opacity: .5; }
 .empty p { font-size: 2.1em; line-height: 1.4; margin: 0; }
-.withs { position: absolute; left: 4%; bottom: 4%; z-index: 3; display: flex; align-items: center; gap: .3em; background: rgba(0,0,0,.7); border-radius: 2em; padding: .3em .7em .3em .3em; font-size: 1em; }
-.withs .av { width: 2.8em; height: 2.8em; font-size: 1em; border: .2em solid #000; }
-.withs .av + .av { margin-left: -1em; }
-.withs span { font-size: 1.4em; font-weight: 700; }
 /* En cours: big cards (where you stopped), the centred one's title and Continuer under it */
 .car.home { padding: 1em 13% 0; }
 .car.home .card { width: 100%; }
@@ -356,7 +352,6 @@ body.tabs-pill #tabs span { display: none; }
 .hout svg { width: 1.2em; height: 1.2em; }
 .where { font-size: 1.8em; color: #d1d1d6; margin: 0 0 1.2em; display: flex; justify-content: center; align-items: center; gap: .4em; }
 .where .av { width: 1.6em; height: 1.6em; }
-.shelf .withs { bottom: calc(4% + .7em); }
 /* a player's face (their character), cropped from the full figure */
 .mug { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
 .ldot.f, .lav, .pd.f, .room .seatsMini i { overflow: hidden; }
@@ -568,7 +563,6 @@ const I = {
   byoc: '<svg viewBox="0 0 24 24"><circle cx="10" cy="7.5" r="4"/><path d="M2 21c0-4.5 3.6-7.4 8-7.4 1.3 0 2.5.2 3.6.7A6.5 6.5 0 0 0 12.6 21z"/><path d="M19 13.5v7M15.5 17h7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>',
   bookmark: '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   bookmarkOn: '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
-  saveWho: '<svg viewBox="0 0 24 24"><path d="M5.5 3.5h10v16l-5-3.6-5 3.6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="18" cy="16.5" r="5.2" fill="#000" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="15" r="1.5"/><path d="M15.4 19.4c.4-1.4 1.4-2.1 2.6-2.1s2.2.7 2.6 2.1" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
   heart: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   heartOn: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
@@ -820,7 +814,7 @@ const OPTIONS = [
 ];
 const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
-let saved = keep.get('saved', {});   // id -> { with: [names], at }
+let saved = keep.get('saved', {});   // id -> { at }
 let screen = 'current', tab = 'explore', viewKey = '', filter = 'all', spotSel = null, deckGone = [];
 
 // ---- pieces ----
@@ -1021,12 +1015,10 @@ function renderExplore() {
 }
 function renderSaved() {
   const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
-  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.<br><br>Une démo à plusieurs : touche encore pour choisir <b>avec qui</b> tu veux la jouer.</p></div>`; return; }
+  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.</p></div>`; return; }
   $('#saved').innerHTML = `<div class="h2" style="margin-top:0">Sauvés <small>${ids.length}</small></div>
     <div class="grid g2">${ids.map((id) => {
-      const d = byId(id), w = saved[id].with;
-      const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
-      return card(d, { byocB: false, extra: withs, live: false });
+      return card(byId(id), { byocB: false, live: false });
     }).join('')}</div>`;
 }
 // ---- + : write a story or make a character (both in the game), then the stories you wrote (same browser). Tap one: its
@@ -1195,6 +1187,21 @@ function moreHtml(d) {
 let charsOpen = false;
 const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; } catch { return 'Toi'; } };
 const face = (c) => `<span class="pp"><img src="${poseOf(c, 'listen')}" alt=""></span>`;
+// a friend who's online: what's going on with them to pick up (a story you started together, or one they wait in), then
+// the 2-player stories to start from the beginning; the game opens on the character pick, and invites them
+function friendSheet(n) {
+  const f = friend(n), fd = f.doing && byId(f.doing);
+  const going = Object.keys(prog).filter((id) => byId(id) && byId(id).players > 1 && prog[id].with.includes(n) && !(byId(id).full ? 0 : done(id)));
+  const first = fd && fd.players > 1 ? [fd.id, ...going.filter((id) => id !== fd.id)] : going;
+  const cont = first.filter((id) => byId(id));
+  const fresh = DEMOS.filter((d) => d.players > 1 && !cont.includes(d.id));
+  const row = (d, what, ep) => `<div class="fr" data-act="withplay" data-id="${d.id}" data-f="${esc(n)}" data-n="${ep}"><span class="th">${cover({ ...d, title: '' })}</span>
+      <div><b>${esc(d.title)}</b><span>${what}</span></div></div>`;
+  const box = sheet(`<h3>Jouer avec ${esc(n)}</h3><p class="lead">${av(n)} ${f.doing && f.waits ? `${esc(n)} t'attend dans « ${esc(fd.title)} ».` : 'En ligne.'}</p>
+    ${cont.length ? `<div class="h2">À continuer</div><div class="frs">${cont.map((id) => { const d = byId(id), e = epNow(d); return row(d, id === (fd && fd.id) && f.waits ? `${esc(n)} t'attend · Épisode ${e}` : `Reprendre · Épisode ${e}`, e); }).join('')}</div>` : ''}
+    <div class="h2">À commencer</div><div class="frs">${fresh.map((d) => row(d, `Depuis le début · ${d.players === 3 ? '2 ou 3 joueurs' : '2 joueurs'}`, 1)).join('')}</div>`);
+  return box;
+}
 function renderSocial() {
   const m = me();
   const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
@@ -1202,7 +1209,7 @@ function renderSocial() {
   const row = (f) => {
     const d = f.doing && byId(f.doing);
     const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
-    return `<div class="fr${d ? '' : ' still'}"${d ? ` data-act="open" data-id="${d.id}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
+    return `<div class="fr${f.on ? '' : ' still'}"${f.on ? ` data-act="friend" data-f="${esc(f.n)}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
       <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
   // waiting for you, then playing, then online, then offline
@@ -1376,9 +1383,9 @@ function setTab(t) {
   if (t === BASE && cur().tabFrom === BASE) return back();
   if (tab === BASE) push({ tab: t, ov: null, tabFrom: BASE }); else swap({ tab: t, ov: null });
 }
-function openPlayer(id, host = false, from = 0, ep = null) {
+function openPlayer(id, host = false, from = 0, ep = null, w = null) {
   const d = byId(id), n = ep || epOf(d);
-  if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}`; return; }   // the real game; its back comes here
+  if (d.full) { track(id, 0, w ? [w] : null); location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}${w ? '&with=' + encodeURIComponent(w) : ''}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'series') o.under = top;
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
@@ -1461,33 +1468,14 @@ function openSeries(id) {
   box.dataset.id = id; box.hidden = false; box.scrollTop = 0;
 }
 
-// ---- saving: a multiplayer demo can be saved with someone, to watch together later ----
-function setSaved(id, w) {
-  if (w === null) delete saved[id]; else saved[id] = { with: w, at: (saved[id] && saved[id].at) || Date.now() };
-  keep.set('saved', saved);
-}
-// a tap saves right away. On a multiplayer one, the icon then asks "with who?": the next tap opens
-// "Je veux jouer avec…" (pick friends, or take it out of the saved ones); a solo one just comes back out
+// ---- saving: a tap saves, another takes it back out ----
 function toggleSave(id) {
-  const d = byId(id);
-  if (!saved[id]) { setSaved(id, []); after(); return; }
-  if (d.players > 1) { people(id); return; }
-  setSaved(id, null); after();
+  if (saved[id]) delete saved[id]; else saved[id] = { at: Date.now() };
+  keep.set('saved', saved);
+  after();
 }
-function people(id) {
-  const d = byId(id), pick = new Set(saved[id] ? saved[id].with : []);
-  const ok = () => pick.size ? `Jouer avec ${[...pick].join(', ')}` : 'Personne pour l\'instant';
-  const box = sheet(`<h3>Je veux jouer avec…</h3><p class="lead">« ${esc(d.title)} » se joue à ${d.players === 3 ? '2 ou 3' : '2'}. Tu la retrouveras dans tes Sauvés, sous leur nom.</p>
-    <div class="people">${FRIENDS.map((f) => `<button data-n="${esc(f.n)}" class="${pick.has(f.n) ? 'on' : ''}">${av(f.n)}<span>${esc(f.n)}</span>${f.on ? '<small>● en ligne</small>' : ''}</button>`).join('')}</div>
-    <div class="row"><button class="btn main wide" id="pplOk">${ok()}</button><button class="btn" id="pplOut">Retirer</button></div>`);
-  $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); pick[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); $('#pplOk').textContent = ok(); });
-  $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); after(); };
-  $('#pplOut').onclick = () => { setSaved(id, null); closeSheet(); after(); };
-}
-// saved, multiplayer, nobody yet: the icon says "with who?"
-const asksWho = (id) => saved[id] && !saved[id].with.length && byId(id).players > 1;
-const saveIconOf = (id) => asksWho(id) ? I.saveWho : saveIcon(!!saved[id]);
-const saveWord = (id) => asksWho(id) ? 'Jouer avec…' : saved[id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver');
+const saveIconOf = (id) => saveIcon(!!saved[id]);
+const saveWord = (id) => saved[id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver');
 function after() {
   renderTabs();
   const v = page();
@@ -1618,6 +1606,8 @@ stage.addEventListener('click', (e) => {
     case 'closeD': case 'closeS': back(); break;
     case 'hdown': $('#home').scrollTo({ top: $('#homeMore').offsetTop - 40, behavior: 'smooth' }); break;
     case 'ep': playEp(id, +el.dataset.n); break;
+    case 'friend': friendSheet(el.dataset.f); break;
+    case 'withplay': closeSheet(() => openPlayer(id, false, 0, +el.dataset.n, el.dataset.f)); break;
     case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
