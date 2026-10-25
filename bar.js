@@ -1161,7 +1161,10 @@ window.BAR = [
 BAR.gaze = true;
 BAR.credits = '';   // no photos: rectangles only
 BAR.seats = ['pa', 'pb'];
-BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // the other character's player name when you play both
+BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // a seat's name when nobody plays it under their own
+// the waiting room: each character in the pose that sums them up, and one line of them
+BAR.pick = { pa: { pose: 'drunk_happy', line: 'Man… I think we’re getting too old for this shit.' },
+  pb: { pose: 'drunk_smile', line: 'I think I’m having my best fucking life, man.' } };
 BAR.cast = {
   pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' },
   pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },

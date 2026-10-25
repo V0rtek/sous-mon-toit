@@ -27,6 +27,9 @@ const dVerre = [
   cam('one', 'cam'), say('cam', 'worried', 'Faut que tu partes. Maintenant.', { to: 'brooke' }),
 ];
 dVerre.seats = ['brooke', 'cam'];   // one phone plays both: no "you are…" card
+dVerre.solo = { brooke: 'Brooke', cam: 'Cam' };
+dVerre.title = 'Le dernier verre';
+dVerre.pick = { brooke: { pose: 'drunk_joke', line: "Ça dépend. C'est un beau secret ou un laid ?" }, cam: { pose: 'flirty', line: 'Si je te dis un secret, tu me promets de pas partir ?' } };
 dVerre.cast = {
   brooke: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 },
