@@ -1078,7 +1078,9 @@ function renderSocial() {
     return `<div class="fr${d ? '' : ' still'}"${d ? ` data-act="open" data-id="${d.id}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
       <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
-  const order = [...FRIENDS].sort((a, b) => (b.on ? 1 : 0) - (a.on ? 1 : 0));
+  // waiting for you, then playing, then online, then offline
+  const rank = (f) => f.doing && f.waits ? 0 : f.doing ? 1 : f.on ? 2 : 3;
+  const order = [...FRIENDS].sort((a, b) => rank(a) - rank(b));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
       ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a></div>` : ''}</div>
     <div class="h2">Amis <small>${FRIENDS.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
