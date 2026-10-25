@@ -35,6 +35,7 @@ svg { display: block; fill: currentColor; }
 #vName b { color: var(--gold); margin-right: .25em; }
 body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
 body.s-current.t-explore #top { background: none; }
+body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
 body.s-menu #tabs { display: none; }
 body.s-menu #views { bottom: 0; }
 
@@ -106,7 +107,6 @@ body.tabs-pill #tabs span { display: none; }
 @keyframes ringF { 50% { box-shadow: 0 0 0 .35em rgba(255,79,139,.25), 0 0 .5em transparent; } }
 .lav { position: absolute; right: 4%; top: 4%; z-index: 4; width: max(4em, 13cqw); height: max(4em, 13cqw); border-radius: 50%; background: var(--c); border: .3em solid #000; box-sizing: border-box; display: grid; place-items: center; font-weight: 900; font-size: 1em; animation: pulse 1.4s infinite; }
 .lav b { font-size: max(1.6em, 5.5cqw); }
-.lav.s { background: #3a3a3c; color: #c7c7cc; }
 .lav.s::after { content: ''; position: absolute; right: -.2em; bottom: -.2em; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--stranger); border: .25em solid #000; animation: blink 1.1s infinite; }
 .lav + .lav { right: calc(4% + max(3em, 9cqw)); }
 
@@ -381,8 +381,7 @@ body.tabs-pill #tabs span { display: none; }
 .pnar { position: absolute; left: 7%; right: 7%; bottom: 9%; text-align: center; font-family: 'Nunito', var(--ui); font-style: italic; font-size: 2.5em; font-weight: 700; line-height: 1.35; color: #fff; text-shadow: 0 .1em .6em rgba(0,0,0,.9); animation: up .3s ease-out; }
 .pclose { position: absolute; top: 2.5em; left: 4%; z-index: 5; width: 6em; height: 6em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .pclose svg { width: 2.8em; height: 2.8em; }
-.pc-corner { position: absolute; top: 3em; right: 4%; z-index: 5; font-size: 2.2em; font-weight: 800; padding: .3em .2em; text-shadow: 0 0 .4em rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
-.pc-corner b { font-size: 1.25em; }
+.pc-corner { position: absolute; top: 3em; right: 4%; z-index: 5; font-size: 1.6em; font-weight: 600; color: rgba(255,255,255,.7); padding: .3em .2em; text-shadow: 0 0 .4em rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
 .pc-bar { position: absolute; top: 1.2em; left: 4%; right: 4%; z-index: 5; display: flex; gap: .5em; }
 .pc-bar i { flex: 1; height: .6em; border-radius: .3em; background: rgba(255,255,255,.3); }
 .pc-bar i.on { background: #fff; }
@@ -396,13 +395,17 @@ body.tabs-pill #tabs span { display: none; }
 .pc-bar ~ .pwith { top: 4em; }
 .pjoin { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,.86); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 9%; animation: fade .3s; cursor: default; }
 .pjoin h3 { font-family: var(--display); font-weight: 400; font-size: 4.2em; margin: 0 0 .3em; }
-.pjoin p { font-size: 2em; color: #c7c7cc; margin: 0 0 2.4em; line-height: 1.4; }
-.pjoin .seatsBig { display: flex; gap: 3em; margin-bottom: 3em; }
-.pjoin .seatsBig div { display: flex; flex-direction: column; align-items: center; gap: .8em; }
-.pjoin .seatsBig .av { width: 10em; height: 10em; font-size: 1em; }
-.pjoin .seatsBig .av b { font-size: 4em; }
-.pjoin .seatsBig span { font-size: 1.8em; font-weight: 700; }
-.pjoin .seatsBig .empty-seat { width: 10em; height: 10em; border-radius: 50%; border: .3em dashed #48484a; display: grid; place-items: center; animation: blink 1.4s infinite; }
+.pjoin p { font-size: 1.9em; color: #c7c7cc; margin: 0 0 2.6em; line-height: 1.4; }
+.pjoin .kick { font-size: 1.7em; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .6em; }
+.pjoin .seats { display: flex; justify-content: center; gap: 2.4em; margin: 2em 0 2.4em; }
+.pjoin .seat { display: flex; flex-direction: column; align-items: center; gap: .5em; width: 12em; }
+.pjoin .seat .av, .pjoin .seat .pp, .pjoin .empty-seat { width: 10em; height: 10em; font-size: 1em; margin-bottom: .4em; }
+.pjoin .seat .av b { font-size: 4em; }
+.pjoin .seat b { font-size: 1.9em; font-weight: 700; }
+.pjoin .seat small { font-size: 1.5em; color: var(--mute); min-height: 1.2em; }
+.pjoin .empty-seat { border-radius: 50%; border: .3em dashed #48484a; box-sizing: border-box; animation: blink 1.4s infinite; }
+.jback { position: absolute; top: 2.5em; left: 4%; width: 6.4em; height: 6.4em; display: grid; place-items: center; filter: drop-shadow(0 0 .4em rgba(0,0,0,.7)); }
+.jback svg { width: 3em; height: 3em; }
 
 /* ---- Full demo's own menu: Current / All ---- */
 #menu { display: flex; flex-direction: column; justify-content: center; gap: 2.2em; padding: 9.5em 7% 5em; }
@@ -422,9 +425,6 @@ body.tabs-pill #tabs span { display: none; }
 .ci .pbub { bottom: 3.5%; right: 5%; }
 .ci .pnar { bottom: 6%; }
 .ci .pc-corner { top: 3em; }
-.ctitle { position: absolute; left: 6%; right: 22%; top: 11%; z-index: 5; font-family: var(--display); font-size: 4em; line-height: 1.05; text-shadow: 0 .1em .5em rgba(0,0,0,.8); opacity: 0; pointer-events: none; }
-.ci.flash .ctitle { animation: tflash 3s ease-out; }
-@keyframes tflash { 8%, 65% { opacity: 1; } 100% { opacity: 0; } }
 .rail { position: absolute; right: 4%; bottom: 25%; z-index: 6; display: flex; flex-direction: column; gap: 2.2em; }
 .rb { position: relative; width: 7.6em; height: 7.6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .5em rgba(0,0,0,.75)); }
 .rb svg { width: 4em; height: 4em; }
@@ -521,7 +521,15 @@ const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', on: true },
   { n: 'Sam', c: '#ff9f2e', on: true, doing: 'pacte' }, { n: 'Inès', c: '#9b6bff', on: false, seen: 'il y a 3 h' }, { n: 'Noé', c: '#25c48a', on: false, seen: 'hier' },
 ];
-const friend = (n) => FRIENDS.find((f) => f.n === n) || { n, c: '#636366' };
+const STRANGERS = [{ n: 'Nico', c: '#5ac8c8' }, { n: 'Zoé', c: '#c97b4a' }, { n: 'Malik', c: '#7f8cff' }, { n: 'Jade', c: '#d4609b' }, { n: 'Hugo', c: '#8bbf4a' }];
+const friend = (n) => FRIENDS.find((f) => f.n === n) || STRANGERS.find((f) => f.n === n) || { n, c: '#636366' };
+// who's waiting in a demo's room: the friend, then the strangers (always the same ones for a given demo)
+function waiting(d) {
+  const l = d.live; if (!l) return [];
+  const h = [...d.id].reduce((a, ch) => a + ch.charCodeAt(0), 0);
+  const st = Array.from({ length: l.strangers || 0 }, (_, k) => ({ ...STRANGERS[(h + k) % STRANGERS.length], stranger: true }));
+  return [...(l.friend ? [{ ...friend(l.friend) }] : []), ...st];
+}
 const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
   { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 14,
@@ -692,7 +700,7 @@ function liveMark(d) {
   const f = l.friend && friend(l.friend);
   if (O.live === 'dot') return f ? `<i class="ldot f" style="--c:${f.c}"><b>${esc(f.n[0])}</b></i>` : `<i class="ldot" style="--c:var(--stranger)"></i>`;
   if (O.live === 'badge') return f ? `<span class="lbadge f"><i></i>${esc(f.n)} attend</span>` : `<span class="lbadge" style="--c:var(--stranger)"><i></i>${l.strangers} en attente</span>`;
-  if (O.live === 'avatar') return f ? `<span class="lav" style="--c:${f.c}"><b>${esc(f.n[0])}</b></span>` : `<span class="lav s" style="--c:#3a3a3c"><b>?</b></span>`;
+  if (O.live === 'avatar') { const w = waiting(d)[0]; return `<span class="lav${f ? '' : ' s'}" style="--c:${w.c};background:${w.c}"><b>${esc(w.n[0])}</b></span>`; }
   return '';
 }
 const ringCls = (d) => O.live === 'ring' && d.live ? (d.live.friend ? ' ring-f' : ' ring-s') : '';
@@ -736,8 +744,9 @@ function liveLine(d) {
   const l = d.live; if (!l) return '';
   const f = l.friend && friend(l.friend);
   const ago = l.since ? ` · depuis ${l.since} min` : '';
-  if (f) return `<p class="liveLine f" style="--c:${f.c}"><i></i>${esc(f.n)} t'attend dans une salle${ago}${l.strangers ? ` (+${l.strangers})` : ''}</p>`;
-  return `<p class="liveLine s" style="--c:var(--stranger)"><i></i>${l.strangers === 1 ? 'Un joueur attend' : l.strangers + ' joueurs attendent'} dans une salle${ago}</p>`;
+  if (f) return `<p class="liveLine f" style="--c:${f.c}"><i></i>${esc(f.n)} t'attend dans une salle${l.strangers ? ` avec ${esc(waiting(d).slice(1).map((w) => w.n).join(', '))}` : ''}${ago}</p>`;
+  const ns = waiting(d).map((w) => w.n);
+  return `<p class="liveLine s" style="--c:var(--stranger)"><i></i>${esc(ns.join(' et '))} ${ns.length > 1 ? 'attendent' : 'attend'} dans une salle${ago}</p>`;
 }
 const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}${saveWord(d.id)}</button>`;
 const actions = (d) => `${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
@@ -792,9 +801,9 @@ const R = {
     const rooms = all().filter((d) => d.live).sort((x, y) => (y.live.friend ? 1 : 0) - (x.live.friend ? 1 : 0));
     const room = (d) => {
       const l = d.live, f = l.friend && friend(l.friend), c = f ? f.c : 'var(--stranger)';
-      const seats = Array.from({ length: d.players }, (_, i) => i === 0 ? `<i class="full" style="--c:${c}">${f ? `<b style="font-size:1.4em">${esc(f.n[0])}</b>` : '?'}</i>` : i < 1 + (f && l.strangers ? 1 : 0) ? '<i class="full" style="--c:#48484a">?</i>' : '<i></i>').join('');
+      const ws = waiting(d), seats = Array.from({ length: d.players }, (_, i) => ws[i] ? `<i class="full" style="--c:${ws[i].c}"><b style="font-size:1.4em">${esc(ws[i].n[0])}</b></i>` : '<i></i>').join('');
       return `<div class="room" style="--c:${c}" data-act="open" data-id="${d.id}"><div class="cvw">${cover(d)}</div><div class="body">
-        <h4>${esc(d.title)}</h4><div class="who">${f ? av(f.n) + esc(f.n) + ' t\'attend' : `<span class="av" style="--c:var(--stranger);background:#3a3a3c">?</span>Un inconnu attend`}</div>
+        <h4>${esc(d.title)}</h4><div class="who">${av(waiting(d)[0].n)}${esc(waiting(d)[0].n)} ${f ? 't\'attend' : 'attend'}</div>
         <div class="seatsMini">${seats}</div>${playBtn(d)}</div></div>`;
     };
     const online = FRIENDS.filter((f) => f.on);
@@ -924,7 +933,7 @@ function renderCurrent() {
   const box = $('#current');
   box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}">${d.full ? `<iframe class="gframe" data-src="index.html?preview=${d.full}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
       : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${castOf(d).length}">${actors(castOf(d))}</div><div class="pshade"></div>`}
-    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
+    <div class="pc-corner"></div><div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
       <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>
       <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`).join('');
@@ -932,7 +941,7 @@ function renderCurrent() {
   if (seen) seen.disconnect();
   seen = new IntersectionObserver((es) => es.forEach((e) => {
     if (!e.isIntersecting) return;
-    const ci = e.target, f = $('iframe', ci); ci.classList.remove('flash'); void ci.offsetWidth; ci.classList.add('flash');
+    const f = $('iframe', e.target);
     if (f && !f.getAttribute('src')) f.src = f.dataset.src;   // the game loads only once you scroll to it
   }), { root: box, threshold: .6 });
   $$('.ci', box).forEach((ci) => seen.observe(ci));
@@ -942,9 +951,9 @@ function line(ci, i) {
   if (i >= n) track(d.id, null); else if (i > 0) track(d.id, i);
   if (i >= n) {
     $('.cline', ci).innerHTML = `<div class="cend${d.full ? ' dark' : ''}">Fin de l'aperçu · ▶ pour jouer</div>`;
-    $('.pc-corner', ci).innerHTML = `<b>${n}</b>/${n}`; return;
+    $('.pc-corner', ci).textContent = `${n}/${n}`; return;
   }
-  $('.pc-corner', ci).innerHTML = `<b>${i + 1}</b>/${n}`;
+  $('.pc-corner', ci).textContent = `${i + 1}/${n}`;
   if (d.full) { $('.cline', ci).innerHTML = ''; return; }
   const [who, text, pose] = d.lines[i], sp = $$('.pcast .sp', ci);
   if (who >= 0 && pose && sp[who]) sp[who].src = srcOf(castOf(d)[who], pose);
@@ -1200,17 +1209,20 @@ function play(id, host = false, from = 0) {
 }
 // a multiplayer demo opens on its room: who's in, who's coming
 function join(d, host) {
-  const l = !host && d.live, f = l && l.friend && friend(l.friend);
-  const seat = (html, name) => `<div>${html}<span>${name}</span></div>`;
-  const others = f ? seat(av(f.n), esc(f.n)) : l ? seat('<span class="av" style="background:#3a3a3c;color:#c7c7cc"><b>?</b></span>', 'Inconnu') : seat('<span class="empty-seat"></span>', 'En attente…');
+  const ws = host ? [] : waiting(d).slice(0, d.players - 1), f = ws.find((w) => !w.stranger), st = ws.filter((w) => w.stranger);
+  const seat = (pic, name, tag) => `<div class="seat">${pic}<b>${esc(name)}</b><small>${tag}</small></div>`;
+  const seats = [seat(face(me()), myName(), myName() === 'Toi' ? '' : 'toi'), ...ws.map((w) => seat(av(w.n), w.n, w.stranger ? 'inconnu·e' : 'ami·e')),
+    ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Libre', ws.length ? '' : 'joué au hasard'))];
+  const say = f ? `${esc(f.n)} t'attend${st.length ? ` avec ${esc(st.map((w) => w.n).join(', '))}` : ''}.`
+    : st.length ? `${esc(st[0].n)} est déjà dans la salle. Vous ne vous connaissez pas : vous jouez l'histoire ensemble.`
+    : 'Personne encore. Pour l\'aperçu, l\'autre rôle est joué au hasard.';
   const box = document.createElement('div'); box.className = 'pjoin';
-  box.innerHTML = `<h3>${f ? `${esc(f.n)} t'attend` : l ? 'Quelqu\'un t\'attend' : 'Salle ouverte'}</h3>
-    <p>${f ? 'Vous jouez ensemble. Chacun choisit pour son perso.' : l ? 'Un joueur est déjà dans la salle. Vous commencez ensemble.' : 'Personne encore ? Pour l\'aperçu, l\'autre rôle est joué au hasard.'}</p>
-    <div class="seatsBig">${seat(`<span class="av" style="background:#f5f5f7;color:#000"><b>T</b></span>`, 'Toi')}${others}${d.players === 3 ? seat('<span class="empty-seat"></span>', 'Libre') : ''}</div>
+  box.innerHTML = `<button class="jback" data-act="pclose" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <small class="kick">Salle d'attente</small><h3>${esc(d.title)}</h3><div class="seats">${seats.join('')}</div><p>${say}</p>
     <button class="btn main" data-act="pgo">${I.play}Commencer</button>`;
   $('#player').appendChild(box);
-  if (f) { P.with = [f.n]; withChip(P.with); }
-  else if (l) { const w = document.createElement('div'); w.className = 'pwith'; w.innerHTML = `<span class="av" style="background:#3a3a3c">?</span>avec un inconnu`; $('#player').appendChild(w); }
+  P.with = ws.map((w) => w.n);
+  if (ws.length) withChip(P.with);
 }
 function withChip(names) {
   const w = document.createElement('div'); w.className = 'pwith';
@@ -1218,7 +1230,7 @@ function withChip(names) {
 }
 function progress() {
   const t = total(P.d), n = Math.min(P.i + 1, t), el = $('#pProg');
-  if (O.progress === 'corner') el.innerHTML = `<div class="pc-corner"><b>${n}</b>/${t}</div>`;
+  if (O.progress === 'corner') el.innerHTML = `<div class="pc-corner">${n}/${t}</div>`;
   else if (O.progress === 'bar') el.innerHTML = `<div class="pc-bar">${Array.from({ length: t }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>`;
   else if (O.progress === 'ring') { const c = 2 * Math.PI * 15; el.innerHTML = `<div class="pc-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c * n / t} ${c}"/></svg><span>${n}/${t}</span></div>`; }
   else el.innerHTML = `<div class="pc-pill">Aperçu · ${n} sur ${t}</div>`;
