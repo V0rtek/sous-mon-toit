@@ -33,7 +33,10 @@ svg { display: block; fill: currentColor; }
 #switch .round { width: 5.2em; height: 5.2em; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
-body.t-saved #switch, body.t-add #switch { visibility: hidden; }
+body.t-saved #switch, body.t-add #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
+body.s-current.t-explore #top { background: none; }
+body.s-menu #tabs { display: none; }
+body.s-menu #views { bottom: 0; }
 
 /* ---- pages ---- */
 #views { position: absolute; left: 0; right: 0; top: 0; bottom: 9.5em; }
@@ -74,7 +77,7 @@ body.tabs-pill #tabs span { display: none; }
 
 /* marks on a cover: players top-left, "bring your character" next to it, live top-right, save bottom-right */
 .marks { position: absolute; left: 4%; top: 4%; display: flex; gap: .5em; align-items: center; z-index: 3; font-size: max(.75em, 2.6cqw); }
-.mk { height: 3.4em; padding: 0 .9em; border-radius: 1.7em; background: rgba(0,0,0,.62); backdrop-filter: blur(.4em); -webkit-backdrop-filter: blur(.4em); display: flex; align-items: center; gap: .35em; font-weight: 800; font-size: 1em; }
+.mk { height: 3.4em; padding: 0 .9em; border-radius: 1.7em; background: rgba(0,0,0,.45); backdrop-filter: blur(.4em); -webkit-backdrop-filter: blur(.4em); display: flex; align-items: center; gap: .35em; font-weight: 800; font-size: 1em; }
 .mk svg { width: 2.1em; height: 2.1em; }
 .ppl { display: flex; }
 .ppl svg + svg { margin-left: -.85em; }
@@ -328,6 +331,7 @@ body.tabs-pill #tabs span { display: none; }
 /* ---- preview player: tap to go on, n/12 ---- */
 #player { position: absolute; inset: 0; z-index: 80; background: #000; cursor: pointer; overflow: hidden; }
 .pbg { position: absolute; inset: 0; background-size: cover; }
+.pcast { position: absolute; inset: 0; isolation: isolate; pointer-events: none; }
 .pcast .sp { bottom: 0; height: 66%; transition: filter .25s, transform .25s; filter: drop-shadow(0 0 1em rgba(0,0,0,.5)) brightness(.5); }
 .pcast .sp.talk { filter: drop-shadow(0 0 1em rgba(0,0,0,.5)); transform: translateX(-50%) translateY(-1%); }
 .pshade { position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.4), transparent 20%, transparent 55%, rgba(0,0,0,.6)); }
@@ -363,6 +367,40 @@ body.tabs-pill #tabs span { display: none; }
 .pjoin .seatsBig span { font-size: 1.8em; font-weight: 700; }
 .pjoin .seatsBig .empty-seat { width: 10em; height: 10em; border-radius: 50%; border: .3em dashed #48484a; display: grid; place-items: center; animation: blink 1.4s infinite; }
 
+/* ---- Full demo's own menu: Current / All ---- */
+#menu { display: flex; flex-direction: column; justify-content: center; gap: 2.2em; padding: 9.5em 7% 5em; }
+.mtile { position: relative; height: 36em; border-radius: 2.6em; overflow: hidden; background: #1c1c1e; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 2.8em; text-align: left; }
+.mtile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 25%, rgba(0,0,0,.9)); }
+.mtile b, .mtile span { position: relative; z-index: 2; }
+.mtile b { font-size: 4.4em; font-weight: 800; letter-spacing: -.02em; }
+.mtile span { font-size: 1.9em; color: #d1d1d6; margin-top: .3em; }
+.mbg { position: absolute; inset: 0; }
+.mbg .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
+.mgrid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: .6em; padding: .6em; opacity: .85; }
+.mgrid .cv { border-radius: 1em; }
+
+/* ---- Current: a TikTok scroll, the demo itself on screen, tap to go on; play / save / info on the right ---- */
+#current { padding: 0; scroll-snap-type: y mandatory; }
+.ci { position: relative; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; overflow: hidden; cursor: pointer; }
+.ci .pbub { bottom: 3.5%; right: 5%; }
+.ci .pnar { bottom: 6%; }
+.ci .pc-corner { top: 3em; }
+.ctitle { position: absolute; left: 6%; right: 22%; top: 11%; z-index: 5; font-family: var(--display); font-size: 4em; line-height: 1.05; text-shadow: 0 .1em .5em rgba(0,0,0,.8); opacity: 0; pointer-events: none; }
+.ci.flash .ctitle { animation: tflash 3s ease-out; }
+@keyframes tflash { 8%, 65% { opacity: 1; } 100% { opacity: 0; } }
+.rail { position: absolute; right: 4%; bottom: 25%; z-index: 6; display: flex; flex-direction: column; gap: 2.2em; }
+.rb { position: relative; width: 7.6em; height: 7.6em; border-radius: 50%; background: rgba(0,0,0,.45); backdrop-filter: blur(.6em); -webkit-backdrop-filter: blur(.6em); display: grid; place-items: center; color: #fff; }
+.rb svg { width: 3.4em; height: 3.4em; }
+.rb.play { background: #fff; color: #000; }
+.rb.play svg { margin-left: .3em; }
+.rb.on { color: var(--gold); }
+.rb .pd { position: absolute; top: -.3em; right: -.3em; width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
+.rb .pd.f { width: 3.4em; height: 3.4em; display: grid; place-items: center; color: #fff; animation: pulse 1.3s infinite; }
+.rb .pd.f b { font-size: 1.5em; font-weight: 900; }
+.ci .cend { position: absolute; left: 6%; right: 6%; bottom: 7%; text-align: center; font-size: 2.2em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em #000; }
+#detail .dimT { position: absolute; inset: 0; }
+.infoC { position: absolute; left: 0; right: 0; bottom: 0; padding: 16em 6% 4em; background: linear-gradient(transparent, rgba(0,0,0,.9) 32%, #000); animation: rise .25s ease-out; }
+
 #toast { position: absolute; left: 50%; top: 10em; z-index: 100; transform: translate(-50%, 2em); opacity: 0; transition: .25s; background: #f5f5f7; color: #000; font-size: 1.9em; font-weight: 700; padding: .7em 1.3em; border-radius: 2em; white-space: nowrap; pointer-events: none; display: flex; align-items: center; gap: .5em; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
@@ -371,18 +409,20 @@ body.tabs-pill #tabs span { display: none; }
 <body>
 <div id="stage">
   <div id="views">
-    <section id="explore" class="view"></section>
+    <section id="menu" class="view"></section>
+    <section id="current" class="view" hidden></section>
+    <section id="explore" class="view" hidden></section>
     <section id="saved" class="view" hidden></section>
     <section id="add" class="view" hidden></section>
   </div>
   <header id="top">
-    <a class="round" href="index.html" aria-label="Retour au menu"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <button class="round" data-act="back" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="switch">
       <button class="round" data-act="vprev" aria-label="Version précédente"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="vName" data-act="gear"></button>
       <button class="round" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <button class="round" data-act="gear" aria-label="Options"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
+    <button class="round gearBtn" data-act="gear" aria-label="Options"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
@@ -512,7 +552,7 @@ const OPTIONS = [
 const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', players: 'icons', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
 let saved = keep.get('saved', {});   // id -> { with: [names], at }
-let tab = 'explore', filter = 'all', savedWho = 'all', spotSel = null, deckGone = [];
+let screen = 'menu', tab = 'explore', viewKey = '', filter = 'all', savedWho = 'all', spotSel = null, deckGone = [];
 
 // ---- pieces ----
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -558,24 +598,29 @@ function saveBtn(d) {
   return `<button class="save${on ? ' on' : ''}${saveCls()}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(on)}</button>`;
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
-function card(d, { title = O.title === 'under', sub = false, saveB = true, extra = '' } = {}) {
-  const corner = d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
+// (solo is the default: only 2-3 players get a mark)
+function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '' } = {}) {
+  const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
   return `<div class="card${ringCls(d)}" data-act="open" data-id="${d.id}">
-    <div class="cvw">${cover(d)}${corner}<div class="marks">${players(d)}${byoc(d)}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
+    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
   </div>`;
 }
 function meta(d) {
-  return `<div class="meta">${players(d, true)}${byoc(d, true)}<span class="by">${esc(d.by)} · ${d.plays}</span></div>`;
+  return `<div class="meta">${players(d, true)}${byoc(d, true)}</div>`;
 }
 // Play: a stranger or a friend waiting changes it (3 ways, ⚙)
-function playBtn(d, cls = '') {
+const playDot = (d) => {
   const l = d.live, f = l && l.friend && friend(l.friend);
-  if (l && O.play === 'color') {
+  return !l ? '' : f ? `<i class="pd f" style="--c:${f.c};background:${f.c}"><b>${esc(f.n[0])}</b></i>` : '<i class="pd" style="--c:var(--stranger);background:var(--stranger)"></i>';
+};
+function playBtn(d, cls = '', how = O.play) {
+  const l = d.live, f = l && l.friend && friend(l.friend);
+  if (l && how === 'color') {
     return f ? `<button class="btn live-f ${cls}" data-act="play" data-id="${d.id}">${av(f.n)}Rejoindre ${esc(f.n)}</button>`
       : `<button class="btn live-s ${cls}" data-act="play" data-id="${d.id}">${I.play}Rejoindre la salle</button>`;
   }
-  const dot = l && O.play === 'dot' ? (f ? `<i class="pd f" style="--c:${f.c};background:${f.c}">${esc(f.n[0])}</i>` : '<i class="pd" style="--c:var(--stranger);background:var(--stranger)"></i>') : '';
+  const dot = how === 'dot' ? playDot(d) : '';
   return `<button class="btn main ${cls}" data-act="play" data-id="${d.id}">${I.play}Jouer${dot}</button>`;
 }
 function liveLine(d) {
@@ -594,7 +639,7 @@ const R = {
     const h = byId('cles');
     let s = `<div class="hero"><div class="blur" style="background-image:url(bg/${h.bg}.jpg);filter:blur(3em) ${h.fx}"></div>
       <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
-      <div class="info"><div class="tags">${h.players} joueurs · Mystère · Amène ton perso</div><div class="row">${playBtn(h)}${saveWide(h)}<button class="btn ghost" data-act="open" data-id="${h.id}">${I.info}</button></div></div></div>`;
+      <div class="info"><div class="row">${playBtn(h)}${saveWide(h)}</div></div></div>`;
     SHELVES.forEach(([name, pick], i) => {
       const list = shelf(pick); if (!list.length) return;
       s += `<div class="h2">${name}${i === 1 ? `<small>${list.length} salles ouvertes</small>` : ''}</div><div class="shelf${i === 1 ? ' big' : ''}">${list.map((d) => card(d)).join('')}</div>`;
@@ -602,13 +647,13 @@ const R = {
     if (mine.length) s = s.replace('</div></div></div>', `</div></div></div><div class="h2">Tes démos</div><div class="shelf">${mine.map((d) => card(d)).join('')}</div>`);
     return s;
   },
-  grid2() { return filters() + `<div class="grid g2">${filtered().map((d) => card(d, { sub: true })).join('')}</div>`; },
+  grid2() { return filters() + `<div class="grid g2">${filtered().map((d) => card(d)).join('')}</div>`; },
   grid3() { return filters() + `<div class="grid g3">${filtered().map((d) => card(d)).join('')}</div>`; },
   feed() {
     return `<div class="feedhint">Glisse vers le haut ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="background-image:url(bg/${d.bg || 'salon'}.jpg);filter:blur(3em) ${d.fx || ''}"></div>
       <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}</div>
       <div class="side"><button data-act="save" data-id="${d.id}"><i class="${saved[d.id] ? 'on' : ''}">${saveIcon(!!saved[d.id])}</i><span>${saved[d.id] ? 'Sauvé' : 'Sauver'}</span></button>
-        <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button><button data-act="toast" data-msg="Lien copié"><i>${I.share}</i><span>Partager</span></button></div>
+        <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button></div>
       <div class="txt"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}</div></div></div>`).join('');
   },
   carousel() {
@@ -624,13 +669,13 @@ const R = {
   },
   list() {
     return filters() + filtered().map((d) => `<div class="li" data-act="open" data-id="${d.id}"><div style="width:17em;flex:none">${card(d, { title: false, saveB: false })}</div>
-      <div class="body"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d)}${saveWide(d)}</div></div></div>`).join('');
+      <div class="body"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d)}</div></div></div>`).join('');
   },
   magazine() {
     const a = all(); let s = '';
     for (let i = 0, k = 0; i < a.length; i += 3, k++) {
       const [b, c1, c2] = a.slice(i, i + 3);
-      s += `<div class="mag${k % 2 ? ' flip' : ''}"><div class="big">${card(b, { sub: true })}</div><div class="col">${c1 ? card(c1) : ''}${c2 ? card(c2) : ''}</div></div>`;
+      s += `<div class="mag${k % 2 ? ' flip' : ''}"><div class="big">${card(b)}</div><div class="col">${c1 ? card(c1) : ''}${c2 ? card(c2) : ''}</div></div>`;
     }
     return s;
   },
@@ -682,7 +727,7 @@ function renderSaved() {
       const d = byId(id), w = saved[id].with;
       const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
       const edit = d.players > 1 ? `<button class="edit" data-act="people" data-id="${id}" aria-label="Avec qui">${I.people}</button>` : '';
-      return card(d, { saveB: false, extra: withs + edit, sub: true });
+      return card(d, { byocB: false, extra: withs + edit });
     }).join('')}</div>`;
 }
 function renderAdd() {
@@ -697,13 +742,106 @@ function renderTabs() {
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
   $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés');
 }
+function renderMenu() {
+  $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('verre'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
+    <button class="mtile" data-act="mode" data-s="all"><div class="mgrid">${['cles', 'pacte', 'gala', 'nuit', 'table', 'feu'].map((id) => cover({ ...byId(id), title: '' })).join('')}</div><b>All</b><span>Toutes les versions : A à J, et ⚙ pour les variantes.</span></button>`;
+}
+// which page shows: Full demo's menu, or one of the tabs (Explorer = the Current scroll or the All layouts)
+const page = () => screen === 'menu' ? 'menu' : tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
 function render() {
-  document.body.className = `t-${tab} tabs-${O.tabs}`;
+  document.body.className = `s-${screen} t-${tab} tabs-${O.tabs}`;
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
-  for (const v of ['explore', 'saved', 'add']) $('#' + v).hidden = v !== tab;
+  const v = page();
+  for (const x of ['menu', 'current', 'explore', 'saved', 'add']) $('#' + x).hidden = x !== v;
   renderTabs();
-  if (tab === 'explore') renderExplore(); else if (tab === 'saved') renderSaved(); else renderAdd();
+  ({ menu: renderMenu, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd })[v]();
+}
+
+// ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
+const at = {};   // demo id -> line shown
+let seen = null;
+function renderCurrent() {
+  const box = $('#current');
+  box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}"><div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div>
+    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
+    <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
+      <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}</button>
+      <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`).join('');
+  $$('.ci', box).forEach((ci) => line(ci, at[ci.dataset.id] || 0));
+  if (seen) seen.disconnect();
+  seen = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const ci = e.target; ci.classList.remove('flash'); void ci.offsetWidth; ci.classList.add('flash');
+  }), { root: box, threshold: .6 });
+  $$('.ci', box).forEach((ci) => seen.observe(ci));
+}
+function line(ci, i) {
+  const d = byId(ci.dataset.id); at[d.id] = i;
+  if (i >= 12) {
+    $('.cline', ci).innerHTML = `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;
+    $('.pc-corner', ci).innerHTML = '<b>12</b>/12'; return;
+  }
+  const [who, text, pose] = d.lines[i], sp = $$('.pcast .sp', ci);
+  if (who >= 0 && pose && sp[who]) sp[who].src = `chars/${d.cast[who][0]}/${pose}.webp`;
+  sp.forEach((img, k) => img.classList.toggle('talk', k === who));
+  $('.cline', ci).innerHTML = lineHtml(d, who, text);
+  $('.pc-corner', ci).innerHTML = `<b>${i + 1}</b>/12`;
+}
+const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : `background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || 'none'}`;
+function lineHtml(d, who, text) {
+  if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
+  const name = NAMES[d.cast[who][0]], yours = d.byoc && who === d.you;
+  return `<div class="pbub"><b>${yours ? 'Ton perso' : esc(name)}${yours ? `<small>(${esc(name)} pour l'aperçu)</small>` : ''}</b><p>${esc(text)}</p></div>`;
+}
+function syncCurrent() {
+  $$('#current .sv').forEach((b) => { const on = !!saved[b.dataset.id]; b.classList.toggle('on', on); b.innerHTML = saveIcon(on); });
+}
+
+// ---- navigation: every level is a history entry, so the phone's back and ‹ do the same thing.
+// state = { screen: menu|current|all, tab, ov: the overlay on top ({k: detail|player|sheet, ..., under}), depth } ----
+const hashOf = (st) => '#' + (st.screen === 'menu' ? '' : st.screen + (st.tab !== 'explore' ? '/' + st.tab : ''));
+const cur = () => history.state;
+function push(p) { const st = { ...cur(), ...p, depth: cur().depth + 1 }; history.pushState(st, '', hashOf(st)); apply(st); }
+function swap(p) { const st = { ...cur(), ...p }; history.replaceState(st, '', hashOf(st)); apply(st); }
+let pending = null;
+function back(then) {
+  const st = cur();
+  if (st.depth > 0) { pending = then || null; history.back(); return; }
+  // opened right here (a link, a reload): walk up by hand
+  if (st.ov) swap({ ov: st.ov.under || null });
+  else if (st.tab !== 'explore') swap({ tab: 'explore' });
+  else if (st.screen !== 'menu') swap({ screen: 'menu', tab: 'explore', tabFrom: null });
+  else return leave();
+  if (then) then();
+}
+// to the game's menu, on its tiles (not its name screen)
+function leave() {
+  try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ }
+  let ref = null; try { ref = document.referrer && new URL(document.referrer); } catch { /* no referrer */ }
+  if (ref && ref.origin === location.origin && !ref.pathname.endsWith('demo.html') && history.length > 1) history.back();
+  else location.href = './';
+}
+addEventListener('popstate', (e) => { if (!e.state || !e.state.screen) return; apply(e.state); const f = pending; pending = null; if (f) f(); });
+function apply(st) {
+  screen = st.screen; tab = st.tab;
+  const key = screen + '/' + tab;
+  if (key !== viewKey) { viewKey = key; render(); }
+  const layers = []; for (let o = st.ov; o; o = o.under) layers.push(o);
+  const pl = layers.find((o) => o.k === 'player'), dt = layers.find((o) => o.k === 'detail');
+  if (pl) { if (!P || P.d.id !== pl.id || $('#player').hidden) play(pl.id, pl.host); }
+  else if (!$('#player').hidden) { $('#player').hidden = true; P = null; after(); }
+  if (dt) { if ($('#detail').hidden || $('#detail').dataset.id !== dt.id) openDetail(dt.id, dt.cur); } else $('#detail').hidden = true;
+  if (!layers.length || layers[0].k !== 'sheet') $('#sheet').hidden = true;
+}
+function setTab(t) {
+  if (t === tab) { $('#' + page()).scrollTop = 0; return; }
+  if (t === 'explore' && cur().tabFrom === 'explore') return back();
+  if (tab === 'explore') push({ tab: t, ov: null, tabFrom: 'explore' }); else swap({ tab: t, ov: null });
+}
+function openPlayer(id, host = false) {
+  const top = cur().ov, o = { k: 'player', id, host };
+  if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
 
 // ---- carousel: the centred cover is big, the info under it follows ----
@@ -750,8 +888,13 @@ function swipe(yes) {
 }
 
 // ---- details: veil (full screen, black at the bottom) / zoomed cover / bottom sheet ----
-function openDetail(id) {
+function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
+  if (inCurrent) {   // Current: black at the bottom, over the scene still playing
+    box.innerHTML = `<div class="dimT" data-act="closeD"></div><div class="infoC"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${liveLine(d)}<div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div>`;
+    box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
+  }
+  delete box.dataset.cur;
   const body = `<h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${actions(d)}`;
   const marks = `${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}`;
   if (O.detail === 'veil') box.innerHTML = `<div class="veil"><div class="cvw">${cover(d)}${marks}</div><div class="shade"></div><div class="txt">${body}</div><button class="x" data-act="closeD">${I.close}</button></div>`;
@@ -759,8 +902,7 @@ function openDetail(id) {
   else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
   box.dataset.id = id; box.hidden = false;
 }
-const closeDetail = () => { $('#detail').hidden = true; };
-const refreshDetail = () => { if (!$('#detail').hidden) openDetail($('#detail').dataset.id); };
+const refreshDetail = () => { const b = $('#detail'); if (!b.hidden) openDetail(b.dataset.id, !!b.dataset.cur); };
 
 // ---- saving: a multiplayer demo can be saved with someone, to watch together later ----
 function setSaved(id, w) {
@@ -785,14 +927,24 @@ function people(id, fresh, done = after) {
   $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); toast(pick.size ? `Sauvé · avec ${[...pick].join(', ')}` : 'Sauvé'); done(); };
   $('#pplMe').onclick = () => { setSaved(id, []); closeSheet(); toast('Sauvé · pour toi'); done(); };
 }
-function after() { renderTabs(); if (tab === 'explore') renderExplore(); else if (tab === 'saved') renderSaved(); refreshDetail(); }
+function after() {
+  renderTabs();
+  const v = page();
+  if (v === 'current') syncCurrent(); else if (v === 'explore') renderExplore(); else if (v === 'saved') renderSaved();
+  refreshDetail();
+}
 
 // ---- sheets ----
 function sheet(html) {
   const s = $('#sheet'); s.innerHTML = `<div class="dim" data-act="closeS"></div><div class="box"><div class="grab"></div>${html}</div>`; s.hidden = false;
+  const top = cur().ov;
+  if (!top || top.k !== 'sheet') push({ ov: { k: 'sheet', under: top || null } });
   return $('.box', s);
 }
-const closeSheet = () => { $('#sheet').hidden = true; };
+function closeSheet(then) {
+  const top = cur().ov;
+  if (top && top.k === 'sheet') back(then); else { $('#sheet').hidden = true; if (then) then(); }
+}
 function options() {
   const box = sheet(`<h3>Les variantes</h3><p class="lead">Mélange-les, puis dis-moi la combinaison gagnante (ex. « D, point qui clignote, panneau du bas »).</p>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
@@ -831,7 +983,8 @@ function create() {
     const d = { id: 'm' + Date.now().toString(36), title, by: '@toi', plays: '0', pitch: pitch || 'Ton pitch ici. Deux phrases qui donnent envie.', players: n, byoc: by, live: null, you: -1, glow: '#fff',
       bg: base.bg, pos: base.pos, fx: base.fx, cast: img ? [] : base.cast, img,
       lines: [[-1, title + '.'], ...(pitch || '').split(/(?<=[.!?])\s+/).filter(Boolean).map((t) => [-1, t]), ...Array.from({ length: 10 }, (_, i) => [-1, `Scène ${i + 2} — à écrire.`])].slice(0, 12) };
-    mine.unshift(d); keep.set('mine', mine); closeSheet(); tab = 'explore'; render(); toast('Publiée');
+    mine.unshift(d); keep.set('mine', mine);
+    closeSheet(() => { viewKey = ''; if (tab !== 'explore') setTab('explore'); else apply(cur()); toast('Publiée'); });
   };
 }
 function openRoom() {
@@ -844,13 +997,12 @@ function openRoom() {
   const inv = new Set();
   $('#rPick', box).onclick = (e) => { const c = e.target.closest('.card'); if (!c) return; e.stopPropagation(); pick = c.dataset.id; $$('#rPick .card', box).forEach((x) => x.classList.toggle('on', x === c)); };
   $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); inv[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); });
-  $('#rGo', box).onclick = () => { closeSheet(); toast(inv.size ? `Invitation envoyée à ${[...inv].join(', ')}` : 'Salle ouverte · en attente'); play(pick, true); };
+  $('#rGo', box).onclick = () => { closeSheet(() => openPlayer(pick, true)); toast(inv.size ? `Invitation envoyée à ${[...inv].join(', ')}` : 'Salle ouverte · en attente'); };
 }
 
 // ---- the preview: tap to go on, n/12 ----
 let P = null;
 function play(id, host = false) {
-  closeDetail();
   const d = byId(id), box = $('#player');
   P = { d, i: -1, poses: d.cast.map((c) => c[1]) };
   box.innerHTML = `<div class="pbg" style="background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || ''}"></div>
@@ -886,9 +1038,7 @@ function step() {
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
   $$('#player .pcast .sp').forEach((img, i) => { const s = `chars/${d.cast[i][0]}/${P.poses[i]}.webp`; if (!img.src.endsWith(s)) img.src = s; img.classList.toggle('talk', i === who); });
-  const name = who >= 0 ? NAMES[d.cast[who][0]] : '';
-  const yours = d.byoc && who === d.you;
-  $('#pLine').innerHTML = who < 0 ? `<div class="pnar">${esc(text)}</div>` : `<div class="pbub"><b>${yours ? 'Ton perso' : esc(name)}${yours ? `<small>(${esc(name)} pour l'aperçu)</small>` : ''}</b><p>${esc(text)}</p></div>`;
+  $('#pLine').innerHTML = lineHtml(d, who, text);
   progress();
 }
 function end() {
@@ -906,17 +1056,24 @@ function toast(html) { const t = $('#toast'); t.innerHTML = html.replace('<svg',
 // ---- one click handler for everything ----
 stage.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
-  if (!el) { if (P && !$('#player').hidden && !$('.pjoin, .pend', $('#player'))) step(); return; }
+  if (!el) {
+    if (P && !$('#player').hidden) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
+    const ci = e.target.closest('.ci');
+    if (ci) line(ci, (at[ci.dataset.id] || 0) >= 12 ? 0 : (at[ci.dataset.id] || 0) + 1);
+    return;
+  }
   const id = el.dataset.id, act = el.dataset.act;
-  if (P && !$('#player').hidden && !['pclose', 'pgo', 'replay', 'save', 'toast'].includes(act)) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
+  if (P && !$('#player').hidden && $('#sheet').hidden && !['pclose', 'pgo', 'replay', 'save', 'toast', 'back'].includes(act)) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
   e.stopPropagation();
   switch (act) {
-    case 'open': openDetail(id); break;
+    case 'back': back(); break;
+    case 'mode': push({ screen: el.dataset.s, tab: 'explore', ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;
+    case 'open': push({ ov: { k: 'detail', id } }); break;
+    case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); if (P && $('.pend')) el.remove(); break;
-    case 'play': play(id); break;
-    case 'closeD': closeDetail(); break;
-    case 'closeS': closeSheet(); break;
-    case 'tab': tab = el.dataset.tab; closeDetail(); render(); $('#' + tab).scrollTop = 0; break;
+    case 'play': openPlayer(id); break;
+    case 'closeD': case 'closeS': back(); break;
+    case 'tab': setTab(el.dataset.tab); break;
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
       O.layout = LAYOUTS[(i + (act === 'vnext' ? 1 : n - 1)) % n][0]; keep.set('opts', O); $('#explore').scrollTop = 0; render(); break;
@@ -931,17 +1088,25 @@ stage.addEventListener('click', (e) => {
     case 'deckReset': deckGone = []; renderExplore(); break;
     case 'create': create(); break;
     case 'room': openRoom(); break;
-    case 'pclose': $('#player').hidden = true; P = null; after(); break;
+    case 'pclose': back(); break;
     case 'pgo': $('.pjoin').remove(); step(); break;
     case 'replay': play(P.d.id); break;
     case 'toast': toast(el.dataset.msg); break;
   }
 });
 addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { if (!$('#player').hidden) { $('#player').hidden = true; P = null; } else if (!$('#sheet').hidden) closeSheet(); else closeDetail(); }
+  if (e.target.closest('input, textarea')) return;
+  if (e.key === 'Escape') back();
   if ((e.key === ' ' || e.key === 'ArrowRight') && P && !$('#player').hidden && !$('.pjoin, .pend', $('#player'))) step();
 });
-render();
+// where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
+{
+  const m = location.hash.match(/^#(current|all)(?:\/(saved|add))?$/);
+  const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'menu', tab: (m && m[2]) || 'explore', ov: null, tabFrom: null, depth: 0 };
+  if (st.ov && st.ov.k === 'sheet') st.ov = st.ov.under;   // a sheet can't come back from a reload
+  history.replaceState(st, '', hashOf(st));
+  apply(st);
+}
 </script>
 </body>
 </html>

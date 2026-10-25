@@ -1509,6 +1509,8 @@ $('#genGo').onclick = async (e) => {
   $('#genGo').disabled = false;
 };
 $('#test1').onclick = (e) => { e.stopPropagation(); show('#cover'); };
+// Full demo is its own page: coming back (its ‹ or the phone's back) lands on these tiles, not on the name screen
+$('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); show('#about3d'); };
 $('#watch3d').onclick = (e) => {
