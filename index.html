@@ -57,6 +57,20 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .ping svg { flex: none; width: 2.6em; height: 2.6em; }
 .ping b { position: absolute; top: -.4em; right: -.4em; min-width: 2.3em; height: 2.3em; padding: 0 .5em; box-sizing: border-box; border-radius: 1.15em; background: #ff3b30; color: #fff; font-size: 1.5em; font-weight: 700; display: grid; place-items: center; }
 .ping.fresh { animation: buzz .5s linear; }
+/* the sender's face, on the buzzing phone and on the banner */
+.sf { flex: none; width: 3.6em; height: 3.6em; border-radius: 50%; overflow: hidden; background: #c7c7cc; }
+.sf { position: relative; }
+.sf img { position: absolute; width: 100%; opacity: 0; }   /* placed on his head once loaded (headCrop) */
+/* a text to the one you play while the camera is elsewhere: a banner up top, like the phone's own */
+.smsNote { position: absolute; left: 5%; right: 5%; top: 3%; display: flex; align-items: center; gap: 1.2em; padding: 1.1em 1.4em; border-radius: 2.4em; background: rgba(28,28,30,.88); backdrop-filter: blur(1em); -webkit-backdrop-filter: blur(1em); color: #fff; box-shadow: 0 .4em 1.4em rgba(0,0,0,.4); font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+.smsNote.fresh { animation: noteIn .35s ease-out; }
+.smsNote .sf { width: 4.6em; height: 4.6em; }
+.ping .sf { width: 4.4em; height: 4.4em; margin: 0 -.9em; }
+.smsNote div { flex: 1; min-width: 0; }
+.smsNote b { display: block; font-size: 2.1em; }
+.smsNote span { display: block; font-size: 1.8em; color: rgba(255,255,255,.7); }
+.smsNote svg { flex: none; width: 2.6em; height: 2.6em; fill: rgba(255,255,255,.8); }
+@keyframes noteIn { from { opacity: 0; transform: translateY(-120%); } }
 @keyframes buzz { 20%, 60% { transform: translateX(-.3em) rotate(-7deg); } 40%, 80% { transform: translateX(.3em) rotate(7deg); } }
 /* someone of the other scene, seen from afar, talking: a bubble without the words */
 #far { position: absolute; inset: 0; pointer-events: none; }
@@ -543,7 +557,7 @@ const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
 const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé',
-  epEnd: "Fin de l'épisode", finished: 'Tu as fini', won: 'Tu gagnes…', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin' };
+  newText: 'Nouveau message', epEnd: "Fin de l'épisode", finished: 'Tu as fini', won: 'Tu gagnes…', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -687,7 +701,7 @@ function textMsg(m, sent) {
   else (texts[m.by || m.from] = texts[m.by || m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
   // {sms: {…, only: seat}}: a private text — the others see his phone buzz and him read it, never the words
   (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from });
-  if (actors[m.to] && !afar(m.to) && !FAST) buzz();
+  if (!FAST && ((actors[m.to] && !afar(m.to)) || mineTo(m.to))) buzz();   // his phone on screen, or yours
   drawTexts();
   setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
 }
@@ -729,17 +743,43 @@ async function readTexts(id, r) {
 }
 const PHONE = '<svg viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm3 14.5h2v1h-2z"/></svg>';
 const nameOf = (id) => (id && castOf(id) && castOf(id).name) || '';
+const mineTo = (id) => seatsOf().includes(id) && sees(id);   // the one (one of those) you play
+const faceOf = (id) => `<span class="sf">${id && castOf(id) ? `<img src="${poseSrc(id, 'listen')}" alt="" onload="headCrop(this)">` : ''}</span>`;
+// a round face from a whole-body sprite: finds his head in the picture (the top of the figure, wherever he leans) and
+// centres it in the circle
+const HEADS = {};
+function headCrop(img) {
+  const put = (h) => { if (!h) return; Object.assign(img.style, { width: h.k * 100 + '%', left: 50 - h.cx * h.k * 100 + '%', top: 50 - h.cy * h.k * 100 + '%', opacity: 1 }); };
+  if (HEADS[img.src] !== undefined) { put(HEADS[img.src]); return; }
+  let h = null;
+  try {
+    const w = 80, ht = Math.round(w * img.naturalHeight / img.naturalWidth), c = document.createElement('canvas');
+    c.width = w; c.height = ht; const g = c.getContext('2d'); g.drawImage(img, 0, 0, w, ht);
+    const px = g.getImageData(0, 0, w, ht).data, on = (x, y) => px[(y * w + x) * 4 + 3] > 40;
+    let y0 = -1, y1 = -1;
+    for (let y = 0; y < ht && y0 < 0; y++) for (let x = 0; x < w; x++) if (on(x, y)) { y0 = y; break; }
+    for (let y = ht - 1; y >= 0 && y1 < 0; y--) for (let x = 0; x < w; x++) if (on(x, y)) { y1 = y; break; }
+    if (y0 >= 0) {
+      const fig = y1 - y0, band = Math.max(2, Math.round(fig * 0.11)); let sx = 0, n = 0;
+      for (let y = y0; y < y0 + band; y++) for (let x = 0; x < w; x++) if (on(x, y)) { sx += x; n++; }
+      const head = fig * 0.13;   // the head, about an eighth of him
+      h = { cx: sx / n / w, cy: (y0 + head * 0.55) / w, k: (w * 0.75) / head };   // in widths of the picture; the head fills 3/4 of the circle
+    }
+  } catch { /* can't read the picture: the plain one */ }
+  HEADS[img.src] = h; put(h || { cx: .5, cy: .12, k: 2.4 });
+}
 function drawTexts(wait = 0) {
   clearTimeout(drawTexts.t); textsEl.innerHTML = '';
   if (wait && !FAST) { drawTexts.t = setTimeout(drawTexts, wait); return; }   // the camera is moving: once it lands
   const f = camNow && camNow.frame; if (!f) return;
-  const s = H / f.camH;
+  const s = H / f.camH, pinged = new Set();
   for (const a of Object.values(actors)) {
     const all = texts[a.id] || [], onPhone = PHONE_POSES.includes(a.pose);
     const list = onPhone ? all.filter((m) => !m.unread && (!m.only || sees(m.only))).slice(-3) : [], unread = all.filter((m) => m.unread && (onPhone || Date.now() - m.at < PING_MS));
     if ((!list.length && !unread.length) || afar(a.id)) continue;
     const b = box(a), x = (a.x - f.left) * s;
     if (x < 0 || x > W) continue;
+    if (unread.length) pinged.add(a.id);
     const st = document.createElement('div'); st.className = 'stack';
     // beside him, on the side of the frame with more room; the bottom of the stack at his chest (below the faces of
     // whoever stands next to him)
@@ -759,12 +799,20 @@ function drawTexts(wait = 0) {
     if (last && last.status) { const d = document.createElement('div'); d.className = 'receipt'; d.textContent = ui(last.status); st.appendChild(d); }
     if (unread.length) {
       const d = document.createElement('div'); d.className = 'ping' + (unread.some((m) => m.fresh) ? ' fresh' : '');
-      d.innerHTML = PHONE;
-      // no name here: who it's from shows once he opens his phone (the name above the bubbles)
+      d.innerHTML = faceOf(unread[unread.length - 1].from);   // who it's from: his face (the words, once he opens his phone)
       const n = document.createElement('b'); n.textContent = unread.length; d.appendChild(n);
       st.appendChild(d); for (const m of unread) m.fresh = false;
     }
     textsEl.appendChild(st);
+  }
+  // a text just came for the one you play, and the camera doesn't show him: the banner, whoever's on screen
+  const two = seatsOf().filter(sees).length > 1;
+  for (const [id, all] of Object.entries(texts)) {
+    const m = all.filter((x) => x.unread && Date.now() - x.at < PING_MS).pop();
+    if (!m || pinged.has(id) || !mineTo(id)) continue;
+    const d = document.createElement('div'); d.className = 'smsNote' + (m.noted ? '' : ' fresh'); m.noted = true;
+    d.innerHTML = `${faceOf(m.from)}<div><b>${nameOf(m.from) || '?'}</b><span>${ui('newText')}${two ? ` · ${nameOf(id)}` : ''}</span></div>${PHONE}`;
+    textsEl.appendChild(d);
   }
 }
 
