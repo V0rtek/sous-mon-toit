@@ -34,8 +34,7 @@ svg { display: block; fill: currentColor; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
 body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-current #switch { visibility: hidden; }
-.gearBtn .pp { width: 5.2em; height: 5.2em; box-shadow: 0 0 0 .25em rgba(255,255,255,.85); }
-.ci .pc-corner { left: 4%; right: auto; }   /* the corner on the right is your picture */
+body:not(.t-social) .gearBtn { visibility: hidden; }   /* the UI settings: in Social only */
 body.s-current.t-explore #top { background: none; }
 body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
 
@@ -494,7 +493,7 @@ body.tabs-pill #tabs span { display: none; }
       <button id="vName" data-act="gear"></button>
       <button class="round" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <button class="round gearBtn" data-act="gear" aria-label="Réglages"></button>
+    <button class="round gearBtn" data-act="gear" aria-label="Réglages"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
@@ -1022,7 +1021,6 @@ const page = () => tab !== 'explore' ? tab : screen === 'current' ? 'current' : 
 const BASE = 'home';   // the tab a mode opens on
 function render() {
   document.body.className = `s-${screen} t-${tab} tabs-${O.tabs}`;
-  $('.gearBtn').innerHTML = face(me());   // you, top right: the UI settings
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
@@ -1494,7 +1492,7 @@ stage.addEventListener('click', (e) => {
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
-    case 'pick': keep.set('me', el.dataset.c); renderSocial(); $('.gearBtn').innerHTML = face(me()); break;
+    case 'pick': keep.set('me', el.dataset.c); renderSocial(); break;
     case 'newchar': e.preventDefault(); leave(); break;   // made in the game's gallery
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
