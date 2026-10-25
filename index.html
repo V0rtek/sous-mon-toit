@@ -226,6 +226,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #ringBtns button:first-child svg { transform: rotate(135deg); }
 #ringBtns .picked i { box-shadow: 0 0 0 .5em #fff; }
 @keyframes ringPulse { 50% { transform: scale(1.06); } }
+/* ?preview=bar: Full demo shows the story's opening inside its feed — no menu, no buttons, the taps come from there */
+body.preview #back, body.preview #qrBtn, body.preview #eyes, body.preview #galBtn, body.preview #storyNote, body.preview #hint { display: none !important; }
 body.watch #ringBtns button { pointer-events: none; }
 body.watch #ringBtns button.mine { pointer-events: auto; }
 body.watch #solo, body.watch #soloPick { display: none !important; }
@@ -1396,7 +1398,7 @@ $('#bar').onclick = (e) => { e.stopPropagation(); openWait('bar'); };
 const STATS_KEY = 'smt-stats';
 const getStats = () => { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch { return {}; } };
 function bump(f) {
-  if (ROLE !== 'host') return;
+  if (ROLE !== 'host' || PREVIEW) return;   // Full demo's previews aren't plays
   const st = getStats(); f(st);
   try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch { /* private window */ }
 }
@@ -1688,6 +1690,7 @@ idbDo('readonly', (st) => st.getAll()).then((all) => (all || []).forEach(registe
 const BROKER = 'wss://broker.emqx.io:8084/mqtt';
 const WATCH = new URLSearchParams(location.search).get('watch');
 const ROLE = WATCH && /^[a-z0-9]{4,12}$/.test(WATCH) ? 'watch' : 'host';
+const PREVIEW = ROLE === 'host' && (s => STORIES[s] ? s : null)(new URLSearchParams(location.search).get('preview'));
 let live = null, room = ROLE === 'watch' ? WATCH : null, game = null, tape = [];
 let myName = '', sentK = -1, hostId = null;   // joiner: its name, the last line it asked to move past, the host's id
 const myId = (() => {
@@ -1916,7 +1919,17 @@ try {
 } catch { /* private window */ }
 try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /* private window */ }
 fit();
-if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
+if (PREVIEW) {
+  // one phone plays both seats, offline; Full demo forwards each tap as where it landed (so choices work too)
+  document.body.classList.add('preview'); state.name = 'Toi';
+  if (seatsOf(PREVIEW).length) state.seats = Object.fromEntries(seatsOf(PREVIEW).map((k) => [k, { id: myId, n: 'Toi' }]));
+  begin(PREVIEW);
+  addEventListener('message', (e) => {
+    if (e.origin !== location.origin || !e.data || !e.data.tap) return;
+    const [fx, fy] = e.data.tap, el = document.elementFromPoint(fx * innerWidth, fy * innerHeight);
+    if (el) el.click();
+  });
+} else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
   const o = location.hash.match(/^#open=(\w+)$/);

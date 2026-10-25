@@ -27,13 +27,13 @@ svg { display: block; fill: currentColor; }
 
 /* ---- top bar: back to the app, the layout switcher, the options ---- */
 #top { position: absolute; left: 0; right: 0; top: 0; height: 9em; z-index: 20; display: flex; align-items: center; gap: 1em; padding: 0 3.5%; box-sizing: border-box; background: linear-gradient(#000 55%, transparent); }
-.round { width: 6.4em; height: 6.4em; border-radius: 50%; background: rgba(255,255,255,.09); display: grid; place-items: center; flex: none; }
+.round { width: 6.4em; height: 6.4em; border-radius: 50%; background: none; filter: drop-shadow(0 0 .4em rgba(0,0,0,.7)); display: grid; place-items: center; flex: none; }
 .round svg { width: 3em; height: 3em; }
 #switch { flex: 1; display: flex; align-items: center; justify-content: center; gap: .6em; min-width: 0; }
 #switch .round { width: 5.2em; height: 5.2em; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
-body.t-saved #switch, body.t-add #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
+body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
 body.s-current.t-explore #top { background: none; }
 body.s-menu #tabs { display: none; }
 body.s-menu #views { bottom: 0; }
@@ -77,19 +77,17 @@ body.tabs-pill #tabs span { display: none; }
 
 /* marks on a cover: players top-left, "bring your character" next to it, live top-right, save bottom-right */
 .marks { position: absolute; left: 4%; top: 4%; display: flex; gap: .5em; align-items: center; z-index: 3; font-size: max(.75em, 2.6cqw); }
-.mk { height: 3.4em; padding: 0 .9em; border-radius: 1.7em; background: rgba(0,0,0,.45); backdrop-filter: blur(.4em); -webkit-backdrop-filter: blur(.4em); display: flex; align-items: center; gap: .35em; font-weight: 800; font-size: 1em; }
+.mk { height: 3.4em; padding: 0 .2em; filter: drop-shadow(0 0 .3em rgba(0,0,0,.9)); display: flex; align-items: center; gap: .35em; font-weight: 800; font-size: 1em; }
 .mk svg { width: 2.1em; height: 2.1em; }
 .ppl { display: flex; }
 .ppl svg + svg { margin-left: -.85em; }
 .mk.solo { color: #fff; } .mk.multi { color: #9fd3ff; }
 .mk.byoc { color: var(--gold); }
-.mk.full { background: var(--gold); color: #000; }
-.ftag { position: absolute; top: 3.4em; left: 50%; transform: translateX(-50%); z-index: 6; font-size: 1.7em; font-weight: 800; padding: .35em .9em; border-radius: 1.2em; background: var(--gold); color: #000; white-space: nowrap; }
 .mk span { font-size: 1.5em; }
 .ribbon { position: absolute; left: -18%; top: 9%; width: 70%; transform: rotate(-38deg); background: var(--gold); color: #000; text-align: center; font-weight: 900; font-size: max(.9em, 3.3cqw); letter-spacing: .06em; padding: .35em 0; z-index: 2; box-shadow: 0 .3em .8em rgba(0,0,0,.4); }
 .ribbon + .marks { left: 4%; top: auto; bottom: 4%; }
 .cvw:has(.cvt) .ribbon + .marks { left: auto; right: 4%; top: 22%; flex-direction: column; align-items: flex-end; }
-.save { position: absolute; right: 4%; bottom: 4%; z-index: 3; width: max(4.6em, 15cqw); height: max(4.6em, 15cqw); border-radius: 50%; background: rgba(0,0,0,.55); display: grid; place-items: center; }
+.save { position: absolute; right: 4%; bottom: 4%; z-index: 3; width: max(4.6em, 15cqw); height: max(4.6em, 15cqw); filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .save svg { width: 55%; height: 55%; }
 .save.on { color: var(--rose); }
 .save.on.bm { color: var(--gold); }
@@ -168,7 +166,7 @@ body.tabs-pill #tabs span { display: none; }
 .fi .cvw .cv { box-shadow: 0 2em 4em rgba(0,0,0,.6); }
 .fi .side { position: absolute; right: 2.5%; top: 26em; display: flex; flex-direction: column; gap: 2.6em; align-items: center; z-index: 4; }
 .fi .side button { display: flex; flex-direction: column; align-items: center; gap: .4em; }
-.fi .side i { width: 6em; height: 6em; border-radius: 50%; background: rgba(0,0,0,.5); display: grid; place-items: center; }
+.fi .side i { width: 6em; height: 6em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .fi .side svg { width: 3em; height: 3em; }
 .fi .side span { font-size: 1.4em; font-weight: 700; }
 .fi .side .on { color: var(--rose); }
@@ -176,7 +174,7 @@ body.tabs-pill #tabs span { display: none; }
 .fi h3 { font-family: var(--display); font-weight: 400; font-size: 4em; margin: 0 0 .25em; line-height: 1.05; }
 .pitch { font-size: 1.95em; line-height: 1.38; color: #d1d1d6; margin: 0 0 1.1em; }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: .7em; margin-bottom: 1.1em; font-size: 1em; }
-.meta .mk { background: rgba(255,255,255,.1); font-size: .85em; }
+.meta .mk { font-size: .85em; }
 .meta .by { font-size: 1.7em; color: var(--mute); }
 .feedhint { position: absolute; left: 50%; top: 9.5em; transform: translateX(-50%); font-size: 1.5em; color: rgba(255,255,255,.6); z-index: 5; pointer-events: none; }
 
@@ -261,7 +259,7 @@ body.tabs-pill #tabs span { display: none; }
 .veil .shade { position: absolute; left: 0; right: 0; bottom: 0; top: 34em; background: linear-gradient(transparent, rgba(0,0,0,.88) 18%, #000 32%); }
 .veil .txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 6% 4em; }
 .dTitle { font-family: var(--display); font-weight: 400; font-size: 4.6em; line-height: 1.04; margin: 0 0 .3em; }
-.x { position: absolute; top: 2.5em; right: 4%; z-index: 5; width: 6.4em; height: 6.4em; border-radius: 50%; background: rgba(0,0,0,.55); display: grid; place-items: center; }
+.x { position: absolute; top: 2.5em; right: 4%; z-index: 5; width: 6.4em; height: 6.4em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .x svg { width: 3em; height: 3em; }
 .dim { position: absolute; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(.6em); -webkit-backdrop-filter: blur(.6em); animation: fade .2s; }
 @keyframes fade { from { opacity: 0; } }
@@ -321,8 +319,20 @@ body.tabs-pill #tabs span { display: none; }
 .withs .av { width: 2.8em; height: 2.8em; font-size: 1em; border: .2em solid #000; }
 .withs .av + .av { margin-left: -1em; }
 .withs span { font-size: 1.4em; font-weight: 700; }
-.edit { position: absolute; right: 4%; bottom: 4%; z-index: 3; width: 4.6em; height: 4.6em; border-radius: 50%; background: rgba(0,0,0,.6); display: grid; place-items: center; }
+.edit { position: absolute; right: 4%; bottom: 4%; z-index: 3; width: 4.6em; height: 4.6em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .edit svg { width: 2.4em; height: 2.4em; }
+.cont { position: relative; margin-top: -9.5em; padding: 11em 0 2em; text-align: center; overflow: hidden; }
+.cont .blur { position: absolute; inset: -10%; filter: blur(3em) brightness(.5) !important; }
+.cont .cvw { position: relative; width: 36em; margin: 0 auto; }
+.cont .cvw .cv { box-shadow: 0 2em 5em rgba(0,0,0,.7); }
+.cont .info { position: relative; padding: 2em 6% 0; }
+.cont h3 { font-family: var(--display); font-weight: 400; font-size: 4em; margin: 0 0 .25em; }
+.where { font-size: 1.8em; color: #d1d1d6; margin: 0 0 1.2em; display: flex; justify-content: center; align-items: center; gap: .4em; }
+.where .av { width: 1.6em; height: 1.6em; }
+.cont .btn { width: 70%; }
+.pbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: .7em; background: rgba(255,255,255,.25); }
+.pbar i { display: block; height: 100%; background: var(--rose); }
+.shelf .withs { bottom: calc(4% + .7em); }
 .acts { display: flex; flex-direction: column; gap: 1.4em; padding: 0 3.5%; }
 .act { display: flex; align-items: center; gap: 2em; padding: 2.2em; border-radius: 2.2em; background: #141416; text-align: left; }
 .act i { width: 8em; height: 8em; border-radius: 2em; background: var(--c, #2c2c2e); display: grid; place-items: center; flex: none; }
@@ -343,9 +353,9 @@ body.tabs-pill #tabs span { display: none; }
 .pbub b small { font-size: .7em; opacity: .85; margin-left: .3em; }
 .pbub p { margin: 0; font-size: 2.6em; font-weight: 700; line-height: 1.3; }
 .pnar { position: absolute; left: 7%; right: 7%; bottom: 9%; text-align: center; font-family: 'Nunito', var(--ui); font-style: italic; font-size: 2.5em; font-weight: 700; line-height: 1.35; color: #fff; text-shadow: 0 .1em .6em rgba(0,0,0,.9); animation: up .3s ease-out; }
-.pclose { position: absolute; top: 2.5em; left: 4%; z-index: 5; width: 6em; height: 6em; border-radius: 50%; background: rgba(0,0,0,.45); display: grid; place-items: center; }
+.pclose { position: absolute; top: 2.5em; left: 4%; z-index: 5; width: 6em; height: 6em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .pclose svg { width: 2.8em; height: 2.8em; }
-.pc-corner { position: absolute; top: 3em; right: 4%; z-index: 5; font-size: 2.2em; font-weight: 800; padding: .3em .8em; border-radius: 1.2em; background: rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
+.pc-corner { position: absolute; top: 3em; right: 4%; z-index: 5; font-size: 2.2em; font-weight: 800; padding: .3em .2em; text-shadow: 0 0 .4em rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
 .pc-corner b { font-size: 1.25em; }
 .pc-bar { position: absolute; top: 1.2em; left: 4%; right: 4%; z-index: 5; display: flex; gap: .5em; }
 .pc-bar i { flex: 1; height: .6em; border-radius: .3em; background: rgba(255,255,255,.3); }
@@ -391,17 +401,24 @@ body.tabs-pill #tabs span { display: none; }
 .ci.flash .ctitle { animation: tflash 3s ease-out; }
 @keyframes tflash { 8%, 65% { opacity: 1; } 100% { opacity: 0; } }
 .rail { position: absolute; right: 4%; bottom: 25%; z-index: 6; display: flex; flex-direction: column; gap: 2.2em; }
-.rb { position: relative; width: 7.6em; height: 7.6em; border-radius: 50%; background: rgba(0,0,0,.45); backdrop-filter: blur(.6em); -webkit-backdrop-filter: blur(.6em); display: grid; place-items: center; color: #fff; }
-.rb svg { width: 3.4em; height: 3.4em; }
-.rb.play { background: #fff; color: #000; }
-.rb.play svg { margin-left: .3em; }
+.rb { position: relative; width: 7.6em; height: 7.6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .5em rgba(0,0,0,.75)); }
+.rb svg { width: 4em; height: 4em; }
+.rb.play svg { width: 5em; height: 5em; }
 .rb.on { color: var(--gold); }
-.rb .pd { position: absolute; top: -.3em; right: -.3em; width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
+.rb .pd { position: absolute; top: .4em; right: .2em; width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
 .rb .pd.f { width: 3.4em; height: 3.4em; display: grid; place-items: center; color: #fff; animation: pulse 1.3s infinite; }
 .rb .pd.f b { font-size: 1.5em; font-weight: 900; }
 .ci .cend { position: absolute; left: 6%; right: 6%; bottom: 7%; text-align: center; font-size: 2.2em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em #000; }
-#detail .dimT { position: absolute; inset: 0; }
-.infoC { position: absolute; left: 0; right: 0; bottom: 0; padding: 16em 6% 4em; background: linear-gradient(transparent, rgba(0,0,0,.9) 32%, #000); animation: rise .25s ease-out; }
+.imm { position: absolute; inset: 0; background: #000; animation: fade .25s; }
+.imm .cvw { position: absolute; inset: 0; container-type: normal; }
+.imm .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
+.imm .cvt, .imm .cvfade { display: none; }
+.imm .sp { height: 70%; } .imm .n3 .sp { height: 60%; } .imm .n3 .sp.p1 { height: 65%; }
+.imm .shade { position: absolute; left: 0; right: 0; bottom: 0; top: 38%; background: linear-gradient(transparent, rgba(0,0,0,.85) 35%, #000); }
+.imm .txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 6% 4em; }
+.gframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+.catch { position: absolute; inset: 0; z-index: 4; }
+.cend.dark { inset: 0; bottom: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); }
 
 #toast { position: absolute; left: 50%; top: 10em; z-index: 100; transform: translate(-50%, 2em); opacity: 0; transition: .25s; background: #f5f5f7; color: #000; font-size: 1.9em; font-weight: 700; padding: .7em 1.3em; border-radius: 2em; white-space: nowrap; pointer-events: none; display: flex; align-items: center; gap: .5em; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
@@ -412,6 +429,7 @@ body.tabs-pill #tabs span { display: none; }
 <div id="stage">
   <div id="views">
     <section id="menu" class="view"></section>
+    <section id="home" class="view" hidden></section>
     <section id="current" class="view" hidden></section>
     <section id="explore" class="view" hidden></section>
     <section id="saved" class="view" hidden></section>
@@ -461,6 +479,7 @@ const I = {
   play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>',
   info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.4"/></svg>',
   close: '<svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+  home: '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>',
   explore: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="10" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="10" rx="1.6"/><rect x="3" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/><rect x="13.5" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/></svg>',
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg>',
   door: '<svg viewBox="0 0 24 24"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 21h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12.5" r="1.3"/><path d="M19 7v6M16 10h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -475,59 +494,63 @@ const FRIENDS = [{ n: 'Léa', c: '#ff4f8b', on: true }, { n: 'Max', c: '#4f9dff'
 const friend = (n) => FRIENDS.find((f) => f.n === n) || { n, c: '#636366' };
 const DEMOS = [
   // the real one: Play opens the game's own waiting room (index.html), the whole episode
-  { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', bg: 'terrasse', pos: '45% 50%', fx: 'sepia(.5) saturate(1.5) hue-rotate(-15deg) brightness(.55)', glow: '#ff9a4d',
+  { id: 'lastcall', title: 'Last call', by: '@sousmontoit', plays: '—', img: 'covers/lastcall.jpg', glow: '#ff9a4d', taps: 14,
     cast: [['justin_bar', 'drunk_listen'], ['cam', 'listen'], ['brooke', 'drunk_listen']], players: 2, byoc: false, live: null, you: 0, full: 'bar',
-    pitch: "Samedi, 1 h 40 : Justin, Brooke et Cam au bar, un verre de trop. Ce soir, Brooke va finir sa phrase — et un inconnu en complet l'attend aux toilettes.",
+    pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
   { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
     cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
-    pitch: "Il reste une heure avant la fermeture et Cam a enfin osé s'asseoir à côté de toi. Tout ce que tu dis ce soir, elle va s'en souvenir demain.",
+    pitch: "Cam a enfin osé s'asseoir à côté de toi. Son téléphone vibre pour la troisième fois — et elle refuse de dire qui c'est.",
     lines: [[-1, 'Terrasse du Marcel. 1 h 04. Le serveur empile déjà les chaises.'], [1, "Je t'avais dit que je viendrais.", 'flirty'], [0, "T'es venue pour moi ou pour le pichet ?", 'drunk_joke'], [1, "Les deux. Dans cet ordre-là, peut-être.", 'tipsy_laugh'], [0, 'Fais attention, je note tout.', 'drunk_point'], [-1, 'Son téléphone vibre sur la table. Elle le retourne sans regarder.'], [0, "C'était qui ?", 'drunk_listen'], [1, "Personne d'important. Pas ce soir.", 'awkward'], [0, '« Pas ce soir », ça veut dire demain oui.', 'drunk_talk'], [1, 'Ça veut dire que tu poses trop de questions.', 'sip'], [-1, 'Le téléphone vibre encore. Trois fois.'], [1, '…Ok. Faut que je te dise un truc.', 'worried']] },
   { id: 'table', title: 'Sous la table', by: '@nego_club', plays: '8,1 k', bg: 'salon', pos: '60% 50%', fx: 'hue-rotate(190deg) brightness(.45) saturate(.8)', glow: '#5cc8ff',
     cast: [['suit', 'adjust'], ['julian', 'smirk']], players: 1, byoc: true, live: null, you: 0,
-    pitch: 'Un contrat à 2 millions, deux hommes qui mentent, une seule signature. Amène ton personnage et vois s\'il tient sous la pression.',
+    pitch: "Deux millions sur la table, un stylo doré, dix secondes pour signer. L'un des deux hommes en face de toi ment — pas forcément celui que tu crois.",
     lines: [[-1, 'Salle de réunion, 23e étage. Il pleut sur la ville.'], [1, 'Asseyez-vous. Vous avez lu la dernière page ?', 'talk'], [0, 'Je lis toujours la dernière page en premier.', 'adjust'], [1, 'Alors vous savez ce qu\'on vous demande.', 'smirk'], [0, 'Je sais ce que vous croyez obtenir.', 'listen'], [-1, 'Julian glisse un stylo sur la table. Doré. Lourd.'], [1, 'Deux millions. Ce soir. Pas demain.', 'offer'], [0, 'Et si je refuse ?', 'angry'], [1, 'Personne ne refuse. On renégocie, au mieux.', 'cold'], [0, 'Alors renégocions.', 'offer'], [1, 'Vous avez dix secondes.', 'cold'], [-1, 'Ta main est au-dessus du stylo. Ton perso hésite.']] },
   { id: 'cles', title: 'Trois clés, une porte', by: '@escape.qc', plays: '21 k', bg: 'maison', pos: '50% 50%', fx: 'sepia(.45) brightness(.6)', glow: '#ffd36b',
     cast: [['ruby', 'holding'], ['james', 'thinking'], ['diane', 'explaining']], players: 3, byoc: true, live: { friend: 'Léa', strangers: 1, since: 3 }, you: 0,
-    pitch: "Trois colocs, trois clés, et une chambre que personne n'a ouverte depuis le départ de Sophie. Chacun cache une partie de la vérité — à vous de décider qui parle en premier.",
+    pitch: "Trois colocs reçoivent chacun une clé, sans un mot. Derrière la porte : la chambre de Sophie, partie sans dire au revoir il y a six mois… sauf à l'un d'eux.",
     lines: [[-1, 'Le couloir de l\'appart. La porte du fond est verrouillée depuis six mois.'], [0, "J'ai la mienne. Elle était dans ma boîte aux lettres.", 'holding'], [1, 'Moi aussi. Sans mot, sans rien.', 'thinking'], [2, "Pareil. Donc quelqu'un veut qu'on l'ouvre ensemble.", 'explaining'], [0, "Ou quelqu'un veut qu'on se dispute.", 'angry'], [1, "Sophie est partie sans dire au revoir. C'est pas normal.", 'explaining'], [2, "Elle t'a dit au revoir à toi, James.", 'angry'], [1, '…Quoi ?', 'surprised'], [-1, 'Un silence. Ruby regarde James.'], [0, "Tu nous l'avais pas dit.", 'listen'], [1, "Parce que c'était pas important.", 'thinking'], [2, 'Alors tourne ta clé en premier.', 'explaining']] },
   { id: 'appel', title: 'Appel manqué', by: '@justin', plays: '5,6 k', bg: 'maison', pos: '30% 50%', fx: 'grayscale(.6) brightness(.45) hue-rotate(180deg)', glow: '#7aa7ff',
     cast: [['justin', 'phone_shock']], players: 1, byoc: false, live: null, you: 0,
-    pitch: '17 appels manqués de ton frère pendant ta soirée. Il ne répond plus, et la porte de chez lui est ouverte.',
+    pitch: "17 appels manqués de ton frère. Quand tu arrives chez lui, la porte est ouverte, la télé allumée, et il t'a laissé une note : « Ne me cherche pas. »",
     lines: [[-1, '2 h 12. Ton écran s\'allume : 17 appels manqués — Marco.'], [0, "Voyons… pourquoi il m'appelle à cette heure-là ?", 'phone_shock'], [-1, 'Tu rappelles. Ça sonne. Ça sonne encore.'], [0, 'Marco. Réponds, man.', 'phone_call'], [-1, 'Messagerie.'], [0, "Ok. Ok, j'y vais.", 'thinking'], [-1, "Vingt minutes plus tard. La porte d'entrée est entrouverte."], [0, "Marco ? C'est moi.", 'surprised'], [-1, 'La télé est allumée. Le son coupé.'], [0, 'T\'es où… ?', 'listen'], [-1, 'Sur la table : son téléphone. Et une note.'], [0, '« Ne me cherche pas. » …Il se fout de moi.', 'angry']] },
   { id: 'pacte', title: 'Le pacte du bar', by: '@lastcall', plays: '17,9 k', bg: 'terrasse', pos: '70% 50%', fx: 'sepia(.6) saturate(1.6) brightness(.7)', glow: '#ffb15c',
     cast: [['justin_bar', 'drunk_talk'], ['cam', 'sip']], players: 2, byoc: false, live: { friend: 'Sam', strangers: 2, since: 1 }, you: 0,
-    pitch: "Deux meilleurs amis, un pacte signé sur une serviette en 2016 : si personne n'est casé à 30 ans… Ce soir, c'est l'anniversaire.",
+    pitch: "En 2016, ils ont signé un pacte sur une serviette de bar. Ce soir, elle l'a ressortie — mais pas pour la raison qu'il espère.",
     lines: [[-1, 'Le bar du coin. La même table qu\'en 2016.'], [0, "Joyeux trente ans. T'as amené la serviette ?", 'drunk_happy'], [1, "Tu pensais vraiment que je l'avais gardée ?", 'sip'], [0, 'Oui.', 'drunk_listen'], [1, '…Je l\'ai gardée.', 'awkward'], [-1, "Elle la déplie. L'encre a bavé, mais on lit encore « PROMIS »."], [0, 'Donc techniquement on est fiancés.', 'drunk_flirt'], [1, "Techniquement t'es saoul.", 'tipsy_laugh'], [0, 'Les deux peuvent être vrais.', 'drunk_talk'], [1, "J'ai quelqu'un, Justin.", 'worried'], [-1, 'Il pose son verre.'], [0, 'Depuis quand ?', 'drunk_sad']] },
   { id: 'mensonge', title: 'Où étais-tu hier soir ?', by: '@ruby_writes', plays: '9,3 k', bg: 'salon', pos: '40% 50%', fx: 'hue-rotate(320deg) brightness(.6) saturate(1.4)', glow: '#ff5c8a',
     cast: [['ruby', 'angry'], ['james', 'listen']], players: 2, byoc: false, live: { friend: 'Max', since: 6 }, you: 0,
-    pitch: 'Ruby a trouvé un reçu de restaurant pour deux. James a une explication — la troisième en dix minutes.',
+    pitch: "Un reçu pour deux, un mardi, 22 h. James a une explication. Puis une deuxième. Puis son téléphone vibre.",
     lines: [[-1, 'Le salon. Un reçu froissé sur la table basse.'], [0, "Deux entrées, deux desserts. T'as faim, toi.", 'angry'], [1, "C'était un souper de travail.", 'explaining'], [0, 'Un mardi. À 22 h.', 'thinking'], [1, 'Les clients sont pas toujours dispos le jour.', 'listen'], [0, "C'est quoi son nom, au client ?", 'holding'], [1, '…Marc.', 'thinking'], [0, 'Marc a commandé le tiramisu pour deux ?', 'angry'], [1, "Ok, j'ai pas été clair.", 'surprised'], [0, "Non. T'as été clair. Juste pas honnête.", 'explaining'], [-1, 'Le téléphone de James vibre. « Merci pour hier ❤ »'], [1, 'Je peux t\'expliquer.', 'explaining']] },
   { id: 'nuit', title: 'Nuit blanche', by: '@insomnie', plays: '3,2 k', bg: 'terrasse', pos: '20% 50%', fx: 'hue-rotate(220deg) brightness(.38) saturate(1.5)', glow: '#9b8cff',
     cast: [['isa_nuit', 'thinking']], players: 1, byoc: true, live: null, you: -1,
-    pitch: 'Il est 4 h, la ville dort, et une inconnue sur le toit dit te connaître depuis toujours. Elle connaît ton prénom. Ton vrai.',
+    pitch: "4 h du matin, sur le toit, une inconnue t'attendait. Elle connaît ton vrai prénom — et elle dit que vous n'avez plus beaucoup de temps.",
     lines: [[-1, "Le toit de l'immeuble. 4 h 02. Tu montes pour respirer."], [0, 'Enfin. Je pensais que tu viendrais plus tôt.', 'listen'], [-1, "Tu ne l'as jamais vue de ta vie."], [0, "Fais pas cette tête. On s'est déjà parlé.", 'explaining'], [0, 'Pas ici. Pas comme ça. Mais souvent.', 'thinking'], [-1, "Elle dit ton prénom. Celui que personne n'utilise."], [0, 'Tu te souviens de rien, hein ?', 'surprised'], [0, "C'est normal. C'est toujours comme ça la première nuit.", 'holding'], [-1, "Au loin, toutes les lumières de la ville s'éteignent. D'un coup."], [0, 'Ok. On a moins de temps que prévu.', 'angry'], [0, 'Tu me fais confiance ?', 'listen'], [-1, 'Elle te tend la main.']] },
   { id: 'gala', title: "Gala d'or", by: '@galanoir', plays: '14 k', bg: 'salon', pos: '55% 50%', fx: 'sepia(.9) saturate(2) brightness(.6) hue-rotate(-10deg)', glow: '#ffd24d',
     cast: [['isa_or', 'holding'], ['suit', 'adjust'], ['julian', 'cold']], players: 3, byoc: true, live: { strangers: 1, since: 2 }, you: 1,
-    pitch: "Un gala de charité, un collier volé, trois invités qui n'auraient jamais dû se croiser. Amène ton perso : quelqu'un doit porter le chapeau.",
+    pitch: "Le collier vient de disparaître et les portes sont verrouillées. Trois invités, trois alibis — un seul est vrai.",
     lines: [[-1, 'Grand salon. Champagne. Le collier Duval vient de disparaître.'], [0, 'Messieurs. Quelle coïncidence de vous voir ici tous les deux.', 'holding'], [1, "Je suis invité. Lui, j'en suis moins sûr.", 'adjust'], [2, "J'ai acheté mon billet. Contrairement à certains.", 'cold'], [0, 'Le collier était à mon cou il y a dix minutes.', 'angry'], [1, 'Et vous m\'accusez ? Je ne touche pas aux bijoux.', 'angry'], [2, 'Seulement aux contrats.', 'smirk'], [-1, 'Les portes se ferment. Personne ne sort.'], [0, 'Alors on va jouer à un jeu.', 'explaining'], [0, 'Chacun dit où il était. Le premier qui ment…', 'thinking'], [2, '…perd quoi ?', 'listen'], [0, 'Tout.', 'holding']] },
   { id: 'coloc', title: 'Le colocataire', by: '@amare.stories', plays: '6,7 k', bg: 'maison', pos: '65% 50%', fx: 'brightness(.85) saturate(.7)', glow: '#c8ffd9',
     cast: [['amare', 'listen']], players: 1, byoc: true, live: null, you: -1,
-    pitch: 'Ton nouveau coloc est parfait : il cuisine, il range, il paie à l\'avance. Trop parfait. Et il ne dort jamais.',
+    pitch: "Ton nouveau coloc cuisine, range et paie d'avance. Il ne dort jamais — et il sait déjà ce qui t'attend demain.",
     lines: [[-1, 'Jour 1. Amare arrive avec une seule valise.'], [0, "Salut ! J'ai fait du café. Et des crêpes. Et j'ai lavé ton char.", 'explaining'], [-1, 'Jour 4. La vaisselle est faite avant que tu la salisses.'], [0, "T'as bien dormi ? Je t'ai entendu rêver.", 'listen'], [-1, 'Entendu… rêver ?'], [0, 'Façon de parler.', 'thinking'], [-1, 'Jour 9. 3 h du matin. La lumière de la cuisine est allumée.'], [0, "Oh. T'es debout.", 'surprised'], [0, "Moi ? Non, je dors jamais vraiment. C'est une condition.", 'holding'], [-1, 'Sur le comptoir : ton agenda. Ouvert à demain.'], [0, 'Demain va être une grosse journée pour toi.', 'explaining'], [0, 'Je voulais juste être prêt.', 'listen']] },
   { id: 'feu', title: 'Autour du feu', by: '@campfire', plays: '11,2 k', bg: 'terrasse', pos: '50% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(.4)', glow: '#ff7a2e',
     cast: [['brooke', 'sit_fire'], ['justin', 'listen']], players: 2, byoc: true, live: { friend: 'Inès', since: 12 }, you: 1,
-    pitch: 'Une histoire de fantôme au chalet, racontée à deux voix. Chaque fois que quelqu\'un ment, le feu baisse.',
+    pitch: "Une histoire de fantôme au chalet, à deux voix. Chaque fois que quelqu'un ment, le feu baisse… et il vient de baisser.",
     lines: [[-1, 'Le chalet. Minuit. Un feu, deux bûches, plus de bière.'], [0, 'Ok, je te raconte la vraie histoire du lac.', 'sit_fire'], [1, 'La vraie ou celle de ton oncle ?', 'listen'], [0, "Mon oncle, c'est la vraie.", 'drunk_point'], [-1, 'Le feu crépite. Plus fort que prévu.'], [0, 'Il y avait une fille qui nageait ici toutes les nuits.', 'drunk_talk'], [1, 'Laisse-moi deviner. Un soir, elle est jamais remontée.', 'thinking'], [0, 'Non. Un soir, elle est remontée… avec quelqu\'un.', 'nervous'], [-1, "Le feu baisse d'un coup. Personne n'a menti. En principe."], [1, "T'as vu ça ?", 'surprised'], [0, "C'est le vent.", 'nervous'], [1, "Y a pas de vent.", 'angry']] },
   { id: 'candy', title: 'Candy ne ment jamais', by: '@sucre', plays: '4,4 k', bg: 'terrasse', pos: '80% 50%', fx: 'hue-rotate(290deg) saturate(1.6) brightness(.85)', glow: '#ff9ce6',
     cast: [['candy', 'explaining']], players: 1, byoc: false, live: null, you: -1,
-    pitch: 'Candy a une règle : elle dit toujours la vérité. Toujours. Même quand tu préférerais vraiment qu\'elle se taise.',
+    pitch: "Candy ne ment jamais. Jamais. Et elle vient de s'asseoir au brunch entre ta mère et ton chum.",
     lines: [[-1, 'Un brunch. Ta mère, ton chum, et Candy. Mauvaise idée.'], [0, "J'adore ta mère ! Elle est exactement comme tu l'as décrite.", 'explaining'], [-1, "Ta mère sourit. Elle ne sait pas comment tu l'as décrite."], [0, 'Non mais pas dans le mauvais sens. Juste… intense.', 'thinking'], [0, "Pis toi, t'es le fameux chum ! Celui du test.", 'holding'], [-1, 'Le test. Il ne sait pas pour le test.'], [0, "Oups. C'était pas censé…", 'surprised'], [0, 'Bon. Je mens jamais, alors je vais tout dire.', 'explaining'], [-1, 'Tu lui donnes un coup de pied sous la table.'], [0, 'Aïe ! Pourquoi tu me frappes ?', 'angry'], [0, 'Ok. Ok. Version courte.', 'thinking'], [0, 'Il a passé le test. De justesse.', 'listen']] },
   { id: 'contrat', title: 'Un dernier boulot', by: '@julianfiles', plays: '7,8 k', bg: 'salon', pos: '25% 50%', fx: 'grayscale(1) brightness(.55) contrast(1.2)', glow: '#ffffff',
     cast: [['julian', 'talk']], players: 1, byoc: false, live: null, you: -1,
-    pitch: "Julian te propose un dernier boulot : facile, payant, sans risque. C'est exactement ce qu'il a dit la dernière fois.",
+    pitch: "Un dernier boulot : facile, payant, sans risque. C'est exactement ce que Julian avait dit la dernière fois.",
     lines: [[-1, 'Un café désert. Julian est déjà là. Il a commandé pour toi.'], [0, "T'as l'air bien. Reposé. Ça te va pas.", 'smirk'], [0, "J'ai un boulot. Un dernier.", 'talk'], [-1, 'La dernière fois, il a dit exactement ça.'], [0, "Je sais ce que tu penses. Cette fois, c'est propre.", 'hands_up'], [0, 'Une livraison. Une enveloppe. Point A, point B.', 'offer'], [-1, 'Il glisse l\'enveloppe. Elle est lourde. Trop pour du papier.'], [0, "Pose pas de questions, c'est inclus dans le prix.", 'cold'], [0, 'Dix mille. La moitié maintenant.', 'offer'], [-1, 'Derrière lui, un homme en complet ne lit pas son journal.'], [0, 'Fais pas ça. Regarde-moi, pas lui.', 'cold'], [0, 'Alors ? On a un deal ?', 'listen']] },
 ];
+// each preview has its own length (it stops on a hook, not on a round number)
+const CUT = { table: 9, cles: 10, pacte: 8, mensonge: 11, nuit: 7, coloc: 9, feu: 10, candy: 8, contrat: 7 };
+for (const d of DEMOS) if (CUT[d.id]) d.lines = d.lines.slice(0, CUT[d.id]);
+const total = (d) => d.taps || d.lines.length;
 // the player's own demos (from the + tab) go first
 const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS];
@@ -548,15 +571,14 @@ const OPTIONS = [
   ['layout', 'Mise en page', 'Aussi avec ‹ › en haut.', LAYOUTS],
   ['live', 'Quelqu\'un attend dans une salle', 'Sur l\'affiche. Vert = un inconnu, rose = un ami.', [['dot', 'Point qui clignote'], ['badge', 'Étiquette'], ['ring', 'Contour lumineux'], ['avatar', 'Avatar']]],
   ['play', 'Bouton Jouer quand quelqu\'un attend', '', [['dot', 'Point sur le bouton'], ['color', 'Bouton coloré'], ['label', 'Ligne au-dessus']]],
-  ['players', 'Solo / multijoueur', '', [['icons', 'Silhouettes'], ['count', 'Chiffre'], ['word', 'Solo / Duo / Trio']]],
   ['byoc', 'Amène ton perso', '', [['icon', 'Icône'], ['tag', 'Étiquette'], ['corner', 'Bandeau en coin']]],
   ['save', 'Sauver', '', [['bookmark', 'Signet'], ['heart', 'Cœur'], ['plus', '+ Ma liste']]],
   ['detail', 'Voir plus', '', [['veil', 'Voile noir plein écran'], ['zoom', 'Affiche zoomée'], ['sheet', 'Panneau du bas']]],
   ['title', 'Titre', '', [['under', 'Sous l\'affiche'], ['over', 'Sur l\'affiche']]],
-  ['progress', 'Progression dans l\'aperçu', '', [['corner', '#/12 en coin'], ['bar', 'Barre en segments'], ['ring', 'Cercle'], ['pill', 'En bas']]],
+  ['progress', 'Progression dans l\'aperçu', '', [['corner', '#/N en coin'], ['bar', 'Barre en segments'], ['ring', 'Cercle'], ['pill', 'En bas']]],
   ['tabs', 'Onglets', '', [['labels', 'Icônes + texte'], ['icons', 'Icônes seules'], ['pill', 'Pilule flottante']]],
 ];
-const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', players: 'icons', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
+const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
 let saved = keep.get('saved', {});   // id -> { with: [names], at }
 let screen = 'menu', tab = 'explore', viewKey = '', filter = 'all', savedWho = 'all', spotSel = null, deckGone = [];
@@ -571,13 +593,10 @@ function cover(d) {
   const art = d.img ? `<img class="cvimg" src="${d.img}" alt="">` : `<div class="cvbg" style="background-image:url(bg/${d.bg}.jpg);background-position:${d.pos};filter:${d.fx}"></div>${sprites(d)}`;
   return `<div class="cv n${d.img ? 0 : d.cast.length}" style="--glow:${d.glow || '#fff'}">${art}<div class="cvfade"></div>${O.title === 'over' ? `<div class="cvt">${esc(d.title)}</div>` : ''}</div>`;
 }
-function players(d, inMeta) {
+// how many play it: a user icon and the number
+function players(d) {
   const n = d.players;
-  let inner;
-  if (O.players === 'icons') inner = `<span class="ppl">${I.person.repeat(n)}</span>`;
-  else if (O.players === 'count') inner = `${I.person}<span>${n === 1 ? '1' : n === 2 ? '2' : '2–3'}</span>`;
-  else inner = `<span>${['Solo', 'Duo', 'Trio'][n - 1]}</span>`;
-  return `<span class="mk ${n === 1 ? 'solo' : 'multi'}" title="${n === 1 ? 'Solo' : n + ' joueurs'}">${inner}${inMeta && O.players === 'icons' ? `<span style="font-size:1.3em">${n === 1 ? 'Solo' : n + ' joueurs'}</span>` : ''}</span>`;
+  return `<span class="mk" title="${n === 1 ? 'Solo' : n + ' joueurs'}">${I.person}<span>${n === 3 ? '2–3' : n}</span></span>`;
 }
 function byoc(d, inMeta) {
   if (!d.byoc) return '';
@@ -609,12 +628,12 @@ function saveBtn(d) {
 function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '' } = {}) {
   const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
   return `<div class="card${ringCls(d)}" data-act="open" data-id="${d.id}">
-    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.full ? '<span class="mk full"><span>Complet</span></span>' : ''}${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
+    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
   </div>`;
 }
 function meta(d) {
-  return `<div class="meta">${d.full ? '<span class="mk full"><span>Histoire complète · EN</span></span>' : ''}${players(d, true)}${byoc(d, true)}</div>`;
+  return `<div class="meta">${players(d)}${byoc(d, true)}</div>`;
 }
 // Play: a stranger or a friend waiting changes it (3 ways, ⚙)
 const playDot = (d) => {
@@ -645,7 +664,7 @@ const R = {
   rows() {
     const h = byId('lastcall');
     let s = `<div class="hero"><div class="blur" style="background-image:url(bg/${h.bg}.jpg);filter:blur(3em) ${h.fx}"></div>
-      <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${h.full ? '<span class="mk full"><span>Complet</span></span>' : ''}${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
+      <div class="cvw" data-act="open" data-id="${h.id}">${cover(h)}<div class="marks">${players(h)}${byoc(h)}</div>${liveMark(h)}</div>
       <div class="info"><div class="row">${playBtn(h)}${saveWide(h)}</div></div></div>`;
     SHELVES.forEach(([name, pick], i) => {
       const list = shelf(pick); if (!list.length) return;
@@ -747,7 +766,7 @@ function renderAdd() {
 function renderTabs() {
   const n = Object.keys(saved).length;
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
-  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés');
+  $('#tabs').innerHTML = t('home', I.home, 'En cours') + t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés');
 }
 function renderMenu() {
   $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
@@ -755,14 +774,46 @@ function renderMenu() {
 }
 // which page shows: Full demo's menu, or one of the tabs (Explorer = the Current scroll or the All layouts)
 const page = () => screen === 'menu' ? 'menu' : tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
+const BASE = 'home';   // the tab a mode opens on
 function render() {
   document.body.className = `s-${screen} t-${tab} tabs-${O.tabs}`;
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
-  for (const x of ['menu', 'current', 'explore', 'saved', 'add']) $('#' + x).hidden = x !== v;
+  for (const x of ['menu', 'home', 'current', 'explore', 'saved', 'add']) $('#' + x).hidden = x !== v;
   renderTabs();
-  ({ menu: renderMenu, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd })[v]();
+  ({ menu: renderMenu, home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd })[v]();
+}
+
+// ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
+// alone or with someone. A preview you finish leaves the list. ----
+const ago = (t) => { const m = Math.round((Date.now() - t) / 60000); return m < 60 ? `il y a ${Math.max(1, m)} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
+const prog = keep.get('prog', (() => {   // a first visit already has a few (fake) ones going
+  const now = Date.now();
+  return { mensonge: { i: 5, with: ['Max'], at: now - 40 * 60000 }, nuit: { i: 3, with: [], at: now - 5 * 3600000 }, cles: { i: 6, with: ['Léa', 'Inès'], at: now - 2 * 86400000 }, table: { i: 4, with: [], at: now - 4 * 86400000 } };
+})());
+function track(id, i, w) {
+  if (i === null) delete prog[id];
+  else prog[id] = { i, with: w || (prog[id] && prog[id].with) || [], at: Date.now() };
+  keep.set('prog', prog);
+}
+const pbar = (id) => { const d = byId(id), p = prog[id]; return `<div class="pbar"><i style="width:${Math.round(100 * (p.i + 1) / total(d))}%"></i></div>`; };
+function going(id) {   // a started story as a card: tap = pick it up
+  const w = prog[id].with;
+  const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>${esc(w.join(', '))}</span></span>` : '';
+  return card(byId(id), { byocB: false, extra: withs + pbar(id) }).replace('data-act="open"', 'data-act="resume"');
+}
+function renderHome() {
+  const ids = Object.keys(prog).filter(byId).sort((a, b) => prog[b].at - prog[a].at);
+  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
+  const [top, ...rest] = ids, d = byId(top), p = prog[top], n = total(d);
+  const solo = rest.filter((id) => !prog[id].with.length), duo = rest.filter((id) => prog[id].with.length);
+  $('#home').innerHTML = `<div class="cont"><div class="blur" style="${bgOf(d)}"></div>
+      <div class="cvw" data-act="resume" data-id="${top}">${cover(d)}${pbar(top)}</div>
+      <div class="info"><h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))} · ` : ''}${p.i + 1}/${n} · ${ago(p.at)}</p>
+      <button class="btn main" data-act="resume" data-id="${top}">${I.play}Continuer</button></div></div>
+    ${duo.length ? `<div class="h2">Avec d'autres</div><div class="shelf">${duo.map(going).join('')}</div>` : ''}
+    ${solo.length ? `<div class="h2">Solo</div><div class="shelf">${solo.map(going).join('')}</div>` : ''}`;
 }
 
 // ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
@@ -770,8 +821,9 @@ const at = {};   // demo id -> line shown
 let seen = null;
 function renderCurrent() {
   const box = $('#current');
-  box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}"><div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div>
-    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div>${d.full ? '<div class="ftag">Histoire complète</div>' : ''}<div class="cline"></div>
+  box.innerHTML = all().map((d) => `<div class="ci" data-id="${d.id}">${d.full ? `<iframe class="gframe" data-src="index.html?preview=${d.full}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
+      : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div>`}
+    <div class="ctitle">${esc(d.title)}</div><div class="pc-corner"></div><div class="cline"></div>
     <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
       <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIcon(!!saved[d.id])}</button>
       <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`).join('');
@@ -779,21 +831,34 @@ function renderCurrent() {
   if (seen) seen.disconnect();
   seen = new IntersectionObserver((es) => es.forEach((e) => {
     if (!e.isIntersecting) return;
-    const ci = e.target; ci.classList.remove('flash'); void ci.offsetWidth; ci.classList.add('flash');
+    const ci = e.target, f = $('iframe', ci); ci.classList.remove('flash'); void ci.offsetWidth; ci.classList.add('flash');
+    if (f && !f.getAttribute('src')) f.src = f.dataset.src;   // the game loads only once you scroll to it
   }), { root: box, threshold: .6 });
   $$('.ci', box).forEach((ci) => seen.observe(ci));
 }
 function line(ci, i) {
-  const d = byId(ci.dataset.id); at[d.id] = i;
-  if (i >= 12) {
-    $('.cline', ci).innerHTML = `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;
-    $('.pc-corner', ci).innerHTML = '<b>12</b>/12'; return;
+  const d = byId(ci.dataset.id), n = total(d); at[d.id] = i;
+  if (i >= n) track(d.id, null); else if (i > 0) track(d.id, i);
+  if (i >= n) {
+    $('.cline', ci).innerHTML = `<div class="cend${d.full ? ' dark' : ''}">Fin de l'aperçu · ▶ pour jouer</div>`;
+    $('.pc-corner', ci).innerHTML = `<b>${n}</b>/${n}`; return;
   }
+  $('.pc-corner', ci).innerHTML = `<b>${i + 1}</b>/${n}`;
+  if (d.full) { $('.cline', ci).innerHTML = ''; return; }
   const [who, text, pose] = d.lines[i], sp = $$('.pcast .sp', ci);
   if (who >= 0 && pose && sp[who]) sp[who].src = `chars/${d.cast[who][0]}/${pose}.webp`;
   sp.forEach((img, k) => img.classList.toggle('talk', k === who));
   $('.cline', ci).innerHTML = lineHtml(d, who, text);
-  $('.pc-corner', ci).innerHTML = `<b>${i + 1}</b>/12`;
+}
+// a tap in the feed: the next line; on Last call it goes to the game, where it landed (a choice is a choice)
+function tapCurrent(ci, e) {
+  const d = byId(ci.dataset.id), i = at[d.id] || 0, over = i >= total(d), f = d.full && $('iframe', ci);
+  if (f && over) f.src = f.dataset.src;
+  else if (f && f.getAttribute('src')) {
+    const r = f.getBoundingClientRect();
+    f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
+  }
+  line(ci, over ? 0 : i + 1);
 }
 const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : `background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || 'none'}`;
 function lineHtml(d, who, text) {
@@ -807,7 +872,7 @@ function syncCurrent() {
 
 // ---- navigation: every level is a history entry, so the phone's back and ‹ do the same thing.
 // state = { screen: menu|current|all, tab, ov: the overlay on top ({k: detail|player|sheet, ..., under}), depth } ----
-const hashOf = (st) => '#' + (st.screen === 'menu' ? '' : st.screen + (st.tab !== 'explore' ? '/' + st.tab : ''));
+const hashOf = (st) => '#' + (st.screen === 'menu' ? '' : st.screen + (st.tab !== BASE ? '/' + st.tab : ''));
 const cur = () => history.state;
 function push(p) { const st = { ...cur(), ...p, depth: cur().depth + 1 }; history.pushState(st, '', hashOf(st)); apply(st); }
 function swap(p) { const st = { ...cur(), ...p }; history.replaceState(st, '', hashOf(st)); apply(st); }
@@ -817,8 +882,8 @@ function back(then) {
   if (st.depth > 0) { pending = then || null; history.back(); return; }
   // opened right here (a link, a reload): walk up by hand
   if (st.ov) swap({ ov: st.ov.under || null });
-  else if (st.tab !== 'explore') swap({ tab: 'explore' });
-  else if (st.screen !== 'menu') swap({ screen: 'menu', tab: 'explore', tabFrom: null });
+  else if (st.tab !== BASE) swap({ tab: BASE });
+  else if (st.screen !== 'menu') swap({ screen: 'menu', tab: BASE, tabFrom: null });
   else return leave();
   if (then) then();
 }
@@ -836,20 +901,20 @@ function apply(st) {
   if (key !== viewKey) { viewKey = key; render(); }
   const layers = []; for (let o = st.ov; o; o = o.under) layers.push(o);
   const pl = layers.find((o) => o.k === 'player'), dt = layers.find((o) => o.k === 'detail');
-  if (pl) { if (!P || P.d.id !== pl.id || $('#player').hidden) play(pl.id, pl.host); }
+  if (pl) { if (!P || P.d.id !== pl.id || $('#player').hidden) play(pl.id, pl.host, pl.from || 0); }
   else if (!$('#player').hidden) { $('#player').hidden = true; P = null; after(); }
   if (dt) { if ($('#detail').hidden || $('#detail').dataset.id !== dt.id) openDetail(dt.id, dt.cur); } else $('#detail').hidden = true;
   if (!layers.length || layers[0].k !== 'sheet') $('#sheet').hidden = true;
 }
 function setTab(t) {
   if (t === tab) { $('#' + page()).scrollTop = 0; return; }
-  if (t === 'explore' && cur().tabFrom === 'explore') return back();
-  if (tab === 'explore') push({ tab: t, ov: null, tabFrom: 'explore' }); else swap({ tab: t, ov: null });
+  if (t === BASE && cur().tabFrom === BASE) return back();
+  if (tab === BASE) push({ tab: t, ov: null, tabFrom: BASE }); else swap({ tab: t, ov: null });
 }
-function openPlayer(id, host = false) {
+function openPlayer(id, host = false, from = 0) {
   const d = byId(id);
   if (d.full) { location.href = `index.html#open=${d.full}`; return; }   // the real game; its back comes here
-  const top = cur().ov, o = { k: 'player', id, host };
+  const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
 
@@ -899,13 +964,13 @@ function swipe(yes) {
 // ---- details: veil (full screen, black at the bottom) / zoomed cover / bottom sheet ----
 function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
-  if (inCurrent) {   // Current: black at the bottom, over the scene still playing
-    box.innerHTML = `<div class="dimT" data-act="closeD"></div><div class="infoC"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${liveLine(d)}<div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div>`;
+  if (inCurrent) {   // Current: the cover, full screen, black at the bottom (not the scene where you left off)
+    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${liveLine(d)}<div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
     box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
   }
   delete box.dataset.cur;
   const body = `<h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${actions(d)}`;
-  const marks = `${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}`;
+  const marks = d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';   // who's waiting: on Jouer
   if (O.detail === 'veil') box.innerHTML = `<div class="veil"><div class="cvw">${cover(d)}${marks}</div><div class="shade"></div><div class="txt">${body}</div><button class="x" data-act="closeD">${I.close}</button></div>`;
   else if (O.detail === 'zoom') box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="zoom"><div class="cvw">${cover(d)}${marks}<div class="over">${body}</div></div></div>`;
   else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
@@ -939,7 +1004,7 @@ function people(id, fresh, done = after) {
 function after() {
   renderTabs();
   const v = page();
-  if (v === 'current') syncCurrent(); else if (v === 'explore') renderExplore(); else if (v === 'saved') renderSaved();
+  if (v === 'current') syncCurrent(); else if (v === 'explore') renderExplore(); else if (v === 'saved') renderSaved(); else if (v === 'home') renderHome();
   refreshDetail();
 }
 
@@ -1011,15 +1076,19 @@ function openRoom() {
 
 // ---- the preview: tap to go on, n/12 ----
 let P = null;
-function play(id, host = false) {
-  const d = byId(id), box = $('#player');
-  P = { d, i: -1, poses: d.cast.map((c) => c[1]) };
+function play(id, host = false, from = 0) {
+  const d = byId(id), box = $('#player'), was = prog[id];
+  P = { d, i: from - 1, poses: d.cast.map((c) => c[1]), with: from && was ? was.with : [] };
+  // picking up where you left off: everyone's last pose up to there
+  for (const [who, , pose] of d.lines.slice(0, from)) if (who >= 0 && pose) P.poses[who] = pose;
   box.innerHTML = `<div class="pbg" style="background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || ''}"></div>
     <div class="pcast n${d.cast.length}">${sprites(d)}</div><div class="pshade"></div><div id="pProg"></div>
     <button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button><div id="pLine"></div>`;
+  $$('.pcast .sp', box).forEach((img, k) => { img.src = `chars/${d.cast[k][0]}/${P.poses[k]}.webp`; });
   if (d.img) $('.pbg', box).style.cssText = `background:url(${d.img}) center/cover`;
   box.hidden = false;
-  if (d.players > 1) join(d, host); else step();
+  if (from && P.with.length) withChip(P.with);
+  if (d.players > 1 && !from) join(d, host); else step();
 }
 // a multiplayer demo opens on its room: who's in, who's coming
 function join(d, host) {
@@ -1032,10 +1101,15 @@ function join(d, host) {
     <div class="seatsBig">${seat(`<span class="av" style="background:#f5f5f7;color:#000"><b>T</b></span>`, 'Toi')}${others}${d.players === 3 ? seat('<span class="empty-seat"></span>', 'Libre') : ''}</div>
     <button class="btn main" data-act="pgo">${I.play}Commencer</button>`;
   $('#player').appendChild(box);
-  if (f || l) { const w = document.createElement('div'); w.className = 'pwith'; w.innerHTML = f ? `${av(f.n)}avec ${esc(f.n)}` : `<span class="av" style="background:#3a3a3c">?</span>avec un inconnu`; $('#player').appendChild(w); }
+  if (f) { P.with = [f.n]; withChip(P.with); }
+  else if (l) { const w = document.createElement('div'); w.className = 'pwith'; w.innerHTML = `<span class="av" style="background:#3a3a3c">?</span>avec un inconnu`; $('#player').appendChild(w); }
+}
+function withChip(names) {
+  const w = document.createElement('div'); w.className = 'pwith';
+  w.innerHTML = `${names.map((n) => av(n)).join('')}avec ${esc(names.join(', '))}`; $('#player').appendChild(w);
 }
 function progress() {
-  const n = P.i + 1, t = 12, el = $('#pProg');
+  const t = total(P.d), n = Math.min(P.i + 1, t), el = $('#pProg');
   if (O.progress === 'corner') el.innerHTML = `<div class="pc-corner"><b>${n}</b>/${t}</div>`;
   else if (O.progress === 'bar') el.innerHTML = `<div class="pc-bar">${Array.from({ length: t }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>`;
   else if (O.progress === 'ring') { const c = 2 * Math.PI * 15; el.innerHTML = `<div class="pc-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c * n / t} ${c}"/></svg><span>${n}/${t}</span></div>`; }
@@ -1043,7 +1117,8 @@ function progress() {
 }
 function step() {
   const d = P.d; P.i++;
-  if (P.i >= 12) return end();
+  if (P.i >= d.lines.length) { track(d.id, null); return end(); }
+  if (P.i > 0) track(d.id, P.i, P.with);
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
   $$('#player .pcast .sp').forEach((img, i) => { const s = `chars/${d.cast[i][0]}/${P.poses[i]}.webp`; if (!img.src.endsWith(s)) img.src = s; img.classList.toggle('talk', i === who); });
@@ -1068,7 +1143,7 @@ stage.addEventListener('click', (e) => {
   if (!el) {
     if (P && !$('#player').hidden) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
     const ci = e.target.closest('.ci');
-    if (ci) line(ci, (at[ci.dataset.id] || 0) >= 12 ? 0 : (at[ci.dataset.id] || 0) + 1);
+    if (ci) tapCurrent(ci, e);
     return;
   }
   const id = el.dataset.id, act = el.dataset.act;
@@ -1076,11 +1151,12 @@ stage.addEventListener('click', (e) => {
   e.stopPropagation();
   switch (act) {
     case 'back': back(); break;
-    case 'mode': push({ screen: el.dataset.s, tab: 'explore', ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;
+    case 'mode': push({ screen: el.dataset.s, tab: BASE, ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;
     case 'open': push({ ov: { k: 'detail', id } }); break;
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); if (P && $('.pend')) el.remove(); break;
     case 'play': openPlayer(id); break;
+    case 'resume': openPlayer(id, false, byId(id).full ? 0 : (prog[id] ? prog[id].i : 0)); break;
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'vprev': case 'vnext': {
@@ -1110,8 +1186,8 @@ addEventListener('keydown', (e) => {
 });
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
-  const m = location.hash.match(/^#(current|all)(?:\/(saved|add))?$/);
-  const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'menu', tab: (m && m[2]) || 'explore', ov: null, tabFrom: null, depth: 0 };
+  const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add))?$/);
+  const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'menu', tab: (m && m[2]) || BASE, ov: null, tabFrom: null, depth: 0 };
   if (st.ov && st.ov.k === 'sheet') st.ov = st.ov.under;   // a sheet can't come back from a reload
   history.replaceState(st, '', hashOf(st));
   apply(st);
