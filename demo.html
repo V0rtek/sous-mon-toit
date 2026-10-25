@@ -115,7 +115,7 @@ body.tabs-pill #tabs span { display: none; }
 .chips::-webkit-scrollbar { display: none; }
 .chip { flex: none; font-size: 1.8em; font-weight: 700; padding: .5em 1em; border-radius: 2em; background: #1c1c1e; color: #d1d1d6; display: flex; align-items: center; gap: .4em; }
 .chip.on { background: var(--fg); color: #000; }
-.av { width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--c); color: #fff; display: inline-grid; place-items: center; font-size: .75em; font-weight: 900; flex: none; }
+.av { position: relative; overflow: hidden; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--c); color: #fff; display: inline-grid; place-items: center; font-size: .75em; font-weight: 900; flex: none; }
 .chip .av { font-size: .8em; }
 
 /* ---- buttons ---- */
@@ -330,6 +330,12 @@ body.tabs-pill #tabs span { display: none; }
 .pbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: .7em; background: rgba(255,255,255,.25); }
 .pbar i { display: block; height: 100%; background: var(--rose); }
 .shelf .withs { bottom: calc(4% + .7em); }
+/* a player's face (their character), cropped from the full figure */
+.mug { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
+.ldot.f, .lav, .pd.f, .room .seatsMini i { overflow: hidden; }
+.room .seatsMini i { position: relative; }
+.fr > div b small { font-size: .7em; font-weight: 600; color: var(--mute); }
+
 /* ---- All › Test bulles ---- */
 .tlead { font-size: 1.8em; color: var(--mute); margin: 0 6% 1em; line-height: 1.35; }
 .tf { position: relative; width: 78%; margin: 0 auto 1.4em; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 2em; background: #000; cursor: pointer; container-type: inline-size; }
@@ -539,10 +545,11 @@ const I = {
 const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
-  { n: 'Léa', c: '#ff4f8b', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', on: true },
-  { n: 'Sam', c: '#ff9f2e', on: true, doing: 'pacte' }, { n: 'Inès', c: '#9b6bff', on: false, seen: 'il y a 3 h' }, { n: 'Noé', c: '#25c48a', on: false, seen: 'hier' },
+  { n: 'Léa', c: '#ff4f8b', ch: 'mila', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', ch: 'ninja', on: true },
+  { n: 'Sam', c: '#ff9f2e', ch: 'belier_blanc', on: true, doing: 'pacte' }, { n: 'Inès', c: '#9b6bff', ch: 'plage', on: false, seen: 'il y a 3 h' },
+  { n: 'Noé', c: '#25c48a', ch: 'exile', on: false, seen: 'hier' },
 ];
-const STRANGERS = [{ n: 'Nico', c: '#5ac8c8' }, { n: 'Zoé', c: '#c97b4a' }, { n: 'Malik', c: '#7f8cff' }, { n: 'Jade', c: '#d4609b' }, { n: 'Hugo', c: '#8bbf4a' }];
+const STRANGERS = [{ n: 'Nico', c: '#5ac8c8', ch: 'dan' }, { n: 'Zoé', c: '#c97b4a', ch: 'ruby' }, { n: 'Malik', c: '#7f8cff', ch: 'amare' }, { n: 'Jade', c: '#d4609b', ch: 'isa_nuit' }, { n: 'Hugo', c: '#8bbf4a', ch: 'alex' }];
 const friend = (n) => FRIENDS.find((f) => f.n === n) || STRANGERS.find((f) => f.n === n) || { n, c: '#636366' };
 // who's waiting in a demo's room: the friend, then the strangers (always the same ones for a given demo)
 function waiting(d) {
@@ -561,72 +568,72 @@ const DEMOS = [
   { id: 'ile', title: "Ce qui reste de l'île", by: '@ileperdue', plays: '19,7 k', bg: 'forest', glow: '#ff3b3b',
     cast: [['dan', 'stand'], ['rae', 'kneel']], players: 2, byoc: false, live: { strangers: 1, since: 2 }, you: 0,
     pitch: "Quatre amis, une île, une semaine de soleil. Le bateau devait revenir il y a deux jours — et Mila, qu'ils ont vue tomber, chante encore dans la forêt.",
-    lines: [[-1, "Jour 3 sur l'île. Le bateau devait revenir hier."], [0, 'Rae. Faut bouger. Il fait presque nuit.'], [1, 'Deux minutes. Juste… deux minutes.'], [0, "T'as entendu ça ?", 'scared'], [1, "Arrête. Y a rien."], [-1, 'Derrière les arbres, quelqu\'un chante. La voix de Mila.'], [0, "Mila est morte, Rae. On l'a vue tomber.", 'scared'], [1, "…Alors pourquoi elle m'appelle ?"], [-1, 'Rae se relève. Lentement. Trop lentement.'], [1, "Elle dit qu'il y a de la place pour nous deux.", 'possessed']] },
+    lines: [[0, "Rae. Lève-toi. Il fait presque nuit.", "stand"], [1, "Deux minutes. Juste… deux minutes."], [0, "T'as entendu ça ?", "scared"], [1, "Arrête. Y a rien."], [-1, "Derrière les arbres, quelqu'un chante. La voix de Mila."], [0, "Mila est morte, Rae. On l'a vue tomber.", "scared"], [1, "…Alors pourquoi elle m'appelle ?"], [1, "Elle dit qu'il y a de la place pour nous deux.", "possessed"]] },
   // drawn from one sheet (25/10): one pose each, so their lines carry none
   { id: 'beliers', title: "Deux béliers", by: '@colline', plays: '2,1 k', bg: 'maison', pos: '70% 50%', fx: 'saturate(.7) brightness(.55) hue-rotate(50deg)', glow: '#e8dcc0',
     cast: [['belier_noir', 'stand'], ['belier_blanc', 'stand']], players: 2, byoc: false, live: { strangers: 1, since: 4 }, you: 0,
     pitch: "Depuis dix ans, Ébène et Neige se disputent le sommet de la colline. Ce matin, quelqu'un a gravé un nom sur le vieux chêne — et ce n'est aucun des deux.",
-    lines: [[-1, "La colline. L'aube. Deux béliers, un seul sommet."], [0, "Tu es en retard, Neige."], [1, "Je suis en avance. C'est toi qui as dormi ici."], [0, "Quelqu'un doit garder le sommet."], [1, "Garder, ou empêcher les autres de monter ?"], [-1, "Sur l'écorce du vieux chêne : un nom, fraîchement gravé."], [0, "…Ce n'est pas mon écriture."], [1, "Ni la mienne."], [-1, "En bas, dans la brume, tout le troupeau les regarde."]] },
+    lines: [[0, "Tu es en retard, Neige."], [1, "Je suis en avance. C'est toi qui as dormi ici."], [0, "Quelqu'un doit garder le sommet."], [1, "Garder, ou empêcher les autres de monter ?"], [-1, "Sur l'écorce du vieux chêne, un nom. Fraîchement gravé."], [0, "…Ce n'est pas mon écriture."], [1, "Ni la mienne."], [-1, "En bas, dans la brume, tout le troupeau les regarde."]] },
   { id: 'ombre', title: "Ce qui dort sous la ville", by: '@nuitblanche', plays: '9,8 k', bg: 'maison', pos: '40% 50%', fx: 'hue-rotate(320deg) saturate(2) brightness(.28)', glow: '#ff3b3b',
     cast: [['ombre', 'stand']], players: 1, byoc: true, live: null, you: -1,
     pitch: "3 h du matin, station vide, et les rails vibrent encore. Ce qui dort sous la ville vient de prononcer ton nom.",
-    lines: [[-1, "Station Berri, 3 h 12. Le dernier métro est passé il y a une heure."], [-1, "Pourtant, les rails vibrent."], [0, "Tu m'entends. Personne ne m'entend, d'habitude."], [-1, "La voix vient de partout. Et de juste derrière toi."], [0, "J'ai dormi sous cette ville cent ans. Tu m'as réveillé."], [0, "Alors tu vas m'aider. Ou tu vas me nourrir."], [-1, "Les néons s'éteignent un par un, jusqu'à ton quai."], [0, "Choisis vite."]] },
+    lines: [[0, "Tu m'entends. Personne ne m'entend, d'habitude."], [-1, "Les rails vibrent. Le dernier métro est passé il y a une heure."], [0, "J'ai dormi sous cette ville cent ans. Tu m'as réveillé."], [0, "Alors tu vas m'aider. Ou tu vas me nourrir."], [-1, "Les néons s'éteignent un par un, jusqu'à ton quai."], [0, "Choisis vite."]] },
   { id: 'serment', title: "Le serment brisé", by: '@kunai', plays: '15,3 k', bg: 'terrasse', pos: '15% 50%', fx: 'grayscale(.4) brightness(.4) hue-rotate(160deg)', glow: '#ff6a3d',
     cast: [['exile', 'stand'], ['ninja', 'stand']], players: 2, byoc: false, live: { strangers: 2, since: 1 }, you: 0,
     pitch: "Six ans qu'il cherche son frère d'armes. Ce soir, il le retrouve sur le pont — et c'est l'autre qui a les réponses.",
-    lines: [[-1, "Le pont du village. Minuit. La pluie vient de s'arrêter."], [1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
+    lines: [[1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
   { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'terrasse', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
     cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
     pitch: "Cinq ans après, tu retrouves Maya sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière elle.",
-    lines: [[-1, "Août. La terrasse du chalet. Il fait 34 degrés."], [0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
+    lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
   { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
     cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
     pitch: "Cam a enfin osé s'asseoir à côté de toi. Son téléphone vibre pour la troisième fois — et elle refuse de dire qui c'est.",
-    lines: [[-1, 'Terrasse du Marcel. 1 h 04. Le serveur empile déjà les chaises.'], [1, "Je t'avais dit que je viendrais.", 'flirty'], [0, "T'es venue pour moi ou pour le pichet ?", 'drunk_joke'], [1, "Les deux. Dans cet ordre-là, peut-être.", 'tipsy_laugh'], [0, 'Fais attention, je note tout.', 'drunk_point'], [-1, 'Son téléphone vibre sur la table. Elle le retourne sans regarder.'], [0, "C'était qui ?", 'drunk_listen'], [1, "Personne d'important. Pas ce soir.", 'awkward'], [0, '« Pas ce soir », ça veut dire demain oui.', 'drunk_talk'], [1, 'Ça veut dire que tu poses trop de questions.', 'sip'], [-1, 'Le téléphone vibre encore. Trois fois.'], [1, '…Ok. Faut que je te dise un truc.', 'worried']] },
+    lines: [[1, "Si je te dis un secret, tu me promets de pas partir ?", "flirty"], [0, "Ça dépend. C'est un beau secret ou un laid ?", "drunk_joke"], [1, "Les deux.", "tipsy_laugh"], [-1, "Son téléphone vibre. Elle le retourne, écran contre la table."], [0, "C'était lui ?", "drunk_listen"], [1, "…Comment tu sais qu'il y a un « lui » ?", "awkward"], [0, "T’as retourné ton téléphone. Personne fait ça pour sa mère.", "drunk_point"], [1, "Il sait que je suis ici. Avec toi.", "worried"], [0, "Et c'est un problème ?", "drunk_talk"], [1, "Ça va le devenir.", "sip"], [-1, "Le téléphone vibre encore. Trois fois."], [1, "Faut que tu partes. Maintenant.", "worried"]] },
   { id: 'table', title: 'Sous la table', by: '@nego_club', plays: '8,1 k', bg: 'salon', pos: '60% 50%', fx: 'hue-rotate(190deg) brightness(.45) saturate(.8)', glow: '#5cc8ff',
     cast: [['suit', 'adjust'], ['julian', 'smirk']], players: 1, byoc: true, live: null, you: 0,
     pitch: "Deux millions sur la table, un stylo doré, dix secondes pour signer. L'un des deux hommes en face de toi ment — pas forcément celui que tu crois.",
-    lines: [[-1, 'Salle de réunion, 23e étage. Il pleut sur la ville.'], [1, 'Asseyez-vous. Vous avez lu la dernière page ?', 'talk'], [0, 'Je lis toujours la dernière page en premier.', 'adjust'], [1, 'Alors vous savez ce qu\'on vous demande.', 'smirk'], [0, 'Je sais ce que vous croyez obtenir.', 'listen'], [-1, 'Julian glisse un stylo sur la table. Doré. Lourd.'], [1, 'Deux millions. Ce soir. Pas demain.', 'offer'], [0, 'Et si je refuse ?', 'angry'], [1, 'Personne ne refuse. On renégocie, au mieux.', 'cold'], [0, 'Alors renégocions.', 'offer'], [1, 'Vous avez dix secondes.', 'cold'], [-1, 'Ta main est au-dessus du stylo. Ton perso hésite.']] },
+    lines: [[1, "Signez, et personne n'apprendra ce que vous avez fait à Montréal.", "offer"], [0, "Je ne suis jamais allé à Montréal.", "adjust"], [1, "Ce n'est pas ce que dit cette photo.", "smirk"], [-1, "Il glisse une photo sur la table. Face cachée."], [0, "Retournez-la.", "angry"], [1, "Signez d'abord.", "cold"], [0, "Vous bluffez.", "listen"], [1, "Peut-être. Vous avez dix secondes pour le découvrir.", "cold"], [-1, "Le stylo doré roule jusqu'à ta main."]] },
   { id: 'cles', title: 'Trois clés, une porte', by: '@escape.qc', plays: '21 k', bg: 'maison', pos: '50% 50%', fx: 'sepia(.45) brightness(.6)', glow: '#ffd36b',
     cast: [['ruby', 'holding'], ['james', 'thinking'], ['diane', 'explaining']], players: 3, byoc: true, live: { friend: 'Léa', strangers: 1, since: 3 }, you: 0,
     pitch: "Trois colocs reçoivent chacun une clé, sans un mot. Derrière la porte : la chambre de Sophie, partie sans dire au revoir il y a six mois… sauf à l'un d'eux.",
-    lines: [[-1, 'Le couloir de l\'appart. La porte du fond est verrouillée depuis six mois.'], [0, "J'ai la mienne. Elle était dans ma boîte aux lettres.", 'holding'], [1, 'Moi aussi. Sans mot, sans rien.', 'thinking'], [2, "Pareil. Donc quelqu'un veut qu'on l'ouvre ensemble.", 'explaining'], [0, "Ou quelqu'un veut qu'on se dispute.", 'angry'], [1, "Sophie est partie sans dire au revoir. C'est pas normal.", 'explaining'], [2, "Elle t'a dit au revoir à toi, James.", 'angry'], [1, '…Quoi ?', 'surprised'], [-1, 'Un silence. Ruby regarde James.'], [0, "Tu nous l'avais pas dit.", 'listen'], [1, "Parce que c'était pas important.", 'thinking'], [2, 'Alors tourne ta clé en premier.', 'explaining']] },
+    lines: [[0, "Qui a mis une clé dans ma boîte aux lettres ?", "holding"], [1, "Moi aussi, j'en ai reçu une.", "surprised"], [2, "Moi aussi. C'est la clé de la chambre de Sophie.", "explaining"], [0, "Sophie est partie il y a six mois.", "angry"], [2, "Elle t'a dit au revoir, à toi, James ?", "angry"], [1, "…Pourquoi tu me regardes comme ça ?", "surprised"], [2, "Parce qu'elle m'a écrit la veille. Elle avait peur de toi.", "explaining"], [1, "C'est faux.", "thinking"], [0, "Alors ouvre la porte en premier.", "listen"], [-1, "Trois clés. Une serrure. James ne bouge pas."]] },
   { id: 'appel', title: 'Appel manqué', by: '@justin', plays: '5,6 k', bg: 'maison', pos: '30% 50%', fx: 'grayscale(.6) brightness(.45) hue-rotate(180deg)', glow: '#7aa7ff',
     cast: [['justin', 'phone_shock']], players: 1, byoc: false, live: null, you: 0,
     pitch: "17 appels manqués de ton frère. Quand tu arrives chez lui, la porte est ouverte, la télé allumée, et il t'a laissé une note : « Ne me cherche pas. »",
-    lines: [[-1, '2 h 12. Ton écran s\'allume : 17 appels manqués — Marco.'], [0, "Voyons… pourquoi il m'appelle à cette heure-là ?", 'phone_shock'], [-1, 'Tu rappelles. Ça sonne. Ça sonne encore.'], [0, 'Marco. Réponds, man.', 'phone_call'], [-1, 'Messagerie.'], [0, "Ok. Ok, j'y vais.", 'thinking'], [-1, "Vingt minutes plus tard. La porte d'entrée est entrouverte."], [0, "Marco ? C'est moi.", 'surprised'], [-1, 'La télé est allumée. Le son coupé.'], [0, 'T\'es où… ?', 'listen'], [-1, 'Sur la table : son téléphone. Et une note.'], [0, '« Ne me cherche pas. » …Il se fout de moi.', 'angry']] },
+    lines: [[0, "Marco ? Marco, réponds !", "phone_call"], [-1, "Messagerie. Pour la dix-septième fois."], [0, "T'as laissé ta porte ouverte, man…", "surprised"], [-1, "La télé allumée. Le son coupé. Une assiette encore chaude."], [0, "Il était là. Il y a cinq minutes.", "thinking"], [-1, "Sur la table, une note. Son écriture."], [0, "« Ne me cherche pas. Ils écoutent. »", "phone_shock"], [0, "Qui ça, « ils » ?", "listen"], [-1, "Ton téléphone vibre. Numéro inconnu."], [0, "…Allô ?", "phone_call"]] },
   { id: 'pacte', title: 'Le pacte du bar', by: '@lastcall', plays: '17,9 k', bg: 'terrasse', pos: '70% 50%', fx: 'sepia(.6) saturate(1.6) brightness(.7)', glow: '#ffb15c',
     cast: [['justin_bar', 'drunk_talk'], ['cam', 'sip']], players: 2, byoc: false, live: { friend: 'Sam', strangers: 2, since: 1 }, you: 0,
     pitch: "En 2016, ils ont signé un pacte sur une serviette de bar. Ce soir, elle l'a ressortie — mais pas pour la raison qu'il espère.",
-    lines: [[-1, 'Le bar du coin. La même table qu\'en 2016.'], [0, "Joyeux trente ans. T'as amené la serviette ?", 'drunk_happy'], [1, "Tu pensais vraiment que je l'avais gardée ?", 'sip'], [0, 'Oui.', 'drunk_listen'], [1, '…Je l\'ai gardée.', 'awkward'], [-1, "Elle la déplie. L'encre a bavé, mais on lit encore « PROMIS »."], [0, 'Donc techniquement on est fiancés.', 'drunk_flirt'], [1, "Techniquement t'es saoul.", 'tipsy_laugh'], [0, 'Les deux peuvent être vrais.', 'drunk_talk'], [1, "J'ai quelqu'un, Justin.", 'worried'], [-1, 'Il pose son verre.'], [0, 'Depuis quand ?', 'drunk_sad']] },
+    lines: [[1, "En 2016, t'as signé une serviette. Tu te souviens de ce qu'il y avait dessus ?", "sip"], [0, "Que si personne était casé à 30 ans…", "drunk_listen"], [1, "Joyeux anniversaire.", "flirty"], [0, "Attends. T'es sérieuse ?", "drunk_happy"], [1, "J'ai gardé la serviette, Justin.", "awkward"], [0, "Donc techniquement on est fiancés.", "drunk_flirt"], [1, "Techniquement, j'ai quelqu'un.", "worried"], [0, "…Depuis quand ?", "drunk_sad"]] },
   { id: 'mensonge', title: 'Où étais-tu hier soir ?', by: '@ruby_writes', plays: '9,3 k', bg: 'salon', pos: '40% 50%', fx: 'hue-rotate(320deg) brightness(.6) saturate(1.4)', glow: '#ff5c8a',
     cast: [['ruby', 'angry'], ['james', 'listen']], players: 2, byoc: false, live: { friend: 'Max', since: 6 }, you: 0,
     pitch: "Un reçu pour deux, un mardi, 22 h. James a une explication. Puis une deuxième. Puis son téléphone vibre.",
-    lines: [[-1, 'Le salon. Un reçu froissé sur la table basse.'], [0, "Deux entrées, deux desserts. T'as faim, toi.", 'angry'], [1, "C'était un souper de travail.", 'explaining'], [0, 'Un mardi. À 22 h.', 'thinking'], [1, 'Les clients sont pas toujours dispos le jour.', 'listen'], [0, "C'est quoi son nom, au client ?", 'holding'], [1, '…Marc.', 'thinking'], [0, 'Marc a commandé le tiramisu pour deux ?', 'angry'], [1, "Ok, j'ai pas été clair.", 'surprised'], [0, "Non. T'as été clair. Juste pas honnête.", 'explaining'], [-1, 'Le téléphone de James vibre. « Merci pour hier ❤ »'], [1, 'Je peux t\'expliquer.', 'explaining']] },
+    lines: [[0, "C'est qui, « Marc », qui commande le tiramisu pour deux ?", "angry"], [1, "Un client.", "explaining"], [0, "Un mardi. À 22 h.", "thinking"], [1, "Les clients sont pas toujours dispos le jour.", "listen"], [0, "Appelle-le. Maintenant. Sur haut-parleur.", "holding"], [1, "Ruby…", "thinking"], [0, "Appelle-le.", "angry"], [-1, "Le téléphone de James vibre dans sa main. « Merci pour hier ❤ »"], [1, "Je peux t’expliquer.", "surprised"], [0, "Non. Lis-le à voix haute.", "explaining"]] },
   { id: 'nuit', title: 'Nuit blanche', by: '@insomnie', plays: '3,2 k', bg: 'terrasse', pos: '20% 50%', fx: 'hue-rotate(220deg) brightness(.38) saturate(1.5)', glow: '#9b8cff',
     cast: [['isa_nuit', 'thinking']], players: 1, byoc: true, live: null, you: -1,
     pitch: "4 h du matin, sur le toit, une inconnue t'attendait. Elle connaît ton vrai prénom — et elle dit que vous n'avez plus beaucoup de temps.",
-    lines: [[-1, "Le toit de l'immeuble. 4 h 02. Tu montes pour respirer."], [0, 'Enfin. Je pensais que tu viendrais plus tôt.', 'listen'], [-1, "Tu ne l'as jamais vue de ta vie."], [0, "Fais pas cette tête. On s'est déjà parlé.", 'explaining'], [0, 'Pas ici. Pas comme ça. Mais souvent.', 'thinking'], [-1, "Elle dit ton prénom. Celui que personne n'utilise."], [0, 'Tu te souviens de rien, hein ?', 'surprised'], [0, "C'est normal. C'est toujours comme ça la première nuit.", 'holding'], [-1, "Au loin, toutes les lumières de la ville s'éteignent. D'un coup."], [0, 'Ok. On a moins de temps que prévu.', 'angry'], [0, 'Tu me fais confiance ?', 'listen'], [-1, 'Elle te tend la main.']] },
+    lines: [[0, "Enfin. Je pensais que tu viendrais plus tôt.", "listen"], [0, "Fais pas cette tête. On s'est déjà parlé.", "explaining"], [0, "Pas ici. Pas comme ça. Mais souvent.", "thinking"], [0, "Tu te souviens de rien, hein ?", "surprised"], [-1, "Au loin, toutes les lumières de la ville s'éteignent. D'un coup."], [0, "Ok. On a moins de temps que prévu.", "angry"], [0, "Tu me fais confiance ?", "holding"]] },
   { id: 'gala', title: "Gala d'or", by: '@galanoir', plays: '14 k', bg: 'salon', pos: '55% 50%', fx: 'sepia(.9) saturate(2) brightness(.6) hue-rotate(-10deg)', glow: '#ffd24d',
     cast: [['isa_or', 'holding'], ['suit', 'adjust'], ['julian', 'cold']], players: 3, byoc: true, live: { strangers: 1, since: 2 }, you: 1,
     pitch: "Le collier vient de disparaître et les portes sont verrouillées. Trois invités, trois alibis — un seul est vrai.",
-    lines: [[-1, 'Grand salon. Champagne. Le collier Duval vient de disparaître.'], [0, 'Messieurs. Quelle coïncidence de vous voir ici tous les deux.', 'holding'], [1, "Je suis invité. Lui, j'en suis moins sûr.", 'adjust'], [2, "J'ai acheté mon billet. Contrairement à certains.", 'cold'], [0, 'Le collier était à mon cou il y a dix minutes.', 'angry'], [1, 'Et vous m\'accusez ? Je ne touche pas aux bijoux.', 'angry'], [2, 'Seulement aux contrats.', 'smirk'], [-1, 'Les portes se ferment. Personne ne sort.'], [0, 'Alors on va jouer à un jeu.', 'explaining'], [0, 'Chacun dit où il était. Le premier qui ment…', 'thinking'], [2, '…perd quoi ?', 'listen'], [0, 'Tout.', 'holding']] },
+    lines: [[0, "Mon collier était à mon cou il y a dix minutes.", "angry"], [1, "Et vous m'accusez ? Je ne touche pas aux bijoux.", "angry"], [2, "Seulement aux contrats.", "smirk"], [0, "Personne ne sort d'ici avant que je le retrouve.", "holding"], [-1, "Les portes se ferment. Clic. Clic. Clic."], [2, "Je l'ai vu près du vestiaire, lui.", "cold"], [1, "Et vous, on vous a vu près de madame.", "adjust"], [0, "Alors on va jouer à un jeu. Le premier qui ment…", "explaining"], [2, "…perd quoi ?", "listen"], [0, "Tout.", "thinking"]] },
   { id: 'coloc', title: 'Le colocataire', by: '@amare.stories', plays: '6,7 k', bg: 'maison', pos: '65% 50%', fx: 'brightness(.85) saturate(.7)', glow: '#c8ffd9',
     cast: [['amare', 'listen']], players: 1, byoc: true, live: null, you: -1,
     pitch: "Ton nouveau coloc cuisine, range et paie d'avance. Il ne dort jamais — et il sait déjà ce qui t'attend demain.",
-    lines: [[-1, 'Jour 1. Amare arrive avec une seule valise.'], [0, "Salut ! J'ai fait du café. Et des crêpes. Et j'ai lavé ton char.", 'explaining'], [-1, 'Jour 4. La vaisselle est faite avant que tu la salisses.'], [0, "T'as bien dormi ? Je t'ai entendu rêver.", 'listen'], [-1, 'Entendu… rêver ?'], [0, 'Façon de parler.', 'thinking'], [-1, 'Jour 9. 3 h du matin. La lumière de la cuisine est allumée.'], [0, "Oh. T'es debout.", 'surprised'], [0, "Moi ? Non, je dors jamais vraiment. C'est une condition.", 'holding'], [-1, 'Sur le comptoir : ton agenda. Ouvert à demain.'], [0, 'Demain va être une grosse journée pour toi.', 'explaining'], [0, 'Je voulais juste être prêt.', 'listen']] },
+    lines: [[0, "T'as bien dormi ? Je t'ai entendu rêver.", "listen"], [0, "De la mer. Encore.", "thinking"], [0, "Moi ? Non, je dors jamais vraiment. C'est une condition.", "explaining"], [-1, "Sur le comptoir, ton agenda. Ouvert à demain. Annoté. Pas par toi."], [0, "Demain va être une grosse journée pour toi.", "holding"], [0, "J'ai juste voulu être prêt.", "surprised"], [0, "Toi, t'es prêt ?", "listen"]] },
   { id: 'feu', title: 'Autour du feu', by: '@campfire', plays: '11,2 k', bg: 'terrasse', pos: '50% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(.4)', glow: '#ff7a2e',
     cast: [['brooke', 'sit_fire'], ['justin', 'listen']], players: 2, byoc: true, live: { friend: 'Inès', since: 12 }, you: 1,
     pitch: "Une histoire de fantôme au chalet, à deux voix. Chaque fois que quelqu'un ment, le feu baisse… et il vient de baisser.",
-    lines: [[-1, 'Le chalet. Minuit. Un feu, deux bûches, plus de bière.'], [0, 'Ok, je te raconte la vraie histoire du lac.', 'sit_fire'], [1, 'La vraie ou celle de ton oncle ?', 'listen'], [0, "Mon oncle, c'est la vraie.", 'drunk_point'], [-1, 'Le feu crépite. Plus fort que prévu.'], [0, 'Il y avait une fille qui nageait ici toutes les nuits.', 'drunk_talk'], [1, 'Laisse-moi deviner. Un soir, elle est jamais remontée.', 'thinking'], [0, 'Non. Un soir, elle est remontée… avec quelqu\'un.', 'nervous'], [-1, "Le feu baisse d'un coup. Personne n'a menti. En principe."], [1, "T'as vu ça ?", 'surprised'], [0, "C'est le vent.", 'nervous'], [1, "Y a pas de vent.", 'angry']] },
+    lines: [[0, "Tu veux la vraie histoire du lac ou celle qu'on raconte aux enfants ?", "sit_fire"], [1, "La vraie.", "listen"], [0, "Une fille nageait ici toutes les nuits. Un soir, elle est remontée… avec quelqu'un.", "drunk_talk"], [-1, "Le feu baisse d'un coup."], [1, "T'as vu ça ?", "surprised"], [0, "C'est le vent.", "nervous"], [1, "Y a pas de vent.", "angry"], [0, "…Alors quelqu'un vient de mentir.", "nervous"]] },
   { id: 'candy', title: 'Candy ne ment jamais', by: '@sucre', plays: '4,4 k', bg: 'terrasse', pos: '80% 50%', fx: 'hue-rotate(290deg) saturate(1.6) brightness(.85)', glow: '#ff9ce6',
     cast: [['candy', 'explaining']], players: 1, byoc: false, live: null, you: -1,
     pitch: "Candy ne ment jamais. Jamais. Et elle vient de s'asseoir au brunch entre ta mère et ton chum.",
-    lines: [[-1, 'Un brunch. Ta mère, ton chum, et Candy. Mauvaise idée.'], [0, "J'adore ta mère ! Elle est exactement comme tu l'as décrite.", 'explaining'], [-1, "Ta mère sourit. Elle ne sait pas comment tu l'as décrite."], [0, 'Non mais pas dans le mauvais sens. Juste… intense.', 'thinking'], [0, "Pis toi, t'es le fameux chum ! Celui du test.", 'holding'], [-1, 'Le test. Il ne sait pas pour le test.'], [0, "Oups. C'était pas censé…", 'surprised'], [0, 'Bon. Je mens jamais, alors je vais tout dire.', 'explaining'], [-1, 'Tu lui donnes un coup de pied sous la table.'], [0, 'Aïe ! Pourquoi tu me frappes ?', 'angry'], [0, 'Ok. Ok. Version courte.', 'thinking'], [0, 'Il a passé le test. De justesse.', 'listen']] },
+    lines: [[0, "J'adore ta mère ! Elle est exactement comme tu l'as décrite.", "explaining"], [0, "Non mais pas dans le mauvais sens. Juste… intense.", "thinking"], [0, "Pis toi, t'es le fameux chum ! Celui du test.", "holding"], [-1, "Ton chum pose sa fourchette. Ta mère aussi."], [0, "Oups. Il savait pas pour le test ?", "surprised"], [0, "Bon. Je mens jamais, alors je vais tout dire.", "explaining"], [0, "Aïe ! Pourquoi tu me donnes des coups de pied ?", "angry"], [0, "Version courte : il a passé. De justesse.", "listen"]] },
   { id: 'contrat', title: 'Un dernier boulot', by: '@julianfiles', plays: '7,8 k', bg: 'salon', pos: '25% 50%', fx: 'grayscale(1) brightness(.55) contrast(1.2)', glow: '#ffffff',
     cast: [['julian', 'talk']], players: 1, byoc: false, live: null, you: -1,
     pitch: "Un dernier boulot : facile, payant, sans risque. C'est exactement ce que Julian avait dit la dernière fois.",
-    lines: [[-1, 'Un café désert. Julian est déjà là. Il a commandé pour toi.'], [0, "T'as l'air bien. Reposé. Ça te va pas.", 'smirk'], [0, "J'ai un boulot. Un dernier.", 'talk'], [-1, 'La dernière fois, il a dit exactement ça.'], [0, "Je sais ce que tu penses. Cette fois, c'est propre.", 'hands_up'], [0, 'Une livraison. Une enveloppe. Point A, point B.', 'offer'], [-1, 'Il glisse l\'enveloppe. Elle est lourde. Trop pour du papier.'], [0, "Pose pas de questions, c'est inclus dans le prix.", 'cold'], [0, 'Dix mille. La moitié maintenant.', 'offer'], [-1, 'Derrière lui, un homme en complet ne lit pas son journal.'], [0, 'Fais pas ça. Regarde-moi, pas lui.', 'cold'], [0, 'Alors ? On a un deal ?', 'listen']] },
+    lines: [[0, "Un dernier boulot. Après, tu me revois plus jamais.", "talk"], [0, "Je sais. J'ai dit ça la dernière fois.", "hands_up"], [0, "Une enveloppe. Point A, point B. Dix mille.", "offer"], [-1, "L'enveloppe est lourde. Trop pour du papier."], [0, "Pose pas de questions, c'est inclus dans le prix.", "cold"], [0, "Et regarde-moi. Pas l'homme derrière moi.", "cold"], [0, "Alors ? On a un deal ?", "listen"]] },
 ];
 // drawn settings (no photo for these): a beach in full sun, a forest at night
 const pines = (n, y0, h, fill, seed) => Array.from({ length: n }, (_, k) => { const x = (k + .5) * 400 / n + ((seed * (k + 3)) % 17) - 8, t = h * (.7 + ((seed * k) % 5) / 10); return `<path d="M${x} ${y0 - t}l${t * .28} ${t}h${-t * .56}z" fill="${fill}"/>`; }).join('');
@@ -635,9 +642,6 @@ const DECOR = {
   beach: `radial-gradient(circle at 76% 16%, #fffbe6 0 3%, rgba(255,244,190,.55) 6%, transparent 13%), linear-gradient(#6fbde9 0%, #c7ebfb 40%, #2a8cc2 40.4%, #45b0dc 55%, #a8e3ee 57%, #f3dfae 57.4%, #e3c387 100%)`,
   forest: `${svgUrl(`<circle cx='300' cy='60' r='16' fill='#dfe6d8' opacity='.85'/>${pines(9, 250, 170, '#13241d', 7)}${pines(7, 290, 230, '#08110d', 11)}<rect y='285' width='400' height='15' fill='#050906'/>`)} center bottom / cover no-repeat, linear-gradient(#0d1c26, #1b3030 60%, #0b1410)`,
 };
-// each preview has its own length (it stops on a hook, not on a round number)
-const CUT = { table: 9, cles: 10, pacte: 8, mensonge: 11, nuit: 7, coloc: 9, feu: 10, candy: 8, contrat: 7 };
-for (const d of DEMOS) if (CUT[d.id]) d.lines = d.lines.slice(0, CUT[d.id]);
 const total = (d) => d.taps || d.lines.length;
 const POSTER = {
   verre: { bg: 'salon', pos: '30% 50%', fx: 'hue-rotate(200deg) brightness(.45)', cast: [['cam', 'worried'], ['brooke', 'drunk_sad']] },
@@ -661,7 +665,7 @@ const POSTER = {
 for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
-const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare']]
+const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare'], ['isa_nuit', 'Isa']]
   .map(([id, name]) => ({ id, name, poses: Object.fromEntries(STD.map((p) => [p, `chars/${id}/${p}.webp`])) }));
 // one pose each: it plays every line
 const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L'Ombre"], ['exile', 'Itsuki'], ['ninja', 'Sora'], ['plage', 'Maya']]
@@ -731,7 +735,10 @@ let screen = 'menu', tab = 'explore', viewKey = '', filter = 'all', savedWho = '
 
 // ---- pieces ----
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const av = (n, extra = '') => { const f = friend(n); return `<span class="av" style="--c:${f.c};background:${f.c}"${extra}><b>${esc(n[0])}</b></span>`; };
+// a player's picture: the face of their character (their initial if they have none), on their colour
+const charOf = (n) => { const f = friend(n); return f.ch && CHARS.find((c) => c.id === f.ch); };
+const mug = (n) => { const c = charOf(n); return c ? `<img class="mug" src="${poseOf(c, 'listen')}" alt="">` : `<b>${esc(n[0])}</b>`; };
+const av = (n, extra = '') => { const f = friend(n); return `<span class="av" style="--c:${f.c};background:${f.c}"${extra}>${mug(n)}</span>`; };
 function sprites(d, cls = '') {
   return d.cast.map(([s, p], i) => `<img class="sp p${i}${cls}" src="chars/${s}/${p}.webp" alt="" loading="lazy" draggable="false">`).join('');
 }
@@ -760,9 +767,9 @@ function byoc(d, inMeta) {
 function liveMark(d) {
   const l = d.live; if (!l) return '';
   const f = l.friend && friend(l.friend);
-  if (O.live === 'dot') return f ? `<i class="ldot f" style="--c:${f.c}"><b>${esc(f.n[0])}</b></i>` : `<i class="ldot" style="--c:var(--stranger)"></i>`;
+  if (O.live === 'dot') return f ? `<i class="ldot f" style="--c:${f.c}">${mug(f.n)}</i>` : `<i class="ldot" style="--c:var(--stranger)"></i>`;
   if (O.live === 'badge') return f ? `<span class="lbadge f"><i></i>${esc(f.n)} attend</span>` : `<span class="lbadge" style="--c:var(--stranger)"><i></i>${l.strangers} en attente</span>`;
-  if (O.live === 'avatar') { const w = waiting(d)[0]; return `<span class="lav${f ? '' : ' s'}" style="--c:${w.c};background:${w.c}"><b>${esc(w.n[0])}</b></span>`; }
+  if (O.live === 'avatar') { const w = waiting(d)[0]; return `<span class="lav${f ? '' : ' s'}" style="--c:${w.c};background:${w.c}">${mug(w.n)}</span>`; }
   return '';
 }
 const ringCls = (d) => O.live === 'ring' && d.live ? (d.live.friend ? ' ring-f' : ' ring-s') : '';
@@ -791,7 +798,7 @@ function meta(d) {
 // Play: a stranger or a friend waiting changes it (3 ways, ⚙)
 const playDot = (d) => {
   const l = d.live, f = l && l.friend && friend(l.friend);
-  return !l ? '' : f ? `<i class="pd f" style="--c:${f.c};background:${f.c}"><b>${esc(f.n[0])}</b></i>` : '<i class="pd" style="--c:var(--stranger);background:var(--stranger)"></i>';
+  return !l ? '' : f ? `<i class="pd f" style="--c:${f.c};background:${f.c}">${mug(f.n)}</i>` : '<i class="pd" style="--c:var(--stranger);background:var(--stranger)"></i>';
 };
 function playBtn(d, cls = '', how = O.play) {
   const l = d.live, f = l && l.friend && friend(l.friend);
@@ -863,7 +870,7 @@ const R = {
     const rooms = all().filter((d) => d.live).sort((x, y) => (y.live.friend ? 1 : 0) - (x.live.friend ? 1 : 0));
     const room = (d) => {
       const l = d.live, f = l.friend && friend(l.friend), c = f ? f.c : 'var(--stranger)';
-      const ws = waiting(d), seats = Array.from({ length: d.players }, (_, i) => ws[i] ? `<i class="full" style="--c:${ws[i].c}"><b style="font-size:1.4em">${esc(ws[i].n[0])}</b></i>` : '<i></i>').join('');
+      const ws = waiting(d), seats = Array.from({ length: d.players }, (_, i) => ws[i] ? `<i class="full" style="--c:${ws[i].c}">${mug(ws[i].n)}</i>` : '<i></i>').join('');
       return `<div class="room" style="--c:${c}" data-act="open" data-id="${d.id}"><div class="cvw">${cover(d)}</div><div class="body">
         <h4>${esc(d.title)}</h4><div class="who">${av(waiting(d)[0].n)}${esc(waiting(d)[0].n)} ${f ? 't\'attend' : 'attend'}</div>
         <div class="seatsMini">${seats}</div>${playBtn(d)}</div></div>`;
@@ -1030,7 +1037,7 @@ function renderSocial() {
     const d = f.doing && byId(f.doing);
     const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
     return `<div class="fr${d ? '' : ' still'}"${d ? ` data-act="open" data-id="${d.id}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
-      <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
+      <div><b>${esc(f.n)}${charOf(f.n) ? `<small> · ${esc(charOf(f.n).name)}</small>` : ''}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
   const order = [...FRIENDS].sort((a, b) => (b.on ? 1 : 0) - (a.on ? 1 : 0));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b><span>Ton perso : ${esc(m.name)}</span></div><i>${charsOpen ? '▴' : '▾'}</i></button>
@@ -1342,7 +1349,7 @@ function play(id, host = false, from = 0) {
 function join(d, host) {
   const ws = host ? [] : waiting(d).slice(0, d.players - 1), f = ws.find((w) => !w.stranger), st = ws.filter((w) => w.stranger);
   const seat = (pic, name, tag) => `<div class="seat">${pic}<b>${esc(name)}</b><small>${tag}</small></div>`;
-  const seats = [seat(face(me()), myName(), myName() === 'Toi' ? '' : 'toi'), ...ws.map((w) => seat(av(w.n), w.n, w.stranger ? 'inconnu·e' : 'ami·e')),
+  const seats = [seat(face(me()), myName(), `${myName() === 'Toi' ? '' : 'toi · '}${esc(me().name)}`), ...ws.map((w) => seat(av(w.n), w.n, `${w.stranger ? 'inconnu·e' : 'ami·e'}${charOf(w.n) ? ` · ${esc(charOf(w.n).name)}` : ''}`)),
     ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Libre', ws.length ? '' : 'joué au hasard'))];
   const say = f ? `${esc(f.n)} t'attend${st.length ? ` avec ${esc(st.map((w) => w.n).join(', '))}` : ''}.`
     : st.length ? `${esc(st[0].n)} est déjà dans la salle. Vous ne vous connaissez pas : vous jouez l'histoire ensemble.`
