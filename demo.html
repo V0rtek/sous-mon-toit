@@ -859,10 +859,10 @@ function saveBtn(d) {
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
 // (solo is the default: only 2-3 players get a mark)
-function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '' } = {}) {
+function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '', live = true } = {}) {
   const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
-  return `<div class="card${ringCls(d)}" data-act="open" data-id="${d.id}">
-    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${liveMark(d)}${saveB ? saveBtn(d) : ''}${extra}</div>
+  return `<div class="card${live ? ringCls(d) : ''}" data-act="open" data-id="${d.id}">
+    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${live ? liveMark(d) : ''}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
   </div>`;
 }
@@ -1009,7 +1009,7 @@ function renderSaved() {
     <div class="grid g2">${ids.map((id) => {
       const d = byId(id), w = saved[id].with;
       const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
-      return card(d, { byocB: false, extra: withs });
+      return card(d, { byocB: false, extra: withs, live: false });
     }).join('')}</div>`;
 }
 // ---- + : write a story or make a character (both in the game), then the stories you wrote (same browser). Tap one: its
