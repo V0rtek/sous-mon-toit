@@ -40,7 +40,7 @@ body.s-current.t-explore #top { background: none; }
 body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
 
 /* ---- pages ---- */
-#views { position: absolute; left: 0; right: 0; top: 0; bottom: 9.5em; }
+#views { position: absolute; left: 0; right: 0; top: 0; bottom: 9.5em; isolation: isolate; z-index: 0; }
 body.tabs-pill #views { bottom: 0; }
 .view { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 9.5em 0 4em; box-sizing: border-box; scrollbar-width: none; }
 .view::-webkit-scrollbar { display: none; }
@@ -50,7 +50,7 @@ body.tabs-pill .view { padding-bottom: 14em; }
 .pad { padding: 0 3.5%; }
 
 /* ---- tabs (bottom) ---- */
-#tabs { position: absolute; left: 0; right: 0; bottom: 0; height: 9.5em; z-index: 20; display: flex; background: rgba(12,12,14,.96); border-top: .1em solid var(--line); }
+#tabs { position: absolute; left: 0; right: 0; bottom: 0; height: 9.5em; z-index: 20; transform: translateZ(0); display: flex; background: rgba(12,12,14,.96); border-top: .1em solid var(--line); }
 #tabs button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5em; color: var(--mute); position: relative; }
 #tabs button.on { color: var(--fg); }
 #tabs svg { width: 3.4em; height: 3.4em; }
@@ -308,22 +308,12 @@ body.tabs-pill #tabs span { display: none; }
   transition: left .55s cubic-bezier(.45,0,.25,1), top .55s cubic-bezier(.45,0,.25,1), width .55s cubic-bezier(.45,0,.25,1), height .55s cubic-bezier(.45,0,.25,1), border-radius .55s, opacity .25s; }
 .hx.on { opacity: 1; }
 .hx.big { border-radius: 0; }
-.hx-cover, .hx-scene { position: absolute; inset: 0; transition: opacity .6s .25s; }
+.hx-cover, .hx-scene { position: absolute; inset: 0; overflow: hidden; container-type: inline-size; transition: opacity .6s .25s; }
 .hx-cover .cv, .hx-scene .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
 .hx-scene { opacity: 0; }
 .hx.big .hx-scene { opacity: 1; }
 .hx.big .hx-cover { opacity: 0; }
-.hx-bg { position: absolute; inset: 0; }
-.hx-cast { position: absolute; inset: 0; }
-.hx-cast .sp { height: 62%; bottom: 22%; }
-.hx-scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.35), transparent 25%, transparent 45%, rgba(0,0,0,.92) 80%); }
-.hx-lines { position: absolute; left: 0; right: 0; bottom: 31%; z-index: 3; display: flex; flex-direction: column; gap: 4.6cqw; opacity: 0; transform: translateY(2em); transition: opacity .4s .7s, transform .4s .7s; }
-.hx.big .hx-lines { opacity: 1; transform: none; }
-.hx-lines .gb { position: relative; top: auto; margin: 0 9%; left: 0; right: 0; padding: 3.6cqw 3.4cqw 2.8cqw; }
-.hx-lines .gb p { font-size: 3.6cqw; }
-.hx-lines .gb b { font-size: 3cqw; top: -2.9cqw; }
-.hx-lines .gb:nth-last-child(3) { opacity: .5; }
-.hx-lines .gb:nth-last-child(2) { opacity: .75; }
+.hx-scene::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(transparent 60%, rgba(0,0,0,.85) 88%); }
 #home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 #home .carInfo { padding-top: 2.4em; }
 #home .carInfo .btn { width: 70%; }
@@ -1055,15 +1045,12 @@ function track(id, i, w) {
 const done = (id) => prog[id].i >= total(byId(id));
 // where you stopped, as a still: the setting, everyone in the pose they had there, the line on screen
 // (Last call runs in the game: its picture stands in)
-// the 3 lines that brought you where you are (the last 3 of a finished one), as the game shows them
-function recap(d, i) {
-  if (!d.lines || !d.lines.length) return '';
-  const cast = castOf(d), upto = Math.min(i, d.lines.length - 1);
-  for (const [w, , p] of d.lines.slice(0, upto + 1)) if (w >= 0 && p && cast[w]) cast[w] = { ...cast[w], p };
-  const last = d.lines.slice(Math.max(0, upto - 2), upto + 1), who = last[last.length - 1][0];
-  const scene = d.full || d.img ? cover(d) : `<div class="hx-bg" style="${place(d)}"></div><div class="hx-cast n${cast.length}">${actors(cast, who)}</div>`;
-  return `<div class="hx-scene">${scene}</div><div class="hx-lines">${last.map(([w, t]) => w < 0
-    ? `<div class="gb narr"><p>${esc(t)}</p></div>` : `<div class="gb"><b style="background:${TINT[cast[w].s] || '#e2557a'}">${esc(cast[w].name)}</b><p>${esc(t)}</p></div>`).join('')}</div>`;
+// replays the 3 lines that brought you where you are (the last 3 of a finished one), one after the other as the game plays
+// them (its camera, the line writing itself, the hop), and stays on the last one
+function replay(stage, d, i, step = 0) {
+  const from = Math.max(0, Math.min(i, d.lines.length - 1) - 2), k = from + step, upto = Math.min(i, d.lines.length - 1);
+  stage.innerHTML = stageHtml(d, k, 4, true); typeIn(stage);
+  if (k < upto) homeOpen = setTimeout(() => replay(stage, d, i, step + 1), 1500 + d.lines[k][1].length * 4);
 }
 // En cours: a carousel of the stories you're in, the last one you left unfinished first; finished ones after. The card in the
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
@@ -1080,7 +1067,9 @@ function renderHome() {
     const card = $(`#homeCar .card[data-id="${centre}"]`), x = $('#homeX'), home = $('#home');
     if (!card || !x || page() !== 'home') return;
     const r = card.getBoundingClientRect(), h = home.getBoundingClientRect(), d = byId(centre);
-    x.innerHTML = `<div class="hx-cover">${cover(d)}</div>${recap(d, prog[centre].i)}`;
+    const lines = !d.full && d.lines && d.lines.length;   // Last call plays in the game: its cover stays
+    x.innerHTML = `<div class="hx-cover">${cover(d)}</div>${lines ? '<div class="hx-scene"></div>' : ''}`;
+    if (lines) homeOpen = setTimeout(() => replay($('.hx-scene', x), d, prog[centre].i), 650);   // once it's opened up
     Object.assign(x.style, { left: r.left - h.left + 'px', top: r.top - h.top + home.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
     x.className = 'hx on';
     requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = 'hx on big'; }));
