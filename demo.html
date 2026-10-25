@@ -346,6 +346,8 @@ body.tabs-pill #tabs span { display: none; }
 .gb.narr p { font-style: italic; text-align: center; }
 /* the feed in a drawn format, and 5's game that shows up once it's ready */
 .stage { position: absolute; inset: 0; overflow: hidden; container-type: inline-size; }
+.ta.hop { animation: hop .22s ease-out; }   /* the game's hop when someone starts talking */
+@keyframes hop { 40% { transform: translateX(-50%) translateY(-.6%) scaleX(var(--fx, 1)); } }
 .gframe.late { opacity: 0; transition: opacity .4s; pointer-events: none; }
 .gframe.late.on { opacity: 1; }
 
@@ -896,7 +898,7 @@ function stageHtml(d, i, mode, feed) {
   const cast = castOf(d), n = total(d), at = Math.min(i, n - 1);
   for (const [w, , p] of d.lines.slice(0, at + 1)) if (w >= 0 && p && cast[w]) cast[w] = { ...cast[w], p };
   const [who, text] = d.lines[at], xs = POS[cast.length] || POS[3], x = who >= 0 ? xs[who] : 50, fl = flips(cast, who);
-  const people = cast.map((m, k) => `<img class="ta" style="left:${xs[k]}%;--fx:${fl[k] ? -1 : 1}" src="${srcOf(m, m.p)}" alt="">`).join('');
+  const people = cast.map((m, k) => `<img class="ta${k === who ? ' hop' : ''}" style="left:${xs[k]}%;--fx:${fl[k] ? -1 : 1}" src="${srcOf(m, m.p)}" alt="">`).join('');
   if (mode === 4) {
     // the game's camera: a close shot on whoever talks (0.86 of a standing height, the head near the top), both for a narration
     const s = who >= 0 ? 1 / (.86 * .64) : 1.12, fx = who >= 0 ? x : xs.reduce((a, b) => a + b, 0) / xs.length, top = who >= 0 ? 8 : 10;
@@ -1074,6 +1076,20 @@ function renderCurrent() {
   if (START) { const c = $(`.ci[data-id="${START}"]`, box); if (c) box.scrollTop = c.offsetTop; }
   $$('.ci', box).forEach((ci) => seen.observe(ci));
 }
+// the drawn line writes itself, like the game's (4 characters every 13 ms); typing(root) finishes it, true if it was writing
+function typeIn(root) {
+  const p = $('.gb p, .tb, .tn', root); if (!p) return;
+  const node = [...p.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim()); if (!node) return;
+  const full = node.textContent; let k = 0; node.textContent = '';
+  clearInterval(root._typing);
+  root._typing = setInterval(() => { k += 4; node.textContent = full.slice(0, k); if (k >= full.length) { clearInterval(root._typing); root._typing = null; } }, 13);
+  root._finish = () => { clearInterval(root._typing); root._typing = null; node.textContent = full; };
+}
+function typing(root) {
+  const r = root.classList.contains('stage') ? root : $('.stage', root);
+  if (!r || !r._typing) return false;
+  r._finish(); return true;
+}
 // (re)load a game frame by putting a fresh one in its place: setting a frame's src adds a step to the browser's history
 // (back would then go back in the frame); null = unloaded
 function reframe(f, url) {
@@ -1091,7 +1107,7 @@ function line(ci, i) {
   }
   $('.pc-corner', ci).textContent = `${i + 1}/${n}`;
   if (inGame(ci)) { $('.cline', ci).innerHTML = ''; return; }
-  if (stage) { stage.innerHTML = stageHtml(d, i, DRAWN || 4, true); return; }
+  if (stage) { stage.innerHTML = stageHtml(d, i, DRAWN || 4, true); typeIn(stage); return; }
   const [who, text, pose] = d.lines[i], sp = $$('.pcast .sp', ci);
   if (who >= 0 && pose && sp[who]) sp[who].src = srcOf(castOf(d)[who], pose);
   sp.forEach((img, k) => img.classList.toggle('talk', k === who));
@@ -1112,6 +1128,7 @@ function tapCurrent(ci, e) {
     }
     return;
   }
+  if (typing(ci)) return;   // a tap while the line writes itself finishes it (like the game)
   line(ci, over ? 0 : i + 1);
   if (!over) reached(d, i + 1);
 }
@@ -1375,11 +1392,12 @@ function step(e) {
     const r = f.getBoundingClientRect(), x = e ? (e.clientX - r.left) / r.width : .5, y = e ? (e.clientY - r.top) / r.height : .5;
     f.contentWindow.postMessage({ tap: [x, y] }, location.origin); return;
   }
+  if (e && typing($('#player'))) return;   // a tap while the line writes itself finishes it (like the game)
   if (e && $('#player iframe.late')) P.tapped = true;   // 5: you're in it already, the game won't take over
   P.i++;
   if (P.i >= d.lines.length) { track(d.id, d.lines.length, P.with); return end(); }
   track(d.id, P.i, P.with);
-  if (DRAWN) { $('#player .stage').innerHTML = stageHtml(d, P.i, DRAWN, true); progress(); return; }
+  if (DRAWN) { $('#player .stage').innerHTML = stageHtml(d, P.i, DRAWN, true); typeIn($('#player .stage')); progress(); return; }
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
   $$('#player .pcast .sp').forEach((img, i) => { const s = srcOf(P.cast[i], P.poses[i]); if (img.getAttribute('src') !== s) img.src = s; img.classList.toggle('talk', i === who); });
