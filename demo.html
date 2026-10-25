@@ -242,6 +242,18 @@ body.tabs-pill #tabs span { display: none; }
 
 /* ---- details ---- */
 #detail { position: absolute; inset: 0; z-index: 40; }
+/* the series (Jouer in Explorer): the cover up top, then what it is, Jouer, its episodes */
+#series { position: absolute; inset: 0; z-index: 60; background: #000; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; animation: fade .25s; }
+#series::-webkit-scrollbar { display: none; }
+.sr-hero { position: relative; height: 62%; container-type: inline-size; }
+.sr-hero .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
+.sr-hero .cvt, .sr-hero .cvfade { display: none; }
+.sr-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 45%, #000); pointer-events: none; }
+.sr-body { position: relative; margin-top: -9em; padding: 0 6% 5em; }
+.sr-body .pitch { font-size: 2em; line-height: 1.45; color: #d1d1d6; margin: 1em 0 2em; }
+.sr-body .h2, .hmore .h2 { padding-left: 0; padding-right: 0; }
+.sr-x { position: absolute; top: 2.5em; left: 3%; z-index: 5; width: 6.4em; height: 6.4em; display: grid; place-items: center; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); }
+.sr-x svg { width: 3.2em; height: 3.2em; }
 .veil { position: absolute; inset: 0; background: #000; }
 .veil .cvw { position: absolute; left: 0; right: 0; top: 0; }
 .veil .cv { border-radius: 0; }
@@ -523,6 +535,7 @@ body.tabs-pill #tabs span { display: none; }
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
+  <div id="series" hidden></div>
   <div id="sheet" hidden></div>
   <div id="player" hidden></div>
 </div>
@@ -1128,14 +1141,25 @@ function renderHome() {
 }
 
 // under it (slide down): what it is, its episodes (the one you're at, the ones done, the ones to come), and out of En cours
-function moreHtml(d) {
-  const eps = d.eps || [{ title: d.title }], now = d.eps ? epOf(d) || 1 : done(d.id) ? 2 : 1;
+// the episode you're at: Last call's from the game; a demo is one episode (done = all of it played)
+const epNow = (d) => d.eps ? epOf(d) || 1 : prog[d.id] && done(d.id) ? 2 : 1;
+const started = (d) => d.full ? epOf(d) > 0 : !!prog[d.id] && prog[d.id].i > 0 && !done(d.id);
+// an episode: Last call's in the game (from its start); a demo's from where you stopped (from the start once done)
+function playEp(id, n) {
+  const d = byId(id);
+  if (d.full) openPlayer(id, false, 0, n); else openPlayer(id, false, started(d) ? prog[id].i : 0);
+}
+function epsHtml(d) {
+  const eps = d.eps || [{ title: d.title }], now = epNow(d);
   const ep = (e, k) => {
     const n = k + 1, st = n < now ? 'done' : n === now ? 'now' : 'lock';
     return `<button class="ep ${st}" data-act="ep" data-id="${d.id}" data-n="${n}"><span class="th">${e.img ? `<img src="${e.img}" alt="">` : cover({ ...d, title: '' })}</span>
       <div><small>Épisode ${n}</small><b>${esc(e.title)}</b>${e.tease ? `<p>${esc(e.tease)}</p>` : ''}</div><span class="st">${st === 'done' ? I.check : st === 'now' ? I.play : I.lock}</span></button>`;
   };
-  return `${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="h2">Épisodes</div><div class="eps">${eps.map(ep).join('')}</div>
+ return `<div class="h2">Épisodes</div><div class="eps">${eps.map(ep).join('')}</div>`;
+}
+function moreHtml(d) {
+  return `${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${epsHtml(d)}
     <button class="hout" data-act="unlist" data-id="${d.id}">${I.close}Retirer de En cours</button>`;
 }
 
@@ -1311,7 +1335,8 @@ function apply(st) {
   const key = screen + '/' + tab;
   if (key !== viewKey) { viewKey = key; render(); }
   const layers = []; for (let o = st.ov; o; o = o.under) layers.push(o);
-  const pl = layers.find((o) => o.k === 'player'), dt = layers.find((o) => o.k === 'detail');
+  const pl = layers.find((o) => o.k === 'player'), dt = layers.find((o) => o.k === 'detail'), se = layers.find((o) => o.k === 'series');
+  if (se) { if ($('#series').hidden || $('#series').dataset.id !== se.id) openSeries(se.id); } else $('#series').hidden = true;
   if (pl) { if (!P || P.d.id !== pl.id || $('#player').hidden) play(pl.id, pl.host, pl.from || 0); }
   else if (!$('#player').hidden) { $('#player').hidden = true; P = null; after(); }
   if (dt) { if ($('#detail').hidden || $('#detail').dataset.id !== dt.id) openDetail(dt.id, dt.cur); } else $('#detail').hidden = true;
@@ -1326,6 +1351,7 @@ function openPlayer(id, host = false, from = 0, ep = null) {
   const d = byId(id), n = ep || epOf(d);
   if (d.full) { track(id, 0); location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}`; return; }   // the real game; its back comes here
   const top = cur().ov, o = { k: 'player', id, host, from };
+  if (top && top.k === 'series') o.under = top;
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
 }
 
@@ -1390,7 +1416,21 @@ function openDetail(id, inCurrent) {
   else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
   box.dataset.id = id; box.hidden = false;
 }
-const refreshDetail = () => { const b = $('#detail'); if (!b.hidden) openDetail(b.dataset.id, !!b.dataset.cur); };
+const refreshDetail = () => {
+  const b = $('#detail'); if (!b.hidden) openDetail(b.dataset.id, !!b.dataset.cur);
+  const s = $('#series'); if (!s.hidden) { const y = s.scrollTop; openSeries(s.dataset.id); s.scrollTop = y; }
+};
+
+// ---- Jouer (Explorer): not the preview again, the series: its cover, what it is, Jouer the episode you're at, all its episodes ----
+function openSeries(id) {
+  const d = byId(id), box = $('#series'), n = epNow(d), eps = (d.eps || [d]).length;
+  const go = `${started(d) ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${Math.min(n, eps)}` : ''}`;
+  box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[Math.min(n, eps) - 1].img } : d)}</div>
+    <div class="sr-body"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>
+      <div class="row"><button class="btn main wide" data-act="ep" data-id="${id}" data-n="${Math.min(n, eps)}">${I.play}${go}</button>${saveWide(d)}</div>${epsHtml(d)}</div>`;
+  box.dataset.id = id; box.hidden = false; box.scrollTop = 0;
+}
 
 // ---- saving: a multiplayer demo can be saved with someone, to watch together later ----
 function setSaved(id, w) {
@@ -1521,7 +1561,8 @@ function step(e) {
 }
 // the end of the preview: its infos take the player's place (back goes where you were before it)
 function end() {
-  swap({ ov: { k: 'detail', id: P.d.id, cur: screen === 'current' } });
+  const under = cur().ov && cur().ov.under;
+  swap({ ov: under && under.k === 'series' ? under : { k: 'detail', id: P.d.id, cur: screen === 'current' } });
 }
 
 
@@ -1543,11 +1584,11 @@ stage.addEventListener('click', (e) => {
     case 'open': push({ ov: { k: 'detail', id } }); break;
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); break;
-    case 'play': openPlayer(id); break;
+    case 'play': { const top = cur().ov, o = { ov: { k: 'series', id } }; if (top && top.k === 'detail') swap(o); else push(o); break; }   // the series, not the preview again
     case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;
     case 'hdown': $('#home').scrollTo({ top: $('#homeMore').offsetTop - 40, behavior: 'smooth' }); break;
-    case 'ep': if (byId(id).full) openPlayer(id, false, 0, +el.dataset.n); else $('#homeInfo [data-act="resume"]').click(); break;   // an episode you did: again from its start
+    case 'ep': playEp(id, +el.dataset.n); break;
     case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
