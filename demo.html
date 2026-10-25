@@ -81,17 +81,13 @@ body.tabs-pill #tabs span { display: none; }
 .mk svg { width: 2.1em; height: 2.1em; }
 .ppl { display: flex; }
 .ppl svg + svg { margin-left: -.85em; }
-.mk.solo { color: #fff; } .mk.multi { color: #9fd3ff; }
-.mk.byoc { color: var(--gold); }
+/* every icon is white; a saved one is just filled */
 .mk span { font-size: 1.5em; }
 .ribbon { position: absolute; left: -18%; top: 9%; width: 70%; transform: rotate(-38deg); background: var(--gold); color: #000; text-align: center; font-weight: 900; font-size: max(.9em, 3.3cqw); letter-spacing: .06em; padding: .35em 0; z-index: 2; box-shadow: 0 .3em .8em rgba(0,0,0,.4); }
 .ribbon + .marks { left: 4%; top: auto; bottom: 4%; }
 .cvw:has(.cvt) .ribbon + .marks { left: auto; right: 4%; top: 22%; flex-direction: column; align-items: flex-end; }
 .save { position: absolute; right: 4%; bottom: 4%; z-index: 3; width: max(4.6em, 15cqw); height: max(4.6em, 15cqw); filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .save svg { width: 55%; height: 55%; }
-.save.on { color: var(--rose); }
-.save.on.bm { color: var(--gold); }
-.save.pl.on { color: var(--stranger); }
 .cvw:has(.save) .cvt { right: 22%; }
 
 /* live: a stranger waiting (green) / a friend waiting (pink, their initial) */
@@ -169,7 +165,6 @@ body.tabs-pill #tabs span { display: none; }
 .fi .side i { width: 6em; height: 6em; filter: drop-shadow(0 0 .4em rgba(0,0,0,.8)); display: grid; place-items: center; }
 .fi .side svg { width: 3em; height: 3em; }
 .fi .side span { font-size: 1.4em; font-weight: 700; }
-.fi .side .on { color: var(--rose); }
 .fi .txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 7em 6% 3em; background: linear-gradient(transparent, rgba(0,0,0,.92) 35%); }
 .fi h3 { font-family: var(--display); font-weight: 400; font-size: 4em; margin: 0 0 .25em; line-height: 1.05; }
 .pitch { font-size: 1.95em; line-height: 1.38; color: #d1d1d6; margin: 0 0 1.1em; }
@@ -201,7 +196,7 @@ body.tabs-pill #tabs span { display: none; }
 .deckBtns { display: flex; justify-content: center; gap: 3em; margin-top: 3em; }
 .deckBtns button { width: 9em; height: 9em; border-radius: 50%; background: #1c1c1e; display: grid; place-items: center; }
 .deckBtns button svg { width: 4em; height: 4em; }
-.deckBtns .no { color: #ff453a; } .deckBtns .yes { color: var(--gold); } .deckBtns .pl { background: var(--fg); color: #000; width: 11em; height: 11em; }
+.deckBtns .pl { background: var(--fg); color: #000; width: 11em; height: 11em; }
 .deckTip { text-align: center; font-size: 1.6em; color: var(--mute); margin-top: 1.2em; }
 
 /* ---- layout G: list ---- */
@@ -404,7 +399,6 @@ body.tabs-pill #tabs span { display: none; }
 .rb { position: relative; width: 7.6em; height: 7.6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .5em rgba(0,0,0,.75)); }
 .rb svg { width: 4em; height: 4em; }
 .rb.play svg { width: 5em; height: 5em; }
-.rb.on { color: var(--gold); }
 .rb .pd { position: absolute; top: .4em; right: .2em; width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
 .rb .pd.f { width: 3.4em; height: 3.4em; display: grid; place-items: center; color: #fff; animation: pulse 1.3s infinite; }
 .rb .pd.f b { font-size: 1.5em; font-weight: 900; }
@@ -593,10 +587,10 @@ function cover(d) {
   const art = d.img ? `<img class="cvimg" src="${d.img}" alt="">` : `<div class="cvbg" style="background-image:url(bg/${d.bg}.jpg);background-position:${d.pos};filter:${d.fx}"></div>${sprites(d)}`;
   return `<div class="cv n${d.img ? 0 : d.cast.length}" style="--glow:${d.glow || '#fff'}">${art}<div class="cvfade"></div>${O.title === 'over' ? `<div class="cvt">${esc(d.title)}</div>` : ''}</div>`;
 }
-// how many play it: a user icon and the number
+// how many play it: a user icon and the number ("Solo" for one)
 function players(d) {
   const n = d.players;
-  return `<span class="mk" title="${n === 1 ? 'Solo' : n + ' joueurs'}">${I.person}<span>${n === 3 ? '2–3' : n}</span></span>`;
+  return `<span class="mk" title="${n === 1 ? 'Solo' : n + ' joueurs'}">${I.person}<span>${n === 1 ? 'Solo' : n === 3 ? '2–3' : n}</span></span>`;
 }
 function byoc(d, inMeta) {
   if (!d.byoc) return '';
