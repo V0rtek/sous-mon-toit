@@ -33,7 +33,9 @@ svg { display: block; fill: currentColor; }
 #switch .round { width: 5.2em; height: 5.2em; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
-body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-current #switch, body.s-current .gearBtn { visibility: hidden; }
+body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-current #switch { visibility: hidden; }
+.gearBtn .pp { width: 5.2em; height: 5.2em; box-shadow: 0 0 0 .25em rgba(255,255,255,.85); }
+.ci .pc-corner { left: 4%; right: auto; }   /* the corner on the right is your picture */
 body.s-current.t-explore #top { background: none; }
 body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
 
@@ -301,17 +303,32 @@ body.tabs-pill #tabs span { display: none; }
 .car.home { padding: 1em 13% 0; }
 .car.home .card { width: 100%; }
 .car.home .cv { border-radius: 2em; }
-.still .sline { position: absolute; left: 6%; right: 6%; bottom: 9%; z-index: 3; background: #fffdf9; color: #1d1a24; border-radius: 4cqw; padding: 3.4cqw 4.4cqw; font-family: 'Nunito', var(--ui); font-size: 4.6cqw; font-weight: 700; line-height: 1.3; }
-.still .sline b { display: table; margin: -7.4cqw 0 1.4cqw; font-size: 3.6cqw; background: #e2557a; color: #fff; padding: .4em .9em; border-radius: 1em; }
-.still .sline.nar { background: none; color: #fff; font-style: italic; text-align: center; text-shadow: 0 .1em .5em #000; padding: 0; }
-.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
-.car.home .withs { top: 4%; bottom: auto; }
+/* the opened-up card: from the card's place to the whole screen, the cover giving way to the scene and its last 3 lines */
+.hx { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 2; overflow: hidden; pointer-events: none; opacity: 0; border-radius: 2em; container-type: inline-size;
+  transition: left .55s cubic-bezier(.45,0,.25,1), top .55s cubic-bezier(.45,0,.25,1), width .55s cubic-bezier(.45,0,.25,1), height .55s cubic-bezier(.45,0,.25,1), border-radius .55s, opacity .25s; }
+.hx.on { opacity: 1; }
+.hx.big { border-radius: 0; }
+.hx-cover, .hx-scene { position: absolute; inset: 0; transition: opacity .6s .25s; }
+.hx-cover .cv, .hx-scene .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
+.hx-scene { opacity: 0; }
+.hx.big .hx-scene { opacity: 1; }
+.hx.big .hx-cover { opacity: 0; }
+.hx-bg { position: absolute; inset: 0; }
+.hx-cast { position: absolute; inset: 0; }
+.hx-cast .sp { height: 62%; bottom: 22%; }
+.hx-scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.35), transparent 25%, transparent 45%, rgba(0,0,0,.92) 80%); }
+.hx-lines { position: absolute; left: 0; right: 0; bottom: 31%; z-index: 3; display: flex; flex-direction: column; gap: 4.6cqw; opacity: 0; transform: translateY(2em); transition: opacity .4s .7s, transform .4s .7s; }
+.hx.big .hx-lines { opacity: 1; transform: none; }
+.hx-lines .gb { position: relative; top: auto; margin: 0 9%; left: 0; right: 0; padding: 3.6cqw 3.4cqw 2.8cqw; }
+.hx-lines .gb p { font-size: 3.6cqw; }
+.hx-lines .gb b { font-size: 3cqw; top: -2.9cqw; }
+.hx-lines .gb:nth-last-child(3) { opacity: .5; }
+.hx-lines .gb:nth-last-child(2) { opacity: .75; }
+#home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 #home .carInfo { padding-top: 2.4em; }
 #home .carInfo .btn { width: 70%; }
 .where { font-size: 1.8em; color: #d1d1d6; margin: 0 0 1.2em; display: flex; justify-content: center; align-items: center; gap: .4em; }
 .where .av { width: 1.6em; height: 1.6em; }
-.pbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: .7em; background: rgba(255,255,255,.25); }
-.pbar i { display: block; height: 100%; background: var(--rose); }
 .shelf .withs { bottom: calc(4% + .7em); }
 /* a player's face (their character), cropped from the full figure */
 .mug { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
@@ -487,7 +504,7 @@ body.tabs-pill #tabs span { display: none; }
       <button id="vName" data-act="gear"></button>
       <button class="round" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <button class="round gearBtn" data-act="gear" aria-label="Options"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
+    <button class="round gearBtn" data-act="gear" aria-label="Réglages"></button>
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
@@ -1015,6 +1032,7 @@ const page = () => tab !== 'explore' ? tab : screen === 'current' ? 'current' : 
 const BASE = 'home';   // the tab a mode opens on
 function render() {
   document.body.className = `s-${screen} t-${tab} tabs-${O.tabs}`;
+  $('.gearBtn').innerHTML = face(me());   // you, top right: the UI settings
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
@@ -1035,34 +1053,47 @@ function track(id, i, w) {
   keep.set('prog', prog);
 }
 const done = (id) => prog[id].i >= total(byId(id));
-const pbar = (id) => { const d = byId(id), p = prog[id]; return `<div class="pbar"><i style="width:${Math.min(100, Math.round(100 * (p.i + 1) / total(d)))}%"></i></div>`; };
 // where you stopped, as a still: the setting, everyone in the pose they had there, the line on screen
 // (Last call runs in the game: its picture stands in)
-function still(d, i) {
-  if (d.full || d.img) return cover(d);
-  const cast = castOf(d), at = Math.min(i, d.lines.length - 1);
-  for (const [who, , pose] of d.lines.slice(0, at + 1)) if (who >= 0 && pose && cast[who]) cast[who] = { ...cast[who], p: pose };
-  const [who, text] = d.lines[at], name = who >= 0 ? cast[who].name : '';
-  return `<div class="cv still n${cast.length}"><div class="cvbg" style="${place(d)}"></div>${actors(cast)}<div class="cvfade"></div>
-    <div class="sline${who < 0 ? ' nar' : ''}">${who >= 0 ? `<b>${esc(name)}</b>` : ''}${esc(text)}</div></div>`;
+// the 3 lines that brought you where you are (the last 3 of a finished one), as the game shows them
+function recap(d, i) {
+  if (!d.lines || !d.lines.length) return '';
+  const cast = castOf(d), upto = Math.min(i, d.lines.length - 1);
+  for (const [w, , p] of d.lines.slice(0, upto + 1)) if (w >= 0 && p && cast[w]) cast[w] = { ...cast[w], p };
+  const last = d.lines.slice(Math.max(0, upto - 2), upto + 1), who = last[last.length - 1][0];
+  const scene = d.full || d.img ? cover(d) : `<div class="hx-bg" style="${place(d)}"></div><div class="hx-cast n${cast.length}">${actors(cast, who)}</div>`;
+  return `<div class="hx-scene">${scene}</div><div class="hx-lines">${last.map(([w, t]) => w < 0
+    ? `<div class="gb narr"><p>${esc(t)}</p></div>` : `<div class="gb"><b style="background:${TINT[cast[w].s] || '#e2557a'}">${esc(cast[w].name)}</b><p>${esc(t)}</p></div>`).join('')}</div>`;
 }
-// En cours: a carousel of the stories you're in, the last one you left unfinished first; finished previews after
+// En cours: a carousel of the stories you're in, the last one you left unfinished first; finished ones after. The card in the
+// middle shows its cover; stay on it a moment and it opens up full screen on where you left off
+let homeOpen = null;
 function renderHome() {
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
-  const cardOf = (id) => {
-    const d = byId(id), p = prog[id], w = p.with;
-    const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
-    return `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${still(d, p.i)}${done(id) ? '<span class="sdone">Fini</span>' : ''}${withs}${pbar(id)}</div></div>`;
-  };
+  const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(byId(id))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
-    <div class="carInfo" id="homeInfo"></div>`;
+    <div class="hx" id="homeX"></div><div class="carInfo" id="homeInfo"></div>`;
+  let centre = ids[0];
+  const close = () => { clearTimeout(homeOpen); const x = $('#homeX'); if (x) x.className = 'hx'; };
+  const open = () => {
+    const card = $(`#homeCar .card[data-id="${centre}"]`), x = $('#homeX'), home = $('#home');
+    if (!card || !x || page() !== 'home') return;
+    const r = card.getBoundingClientRect(), h = home.getBoundingClientRect(), d = byId(centre);
+    x.innerHTML = `<div class="hx-cover">${cover(d)}</div>${recap(d, prog[centre].i)}`;
+    Object.assign(x.style, { left: r.left - h.left + 'px', top: r.top - h.top + home.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
+    x.className = 'hx on';
+    requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = 'hx on big'; }));
+  };
+  const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
+  $('#homeCar').addEventListener('scroll', wait, { passive: true });
   snap($('#homeCar'), (id) => {
-    const d = byId(id), p = prog[id];
+    const d = byId(id), p = prog[id]; centre = id;
     $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
       <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}</button>`;
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
+  wait();
 }
 
 // ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
@@ -1474,7 +1505,7 @@ stage.addEventListener('click', (e) => {
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
-    case 'pick': keep.set('me', el.dataset.c); renderSocial(); break;
+    case 'pick': keep.set('me', el.dataset.c); renderSocial(); $('.gearBtn').innerHTML = face(me()); break;
     case 'newchar': e.preventDefault(); leave(); break;   // made in the game's gallery
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
