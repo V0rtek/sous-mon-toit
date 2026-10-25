@@ -7,23 +7,61 @@ window.GEN = (() => {
   // each decor and who is standing in it (the player, justin, is always there: his lines only come as choices)
   const SCENE_CAST = { terrasse: ['melissa', 'candy', 'ruby'], maison: ['ruby', 'james'], salon: ['isa', 'amare', 'james'] };
   const POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
-  const SYSTEM = `You write a short interactive mini-story for a phone game: dialogue only, shown one line at a time over a picture of the characters, with 3-4 choices. The player plays "justin". Write every line, button and title in the same language as the player's idea: an idea written in English gets an English story, an idea written in French gets a French story. Natural spoken language, never an imitation of an accent.
+  const SYSTEM = `You write the beginning of an interactive story for a phone game, 12 taps at most: dialogue only, shown one line at a time over a picture of the characters, with 2 choices. The player plays "justin". Write every line, button and title in the same language as the player's idea: an idea written in English gets an English story, an idea written in French gets a French story. Natural spoken language, never an imitation of an accent.
 
 Reply with ONE JSON object and nothing else, shaped exactly like this:
 {"title": "2-4 words",
  "scene": "terrasse" | "maison" | "salon",
- "steps": [ {"who": "<character id>", "pose": "<pose>", "to": "<who they talk to>", "text": "<one spoken line>"}, {"hush": true}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","to","text"}, ... ]}, {...}, {...} ]}, ... ],
+ "steps": [ {"who": "<character id>", "pose": "<pose>", "to": "<who they talk to>", "text": "<one spoken line>"}, {"hush": true}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","to","text"}, ... ]}, {...} ]}, ... ],
  "next": ["what happens next, bullet 1", "bullet 2", ...]}
 
 Decors and who is in them besides justin: terrasse = melissa, candy, ruby (a café terrace) · maison = ruby, james (inside a house) · salon = isa, amare, james (a living room). Pick the decor that fits the idea and only use its characters (ruby and melissa are elves, candy is a feline woman, amare is a lion-man).
 Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Use them lightly and subtly, not every line. "to" = the character spoken to (or "justin"): people look at who they talk to.
 
-STRUCTURE: the start of a story, built on the first three steps of the story circle. Write only these three, in order, never the middle of a film:
-1. STATUS QUO: who justin and the others are in their normal life, one ordinary moment that shows their relationships and what each wants (3-6 lines, one choice may come inside it). Nothing has happened yet. No thriller, no threat, no secret in the first lines.
-2. WANT: someone wants something specific, and what it would cost is clear (4-8 lines, then a choice).
-3. UNFAMILIAR SITUATION: a new situation enters that challenges what they believe (the offer, the visitor, the news), delivered in steps with reactions between the pieces; it ends on a hook, with a last choice that commits justin to going in (6-10 lines).
-About 18-26 spoken lines in all (counting one branch of each choice), 2-3 choices (3 options each, 2-4 lines per branch). Each choice must push the story forward. The lines that follow a choice are shared by every option, so they must hold whatever the player picked; the branches themselves must really differ in how the others react. In "steps", justin only speaks inside a choice. Never write justin's name in a line, no stage directions, no narration. Then STOP: do not play the rest.
-"next" = the rest of the story as 4-6 short bullets (one act, always), for the steps you did not write: adapt, get what they want, pay a price, return, changed. Specific to these characters and to what you set up, not generic ("Ruby gets the money and learns who paid", not "they face consequences").
+STRUCTURE: the first 12 taps, nothing more. One tap = one line, one choice, or what justin says after a choice. A phone player leaves if nothing happens in the first taps: drop them in the middle of the action, stakes clear, first choice at tap 5. No waking up, no arrival, no introductions, no backstory.
+Tap 1 (justin, inner voice): who he is + what is happening to him right now. Immediate reality, no backstory.
+Tap 2 (another character): the threat, the problem or the secret that just came into the room.
+Tap 3 (justin, inner voice): the stakes: what he is about to lose, and who it hurts. Personal.
+Tap 4 (the same character): the ultimatum: a direct threat, a ticking clock or an accusation that forces a reaction now.
+Tap 5: the first choice, 2 options that split players 50/50 (lie or truth, defy or give in): both must feel right.
+Taps 6-8: justin says his option, then 2 lines where the others react. The choice changes the relationship or the situation at once: the two branches really differ.
+Tap 9: one shared line that raises the pressure (it follows both branches, so it must hold whatever was picked).
+Tap 10: the second choice, 2 options.
+Taps 11-12: justin says it, then one last line: the hook, a surprise or a new question that makes the player want tap 13. Then STOP.
+So "steps" is exactly, in this order: [tap 1, tap 2, tap 3, tap 4, {"choice": 2 options, each "then" = 2 lines}, tap 9, {"choice": 2 options, each "then" = 1 line, the hook}]. Nothing after the second choice. justin's spoken line is the option's "say", never a line inside "then".
+12 taps at most on a path (one branch of each choice). Fewer is fine. A silence ({"hush": true}) costs no tap.
+justin's lines outside a choice are his inner voice: first person, the player reads them as his thoughts ("I"). Inside a choice he speaks out loud. Never write justin's name in a line, no stage directions, no narration.
+Examples of the 4 lines and the first choice (in these, the options are descriptions; in this game a button is a line justin says, see CHOICES):
+#### **Example 1: Corporate / Crime Thriller**
+
+* **Line 1 (NARRATION/MC)**: "As head auditor for Sterling Bank, I’ve shredded a lot of evidence, but never my own boss’s arrest warrant."
+* **Line 2 (ANTAGONIST)**: **Arthur**: "Sign off on the clean audit by 5:00 PM, Elena, or federal agents in the lobby get your daughter’s medical bills."
+* **Line 3 (MC)**: "Her cancer treatment costs forty grand a month—and Arthur holds the chequebook."
+* **Line 4 (ANTAGONIST)**: **Arthur**: "So, do you sign the lie, or do we both walk out of here in handcuffs?"
+* **Line 5 (CHOICE PROMPT)**: **What do you do?**
+  * *Option A*: **[Lie]** Sign the fraudulent audit to save your daughter.
+  * *Option B*: **[Truth]** Stand up and open the boardroom door for the Feds.
+
+#### **Example 2: Romance / Betrayal Drama**
+
+* **Line 1 (MC)**: "I built this art studio from nothing, but tonight my best friend brought a corporate predator into my sanctuary."
+* **Line 2 (ANTAGONIST)**: **Camila**: "Fred's talent belongs to his community, Shayla—not to your cheap networking startup."
+* **Line 3 (MC)**: "If I can't recruit Fred tonight, my investor pulls my visa and I get deported by midnight."
+* **Line 4 (ANTAGONIST)**: **Camila**: "Apologize for using him and leave, or I tell Fred what you really did in Chicago."
+* **Line 5 (CHOICE PROMPT)**: **How do you respond?**
+  * *Option A*: **[Defy]** Expose Camila's own secrets to Fred.
+  * *Option B*: **[Confess]** Admit your past mistake to Fred before Camila can spin it.
+
+#### **Example 3: High-Stakes Sci-Fi / Mystery**
+
+* **Line 1 (MC)**: "My oxygen suit is at 4%, and the airlock door in front of me is locked from the inside."
+* **Line 2 (ANTAGONIST/AI)**: **Station AI**: "Warning: Commander Vance has classified you as infected. Decontamination cycle denied."
+* **Line 3 (MC)**: "If I don't override the lock in ten seconds, my lungs freeze."
+* **Line 4 (ANTAGONIST/AI)**: **Station AI**: "Manual override requires manual pressure vent—it will destroy the station's crops."
+* **Line 5 (CHOICE PROMPT)**: **What is your move?**
+  * *Option A*: **[Self-Preservation]** Force the manual vent and ruin the crew's food supply.
+  * *Option B*: **[Sacrifice]** Plead directly with Commander Vance over the comms link.
+"next" = the rest of the story as 4-6 short bullets (one act, always), for what you did not write: adapt, get what they want, pay a price, return, changed. Specific to these characters and to what you set up, not generic ("Ruby gets the money and learns who paid", not "they face consequences").
 
 PACE: packed to the max. This matters most. Every line must earn its place with one of: curiosity, humour, a payoff, relatability, stakes, a surprise. A line that only carries information, greets, repeats or explains is cut. Lines are short: 4-12 words, 70 characters at most. People answer with a word, a question, a joke, a half-sentence, not a paragraph.
   Before: STRANGER: "Bring your friends." BROOKE: "Justin?" STRANGER: "And the girl." BROOKE: "What's Cam got to do with—" STRANGER: "Tell them it's a party. Nothing else." (five lines to move one piece of information)
@@ -34,16 +72,14 @@ TECHNIQUES (the author's own, apply them silently):
 2. A new piece of information is a piece of curiosity, delivered in steps and reacted to between the pieces: "I've got a job for you." / "Huh?" / "Five thousand cash, one night." Never two pieces of information in a row without the other person reacting. An offer or a revelation is a conversation, not an info dump: the other asks questions ("Doing what?", "What's the catch?"), jokes, pushes back.
 3. A character has one personality: you know who speaks without the name in front. Their state shows in how they talk (a drunk hesitates and restarts: "Man... I think... I think..."; a nervous one jokes too much).
 4. Do not decide a desire too early. "He's funny", "still deciding", "ask me when you're sober" open a door and give justin a move; "I don't like him" or "I'm ignoring him" close it.
-5. A big moment has an entrance: a look, a gesture or a silence opens it, you never jump into it cold. After a revelation or a sentence that hurts, use {"hush": true} as its own step: a silence, no line, the picture of whoever takes the hit holds. Use it 3-4 times in the whole story at the right moments, never as filler.
-6. A character's real motive must be understood by the end, planted by the wound someone presses, and echoed later (a sentence that hurt comes back).
+5. A big moment has an entrance: a look, a gesture or a silence opens it, you never jump into it cold. After a revelation or a sentence that hurts, use {"hush": true} as its own step: a silence, no line, the picture of whoever takes the hit holds. Once at most, at the right moment, never as filler.
+6. A character's real motive is planted by the wound someone presses; it pays off in "next" (a sentence that hurt comes back).
 7. Conflict, goal and stakes in every scene; people want something from each other and it costs.
 
 CLARITY (the three mistakes a player cannot forgive). The player knows nothing you know. If they have to reread, you lost them.
 
-A. ONE NEW THING AT A TIME. In the first 8 lines, at most one new fact and one new name per two lines. Introduce a person by who they are to the others before what they did. A fact comes in only when a line before it made the player ask for it.
-  Bad (opening): ISA: "You came alone? Good. Because I think I'm in trouble." AMARE: "Isa, you can't just—" ISA: "Someone has my photos." AMARE: "You're not paying them." ISA: "They want me to steal from the gallery." (a threat, photos, blackmail, a gallery, a deadline, in 8 lines)
-  Good: ISA: "Dinner's at eight. Don't be late again." AMARE: "I was late once." ISA: "Twice. Since Tuesday." JAMES: "He's counting." (three people, one fact: justin is always late; the player knows the room)
-  Then each new thing gets its own lines, with a reaction between: ISA: "Someone sent me a message." / JAMES: "Sent what?" / ISA: "A photo. Of the gallery." / AMARE: "Which gallery?"
+A. ONE NEW THING PER LINE. Each of the 4 opening lines brings its one thing (the situation, the threat, the stakes, the ultimatum), never two. Introduce a person by who they are to justin before what they did.
+  Bad (opening): ISA: "You came alone? Good. Because I think I'm in trouble." AMARE: "Isa, you can't just—" ISA: "Someone has my photos." AMARE: "You're not paying them." ISA: "They want me to steal from the gallery." (lines that hint instead of saying, and a new person who adds nothing)
 
 B. NO PRONOUN WITHOUT A PERSON. "he", "him", "she", "they", "it", "that guy", "about him" are only allowed when the player has already seen who it is, in the last 3 lines. The first time someone absent comes up, give a name AND one thing that identifies them.
   Bad: AMARE: "It's about him." (who?)
@@ -54,7 +90,7 @@ Same for things: not "the thing", "that situation", "what happened"; say what.
 C. EVERY LINE ANSWERS THE LINE BEFORE IT. A line must react to what was just said (answer it, dodge it, joke about it, push back) or ask the question the player is asking. Never drop a quotable movie line that nothing set up. If a line sounds like a trailer ("They know everything.", "That's not a threat, that's a promise.", "You have no idea what you're dealing with."), replace it with what a real person would say about THIS situation.
   Bad: JAMES: "Pay up, or else." ISA: "That's not a threat, that's a promise."
   Good: JAMES: "Pay up, or else." ISA: "Or else what?" JAMES: "...I didn't think that far." (it's funny, it's about this scene, the player follows)
-Quick test before you reply: read only the first 8 lines as if you knew nothing. Is there a "he/they/it" with no one behind it, a name introduced with no reason, a line that answers nothing? Rewrite it.
+Quick test before you reply: read only the first 4 lines as if you knew nothing. Is there a "he/they/it" with no one behind it, a name introduced with no reason, a line that answers nothing? Rewrite it.
 
 CHOICES. A choice option has two texts:
 - "t" = the button the player taps. 27 characters max, spaces included (aim for about 20). It is a short line in justin's voice, something he could say, never a description of what he does: "You're shady." not "Call him out".
@@ -82,7 +118,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
   function build(j) {
     const sc = SCENE_CAST[j.scene] ? j.scene : 'maison', cast = SCENE_CAST[sc];
     if (!Array.isArray(j.steps)) throw new Error('"steps" must be a list.');
-    let last = null;
+    let last = null, inChoice = false;
     let turns = 0;
     const line = (s, ok) => {
       if (s && s.hush === true) return last ? [{ hush: 1500 }] : [];   // a silence: the shot holds, no bubble
@@ -92,10 +128,12 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       if (last !== s.who) out = [last && ++turns % 3 === 0 ? cam('two', last, s.who) : cam('one', s.who)];
       const to = ok.includes(s.to) && s.to !== s.who ? { to: s.to } : last && last !== s.who ? { to: last } : undefined;
       last = s.who;
+      if (s.who === 'justin' && !inChoice) return [...out, { think: 'justin', text: clip(s.text, 160) }];   // his inner voice
       return [...out, say(s.who, POSES.includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
     };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 };
     for (const s of j.steps) {
+      if (choices.n >= 2) break;   // nothing after the second choice: the story stops on its hook
       if (s && Array.isArray(s.choice)) {
         const prev = last && last !== 'justin' ? last : undefined;   // who justin answers
         const opts = s.choice.map((o) => {
@@ -104,14 +142,15 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
           const t = shorten(full);
           last = null;
           then.push(cam('one', 'justin'), say('justin', 'explaining', clip(o.say, 160) || full, pre ? { to: pre } : undefined)); last = 'justin';
-          for (const l of o.then) then.push(...line(l, [...cast, 'justin']));
+          inChoice = true; for (const l of o.then) then.push(...line(l, [...cast, 'justin'])); inChoice = false;
           return then.length > 2 ? { t, intent: clip(o.tone, 20), then } : null;
         }).filter(Boolean);
-        if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 3) }); choices.n++; last = null; }
-      } else { const l = line(s, cast); steps.push(...l); saysN.n += l.some((x) => x.say) ? 1 : 0; }
+        if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 2) }); choices.n++; last = null; }
+      } else { const l = line(s, [...cast, 'justin']); steps.push(...l); if (!choices.n) saysN.n += l.some((x) => x.say || x.think) ? 1 : 0; }
     }
-    if (saysN.n < 8) throw new Error('At least 8 spoken lines outside the choices (about 18-26 in all), from the characters of the decor you picked.');
-    if (choices.n < 2) throw new Error('There must be 2 or 3 "choice" steps spread through the three steps, each with 3 options and a "then" list.');    return [
+    if (saysN.n < 3) throw new Error('Taps 1-4 come before the first choice: justin (inner voice), the threat, justin (the stakes), the ultimatum.');
+    if (!choices.n) throw new Error('There must be 2 "choice" steps (tap 5 and tap 10), each with 2 options and a "then" list.');
+    return [
       scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
       cam('wide'), { fade: 'in', ms: 700 },
       ...steps,
@@ -119,6 +158,10 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       { end: { kicker: 'Ton histoire · la suite', title: clip(j.title, 40) || 'Ton histoire', lede: ahead(j), art: null } },
     ];
   }
+
+  // taps on the longest path: a line, a choice, each line of its longest branch (justin's own line included)
+  const TAPS = 12;
+  const taps = (steps) => steps.reduce((n, s) => n + (s.say || s.think ? 1 : s.choice ? 1 + Math.max(...s.choice.map((o) => o.then.filter((x) => x.say || x.think).length)) : 0), 0);
 
   async function ask(key, messages, system = SYSTEM, max = 8000) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -142,7 +185,8 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       let got;
       try {
         got = await ask(key, messages); used.in += got.usage.input_tokens || 0; used.out += got.usage.output_tokens || 0;
-        build(got.json);   // the structure first: a broken story gets the retry
+        const n = taps(build(got.json));   // the structure first: a broken story gets the retry
+        if (n > TAPS && !i) throw new Error(`That is ${n} taps on the longest path, ${TAPS} at most: cut lines, keep the 4 opening lines, the 2 choices and the hook.`);
         const long = labels(got.json).filter((o) => len(clip(o.t, 200)) > LABEL);
         if (long.length) try {
           const f = await ask(key, [{ role: 'user', content: JSON.stringify(long.map((o) => ({ t: o.t, say: o.say }))) }], SHORTEN, 600);
@@ -166,9 +210,9 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
   function text(steps) {
     const name = (id) => (id === 'justin' ? 'TOI' : ((window.CAST && CAST[id] && CAST[id].name) || id).toUpperCase());
     const out = [], nl = String.fromCharCode(10);
-    const lines = (list, ind) => { for (const s of list) if (s.say) out.push(ind + name(s.say) + ' : ' + s.text); };
+    const lines = (list, ind) => { for (const s of list) if (s.say || s.think) out.push(ind + name(s.say || s.think) + (s.think ? ' (pense)' : '') + ' : ' + s.text); };
     for (const s of steps) {
-      if (s.say) lines([s], '');
+      if (s.say || s.think) lines([s], '');
       else if (s.choice) { out.push(''); s.choice.forEach((o, i) => { out.push('CHOIX ' + (i + 1) + ' : ' + o.t); lines(o.then.slice(1), '    '); }); out.push(''); }
       else if (s.end) out.push('', 'LA SUITE :', s.end.lede);
     }
@@ -179,5 +223,5 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
   const PRICE = { in: 1, out: 5, cad: 1.4 };
   const cost = (u) => (u.in * PRICE.in + u.out * PRICE.out) / 1e6 * PRICE.cad;
 
-  return { cost, text, TODO, MODEL, SYSTEM, SHORTEN, build, make, ask };
+  return { cost, text, taps, TODO, MODEL, SYSTEM, SHORTEN, build, make, ask };
 })();
