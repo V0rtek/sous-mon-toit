@@ -1936,7 +1936,7 @@ if (PREVIEW) {
     if (parent !== window) parent.postMessage({ pos }, location.origin);
   };
   const goTo = async (n) => { jumping = true; veil.style.opacity = 1; await skipTo(n, PREVIEW); await sleep(150); veil.style.opacity = 0; jumping = false; report(); };
-  if (cut.length) goTo(cut[0][0]); else { veil.style.opacity = 0; begin(PREVIEW); }
+  if (cut.length) goTo(cut[0][0]); else { veil.style.opacity = 0; begin(PREVIEW); setTimeout(report, 900); }   // report = "ready" for Full demo
   addEventListener('message', (e) => {
     if (e.origin !== location.origin || !e.data || !e.data.tap || jumping) return;
     const [fx, fy] = e.data.tap, el = document.elementFromPoint(fx * innerWidth, fy * innerHeight);
@@ -1954,9 +1954,11 @@ else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 }
 const jump = location.hash.match(/^#([tpb])(\d+)$/);
 if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
-// warm the cache so cuts never flash
-for (const s of Object.values(SCENES)) if (s.image) new Image().src = s.image;
-for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = charUrl(id, pose);
+// warm the cache so cuts never flash (not for a preview: it plays one stretch, and Full demo has several of them)
+if (!PREVIEW) {
+  for (const s of Object.values(SCENES)) if (s.image) new Image().src = s.image;
+  for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = charUrl(id, pose);
+}
 </script>
 </body>
 </html>
