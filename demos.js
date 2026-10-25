@@ -10,21 +10,21 @@ SCENES.d_terrasse = {
 };
 
 const dVerre = [
-  scene('d_terrasse', { brooke: 'drunk_listen', cam: 'listen' }),
-  cam('two', 'brooke', 'cam'),
-  { fade: 'in', ms: 700 },
-  narr('Terrasse du Marcel. 1 h 04. Le serveur empile déjà les chaises.'),
-  cam('one', 'cam'), say('cam', 'flirty', "Je t'avais dit que je viendrais.", { to: 'brooke' }),
-  cam('one', 'brooke'), say('brooke', 'drunk_joke', "T'es venue pour moi ou pour le pichet ?", { to: 'cam' }),
-  cam('one', 'cam'), say('cam', 'tipsy_laugh', 'Les deux. Dans cet ordre-là, peut-être.', { to: 'brooke' }),
-  cam('one', 'brooke'), say('brooke', 'drunk_point', 'Fais attention, je note tout.', { to: 'cam' }),
-  cam('two', 'brooke', 'cam'), narr('Son téléphone vibre sur la table. Elle le retourne sans regarder.'),
-  say('brooke', 'drunk_listen', "C'était qui ?", { to: 'cam' }),
-  cam('one', 'cam'), say('cam', 'awkward', "Personne d'important. Pas ce soir.", { to: 'brooke' }),
-  cam('one', 'brooke'), say('brooke', 'drunk_talk', '« Pas ce soir », ça veut dire demain oui.', { to: 'cam' }),
-  cam('one', 'cam'), say('cam', 'sip', 'Ça veut dire que tu poses trop de questions.', { to: 'brooke' }),
+  scene('d_terrasse', { brooke: 'drunk_listen', cam: 'flirty' }),
+  cam('one', 'cam'),
+  { fade: 'in', ms: 500 },
+  say('cam', 'flirty', 'Si je te dis un secret, tu me promets de pas partir ?', { to: 'brooke' }),
+  cam('one', 'brooke'), say('brooke', 'drunk_joke', "Ça dépend. C'est un beau secret ou un laid ?", { to: 'cam' }),
+  cam('one', 'cam'), say('cam', 'tipsy_laugh', 'Les deux.', { to: 'brooke' }),
+  cam('two', 'brooke', 'cam'), narr('Son téléphone vibre. Elle le retourne, écran contre la table.'),
+  say('brooke', 'drunk_listen', "C'était lui ?", { to: 'cam' }),
+  cam('one', 'cam'), say('cam', 'awkward', "…Comment tu sais qu'il y a un « lui » ?", { to: 'brooke' }),
+  cam('one', 'brooke'), say('brooke', 'drunk_point', 'T’as retourné ton téléphone. Personne fait ça pour sa mère.', { to: 'cam' }),
+  cam('one', 'cam'), say('cam', 'worried', 'Il sait que je suis ici. Avec toi.', { to: 'brooke' }),
+  cam('one', 'brooke'), say('brooke', 'drunk_talk', "Et c'est un problème ?", { to: 'cam' }),
+  cam('one', 'cam'), say('cam', 'sip', 'Ça va le devenir.', { to: 'brooke' }),
   cam('two', 'brooke', 'cam'), narr('Le téléphone vibre encore. Trois fois.'),
-  cam('one', 'cam'), say('cam', 'worried', '…Ok. Faut que je te dise un truc.', { to: 'brooke' }),
+  cam('one', 'cam'), say('cam', 'worried', 'Faut que tu partes. Maintenant.', { to: 'brooke' }),
 ];
 dVerre.seats = ['brooke', 'cam'];   // one phone plays both: no "you are…" card
 dVerre.cast = {
