@@ -469,6 +469,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="bar.js?v=20261025090556"></script>
 <script src="games.js?v=20261025090556"></script>
 <script src="gen.js?v=20261025090556"></script>
+<script src="demos.js?v=20261025090556"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -485,7 +486,7 @@ let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST 
 let sc = null, actors = {}, camNow = null;
 // story: 't1' (chapter 1, solo) or a 2-player one ('play' = the café, 'bar' = Last call: they list their seats);
 // f = what the choices decided (read by the story's `when` steps)
-const STORIES = { t1: STORY, play: PLAY, bar: BAR, ...GAMES };   // + the mini-games (games.js), 2-player each
+const STORIES = { t1: STORY, play: PLAY, bar: BAR, ...GAMES, ...(window.DEMO_STORIES || {}) };   // + Full demo's demos (demos.js)   // + the mini-games (games.js), 2-player each
 // seats = who took each character of a 2-player story in the waiting room: {pa: {id, n}, pb: {id, n}}
 const state = { name: 'Justin', seats: {}, story: 't1', f: {}, isa: ISA_LOOKS[0].sprite, picks: [] };
 const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
