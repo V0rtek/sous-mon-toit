@@ -897,7 +897,8 @@ function renderAdd() {
 function renderTabs() {
   const n = Object.keys(saved).length;
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
-  $('#tabs').innerHTML = t('home', I.home, 'En cours') + t('explore', I.explore, 'Explorer') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('social', I.people, 'Social');
+  // En cours, the main tab, in the middle
+  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', I.home, 'En cours') + t('add', `<i>${I.plus}</i>`, 'Ajouter', 'add') + t('social', I.people, 'Social');
 }
 function renderMenu() {
   $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
