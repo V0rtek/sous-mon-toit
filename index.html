@@ -33,8 +33,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #world > * { position: absolute; }
 #bgimg { left: 0; top: 0; display: block; }
 .actor img { width: 100%; height: 100%; display: block; }
-.actor.talk { animation: talk .38s ease-out; }
-@keyframes talk { 40% { transform: translateY(-1.5%); } }
+.actor.talk { animation: talk .22s ease-out; }   /* a small, quick hop when someone starts talking */
+@keyframes talk { 40% { transform: translateY(-.6%); } }
 #shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 60%, rgba(0,0,0,.28)); }
 /* text messages: a stack beside the character's head, newest at the bottom, every bubble against his side (its sharp
    corner points at him); received = grey, sent = blue */
@@ -288,6 +288,9 @@ body:not(.home) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display
 /* two players: the one whose turn it is not waits on the last shot */
 #waitOther { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 20; padding: .7em 1.4em; border-radius: 2em; background: rgba(15,12,20,.75); color: #fff; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; }
 #waitOther i { font-style: normal; animation: blink 1.2s infinite; }
+#waitFace { display: inline-block; width: 1.9em; height: 1.9em; border-radius: 50%; overflow: hidden; vertical-align: middle; margin: -.3em .5em -.2em -.5em; background: rgba(255,255,255,.15); }
+#waitFace[hidden] { display: none; }
+#waitFace img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
 #waitOther i:nth-child(3) { animation-delay: .2s; }
 #waitOther i:nth-child(4) { animation-delay: .4s; }
 body.watch #choices button.mine { pointer-events: auto; }
@@ -319,7 +322,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
-  <div id="waitOther" hidden><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
+  <div id="waitOther" hidden><span id="waitFace" hidden><img alt=""></span><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
   <div id="black"></div>
@@ -780,7 +783,7 @@ function typeText(t) {
   clearInterval(typing); textEl.textContent = ''; typingFull = t;
   if (REDUCED || FAST) { textEl.textContent = t; typing = null; return; }
   let i = 0;
-  typing = setInterval(() => { i += 2; textEl.textContent = t.slice(0, i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);
+  typing = setInterval(() => { i += 4; textEl.textContent = t.slice(0, i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);   // ~300 characters a second
 }
 // a story that stages itself (STORY.gaze): when someone speaks, the others stop their talking gesture and turn to them,
 // and the speaker turns to whom they talk to (s.to, else whoever spoke last). Someone `aside` (a stranger in the back)
@@ -854,7 +857,11 @@ function botTap() {
 const waitsFor = (by) => duo() && seated() && !mineFor(by);
 const byOf = (s) => s.by || laneNow;
 let held = [];   // the steps that lead into the other player's choice: they run once that player has picked
-function waitNote(t) { $('#waitText').textContent = t; $('#waitOther').hidden = !t; }
+// "Brooke is choosing…": with the face of who it waits on (their character), when it's someone
+function waitNote(t, who) {
+  $('#waitText').textContent = t; $('#waitOther').hidden = !t;
+  $('#waitFace').hidden = !who; if (who) $('#waitFace img').src = poseSrc(who, 'listen');
+}
 // {ring: 'Justin', choice: [answer, decline]}: the choice is an incoming call (the caller's name, a ringtone and the
 // phone's vibration; the green button = the 1st option, the red = the 2nd). Only the player it rings for sees it
 const ICON_PHONE = '<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>';
@@ -905,7 +912,7 @@ const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns'))
 function choose(opts, by, ring) {
   options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
   const mine = mineFor(by);
-  if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(by)} ${ui('choosing')}`); }
+  if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(by)} ${ui('choosing')}`, by); }
   else if (ring) {
     bubble.hidden = true; choicesEl.hidden = true;
     $('#ringName').textContent = fill(ring); $('#ringSub').textContent = ui('calling'); $('#ringCard').hidden = false;

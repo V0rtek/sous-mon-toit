@@ -1045,9 +1045,9 @@ function renderSocial() {
 }
 
 // ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
-// a bubble format to try, from All › Test bulles: ?fmt=1 the game's engine where a demo has a version for it (else 4),
+// the bubble format (All › Test bulles tries each): ?fmt=1 the game's engine where a demo has a version for it (else 4),
 // 2 imitation, 3 my bubble up close, 4 imitation the game's way, 5 4 at once then the game (lighter) once it's ready
-const ARGS = new URLSearchParams(location.search), FMT = ARGS.get('fmt'), START = ARGS.get('start');
+const ARGS = new URLSearchParams(location.search), FMT = ARGS.get('fmt') || '5', START = ARGS.get('start');   // 5 by default; ?fmt=0 = the first one
 const ENGINE = { verre: 'd_verre' };   // demos written for the engine (demos.js)
 const gameOf = (d) => d.full ? d.full + (d.cut ? '&cut=' + d.cut : '') : (FMT === '1' || FMT === '5') && ENGINE[d.id];
 const DRAWN = { 1: 4, 2: 2, 3: 3, 4: 4, 5: 4 }[FMT];
@@ -1067,12 +1067,19 @@ function renderCurrent() {
   seen = new IntersectionObserver((es) => es.forEach((e) => {
     const ci = e.target, f = $('iframe', ci);
     if (!f) return;
-    if (e.isIntersecting) { if (!f.getAttribute('src')) f.src = f.dataset.src; return; }   // the game loads only once you scroll to it
+    if (e.isIntersecting) { if (!f.getAttribute('src')) reframe(f, f.dataset.src); return; }   // the game loads only once you scroll to it
     // 5: only the game on screen stays loaded; back to it = from the start
-    if (f.classList.contains('late') && f.getAttribute('src')) { f.removeAttribute('src'); f.classList.remove('on'); delete ci.dataset.tapped; line(ci, 0); }
+    if (f.classList.contains('late') && f.getAttribute('src')) { reframe(f, null); delete ci.dataset.tapped; line(ci, 0); }
   }), { root: box, threshold: .6 });
   if (START) { const c = $(`.ci[data-id="${START}"]`, box); if (c) box.scrollTop = c.offsetTop; }
   $$('.ci', box).forEach((ci) => seen.observe(ci));
+}
+// (re)load a game frame by putting a fresh one in its place: setting a frame's src adds a step to the browser's history
+// (back would then go back in the frame); null = unloaded
+function reframe(f, url) {
+  const n = f.cloneNode(); n.classList.remove('on');
+  if (url) n.src = url; else n.removeAttribute('src');
+  f.replaceWith(n); return n;
 }
 // the game draws it (Last call, a demo in the engine's format; in 5, once it showed up)
 const inGame = (ci) => { const f = $('iframe.gframe', ci); return f && (!f.classList.contains('late') || f.classList.contains('on')) ? f : null; };
@@ -1098,7 +1105,7 @@ function tapCurrent(ci, e) {
   const d = byId(ci.dataset.id), i = at[d.id] || 0, over = i >= total(d), f = inGame(ci);
   if ($('iframe.late', ci) && !f) ci.dataset.tapped = 1;   // 5: you're in it already, the game won't take over
   if (f) {   // the game moves on (or not: a tap beside a choice does nothing) and says where it is
-    if (over) { f.src = f.dataset.src; line(ci, 0); }
+    if (over) { reframe(f, f.dataset.src); line(ci, 0); }
     else if (f.getAttribute('src')) {
       const r = f.getBoundingClientRect();
       f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
@@ -1114,6 +1121,14 @@ function reached(d, i) {
 }
 addEventListener('message', (e) => {
   if (e.origin !== location.origin || !e.data || e.data.pos == null) return;
+  const pf = $('#player iframe.gframe');
+  if (P && pf && pf.contentWindow === e.source) {   // the game in the player
+    if (pf.classList.contains('late') && !pf.classList.contains('on')) { if (!P.tapped && P.i <= P.from) pf.classList.add('on'); return; }
+    const i = P.from + e.data.pos, n = total(P.d);
+    if (i >= n) { track(P.d.id, n, P.with); end(); return; }
+    if (i !== P.i) { P.i = i; track(P.d.id, i, P.with); progress(); }
+    return;
+  }
   const f = $$('#current iframe').find((x) => x.contentWindow === e.source), ci = f && f.closest('.ci');
   if (!ci) return;
   if (f.classList.contains('late') && !f.classList.contains('on')) {   // 5: the game is ready; it takes over if you haven't started
@@ -1138,7 +1153,8 @@ function syncCurrent() {
 // state = { screen: current|all, tab, ov: the overlay on top ({k: detail|player|sheet, ..., under}), depth } ----
 const hashOf = (st) => '#' + st.screen + (st.tab !== BASE ? '/' + st.tab : '');
 const cur = () => history.state;
-function push(p) { const st = { ...cur(), ...p, depth: cur().depth + 1 }; history.pushState(st, '', hashOf(st)); apply(st); }
+// in a frame (All › Test bulles shows the app in several), no steps of its own in the browser's history: back stays the page's
+function push(p) { if (parent !== window) return swap(p); const st = { ...cur(), ...p, depth: cur().depth + 1 }; history.pushState(st, '', hashOf(st)); apply(st); }
 function swap(p) { const st = { ...cur(), ...p }; history.replaceState(st, '', hashOf(st)); apply(st); }
 let pending = null;
 function back(then) {
@@ -1306,14 +1322,18 @@ let P = null;
 function play(id, host = false, from = 0) {
   const d = byId(id), box = $('#player'), was = prog[id];
   const cast = castOf(d);
-  P = { d, cast, i: from - 1, poses: cast.map((c) => c.p), with: from && was ? was.with : [] };
+  P = { d, cast, i: from - 1, from, poses: cast.map((c) => c.p), with: from && was ? was.with : [] };
   // picking up where you left off: everyone's last pose up to there
   for (const [who, , pose] of d.lines.slice(0, from)) if (who >= 0 && pose) P.poses[who] = pose;
-  box.innerHTML = `<div class="pbg" style="${bgOf(d)}"></div>
+  // in the bubble format: drawn the game's way, and (1, 5) the game itself when the demo has a version for it, from the same line
+  const g = (FMT === '1' || FMT === '5') && ENGINE[d.id];
+  box.innerHTML = DRAWN ? `<div class="stage"></div>${g ? `<iframe class="gframe${FMT === '5' ? ' late' : ''}" src="index.html?preview=${g}${from ? `&cut=${from}-999` : ''}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>` : ''}
+    <div id="pProg"></div><button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button>`
+    : `<div class="pbg" style="${bgOf(d)}"></div>
     <div class="pcast n${cast.length}">${actors(cast)}</div><div class="pshade"></div><div id="pProg"></div>
     <button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button><div id="pLine"></div>`;
   $$('.pcast .sp', box).forEach((img, k) => { img.src = srcOf(cast[k], P.poses[k]); });
-  if (d.img) $('.pbg', box).style.cssText = `background:url(${d.img}) center/cover`;
+  if (d.img && !DRAWN) $('.pbg', box).style.cssText = `background:url(${d.img}) center/cover`;
   box.hidden = false;
   if (from && P.with.length) withChip(P.with);
   if (d.players > 1 && !from) join(d, host); else step();
@@ -1346,10 +1366,20 @@ function progress() {
   else if (O.progress === 'ring') { const c = 2 * Math.PI * 15; el.innerHTML = `<div class="pc-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c * n / t} ${c}"/></svg><span>${n}/${t}</span></div>`; }
   else el.innerHTML = `<div class="pc-pill">Aperçu · ${n} sur ${t}</div>`;
 }
-function step() {
-  const d = P.d; P.i++;
+// the game in the player, once it's the one showing (5: once it took over)
+const playerGame = () => { const f = $('#player iframe.gframe'); return f && (!f.classList.contains('late') || f.classList.contains('on')) ? f : null; };
+function step(e) {
+  const d = P.d, f = playerGame();
+  if (f) {   // the game moves on and says where it is (the message below); opening the player isn't a tap
+    if (!e) { P.i = Math.max(P.i, P.from); progress(); return; }
+    const r = f.getBoundingClientRect(), x = e ? (e.clientX - r.left) / r.width : .5, y = e ? (e.clientY - r.top) / r.height : .5;
+    f.contentWindow.postMessage({ tap: [x, y] }, location.origin); return;
+  }
+  if (e && $('#player iframe.late')) P.tapped = true;   // 5: you're in it already, the game won't take over
+  P.i++;
   if (P.i >= d.lines.length) { track(d.id, d.lines.length, P.with); return end(); }
   track(d.id, P.i, P.with);
+  if (DRAWN) { $('#player .stage').innerHTML = stageHtml(d, P.i, DRAWN, true); progress(); return; }
   const [who, text, pose] = d.lines[P.i];
   if (who >= 0 && pose) P.poses[who] = pose;
   $$('#player .pcast .sp').forEach((img, i) => { const s = srcOf(P.cast[i], P.poses[i]); if (img.getAttribute('src') !== s) img.src = s; img.classList.toggle('talk', i === who); });
@@ -1367,13 +1397,13 @@ function end() {
 stage.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el) {
-    if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(); return; }
+    if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(e); return; }
     const ci = e.target.closest('.ci');
     if (ci) tapCurrent(ci, e);
     return;
   }
   const id = el.dataset.id, act = el.dataset.act;
-  if (P && !$('#player').hidden && $('#sheet').hidden && !['pclose', 'pgo', 'back'].includes(act)) { if (!$('.pjoin', $('#player'))) step(); return; }
+  if (P && !$('#player').hidden && $('#sheet').hidden && !['pclose', 'pgo', 'back'].includes(act)) { if (!$('.pjoin', $('#player'))) step(e); return; }
   e.stopPropagation();
   switch (act) {
     case 'back': back(); break;
