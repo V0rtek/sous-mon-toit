@@ -363,10 +363,9 @@ body.tabs-pill #tabs span { display: none; }
 .pwith { position: absolute; top: 3.2em; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: .5em; padding: .4em .9em .4em .4em; border-radius: 2em; background: rgba(0,0,0,.55); font-size: 1.7em; font-weight: 700; }
 .pwith .av { width: 1.8em; height: 1.8em; }
 .pc-bar ~ .pwith { top: 4em; }
-.pend, .pjoin { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,.86); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 9%; animation: fade .3s; cursor: default; }
-.pend h3, .pjoin h3 { font-family: var(--display); font-weight: 400; font-size: 4.2em; margin: 0 0 .3em; }
-.pend p, .pjoin p { font-size: 2em; color: #c7c7cc; margin: 0 0 2.4em; line-height: 1.4; }
-.pend .col { display: flex; flex-direction: column; gap: 1.2em; width: 100%; }
+.pjoin { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,.86); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 9%; animation: fade .3s; cursor: default; }
+.pjoin h3 { font-family: var(--display); font-weight: 400; font-size: 4.2em; margin: 0 0 .3em; }
+.pjoin p { font-size: 2em; color: #c7c7cc; margin: 0 0 2.4em; line-height: 1.4; }
 .pjoin .seatsBig { display: flex; gap: 3em; margin-bottom: 3em; }
 .pjoin .seatsBig div { display: flex; flex-direction: column; align-items: center; gap: .8em; }
 .pjoin .seatsBig .av { width: 10em; height: 10em; font-size: 1em; }
@@ -853,6 +852,8 @@ function tapCurrent(ci, e) {
     f.contentWindow.postMessage({ tap: [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] }, location.origin);
   }
   line(ci, over ? 0 : i + 1);
+  // the last tap: the infos open by themselves (what it is, Jouer, Sauver)
+  if (!over && i + 1 >= total(d)) setTimeout(() => { if (!cur().ov && page() === 'current') push({ ov: { k: 'detail', id: d.id, cur: true } }); }, 700);
 }
 const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : `background-image:url(bg/${d.bg || 'salon'}.jpg);background-position:${d.pos || 'center'};filter:${d.fx || 'none'}`;
 function lineHtml(d, who, text) {
@@ -1119,13 +1120,9 @@ function step() {
   $('#pLine').innerHTML = lineHtml(d, who, text);
   progress();
 }
+// the end of the preview: its infos take the player's place (back goes where you were before it)
 function end() {
-  const d = P.d, box = document.createElement('div'); box.className = 'pend';
-  box.innerHTML = `<h3>Fin de l'aperçu</h3><p>La suite de « ${esc(d.title)} » est dans l'histoire complète.</p>
-    <div class="col"><button class="btn main" data-act="toast" data-msg="Bientôt : l'histoire complète">${I.play}Jouer l'histoire complète</button>
-    ${saved[d.id] ? '' : `<button class="btn" data-act="save" data-id="${d.id}">${saveIcon(false)}Sauver pour plus tard</button>`}
-    <button class="btn ghost" data-act="replay">Revoir l'aperçu</button><button class="btn ghost" data-act="pclose">Fermer</button></div>`;
-  $('#player').appendChild(box);
+  swap({ ov: { k: 'detail', id: P.d.id, cur: screen === 'current' } });
 }
 
 let toastT;
@@ -1135,20 +1132,20 @@ function toast(html) { const t = $('#toast'); t.innerHTML = html.replace('<svg',
 stage.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el) {
-    if (P && !$('#player').hidden) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
+    if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(); return; }
     const ci = e.target.closest('.ci');
     if (ci) tapCurrent(ci, e);
     return;
   }
   const id = el.dataset.id, act = el.dataset.act;
-  if (P && !$('#player').hidden && $('#sheet').hidden && !['pclose', 'pgo', 'replay', 'save', 'toast', 'back'].includes(act)) { if (!$('.pjoin, .pend', $('#player'))) step(); return; }
+  if (P && !$('#player').hidden && $('#sheet').hidden && !['pclose', 'pgo', 'back'].includes(act)) { if (!$('.pjoin', $('#player'))) step(); return; }
   e.stopPropagation();
   switch (act) {
     case 'back': back(); break;
     case 'mode': push({ screen: el.dataset.s, tab: BASE, ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;
     case 'open': push({ ov: { k: 'detail', id } }); break;
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
-    case 'save': toggleSave(id); if (P && $('.pend')) el.remove(); break;
+    case 'save': toggleSave(id); break;
     case 'play': openPlayer(id); break;
     case 'resume': openPlayer(id, false, byId(id).full ? 0 : (prog[id] ? prog[id].i : 0)); break;
     case 'closeD': case 'closeS': back(); break;
@@ -1169,14 +1166,13 @@ stage.addEventListener('click', (e) => {
     case 'room': openRoom(); break;
     case 'pclose': back(); break;
     case 'pgo': $('.pjoin').remove(); step(); break;
-    case 'replay': play(P.d.id); break;
     case 'toast': toast(el.dataset.msg); break;
   }
 });
 addEventListener('keydown', (e) => {
   if (e.target.closest('input, textarea')) return;
   if (e.key === 'Escape') back();
-  if ((e.key === ' ' || e.key === 'ArrowRight') && P && !$('#player').hidden && !$('.pjoin, .pend', $('#player'))) step();
+  if ((e.key === ' ' || e.key === 'ArrowRight') && P && !$('#player').hidden && !$('.pjoin', $('#player'))) step();
 });
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
