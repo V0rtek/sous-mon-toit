@@ -33,11 +33,9 @@ svg { display: block; fill: currentColor; }
 #switch .round { width: 5.2em; height: 5.2em; }
 #vName { font-size: 2.2em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .45em .9em; border-radius: 2em; background: rgba(255,255,255,.09); }
 #vName b { color: var(--gold); margin-right: .25em; }
-body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-menu #switch, body.s-current #switch, body.s-menu .gearBtn, body.s-current .gearBtn { visibility: hidden; }
+body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-current #switch, body.s-current .gearBtn { visibility: hidden; }
 body.s-current.t-explore #top { background: none; }
 body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
-body.s-menu #tabs { display: none; }
-body.s-menu #views { bottom: 0; }
 
 /* ---- pages ---- */
 #views { position: absolute; left: 0; right: 0; top: 0; bottom: 9.5em; }
@@ -129,10 +127,6 @@ body.tabs-pill #tabs span { display: none; }
 .btn.live-s { background: var(--stranger); color: #000; animation: pulse 1.6s infinite; --c: rgba(52,199,89,.7); }
 .btn.live-f { background: var(--rose); color: #fff; animation: pulse 1.3s infinite; --c: rgba(255,79,139,.7); }
 .btn.live-f .av { border: .12em solid #fff; font-size: .7em; width: 1.8em; height: 1.8em; }
-.liveLine { font-size: 1.8em; font-weight: 700; display: flex; align-items: center; gap: .5em; margin: 0 0 .6em; }
-.liveLine i { width: .75em; height: .75em; border-radius: 50%; background: var(--c); animation: blink 1s infinite; flex: none; }
-.liveLine.f { color: #ff9ec0; }
-.liveLine.s { color: #8be2a2; }
 .row { display: flex; gap: 1em; align-items: center; }
 
 /* ---- layout A: rows ---- */
@@ -294,17 +288,6 @@ body.tabs-pill #tabs span { display: none; }
 .opt .chip { font-size: 1.65em; }
 .opt .chip em { font-style: normal; color: var(--gold); font-weight: 900; margin-right: .2em; }
 .opt .chip.on em { color: #b8860b; }
-.field { display: flex; flex-direction: column; gap: .6em; margin-bottom: 1.8em; }
-.field label { font-size: 1.7em; font-weight: 700; color: #d1d1d6; }
-.field input, .field textarea { font: inherit; font-size: 2.1em; padding: .7em .8em; border-radius: .7em; border: 0; background: #1c1c1e; color: var(--fg); outline: none; resize: none; user-select: text; }
-.picks { display: flex; gap: 1em; overflow-x: auto; padding-bottom: .4em; scrollbar-width: none; }
-.picks .card { flex: none; width: 11em; }
-.picks .card.on .cv { box-shadow: 0 0 0 .35em var(--fg); }
-.picks .up { flex: none; width: 11em; aspect-ratio: 3 / 4; border-radius: 1.4em; border: .2em dashed #48484a; display: grid; place-items: center; color: var(--mute); font-size: 1.5em; text-align: center; }
-.seg { display: flex; background: #1c1c1e; border-radius: 1.2em; padding: .35em; }
-.seg button { flex: 1; font-size: 1.8em; font-weight: 700; padding: .55em 0; border-radius: .8em; color: #aeaeb2; display: flex; justify-content: center; align-items: center; gap: .3em; }
-.seg button.on { background: #3a3a3c; color: #fff; }
-.seg svg { width: 1.2em; height: 1.2em; }
 
 /* ---- saved / add pages ---- */
 .empty { text-align: center; padding: 14em 10% 0; color: var(--mute); }
@@ -373,8 +356,6 @@ body.tabs-pill #tabs span { display: none; }
 .pp img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
 .prof .me div { flex: 1; min-width: 0; }
 .prof .me b { display: block; font-size: 3em; font-weight: 800; }
-.prof .me span { font-size: 1.8em; color: var(--mute); }
-.prof .me i { font-style: normal; font-size: 2.4em; color: var(--mute); }
 .mcs { display: flex; gap: 1.2em; overflow-x: auto; padding: 0 2.4em 2.4em; scrollbar-width: none; }
 .mcs::-webkit-scrollbar { display: none; }
 .mc { flex: none; width: 12em; height: 17em; border-radius: 1.6em; background: #222225; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .4em; padding: 1em .4em .9em; box-sizing: border-box; color: inherit; text-decoration: none; }
@@ -399,6 +380,13 @@ body.tabs-pill #tabs span { display: none; }
 .fr > div span.busy { color: #ff9ec0; }
 .fr .th { width: 6.5em; flex: none; }
 .fr .th .cv { border-radius: .8em; }
+.stories { display: flex; flex-direction: column; padding: 1.4em 3.5% 0; }
+.story { display: flex; align-items: center; gap: 1.4em; padding: 1.6em 0; border-bottom: .1em solid #1c1c1e; }
+.story > div { flex: 1; min-width: 0; }
+.story b { display: block; font-size: 2.2em; }
+.story span { display: block; font-size: 1.6em; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.story .btn { font-size: 1.7em; height: 2.4em; flex: none; }
+.lab { display: block; margin: 4em auto 0; font-size: 1.6em; color: var(--mute); text-decoration: underline; }
 .acts { display: flex; flex-direction: column; gap: 1.4em; padding: 0 3.5%; }
 .act { display: flex; align-items: center; gap: 2em; padding: 2.2em; border-radius: 2.2em; background: #141416; text-align: left; }
 .act i { width: 8em; height: 8em; border-radius: 2em; background: var(--c, #2c2c2e); display: grid; place-items: center; flex: none; }
@@ -442,22 +430,10 @@ body.tabs-pill #tabs span { display: none; }
 .pjoin .seat .av, .pjoin .seat .pp, .pjoin .empty-seat { width: 10em; height: 10em; font-size: 1em; margin-bottom: .4em; }
 .pjoin .seat .av b { font-size: 4em; }
 .pjoin .seat b { font-size: 1.9em; font-weight: 700; }
-.pjoin .seat small { font-size: 1.5em; color: var(--mute); min-height: 1.2em; }
 .pjoin .empty-seat { border-radius: 50%; border: .3em dashed #48484a; box-sizing: border-box; animation: blink 1.4s infinite; }
 .jback { position: absolute; top: 2.5em; left: 4%; width: 6.4em; height: 6.4em; display: grid; place-items: center; filter: drop-shadow(0 0 .4em rgba(0,0,0,.7)); }
 .jback svg { width: 3em; height: 3em; }
 
-/* ---- Full demo's own menu: Current / All ---- */
-#menu { display: flex; flex-direction: column; justify-content: center; gap: 2.2em; padding: 9.5em 7% 5em; }
-.mtile { position: relative; height: 36em; border-radius: 2.6em; overflow: hidden; background: #1c1c1e; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 2.8em; text-align: left; }
-.mtile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 25%, rgba(0,0,0,.9)); }
-.mtile b, .mtile span { position: relative; z-index: 2; }
-.mtile b { font-size: 4.4em; font-weight: 800; letter-spacing: -.02em; }
-.mtile span { font-size: 1.9em; color: #d1d1d6; margin-top: .3em; }
-.mbg { position: absolute; inset: 0; }
-.mbg .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
-.mgrid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: .6em; padding: .6em; opacity: .85; }
-.mgrid .cv { border-radius: 1em; }
 
 /* ---- Current: a TikTok scroll, the demo itself on screen, tap to go on; play / save / info on the right ---- */
 #current { padding: 0; scroll-snap-type: y mandatory; }
@@ -472,7 +448,6 @@ body.tabs-pill #tabs span { display: none; }
 .rb .pd { position: absolute; top: .7em; right: .6em; transform: scale(.75); width: 2.4em; height: 2.4em; border-radius: 50%; background: var(--c); border: .35em solid #000; box-sizing: border-box; animation: blink 1s infinite, pulse 1.5s infinite; }
 .rb .pd.f { width: 3.4em; height: 3.4em; display: grid; place-items: center; color: #fff; animation: pulse 1.3s infinite; }
 .rb .pd.f b { font-size: 1.5em; font-weight: 900; }
-.ci .cend { position: absolute; left: 6%; right: 6%; bottom: 7%; text-align: center; font-size: 2.2em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em #000; }
 .imm { position: absolute; inset: 0; background: #000; animation: fade .25s; }
 .imm .cvw { position: absolute; inset: 0; container-type: normal; }
 .imm .cv { height: 100%; aspect-ratio: auto; border-radius: 0; }
@@ -483,15 +458,12 @@ body.tabs-pill #tabs span { display: none; }
 .gframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
 .catch { position: absolute; inset: 0; z-index: 4; }
 
-#toast { position: absolute; left: 50%; top: 10em; z-index: 100; transform: translate(-50%, 2em); opacity: 0; transition: .25s; background: #f5f5f7; color: #000; font-size: 1.9em; font-weight: 700; padding: .7em 1.3em; border-radius: 2em; white-space: nowrap; pointer-events: none; display: flex; align-items: center; gap: .5em; }
-#toast.on { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <div id="stage">
   <div id="views">
-    <section id="menu" class="view"></section>
     <section id="home" class="view" hidden></section>
     <section id="current" class="view" hidden></section>
     <section id="explore" class="view" hidden></section>
@@ -512,7 +484,6 @@ body.tabs-pill #tabs span { display: none; }
   <div id="detail" hidden></div>
   <div id="sheet" hidden></div>
   <div id="player" hidden></div>
-  <div id="toast"></div>
 </div>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
@@ -547,14 +518,13 @@ const I = {
   home: '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>',
   explore: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="10" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="10" rx="1.6"/><rect x="3" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/><rect x="13.5" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/></svg>',
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg>',
-  door: '<svg viewBox="0 0 24 24"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 21h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12.5" r="1.3"/><path d="M19 7v6M16 10h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   pen: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="currentColor" stroke-width="2"/></svg>',
   share: '<svg viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7.5h14V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
 // ---- the community's demos (fake). cast: [sprite, pose]; you: which cast member the player brings their own
 // character into (-1 = the player isn't on screen); lines: [who (-1 = narration), text, pose?] ----
-const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
+const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', melissa: 'Melissa', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', ch: 'mila', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', ch: 'ninja', on: true },
@@ -748,7 +718,7 @@ const LAYOUTS = [['rows', 'Rangées'], ['grid2', 'Grille 2'], ['grid3', 'Mur d\'
 const OPTIONS = [
   ['layout', 'Mise en page', 'Aussi avec ‹ › en haut.', LAYOUTS],
   ['live', 'Quelqu\'un attend dans une salle', 'Sur l\'affiche. Vert = un inconnu, rose = un ami.', [['dot', 'Point qui clignote'], ['badge', 'Étiquette'], ['ring', 'Contour lumineux'], ['avatar', 'Avatar']]],
-  ['play', 'Bouton Jouer quand quelqu\'un attend', '', [['dot', 'Point sur le bouton'], ['color', 'Bouton coloré'], ['label', 'Ligne au-dessus']]],
+  ['play', 'Bouton Jouer quand quelqu\'un attend', '', [['dot', 'Point sur le bouton'], ['color', 'Bouton coloré']]],
   ['byoc', 'Amène ton perso', '', [['icon', 'Icône'], ['tag', 'Étiquette'], ['corner', 'Bandeau en coin']]],
   ['save', 'Sauver', '', [['bookmark', 'Signet'], ['heart', 'Cœur'], ['plus', '+ Ma liste']]],
   ['detail', 'Voir plus', '', [['veil', 'Voile noir plein écran'], ['zoom', 'Affiche zoomée'], ['sheet', 'Panneau du bas']]],
@@ -759,7 +729,7 @@ const OPTIONS = [
 const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
 let saved = keep.get('saved', {});   // id -> { with: [names], at }
-let screen = 'menu', tab = 'explore', viewKey = '', filter = 'all', savedWho = 'all', spotSel = null, deckGone = [];
+let screen = 'current', tab = 'explore', viewKey = '', filter = 'all', spotSel = null, deckGone = [];
 
 // ---- pieces ----
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -838,16 +808,8 @@ function playBtn(d, cls = '', how = O.play) {
   const dot = how === 'dot' ? playDot(d) : '';
   return `<button class="btn main ${cls}" data-act="play" data-id="${d.id}">${I.play}Jouer${dot}</button>`;
 }
-function liveLine(d) {
-  const l = d.live; if (!l) return '';
-  const f = l.friend && friend(l.friend);
-  const ago = l.since ? ` · depuis ${l.since} min` : '';
-  if (f) return `<p class="liveLine f" style="--c:${f.c}"><i></i>${esc(f.n)} t'attend dans une salle${l.strangers ? ` avec ${esc(waiting(d).slice(1).map((w) => w.n).join(', '))}` : ''}${ago}</p>`;
-  const ns = waiting(d).map((w) => w.n);
-  return `<p class="liveLine s" style="--c:var(--stranger)"><i></i>${esc(ns.join(' et '))} ${ns.length > 1 ? 'attendent' : 'attend'} dans une salle${ago}</p>`;
-}
 const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}${saveWord(d.id)}</button>`;
-const actions = (d) => `${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
+const actions = (d) => `<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
 
 // ---- explore: one renderer per layout ----
 const R = {
@@ -870,7 +832,7 @@ const R = {
       <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}</div>
       <div class="side"><button data-act="save" data-id="${d.id}"><i>${saveIconOf(d.id)}</i><span>${saveWord(d.id)}</span></button>
         <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button></div>
-      <div class="txt"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d, 'wide')}</div></div></div>`).join('');
+      <div class="txt"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide')}</div></div></div>`).join('');
   },
   carousel() {
     return `<div class="carBg" id="carBg"></div><div class="car" id="car">${all().map((d) => card(d, { title: false })).join('')}</div><div class="carInfo" id="carInfo"></div>`;
@@ -885,7 +847,7 @@ const R = {
   },
   list() {
     return filters() + filtered().map((d) => `<div class="li" data-act="open" data-id="${d.id}"><div style="width:17em;flex:none">${card(d, { title: false, saveB: false })}</div>
-      <div class="body"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${O.play === 'label' ? liveLine(d) : ''}<div class="row">${playBtn(d)}</div></div></div>`).join('');
+      <div class="body"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d)}</div></div></div>`).join('');
   },
   magazine() {
     const a = all(); let s = '';
@@ -968,24 +930,39 @@ function renderExplore() {
 function renderSaved() {
   const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
   if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.<br><br>Une démo à plusieurs : touche encore pour choisir <b>avec qui</b> tu veux la jouer.</p></div>`; return; }
-  const who = [...new Set(ids.flatMap((id) => saved[id].with))];
-  if (savedWho !== 'all' && savedWho !== 'me' && !who.includes(savedWho)) savedWho = 'all';
-  const show = ids.filter((id) => savedWho === 'all' || (savedWho === 'me' ? !saved[id].with.length : saved[id].with.includes(savedWho)));
-  const chip = (k, label) => `<button class="chip${savedWho === k ? ' on' : ''}" data-act="who" data-who="${esc(k)}">${label}</button>`;
   $('#saved').innerHTML = `<div class="h2" style="margin-top:0">Sauvés <small>${ids.length}</small></div>
-    <div class="chips">${chip('all', 'Tous')}${chip('me', 'Pour moi')}${who.map((n) => chip(n, av(n) + 'Avec ' + esc(n))).join('')}</div>
-    <div class="grid g2">${show.map((id) => {
+    <div class="grid g2">${ids.map((id) => {
       const d = byId(id), w = saved[id].with;
       const withs = w.length ? `<span class="withs">${w.map((n) => av(n)).join('')}<span>avec ${esc(w.join(', '))}</span></span>` : '';
       return card(d, { byocB: false, extra: withs });
     }).join('')}</div>`;
 }
+// ---- + : the stories you wrote (the game's « Ton histoire », same browser) — each one can become a demo in the feed ----
+const getGens = () => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } };
 function renderAdd() {
-  $('#add').innerHTML = `<div class="h2" style="margin-top:0">Ajouter</div><div class="acts">
-    <button class="act" data-act="create" style="--c:#e2557a"><i>${I.pen}</i><div><b>Créer une démo</b><span>Un titre, deux phrases qui accrochent, une affiche.</span></div></button>
-    <button class="act" data-act="room" style="--c:#34c759"><i>${I.door}</i><div><b>Ouvrir une salle</b><span>Choisis une démo à plusieurs et attends quelqu'un — ou invite un ami.</span></div></button>
-    <button class="act" data-act="mychars" style="--c:#4f9dff"><i>${I.byoc}</i><div><b>Choisir ton perso</b><span>Il joue ta part dans les démos « Ton perso ». Les tiens se créent dans la galerie du jeu.</span></div></button>
-  </div>${mine.length ? `<div class="h2">Tes démos</div><div class="grid g3">${mine.map((d) => card(d)).join('')}</div>` : ''}`;
+  const gens = getGens();
+  const row = (g) => {
+    const made = mine.find((d) => d.story === g.at), title = (g.json && g.json.title) || 'Sans titre';
+    return `<div class="story"><div><b>${esc(title)}</b><span>${esc(g.idea || '')}</span></div>${made
+      ? `<button class="btn ghost" data-act="seedemo" data-id="${made.id}">Voir la démo</button>` : `<button class="btn main" data-act="mkdemo" data-at="${g.at}">Créer la démo</button>`}</div>`;
+  };
+  $('#add').innerHTML = `<div class="h2" style="margin-top:0">Tes histoires</div><div class="acts">
+    <button class="act" data-act="write" style="--c:#e2557a"><i>${I.pen}</i><div><b>Écrire une histoire</b><span>Ton idée en une phrase, le jeu l'écrit.</span></div></button></div>
+    ${gens.length ? `<div class="stories">${gens.map(row).join('')}</div>` : `<p class="tlead">Tu n'as pas encore écrit d'histoire.</p>`}
+    <button class="lab" data-act="mode" data-s="all">Versions et tests</button>`;
+}
+// a written story as a demo: its decor, its people, its lines (first option of each choice), the idea as its pitch
+const GEN_POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
+function fromStory(g) {
+  const j = g.json || {}, cast = [], idx = {}, lines = [];
+  const who = (id) => { const sp = id === 'isa' ? 'isa_nuit' : id; if (!(sp in idx)) { idx[sp] = cast.length; cast.push([sp, 'listen']); } return idx[sp]; };
+  const walk = (steps) => { for (const st of steps || []) {
+    if (st.choice && st.choice[0]) { const o = st.choice[0]; lines.push([who('justin'), o.say || o.t, 'explaining']); walk(o.then); }
+    else if (st.text && st.who) lines.push([who(st.who), st.text, GEN_POSES.includes(st.pose) ? st.pose : 'listen']);
+  } };
+  walk(j.steps);
+  return { id: 'g' + g.at, story: g.at, title: j.title || 'Sans titre', pitch: g.idea || '', bg: ['terrasse', 'maison', 'salon'].includes(j.scene) ? j.scene : 'salon',
+    pos: '50% 50%', fx: 'brightness(.85)', glow: '#fff', cast: cast.slice(0, 4), players: 1, byoc: false, live: null, you: -1, lines: lines.filter((l) => l[0] < 4).slice(0, 12) };
 }
 function renderTabs() {
   const n = Object.keys(saved).length;
@@ -993,21 +970,17 @@ function renderTabs() {
   // En cours, the main tab, in the middle
   $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', `<i>${I.home}</i>`, 'En cours', 'main') + t('add', I.plus, 'Ajouter') + t('social', I.people, 'Social');
 }
-function renderMenu() {
-  $('#menu').innerHTML = `<button class="mtile" data-act="mode" data-s="current"><div class="mbg">${cover({ ...byId('lastcall'), title: '' })}</div><b>Current</b><span>Le scroll : la démo direct dans la face.</span></button>
-    <button class="mtile" data-act="mode" data-s="all"><div class="mgrid">${['cles', 'pacte', 'gala', 'nuit', 'table', 'feu'].map((id) => cover({ ...byId(id), title: '' })).join('')}</div><b>All</b><span>Toutes les versions : A à J, et ⚙ pour les variantes.</span></button>`;
-}
-// which page shows: Full demo's menu, or one of the tabs (Explorer = the Current scroll or the All layouts)
-const page = () => screen === 'menu' ? 'menu' : tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
+// which page shows: one of the tabs (Explorer = the Current scroll, or All's layouts while testing)
+const page = () => tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
 const BASE = 'home';   // the tab a mode opens on
 function render() {
   document.body.className = `s-${screen} t-${tab} tabs-${O.tabs}`;
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
-  for (const x of ['menu', 'home', 'current', 'explore', 'saved', 'add', 'social']) $('#' + x).hidden = x !== v;
+  for (const x of ['home', 'current', 'explore', 'saved', 'add', 'social']) $('#' + x).hidden = x !== v;
   renderTabs();
-  ({ menu: renderMenu, home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial })[v]();
+  ({ home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial })[v]();
 }
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
@@ -1066,7 +1039,7 @@ function renderSocial() {
       <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
   const order = [...FRIENDS].sort((a, b) => (b.on ? 1 : 0) - (a.on ? 1 : 0));
-  $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b><span>Ton perso : ${esc(m.name)}</span></div><i>${charsOpen ? '▴' : '▾'}</i></button>
+  $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
       ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a></div>` : ''}</div>
     <div class="h2">Amis <small>${FRIENDS.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
 }
@@ -1106,7 +1079,7 @@ const inGame = (ci) => { const f = $('iframe.gframe', ci); return f && (!f.class
 function line(ci, i) {
   const d = byId(ci.dataset.id), n = total(d), stage = $('.stage', ci); at[d.id] = i;
   if (i >= n) {   // the last line stays on screen
-    $('.cline', ci).innerHTML = inGame(ci) || stage ? '' : `<div class="cend">Fin de l'aperçu · ▶ pour jouer</div>`;
+    $('.cline', ci).innerHTML = '';
     $('.pc-corner', ci).textContent = `${n}/${n}`; return;
   }
   $('.pc-corner', ci).textContent = `${i + 1}/${n}`;
@@ -1162,8 +1135,8 @@ function syncCurrent() {
 }
 
 // ---- navigation: every level is a history entry, so the phone's back and ‹ do the same thing.
-// state = { screen: menu|current|all, tab, ov: the overlay on top ({k: detail|player|sheet, ..., under}), depth } ----
-const hashOf = (st) => '#' + (st.screen === 'menu' ? '' : st.screen + (st.tab !== BASE ? '/' + st.tab : ''));
+// state = { screen: current|all, tab, ov: the overlay on top ({k: detail|player|sheet, ..., under}), depth } ----
+const hashOf = (st) => '#' + st.screen + (st.tab !== BASE ? '/' + st.tab : '');
 const cur = () => history.state;
 function push(p) { const st = { ...cur(), ...p, depth: cur().depth + 1 }; history.pushState(st, '', hashOf(st)); apply(st); }
 function swap(p) { const st = { ...cur(), ...p }; history.replaceState(st, '', hashOf(st)); apply(st); }
@@ -1174,7 +1147,7 @@ function back(then) {
   // opened right here (a link, a reload): walk up by hand
   if (st.ov) swap({ ov: st.ov.under || null });
   else if (st.tab !== BASE) swap({ tab: BASE });
-  else if (st.screen !== 'menu') swap({ screen: 'menu', tab: BASE, tabFrom: null });
+  else if (st.screen === 'all') swap({ screen: 'current', tab: BASE, tabFrom: null });
   else return leave();
   if (then) then();
 }
@@ -1187,7 +1160,7 @@ function leave() {
 }
 addEventListener('popstate', (e) => { if (!e.state || !e.state.screen) return; apply(e.state); const f = pending; pending = null; if (f) f(); });
 function apply(st) {
-  screen = st.screen; tab = st.tab;
+  screen = st.screen === 'all' ? 'all' : 'current'; tab = st.tab;
   const key = screen + '/' + tab;
   if (key !== viewKey) { viewKey = key; render(); }
   const layers = []; for (let o = st.ov; o; o = o.under) layers.push(o);
@@ -1259,7 +1232,7 @@ function swipe(yes) {
 function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
   if (inCurrent) {   // Current: the cover, full screen, black at the bottom (not the scene where you left off)
-    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${liveLine(d)}<div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
+    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
     box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
   }
   delete box.dataset.cur;
@@ -1281,9 +1254,9 @@ function setSaved(id, w) {
 // "Je veux jouer avec…" (pick friends, or take it out of the saved ones); a solo one just comes back out
 function toggleSave(id) {
   const d = byId(id);
-  if (!saved[id]) { setSaved(id, []); toast(d.players > 1 ? 'Sauvé · touche encore pour choisir avec qui' : `${saveIcon(true)}Sauvé`); after(); return; }
+  if (!saved[id]) { setSaved(id, []); after(); return; }
   if (d.players > 1) { people(id); return; }
-  setSaved(id, null); toast('Retiré'); after();
+  setSaved(id, null); after();
 }
 function people(id) {
   const d = byId(id), pick = new Set(saved[id] ? saved[id].with : []);
@@ -1292,8 +1265,8 @@ function people(id) {
     <div class="people">${FRIENDS.map((f) => `<button data-n="${esc(f.n)}" class="${pick.has(f.n) ? 'on' : ''}">${av(f.n)}<span>${esc(f.n)}</span>${f.on ? '<small>● en ligne</small>' : ''}</button>`).join('')}</div>
     <div class="row"><button class="btn main wide" id="pplOk">${ok()}</button><button class="btn" id="pplOut">Retirer</button></div>`);
   $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); pick[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); $('#pplOk').textContent = ok(); });
-  $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); if (pick.size) toast(`Avec ${[...pick].join(', ')}`); after(); };
-  $('#pplOut').onclick = () => { setSaved(id, null); closeSheet(); toast('Retiré'); after(); };
+  $('#pplOk').onclick = () => { setSaved(id, [...pick]); closeSheet(); after(); };
+  $('#pplOut').onclick = () => { setSaved(id, null); closeSheet(); after(); };
 }
 // saved, multiplayer, nobody yet: the icon says "with who?"
 const asksWho = (id) => saved[id] && !saved[id].with.length && byId(id).players > 1;
@@ -1327,50 +1300,6 @@ function options() {
     if (e.target.id === 'reset') { keep.set('opts', {}); location.reload(); }
   };
 }
-function create() {
-  const presets = DEMOS.slice(0, 8);
-  let pick = presets[0].id, img = null, n = 1, by = false;
-  const box = sheet(`<h3>Créer une démo</h3><p class="lead">Elle apparaît en haut d'Explorer, sur cet appareil.</p>
-    <div class="field"><label>Titre</label><input id="cTitle" maxlength="32" placeholder="Ex. : Le dernier métro"></div>
-    <div class="field"><label>Le pitch (2 phrases qui accrochent)</label><textarea id="cPitch" rows="3" maxlength="220" placeholder="Une situation. Un enjeu qui donne envie de cliquer."></textarea></div>
-    <div class="field"><label>Joueurs</label><div class="seg" id="cN"><button class="on" data-n="1">${I.person}Solo</button><button data-n="2">${I.person}${I.person}2</button><button data-n="3">2–3</button></div></div>
-    <div class="field"><label>Amène ton perso ?</label><div class="seg" id="cB"><button class="on" data-b="0">Non</button><button data-b="1">${I.byoc}Oui</button></div></div>
-    <div class="field"><label>Affiche (3:4)</label><div class="picks" id="cPick"><label class="up">+ Ta photo<input type="file" accept="image/*" hidden id="cFile"></label>${presets.map((d, i) => card({ ...d, title: '', live: null, byoc: false }, { title: false, saveB: false }).replace('class="card', `class="card${i ? '' : ' on'}`)).join('')}</div></div>
-    <button class="btn main" id="cGo" style="width:100%">Publier</button>`);
-  $$('#cN button', box).forEach((b) => b.onclick = () => { n = +b.dataset.n; $$('#cN button', box).forEach((x) => x.classList.toggle('on', x === b)); });
-  $$('#cB button', box).forEach((b) => b.onclick = () => { by = b.dataset.b === '1'; $$('#cB button', box).forEach((x) => x.classList.toggle('on', x === b)); });
-  $('#cPick', box).onclick = (e) => { const c = e.target.closest('.card'); if (!c) return; e.stopPropagation(); pick = c.dataset.id; img = null; $$('#cPick .card', box).forEach((x) => x.classList.toggle('on', x === c)); };
-  $('#cFile', box).onchange = (e) => {
-    const f = e.target.files[0]; if (!f) return;
-    const im = new Image(); im.onload = () => {   // shrunk to a 3:4 jpeg so it fits in this browser's storage
-      const cv = document.createElement('canvas'); cv.width = 450; cv.height = 600; const g = cv.getContext('2d');
-      const s = Math.max(450 / im.width, 600 / im.height); g.drawImage(im, (450 - im.width * s) / 2, (600 - im.height * s) / 2, im.width * s, im.height * s);
-      img = cv.toDataURL('image/jpeg', .8); $('.up', box).style.cssText = `background:url(${img}) center/cover;border-style:solid;color:transparent`; $$('#cPick .card', box).forEach((x) => x.classList.remove('on'));
-    }; im.src = URL.createObjectURL(f);
-  };
-  $('#cGo', box).onclick = () => {
-    const title = $('#cTitle').value.trim(), pitch = $('#cPitch').value.trim();
-    if (!title) { $('#cTitle').focus(); return; }
-    const base = byId(pick);
-    const d = { id: 'm' + Date.now().toString(36), title, by: '@toi', plays: '0', pitch: pitch || 'Ton pitch ici. Deux phrases qui donnent envie.', players: n, byoc: by, live: null, you: -1, glow: '#fff',
-      bg: base.bg, pos: base.pos, fx: base.fx, cast: img ? [] : base.cast, img,
-      lines: [[-1, title + '.'], ...(pitch || '').split(/(?<=[.!?])\s+/).filter(Boolean).map((t) => [-1, t]), ...Array.from({ length: 10 }, (_, i) => [-1, `Scène ${i + 2} — à écrire.`])].slice(0, 12) };
-    mine.unshift(d); keep.set('mine', mine);
-    closeSheet(() => { viewKey = ''; if (tab !== 'explore') setTab('explore'); else apply(cur()); toast('Publiée'); });
-  };
-}
-function openRoom() {
-  const multi = all().filter((d) => d.players > 1);
-  let pick = multi[0].id;
-  const box = sheet(`<h3>Ouvrir une salle</h3><p class="lead">Choisis la démo. Un inconnu peut entrer, ou invite un ami.</p>
-    <div class="picks" id="rPick">${multi.map((d, i) => card(d, { saveB: false }).replace('class="card', `class="card${i ? '' : ' on'}`)).join('')}</div><br>
-    <div class="people">${FRIENDS.map((f) => `<button data-n="${esc(f.n)}">${av(f.n)}<span>${esc(f.n)}</span>${f.on ? '<small>● en ligne</small>' : ''}</button>`).join('')}</div>
-    <div class="row"><button class="btn main wide" id="rGo">Ouvrir</button></div>`);
-  const inv = new Set();
-  $('#rPick', box).onclick = (e) => { const c = e.target.closest('.card'); if (!c) return; e.stopPropagation(); pick = c.dataset.id; $$('#rPick .card', box).forEach((x) => x.classList.toggle('on', x === c)); };
-  $$('.people button', box).forEach((b) => b.onclick = () => { b.classList.toggle('on'); inv[b.classList.contains('on') ? 'add' : 'delete'](b.dataset.n); });
-  $('#rGo', box).onclick = () => { closeSheet(() => openPlayer(pick, true)); toast(inv.size ? `Invitation envoyée à ${[...inv].join(', ')}` : 'Salle ouverte · en attente'); };
-}
 
 // ---- the preview: tap to go on, n/12 ----
 let P = null;
@@ -1392,9 +1321,9 @@ function play(id, host = false, from = 0) {
 // a multiplayer demo opens on its room: who's in, who's coming
 function join(d, host) {
   const ws = host ? [] : waiting(d).slice(0, d.players - 1), f = ws.find((w) => !w.stranger), st = ws.filter((w) => w.stranger);
-  const seat = (pic, name, tag) => `<div class="seat">${pic}<b>${esc(name)}</b><small>${tag}</small></div>`;
-  const seats = [seat(face(me()), myName(), myName() === 'Toi' ? '' : 'toi'), ...ws.map((w) => seat(av(w.n), w.n, w.stranger ? 'inconnu·e' : 'ami·e')),
-    ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Libre', ws.length ? '' : 'joué au hasard'))];
+  const seat = (pic, name) => `<div class="seat">${pic}<b>${esc(name)}</b></div>`;
+  const seats = [seat(face(me()), myName()), ...ws.map((w) => seat(av(w.n), w.n)),
+    ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Libre'))];
   const say = f ? `${esc(f.n)} t'attend${st.length ? ` avec ${esc(st.map((w) => w.n).join(', '))}` : ''}.`
     : st.length ? `${esc(st[0].n)} est déjà dans la salle. Vous ne vous connaissez pas : vous jouez l'histoire ensemble.`
     : 'Personne encore. Pour l\'aperçu, l\'autre rôle est joué au hasard.';
@@ -1433,8 +1362,6 @@ function end() {
   swap({ ov: { k: 'detail', id: P.d.id, cur: screen === 'current' } });
 }
 
-let toastT;
-function toast(html) { const t = $('#toast'); t.innerHTML = html.replace('<svg', '<svg style="width:1.2em;height:1.2em"'); t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1800); }
 
 // ---- one click handler for everything ----
 stage.addEventListener('click', (e) => {
@@ -1450,7 +1377,7 @@ stage.addEventListener('click', (e) => {
   e.stopPropagation();
   switch (act) {
     case 'back': back(); break;
-    case 'mode': push({ screen: el.dataset.s, tab: BASE, ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;
+    case 'mode': push({ screen: el.dataset.s, tab: 'explore', ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;   // Versions et tests: All's layouts
     case 'open': push({ ov: { k: 'detail', id } }); break;
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); break;
@@ -1459,8 +1386,7 @@ stage.addEventListener('click', (e) => {
     case 'closeD': case 'closeS': back(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
-    case 'mychars': charsOpen = true; setTab('social'); break;
-    case 'pick': keep.set('me', el.dataset.c); renderSocial(); toast(`Ton perso : ${esc(me().name)}`); break;
+    case 'pick': keep.set('me', el.dataset.c); renderSocial(); break;
     case 'newchar': e.preventDefault(); leave(); break;   // made in the game's gallery
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
@@ -1468,16 +1394,15 @@ stage.addEventListener('click', (e) => {
     }
     case 'gear': options(); break;
     case 'filter': filter = el.dataset.f; renderExplore(); break;
-    case 'who': savedWho = el.dataset.who; renderSaved(); break;
     case 'spot': spotSel = id; renderExplore(); break;
     case 'deckYes': swipe(true); break;
     case 'deckNo': swipe(false); break;
     case 'deckReset': deckGone = []; renderExplore(); break;
-    case 'create': create(); break;
-    case 'room': openRoom(); break;
+    case 'write': try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=histoire'; break;
+    case 'mkdemo': { const g = getGens().find((x) => String(x.at) === el.dataset.at); if (g) { mine.unshift(fromStory(g)); keep.set('mine', mine); renderAdd(); } break; }
+    case 'seedemo': setTab('explore'); { const c = $(`.ci[data-id="${id}"]`); if (c) $('#current').scrollTop = c.offsetTop; } break;
     case 'pclose': back(); break;
     case 'pgo': $('.pjoin').remove(); step(); break;
-    case 'toast': toast(el.dataset.msg); break;
   }
 });
 addEventListener('keydown', (e) => {
@@ -1488,7 +1413,7 @@ addEventListener('keydown', (e) => {
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
   const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add|social))?$/);
-  const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'menu', tab: (m && m[2]) || BASE, ov: null, tabFrom: null, depth: 0 };
+  const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'current', tab: (m && m[2]) || BASE, ov: null, tabFrom: null, depth: 0 };
   if (st.ov && st.ov.k === 'sheet') st.ov = st.ov.under;   // a sheet can't come back from a reload
   history.replaceState(st, '', hashOf(st));
   apply(st);
