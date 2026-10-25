@@ -60,7 +60,7 @@ CHOICES. A choice option has two texts:
 - "t" = the button the player taps. 27 characters max, spaces included (aim for about 20). It is a short line in justin's voice, something he could say, never a description of what he does: "You're shady." not "Call him out".
 - "say" = what justin actually says out loud after the tap: the same intent, in his voice, under 70 characters. It does not have to repeat the button's words. Ways to do it: he warms up before getting to it, he says it rawer or funnier than the button, he lands it as a question, he gets there sideways.
 Examples:
-  "t": "Spot me, brother?" -> "say": "Bro. My brother. My rock." (he is acting like he's about to ask for a favor)
+  "t": "Spot me brother?" -> "say": "Justin. My brother. My rock" (he is acting like he's about to ask for a favor)
   "t": "You're shady." -> "say": "Man... you a shady ass bitch."
 Test before you reply: count the characters of every "t". Over 27 = say it shorter. The usual mistakes: a "t" that is the full sentence, a "t" that describes the action, a "say" that just copies the "t".`;
 
