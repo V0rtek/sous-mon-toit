@@ -1390,9 +1390,13 @@ function takeSeat(k, id, n) {
   if (full()) takeSeat.t = setTimeout(() => { if (waitRoom && full()) begin(); }, 900);
 }
 // Full demo's Play on a real story (index.html#open=bar): its waiting room once the name is in; its ‹ goes back there.
-// #open=histoire: the story writer (Full demo's + tab sends you there to write one)
+// #open=histoire: the story writer, #open=perso: a new character (Full demo's + tab sends you there)
 let openAfterName = null, fromDemo = false;
-function openFromDemo(id) { if (id === 'histoire') { $('#genMsg').textContent = ''; show('#genScreen'); } else openWait(id); }
+function openFromDemo(id) {
+  if (id === 'histoire') { $('#genMsg').textContent = ''; show('#genScreen'); }
+  else if (id === 'perso') { ncStep(1); show('#newChar'); }
+  else openWait(id);
+}
 $('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const v = $('#whoName').value.trim().slice(0, 16);
@@ -1535,7 +1539,7 @@ $('#watch3d').onclick = (e) => {
 $('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
 $('#back').onclick = (e) => {
   e.stopPropagation();
-  if (fromDemo && ['#wait', '#end', '#genScreen'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
+  if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
   const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
 $('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
@@ -1956,7 +1960,7 @@ if (PREVIEW) {
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
   const o = location.hash.match(/^#open=(\w+)$/);
-  if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire')) {
+  if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire' || o[1] === 'perso')) {
     openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
     if (screen === '#hub') { openAfterName = null; openFromDemo(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();
   }

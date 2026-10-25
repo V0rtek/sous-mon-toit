@@ -383,11 +383,18 @@ body.tabs-pill #tabs span { display: none; }
 .fr .th { width: 6.5em; flex: none; }
 .fr .th .cv { border-radius: .8em; }
 .stories { display: flex; flex-direction: column; padding: 1.4em 3.5% 0; }
-.story { display: flex; align-items: center; gap: 1.4em; padding: 1.6em 0; border-bottom: .1em solid #1c1c1e; }
+.story { display: flex; align-items: center; gap: 1.4em; padding: 1.6em 0; border-bottom: .1em solid #1c1c1e; width: 100%; text-align: left; }
+.story i { font-style: normal; font-size: 1.5em; font-weight: 700; color: var(--mute); border: .1em solid #3a3a3c; border-radius: 1em; padding: .2em .7em; flex: none; }
+.acts .act { padding: 1.8em 2.2em; }
+.acts .act i { width: 6em; height: 6em; }
+.lns { display: flex; flex-direction: column; gap: .6em; margin: 0 0 2em; }
+.ln { text-align: left; font-size: 1.8em; line-height: 1.35; padding: .7em .9em; border-radius: .8em; background: #1c1c1e; color: #8e8e93; }
+.ln b { display: block; font-size: .8em; color: inherit; opacity: .8; }
+.ln.on { background: #2c2c2e; color: #f5f5f7; }
+.ln.end { box-shadow: inset .25em 0 0 var(--rose); }
 .story > div { flex: 1; min-width: 0; }
 .story b { display: block; font-size: 2.2em; }
 .story span { display: block; font-size: 1.6em; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.story .btn { font-size: 1.7em; height: 2.4em; flex: none; }
 .lab { display: block; margin: 4em auto 0; font-size: 1.6em; color: var(--mute); text-decoration: underline; }
 .acts { display: flex; flex-direction: column; gap: 1.4em; padding: 0 3.5%; }
 .act { display: flex; align-items: center; gap: 2em; padding: 2.2em; border-radius: 2.2em; background: #141416; text-align: left; }
@@ -939,23 +946,22 @@ function renderSaved() {
       return card(d, { byocB: false, extra: withs });
     }).join('')}</div>`;
 }
-// ---- + : the stories you wrote (the game's « Ton histoire », same browser) — each one can become a demo in the feed ----
+// ---- + : write a story or make a character (both in the game), then the stories you wrote (same browser). Tap one: its
+// lines, pick the first and the last, and that stretch becomes a demo in the feed ----
 const getGens = () => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } };
 function renderAdd() {
   const gens = getGens();
-  const row = (g) => {
-    const made = mine.find((d) => d.story === g.at), title = (g.json && g.json.title) || 'Sans titre';
-    return `<div class="story"><div><b>${esc(title)}</b><span>${esc(g.idea || '')}</span></div>${made
-      ? `<button class="btn ghost" data-act="seedemo" data-id="${made.id}">Voir la démo</button>` : `<button class="btn main" data-act="mkdemo" data-at="${g.at}">Créer la démo</button>`}</div>`;
-  };
-  $('#add').innerHTML = `<div class="h2" style="margin-top:0">Tes histoires</div><div class="acts">
-    <button class="act" data-act="write" style="--c:#e2557a"><i>${I.pen}</i><div><b>Écrire une histoire</b><span>Ton idée en une phrase, le jeu l'écrit.</span></div></button></div>
+  const row = (g) => `<button class="story" data-act="story" data-at="${g.at}"><div><b>${esc((g.json && g.json.title) || 'Sans titre')}</b><span>${esc(g.idea || '')}</span></div>${mine.some((d) => d.story === g.at) ? '<i>Démo</i>' : ''}</button>`;
+  $('#add').innerHTML = `<div class="acts">
+      <button class="act" data-act="write" style="--c:#e2557a"><i>${I.pen}</i><div><b>Créer une histoire</b></div></button>
+      <button class="act" data-act="newperso" style="--c:#4f9dff"><i>${I.byoc}</i><div><b>Créer un personnage</b></div></button></div>
+    <div class="h2">Tes histoires</div>
     ${gens.length ? `<div class="stories">${gens.map(row).join('')}</div>` : `<p class="tlead">Tu n'as pas encore écrit d'histoire.</p>`}
     <button class="lab" data-act="mode" data-s="all">Versions et tests</button>`;
 }
-// a written story as a demo: its decor, its people, its lines (first option of each choice), the idea as its pitch
+// a written story, line by line: its decor, its people, its lines (the first option of each choice)
 const GEN_POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
-function fromStory(g) {
+function storyOf(g) {
   const j = g.json || {}, cast = [], idx = {}, lines = [];
   const who = (id) => { const sp = id === 'isa' ? 'isa_nuit' : id; if (!(sp in idx)) { idx[sp] = cast.length; cast.push([sp, 'listen']); } return idx[sp]; };
   const walk = (steps) => { for (const st of steps || []) {
@@ -963,8 +969,40 @@ function fromStory(g) {
     else if (st.text && st.who) lines.push([who(st.who), st.text, GEN_POSES.includes(st.pose) ? st.pose : 'listen']);
   } };
   walk(j.steps);
-  return { id: 'g' + g.at, story: g.at, title: j.title || 'Sans titre', pitch: g.idea || '', bg: ['terrasse', 'maison', 'salon'].includes(j.scene) ? j.scene : 'salon',
-    pos: '50% 50%', fx: 'brightness(.85)', glow: '#fff', cast: cast.slice(0, 4), players: 1, byoc: false, live: null, you: -1, lines: lines.filter((l) => l[0] < 4).slice(0, 12) };
+  return { title: j.title || 'Sans titre', bg: ['terrasse', 'maison', 'salon'].includes(j.scene) ? j.scene : 'salon', cast: cast.slice(0, 4), lines: lines.filter((l) => l[0] < 4) };
+}
+// its lines a..b as a demo (the idea as its pitch); a new one replaces the story's last
+function fromStory(g, a, b) {
+  const st = storyOf(g);
+  return { id: 'g' + g.at, story: g.at, title: st.title, pitch: g.idea || '', bg: st.bg, pos: '50% 50%', fx: 'brightness(.85)', glow: '#fff',
+    cast: st.cast, players: 1, byoc: false, live: null, you: -1, lines: st.lines.slice(a, b + 1) };
+}
+function openStory(stamp) {
+  const g = getGens().find((x) => String(x.at) === String(stamp)); if (!g) return;
+  const st = storyOf(g), n = st.lines.length, made = mine.find((d) => d.story === g.at);
+  let a = 0, b = Math.min(n - 1, 11), next = 'a';   // the first tap picks the first line, the second the last
+  const box = sheet(`<h3>${esc(st.title)}</h3><p class="lead">${esc(g.idea || '')}</p>
+    <p class="lead">Touche la première réplique de la démo, puis la dernière.</p>
+    <div class="lns">${st.lines.map(([w, t], k) => `<button class="ln" data-k="${k}"><b>${esc(NAMES[st.cast[w][0]] || st.cast[w][0])}</b>${esc(t)}</button>`).join('')}</div>
+    <div class="row"><button class="btn main wide" id="mkGo"></button>${made ? '<button class="btn" id="mkSee">Voir la démo</button>' : ''}</div>`);
+  const paint = () => {
+    $$('.ln', box).forEach((x) => { const k = +x.dataset.k; x.classList.toggle('on', k >= a && k <= b); x.classList.toggle('end', k === a || k === b); });
+    $('#mkGo').textContent = `Créer la démo · ${b - a + 1} réplique${b > a ? 's' : ''}`;
+  };
+  $$('.ln', box).forEach((x) => x.onclick = () => {
+    const k = +x.dataset.k;
+    if (next === 'a') { a = b = k; next = 'b'; } else { [a, b] = [Math.min(a, k), Math.max(a, k)]; next = 'a'; }
+    paint();
+  });
+  const see = (id) => closeSheet(() => { setTab('explore'); const c = $(`.ci[data-id="${id}"]`); if (c) $('#current').scrollTop = c.offsetTop; });
+  $('#mkGo').onclick = () => {
+    const d = fromStory(g, a, b), k = mine.findIndex((x) => x.story === g.at);
+    if (k >= 0) mine.splice(k, 1);
+    mine.unshift(d); keep.set('mine', mine); delete at[d.id];
+    viewKey = ''; see(d.id);
+  };
+  if (made) $('#mkSee').onclick = () => see(made.id);
+  paint();
 }
 function renderTabs() {
   const n = Object.keys(saved).length;
@@ -1447,8 +1485,8 @@ stage.addEventListener('click', (e) => {
     case 'deckNo': swipe(false); break;
     case 'deckReset': deckGone = []; renderExplore(); break;
     case 'write': try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=histoire'; break;
-    case 'mkdemo': { const g = getGens().find((x) => String(x.at) === el.dataset.at); if (g) { mine.unshift(fromStory(g)); keep.set('mine', mine); renderAdd(); } break; }
-    case 'seedemo': setTab('explore'); { const c = $(`.ci[data-id="${id}"]`); if (c) $('#current').scrollTop = c.offsetTop; } break;
+    case 'newperso': try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=perso'; break;
+    case 'story': openStory(el.dataset.at); break;
     case 'pclose': back(); break;
     case 'pgo': $('.pjoin').remove(); step(); break;
   }
@@ -1458,6 +1496,7 @@ addEventListener('keydown', (e) => {
   if (e.key === 'Escape') back();
   if ((e.key === ' ' || e.key === 'ArrowRight') && P && !$('#player').hidden && !$('.pjoin', $('#player'))) step();
 });
+addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });   // back from the game (a new story, a new character)
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
   const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add|social))?$/);
