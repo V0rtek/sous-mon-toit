@@ -793,7 +793,7 @@ function poseOf(c, pose) {
 function castOf(d) {
   const c = d.cast.map(([s, p]) => ({ s, p, name: NAMES[s] }));
   if (!d.byoc) return c;
-  const m = me(), mine = { s: m.id, p: 'listen', name: nameOf(m), me: m };
+  const m = me(), mine = { s: m.id, p: 'listen', name: m.name, me: m };
   if (d.you >= 0) c[d.you] = { ...mine, p: c[d.you].p }; else c.push(mine);
   return c;
 }
@@ -1257,39 +1257,40 @@ function moreHtml(d) {
 // ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
 let charsOpen = false;
 const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; } catch { return 'Toi'; } };
-// your character's look: re-tap it in your characters for a background colour and one of its 3 best poses (this browser)
+// you, the player (re-tap your character): your name (the game's too), your colour behind your picture, and the pose of
+// your character in it (one of its 3 best). The characters' own cards don't change (this browser)
 const LOOK_COLORS = ['#2c2c2e', '#ff375f', '#ff9f0a', '#ffd60a', '#30d158', '#64d2ff', '#0a84ff', '#bf5af2'];
 const BEST = { justin: ['holding', 'punch', 'thinking'], justin_bar: ['drunk_talk', 'drunk_happy', 'drunk_flirt'], cam: ['flirty', 'sip', 'tipsy_laugh'],
   brooke: ['drunk_point', 'drunk_joke', 'drunk_smile'], julian: ['smirk', 'cold', 'offer'], suit: ['adjust', 'offer', 'listen'] };
 const bestOf = (c) => { const ps = (BEST[c.id] || ['holding', 'explaining', 'thinking']).filter((p) => c.poses[p]); return ps.length ? ps : Object.keys(c.poses).slice(0, 3); };
-const looks = keep.get('looks', {});   // character id -> { c: colour, p: pose }
-const lookColor = (c) => (looks[c.id] || {}).c || '';
-const nameOf = (c) => (looks[c.id] || {}).n || c.name;   // renamed in its look sheet, or its own name
+const looks = keep.get('looks', {});   // character id -> { p: the pose in your picture }
+const myColor = () => keep.get('color', '');
 const picOf = (c) => { const p = (looks[c.id] || {}).p; return p && c.poses[p] ? c.poses[p] : poseOf(c, 'listen'); };
-const face = (c) => `<span class="pp"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""></span>`;
+const face = (c) => `<span class="pp"${myColor() ? ` style="background:${myColor()}"` : ''}><img src="${picOf(c)}" alt=""></span>`;
 function lookSheet(id) {
   const c = owned().find((x) => x.id === id); if (!c) return;
   const box = sheet('<div class="look"></div>');
   const paint = () => {
-    const col = lookColor(c) || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`;
-    $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(nameOf(c))}" size="${Math.max(2, nameOf(c).length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Nom">${I.pen}</label>
+    const col = myColor() || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`, n = savedName();
+    $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(n)}" placeholder="Ton nom" size="${Math.max(6, n.length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Nom">${I.pen}</label>
       <div class="lk-big" ${bg}><img src="${picOf(c)}" alt=""></div>
       <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Couleur"></button>`).join('')}</div>
       ${ps.length > 1 ? `<div class="lk-poses">${ps.map((p) => `<button class="${picOf(c) === c.poses[p] ? 'on' : ''}" data-pose="${p}" ${bg}><img src="${c.poses[p]}" alt=""></button>`).join('')}</div>` : ''}`;
   };
-  box.oninput = (e) => {   // its name, kept as you type (empty = its own name back)
+  box.oninput = (e) => {   // your name, kept as you type (never emptied: the last one stays)
     if (!e.target.closest('.lk-name')) return;
-    e.target.size = Math.max(2, e.target.value.length);   // as wide as the name, the pencil right after it
-    const l = (looks[c.id] = { ...looks[c.id] }), v = e.target.value.trim();
-    if (v) l.n = v; else delete l.n;
-    keep.set('looks', looks); renderSocial();
+    e.target.size = Math.max(6, e.target.value.length);   // as wide as the name, the pencil right after it
+    const v = e.target.value.trim(); if (!v) return;
+    try { localStorage.setItem('smt-name', v); } catch { /* private window */ }
+    renderSocial();
   };
+  box.addEventListener('focusout', (e) => { if (e.target.closest('.lk-name') && !e.target.value.trim()) e.target.value = savedName(); });
   box.onkeydown = (e) => { if (e.key === 'Enter') e.target.blur(); };
   box.onclick = (e) => {   // a tap applies it right away
     const b = e.target.closest('[data-col], [data-pose]'); if (!b) return;
-    const l = (looks[c.id] = { ...looks[c.id] });
-    if (b.dataset.col) l.c = b.dataset.col; else l.p = b.dataset.pose;
-    keep.set('looks', looks); paint(); renderSocial();
+    if (b.dataset.col) keep.set('color', b.dataset.col);
+    else { looks[c.id] = { ...looks[c.id], p: b.dataset.pose }; keep.set('looks', looks); }
+    paint(); renderSocial();
   };
   paint();
 }
@@ -1361,7 +1362,7 @@ function gotInvite(v) {
 }
 function renderSocial() {
   const m = me();
-  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""><span>${esc(nameOf(c))}</span></button>`).join('');
+  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
   const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Épisode ${w.ep}</small></div>`).join('');
   const row = (f) => {
     const d = f.doing && byId(f.doing);
