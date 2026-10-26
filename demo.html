@@ -1214,8 +1214,11 @@ function renderHome() {
     else if (lines) homeOpen = setTimeout(() => replay($('.hx-scene', x), d, prog[centre].i), 650);   // once it's opened up
     Object.assign(x.style, { left: r.left - h.left + 'px', top: r.top - h.top + home.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
     x.className = 'hx on';
-    requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = `hx on big${g ? ' wait' : ''}`; document.body.classList.add('hxbig'); }));
+    requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = `hx on big${g ? ' wait' : ''}`; barFor(); }));
   };
+  // the opened preview hides the tab bar; scrolled down towards the infos, the bar comes back (and goes again back at the top)
+  const barFor = () => { const x = $('#homeX'); document.body.classList.toggle('hxbig', !!(x && x.classList.contains('big')) && $('#home').scrollTop < 40); };
+  $('#home').onscroll = barFor;
   const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
   $('#homeCar').addEventListener('scroll', wait, { passive: true });
   // a swipe anywhere on the page or a tap on either side (homeGo): the next / previous one; a cover at the side: that one
