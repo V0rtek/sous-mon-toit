@@ -327,6 +327,15 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #back svg { width: 3.6em; height: 3.6em; }
+/* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
+#menuBtn { position: absolute; right: 4%; bottom: 2.2%; z-index: 30; font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(15,12,20,.45); display: grid; place-items: center; cursor: pointer; padding: 0; opacity: .7; }
+#menuBtn svg { width: 2.8em; height: 2.8em; }
+#menuPop { position: absolute; right: 4%; bottom: calc(2.2% + 7.2em); z-index: 31; min-width: 26em; padding: .6em; border-radius: 2em; background: rgba(28,28,30,.94); -webkit-backdrop-filter: blur(1.5em); backdrop-filter: blur(1.5em); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+#menuPop[hidden], #menuPop button[hidden] { display: none; }
+#menuPop button { font: inherit; font-size: 2.1em; font-weight: 600; color: #f5f5f7; background: none; border: 0; text-align: left; padding: .75em .9em; cursor: pointer; }
+#menuPop button + button { border-top: .05em solid rgba(255,255,255,.1); }
+#menuPop [data-m="quit"] { color: #ff453a; }
+body.preview #menuBtn, body.preview #menuPop { display: none !important; }
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #galBtn svg { width: 3.8em; height: 3.8em; }
@@ -565,18 +574,20 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="galBtn" type="button" aria-label="Personnages"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
   <div id="poseCard" hidden><img id="poseImg" alt=""><span id="poseName"></span></div>
   <button id="back" type="button" hidden aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+  <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025210231"></script>
-<script src="story.js?v=20261025210231"></script>
-<script src="play.js?v=20261025210231"></script>
-<script src="bar.js?v=20261025210231"></script>
-<script src="games.js?v=20261025210231"></script>
-<script src="gen.js?v=20261025210231"></script>
-<script src="demos.js?v=20261025210231"></script>
-<script src="episodes.js?v=20261025210231"></script>
-<script src="people.js?v=20261025210231"></script>
+<script src="chars.js?v=20261025212124"></script>
+<script src="story.js?v=20261025212124"></script>
+<script src="play.js?v=20261025212124"></script>
+<script src="bar.js?v=20261025212124"></script>
+<script src="games.js?v=20261025212124"></script>
+<script src="gen.js?v=20261025212124"></script>
+<script src="demos.js?v=20261025212124"></script>
+<script src="episodes.js?v=20261025212124"></script>
+<script src="people.js?v=20261025212124"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -603,7 +614,8 @@ const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
 const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé',
-  newText: 'Nouveau message', epEnd: "Fin de l'épisode", finished: 'Tu as fini', won: 'Tu gagnes…', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin' };
+  newText: 'Nouveau message', epEnd: "Fin de l'épisode", finished: 'Tu as fini', won: 'Tu gagnes…', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin',
+  mute: 'Couper le son', unmute: 'Remettre le son', restartEp: "Recommencer l'épisode", restart: 'Recommencer', quit: 'Quitter' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -867,6 +879,13 @@ function drawTexts(wait = 0) {
 // the sound on a first tap, so every tap wakes it up ----
 let actx = null;
 const sfxBuf = {}, sfxLoops = {};
+// the menu's sound on / off (kept on this phone): every sound plays through this one gain
+let muted = (() => { try { return localStorage.getItem('smt-mute') === '1'; } catch { return false; } })(), master = null;
+const out = () => { if (!master) { master = actx.createGain(); master.connect(actx.destination); } master.gain.value = muted ? 0 : 1; return master; };
+function setMuted(m) {
+  muted = m; if (master) master.gain.value = m ? 0 : 1;
+  try { localStorage.setItem('smt-mute', m ? '1' : '0'); } catch { /* private window */ }
+}
 function audio() {
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
   if (actx.state === 'suspended' && !document.hidden) actx.resume();
@@ -893,7 +912,7 @@ async function sfx(name, loop = false, rate = 1) {
   if (loop === 'card' && $('#epCard').hidden) return;   // the episode's end card closed while the file loaded
   if (loop) stopSfx(name);
   const src = actx.createBufferSource(), g = actx.createGain(), vol = SFX_VOL[name] ?? 1;
-  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(actx.destination);
+  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(out());
   // a loop fades in, so a room's sound arrives with the room instead of cutting in
   if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
   else g.gain.value = vol;
@@ -916,7 +935,7 @@ function buzz() {
     o.type = 'square'; o.frequency.value = 165;
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.05, t + 0.01);
     g.gain.setValueAtTime(0.05, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
-    o.connect(g).connect(c.destination); o.start(t); o.stop(t + 0.14);
+    o.connect(g).connect(out()); o.start(t); o.stop(t + 0.14);
   }
 }
 function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; applyCam({ ...c, frame: null }, ms); }
@@ -1021,7 +1040,7 @@ function ringTone(on) {
     for (const [t0, f] of [[0, 880], [0.2, 660], [0.5, 880], [0.7, 660]]) {
       const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
       o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18); o.connect(g).connect(c.destination); o.start(t); o.stop(t + 0.2);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18); o.connect(g).connect(out()); o.start(t); o.stop(t + 0.2);
     }
   };
   beep(); ringing = setInterval(beep, 2400);
@@ -1446,6 +1465,7 @@ function show(id) {
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
   screen = id;
+  $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
@@ -1805,6 +1825,37 @@ $('#back').onclick = (e) => {
   e.stopPropagation();
   if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
   const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
+// ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
+// only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
+const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).includes('"episode"');
+function paintMenu() {
+  $('#menuPop [data-m="sound"]').textContent = ui(muted ? 'unmute' : 'mute');
+  const again = $('#menuPop [data-m="again"]');
+  again.hidden = ROLE !== 'host'; again.textContent = ui(hasEps(state.story) ? 'restartEp' : 'restart');
+  $('#menuPop [data-m="quit"]').textContent = ui('quit');
+}
+// the episode you're in: the last one whose first tap is behind you (Last call's episodeAt); none = the story from its start
+function restartEpisode() {
+  const at = story().episodeAt || {};
+  const n = Object.keys(at).map(Number).filter((k) => tape.length >= at[k]).reduce((a, b) => Math.max(a, b), 1);
+  resumeEp = n > 1 ? n : null; startStory();
+}
+$('#menuBtn').onclick = (e) => { e.stopPropagation(); paintMenu(); $('#menuPop').hidden = !$('#menuPop').hidden; };
+$('#menuPop').onclick = (e) => {
+  e.stopPropagation();
+  const m = e.target.closest('[data-m]'); if (!m) return;
+  if (m.dataset.m === 'sound') { setMuted(!muted); paintMenu(); return; }
+  $('#menuPop').hidden = true;
+  if (m.dataset.m === 'again') restartEpisode();
+  else if (ROLE !== 'host') goHome();
+  else if (fromDemo) { toHub(); history.back(); }
+  else toHub();
+};
+// the menu open: a tap anywhere else only closes it (the story doesn't go on)
+addEventListener('click', (e) => {
+  if ($('#menuPop').hidden || e.target.closest('#menuPop, #menuBtn')) return;
+  e.stopPropagation(); e.preventDefault(); $('#menuPop').hidden = true;
+}, true);
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
 $('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
 
@@ -1986,7 +2037,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025210231';
+const BUILD = '20261025212124';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

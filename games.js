@@ -31,7 +31,8 @@ const MG_CAST = {
   suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
 };
 const MG_UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
-  again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended' };
+  again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended',
+  mute: 'Sound off', unmute: 'Sound on', restartEp: 'Restart episode', restart: 'Restart', quit: 'Quit' };
 const mg = (steps) => Object.assign(steps, { gaze: true, credits: '', seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
   cast: MG_CAST, ui: MG_UI,
   pick: { pa: { pose: 'drunk_talk', line: 'I need water. Like… a lot of water.' }, pb: { pose: 'drunk_point', line: 'THAT’S my brother.' } } });

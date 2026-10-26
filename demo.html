@@ -331,6 +331,8 @@ body.tabs-pill #tabs span { display: none; }
 .hx-scene iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .hx.big.wait .hx-scene { opacity: 0; }
 .hx.big.wait .hx-cover { opacity: 1; }
+/* En cours: a sideways swipe moves the stories, never the browser's back / forward */
+html, body, #home, #homeCar { overscroll-behavior-x: none; }
 /* the preview opened up: the bottom bar steps aside */
 #tabs { transition: transform .35s ease; }
 body.hxbig #tabs { transform: translateY(100%); }
@@ -417,6 +419,15 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .mc img { height: 12em; max-width: 100%; object-fit: contain; }
 .mc span { font-size: 1.6em; font-weight: 700; }
 .mc.on { box-shadow: inset 0 0 0 .3em #fff; }
+/* your character's look (re-tap it): big on its colour, the colours, its 3 best poses */
+.look .lk-big { position: relative; width: 56%; aspect-ratio: 3 / 4; margin: 1em auto 2.6em; border-radius: 2.4em; overflow: hidden; transition: background .2s; }
+.look .lk-big img, .look .lk-poses img { position: absolute; left: 4%; right: 4%; bottom: 0; width: 92%; height: 94%; object-fit: contain; object-position: 50% 100%; }
+.look .lk-cols { display: flex; justify-content: center; gap: 1.5em; margin-bottom: 2.8em; }
+.look .lk-cols button { width: 4.4em; height: 4.4em; border-radius: 50%; }
+.look .lk-cols button.on { box-shadow: 0 0 0 .3em #111113, 0 0 0 .6em #fff; }
+.look .lk-poses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4em; }
+.look .lk-poses button { position: relative; aspect-ratio: 3 / 4; border-radius: 1.6em; overflow: hidden; }
+.look .lk-poses button.on { outline: .3em solid #fff; outline-offset: -.3em; }
 .mc.add { justify-content: center; color: var(--mute); }
 .mc.add svg { width: 4em; height: 4em; }
 /* still to win: his silhouette, and where he's won */
@@ -741,7 +752,7 @@ for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
 const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare'], ['isa_nuit', 'Isa']]
-  .map(([id, name]) => ({ id, name, poses: Object.fromEntries(STD.map((p) => [p, `chars/${id}/${p}.webp`])) }));
+  .map(([id, name]) => ({ id, name, poses: Object.fromEntries([...new Set([...STD, ...Object.keys((window.SPRITES && SPRITES[id] || { poses: {} }).poses)])].map((p) => [p, `chars/${id}/${p}.webp`])) }));   // the 6 standard ones + any drawn since (Justin's punch, his phone...)
 // one pose each: it plays every line
 const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L'Ombre"], ['exile', 'Itsuki'], ['ninja', 'Sora'], ['plage', 'Maya']]
   .map(([id, name]) => ({ id, name, poses: { listen: `chars/${id}/stand.webp` } }))
@@ -824,11 +835,10 @@ const OPTIONS = [
   ['byoc', 'Amène ton perso', '', [['icon', 'Icône'], ['tag', 'Étiquette'], ['corner', 'Bandeau en coin']]],
   ['save', 'Sauver', '', [['bookmark', 'Signet'], ['heart', 'Cœur'], ['plus', '+ Ma liste']]],
   ['detail', 'Voir plus', '', [['veil', 'Voile noir plein écran'], ['zoom', 'Affiche zoomée'], ['sheet', 'Panneau du bas']]],
-  ['title', 'Titre', '', [['under', 'Sous l\'affiche'], ['over', 'Sur l\'affiche']]],
   ['progress', 'Progression dans l\'aperçu', '', [['corner', '#/N en coin'], ['bar', 'Barre en segments'], ['ring', 'Cercle'], ['pill', 'En bas']]],
   ['tabs', 'Onglets', '', [['labels', 'Icônes + texte'], ['icons', 'Icônes seules'], ['pill', 'Pilule flottante']]],
 ];
-const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', title: 'under', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
+const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
 let saved = keep.get('saved', {});   // id -> { at }
 let screen = 'current', tab = 'explore', viewKey = '', filter = 'all', spotSel = null, deckGone = [];
@@ -849,7 +859,7 @@ function sprites(d, cls = '') {
 function cover(d) {
   const v = posterOf(d);
   const art = v.img ? `<img class="cvimg" src="${v.img}" alt="">` : `<div class="cvbg" style="${place(v)}"></div>${sprites(v)}`;
-  return `<div class="cv n${v.img ? 0 : v.cast.length}" style="--glow:${v.glow || '#fff'}">${art}<div class="cvfade"></div>${O.title === 'over' ? `<div class="cvt">${esc(d.title)}</div>` : ''}</div>`;
+  return `<div class="cv n${v.img ? 0 : v.cast.length}" style="--glow:${v.glow || '#fff'}">${art}<div class="cvfade"></div><div class="cvt">${esc(d.title)}</div></div>`;
 }
 const posterOf = (d) => d.poster ? { ...d, ...d.poster } : d;
 // the blurred backdrop behind a big cover: the cover's own picture
@@ -888,7 +898,7 @@ function saveBtn(d) {
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
 // (solo is the default: only 2-3 players get a mark)
-function card(d, { title = O.title === 'under', sub = false, saveB = false, byocB = true, extra = '', live = true } = {}) {
+function card(d, { title = false, sub = false, saveB = false, byocB = true, extra = '', live = true } = {}) {
   const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
   return `<div class="card${live ? ringCls(d) : ''}" data-act="open" data-id="${d.id}">
     <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${live ? liveMark(d) : ''}${saveB ? saveBtn(d) : ''}${extra}</div>
@@ -1128,10 +1138,13 @@ function track(id, i, w) {
   else prog[id] = { i, with: w || (prog[id] && prog[id].with) || [], at: Date.now() };
   keep.set('prog', prog);
 }
-const done = (id) => prog[id].i >= total(byId(id));
-// the real game's episodes (index.html keeps the next one to play in smt-ep): Last call at episode 2 shows it, with its cover
+// done: a story in the game once its last episode is over; one of yours once every line was played
+const done = (id) => { const d = byId(id); return d.full ? finished(d) : prog[id].i >= total(d); };
+// the real game's episodes (index.html keeps the next one to play in smt-ep, one past the last once it's over): Last call at
+// episode 2 shows it, with its cover
 const epOf = (d) => { try { return d.full && (JSON.parse(localStorage.getItem('smt-ep')) || {})[d.full] || 0; } catch { return 0; } };
-const epd = (d) => { const n = epOf(d); return n > 1 ? { ...d, img: `covers/${d.id}_ep${n}.jpg` } : d; };
+const finished = (d) => !!d.full && epOf(d) > (d.eps || [d]).length;
+const epd = (d) => { const e = d.eps && d.eps[epOf(d) - 1]; return epOf(d) > 1 && e && e.img ? { ...d, img: e.img } : d; };
 // where you stopped, as a still: the setting, everyone in the pose they had there, the line on screen
 // (Last call runs in the game: its picture stands in)
 // replays the 3 lines that brought you where you are (the last 3 of a finished one), one after the other as the game plays
@@ -1143,7 +1156,33 @@ function replay(stage, d, i, step = 0) {
 }
 // En cours: a carousel of the stories you're in, the last one you left unfinished first; finished ones after. The card in the
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
-let homeOpen = null;
+let homeOpen = null, homeGo = null, homeCentre = null;
+{
+  // a swipe at any height (the covers scroll by themselves); a tap on either quarter, or on a cover at the side
+  let t0 = null;
+  const home = $('#home');
+  home.addEventListener('touchstart', (e) => { const t = e.touches[0]; t0 = e.touches.length === 1 && !e.target.closest('#homeCar') ? { x: t.clientX, y: t.clientY, side: null } : null; }, { passive: true });
+  // once it's clearly sideways, the browser doesn't get it (no page scroll, no back / forward)
+  home.addEventListener('touchmove', (e) => {
+    if (!t0) return; const t = e.touches[0], dx = Math.abs(t.clientX - t0.x), dy = Math.abs(t.clientY - t0.y);
+    if (t0.side === null && dx + dy > 10) t0.side = dx > dy;
+    if (t0.side && e.cancelable) e.preventDefault();
+  }, { passive: false });
+  home.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0]; if (!t0 || !homeGo) return;
+    const dx = t.clientX - t0.x, dy = t.clientY - t0.y; t0 = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) homeGo(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+// true when the tap moved the carousel instead of doing what's under it
+function homeTap(e) {
+  if (page() !== 'home' || !homeGo || !e.target.closest('.hfirst') || e.target.closest('.btn, .hdown')) return false;
+  const card = e.target.closest('#homeCar .card');
+  if (card && card.dataset.id !== homeCentre) { homeGo(card.dataset.id); return true; }
+  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+  if (x < .25 || x > .75) { homeGo(x < .25 ? -1 : 1); return true; }
+  return false;
+}
 function renderHome() {
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
@@ -1172,11 +1211,16 @@ function renderHome() {
   };
   const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
   $('#homeCar').addEventListener('scroll', wait, { passive: true });
+  // a swipe anywhere on the page or a tap on either side (homeGo): the next / previous one; a cover at the side: that one
+  homeGo = (k) => {
+    const car = $('#homeCar'), c = car && car.children[typeof k === 'number' ? ids.indexOf(centre) + k : ids.indexOf(k)];
+    if (c) car.scrollTo({ left: c.offsetLeft - (car.clientWidth - c.offsetWidth) / 2, behavior: 'smooth' });
+  };
   snap($('#homeCar'), (id) => {
-    const d = byId(id), p = prog[id]; centre = id;
-    $('#homeInfo').innerHTML = `<h3>${esc(d.title)}</h3><p class="where">${p.with.length ? `${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}` : 'Solo'}</p>
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) ? ` · Épisode ${epOf(d)}` : ''}</button>
-      <button class="hdown" data-act="hdown">Infos et épisodes${I.down}</button>`;
+    const d = byId(id), p = prog[id]; centre = homeCentre = id;
+    $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}</p>` : ''}
+      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) && !done(id) ? ` · Épisode ${epOf(d)}` : ''}</button>
+      <button class="hdown" data-act="hdown">Infos${I.down}</button>`;
     $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
@@ -1209,7 +1253,32 @@ function moreHtml(d) {
 // ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
 let charsOpen = false;
 const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; } catch { return 'Toi'; } };
-const face = (c) => `<span class="pp"><img src="${poseOf(c, 'listen')}" alt=""></span>`;
+// your character's look: re-tap it in your characters for a background colour and one of its 3 best poses (this browser)
+const LOOK_COLORS = ['#2c2c2e', '#ff375f', '#ff9f0a', '#ffd60a', '#30d158', '#64d2ff', '#0a84ff', '#bf5af2'];
+const BEST = { justin: ['holding', 'punch', 'thinking'], justin_bar: ['drunk_talk', 'drunk_happy', 'drunk_flirt'], cam: ['flirty', 'sip', 'tipsy_laugh'],
+  brooke: ['drunk_point', 'drunk_joke', 'drunk_smile'], julian: ['smirk', 'cold', 'offer'], suit: ['adjust', 'offer', 'listen'] };
+const bestOf = (c) => { const ps = (BEST[c.id] || ['holding', 'explaining', 'thinking']).filter((p) => c.poses[p]); return ps.length ? ps : Object.keys(c.poses).slice(0, 3); };
+const looks = keep.get('looks', {});   // character id -> { c: colour, p: pose }
+const lookColor = (c) => (looks[c.id] || {}).c || '';
+const picOf = (c) => { const p = (looks[c.id] || {}).p; return p && c.poses[p] ? c.poses[p] : poseOf(c, 'listen'); };
+const face = (c) => `<span class="pp"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""></span>`;
+function lookSheet(id) {
+  const c = owned().find((x) => x.id === id); if (!c) return;
+  const box = sheet('<div class="look"></div>');
+  const paint = () => {
+    const col = lookColor(c) || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`;
+    $('.look', box).innerHTML = `<div class="lk-big" ${bg}><img src="${picOf(c)}" alt=""></div>
+      <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Couleur"></button>`).join('')}</div>
+      ${ps.length > 1 ? `<div class="lk-poses">${ps.map((p) => `<button class="${picOf(c) === c.poses[p] ? 'on' : ''}" data-pose="${p}" ${bg}><img src="${c.poses[p]}" alt=""></button>`).join('')}</div>` : ''}`;
+  };
+  box.onclick = (e) => {   // a tap applies it right away
+    const b = e.target.closest('[data-col], [data-pose]'); if (!b) return;
+    const l = (looks[c.id] = { ...looks[c.id] });
+    if (b.dataset.col) l.c = b.dataset.col; else l.p = b.dataset.pose;
+    keep.set('looks', looks); paint(); renderSocial();
+  };
+  paint();
+}
 // a friend (k = their key: '@id' for a real one, the name for a fake one). Waiting in a film: that film (its poster,
 // what it is) and Rejoindre. Otherwise: invite them into one of yours, En cours then Sauvés (2-player films)
 function friendSheet(k) {
@@ -1221,7 +1290,7 @@ function friendSheet(k) {
   const duo = (ids) => ids.map(byId).filter((d) => d && d.players > 1);
   const going = duo(Object.keys(prog).filter((id) => !gone[id]).sort((a, b) => prog[b].at - prog[a].at));
   const kept = duo(Object.keys(saved).sort((a, b) => saved[b].at - saved[a].at)).filter((d) => !going.includes(d));
-  const grid = (ds) => `<div class="grid g3">${ds.map((d) => `<div class="card" data-act="invite" data-id="${d.id}" data-f="${esc(k)}"><div class="cvw">${cover(d)}</div><div class="ct">${esc(d.title)}</div></div>`).join('')}</div>`;
+  const grid = (ds) => `<div class="grid g3">${ds.map((d) => `<div class="card" data-act="invite" data-id="${d.id}" data-f="${esc(k)}"><div class="cvw">${cover(d)}</div></div>`).join('')}</div>`;
   return sheet(`<h3>${av(k)}Inviter ${esc(f.n)} dans…</h3>${going.length ? `<div class="h2">En cours</div>${grid(going)}` : ''}${kept.length ? `<div class="h2">Sauvés</div>${grid(kept)}` : ''}
     ${going.length || kept.length ? '' : '<div class="pick"><button class="btn main" data-act="sheetTab" data-tab="explore">Explorer</button></div>'}`);
 }
@@ -1278,7 +1347,7 @@ function gotInvite(v) {
 }
 function renderSocial() {
   const m = me();
-  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
+  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""><span>${esc(c.name)}</span></button>`).join('');
   const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Épisode ${w.ep}</small></div>`).join('');
   const row = (f) => {
     const d = f.doing && byId(f.doing);
@@ -1290,7 +1359,7 @@ function renderSocial() {
   const rank = (f) => f.doing && f.waits ? 0 : f.doing ? 1 : f.on ? 2 : 3;
   const everyone = [...realFriends(), ...FRIENDS], order = everyone.sort((a, b) => rank(a) - rank(b));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
-      ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a>${locked}</div>` : ''}</div>
+      ${charsOpen ? `<div class="mcs">${chars}<button class="mc add" data-act="newperso">${I.plus}<span>Créer</span></button>${locked}</div>` : ''}</div>
     <div class="h2">Amis <small>${everyone.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
 }
 
@@ -1318,8 +1387,8 @@ function renderCurrent() {
     const ci = e.target, f = $('iframe', ci);
     if (!f) return;
     if (e.isIntersecting) { if (!f.getAttribute('src')) reframe(f, f.dataset.src); return; }   // the game loads only once you scroll to it
-    // 5: only the game on screen stays loaded; back to it = from the start
-    if (f.classList.contains('late') && f.getAttribute('src')) { reframe(f, null); delete ci.dataset.tapped; line(ci, 0); }
+    // only the game on screen stays loaded (one copy of the game at a time, a phone can't hold 18); back to it = from the start
+    if (f.getAttribute('src')) { reframe(f, null); delete ci.dataset.tapped; line(ci, 0); }
   }), { root: box, threshold: .6 });
   if (START) { const c = $(`.ci[data-id="${START}"]`, box); if (c) box.scrollTop = c.offsetTop; }
   $$('.ci', box).forEach((ci) => seen.observe(ci));
@@ -1471,7 +1540,7 @@ function setTab(t) {
 // inRoom: the names already in the room you join (they hold the other characters in the game's waiting room);
 // to: a real friend to invite ({id, n}: their device rings)
 function openPlayer(id, host = false, from = 0, ep = null, w = null, inRoom = null, to = null) {
-  const d = byId(id), n = ep || epOf(d);
+  const d = byId(id), n = ep || epTo(d);
   if (d.full) {   // the real game; its back comes here
     track(id, 0, inRoom || (w ? [w] : to ? [to.n] : null));
     location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}${w ? '&with=' + encodeURIComponent(w) : ''}${inRoom ? '&in=' + encodeURIComponent(inRoom.join(',')) : ''}${to ? `&invite=${to.id}&iname=${encodeURIComponent(to.n)}` : ''}`;
@@ -1550,18 +1619,18 @@ const refreshDetail = () => {
 
 // ---- Jouer (Explorer): not the preview again, the series: its cover, what it is, Jouer the episode you're at, all its episodes ----
 function openSeries(id) {
-  const d = byId(id), box = $('#series'), n = epNow(d), eps = (d.eps || [d]).length;
-  const go = `${started(d) ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${Math.min(n, eps)}` : ''}`;
+  const d = byId(id), box = $('#series'), n = epTo(d), eps = (d.eps || [d]).length;
+  const go = finished(d) ? 'Rejouer' : `${started(d) ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${n}` : ''}`;
   box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[Math.min(n, eps) - 1].img } : d)}</div>
+    <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[n - 1].img } : d)}</div>
     <div class="sr-body"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>
-      <div class="row"><button class="btn main wide" data-act="ep" data-id="${id}" data-n="${Math.min(n, eps)}">${I.play}${go}</button>${saveWide(d)}</div>${epsHtml(d)}</div>`;
+      <div class="row"><button class="btn main wide" data-act="ep" data-id="${id}" data-n="${n}">${I.play}${go}</button>${saveWide(d)}</div>${epsHtml(d)}</div>`;
   box.dataset.id = id; box.hidden = false; box.scrollTop = 0;
 }
 
 // ---- Jouer (Explorer): straight to the game's waiting room, at the episode you're at. Someone already in a room for
 // it (a stranger or a friend): join them, or open your own room ----
-const epTo = (d) => Math.min(epNow(d), (d.eps || [d]).length);
+const epTo = (d) => finished(d) ? 1 : Math.min(epNow(d), (d.eps || [d]).length);   // all over: again from the first
 const othersIn = (d) => waiting(d).slice(0, d.players - 1).map((w) => w.n);
 function playNow(id) {
   const d = byId(id), real = realIn(d).slice(0, 1), keys = real.length ? real.map((p) => '@' + p.id) : othersIn(d);   // a real room first
@@ -1689,6 +1758,7 @@ function end() {
 
 // ---- one click handler for everything ----
 stage.addEventListener('click', (e) => {
+  if (homeTap(e)) return;
   const el = e.target.closest('[data-act]');
   if (!el) {
     if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(e); return; }
@@ -1722,8 +1792,7 @@ stage.addEventListener('click', (e) => {
     case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
-    case 'pick': keep.set('me', el.dataset.c); renderSocial(); break;
-    case 'newchar': e.preventDefault(); leave(); break;   // made in the game's gallery
+    case 'pick': if (el.dataset.c === me().id) lookSheet(el.dataset.c); else { keep.set('me', el.dataset.c); renderSocial(); } break;   // yours again: its look
     case 'vprev': case 'vnext': {
       const i = LAYOUTS.findIndex(([k]) => k === O.layout), n = LAYOUTS.length;
       O.layout = LAYOUTS[(i + (act === 'vnext' ? 1 : n - 1)) % n][0]; keep.set('opts', O); $('#explore').scrollTop = 0; render(); break;

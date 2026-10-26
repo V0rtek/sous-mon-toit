@@ -1182,7 +1182,8 @@ BAR.words = {
 // a private line (Brooke remembering the rule) shows the other player "<name> is thinking…"
 BAR.episodeAt = { 2: 112, 3: 190 };   // the tap each episode starts at (Continuer from Full demo jumps there)
 BAR.ui = { you: 'You are', choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read',
-  newText: 'New message', epEnd: 'End of episode', finished: 'You finished', won: 'You won…', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending' };
+  newText: 'New message', epEnd: 'End of episode', finished: 'You finished', won: 'You won…', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending',
+  mute: 'Sound off', unmute: 'Sound on', restartEp: 'Restart episode', restart: 'Restart', quit: 'Quit' };
 // what's known to be off, behind the "?" of the waiting room (so testers know)
 BAR.todo = { title: 'What to fix:', items: ['Pacing wrong', 'Emotion wrong', 'Cringe end interaction',
   'Make the style uniform, between characters, backgrounds. Tone (music / sounds)'] };
