@@ -286,6 +286,12 @@ body.tabs-pill #tabs span { display: none; }
 #sheet h3 { font-size: 3em; margin: 0 0 .3em; }
 #sheet .lead { font-size: 1.9em; color: var(--mute); margin: 0 0 1.4em; line-height: 1.35; }
 #sheet .pick { display: flex; flex-direction: column; gap: 1em; }
+#sheet .fsCv { width: 48%; margin: 0 auto 2em; }
+#sheet .fsCv .cv { border-radius: 1.2em; }
+#sheet .grid { padding: 0; margin-bottom: 2em; }
+#sheet .h2:has(+ .grid) { padding: 0; }
+#sheet h3 .av { width: 1.2em; height: 1.2em; font-size: .7em; vertical-align: -.25em; margin-right: .3em; }
+#sheet .pitch { font-size: 1.9em; line-height: 1.4; color: #d1d1d6; margin: 0 0 2em; }
 .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4em; margin-bottom: 2em; }
 .people button { display: flex; flex-direction: column; align-items: center; gap: .6em; padding: 1.4em 0; border-radius: 1.6em; background: #1c1c1e; position: relative; }
 .people .av { width: 6em; height: 6em; font-size: 1.1em; }
@@ -549,6 +555,7 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
   <div id="player" hidden></div>
 </div>
 <script src="chars.js"></script>
+<script src="people.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -597,7 +604,8 @@ const FRIENDS = [
   { n: 'Noé', c: '#25c48a', ch: 'exile', on: false, seen: 'hier' },
 ];
 const STRANGERS = [{ n: 'Nico', c: '#5ac8c8', ch: 'dan' }, { n: 'Zoé', c: '#c97b4a', ch: 'ruby' }, { n: 'Malik', c: '#7f8cff', ch: 'amare' }, { n: 'Jade', c: '#d4609b', ch: 'isa_nuit' }, { n: 'Hugo', c: '#8bbf4a', ch: 'alex' }];
-const friend = (n) => FRIENDS.find((f) => f.n === n) || STRANGERS.find((f) => f.n === n) || { n, c: '#636366' };
+// a real person ('@' + their id: every device with the app open) or one of the fake ones (by name)
+const friend = (n) => (n[0] === '@' && realFriend(n.slice(1))) || FRIENDS.find((f) => f.n === n) || STRANGERS.find((f) => f.n === n) || { n, c: '#636366' };
 // who's waiting in a demo's room: the friend, then the strangers (always the same ones for a given demo)
 function waiting(d) {
   const l = d.live; if (!l) return [];
@@ -828,8 +836,10 @@ let screen = 'current', tab = 'explore', viewKey = '', filter = 'all', spotSel =
 // ---- pieces ----
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // a player's picture: the face of their character (their initial if they have none), on their colour
-const charOf = (n) => { const f = friend(n); return f.ch && CHARS.find((c) => c.id === f.ch); };
-const mug = (n) => { const c = charOf(n); return c ? `<img class="mug" src="${poseOf(c, 'listen')}" alt="">` : `<b>${esc(n[0])}</b>`; };
+// (someone else's character may be one this phone hasn't won: any drawn one shows from its sheet)
+const charOf = (n) => { const f = friend(n); if (!f.ch) return null; return CHARS.find((c) => c.id === f.ch)
+  || (window.SPRITES && SPRITES[f.ch] ? { id: f.ch, poses: Object.fromEntries(Object.keys(SPRITES[f.ch].poses).map((p) => [p, `chars/${f.ch}/${p}.webp`])) } : null); };
+const mug = (n) => { const c = charOf(n); return c ? `<img class="mug" src="${poseOf(c, 'listen')}" alt="">` : `<b>${esc(friend(n).n[0])}</b>`; };
 const av = (n, extra = '') => { const f = friend(n); return `<span class="av" style="--c:${f.c};background:${f.c}"${extra}>${mug(n)}</span>`; };
 function sprites(d, cls = '') {
   const fl = flips(d.cast.map(([s, p]) => ({ s, p })), -1);
@@ -1200,20 +1210,71 @@ function moreHtml(d) {
 let charsOpen = false;
 const myName = () => { try { return localStorage.getItem('smt-name') || 'Toi'; } catch { return 'Toi'; } };
 const face = (c) => `<span class="pp"><img src="${poseOf(c, 'listen')}" alt=""></span>`;
-// a friend who's online: what's going on with them to pick up (a story you started together, or one they wait in), then
-// the 2-player stories to start from the beginning; the game opens on the character pick, and invites them
-function friendSheet(n) {
-  const f = friend(n), fd = f.doing && byId(f.doing);
-  const going = Object.keys(prog).filter((id) => byId(id) && byId(id).players > 1 && prog[id].with.includes(n) && !(byId(id).full ? 0 : done(id)));
-  const first = fd && fd.players > 1 ? [fd.id, ...going.filter((id) => id !== fd.id)] : going;
-  const cont = first.filter((id) => byId(id));
-  const fresh = DEMOS.filter((d) => d.players > 1 && !cont.includes(d.id));
-  const row = (d, what, ep) => `<div class="fr" data-act="withplay" data-id="${d.id}" data-f="${esc(n)}" data-n="${ep}"><span class="th">${cover({ ...d, title: '' })}</span>
-      <div><b>${esc(d.title)}</b><span>${what}</span></div></div>`;
-  const box = sheet(`<h3>Jouer avec ${esc(n)}</h3><p class="lead">${av(n)} ${f.doing && f.waits ? `${esc(n)} t'attend dans « ${esc(fd.title)} ».` : 'En ligne.'}</p>
-    ${cont.length ? `<div class="h2">À continuer</div><div class="frs">${cont.map((id) => { const d = byId(id), e = epNow(d); return row(d, id === (fd && fd.id) && f.waits ? `${esc(n)} t'attend · Épisode ${e}` : `Reprendre · Épisode ${e}`, e); }).join('')}</div>` : ''}
-    <div class="h2">À commencer</div><div class="frs">${fresh.map((d) => row(d, `Depuis le début · ${d.players === 3 ? '2 ou 3 joueurs' : '2 joueurs'}`, 1)).join('')}</div>`);
-  return box;
+// a friend (k = their key: '@id' for a real one, the name for a fake one). Waiting in a film: that film (its poster,
+// what it is) and Rejoindre. Otherwise: invite them into one of yours, En cours then Sauvés (2-player films)
+function friendSheet(k) {
+  const f = friend(k), fd = f.doing && byId(f.doing);
+  if (fd && f.waits) {
+    return sheet(`<div class="cvw fsCv">${cover(fd)}</div><h3>${esc(fd.title)}</h3><p class="lead">${av(k)} ${esc(f.n)} t'attend</p><p class="pitch">${esc(fd.pitch)}</p>
+      <div class="pick"><button class="btn main" data-act="joinf" data-id="${fd.id}" data-f="${esc(k)}">Rejoindre ${esc(f.n)}</button></div>`);
+  }
+  const duo = (ids) => ids.map(byId).filter((d) => d && d.players > 1);
+  const going = duo(Object.keys(prog).filter((id) => !gone[id]).sort((a, b) => prog[b].at - prog[a].at));
+  const kept = duo(Object.keys(saved).sort((a, b) => saved[b].at - saved[a].at)).filter((d) => !going.includes(d));
+  const grid = (ds) => `<div class="grid g3">${ds.map((d) => `<div class="card" data-act="invite" data-id="${d.id}" data-f="${esc(k)}"><div class="cvw">${cover(d)}</div><div class="ct">${esc(d.title)}</div></div>`).join('')}</div>`;
+  return sheet(`<h3>${av(k)}Inviter ${esc(f.n)} dans…</h3>${going.length ? `<div class="h2">En cours</div>${grid(going)}` : ''}${kept.length ? `<div class="h2">Sauvés</div>${grid(kept)}` : ''}
+    ${going.length || kept.length ? '' : '<div class="pick"><button class="btn main" data-act="sheetTab" data-tab="explore">Explorer</button></div>'}`);
+}
+// invite a friend into a film: your waiting room opens; a real one's device rings once you've taken your character,
+// a fake one accepts after a moment
+function inviteTo(id, k) {
+  const d = byId(id), f = friend(k);
+  if (f.id) openPlayer(id, false, 0, epTo(d), null, null, { id: f.id, n: f.n }); else openPlayer(id, false, 0, epTo(d), f.n);
+}
+// a friend waiting in a film: a real one = their room (as if you'd scanned their QR), a fake one = simulated
+function joinFriend(id, k) {
+  const d = byId(id), f = friend(k);
+  if (f.room) goJoin(f.room, d); else openPlayer(id, false, 0, epTo(d), null, [f.n]);
+}
+function goJoin(room, d) {
+  if (d) track(d.id, 0, null);
+  try { sessionStorage.setItem('smt-auto', '1'); sessionStorage.setItem('smt-back', 'demo.html'); } catch { /* private window */ }   // its back comes here
+  location.href = `index.html?watch=${room}`;
+}
+
+// ---- live: the real people (every device with the app open), friends like the fake ones; their invites ----
+const PAL = ['#ff4f8b', '#4f9dff', '#ff9f2e', '#9b6bff', '#25c48a', '#5ac8c8', '#c97b4a', '#7f8cff'];
+const colorOf = (id) => PAL[[...id].reduce((a, ch) => a + ch.charCodeAt(0), 0) % PAL.length];
+const savedName = () => { try { return localStorage.getItem('smt-name') || ''; } catch { return ''; } };
+let inviter = null, pendingInvite = null;   // the last invite's sender (until their presence arrives), the invite on screen
+function realFriend(id) {
+  const p = (window.PEOPLE && PEOPLE.get(id)) || (inviter && inviter.id === id ? inviter : null);
+  if (!p) return null;
+  const d = p.s && DEMOS.find((x) => x.full === p.s);
+  return { n: p.n, key: '@' + id, id, c: colorOf(id), ch: p.ch, on: true, doing: d ? d.id : null, waits: !!(d && p.room), room: p.room };
+}
+const realFriends = () => (window.PEOPLE ? PEOPLE.online() : []).map((p) => realFriend(p.id));
+const realIn = (d) => (window.PEOPLE ? PEOPLE.online() : []).filter((p) => p.room && p.s === d.full);
+const keyOf = (f) => f.key || f.n;
+function gotInvite(v) {
+  inviter = { id: v.from, n: String(v.n || '?').slice(0, 16), ch: v.ch || null };
+  pendingInvite = v;
+  const d = DEMOS.find((x) => x.full === v.invite.s);
+  sheet(`${d ? `<div class="cvw fsCv">${cover(d)}</div>` : ''}<p class="lead">${av('@' + v.from)} ${esc(inviter.n)} t'invite</p><h3>${esc(d ? d.title : v.invite.s)}</h3>
+    <div class="pick"><button class="btn main" data-act="accept">Rejoindre</button><button class="btn" data-act="later">Plus tard</button></div>`);
+}
+{
+  const myId = (() => {   // the game's own id for this device (index.html keeps the same one)
+    const fresh = () => Math.random().toString(36).slice(2, 10);
+    try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
+  })();
+  const s = document.createElement('script'); s.src = 'https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';
+  s.onload = () => {
+    const c = mqtt.connect(BROKER, { clientId: 'smtd-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20 });
+    PEOPLE.attach(c, myId, { me: () => ({ n: savedName(), ch: me().custom ? null : me().id }), invite: gotInvite,
+      change: () => { if (page() === 'social') renderSocial(); } });
+  };
+  document.head.appendChild(s);
 }
 function renderSocial() {
   const m = me();
@@ -1222,15 +1283,15 @@ function renderSocial() {
   const row = (f) => {
     const d = f.doing && byId(f.doing);
     const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
-    return `<div class="fr${f.on ? '' : ' still'}"${f.on ? ` data-act="friend" data-f="${esc(f.n)}"` : ''}><span class="fav">${av(f.n)}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
+    return `<div class="fr${f.on ? '' : ' still'}"${f.on ? ` data-act="friend" data-f="${esc(keyOf(f))}"` : ''}><span class="fav">${av(keyOf(f))}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
       <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
-  // waiting for you, then playing, then online, then offline
+  // waiting for you, then playing, then online, then offline; the real people (other devices) mixed in like the others
   const rank = (f) => f.doing && f.waits ? 0 : f.doing ? 1 : f.on ? 2 : 3;
-  const order = [...FRIENDS].sort((a, b) => rank(a) - rank(b));
+  const everyone = [...realFriends(), ...FRIENDS], order = everyone.sort((a, b) => rank(a) - rank(b));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
       ${charsOpen ? `<div class="mcs">${chars}<a class="mc add" data-act="newchar" href="index.html">${I.plus}<span>Créer</span></a>${locked}</div>` : ''}</div>
-    <div class="h2">Amis <small>${FRIENDS.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
+    <div class="h2">Amis <small>${everyone.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
 }
 
 // ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
@@ -1407,10 +1468,15 @@ function setTab(t) {
   if (t === BASE && cur().tabFrom === BASE) return back();
   if (tab === BASE) push({ tab: t, ov: null, tabFrom: BASE }); else swap({ tab: t, ov: null });
 }
-// inRoom: the names already in the room you join (they hold the other characters in the game's waiting room)
-function openPlayer(id, host = false, from = 0, ep = null, w = null, inRoom = null) {
+// inRoom: the names already in the room you join (they hold the other characters in the game's waiting room);
+// to: a real friend to invite ({id, n}: their device rings)
+function openPlayer(id, host = false, from = 0, ep = null, w = null, inRoom = null, to = null) {
   const d = byId(id), n = ep || epOf(d);
-  if (d.full) { track(id, 0, inRoom || (w ? [w] : null)); location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}${w ? '&with=' + encodeURIComponent(w) : ''}${inRoom ? '&in=' + encodeURIComponent(inRoom.join(',')) : ''}`; return; }   // the real game; its back comes here
+  if (d.full) {   // the real game; its back comes here
+    track(id, 0, inRoom || (w ? [w] : to ? [to.n] : null));
+    location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}${w ? '&with=' + encodeURIComponent(w) : ''}${inRoom ? '&in=' + encodeURIComponent(inRoom.join(',')) : ''}${to ? `&invite=${to.id}&iname=${encodeURIComponent(to.n)}` : ''}`;
+    return;
+  }
   const top = cur().ov, o = { k: 'player', id, host, from };
   if (top && top.k === 'series') o.under = top;
   if (top && top.k === 'detail') swap({ ov: o }); else push({ ov: o });
@@ -1498,10 +1564,11 @@ function openSeries(id) {
 const epTo = (d) => Math.min(epNow(d), (d.eps || [d]).length);
 const othersIn = (d) => waiting(d).slice(0, d.players - 1).map((w) => w.n);
 function playNow(id) {
-  const d = byId(id), ws = othersIn(d);
-  if (!ws.length) { playEp(id, epTo(d)); return; }
+  const d = byId(id), real = realIn(d).slice(0, 1), keys = real.length ? real.map((p) => '@' + p.id) : othersIn(d);   // a real room first
+  if (!keys.length) { playEp(id, epTo(d)); return; }
+  const ws = keys.map((k) => friend(k).n);
   const names = ws.length > 1 ? `${ws.slice(0, -1).join(', ')} et ${ws[ws.length - 1]}` : ws[0];
-  sheet(`<h3>${esc(d.title)}</h3><p class="lead">${ws.map((n) => av(n)).join('')} ${esc(names)} ${ws.length > 1 ? 'sont' : 'est'} déjà dans une salle</p>
+  sheet(`<h3>${esc(d.title)}</h3><p class="lead">${keys.map((k) => av(k)).join('')} ${esc(names)} ${ws.length > 1 ? 'sont' : 'est'} déjà dans une salle</p>
     <div class="pick"><button class="btn main" data-act="joinroom" data-id="${id}">Rejoindre ${esc(names)}</button><button class="btn" data-act="ownroom" data-id="${id}">Créer ta salle</button></div>`);
 }
 
@@ -1639,7 +1706,12 @@ stage.addEventListener('click', (e) => {
     case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); break;
     case 'play': playNow(id); break;   // the game's waiting room, not the episodes
-    case 'joinroom': closeSheet(() => openPlayer(id, false, 0, epTo(byId(id)), null, othersIn(byId(id)))); break;
+    case 'joinroom': { const d = byId(id), r = realIn(d)[0]; closeSheet(() => (r ? goJoin(r.room, d) : openPlayer(id, false, 0, epTo(d), null, othersIn(d)))); break; }
+    case 'invite': { const k = el.dataset.f; closeSheet(() => inviteTo(id, k)); break; }
+    case 'joinf': { const k = el.dataset.f; closeSheet(() => joinFriend(id, k)); break; }
+    case 'accept': { const v = pendingInvite; pendingInvite = null; closeSheet(() => v && goJoin(v.invite.room, DEMOS.find((x) => x.full === v.invite.s))); break; }
+    case 'later': { const v = pendingInvite; pendingInvite = null; if (v) PEOPLE.decline(v, savedName()); closeSheet(); break; }
+    case 'sheetTab': closeSheet(() => setTab(el.dataset.tab)); break;
     case 'ownroom': closeSheet(() => playEp(id, epTo(byId(id)))); break;
     case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;

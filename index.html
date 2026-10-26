@@ -177,8 +177,25 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .wr-opts { display: flex; gap: 1em; margin-top: 2em; }
 .wr-opts button { flex: 1; font: inherit; font-size: 1.75em; font-weight: 700; padding: .85em .3em; border-radius: 1.4em; border: 0; background: #2c2c2e; color: #fff; cursor: pointer; }
 .wr-opts button:first-child { background: #f5f5f7; color: #000; }
-.wr-friends { display: flex; gap: 1em; justify-content: center; margin-top: 1.4em; }
-.wr-friends button { font: inherit; font-size: 1.9em; font-weight: 700; padding: .55em 1.2em; border-radius: 2em; border: .1em solid #48484a; background: none; color: #fff; cursor: pointer; }
+/* who to invite: a row of heads (their character), the name under, a dot when they're online */
+.wr-friends { display: flex; gap: 1.6em; justify-content: center; flex-wrap: wrap; margin-top: 2em; }
+.wr-friends button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: .5em; width: 9em; background: none; border: 0; padding: 0; color: #fff; cursor: pointer; }
+.wr-head { position: relative; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; }
+.wr-head > span { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
+.wr-head img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
+.wr-head b { font-size: 3em; }
+.wr-head i { position: absolute; right: .2em; bottom: .2em; width: 1.7em; height: 1.7em; border-radius: 50%; background: #34c759; border: .3em solid #000; }
+.wr-friends button > span:last-child { font-size: 1.7em; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* an invite from a friend's device: rises from the bottom */
+#inviteCard { position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+#inviteCard[hidden] { display: none; }
+#inviteCard .box { width: 100%; box-sizing: border-box; background: #111113; color: #f5f5f7; border-radius: 3em 3em 0 0; padding: 3.4em 5% 5em; animation: rise .3s ease-out; }
+#inviteCard p { display: flex; align-items: center; gap: .6em; font-size: 1.9em; color: #8e8e93; margin: 0 0 .4em; }
+#inviteCard p .wr-head { width: 2em; height: 2em; font-size: 1em; }
+#inviteCard p .wr-head b { font-size: 1em; }
+#inviteCard h3 { font-size: 3em; margin: 0 0 1.4em; }
+#inviteCard button { display: block; width: 100%; font: inherit; font-size: 2.2em; font-weight: 800; padding: .8em; border-radius: 1.3em; border: 0; margin-top: .5em; background: #2c2c2e; color: #fff; cursor: pointer; }
+#inviteCard button.go { background: #f5f5f7; color: #000; }
 .wr-hint { text-align: center; font-size: 1.9em; color: #8e8e93; margin-top: 2em; }
 .wr-hint.wr-go { color: #34c759; font-weight: 800; }
 /* the story's known problems, behind a "?" in the waiting room's corner (tap = open, tap anywhere = close) */
@@ -444,6 +461,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="obsBtns"><button type="button" id="fbSend">Envoyer</button><button type="button" id="fbClose">Fermer</button></div>
   </div></div>
   <button id="storyNote" type="button" aria-label="Notes" hidden><span>?</span></button>
+  <div id="inviteCard" hidden><div class="box"><p id="invFrom"></p><h3 id="invTitle"></h3><button type="button" class="go" id="invGo">Rejoindre</button><button type="button" id="invLater">Plus tard</button></div></div>
   <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul>
     <div class="obs" id="obsBox" hidden><textarea id="obsText" rows="2" maxlength="300" placeholder="Une observation…" aria-label="Une observation"></textarea>
       <div class="obsBtns"><button type="button" id="obsAdd">Ajouter</button><button type="button" id="obsCopy">Copier tout</button></div></div></div></div>
@@ -550,14 +568,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025202218"></script>
-<script src="story.js?v=20261025202218"></script>
-<script src="play.js?v=20261025202218"></script>
-<script src="bar.js?v=20261025202218"></script>
-<script src="games.js?v=20261025202218"></script>
-<script src="gen.js?v=20261025202218"></script>
-<script src="demos.js?v=20261025202218"></script>
-<script src="episodes.js?v=20261025202218"></script>
+<script src="chars.js?v=20261025210231"></script>
+<script src="story.js?v=20261025210231"></script>
+<script src="play.js?v=20261025210231"></script>
+<script src="bar.js?v=20261025210231"></script>
+<script src="games.js?v=20261025210231"></script>
+<script src="gen.js?v=20261025210231"></script>
+<script src="demos.js?v=20261025210231"></script>
+<script src="episodes.js?v=20261025210231"></script>
+<script src="people.js?v=20261025210231"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -861,8 +880,12 @@ addEventListener('pageshow', hearing);
 addEventListener('pointerdown', () => audio(), true);
 const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3`)
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
-// how loud each file plays (the files are levelled alike): a room's sound stays under the voices, the campfire lowest
-const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02 };
+// how loud each file plays (the files are levelled alike, ~-21 LUFS): a room's sound stays under the voices, the campfire
+// lowest; a one-off (a stinger: the boss's arrival, the important moment, the glitch) a little above the rooms.
+// Rooms: bar, bathroom, dark, campfire, crowd (a busy public interior), party (a house party), crickets (outside, evening),
+// wrong (something is wrong, horror), suspense (tense). One-offs: boss, moment, glitch
+const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
+  boss: 0.25, moment: 0.2, glitch: 0.25 };
 async function sfx(name, loop = false, rate = 1) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -1149,6 +1172,7 @@ function saveEp(n) {
   try { localStorage.setItem('smt-ep', JSON.stringify(all)); } catch { /* private window */ }
 }
 let withFriend = null;   // #open=id&with=Léa (Full demo's friend sheet): once you've taken your character, they get invited to the other
+let withFriendTo = null;   // #open=id&invite=<their id>&iname=<name>: that friend is real, the invite rings their device
 let resumeEp = null;   // #open=bar&ep=2 (Full demo's Continuer): once both are in, the story starts at that episode
 async function startStory() {
   const at = resumeEp && (story().episodeAt || {})[resumeEp];
@@ -1475,23 +1499,35 @@ function begin(id = state.story) {
 function toHub() {
   halt(); show('#hub');
   if (waitRoom) announce(false);
-  waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; invite = null;
+  waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; withFriendTo = null; invite = null; friendsOpen = false;
 }
 
 // ---- a 2-player story's waiting room: a dot over each character, red = free, green = taken (the name above it).
 // Tap a free one to take it (it frees the one you had), tap yours to let it go. Two taken = the story starts ----
 let waitRoom = false;   // host: the waiting room is open
-function openWait(id) {
+// own: a room of your own even if another phone's is open (Full demo already asked: join them or create yours)
+function openWait(id, own = false) {
   // another phone's waiting room for this story is open: join it instead of opening a second one
-  const other = roomFor(id);
+  const other = !own && roomFor(id);
   if (other) { joinRoom(other.room); return; }
-  halt(); state.story = id; waitRoom = true; state.seats = {}; invite = null; clearTimeout(callFor.t); game = null; tape = []; renderWait(); share(); announce(true);
+  halt(); state.story = id; waitRoom = true; state.seats = {}; invite = null; friendsOpen = false; clearTimeout(callFor.t); game = null; tape = []; renderWait(); share(); announce(true);
 }
 // ---- a 2-player story's waiting room: you pick your character (the pose that sums them up, one line of them); for the
 // other one, invite a friend, open it to anyone or play alone (it plays itself: random choices). It starts once both are
-// taken. Real players still join by the code / QR; a friend or a stranger joining is simulated for now ----
-const SIM_FRIENDS = ['Léa', 'Max', 'Sam'], SIM_STRANGERS = ['Nico', 'Zoé', 'Malik', 'Jade', 'Hugo'];
-let invite = null;   // the host's call for the other seat: { seat, kind: 'friend' | 'public', n }
+// taken. Real players join by the code / QR or a real invite; Léa, Max, Sam and the strangers are simulated ----
+const SIM_FRIENDS = [{ n: 'Léa', ch: 'mila' }, { n: 'Max', ch: 'ninja' }, { n: 'Sam', ch: 'belier_blanc' }], SIM_STRANGERS = ['Nico', 'Zoé', 'Malik', 'Jade', 'Hugo'];
+let invite = null;   // the host's call for the other seat: { seat, kind: 'friend' | 'public', n, to: a real friend's id }
+let friendsOpen = false, friendsKey = '';   // "Inviter un ami" tapped: the row of friends shows; who was in it
+// who you can invite: everyone with the app open on another device (their invite rings there), then Léa, Max, Sam
+const friendsNow = () => [...(window.PEOPLE ? PEOPLE.online() : []).map((p) => ({ n: p.n, ch: p.ch, to: p.id })), ...SIM_FRIENDS];
+// a head: their character's face (their initial when it isn't one this phone has), a dot = online
+const headOf = (f, dot = true) => {
+  const sp = f.ch && SPRITES[f.ch], pose = sp && (sp.poses.listen ? 'listen' : Object.keys(sp.poses)[0]);
+  return `<span class="wr-head"><span>${sp ? `<img src="${charUrl(f.ch, pose)}" alt="">` : ''}</span>${sp ? '' : `<b>${esc(f.n[0] || '?')}</b>`}${dot ? '<i></i>' : ''}</span>`;
+};
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// this phone's character (picked in Full demo's Social), for the others' heads
+const myChar = () => { try { const c = JSON.parse(localStorage.getItem('smtDemo.me')) || 'justin'; return SPRITES[c] ? c : null; } catch { return 'justin'; } };
 const storyTitle = (id = state.story) => (STORIES[id] && STORIES[id].title) || { bar: 'Last call', play: 'Le café' }[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || '';
 const seatLabel = (k) => { const c = castOf(k); return c && c.name && !c.name.includes('{') ? c.name : (story().solo || {})[k] || k; };
 function renderWait() {
@@ -1509,7 +1545,7 @@ function renderWait() {
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats">${seats.map(card).join('')}</div>
     ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="friend">Inviter un ami</button><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
-    <div class="wr-friends" hidden>${SIM_FRIENDS.map((n) => `<button type="button" data-f="${n}">${n}</button>`).join('')}</div>
+    ${friendsOpen && host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
@@ -1517,18 +1553,28 @@ function renderWait() {
     if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
   });
   document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); otherSeat(b.dataset.o); });
-  document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); const k = seatsOf().find((j) => !state.seats[j]); if (k) callFor(k, 'friend', b.dataset.f); });
+  const list = friendsNow(); friendsKey = list.map((f) => f.to || f.n).join('|');
+  document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => {
+    e.stopPropagation(); const k = seatsOf().find((j) => !state.seats[j]), f = list[+b.dataset.f];
+    if (k && f) { friendsOpen = false; callFor(k, 'friend', f.n, f.to); }
+  });
+}
+// someone came or went on another device: redraw the row of friends (only then, so a tap never lands on a redraw)
+function peopleChanged() {
+  if (screen === '#wait' && friendsOpen && friendsNow().map((f) => f.to || f.n).join('|') !== friendsKey) renderWait();
 }
 function otherSeat(o) {
   const k = seatsOf().find((j) => !state.seats[j]); if (!k) return;
-  if (o === 'friend') { $('.wr-friends').hidden = false; return; }
+  if (o === 'friend') { friendsOpen = !friendsOpen; renderWait(); return; }
   if (o === 'public') { callFor(k, 'public', SIM_STRANGERS[Math.floor(Math.random() * SIM_STRANGERS.length)]); return; }
   state.seats[k] = { id: BOT, n: seatLabel(k) }; renderWait(); share(); startWhenFull();   // alone: the other one plays itself
 }
-// simulated for now: the friend accepts after a moment, a stranger shows up a bit later; they play like the bot
-function callFor(k, kind, n) {
-  invite = { seat: k, kind, n }; renderWait();
+// a real friend (to = their id): the invite rings their device; they join like a QR scan and take the character.
+// Simulated ones: the friend accepts after a moment, a stranger shows up a bit later; they play like the bot
+function callFor(k, kind, n, to = null) {
+  invite = { seat: k, kind, n, to }; renderWait();
   clearTimeout(callFor.t);
+  if (to) { PEOPLE.invite(to, room, state.story, { n: state.name, ch: myChar() }); return; }
   callFor.t = setTimeout(() => {
     if (!waitRoom || !invite || state.seats[k]) return;
     invite = null; state.seats[k] = { id: BOT, n }; renderWait(); share(); startWhenFull();
@@ -1591,8 +1637,9 @@ function takeSeat(k, id, n) {
   else if (!s) {
     for (const j of seatsOf()) if (state.seats[j] && state.seats[j].id === id) delete state.seats[j];
     state.seats[k] = { id, n: String(n || 'Kev').slice(0, 16) };
+    if (invite && invite.seat === k) invite = null;   // the one invited is in
     const free = seatsOf().find((j) => !state.seats[j]);
-    if (withFriend && ROLE === 'host' && id === myId && free && !invite) { callFor(free, 'friend', withFriend); share(); return; }
+    if (withFriend && ROLE === 'host' && id === myId && free && !invite) { const w = withFriend; withFriend = null; callFor(free, 'friend', w, withFriendTo); withFriendTo = null; share(); return; }
   } else return;
   renderWait(); share(); startWhenFull();
 }
@@ -1605,7 +1652,7 @@ function openFromDemo(id) {
   if (id === 'histoire') { $('#genMsg').textContent = ''; show('#genScreen'); }
   else if (id === 'perso') { ncStep(1); show('#newChar'); }
   else {
-    openWait(id);
+    openWait(id, true);
     if (joinIn && waitRoom) {
       const free = seatsOf().filter((k) => !state.seats[k]);
       joinIn.slice(0, free.length - 1).forEach((n, i) => { state.seats[free[free.length - 1 - i]] = { id: BOT, n }; });
@@ -1918,7 +1965,7 @@ idbDo('readonly', (st) => st.getAll()).then((all) => (all || []).forEach(registe
 // relay as one retained message (story + game id + names + waiting-room seats + every tap so far); a joiner replays the
 // taps on the same story, so a late joiner catches up. Joiners' taps (a seat, a line, a choice) go to the host, which
 // plays them into the tape like its own.
-const BROKER = 'wss://broker.emqx.io:8084/mqtt';
+// the relay: people.js (BROKER)
 const WATCH = new URLSearchParams(location.search).get('watch');
 const ROLE = WATCH && /^[a-z0-9]{4,12}$/.test(WATCH) ? 'watch' : 'host';
 const PREVIEW = ROLE === 'host' && (s => STORIES[s] ? s : null)(new URLSearchParams(location.search).get('preview'));
@@ -1939,7 +1986,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025202218';
+const BUILD = '20261025210231';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -1961,6 +2008,7 @@ const OPEN = 'sousmontoit/v1/open';
 const rooms = new Map();   // room -> its last announcement {room, s, n: [names], t}
 const roomFor = (s) => [...rooms.values()].filter((r) => r.room !== room && r.s === s && Date.now() - r.t < 30000).sort((a, b) => b.t - a.t)[0];
 function announce(on) {
+  setTimeout(PEOPLE.here, 0);   // this phone's presence says it too (its room, its story), once the waiting room's state has changed
   if (ROLE !== 'host' || !live || !live.connected) return;
   const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
   live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now(), v: BUILD }) : '', { retain: true });
@@ -1980,11 +2028,26 @@ function joinRoom(r) {
   try { sessionStorage.setItem('smt-auto', '1'); } catch { /* private window */ }
   location.href = `${location.pathname}?watch=${r}`;
 }
-// a joiner leaves the room for its own menu (a fresh page that keeps the name, so no name screen)
+// a joiner leaves the room for its own menu (a fresh page that keeps the name, so no name screen); one that came from
+// Full demo (a friend's room, an invite) goes back there
 function goHome() {
-  try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ }
-  location.href = location.pathname;
+  let back = null;
+  try { sessionStorage.setItem('smt-home', '1'); back = sessionStorage.getItem('smt-back'); sessionStorage.removeItem('smt-back'); } catch { /* private window */ }
+  location.href = back || location.pathname;
 }
+
+// ---- an invite from a friend's device (PEOPLE): the card rises over the menu, never in the middle of a story ----
+let invNow = null;
+function gotInvite(v) {
+  if (!['#hub', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
+  invNow = v;
+  $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} t'invite`;
+  $('#invTitle').textContent = storyTitle(v.invite.s) || v.invite.s;
+  $('#inviteCard').hidden = false;
+}
+$('#invGo').onclick = (e) => { e.stopPropagation(); const v = invNow; invNow = null; $('#inviteCard').hidden = true; if (v) joinRoom(v.invite.room); };
+$('#invLater').onclick = (e) => { e.stopPropagation(); const v = invNow; invNow = null; $('#inviteCard').hidden = true; if (v) PEOPLE.decline(v, state.name || myName); };
+$('#inviteCard').onclick = (e) => e.stopPropagation();
 
 // joiners keep a retained presence under <topic>/w/ ({t: time, n: name, j: joined}, refreshed every 10 s); the broker
 // clears it when they drop (will), and the host forgets anyone silent for 35 s (and frees their character in the waiting room)
@@ -2005,6 +2068,7 @@ function countEyes() {
 }
 function fromJoiner(m) {
   if (m.e === 'seat') { const w = watchers.get(m.id); takeSeat(m.s, m.id, (w && w.n) || m.n); return; }
+  if (m.e === 'no') { if (invite && invite.to === m.id) { invite = null; if (waitRoom) renderWait(); } return; }   // "Plus tard" on their device
   if (!game || m.g !== game || !Object.values(state.seats).some((s) => s.id === m.id)) return;
   // in a split, a player's tap goes to his scene: a ghost here, or the scene this phone shows (a host who watches)
   const g = m.lane && split && split.ghosts[m.lane];
@@ -2031,12 +2095,15 @@ async function goLive() {
   const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined, v: BUILD }), { retain: true }); };
   live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
     will: { topic: ROLE === 'watch' ? seat : `${OPEN}/${room}`, payload: '', retain: true, qos: 0 } });
+  // who's here on every device (friends to invite), and the invites that come to this one
+  PEOPLE.attach(live, myId, { change: peopleChanged, invite: gotInvite,
+    me: () => ({ n: ROLE === 'watch' ? myName : state.name, ch: myChar(), s: ROLE === 'host' && (waitRoom || game) ? state.story : null, room: ROLE === 'host' && waitRoom ? room : null }) });
   live.on('connect', () => {
     if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${OPEN}/+`]); if (waitRoom) announce(true); }
     else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
-    live.on('message', (t, buf) => { try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
+    live.on('message', (t, buf) => { if (t !== topic()) return; try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
     setInterval(here, 10000);
     addEventListener('pagehide', () => { if (live.connected) live.publish(seat, '', { retain: true }); });
   } else {
@@ -2177,7 +2244,8 @@ if (PREVIEW) {
 } else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
-  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?$/);
+  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?(?:&invite=([a-z0-9]+)&iname=([^&]+))?$/);
+  if (o && o[5]) { withFriend = decodeURIComponent(o[6]); withFriendTo = o[5]; }
   if (o && o[2]) resumeEp = +o[2];
   if (o && o[3]) withFriend = decodeURIComponent(o[3]);
   if (o && o[4]) joinIn = decodeURIComponent(o[4]).split(',').filter(Boolean);
