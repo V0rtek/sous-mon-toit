@@ -663,10 +663,10 @@ const houseMeet = (f) => [
     one('pa'), say('pa', 'drunk_talk', 'Brooke. Who’s the guy?', { to: 'pb' }),
     one('pb'), say('pb', 'nervous', 'Nobody. A job. Let’s just… let’s have a drink.', { to: 'pa' }),
   ]),
-  // two guys in hoodies in a room full of money
+  // two guys dressed for a bar in a room full of money
   two('pa', 'pb'), hush(1400),
   say('pb', 'drunk_talk', 'So yeah… I guess we gotta talk to people now.', { to: 'pa' }),
-  one('pa'), say('pa', 'drunk_listen', 'I’m wearing a hoodie, man.', { to: 'pb' }),
+  one('pa'), say('pa', 'drunk_listen', 'I’m wearing a tank top, man.', { to: 'pb' }),
   one('pb'), say('pb', 'drunk_smile', 'Confidence is the outfit.', { to: 'pa' }),
   // Julian
   { enter: { julian: 'listen' } }, two('cam', 'julian'), hush(900),
@@ -851,7 +851,7 @@ const downstairs = [
   { enter: { diane: 'listen' } }, two('diane', 'pa'), hush(1100),
   say('diane', 'talk', 'First time?', { to: 'pa' }),
   one('pa'), say('pa', 'drunk_listen', 'That obvious?', { to: 'diane' }),
-  one('diane'), say('diane', 'laugh', 'You’re wearing a hoodie.', { to: 'pa' }),
+  one('diane'), say('diane', 'laugh', 'You’re wearing a tank top.', { to: 'pa' }),
   one('pa'), hush(700), say('pa', 'drunk_talk', 'Who’s the guy? With my friend.', { to: 'diane' }),
   one('diane'), hush(800), say('diane', 'look_up', 'Julian always gets what he pays for.', { to: 'pa' }),
   one('pa'), hush(1700),
@@ -1133,7 +1133,8 @@ window.BAR = [
   two('cam', 'pb'), hush(1600),
   say('cam', 'amused', '…What?', { to: 'pb' }),
   hush(900),
-  // the last two, Brooke and Cam together in the frame
+  // the last two, Brooke and Cam together in the frame; when he says her name she gets it: a smile, not her laugh
+  { poses: { cam: 'flirty' } },
   say('pb', 'drunk_flirt', 'Cam. You’re just…', { to: 'cam' }),
   hush(1000),
   say('pb', 'drunk_flirt', 'Yeah. Just…', { to: 'cam' }),

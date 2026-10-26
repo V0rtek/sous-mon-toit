@@ -552,14 +552,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025090556"></script>
-<script src="story.js?v=20261025090556"></script>
-<script src="play.js?v=20261025090556"></script>
-<script src="bar.js?v=20261025090556"></script>
-<script src="games.js?v=20261025090556"></script>
-<script src="gen.js?v=20261025090556"></script>
-<script src="demos.js?v=20261025090556"></script>
-<script src="episodes.js?v=20261025090556"></script>
+<script src="chars.js?v=20261025201420"></script>
+<script src="story.js?v=20261025201420"></script>
+<script src="play.js?v=20261025201420"></script>
+<script src="bar.js?v=20261025201420"></script>
+<script src="games.js?v=20261025201420"></script>
+<script src="gen.js?v=20261025201420"></script>
+<script src="demos.js?v=20261025201420"></script>
+<script src="episodes.js?v=20261025201420"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -865,13 +865,14 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
 // how loud each file plays (the files are levelled alike): a room's sound stays under the voices, the campfire lowest
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02 };
-async function sfx(name, loop = false) {
+async function sfx(name, loop = false, rate = 1) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
   if (loop === 'scene' && (!sc || sc.ambience !== name)) return;   // the scene changed while the file loaded
+  if (loop === 'card' && $('#epCard').hidden) return;   // the episode's end card closed while the file loaded
   if (loop) stopSfx(name);
   const src = actx.createBufferSource(), g = actx.createGain(), vol = SFX_VOL[name] ?? 1;
-  src.buffer = buf; src.loop = !!loop; src.connect(g).connect(actx.destination);
+  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(actx.destination);
   // a loop fades in, so a room's sound arrives with the room instead of cutting in
   if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
   else g.gain.value = vol;
@@ -1181,13 +1182,16 @@ function episodeEnd(ep, r) {
       <div class="ep-kick">${ui('won')}</div><div class="ep-rays"></div><div class="ep-shake"><div class="ep-glow"></div><img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""></div>
       <div class="ep-ring"></div><div class="ep-sparks">${sparks()}</div><div class="ep-flash"></div><div class="ep-won"><b>${w.name}</b><span>${ui('added')}</span></div></div>`;
     box.className = ''; box.hidden = false; box.onclick = null;
+    // the room's sound stops with the episode; under the card, the house's dark sound slowed down (Continue stops it,
+    // the next scene brings its own; leaving the story stops everything)
+    stopSfx(); sfx('dark', 'card', 0.6);
     const tease = () => {
       timers.forEach(clearTimeout); box.onclick = null;
       const nx = ep.next;
       box.className = 'teasing';
       box.innerHTML = `<div class="ep-t">${nx ? `<div class="ep-kick">${ui('episode')} ${nx.n}</div><h2>${nx.title}</h2><img class="ep-img" src="${nx.img}" alt=""><p>${nx.tease}</p>` : ''}
         <button type="button" class="ep-go">${nx ? ui('next') : ui('finale')}</button><button type="button" class="ep-home">${ui('home')}</button></div>`;
-      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(true); };
+      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; stopSfx('dark'); done(true); };
       $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
     };
     later(60, () => box.className = 'done');                             // "you finished episode N"
@@ -1203,7 +1207,7 @@ function endCard(d) {
   if (story().episodeAt) saveEp(null);   // the whole story is done
   bump((st) => { st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.done = (r.done || 0) + 1; });
   const e = typeof d === 'object' ? d : END0, two = duo();
-  bubble.hidden = true;
+  bubble.hidden = true; stopSfx();   // the last room's sound ends with the story, not under the end card
   $('#endKicker').textContent = fill(e.kicker || ''); $('#endTitle').textContent = fill(e.title || '');
   $('#endLede').textContent = fill(e.lede || ''); $('#endLede').hidden = !e.lede;
   const ul = $('#picks'); ul.innerHTML = '';
@@ -1927,7 +1931,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025090556';
+const BUILD = '20261025201420';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
