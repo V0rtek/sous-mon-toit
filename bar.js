@@ -1180,7 +1180,6 @@ BAR.words = {
   LEDE: (f) => `${f.confess === 'yes' ? 'Brooke said the number out loud.' : f.confess === 'no' ? 'Brooke lied at the red door.' : 'Brooke threw a punch instead of an answer.'} ${f.jend === 'forgives' ? 'Justin forgave him.' : f.jend === 'hard' ? 'Justin didn’t.' : 'Justin stayed by him.'}`,
 };
 // a private line (Brooke remembering the rule) shows the other player "<name> is thinking…"
-BAR.episodeAt = { 2: 112, 3: 190 };   // the tap each episode starts at (Continuer from Full demo jumps there)
 BAR.ui = { you: 'You are', choosing: 'is choosing', reading: 'is thinking…', choices: 'Your choices', again: 'Play again', delivered: 'Delivered', read: 'Read',
   newText: 'New message', epEnd: 'End of episode', finished: 'You finished', won: 'You won…', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending',
   mute: 'Sound off', unmute: 'Sound on', restartEp: 'Restart episode', restart: 'Restart', quit: 'Quit' };

@@ -1195,13 +1195,18 @@ function saveEp(n) {
 let withFriend = null;   // #open=id&with=Léa (Full demo's friend sheet): once you've taken your character, they get invited to the other
 let withFriendTo = null;   // #open=id&invite=<their id>&iname=<name>: that friend is real, the invite rings their device
 let resumeEp = null;   // #open=bar&ep=2 (Full demo's Continuer): once both are in, the story starts at that episode
+// the jump: played silently on this phone (both seats, first option everywhere) until the end of the episode before
+// ({episode: {n: N-1}}), whatever the path; the joiners get the whole tape at once, plus j = N (they skip those ends too)
+let jumpEp = 0, jumped = false, startEp = 0, quiet = false, curEp = 1;
 async function startStory() {
-  const at = resumeEp && (story().episodeAt || {})[resumeEp];
-  resumeEp = null;
-  if (!at) { begin(); return; }
+  const ep = resumeEp; resumeEp = null;
+  if (!(ep > 1) || !story().some((s) => s.episode && s.episode.n === ep - 1)) { begin(); return; }
   const seats = { ...state.seats };   // the jump plays both seats on this phone, then gives them back
-  await skipTo(at, state.story);
+  jumpEp = ep; jumped = false; quiet = true;
+  await skipTo(5000, state.story, () => jumped);
+  jumpEp = 0; quiet = false; startEp = ep;
   state.seats = seats; share();
+  if (sc && sc.ambience && !sfxLoops[sc.ambience]) sfx(sc.ambience, 'scene');   // the jump was silent
 }
 // the embers around the one you won: fine sparks drifting up and a few glints, each on its own timing
 function sparks() {
@@ -1247,7 +1252,8 @@ function episodeEnd(ep, r) {
   });
 }
 function endCard(d) {
-  if (story().episodeAt) saveEp(Math.max(...Object.keys(story().episodeAt).map(Number)) + 1);   // the whole story is done: it stays done (Full demo: Fini, Rejouer)
+  const eps = story().filter((s) => s.episode).map((s) => s.episode.n);
+  if (eps.length) saveEp(Math.max(...eps) + 1);   // the whole story is done: it stays done (Full demo: Fini, Rejouer)
   bump((st) => { st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.done = (r.done || 0) + 1; });
   const e = typeof d === 'object' ? d : END0, two = duo();
   bubble.hidden = true; stopSfx();   // the last room's sound ends with the story, not under the end card
@@ -1432,7 +1438,13 @@ async function next() {
       return;
     }
     else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
-    else if (s.episode) { if (FAST || PREVIEW) continue; if (!(await episodeEnd(s.episode, r))) return; }   // not while jumping, not in Full demo's previews
+    else if (s.episode) {
+      curEp = s.episode.n + 1;
+      // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
+      if (jumpEp && s.episode.n === jumpEp - 1) { jumpEp = 0; jumped = true; continue; }
+      if (FAST || PREVIEW || (remote && s.episode.n < (remote.j || 0))) continue;   // not while jumping, not in Full demo's previews
+      if (!(await episodeEnd(s.episode, r))) return;
+    }
     else if (s.end) { endCard(s.end); return; }
   }
 }
@@ -1506,6 +1518,8 @@ async function introCard(who, at) {
 }
 function begin(id = state.story) {
   const replay = screen === '#end';
+  if (!jumpEp) startEp = 0;   // from the top (a jump's own begin keeps the episode it's heading to)
+  curEp = 1;
   bump((st) => { st.s = st.s || {}; const r = (st.s[id] = st.s[id] || {}); r.plays = (r.plays || 0) + 1; });
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
@@ -1845,11 +1859,9 @@ function paintMenu() {
   set('again', 'again', ui(hasEps(state.story) ? 'restartEp' : 'restart')).hidden = ROLE !== 'host';
   set('quit', 'quit', ui('quit'));
 }
-// the episode you're in: the last one whose first tap is behind you (Last call's episodeAt); none = the story from its start
+// the episode you're in (curEp: one past the last episode end the story went through); 1 = the story from its start
 function restartEpisode() {
-  const at = story().episodeAt || {};
-  const n = Object.keys(at).map(Number).filter((k) => tape.length >= at[k]).reduce((a, b) => Math.max(a, b), 1);
-  resumeEp = n > 1 ? n : null; startStory();
+  resumeEp = curEp > 1 ? curEp : null; startStory();
 }
 $('#menuBtn').onclick = (e) => { e.stopPropagation(); paintMenu(); $('#menuPop').hidden = !$('#menuPop').hidden; };
 $('#menuPop').onclick = (e) => {
@@ -2057,11 +2069,11 @@ function newer(v) {
   location.replace(`${location.pathname}?${ROLE === 'watch' ? `watch=${room}&` : ''}v=${v}`);
 }
 function share() {
-  if (ROLE !== 'host' || !live || !live.connected) return;
+  if (ROLE !== 'host' || quiet || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, v: BUILD }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD }), { retain: true, qos: 1 });
 }
-function record(ev) { if (ROLE === 'host') { tape.push(ev); share(); } }
+function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share(); } }   // a jump sends its taps once, at its end
 
 // no QR needed for a 2-player story: an open waiting room is announced under sousmontoit/v1/open/<room> with the names
 // of everyone in it (refreshed every 10 s, cleared when it closes or the phone drops). Every other phone's menu shows it
@@ -2256,14 +2268,15 @@ async function pump() {
 
 // index.html#t40 / #p12 = start chapter 1 / the Playthrough and jump to the 40th / 12th tap (first option on every
 // choice), to check a shot without playing
-async function skipTo(n, id) {
+// stop: a check before each tap (Continuer's jump stops at an episode's start)
+async function skipTo(n, id, stop = null) {
   const tick = () => new Promise((r) => setTimeout(r, 0));
   FAST = true;
-  if (seatsOf(id).length) state.seats = { pa: { id: myId, n: state.name }, pb: { id: myId, n: 'Kev' } };   // a jump plays both
+  if (seatsOf(id).length) state.seats = Object.fromEntries(seatsOf(id).map((k) => [k, { id: myId, n: state.name }]));   // a jump plays them all
   begin(id);
   for (let k = 0; k < n; k++) {
     for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
-    if (!$('#end').hidden) break;
+    if (!$('#end').hidden || (stop && stop())) break;
     if (!$('#looks').hidden) { $('#lookGo').click(); await tick(); continue; }   // let the card close before the next tap
     if (waiting === 'choice') [...optionButtons()].find((b) => b.dataset.i === '0').click();
     else advance();
