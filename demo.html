@@ -1304,7 +1304,7 @@ function lookSheet(id) {
 function friendSheet(k) {
   const f = friend(k), fd = f.doing && byId(f.doing);
   if (fd && f.waits) {
-    return sheet(`<div class="cvw fsCv">${cover(fd)}</div><h3>${esc(fd.title)}</h3><p class="lead">${av(k)} ${esc(f.n)} t'attend</p><p class="pitch">${esc(fd.pitch)}</p>
+    return sheet(`<div class="cvw fsCv">${cover(fd)}</div><p class="lead">${av(k)} ${esc(f.n)} t'attend</p><p class="pitch">${esc(fd.pitch)}</p>
       <div class="pick"><button class="btn main" data-act="joinf" data-id="${fd.id}" data-f="${esc(k)}">Rejoindre ${esc(f.n)}</button></div>`);
   }
   const duo = (ids) => ids.map(byId).filter((d) => d && d.players > 1);
@@ -1349,7 +1349,7 @@ function gotInvite(v) {
   inviter = { id: v.from, n: String(v.n || '?').slice(0, 16), ch: v.ch || null };
   pendingInvite = v;
   const d = DEMOS.find((x) => x.full === v.invite.s);
-  sheet(`${d ? `<div class="cvw fsCv">${cover(d)}</div>` : ''}<p class="lead">${av('@' + v.from)} ${esc(inviter.n)} t'invite</p><h3>${esc(d ? d.title : v.invite.s)}</h3>
+  sheet(`${d ? `<div class="cvw fsCv">${cover(d)}</div>` : ''}<p class="lead">${av('@' + v.from)} ${esc(inviter.n)} t'invite</p>${d ? '' : `<h3>${esc(v.invite.s)}</h3>`}
     <div class="pick"><button class="btn main" data-act="accept">Rejoindre</button><button class="btn" data-act="later">Plus tard</button></div>`);
 }
 {

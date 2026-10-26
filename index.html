@@ -581,15 +581,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025213234"></script>
-<script src="story.js?v=20261025213234"></script>
-<script src="play.js?v=20261025213234"></script>
-<script src="bar.js?v=20261025213234"></script>
-<script src="games.js?v=20261025213234"></script>
-<script src="gen.js?v=20261025213234"></script>
-<script src="demos.js?v=20261025213234"></script>
-<script src="episodes.js?v=20261025213234"></script>
-<script src="people.js?v=20261025213234"></script>
+<script src="chars.js?v=20261026145905"></script>
+<script src="story.js?v=20261026145905"></script>
+<script src="play.js?v=20261026145905"></script>
+<script src="bar.js?v=20261026145905"></script>
+<script src="games.js?v=20261026145905"></script>
+<script src="gen.js?v=20261026145905"></script>
+<script src="demos.js?v=20261026145905"></script>
+<script src="episodes.js?v=20261026145905"></script>
+<script src="people.js?v=20261026145905"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1010,7 +1010,7 @@ const seated = () => Object.values(state.seats).some((s) => s.id === myId);
 // a simulated player ("L'autre au hasard"): its seat's owner is BOT; it is nobody's to play, the host plays it by itself
 const BOT = 'bot';
 const isBot = (seat) => !!(seat && state.seats[seat] && state.seats[seat].id === BOT);
-const mineFor = (by) => { if (isBot(by)) return false; const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
+const mineFor = (by) => { if (jumpAll) return true; if (isBot(by)) return false; const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
 // the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
 function botPick() {
   const at = run, n = options.length;
@@ -1195,17 +1195,18 @@ function saveEp(n) {
 let withFriend = null;   // #open=id&with=Léa (Full demo's friend sheet): once you've taken your character, they get invited to the other
 let withFriendTo = null;   // #open=id&invite=<their id>&iname=<name>: that friend is real, the invite rings their device
 let resumeEp = null;   // #open=bar&ep=2 (Full demo's Continuer): once both are in, the story starts at that episode
-// the jump: played silently on this phone (both seats, first option everywhere) until the end of the episode before
-// ({episode: {n: N-1}}), whatever the path; the joiners get the whole tape at once, plus j = N (they skip those ends too)
-let jumpEp = 0, jumped = false, startEp = 0, quiet = false, curEp = 1;
+// the jump: played silently on this phone until the end of the episode before ({episode: {n: N-1}}), whatever the path.
+// Everyone keeps their seat and every scene plays by the 2-player rules (jumpAll: this phone answers for everyone, the
+// other player's scene runs as a ghost, first option everywhere), so the joiners replay exactly the same tape. They
+// get it whole at the end, plus j = N (they skip those episode ends too)
+let jumpEp = 0, jumped = false, jumpAll = false, startEp = 0, quiet = false, curEp = 1;
 async function startStory() {
   const ep = resumeEp; resumeEp = null;
   if (!(ep > 1) || !story().some((s) => s.episode && s.episode.n === ep - 1)) { begin(); return; }
-  const seats = { ...state.seats };   // the jump plays both seats on this phone, then gives them back
-  jumpEp = ep; jumped = false; quiet = true;
-  await skipTo(5000, state.story, () => jumped);
-  jumpEp = 0; quiet = false; startEp = ep;
-  state.seats = seats; share();
+  jumpEp = ep; jumped = false; quiet = true; jumpAll = true;
+  await skipTo(5000, state.story, () => jumped, true);
+  jumpEp = 0; quiet = false; jumpAll = false; startEp = ep;
+  share();
   if (sc && sc.ambience && !sfxLoops[sc.ambience]) sfx(sc.ambience, 'scene');   // the jump was silent
 }
 // the embers around the one you won: fine sparks drifting up and a few glints, each on its own timing
@@ -1371,11 +1372,12 @@ function ghostPick(g, i) {
   state.picks.push({ ...o, by: g.seat }); if (o.set) Object.assign(state.f, o.set);
   g.waiting = null; g.q.unshift(...o.then); ghostRun(g);
 }
-// the host plays a ghost scene whose player left (first option, a tap every 1.6 s), so the story never gets stuck
+// the host plays a ghost scene whose player left (first option, a tap every 1.6 s), so the story never gets stuck; during a
+// jump (Continuer at episode N) it plays every ghost scene, first option everywhere, the way a joiner will replay it
 function autoGhost(g) {
-  if (ROLE !== 'host' || !g.waiting) return;
-  const o = ownerOf(g.seat); if (o === myId || watchers.has(o)) return;
-  const pick = () => (isBot(g.seat) ? Math.floor(Math.random() * g.options.length) : 0);   // a bot picks at random
+  if (ROLE !== 'host' || (g.waiting !== 'click' && g.waiting !== 'choice')) return;
+  const o = ownerOf(g.seat); if (!jumpAll && (o === myId || watchers.has(o))) return;
+  const pick = () => (isBot(g.seat) && !jumpAll ? Math.floor(Math.random() * g.options.length) : 0);   // a bot picks at random
   clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, pick())), FAST ? 0 : 800);
 }
 
@@ -2060,7 +2062,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025213234';
+const BUILD = '20261026145905';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -2167,7 +2169,7 @@ async function goLive() {
   try { await loadScript('https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'); } catch { return; }
   const seat = `${topic()}/w/${myId}`, joined = Date.now();
   const here = () => { if (live.connected) live.publish(seat, JSON.stringify({ t: Date.now(), n: myName, j: joined, v: BUILD }), { retain: true }); };
-  live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20,
+  live = mqtt.connect(BROKER, { clientId: 'smt-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 15000, keepalive: 20,
     will: { topic: ROLE === 'watch' ? seat : `${OPEN}/${room}`, payload: '', retain: true, qos: 0 } });
   // who's here on every device (friends to invite), and the invites that come to this one
   PEOPLE.attach(live, myId, { change: peopleChanged, invite: gotInvite,
@@ -2221,7 +2223,8 @@ $('#qrCard').onclick = (e) => { e.stopPropagation(); $('#qrCard').hidden = true;
 
 // joiner: replay the host's taps in order, each one when the story is ready for it; far behind = no animation
 let remote = null, applied = 0, pumping = false;
-const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, 40)); t(); });
+// (catching up, FAST: checks again at once instead of every 40 ms, so 200 taps take a moment, not 10 s)
+const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, FAST ? 0 : 40)); t(); });
 function follow(msg) {
   hostId = msg && msg.h;
   newer(msg && msg.v);
@@ -2268,14 +2271,16 @@ async function pump() {
 
 // index.html#t40 / #p12 = start chapter 1 / the Playthrough and jump to the 40th / 12th tap (first option on every
 // choice), to check a shot without playing
-// stop: a check before each tap (Continuer's jump stops at an episode's start)
-async function skipTo(n, id, stop = null) {
+// stop: a check before each tap (Continuer's jump stops at an episode's start); keep: the seats stay as they are (else
+// this phone takes them all). It taps only when the story waits for a tap or a choice (a scene waiting for the other one's
+// moment or for the others to join gets there through the ghosts)
+async function skipTo(n, id, stop = null, keep = false) {
   const tick = () => new Promise((r) => setTimeout(r, 0));
   FAST = true;
-  if (seatsOf(id).length) state.seats = Object.fromEntries(seatsOf(id).map((k) => [k, { id: myId, n: state.name }]));   // a jump plays them all
+  if (!keep && seatsOf(id).length) state.seats = Object.fromEntries(seatsOf(id).map((k) => [k, { id: myId, n: state.name }]));   // a jump plays them all
   begin(id);
   for (let k = 0; k < n; k++) {
-    for (let g = 0; g < 500 && !waiting && $('#looks').hidden && $('#end').hidden; g++) await tick();
+    for (let g = 0; g < 500 && waiting !== 'click' && waiting !== 'choice' && $('#looks').hidden && $('#end').hidden; g++) await tick();
     if (!$('#end').hidden || (stop && stop())) break;
     if (!$('#looks').hidden) { $('#lookGo').click(); await tick(); continue; }   // let the card close before the next tap
     if (waiting === 'choice') [...optionButtons()].find((b) => b.dataset.i === '0').click();

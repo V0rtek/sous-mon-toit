@@ -6,7 +6,8 @@
 //   (sousmontoit/v1/<room>/in, {e: 'no'}), where the game already listens to its joiners.
 // The relay for everything live (rooms too): HiveMQ's public one. EMQX's (broker.emqx.io), used until 25/10, stopped
 // answering (the socket opens, the broker never acknowledges).
-window.BROKER = 'wss://broker.hivemq.com:8884/mqtt';
+// A test points at its own relay with localStorage smt-broker (one running on the PC: the public ones are slow some nights)
+window.BROKER = (() => { try { return localStorage.getItem('smt-broker') || 'wss://broker.hivemq.com:8884/mqtt'; } catch { return 'wss://broker.hivemq.com:8884/mqtt'; } })();
 // every topic lives under NS; a test sets localStorage smt-ns to a channel of its own, so it never meets real phones
 window.NS = (() => { try { return localStorage.getItem('smt-ns') || 'sousmontoit/v1'; } catch { return 'sousmontoit/v1'; } })();
 window.PEOPLE = (() => {
