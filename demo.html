@@ -56,7 +56,6 @@ body.tabs-pill .view { padding-bottom: 14em; }
 #tabs span { font-size: 1.6em; font-weight: 600; }
 #tabs .main i { width: 6em; height: 4.4em; border-radius: 1.4em; background: var(--fg); color: #000; display: grid; place-items: center; }
 #tabs .main i svg { width: 3em; height: 3em; }
-#tabs .count { position: absolute; top: 1.3em; left: 54%; min-width: 2.2em; height: 2.2em; border-radius: 1.1em; background: var(--rose); color: #fff; font-size: 1.3em; font-weight: 800; display: grid; place-items: center; padding: 0 .4em; box-sizing: border-box; }
 body.tabs-icons #tabs span { display: none; }
 body.tabs-pill #tabs { left: 12%; right: 12%; bottom: 2.6em; height: 8em; border-radius: 4em; border: .1em solid rgba(255,255,255,.12); background: rgba(30,30,34,.82); backdrop-filter: blur(1.5em); -webkit-backdrop-filter: blur(1.5em); box-shadow: 0 1em 3em rgba(0,0,0,.6); }
 body.tabs-pill #tabs span { display: none; }
@@ -322,6 +321,14 @@ body.tabs-pill #tabs span { display: none; }
 .hx.big .hx-scene { opacity: 1; }
 .hx.big .hx-cover { opacity: 0; }
 .hx-scene::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(transparent 60%, rgba(0,0,0,.85) 88%); }
+/* a story in the game: its preview frame, shown once the game says it's ready (the cover stays until then) */
+.hx-scene iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.hx.big.wait .hx-scene { opacity: 0; }
+.hx.big.wait .hx-cover { opacity: 1; }
+/* the preview opened up: the bottom bar steps aside */
+#tabs { transition: transform .35s ease; }
+body.hxbig #tabs { transform: translateY(100%); }
+body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 #home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 #home .carInfo { padding-top: 2.4em; }
 #home .carInfo .btn { width: 70%; }
@@ -1081,8 +1088,7 @@ function openStory(stamp) {
   paint();
 }
 function renderTabs() {
-  const n = Object.keys(saved).length;
-  const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span>${k === 'saved' && n ? `<b class="count">${n}</b>` : ''}</button>`;
+  const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span></button>`;
   // En cours, the main tab, in the middle
   $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', `<i>${I.home}</i>`, 'En cours', 'main') + t('add', I.plus, 'Ajouter') + t('social', I.people, 'Social');
 }
@@ -1136,17 +1142,23 @@ function renderHome() {
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
     <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
   let centre = ids[0];
-  const close = () => { clearTimeout(homeOpen); const x = $('#homeX'); if (x) x.className = 'hx'; };
+  const close = () => {
+    clearTimeout(homeOpen); document.body.classList.remove('hxbig');
+    const x = $('#homeX'); if (!x) return;
+    x.className = 'hx'; const f = $('iframe', x); if (f) setTimeout(() => f.remove(), 300);   // the game unloads once it's faded out
+  };
   const open = () => {
     const card = $(`#homeCar .card[data-id="${centre}"]`), x = $('#homeX'), home = $('#home');
     if (!card || !x || page() !== 'home') return;
     const r = card.getBoundingClientRect(), h = home.getBoundingClientRect(), d = byId(centre);
-    const lines = !d.full && d.lines && d.lines.length;   // Last call plays in the game: its cover stays
-    x.innerHTML = `<div class="hx-cover">${cover(epd(d))}</div>${lines ? '<div class="hx-scene"></div>' : ''}`;
-    if (lines) homeOpen = setTimeout(() => replay($('.hx-scene', x), d, prog[centre].i), 650);   // once it's opened up
+    // a story in the game: the game's own preview, as in Explorer (the cover stays until it's ready); one of yours: drawn
+    const g = gameOf(d), lines = !g && d.lines && d.lines.length;
+    x.innerHTML = `<div class="hx-cover">${cover(epd(d))}</div>${g || lines ? '<div class="hx-scene"></div>' : ''}`;
+    if (g) $('.hx-scene', x).innerHTML = `<iframe src="index.html?preview=${g}" title="${esc(d.title)}" tabindex="-1"></iframe>`;
+    else if (lines) homeOpen = setTimeout(() => replay($('.hx-scene', x), d, prog[centre].i), 650);   // once it's opened up
     Object.assign(x.style, { left: r.left - h.left + 'px', top: r.top - h.top + home.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
     x.className = 'hx on';
-    requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = 'hx on big'; }));
+    requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = `hx on big${g ? ' wait' : ''}`; document.body.classList.add('hxbig'); }));
   };
   const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
   $('#homeCar').addEventListener('scroll', wait, { passive: true });
@@ -1321,6 +1333,8 @@ addEventListener('message', (e) => {
     if (i !== P.i) { P.i = i; track(P.d.id, i, P.with); progress(); }
     return;
   }
+  const hf = $('#homeX iframe');
+  if (hf && hf.contentWindow === e.source) { homeReady(hf); return; }
   const f = $$('#current iframe').find((x) => x.contentWindow === e.source), ci = f && f.closest('.ci');
   if (!ci) return;
   if (f.classList.contains('late') && !f.classList.contains('on')) {   // 5: the game is ready; it takes over if you haven't started
@@ -1331,6 +1345,15 @@ addEventListener('message', (e) => {
   if (i === was) return;
   line(ci, i); if (i > was) reached(d, i);
 });
+// En cours' preview in the game: its first word (ready) shows it, then it goes on by itself for 2 lines (3 in all, like a
+// drawn one) and stays
+function homeReady(f) {
+  const x = $('#homeX'); if (!x.classList.contains('wait')) return;
+  x.classList.remove('wait');
+  let n = 0;
+  const next = () => { if (!f.isConnected) return; f.contentWindow.postMessage({ tap: [.5, .3] }, location.origin); if (++n < 2) homeOpen = setTimeout(next, 2600); };
+  homeOpen = setTimeout(next, 2600);
+}
 const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : place(d);
 function lineHtml(d, who, text) {
   if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
