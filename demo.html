@@ -1693,12 +1693,32 @@ function closeSheet(then) {
 function options() {
   const box = sheet(`<h3>Les variantes</h3><p class="lead">Mélange-les, puis dis-moi la combinaison gagnante (ex. « D, point qui clignote, panneau du bas »).</p>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
-    `<button class="btn" id="reset" style="width:100%">Tout remettre par défaut</button>`);
+    `<button class="btn" id="reset" style="width:100%">Tout remettre par défaut</button>
+    <button class="btn" id="wipe" style="width:100%;margin-top:1em;color:#ff453a">Réinitialiser mon profil</button>
+    <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>`);
   box.onclick = (e) => {
     const c = e.target.closest('[data-k]');
     if (c) { O[c.dataset.k] = c.dataset.v; keep.set('opts', O); $$(`[data-k="${c.dataset.k}"]`, box).forEach((x) => x.classList.toggle('on', x === c)); render(); }
     if (e.target.id === 'reset') { keep.set('opts', {}); location.reload(); }
+    // two taps: the first says what goes, the second wipes
+    const w = e.target.closest('#wipe');
+    if (w && w.dataset.sure) wipeProfile();
+    else if (w) { w.dataset.sure = '1'; w.textContent = 'Touche encore : tout effacer'; Object.assign(w.style, { background: '#ff453a', color: '#fff' }); $('#wipeWhat', box).hidden = false; }
   };
+}
+// a new profile: everything this browser kept about the player (characters made or won, name, progress, saved, looks, who
+// they are to the others), then a fresh start. The API key typed for « Ton histoire » stays, and so do the onboarding test's results.
+function wipeProfile() {
+  const KEEP = ['smt-key', 'smt-onb', 'smt-onb-v'];
+  try { Object.keys(localStorage).filter((k) => k.startsWith('smt') && !KEEP.includes(k)).forEach((k) => localStorage.removeItem(k)); } catch { /* private window */ }
+  try { Object.keys(sessionStorage).filter((k) => k.startsWith('smt')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* private window */ }
+  const done = () => location.reload();
+  try {   // the characters' pictures: emptied in place (deleting the base would wait on the game still holding it open)
+    const r = indexedDB.open('smt-chars', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('chars', { keyPath: 'id' });
+    r.onsuccess = () => { const t = r.result.transaction('chars', 'readwrite'); t.objectStore('chars').clear(); t.oncomplete = t.onerror = done; };
+    r.onerror = done;
+  } catch { done(); }
 }
 
 // ---- the preview: tap to go on, n/12 ----

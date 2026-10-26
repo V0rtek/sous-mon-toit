@@ -328,6 +328,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles .here i { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; background: #34c759; }
 .tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
+#investors .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
+#investors .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
+#investors .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #back svg { width: 3.6em; height: 3.6em; }
 /* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
@@ -455,6 +458,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="mine"><span>Ton histoire</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
       <button type="button" id="statsBtn"><span>Stats</span></button>
+      <button type="button" id="invBtn"><span>Investisseurs</span></button>
     </div>
   </div>
   <div id="about3d" class="card menu" hidden>
@@ -503,6 +507,13 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="step"><h2>Stats</h2><p class="lead">Sur cet appareil seulement.</p><div id="statsBody"></div>
       <a class="ghost" href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener">Info</a>
       <button class="ghost" id="statsReset" type="button">Effacer les stats</button></div>
+  </div>
+  <div id="investors" class="card menu" hidden>
+    <div class="step"><h2>Investisseurs</h2>
+      <ul class="inv">
+        <li>Stand out by proprietary data.</li>
+        <li>AI is incapable of applying story theory (story circle) since there's no process clear or logical, or at least the clear or logical they do sucks. It's like asking AI for jokes.</li>
+      </ul></div>
   </div>
   <div id="genHist" class="card menu" hidden>
     <div class="step"><h2>Dernières histoires</h2><p class="lead" id="histEmpty">Rien encore.</p><div id="histList"></div></div>
@@ -1474,8 +1485,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors'];
+const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub', '#investors': '#hub' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -1778,6 +1789,7 @@ function renderStats() {
   if ((st.notes || []).length) card('Mots des testeurs', st.notes.slice(0, 8).map((n) => ({ t: `${storyName(n.story)} : ${n.text}` })));
 }
 $('#statsBtn').onclick = (e) => { e.stopPropagation(); renderStats(); show('#statsScreen'); };
+$('#invBtn').onclick = (e) => { e.stopPropagation(); show('#investors'); };   // Justin's notes for investors, his words
 $('#statsReset').onclick = (e) => { e.stopPropagation(); try { localStorage.removeItem(STATS_KEY); } catch { /* nothing */ } renderStats(); };
 
 // "Ton histoire": the idea goes to Haiku (gen.js) with the key typed here, and the story plays like any other
