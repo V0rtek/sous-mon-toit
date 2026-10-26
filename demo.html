@@ -6,6 +6,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000">
 <title>Full demo</title>
+<script>
+// a brand-new profile (first visit, or just reset in the settings) starts with the onboarding: what you're in the mood for,
+// then that taste's opening; it comes back here after, with the taste kept (smtDemo.onb)
+try {
+  if (!Object.keys(localStorage).some((k) => k === 'smt-name' || (k.startsWith('smtDemo.') && k !== 'smtDemo.opts')))
+    location.replace('onboarding.html?v=4&new=1&back=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
+} catch { /* no storage: straight in */ }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Yeseva+One&display=swap">
 <style>
@@ -819,11 +827,16 @@ function flips(cast, who) {
 const actors = (cast, who = -1) => { const fl = flips(cast, who); return cast.map((m, i) => `<img class="sp p${i}" style="--fx:${fl[i] ? -1 : 1}" src="${srcOf(m, m.p)}" alt="" draggable="false">`).join(''); };
 const turn = (imgs, cast, who) => { const fl = flips(cast, who); imgs.forEach((img, k) => img.style.setProperty('--fx', fl[k] ? -1 : 1)); };
 
-// the player's own demos (from the + tab) go first
+// the player's own demos (from the + tab) go first, then the stories of the taste picked at the start (onboarding), then the rest
+const TASTE = { verre: 'desir', pacte: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
+  lastcall: 'danger', appel: 'danger', cles: 'danger', gala: 'danger', contrat: 'danger', ombre: 'etrange', ile: 'etrange', nuit: 'etrange', coloc: 'etrange', feu: 'etrange' };
+const myTaste = (keep.get('onb', {}) || {}).k;
+const ofMyTaste = (d) => !!myTaste && TASTE[d.id] === myTaste;
 const mine = keep.get('mine', []);
-const all = () => [...mine, ...DEMOS];
+const all = () => [...mine, ...DEMOS.filter(ofMyTaste), ...DEMOS.filter((d) => !ofMyTaste(d))];
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
+  ...(myTaste ? [['Pour toi', ofMyTaste]] : []),
   ['Tendances', ['lastcall', 'ile', 'serment', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
   ['Quelqu\'un t\'attend', (d) => d.live],
   ['À plusieurs', (d) => d.players > 1],

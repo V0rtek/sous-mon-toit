@@ -124,6 +124,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .pick .face { flex: 1; position: relative; height: 46em; border-radius: 1.8em; overflow: hidden; }
 .pick .face::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
 .pick .face b { position: absolute; left: 0; right: 0; bottom: 1em; z-index: 1; font-size: 2.6em; font-weight: 600; text-align: center; }
+.end .go { align-self: flex-start; padding: .9em 2.6em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 2em; }
 @keyframes in { from { opacity: 0; transform: translateY(.6em); } }
 
 /* ---- the end ---- */
@@ -302,15 +303,37 @@ const ARGS = new URLSearchParams(location.search);
 // ?v=2 (or ?v=duel): that version only, no testing bar, no numbers at the end (the link for strangers)
 const FIXED = ARGS.get('v') ? VERSIONS.findIndex((v, i) => v.id === ARGS.get('v') || String(i + 1) === ARGS.get('v')) : -1;
 const LOCKED = FIXED >= 0;
+// ?new: a brand-new Full demo profile lands here first (onboarding.html?v=4&new=1&back=demo.html), and goes back after
+const NEWP = ARGS.has('new');
+const BACK = /^[\w.-]+\.html(\?[\w=&%.-]*)?$/.test(ARGS.get('back') || '') ? ARGS.get('back') : 'demo.html';
 if (LOCKED) document.body.classList.add('locked');
 let vi = LOCKED ? FIXED : (() => { try { return +localStorage.getItem('smt-onb-v') || 0; } catch { return 0; } })();
 let run = null, timers = [];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 const stopTimers = () => { timers.forEach(clearTimeout); timers = []; };
 
-// ---- what each run measured (this browser only) ----
+// ---- what each run measured. This browser keeps them all; a stranger's (a fixed link, or a new Full demo profile) also goes
+// to the relay, one retained message per run (<NS>/onb/<rid>, sent again at each step), and the PC copies them into the
+// vault every 15 min (Process - Onboarding.py). Mine, while testing versions, stay here. ----
 const RUNS = (() => { try { return JSON.parse(localStorage.getItem('smt-onb') || '[]'); } catch { return []; } })();
-const save = () => { try { localStorage.setItem('smt-onb', JSON.stringify(RUNS.slice(-500))); } catch { /* private window */ } };
+const NSR = (() => { try { return localStorage.getItem('smt-ns') || 'sousmontoit/v1'; } catch { return 'sousmontoit/v1'; } })();
+const BROKER = (() => { try { return localStorage.getItem('smt-broker') || 'wss://broker.hivemq.com:8884/mqtt'; } catch { return 'wss://broker.hivemq.com:8884/mqtt'; } })();
+let relay = null;
+const store = () => { try { localStorage.setItem('smt-onb', JSON.stringify(RUNS.slice(-500))); } catch { /* private window */ } };
+const send = () => {
+  if (!relay || !relay.connected) return;
+  for (const r of RUNS) if (r.rid && r.n !== r.sent) {
+    const n = r.n, { t0, n: _n, sent, ...out } = r;
+    relay.publish(`${NSR}/onb/${r.rid}`, JSON.stringify(out), { qos: 1, retain: true }, (err) => { if (!err) { r.sent = n; store(); } });
+  }
+};
+const save = () => { if (run && run.rid) run.n = (run.n || 0) + 1; store(); send(); };
+// a run not sent last time (no network) leaves with this visit
+if (LOCKED || RUNS.some((r) => r.rid && r.n !== r.sent)) {
+  const sc = document.createElement('script'); sc.src = 'https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';
+  sc.onload = () => { relay = mqtt.connect(BROKER, { clientId: 'smto-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 15000, keepalive: 20 }); relay.on('connect', send); };
+  document.head.append(sc);
+}
 
 function start(i = vi) {
   stopTimers(); vi = (i + VERSIONS.length) % VERSIONS.length;
@@ -318,7 +341,7 @@ function start(i = vi) {
   const v = VERSIONS[vi];
   $('#vName').innerHTML = `<small>${vi + 1}</small>${esc(v.name)}`;
   // a stranger's run counts as soon as it's shown (the funnel); mine only once I pick (switching versions isn't a try)
-  run = { v: v.id, at: Date.now(), t0: performance.now() };
+  run = { v: v.id, at: Date.now(), t0: performance.now(), ...(LOCKED && { rid: Math.random().toString(36).slice(2, 12), src: NEWP ? 'demo' : 'lien' }) };
   if (LOCKED) { RUNS.push(run); save(); }
   const box = $('#screen'); box.className = 'screen'; box.innerHTML = ''; box.onclick = null; box.style.opacity = '';
   const go = location.hash.match(/^#go=(\w+)/);   // #go=desir&at=4: straight into an opening (to check a line)
@@ -466,6 +489,11 @@ function end() {
   stopTimers(); run.done = Math.round(performance.now() - run.t0); save();
   const a = ARCH[run.k], box = $('#screen'); box.onclick = null;
   box.className = 'screen end';
+  if (NEWP) {   // the new profile keeps what was picked (Full demo puts that taste first), then goes in
+    try { localStorage.setItem('smtDemo.onb', JSON.stringify({ k: run.k, me: run.me || null, li: run.li || null, at: Date.now() })); } catch { /* private window */ }
+    box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">La suite arrive.</div><div class="row"><button class="go" data-act="back">Continuer</button></div>`;
+    return;
+  }
   const rows = [['Choisi en', sec(run.pick)]];
   if (run.rerolls) rows.push(['↻', run.rerolls + ' fois']);
   if (run.dwell) rows.push(['Regardé', run.order.filter((k) => run.dwell[k]).map((k) => `${ARCH[k].title} ${sec(run.dwell[k])}`).join(' · ')]);
@@ -496,7 +524,7 @@ function stats() {
 stage.addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   e.stopPropagation();
-  ({ vprev: () => start(vi - 1), vnext: () => start(vi + 1), restart: () => start(vi), stats,
+  ({ vprev: () => start(vi - 1), vnext: () => start(vi + 1), restart: () => start(vi), stats, back: () => location.replace(BACK),
     unstats: () => $('#stats').remove(), wipe: () => { RUNS.length = 0; save(); $('#stats').remove(); stats(); } })[b.dataset.act]();
 }, true);
 // preload the faces so a scene never waits on an image
