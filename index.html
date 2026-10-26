@@ -579,15 +579,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025212124"></script>
-<script src="story.js?v=20261025212124"></script>
-<script src="play.js?v=20261025212124"></script>
-<script src="bar.js?v=20261025212124"></script>
-<script src="games.js?v=20261025212124"></script>
-<script src="gen.js?v=20261025212124"></script>
-<script src="demos.js?v=20261025212124"></script>
-<script src="episodes.js?v=20261025212124"></script>
-<script src="people.js?v=20261025212124"></script>
+<script src="chars.js?v=20261025212445"></script>
+<script src="story.js?v=20261025212445"></script>
+<script src="play.js?v=20261025212445"></script>
+<script src="bar.js?v=20261025212445"></script>
+<script src="games.js?v=20261025212445"></script>
+<script src="gen.js?v=20261025212445"></script>
+<script src="demos.js?v=20261025212445"></script>
+<script src="episodes.js?v=20261025212445"></script>
+<script src="people.js?v=20261025212445"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1217,7 +1217,7 @@ function episodeEnd(ep, r) {
       const won = JSON.parse(localStorage.getItem('smt-won') || '[]');
       if (!won.some((x) => x.sprite === w.sprite)) localStorage.setItem('smt-won', JSON.stringify([...won, { sprite: w.sprite, name: w.name, from: state.story, ep: ep.n }]));
     } catch { /* private window */ }
-    saveEp(ep.next ? ep.next.n : null);   // where you are now: the next episode (Full demo's En cours shows it)
+    saveEp(ep.next ? ep.next.n : ep.n + 1);   // where you are now: the next episode, one past the last once it's over (Full demo's En cours shows it)
     bubble.hidden = true; choicesEl.hidden = true; hint.hidden = true;
     box.innerHTML = `<div class="ep-a"><div class="ep-done"><small>${ui('finished')}</small><b>${ui('episode')} ${ep.n}</b></div>
       <div class="ep-kick">${ui('won')}</div><div class="ep-rays"></div><div class="ep-shake"><div class="ep-glow"></div><img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""></div>
@@ -1245,7 +1245,7 @@ function episodeEnd(ep, r) {
   });
 }
 function endCard(d) {
-  if (story().episodeAt) saveEp(null);   // the whole story is done
+  if (story().episodeAt) saveEp(Math.max(...Object.keys(story().episodeAt).map(Number)) + 1);   // the whole story is done: it stays done (Full demo: Fini, Rejouer)
   bump((st) => { st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.done = (r.done || 0) + 1; });
   const e = typeof d === 'object' ? d : END0, two = duo();
   bubble.hidden = true; stopSfx();   // the last room's sound ends with the story, not under the end card
@@ -2037,7 +2037,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025212124';
+const BUILD = '20261025212445';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

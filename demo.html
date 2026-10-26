@@ -420,7 +420,11 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .mc span { font-size: 1.6em; font-weight: 700; }
 .mc.on { box-shadow: inset 0 0 0 .3em #fff; }
 /* your character's look (re-tap it): big on its colour, the colours, its 3 best poses */
-.look .lk-big { position: relative; width: 56%; aspect-ratio: 3 / 4; margin: 1em auto 2.6em; border-radius: 2.4em; overflow: hidden; transition: background .2s; }
+.look .lk-name { display: flex; align-items: center; justify-content: center; gap: .6em; margin: .6em 0 1.6em; color: var(--mute); }
+.look .lk-name input { max-width: 80%; background: none; border: 0; border-bottom: .08em solid transparent; color: #fff; font: inherit; font-size: 3.2em; font-weight: 800; text-align: center; padding: 0 0 .05em; outline: none; }
+.look .lk-name input:focus { border-bottom-color: rgba(255,255,255,.35); }
+.look .lk-name svg { width: 2.6em; height: 2.6em; flex: none; }
+.look .lk-big { position: relative; width: 56%; aspect-ratio: 3 / 4; margin: 0 auto 2.6em; border-radius: 2.4em; overflow: hidden; transition: background .2s; }
 .look .lk-big img, .look .lk-poses img { position: absolute; left: 4%; right: 4%; bottom: 0; width: 92%; height: 94%; object-fit: contain; object-position: 50% 100%; }
 .look .lk-cols { display: flex; justify-content: center; gap: 1.5em; margin-bottom: 2.8em; }
 .look .lk-cols button { width: 4.4em; height: 4.4em; border-radius: 50%; }
@@ -789,7 +793,7 @@ function poseOf(c, pose) {
 function castOf(d) {
   const c = d.cast.map(([s, p]) => ({ s, p, name: NAMES[s] }));
   if (!d.byoc) return c;
-  const m = me(), mine = { s: m.id, p: 'listen', name: m.name, me: m };
+  const m = me(), mine = { s: m.id, p: 'listen', name: nameOf(m), me: m };
   if (d.you >= 0) c[d.you] = { ...mine, p: c[d.you].p }; else c.push(mine);
   return c;
 }
@@ -1260,6 +1264,7 @@ const BEST = { justin: ['holding', 'punch', 'thinking'], justin_bar: ['drunk_tal
 const bestOf = (c) => { const ps = (BEST[c.id] || ['holding', 'explaining', 'thinking']).filter((p) => c.poses[p]); return ps.length ? ps : Object.keys(c.poses).slice(0, 3); };
 const looks = keep.get('looks', {});   // character id -> { c: colour, p: pose }
 const lookColor = (c) => (looks[c.id] || {}).c || '';
+const nameOf = (c) => (looks[c.id] || {}).n || c.name;   // renamed in its look sheet, or its own name
 const picOf = (c) => { const p = (looks[c.id] || {}).p; return p && c.poses[p] ? c.poses[p] : poseOf(c, 'listen'); };
 const face = (c) => `<span class="pp"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""></span>`;
 function lookSheet(id) {
@@ -1267,10 +1272,19 @@ function lookSheet(id) {
   const box = sheet('<div class="look"></div>');
   const paint = () => {
     const col = lookColor(c) || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`;
-    $('.look', box).innerHTML = `<div class="lk-big" ${bg}><img src="${picOf(c)}" alt=""></div>
+    $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(nameOf(c))}" size="${Math.max(2, nameOf(c).length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Nom">${I.pen}</label>
+      <div class="lk-big" ${bg}><img src="${picOf(c)}" alt=""></div>
       <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Couleur"></button>`).join('')}</div>
       ${ps.length > 1 ? `<div class="lk-poses">${ps.map((p) => `<button class="${picOf(c) === c.poses[p] ? 'on' : ''}" data-pose="${p}" ${bg}><img src="${c.poses[p]}" alt=""></button>`).join('')}</div>` : ''}`;
   };
+  box.oninput = (e) => {   // its name, kept as you type (empty = its own name back)
+    if (!e.target.closest('.lk-name')) return;
+    e.target.size = Math.max(2, e.target.value.length);   // as wide as the name, the pencil right after it
+    const l = (looks[c.id] = { ...looks[c.id] }), v = e.target.value.trim();
+    if (v) l.n = v; else delete l.n;
+    keep.set('looks', looks); renderSocial();
+  };
+  box.onkeydown = (e) => { if (e.key === 'Enter') e.target.blur(); };
   box.onclick = (e) => {   // a tap applies it right away
     const b = e.target.closest('[data-col], [data-pose]'); if (!b) return;
     const l = (looks[c.id] = { ...looks[c.id] });
@@ -1347,7 +1361,7 @@ function gotInvite(v) {
 }
 function renderSocial() {
   const m = me();
-  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""><span>${esc(c.name)}</span></button>`).join('');
+  const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"${lookColor(c) ? ` style="background:${lookColor(c)}"` : ''}><img src="${picOf(c)}" alt=""><span>${esc(nameOf(c))}</span></button>`).join('');
   const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Épisode ${w.ep}</small></div>`).join('');
   const row = (f) => {
     const d = f.doing && byId(f.doing);
