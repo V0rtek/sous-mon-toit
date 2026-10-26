@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onboarding</title>
+<style>
+:root { --fg: #f5f5f7; --mute: #86868b; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: #000; color: var(--fg); overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+body { display: grid; place-items: center; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+#stage { position: relative; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; }
+.screen { position: absolute; inset: 0; }
+
+/* ---- the worlds (drawn, no photo): one per taste ---- */
+.art { position: absolute; inset: 0; overflow: hidden; background: #000; }
+.art .bg { position: absolute; inset: -6%; }
+.art .spr, .cast .spr { position: absolute; transform: translateX(-50%); pointer-events: none; transition: filter .3s, left .4s; }
+.a-desir .bg { filter: blur(.5em); background:
+  radial-gradient(circle at 18% 22%, rgba(255,110,150,.6) 0 3%, transparent 9%),
+  radial-gradient(circle at 78% 16%, rgba(255,185,95,.55) 0 2.5%, transparent 8%),
+  radial-gradient(circle at 62% 38%, rgba(255,80,140,.35) 0 4%, transparent 12%),
+  radial-gradient(circle at 8% 58%, rgba(255,200,120,.3) 0 3%, transparent 9%),
+  radial-gradient(circle at 92% 52%, rgba(255,110,170,.4) 0 3%, transparent 10%),
+  radial-gradient(circle at 35% 8%, rgba(255,150,110,.35) 0 2%, transparent 7%),
+  radial-gradient(ellipse at 50% 35%, #521628 0%, #1c0711 55%, #070204 100%); }
+.a-revanche .bg { background:
+  radial-gradient(ellipse 34% 75% at 50% -8%, rgba(255,214,130,.6), rgba(255,200,100,.12) 60%, transparent 75%),
+  radial-gradient(circle at 20% 10%, rgba(255,220,150,.5) 0 .5%, transparent 1.5%),
+  radial-gradient(circle at 80% 12%, rgba(255,220,150,.5) 0 .5%, transparent 1.5%),
+  radial-gradient(circle at 35% 6%, rgba(255,220,150,.4) 0 .4%, transparent 1.2%),
+  radial-gradient(circle at 66% 5%, rgba(255,220,150,.4) 0 .4%, transparent 1.2%),
+  radial-gradient(ellipse at 50% 105%, rgba(232,194,90,.25), transparent 55%),
+  linear-gradient(180deg, #1f170a, #0b0905 70%, #000); }
+.a-danger .bg { background: radial-gradient(ellipse 45% 14% at 50% 71%, rgba(255,69,58,.4), transparent 70%), linear-gradient(#05080f, #0b1222 55%, #04060b); }
+.a-danger .door { position: absolute; left: 24%; right: 24%; top: 12%; bottom: 31%; border: .8em solid #1e2945; border-bottom: 0;
+  background: linear-gradient(90deg, #111a2e, #18233d 50%, #111a2e); box-shadow: 0 0 6em rgba(0,0,0,.7) inset; }
+.a-danger .door::before { content: ''; position: absolute; right: 12%; top: 52%; width: 1.4em; height: 1.4em; border-radius: 50%; background: #3a4560; }
+.a-danger .door::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.7em; height: .7em;
+  background: linear-gradient(90deg, transparent 4%, #ff453a 12%, #ff453a 34%, transparent 38%, transparent 56%, #ff453a 60%, #ff453a 88%, transparent 96%);
+  box-shadow: 0 0 2.4em .6em rgba(255,69,58,.45); }
+.a-etrange .bg { background:
+  radial-gradient(circle at 72% 16%, rgba(235,235,255,.95) 0 4.5%, rgba(180,165,255,.28) 6.5%, transparent 20%),
+  radial-gradient(ellipse at 50% 102%, rgba(70,200,170,.28), transparent 58%),
+  radial-gradient(ellipse at 15% 70%, rgba(140,110,255,.18), transparent 50%),
+  linear-gradient(#0e0822, #170c2e 50%, #06040c); }
+.a-etrange .ghost { opacity: .5; mix-blend-mode: screen; filter: drop-shadow(0 0 1.6em rgba(167,139,250,.9)) blur(.06em); }
+.a-nuit .bg { background: radial-gradient(ellipse 60% 40% at 50% 62%, rgba(80,130,255,.2), transparent 70%), linear-gradient(#020306, #070a14 60%, #020306); }
+.notif { position: absolute; left: 6%; right: 6%; top: 5%; padding: 1.1em 1.3em; border-radius: 1.8em; background: rgba(44,44,48,.82);
+  -webkit-backdrop-filter: blur(1em); backdrop-filter: blur(1em); display: flex; gap: 1em; align-items: center; }
+.notif i { width: 3.2em; height: 3.2em; border-radius: .8em; background: #3a3a3e; flex: none; }
+.notif b { display: block; font-size: 1.5em; }
+.notif span { display: block; font-size: 1.5em; color: #e5e5ea; }
+
+/* ---- a poster: the world + its title + its hook ---- */
+.poster { position: absolute; overflow: hidden; cursor: pointer; }
+.poster .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 55%; background: linear-gradient(transparent, rgba(0,0,0,.88) 60%); }
+.ptxt { position: absolute; left: 7%; right: 7%; bottom: 6%; transition: opacity .25s; }
+.ptxt h2 { font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+.ptxt p { color: #d1d1d6; line-height: 1.3; margin-top: .45em; }
+.grow { z-index: 30; transition: left .38s cubic-bezier(.2,.8,.2,1), top .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), height .38s cubic-bezier(.2,.8,.2,1); }
+.grow .ptxt, .grow .shade, .grow .notif, .grow .go, .grow .fline, .grow .chev { opacity: 0; transition: opacity .2s; }
+
+/* 1 · the grid */
+.grid .poster { width: 50%; height: 50%; }
+.grid .poster:nth-child(2n) { left: 50%; } .grid .poster:nth-child(n+3) { top: 50%; }
+.grid .poster { border: .15em solid #000; }
+.grid h2 { font-size: 2.3em; } .grid .ptxt p { font-size: 1.35em; }
+.grid .notif { transform: scale(.55); transform-origin: top center; left: 2%; right: 2%; }
+
+/* 2 · the duel */
+.duel .poster { left: 0; width: 100%; height: 50%; }
+.duel .poster + .poster { top: 50%; border-top: .2em solid #000; }
+.duel h2 { font-size: 3.4em; } .duel .ptxt p { font-size: 1.7em; max-width: 80%; }
+.duel .notif { transform: scale(.7); transform-origin: top center; }
+.reroll { position: absolute; right: 4%; top: 50%; transform: translateY(-50%); width: 6em; height: 6em; border-radius: 50%; z-index: 5;
+  background: rgba(30,30,34,.9); -webkit-backdrop-filter: blur(1em); backdrop-filter: blur(1em); border: .12em solid rgba(255,255,255,.18); display: grid; place-items: center; }
+.reroll svg { width: 2.8em; height: 2.8em; }
+
+/* 3 · the feed */
+.feed { position: absolute; inset: 0; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+.feed::-webkit-scrollbar { display: none; }
+.feed .poster { position: relative; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+.feed h2 { font-size: 4.4em; } .feed .ptxt { bottom: 12%; } .feed .ptxt p { font-size: 1.9em; }
+.fline { position: absolute; left: 7%; right: 7%; bottom: 34%; min-height: 6em; display: flex; flex-direction: column; justify-content: flex-end; }
+.feed .go { position: absolute; left: 7%; bottom: 4.5%; padding: .9em 2.6em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 1.8em; }
+.chev { position: absolute; left: 50%; bottom: 1.5%; transform: translateX(-50%); width: 3em; height: 3em; opacity: .6; }
+
+/* 4 · one question */
+.question { display: flex; flex-direction: column; justify-content: center; padding: 0 9%; background: #000; }
+.question h1 { font-size: 3.2em; font-weight: 600; letter-spacing: -.02em; color: var(--mute); margin-bottom: .9em; }
+.question button { text-align: left; font-size: 3.6em; font-weight: 600; letter-spacing: -.025em; padding: .42em 0; border-top: .03em solid #2c2c2e; transition: color .2s; }
+.question button:last-child { border-bottom: .03em solid #2c2c2e; }
+
+/* ---- a scene: the world, who's there, one line at a time ---- */
+.scene { cursor: pointer; }
+.say { position: absolute; left: 6%; right: 6%; bottom: 7%; display: flex; flex-direction: column; }
+.say .who { font-size: 1.5em; font-weight: 600; color: var(--mute); margin: 0 0 .5em .2em; }
+.bub { font-size: 2.1em; line-height: 1.3; padding: .7em .95em; border-radius: 1.1em; max-width: 88%; animation: in .25s ease-out; }
+.bub.them { align-self: flex-start; background: rgba(28,28,30,.9); -webkit-backdrop-filter: blur(1em); backdrop-filter: blur(1em); }
+.bub.me { align-self: flex-end; background: #fff; color: #000; }
+.bub.voice { align-self: flex-start; background: rgba(28,28,30,.75); font-style: italic; }
+.narr { font-size: 2em; line-height: 1.4; text-align: center; color: #e5e5ea; text-shadow: 0 .1em 1em #000; padding: 0 4%; animation: in .35s ease-out; }
+.phone { position: absolute; left: 7%; right: 7%; top: 9%; padding: 1em 1em 1.2em; border-radius: 2.2em; background: rgba(22,22,24,.9);
+  -webkit-backdrop-filter: blur(1.2em); backdrop-filter: blur(1.2em); display: flex; flex-direction: column; gap: .5em; }
+.phone[hidden] { display: none; }
+.phone .from { text-align: center; font-size: 1.4em; color: var(--mute); margin-bottom: .3em; }
+.phone .m { font-size: 1.85em; line-height: 1.3; padding: .5em .8em; border-radius: 1.1em; max-width: 82%; animation: in .25s ease-out; }
+.phone .m.in { align-self: flex-start; background: #3a3a3c; }
+.phone .m.out { align-self: flex-end; background: #0a84ff; }
+.choices { display: flex; flex-direction: column; gap: 1em; }
+.choices button { padding: 1em 1.2em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 2em; animation: in .3s ease-out; }
+@keyframes in { from { opacity: 0; transform: translateY(.6em); } }
+
+/* ---- the end ---- */
+.end { display: flex; flex-direction: column; justify-content: center; padding: 0 9%; background: #000; animation: in .5s ease-out; }
+.end h1 { font-size: 4.6em; font-weight: 700; letter-spacing: -.025em; }
+.end .lede { font-size: 2em; color: var(--mute); margin-top: .5em; }
+.end dl { margin-top: 3em; font-size: 1.7em; display: grid; grid-template-columns: auto 1fr; gap: .55em 1.2em; }
+.end dt { color: var(--mute); } .end dd { color: var(--fg); }
+.end .row { display: flex; gap: 1.2em; margin-top: 4em; }
+.round { width: 6.4em; height: 6.4em; border-radius: 50%; background: #1c1c1e; display: grid; place-items: center; }
+.round.main { background: #fff; color: #000; }
+.round svg { width: 2.8em; height: 2.8em; }
+
+/* ---- testing bar (hidden when a version is fixed in the link) ---- */
+#top { position: absolute; left: 0; right: 0; top: 0; z-index: 40; display: flex; justify-content: center; align-items: center; gap: .6em; padding: 1.4em 1.6em; pointer-events: none; }
+#top > * { pointer-events: auto; }
+#vsw { display: flex; align-items: center; gap: .2em; padding: .3em; border-radius: 3em; background: rgba(20,20,22,.78); -webkit-backdrop-filter: blur(1em); backdrop-filter: blur(1em); }
+#vsw button { height: 3.8em; min-width: 3.8em; border-radius: 2em; display: grid; place-items: center; }
+#vsw svg { width: 2em; height: 2em; }
+#vName { font-size: 1.5em; font-weight: 600; padding: 0 .6em; white-space: nowrap; }
+#vName small { color: var(--mute); font-weight: 500; margin-right: .4em; }
+#statBtn { position: absolute; right: 1.6em; width: 4.4em; height: 4.4em; border-radius: 50%; background: rgba(20,20,22,.78); display: grid; place-items: center; }
+#statBtn svg { width: 2.2em; height: 2.2em; }
+body.locked #top { display: none; }
+#stats { position: absolute; inset: 0; z-index: 50; background: #000; overflow-y: auto; padding: 8em 7% 6em; }
+#stats h2 { font-size: 2.6em; font-weight: 600; letter-spacing: -.02em; margin: 1.2em 0 .5em; }
+#stats h2:first-of-type { margin-top: 0; }
+#stats p { font-size: 1.6em; color: #d1d1d6; line-height: 1.55; }
+#stats p span { color: var(--mute); }
+#stats .close { position: absolute; right: 1.6em; top: 1.4em; }
+#stats .wipe { margin-top: 3em; font-size: 1.6em; color: var(--mute); text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="screen" class="screen"></div>
+  <header id="top">
+    <div id="vsw">
+      <button data-act="vprev" aria-label="Version précédente"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="vName" data-act="restart"></button>
+      <button data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <button id="statBtn" data-act="stats" aria-label="Résultats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+  </header>
+</div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const stage = $('#stage');
+function fit() {
+  const bw = document.body.clientWidth, bh = document.body.clientHeight;
+  const H = Math.min(bh, bw * 16 / 9), W = H * 9 / 16;
+  Object.assign(stage.style, { width: W + 'px', height: H + 'px', fontSize: H / 100 + 'px' });
+}
+addEventListener('resize', fit); fit();
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const sec = (ms) => (ms / 1000).toFixed(1).replace('.', ',') + ' s';
+const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// ---- lines: narration, someone on screen, you, a text, a voice off screen, a choice ([button, lines said after]) ----
+const N = (t) => ({ n: t });
+const O = (who, pose, t) => ({ o: who, pose, t });
+const T = (t) => ({ me: t });
+const S = (from, t) => ({ sms: t, from });
+const V = (who, t) => ({ v: who, t });
+const C = (...opts) => ({ c: opts });
+const CAST = { cam: ['Cam', 'cam'], julian: ['Julian', 'julian'], victor: ['Victor', 'suit'], maman: ['Maman', 'diane'] };
+
+// ---- the four tastes: each one written for what that taste comes for (the player is « toi », seen through their eyes) ----
+const ARCH = {
+  desir: { name: 'Le désir', color: '#ff5c8a', title: 'Interdite', hook: 'La blonde de ton meilleur ami te regarde comme ça depuis une heure.',
+    poster: [['cam', 'flirty', 56, 108, 9]], verb: 'Tomber pour quelqu’un',
+    lines: [
+      N('Samedi, 2 h. Le party de Max tire à sa fin.'),
+      O('cam', 'flirty', 'Max dort. Il s’endort toujours quand ça devient intéressant.'),
+      T('Cam… t’as bu.'),
+      O('cam', 'sip', 'Un peu. Assez pour te dire un truc.'),
+      O('cam', 'flirty', 'Au chalet, l’été passé. C’est toi que je voulais embrasser. Pas lui.'),
+      N('Derrière la porte de la chambre, quelqu’un se lève.'),
+      O('cam', 'worried', 'Dis quelque chose. Vite.'),
+      C(['Moi aussi.', [T('Moi aussi. Depuis le chalet.'), O('cam', 'flirty', 'Alors on a un problème.'), N('La poignée tourne.')]],
+        ['Va le rejoindre.', [T('Va le rejoindre, Cam.'), O('cam', 'awkward', 'Ok. Mais tu vas y penser toute la nuit.'), N('Elle a raison.')]]),
+    ] },
+  revanche: { name: 'La revanche', color: '#e8c25a', title: 'Regarde-moi bien', hook: 'Il y a un an, il a ri de toi devant 200 personnes. Ce soir, tu reviens.',
+    poster: [['julian', 'smirk', 50, 104, 8]], verb: 'Te venger',
+    lines: [
+      N('Gala Delorme. Un an plus tard.'),
+      O('julian', 'smirk', 'Wow. Je pensais pas qu’ils te laisseraient entrer.'),
+      T('Moi, je pensais pas que tu resterais.'),
+      O('julian', 'talk', 'C’est mon gala. Mes investisseurs. Ma compagnie.'),
+      N('Un homme en complet traverse la salle. Il ne regarde que toi.'),
+      O('victor', 'offer', 'Les papiers de l’achat. Il ne manque que votre signature.'),
+      O('julian', 'cold', '…Quel achat ?'),
+      C(['Lis-lui le contrat.', [T('Victor. Lis-lui le contrat.'), O('victor', 'listen', 'Acquisition complète de Delorme inc. Effective ce soir.'), O('julian', 'hands_up', 'C’est une blague.'), N('Deux cents têtes se tournent vers lui.')]],
+        ['Pas devant eux.', [T('On se reparle lundi, Julian.'), O('julian', 'cold', 'Lundi ?'), N('Tu le laisses avec la question. Toute la fin de semaine.')]]),
+    ] },
+  danger: { name: 'Le danger', color: '#ff453a', title: 'Ouvre pas', hook: '3 h 12. Un texto de ton propre numéro.',
+    poster: [], notif: ['Toi', 'Ouvre pas la porte.'], verb: 'Avoir peur',
+    lines: [
+      N('3 h 12. Ton cell vibre.'),
+      S('Toi', 'Ouvre pas la porte.'),
+      T('…C’est mon numéro.'),
+      N('On cogne. Trois coups. Lents.'),
+      V('Derrière la porte', 'C’est Léa. Ouvre, j’ai pu de batterie.'),
+      S('Toi', 'C’est pas elle.'),
+      V('Derrière la porte', 'S’il te plaît. Il fait froid.'),
+      C(['J’ouvre.', [T('J’arrive, Léa.'), N('La chaîne est encore mise. Par l’ouverture, tu vois son manteau. Trempé.'), N('Il ne pleut pas.')]],
+        ['Dis mon 2e nom.', [T('Léa. C’est quoi, mon deuxième nom ?'), N('Silence.'), S('Toi', 'Elle le sait pas. Moi oui.')]]),
+    ] },
+  etrange: { name: 'L’étrange', color: '#a78bfa', title: 'Personne se souvient', hook: 'Ce matin, ta sœur n’existe plus. Sauf pour toi.',
+    poster: [['isa_nuit', 'listen', 46, 100, 12, 'ghost']], verb: 'L’inexpliqué',
+    lines: [
+      N('Mardi, 7 h 40. La chambre d’Emma est vide. Pas rangée. Vide.'),
+      T('M’man ? Où sont les affaires d’Emma ?'),
+      O('maman', 'listen', 'Qui ?'),
+      T('Emma. Ta fille.'),
+      O('maman', 'thinking', 'Mon cœur… T’as jamais eu de sœur.'),
+      N('Ton cell vibre. Un vocal. Le numéro d’Emma.'),
+      V('Vocal · Emma', 'Dis rien. Regarde-la pas. Elle, c’est pas maman.'),
+      O('maman', 'listen', 'C’était qui ?'),
+      C(['Personne.', [T('Personne. Un faux numéro.'), O('maman', 'explaining', 'Montre-moi ton téléphone.'), N('Elle sourit. Elle a jamais souri comme ça.')]],
+        ['C’était Emma.', [T('C’était Emma.'), O('maman', 'angry', 'Il n’y a pas d’Emma.'), N('Les lumières de la cuisine s’éteignent. Toutes en même temps.')]]),
+    ] },
+};
+const KEYS = Object.keys(ARCH);
+
+// 5 · in the story: one opening for all, its first answer is the taste
+const X = 'Numéro inconnu';
+const INSIDE = [
+  N('3 h du matin. Ton cell vibre.'),
+  S(X, 'T’es réveillé ?'),
+  S(X, 'Faut que je te parle. Ce soir.'),
+  { c: [
+    ['Toi ? Enfin.', [S('me', 'Toi ? Enfin.'), S(X, 'C’est Cam.'), S(X, 'Max dort à côté de moi.'), S(X, 'Je pense au chalet. Encore.'),
+      C(['Moi aussi.', [S('me', 'Moi aussi.'), S(X, 'Viens. La porte est débarrée.')]], ['Cam. C’est Max.', [S('me', 'Cam. C’est mon meilleur ami.'), S(X, 'Je sais. C’est ça, le problème.')]])], 'desir'],
+    ['Qui t’a donné mon numéro ?', [S('me', 'Qui t’a donné mon numéro ?'), S(X, 'Regarde le numéro.'), N('C’est le tien.'), S(X, 'Ouvre pas la porte.'), N('On cogne. Trois coups.'),
+      C(['J’ouvre.', [N('Tu tournes la poignée.'), S(X, 'Je t’avais dit.')]], ['Qui est là ?', [T('Qui est là ?'), N('Personne répond. Mais quelqu’un respire.')]])], 'danger'],
+    ['Julian ? T’as du culot.', [S('me', 'Julian ? T’as du culot.'), S(X, 'Pas Julian. Quelqu’un qui le déteste autant que toi.'), S(X, 'Il vend sa compagnie demain.'), S(X, 'Je peux la mettre à ton nom.'),
+      C(['Pourquoi moi ?', [S('me', 'Pourquoi moi ?'), S(X, 'Parce qu’il a ri de toi. Devant tout le monde.')]], ['Combien ?', [S('me', 'Combien ?'), S(X, 'Rien. Je veux juste être là quand il va l’apprendre.')]])], 'revanche'],
+    ['Ce numéro existe plus.', [S('me', 'Ce numéro existe plus.'), S(X, 'Je sais.'), S(X, 'C’était le mien.'), S(X, 'Emma. Ta sœur. Tu te souviens de moi ?'),
+      C(['Évidemment.', [S('me', 'Évidemment. T’es où ?'), S(X, 'Dans ta chambre. Derrière toi.')]], ['J’ai pas de sœur.', [S('me', 'J’ai pas de sœur.'), S(X, 'Alors toi aussi, tu m’as oubliée.')]])], 'etrange'],
+  ] },
+];
+
+// ---- drawing a world ----
+const spr = (sprite, pose, x, h, top, cls = '') => `<img class="spr ${cls}" src="chars/${sprite}/${pose}.webp" alt="" style="left:${x}%;height:${h}%;top:${top}%">`;
+function art(k, withNotif) {
+  const a = ARCH[k];
+  return `<div class="art a-${k}"><div class="bg"></div>${k === 'danger' ? '<div class="door"></div>' : ''}
+    ${(a?.poster || []).map(([s, p, x, h, t, c]) => spr(s, p, x, h, t, c)).join('')}
+    ${withNotif && a?.notif ? `<div class="notif"><i></i><div><b>${esc(a.notif[0])}</b><span>${esc(a.notif[1])}</span></div></div>` : ''}</div>`;
+}
+const poster = (k) => `<div class="poster" data-k="${k}">${art(k, true)}<div class="shade"></div><div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div></div>`;
+
+// ---- the versions: each one changes only HOW the taste is picked; the openings after are the same ----
+const VERSIONS = [
+  { id: 'grille', name: 'Grille', draw: drawGrid },
+  { id: 'duel', name: 'Duel', draw: drawDuel },
+  { id: 'fil', name: 'Fil', draw: drawFeed },
+  { id: 'question', name: 'Une question', draw: drawQuestion },
+  { id: 'dedans', name: 'Dans l’histoire', draw: drawInside },
+];
+const ARGS = new URLSearchParams(location.search);
+// ?v=2 (or ?v=duel): that version only, no testing bar, no numbers at the end (the link for strangers)
+const FIXED = ARGS.get('v') ? VERSIONS.findIndex((v, i) => v.id === ARGS.get('v') || String(i + 1) === ARGS.get('v')) : -1;
+const LOCKED = FIXED >= 0;
+if (LOCKED) document.body.classList.add('locked');
+let vi = LOCKED ? FIXED : (() => { try { return +localStorage.getItem('smt-onb-v') || 0; } catch { return 0; } })();
+let run = null, timers = [];
+const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+const stopTimers = () => { timers.forEach(clearTimeout); timers = []; };
+
+// ---- what each run measured (this browser only) ----
+const RUNS = (() => { try { return JSON.parse(localStorage.getItem('smt-onb') || '[]'); } catch { return []; } })();
+const save = () => { try { localStorage.setItem('smt-onb', JSON.stringify(RUNS.slice(-500))); } catch { /* private window */ } };
+
+function start(i = vi) {
+  stopTimers(); vi = (i + VERSIONS.length) % VERSIONS.length;
+  try { localStorage.setItem('smt-onb-v', vi); } catch {}
+  const v = VERSIONS[vi];
+  $('#vName').innerHTML = `<small>${vi + 1}</small>${esc(v.name)}`;
+  // a stranger's run counts as soon as it's shown (the funnel); mine only once I pick (switching versions isn't a try)
+  run = { v: v.id, at: Date.now(), t0: performance.now() };
+  if (LOCKED) { RUNS.push(run); save(); }
+  const box = $('#screen'); box.className = 'screen'; box.innerHTML = ''; box.onclick = null; box.style.opacity = '';
+  const go = location.hash.match(/^#go=(\w+)/);   // #go=desir&at=4: straight into an opening (to check a line)
+  if (go && ARCH[go[1]]) { picked(go[1]); return scene(go[1], ARCH[go[1]].lines); }
+  v.draw(box);
+}
+function picked(k) {
+  if (run.k) return;
+  run.k = k; run.pick = Math.round(performance.now() - run.t0);
+  if (!RUNS.includes(run)) RUNS.push(run);
+  save();
+}
+
+// a poster grows to fill the screen, then its opening starts
+function grow(el, then) {
+  const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+  const c = el.cloneNode(true); c.classList.add('grow'); c.style.border = '0';
+  Object.assign(c.style, { left: r.left - s.left + 'px', top: r.top - s.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  stage.append(c); c.getBoundingClientRect();
+  Object.assign(c.style, { left: '0px', top: '0px', width: s.width + 'px', height: s.height + 'px' });
+  setTimeout(() => { then(); c.remove(); }, 400);
+}
+const choose = (el) => { const k = el.dataset.k; picked(k); grow(el, () => scene(k, ARCH[k].lines)); };
+
+// 1 · the four at once
+function drawGrid(box) {
+  box.className = 'screen grid'; run.order = shuffle(KEYS);
+  box.innerHTML = run.order.map(poster).join('');
+  $$('.poster', box).forEach((p) => p.onclick = () => choose(p));
+}
+// 2 · two, bigger; ↻ shows the other two
+function drawDuel(box) {
+  box.className = 'screen duel'; run.rerolls = 0;
+  const pairs = [shuffle(['desir', 'danger']), shuffle(['revanche', 'etrange'])];
+  let p = 0;
+  const draw = () => {
+    box.innerHTML = pairs[p].map(poster).join('') + `<button class="reroll" aria-label="Deux autres"><svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    $$('.poster', box).forEach((el) => el.onclick = () => choose(el));
+    $('.reroll', box).onclick = () => { run.rerolls++; save(); p = 1 - p; draw(); };
+  };
+  draw();
+}
+// 3 · one at a time, full screen, it plays by itself; swipe for the next
+function drawFeed(box) {
+  run.order = shuffle(KEYS); run.dwell = {};
+  box.innerHTML = `<div class="feed">${run.order.map((k, i) => `<div class="poster" data-k="${k}">${art(k, false)}<div class="shade"></div><div class="fline"></div>
+    <div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div><button class="go">Jouer</button>
+    ${i === 0 ? '<svg class="chev" viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}</div>`).join('')}</div>`;
+  let cur = null, since = 0, loop = null;
+  const leave = () => { if (cur) run.dwell[cur.dataset.k] = (run.dwell[cur.dataset.k] || 0) + Math.round(performance.now() - since); clearInterval(loop); };
+  const enter = (el) => {
+    leave(); cur = el; since = performance.now();
+    const said = ARCH[el.dataset.k].lines.filter((l) => !l.c).slice(0, 4);
+    let i = 0; const f = $('.fline', el);
+    const next = () => { f.innerHTML = lineHtml(said[i % said.length], true); i++; };
+    next(); loop = setInterval(next, 2000); timers.push(loop);
+  };
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) enter(e.target); }), { root: $('.feed', box), threshold: .6 });
+  $$('.poster', box).forEach((el) => { io.observe(el); el.onclick = () => { leave(); cur = null; io.disconnect(); save(); choose(el); }; });
+}
+// 4 · the feeling, in words, nothing else
+function drawQuestion(box) {
+  box.className = 'screen question'; run.order = shuffle(KEYS);
+  box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${esc(ARCH[k].verb)}</button>`).join('')}`;
+  $$('button', box).forEach((b) => b.onclick = () => {
+    const k = b.dataset.k; b.style.color = ARCH[k].color; picked(k);
+    setTimeout(() => { box.style.transition = 'opacity .3s'; box.style.opacity = 0; setTimeout(() => { box.style.opacity = ''; scene(k, ARCH[k].lines); }, 300); }, 250);
+  });
+}
+// 5 · no poster: the story starts, its first answer says the taste
+function drawInside(box) { scene('nuit', INSIDE); }
+
+// ---- an opening: tap to go on ----
+function lineHtml(l, small) {
+  if (l.n) return `<div class="narr">${esc(l.n)}</div>`;
+  if (l.me) return `<div class="bub me">${esc(l.me)}</div>`;
+  if (l.o) return `<div class="who">${esc(CAST[l.o][0])}</div><div class="bub them">${esc(l.t)}</div>`;
+  if (l.v) return `<div class="who">${esc(l.v)}</div><div class="bub voice">${esc(l.t)}</div>`;
+  if (l.sms && small) return `<div class="who">${esc(l.from)}</div><div class="bub them">${esc(l.sms)}</div>`;
+  return '';
+}
+function scene(k, lines) {
+  stopTimers();
+  const box = $('#screen'); box.className = 'screen scene';
+  box.innerHTML = `${art(k === 'nuit' ? 'nuit' : k, false).replace(/<img[^>]*>/g, '')}<div class="cast"></div><div class="phone" hidden></div><div class="say"></div>`;
+  if (k === 'nuit') box.firstElementChild.className = 'art a-nuit';
+  const q = [...lines], on = {}, order = [];
+  let thread = null, waiting = false;
+  const castBox = $('.cast', box), say = $('.say', box), phone = $('.phone', box);
+  // who's there, kept from line to line (one in the middle, two side by side); whoever isn't talking is dimmed
+  const drawCast = (speaker) => order.forEach((w, i) => {
+    let im = $(`[data-w="${w}"]`, castBox);
+    if (!im) { castBox.insertAdjacentHTML('beforeend', spr(CAST[w][1], on[w], 50, 92, 12)); im = castBox.lastElementChild; im.dataset.w = w; }
+    const src = `chars/${CAST[w][1]}/${on[w]}.webp`;
+    if (!im.src.endsWith(src)) im.src = src;
+    const two = order.length > 1;
+    Object.assign(im.style, { left: (two ? (i ? 72 : 28) : 50) + '%', height: (two ? 84 : 92) + '%', top: (two ? 18 : 12) + '%' });
+    im.style.filter = speaker && w !== speaker ? 'brightness(.5)' : '';
+  });
+  const sms = (l) => {
+    phone.hidden = false;
+    if (l.from !== 'me' && l.from !== thread) { thread = l.from; phone.innerHTML = `<div class="from">${esc(thread)}</div>`; }
+    phone.insertAdjacentHTML('beforeend', `<div class="m ${l.from === 'me' ? 'out' : 'in'}">${esc(l.sms)}</div>`);
+    const ms = $$('.m', phone); if (ms.length > 4) ms[0].remove();
+  };
+  const next = () => {
+    if (waiting) return;
+    const l = q.shift();
+    if (!l) return end();
+    if (l.o) { if (!on[l.o]) order.push(l.o); on[l.o] = l.pose; drawCast(l.o); } else if (order.length) drawCast(null);
+    if (l.sms) { sms(l); say.innerHTML = ''; return; }
+    if (l.c) {
+      waiting = true; run.atChoice = Math.round(performance.now() - run.t0); save();
+      say.innerHTML = `<div class="choices">${l.c.map(([t], i) => `<button data-i="${i}">${esc(t)}</button>`).join('')}</div>`;
+      $$('.choices button', say).forEach((b) => b.onclick = (e) => {
+        e.stopPropagation(); const [t, after, taste] = l.c[+b.dataset.i];
+        if (taste) picked(taste); else { run.choice = t; save(); }
+        q.unshift(...after); waiting = false; next();
+      });
+      return;
+    }
+    say.innerHTML = lineHtml(l);
+  };
+  box.onclick = next;
+  const jump = location.hash.match(/at=(\d+)/);
+  next(); if (jump) for (let i = 0; i < +jump[1]; i++) next();
+}
+
+// ---- the end: what this run measured ----
+function end() {
+  stopTimers(); run.done = Math.round(performance.now() - run.t0); save();
+  const a = ARCH[run.k], box = $('#screen'); box.onclick = null;
+  box.className = 'screen end';
+  const rows = [['Choisi en', sec(run.pick)]];
+  if (run.rerolls) rows.push(['↻', run.rerolls + ' fois']);
+  if (run.dwell) rows.push(['Regardé', run.order.filter((k) => run.dwell[k]).map((k) => `${ARCH[k].title} ${sec(run.dwell[k])}`).join(' · ')]);
+  if (run.choice) rows.push(['Son choix', run.choice]);
+  rows.push(['En tout', sec(run.done)]);
+  box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">La suite arrive.</div>
+    ${LOCKED ? '' : `<dl>${rows.map(([t, d]) => `<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl>`}
+    <div class="row"><button class="round" data-act="restart" aria-label="Recommencer"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4v4.5H9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    ${LOCKED ? '' : `<button class="round main" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}</div>`;
+}
+
+// ---- results, per version ----
+function stats() {
+  const med = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
+  const body = VERSIONS.map((v) => {
+    const r = RUNS.filter((x) => x.v === v.id), p = r.filter((x) => x.k), d = r.filter((x) => x.done);
+    if (!r.length) return `<h2>${esc(v.name)}</h2><p><span>Pas encore joué.</span></p>`;
+    const by = KEYS.map((k) => `${ARCH[k].name} ${p.filter((x) => x.k === k).length}`).join(' · ');
+    const m = med(p.map((x) => x.pick));
+    return `<h2>${esc(v.name)}</h2><p>${r.length} essai${r.length > 1 ? 's' : ''} · ${p.length} choisi${p.length > 1 ? 's' : ''} · ${d.length} jusqu’au bout<br>
+      <span>Temps pour choisir (médiane)</span> ${m === null ? '·' : sec(m)}<br><span>Choix</span> ${by}</p>`;
+  }).join('');
+  stage.insertAdjacentHTML('beforeend', `<div id="stats"><button class="round close" data-act="unstats" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    ${body}<button class="wipe" data-act="wipe">Effacer les résultats</button></div>`);
+}
+
+stage.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  e.stopPropagation();
+  ({ vprev: () => start(vi - 1), vnext: () => start(vi + 1), restart: () => start(vi), stats,
+    unstats: () => $('#stats').remove(), wipe: () => { RUNS.length = 0; save(); $('#stats').remove(); stats(); } })[b.dataset.act]();
+}, true);
+// preload the faces so a scene never waits on an image
+for (const k of KEYS) for (const l of ARCH[k].lines.flatMap((l) => l.c ? [l, ...l.c.flatMap((o) => o[1])] : [l])) if (l.o) new Image().src = `chars/${CAST[l.o][1]}/${l.pose}.webp`;
+start();
+</script>
+</body>
+</html>
