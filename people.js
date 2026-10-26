@@ -7,8 +7,10 @@
 // The relay for everything live (rooms too): HiveMQ's public one. EMQX's (broker.emqx.io), used until 25/10, stopped
 // answering (the socket opens, the broker never acknowledges).
 window.BROKER = 'wss://broker.hivemq.com:8884/mqtt';
+// every topic lives under NS; a test sets localStorage smt-ns to a channel of its own, so it never meets real phones
+window.NS = (() => { try { return localStorage.getItem('smt-ns') || 'sousmontoit/v1'; } catch { return 'sousmontoit/v1'; } })();
 window.PEOPLE = (() => {
-  const ROOT = 'sousmontoit/v1';
+  const ROOT = NS;
   const people = new Map();   // id -> {id, n, ch, t, s, room}
   let client = null, myId = null, mine = () => ({}), onChange = () => {}, onInvite = () => {};
   function here() {

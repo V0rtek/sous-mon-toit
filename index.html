@@ -2049,7 +2049,7 @@ const myId = (() => {
   const fresh = () => Math.random().toString(36).slice(2, 10);
   try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
 })();
-const topic = () => `sousmontoit/v1/${room}`;
+const topic = () => `${NS}/${room}`;
 function loadScript(src) {
   return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
 }
@@ -2078,7 +2078,7 @@ function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share();
 // no QR needed for a 2-player story: an open waiting room is announced under sousmontoit/v1/open/<room> with the names
 // of everyone in it (refreshed every 10 s, cleared when it closes or the phone drops). Every other phone's menu shows it
 // as a green dot + those names on that story's tile; tapping the tile joins that room
-const OPEN = 'sousmontoit/v1/open';
+const OPEN = `${NS}/open`;
 const rooms = new Map();   // room -> its last announcement {room, s, n: [names], t}
 const roomFor = (s) => [...rooms.values()].filter((r) => r.room !== room && r.s === s && Date.now() - r.t < 30000).sort((a, b) => b.t - a.t)[0];
 function announce(on) {
