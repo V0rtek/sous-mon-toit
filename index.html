@@ -107,14 +107,12 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 @keyframes blink { 50% { opacity: .35; } }
 #intro { position: absolute; inset: 0; z-index: 36; --c: #ff9a4d; background: radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--c) 28%, #000), #000 72%); color: #fff; overflow: hidden; opacity: 1; transition: opacity .9s; cursor: pointer; }
 #intro[hidden] { display: none; }
-#intro .ep-glow { background: radial-gradient(color-mix(in srgb, var(--c) 55%, transparent), transparent 65%); }
-#intro .ep-rays { background: repeating-conic-gradient(color-mix(in srgb, var(--c) 30%, transparent) 0 3deg, transparent 3deg 15deg); -webkit-mask: radial-gradient(closest-side, #000 15%, transparent 72%); mask: radial-gradient(closest-side, #000 15%, transparent 72%); }
-.in-kick { position: absolute; left: 0; right: 0; top: 11%; text-align: center; font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: .7em; text-indent: .7em; color: rgba(255,255,255,.8); opacity: 0; transition: opacity .8s, letter-spacing 1.4s ease-out, text-indent 1.4s ease-out; }
-.in .in-kick { opacity: 1; letter-spacing: .32em; text-indent: .32em; }
-.in-fig { position: absolute; left: 50%; bottom: 17%; height: 60%; opacity: 0; transform: translateX(-50%) translateY(4em) scale(.92); filter: brightness(0) drop-shadow(0 0 1.6em var(--c)); transition: opacity .7s, filter 1s ease-in, transform 1.6s ease-out; }
+/* who you play: shown, not won. No rays, flash or silhouette (those are the episode's "you won" reveal) */
+.in-kick { position: absolute; left: 0; right: 0; top: 11%; text-align: center; font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: .32em; text-indent: .32em; color: rgba(255,255,255,.8); opacity: 0; transition: opacity .8s; }
+.in .in-kick { opacity: 1; }
+.in-fig { position: absolute; left: 50%; bottom: 17%; height: 60%; opacity: 0; transform: translateX(-50%) translateY(1.5em); transition: opacity .8s, transform 1.2s ease-out; }
 .rise .in-fig { opacity: 1; transform: translateX(-50%); }
-.burst .in-fig { filter: brightness(1) drop-shadow(0 0 2.2em color-mix(in srgb, var(--c) 70%, transparent)); transform: translateX(-50%) scale(1.03); transition: opacity .4s, filter .6s ease-out, transform 1.2s cubic-bezier(.2,.9,.25,1.15); }
-.in-name { position: absolute; left: 0; right: 0; bottom: 5%; text-align: center; font-family: var(--display); font-size: 8em; line-height: 1.1; opacity: 0; transform: translateY(1.2em) scale(.9); text-shadow: 0 .05em .5em color-mix(in srgb, var(--c) 60%, transparent); transition: opacity .6s, transform .8s cubic-bezier(.2,.9,.25,1.2); }
+.in-name { position: absolute; left: 0; right: 0; bottom: 5%; text-align: center; font-family: var(--display); font-size: 8em; line-height: 1.1; opacity: 0; transform: translateY(.4em); transition: opacity .8s, transform .8s ease-out; }
 .named .in-name { opacity: 1; transform: none; }
 #black { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 1s; }
 
@@ -552,14 +550,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025201420"></script>
-<script src="story.js?v=20261025201420"></script>
-<script src="play.js?v=20261025201420"></script>
-<script src="bar.js?v=20261025201420"></script>
-<script src="games.js?v=20261025201420"></script>
-<script src="gen.js?v=20261025201420"></script>
-<script src="demos.js?v=20261025201420"></script>
-<script src="episodes.js?v=20261025201420"></script>
+<script src="chars.js?v=20261025202218"></script>
+<script src="story.js?v=20261025202218"></script>
+<script src="play.js?v=20261025202218"></script>
+<script src="bar.js?v=20261025202218"></script>
+<script src="games.js?v=20261025202218"></script>
+<script src="gen.js?v=20261025202218"></script>
+<script src="demos.js?v=20261025202218"></script>
+<script src="episodes.js?v=20261025202218"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1450,13 +1448,13 @@ async function introCard(who, at) {
   const img = new Image(); img.src = poseSrc(who, 'listen'); img.className = 'in-fig';
   const name = fill(castOf(who).name || ''), box = $('#intro');
   box.className = ''; box.style.setProperty('--c', castOf(who).color || '#ff9a4d');
-  box.innerHTML = `<div class="ep-rays"></div><div class="ep-glow"></div><div class="in-kick">${ui('you')}</div><div class="ep-ring"></div><div class="ep-sparks">${sparks()}</div><div class="ep-flash"></div><div class="in-name">${name}</div>`;
-  box.insertBefore(img, $('.ep-ring', box));
+  box.innerHTML = `<div class="in-kick">${ui('you')}</div><div class="in-name">${name}</div>`;
+  box.insertBefore(img, $('.in-name', box));
   await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
   if (run !== at) return;
   box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
-  const timers = [[150, 'in'], [650, 'in rise'], [1900, 'in rise burst'], [2500, 'in rise burst named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
-  await new Promise((ok) => { const t = setTimeout(ok, 4200); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
+  const timers = [[150, 'in'], [500, 'in rise'], [1100, 'in rise named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
+  await new Promise((ok) => { const t = setTimeout(ok, 3200); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
   timers.forEach(clearTimeout); box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
   await sleep(950); box.hidden = true;
 }
@@ -1600,11 +1598,21 @@ function takeSeat(k, id, n) {
 }
 // Full demo's Play on a real story (index.html#open=bar): its waiting room once the name is in; its ‹ goes back there.
 // #open=histoire: the story writer, #open=perso: a new character (Full demo's + tab sends you there)
-let openAfterName = null, fromDemo = false;
+// #open=id&in=Nico: you joined a room someone's already in (simulated, like "Ouvrir au public"): they hold the last
+// character(s), you take a free one and it starts
+let openAfterName = null, fromDemo = false, joinIn = null;
 function openFromDemo(id) {
   if (id === 'histoire') { $('#genMsg').textContent = ''; show('#genScreen'); }
   else if (id === 'perso') { ncStep(1); show('#newChar'); }
-  else openWait(id);
+  else {
+    openWait(id);
+    if (joinIn && waitRoom) {
+      const free = seatsOf().filter((k) => !state.seats[k]);
+      joinIn.slice(0, free.length - 1).forEach((n, i) => { state.seats[free[free.length - 1 - i]] = { id: BOT, n }; });
+      renderWait(); share();
+    }
+    joinIn = null;
+  }
 }
 $('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1931,7 +1939,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025201420';
+const BUILD = '20261025202218';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -1988,7 +1996,8 @@ function countEyes() {
   $('#eyes span').textContent = watchers.size;
   $('#eyes').hidden = !watchers.size;
   let changed = false;
-  if (waitRoom) for (const k of seatsOf()) { const s = state.seats[k]; if (s && s.id !== myId && !watchers.has(s.id)) { delete state.seats[k]; changed = true; } }
+  // a phone that left frees its character; the bot (Jouer seul, a simulated friend or stranger) is never a phone
+  if (waitRoom) for (const k of seatsOf()) { const s = state.seats[k]; if (s && s.id !== myId && s.id !== BOT && !watchers.has(s.id)) { delete state.seats[k]; changed = true; } }
   if (changed) renderWait();
   if (split) for (const g of Object.values(split.ghosts)) autoGhost(g);   // a player left in the middle of his scene
   const now2 = [...watchers.values()].map((w) => w.n).join('|');
@@ -2168,9 +2177,10 @@ if (PREVIEW) {
 } else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
-  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?$/);
+  const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?$/);
   if (o && o[2]) resumeEp = +o[2];
   if (o && o[3]) withFriend = decodeURIComponent(o[3]);
+  if (o && o[4]) joinIn = decodeURIComponent(o[4]).split(',').filter(Boolean);
   if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire' || o[1] === 'perso')) {
     openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
     if (screen === '#hub') { openAfterName = null; openFromDemo(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();
