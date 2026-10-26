@@ -177,9 +177,12 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .wr-opts { display: flex; gap: 1em; margin-top: 2em; }
 .wr-opts button { flex: 1; font: inherit; font-size: 1.75em; font-weight: 700; padding: .85em .3em; border-radius: 1.4em; border: 0; background: #2c2c2e; color: #fff; cursor: pointer; }
 .wr-opts button:first-child { background: #f5f5f7; color: #000; }
+.wr-opts button.wr-cancel { flex: none; margin: 0 auto; padding: .85em 2.6em; background: #2c2c2e; color: #fff; }
 /* who to invite: a row of heads (their character), the name under, a dot when they're online */
-.wr-friends { display: flex; gap: 1.6em; justify-content: center; flex-wrap: wrap; margin-top: 2em; }
-.wr-friends button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: .5em; width: 9em; background: none; border: 0; padding: 0; color: #fff; cursor: pointer; }
+.wr-friends { display: flex; gap: 1.6em; overflow-x: auto; margin: 2.4em -5.5% 0; padding: 0 5.5%; scrollbar-width: none; overscroll-behavior-x: contain; }
+.wr-friends::-webkit-scrollbar { display: none; }
+.wr-friends > :first-child { margin-left: auto; } .wr-friends > :last-child { margin-right: auto; }   /* centred while they fit */
+.wr-friends button { flex: none; font: inherit; display: flex; flex-direction: column; align-items: center; gap: .5em; width: 9em; background: none; border: 0; padding: 0; color: #fff; cursor: pointer; }
 .wr-head { position: relative; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; }
 .wr-head > span { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
 .wr-head img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(2.4); transform-origin: 50% 8%; }
@@ -330,11 +333,10 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 /* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
 #menuBtn { position: absolute; right: 4%; bottom: 2.2%; z-index: 30; font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(15,12,20,.45); display: grid; place-items: center; cursor: pointer; padding: 0; opacity: .7; }
 #menuBtn svg { width: 2.8em; height: 2.8em; }
-#menuPop { position: absolute; right: 4%; bottom: calc(2.2% + 7.2em); z-index: 31; min-width: 26em; padding: .6em; border-radius: 2em; background: rgba(28,28,30,.94); -webkit-backdrop-filter: blur(1.5em); backdrop-filter: blur(1.5em); display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+#menuPop { position: absolute; right: 4%; bottom: calc(2.2% + 7.2em); z-index: 31; display: flex; flex-direction: column; gap: 1.2em; }
 #menuPop[hidden], #menuPop button[hidden] { display: none; }
-#menuPop button { font: inherit; font-size: 2.1em; font-weight: 600; color: #f5f5f7; background: none; border: 0; text-align: left; padding: .75em .9em; cursor: pointer; }
-#menuPop button + button { border-top: .05em solid rgba(255,255,255,.1); }
-#menuPop [data-m="quit"] { color: #ff453a; }
+#menuPop button { font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(28,28,30,.92); display: grid; place-items: center; cursor: pointer; padding: 0; }
+#menuPop svg { width: 2.8em; height: 2.8em; }
 body.preview #menuBtn, body.preview #menuPop { display: none !important; }
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -579,15 +581,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261025212445"></script>
-<script src="story.js?v=20261025212445"></script>
-<script src="play.js?v=20261025212445"></script>
-<script src="bar.js?v=20261025212445"></script>
-<script src="games.js?v=20261025212445"></script>
-<script src="gen.js?v=20261025212445"></script>
-<script src="demos.js?v=20261025212445"></script>
-<script src="episodes.js?v=20261025212445"></script>
-<script src="people.js?v=20261025212445"></script>
+<script src="chars.js?v=20261025213234"></script>
+<script src="story.js?v=20261025213234"></script>
+<script src="play.js?v=20261025213234"></script>
+<script src="bar.js?v=20261025213234"></script>
+<script src="games.js?v=20261025213234"></script>
+<script src="gen.js?v=20261025213234"></script>
+<script src="demos.js?v=20261025213234"></script>
+<script src="episodes.js?v=20261025213234"></script>
+<script src="people.js?v=20261025213234"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1519,7 +1521,7 @@ function begin(id = state.story) {
 function toHub() {
   halt(); show('#hub');
   if (waitRoom) announce(false);
-  waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; withFriendTo = null; invite = null; friendsOpen = false;
+  waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; withFriendTo = null; invite = null;
 }
 
 // ---- a 2-player story's waiting room: a dot over each character, red = free, green = taken (the name above it).
@@ -1530,14 +1532,14 @@ function openWait(id, own = false) {
   // another phone's waiting room for this story is open: join it instead of opening a second one
   const other = !own && roomFor(id);
   if (other) { joinRoom(other.room); return; }
-  halt(); state.story = id; waitRoom = true; state.seats = {}; invite = null; friendsOpen = false; clearTimeout(callFor.t); game = null; tape = []; renderWait(); share(); announce(true);
+  halt(); state.story = id; waitRoom = true; state.seats = {}; invite = null; clearTimeout(callFor.t); game = null; tape = []; renderWait(); share(); announce(true);
 }
 // ---- a 2-player story's waiting room: you pick your character (the pose that sums them up, one line of them); for the
 // other one, invite a friend, open it to anyone or play alone (it plays itself: random choices). It starts once both are
 // taken. Real players join by the code / QR or a real invite; Léa, Max, Sam and the strangers are simulated ----
 const SIM_FRIENDS = [{ n: 'Léa', ch: 'mila' }, { n: 'Max', ch: 'ninja' }, { n: 'Sam', ch: 'belier_blanc' }], SIM_STRANGERS = ['Nico', 'Zoé', 'Malik', 'Jade', 'Hugo'];
 let invite = null;   // the host's call for the other seat: { seat, kind: 'friend' | 'public', n, to: a real friend's id }
-let friendsOpen = false, friendsKey = '';   // "Inviter un ami" tapped: the row of friends shows; who was in it
+let friendsKey = '';   // who was in the row of friends (under the buttons, always there while the other seat is free)
 // who you can invite: everyone with the app open on another device (their invite rings there), then Léa, Max, Sam
 const friendsNow = () => [...(window.PEOPLE ? PEOPLE.online() : []).map((p) => ({ n: p.n, ch: p.ch, to: p.id })), ...SIM_FRIENDS];
 // a head: their character's face (their initial when it isn't one this phone has), a dot = online
@@ -1564,8 +1566,9 @@ function renderWait() {
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats">${seats.map(card).join('')}</div>
-    ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="friend">Inviter un ami</button><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
-    ${friendsOpen && host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
+    ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
+    ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
+    ${host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
@@ -1576,16 +1579,16 @@ function renderWait() {
   const list = friendsNow(); friendsKey = list.map((f) => f.to || f.n).join('|');
   document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = seatsOf().find((j) => !state.seats[j]), f = list[+b.dataset.f];
-    if (k && f) { friendsOpen = false; callFor(k, 'friend', f.n, f.to); }
+    if (k && f) callFor(k, 'friend', f.n, f.to);
   });
 }
 // someone came or went on another device: redraw the row of friends (only then, so a tap never lands on a redraw)
 function peopleChanged() {
-  if (screen === '#wait' && friendsOpen && friendsNow().map((f) => f.to || f.n).join('|') !== friendsKey) renderWait();
+  if (screen === '#wait' && friendsNow().map((f) => f.to || f.n).join('|') !== friendsKey) renderWait();
 }
 function otherSeat(o) {
   const k = seatsOf().find((j) => !state.seats[j]); if (!k) return;
-  if (o === 'friend') { friendsOpen = !friendsOpen; renderWait(); return; }
+  if (o === 'cancel') { clearTimeout(callFor.t); invite = null; renderWait(); return; }   // nobody came yet: the seat is free again
   if (o === 'public') { callFor(k, 'public', SIM_STRANGERS[Math.floor(Math.random() * SIM_STRANGERS.length)]); return; }
   state.seats[k] = { id: BOT, n: seatLabel(k) }; renderWait(); share(); startWhenFull();   // alone: the other one plays itself
 }
@@ -1828,11 +1831,19 @@ $('#back').onclick = (e) => {
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
 // only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
 const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).includes('"episode"');
+// icons, no words (the words stay as their labels): the sound shows how it is now, a tap switches it
+const SPEAKER = '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="#fff"/>';
+const MENU_ICON = {
+  on: `${SPEAKER}<path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+  off: `${SPEAKER}<path d="m15.5 9.5 5 5m0-5-5 5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+  again: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M4.5 3.8v4.6h4.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  quit: '<path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14" fill="none" stroke="#ff453a" stroke-width="2.2" stroke-linecap="round"/><path d="m9.5 8-4 4 4 4M5.5 12H15" fill="none" stroke="#ff453a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+};
 function paintMenu() {
-  $('#menuPop [data-m="sound"]').textContent = ui(muted ? 'unmute' : 'mute');
-  const again = $('#menuPop [data-m="again"]');
-  again.hidden = ROLE !== 'host'; again.textContent = ui(hasEps(state.story) ? 'restartEp' : 'restart');
-  $('#menuPop [data-m="quit"]').textContent = ui('quit');
+  const set = (m, icon, label) => { const b = $(`#menuPop [data-m="${m}"]`); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICON[icon]}</svg>`; b.setAttribute('aria-label', label); return b; };
+  set('sound', muted ? 'off' : 'on', ui(muted ? 'unmute' : 'mute'));
+  set('again', 'again', ui(hasEps(state.story) ? 'restartEp' : 'restart')).hidden = ROLE !== 'host';
+  set('quit', 'quit', ui('quit'));
 }
 // the episode you're in: the last one whose first tap is behind you (Last call's episodeAt); none = the story from its start
 function restartEpisode() {
@@ -2037,7 +2048,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261025212445';
+const BUILD = '20261025213234';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
