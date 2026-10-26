@@ -404,7 +404,7 @@ function drawFeed(box) {
 }
 // 4 · the feeling, in words, nothing else
 function drawQuestion(box) {
-  box.className = 'screen question'; run.order = shuffle(KEYS);
+  box.className = 'screen question'; run.order = ['revanche', 'desir', 'etrange', 'danger'];   // Justin's order (26/10), not shuffled
   box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${art(k, false, 'row')}<b>${esc(ARCH[k].verb)}</b></button>`).join('')}`;
   $$('button', box).forEach((b) => b.onclick = () => {
     const k = b.dataset.k; $('b', b).style.color = ARCH[k].color; picked(k);
