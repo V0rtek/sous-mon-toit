@@ -88,11 +88,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .feed .go { position: absolute; left: 7%; bottom: 4.5%; padding: .9em 2.6em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 1.8em; }
 .chev { position: absolute; left: 50%; bottom: 1.5%; transform: translateX(-50%); width: 3em; height: 3em; opacity: .6; }
 
-/* 4 · one question */
-.question { display: flex; flex-direction: column; justify-content: center; padding: 0 9%; background: #000; }
-.question h1 { font-size: 3.2em; font-weight: 600; letter-spacing: -.02em; color: var(--mute); margin-bottom: .9em; }
-.question button { text-align: left; font-size: 3.6em; font-weight: 600; letter-spacing: -.025em; padding: .42em 0; border-top: .03em solid #2c2c2e; transition: color .2s; }
-.question button:last-child { border-bottom: .03em solid #2c2c2e; }
+/* 4 · one question: each answer is a strip of its world, black on the words' side */
+.question { display: flex; flex-direction: column; justify-content: center; background: #000; }
+.question h1 { font-size: 3.2em; font-weight: 600; letter-spacing: -.02em; color: var(--mute); margin: 0 7% .8em; }
+.question button { position: relative; height: 16em; overflow: hidden; text-align: left; padding: 0 7%; border-top: .25em solid #000; }
+.question button .art { left: 32%; }
+.question button::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 30%, rgba(0,0,0,.55) 52%, transparent 78%); }
+.question button b { position: relative; z-index: 1; font-size: 3.5em; font-weight: 600; letter-spacing: -.025em; transition: color .2s; }
+.question .a-danger .door { left: 40%; right: 22%; top: 8%; bottom: 22%; border-width: .5em; }
+.question .a-danger .bg { background: radial-gradient(ellipse 40% 18% at 60% 84%, rgba(255,69,58,.45), transparent 70%), linear-gradient(#05080f, #0b1222 55%, #04060b); }
 
 /* ---- a scene: the world, who's there, one line at a time ---- */
 .scene { cursor: pointer; }
@@ -112,6 +116,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .phone .m.out { align-self: flex-end; background: #0a84ff; }
 .choices { display: flex; flex-direction: column; gap: 1em; }
 .choices button { padding: 1em 1.2em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 2em; animation: in .3s ease-out; }
+.pick { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; justify-content: center; padding: 0 7%; cursor: default;
+  background: rgba(0,0,0,.6); -webkit-backdrop-filter: blur(.8em); backdrop-filter: blur(.8em); animation: in .3s ease-out; }
+.pick h2 { font-size: 3.6em; font-weight: 600; letter-spacing: -.02em; margin-bottom: .7em; }
+.pick .two { display: flex; gap: 1.2em; }
+.pick [data-me] { flex: 1; padding: 1.1em 0; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 2.2em; }
+.pick .face { flex: 1; position: relative; height: 46em; border-radius: 1.8em; overflow: hidden; }
+.pick .face::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
+.pick .face b { position: absolute; left: 0; right: 0; bottom: 1em; z-index: 1; font-size: 2.6em; font-weight: 600; text-align: center; }
 @keyframes in { from { opacity: 0; transform: translateY(.6em); } }
 
 /* ---- the end ---- */
@@ -179,24 +191,36 @@ const S = (from, t) => ({ sms: t, from });
 const V = (who, t) => ({ v: who, t });
 const C = (...opts) => ({ c: opts });
 const CAST = { cam: ['Cam', 'cam'], julian: ['Julian', 'julian'], victor: ['Victor', 'suit'], maman: ['Maman', 'diane'] };
+// the romance's love interest ('li'), picked by the player along with who they are: Cam or Brooke, and the partner they'd betray
+const LOVE = {
+  cam: { name: 'Cam', partner: 'Max', fem: true, partnerFem: false },
+  brooke: { name: 'Brooke', partner: 'Léa', fem: false, partnerFem: true, poses: { flirty: 'drunk_smile', sip: 'drunk_listen', worried: 'nervous', awkward: 'drunk_letdown' } },
+};
+const love = () => LOVE[run?.li] || LOVE.cam;
+const who = (w) => w === 'li' ? [love().name, run?.li || 'cam'] : CAST[w];
+const poseOf = (w, p) => (w === 'li' && love().poses?.[p]) || p;
+// the words that change with the picks: {LI} their name · {P} the partner · {me:gars|fille} · {li:il|elle} · {p:il|elle} (the partner)
+const fill = (t) => String(t).replace(/\{LI\}/g, love().name).replace(/\{P\}/g, love().partner)
+  .replace(/\{(me|li|p):([^|}]*)\|([^}]*)\}/g, (_, k, a, b) => ({ me: run?.me === 'f', li: love().fem, p: love().partnerFem })[k] ? b : a);
 
 // ---- the four tastes: each one written for what that taste comes for (the player is « toi », seen through their eyes) ----
 const ARCH = {
   desir: { name: 'Le désir', color: '#ff5c8a', title: 'Interdite', hook: 'La blonde de ton meilleur ami te regarde comme ça depuis une heure.',
-    poster: [['cam', 'flirty', 56, 108, 9]], verb: 'Tomber pour quelqu’un',
+    poster: [['cam', 'flirty', 56, 108, 9]], row: [['cam', 'flirty', 78, 330, -10]], verb: 'Tomber pour quelqu’un',
     lines: [
-      N('Samedi, 2 h. Le party de Max tire à sa fin.'),
-      O('cam', 'flirty', 'Max dort. Il s’endort toujours quand ça devient intéressant.'),
-      T('Cam… t’as bu.'),
-      O('cam', 'sip', 'Un peu. Assez pour te dire un truc.'),
-      O('cam', 'flirty', 'Au chalet, l’été passé. C’est toi que je voulais embrasser. Pas lui.'),
+      { pick: true },
+      N('Samedi, 2 h. Le party de {P} tire à sa fin.'),
+      O('li', 'flirty', '{P} dort. {p:Il|Elle} s’endort toujours quand ça devient intéressant.'),
+      T('{LI}… t’as bu.'),
+      O('li', 'sip', 'Un peu. Assez pour te dire que t’es {me:beau|belle} quand t’es {me:gêné|gênée}.'),
+      O('li', 'flirty', 'Pis un autre truc. Au chalet, l’été passé… C’est toi que je voulais embrasser. Pas {p:lui|elle}.'),
       N('Derrière la porte de la chambre, quelqu’un se lève.'),
-      O('cam', 'worried', 'Dis quelque chose. Vite.'),
-      C(['Moi aussi.', [T('Moi aussi. Depuis le chalet.'), O('cam', 'flirty', 'Alors on a un problème.'), N('La poignée tourne.')]],
-        ['Va le rejoindre.', [T('Va le rejoindre, Cam.'), O('cam', 'awkward', 'Ok. Mais tu vas y penser toute la nuit.'), N('Elle a raison.')]]),
+      O('li', 'worried', 'Dis quelque chose. Vite.'),
+      C(['Moi aussi.', [T('Moi aussi. Depuis le chalet.'), O('li', 'flirty', 'Alors on a un problème.'), N('La poignée tourne.')]],
+        ['Va {p:le|la} rejoindre.', [T('Va {p:le|la} rejoindre, {LI}.'), O('li', 'awkward', 'Ok. Mais tu vas y penser toute la nuit.'), N('{li:Il|Elle} a raison.')]]),
     ] },
   revanche: { name: 'La revanche', color: '#e8c25a', title: 'Regarde-moi bien', hook: 'Il y a un an, il a ri de toi devant 200 personnes. Ce soir, tu reviens.',
-    poster: [['julian', 'smirk', 50, 104, 8]], verb: 'Te venger',
+    poster: [['julian', 'smirk', 50, 104, 8]], row: [['julian', 'smirk', 78, 320, -12]], verb: 'Te venger',
     lines: [
       N('Gala Delorme. Un an plus tard.'),
       O('julian', 'smirk', 'Wow. Je pensais pas qu’ils te laisseraient entrer.'),
@@ -222,7 +246,7 @@ const ARCH = {
         ['Dis mon 2e nom.', [T('Léa. C’est quoi, mon deuxième nom ?'), N('Silence.'), S('Toi', 'Elle le sait pas. Moi oui.')]]),
     ] },
   etrange: { name: 'L’étrange', color: '#a78bfa', title: 'Personne se souvient', hook: 'Ce matin, ta sœur n’existe plus. Sauf pour toi.',
-    poster: [['isa_nuit', 'listen', 46, 100, 12, 'ghost']], verb: 'L’inexpliqué',
+    poster: [['isa_nuit', 'listen', 46, 100, 12, 'ghost']], row: [['isa_nuit', 'listen', 74, 300, -8, 'ghost']], verb: 'L’inexpliqué',
     lines: [
       N('Mardi, 7 h 40. La chambre d’Emma est vide. Pas rangée. Vide.'),
       T('M’man ? Où sont les affaires d’Emma ?'),
@@ -238,30 +262,30 @@ const ARCH = {
 };
 const KEYS = Object.keys(ARCH);
 
-// 5 · in the story: one opening for all, its first answer is the taste
+// 5 · in the story: one opening for all, two answers at a time; the first = someone you know or not, the second = the taste
 const X = 'Numéro inconnu';
 const INSIDE = [
   N('3 h du matin. Ton cell vibre.'),
   S(X, 'T’es réveillé ?'),
   S(X, 'Faut que je te parle. Ce soir.'),
-  { c: [
-    ['Toi ? Enfin.', [S('me', 'Toi ? Enfin.'), S(X, 'C’est Cam.'), S(X, 'Max dort à côté de moi.'), S(X, 'Je pense au chalet. Encore.'),
-      C(['Moi aussi.', [S('me', 'Moi aussi.'), S(X, 'Viens. La porte est débarrée.')]], ['Cam. C’est Max.', [S('me', 'Cam. C’est mon meilleur ami.'), S(X, 'Je sais. C’est ça, le problème.')]])], 'desir'],
-    ['Qui t’a donné mon numéro ?', [S('me', 'Qui t’a donné mon numéro ?'), S(X, 'Regarde le numéro.'), N('C’est le tien.'), S(X, 'Ouvre pas la porte.'), N('On cogne. Trois coups.'),
+  C(['Je sais c’est qui.', [S('me', 'Je sais c’est qui.'), S(X, 'Alors tu sais pourquoi j’écris.'),
+    C(['T’as pensé à moi ?', [S('me', 'T’as pensé à moi ?'), { pick: true }, S(X, 'C’est {LI}.'), S(X, '{P} dort à côté de moi.'), S(X, 'Je pense au chalet. Encore.'),
+      C(['Moi aussi.', [S('me', 'Moi aussi.'), S(X, 'Viens. La porte est débarrée.')]], ['{LI}. C’est {P}.', [S('me', '{LI}. C’est {p:mon meilleur ami|ma meilleure amie}.'), S(X, 'Je sais. C’est ça, le problème.')]])], 'desir'],
+      ['T’as du culot.', [S('me', 'T’as du culot.'), S(X, 'C’est pas qui tu penses. Mais on déteste la même personne.'), S(X, 'Julian vend sa compagnie demain.'), S(X, 'Je peux la mettre à ton nom.'),
+      C(['Pourquoi moi ?', [S('me', 'Pourquoi moi ?'), S(X, 'Parce qu’il a ri de toi. Devant tout le monde.')]], ['Combien ?', [S('me', 'Combien ?'), S(X, 'Rien. Je veux juste être là quand il va l’apprendre.')]])], 'revanche'])]],
+    ['C’est qui ?', [S('me', 'C’est qui ?'), S(X, 'Tu me reconnais pas ?'),
+    C(['Qui t’a donné mon numéro ?', [S('me', 'Qui t’a donné mon numéro ?'), S(X, 'Regarde le numéro.'), N('C’est le tien.'), S(X, 'Ouvre pas la porte.'), N('On cogne. Trois coups.'),
       C(['J’ouvre.', [N('Tu tournes la poignée.'), S(X, 'Je t’avais dit.')]], ['Qui est là ?', [T('Qui est là ?'), N('Personne répond. Mais quelqu’un respire.')]])], 'danger'],
-    ['Julian ? T’as du culot.', [S('me', 'Julian ? T’as du culot.'), S(X, 'Pas Julian. Quelqu’un qui le déteste autant que toi.'), S(X, 'Il vend sa compagnie demain.'), S(X, 'Je peux la mettre à ton nom.'),
-      C(['Pourquoi moi ?', [S('me', 'Pourquoi moi ?'), S(X, 'Parce qu’il a ri de toi. Devant tout le monde.')]], ['Combien ?', [S('me', 'Combien ?'), S(X, 'Rien. Je veux juste être là quand il va l’apprendre.')]])], 'revanche'],
-    ['Ce numéro existe plus.', [S('me', 'Ce numéro existe plus.'), S(X, 'Je sais.'), S(X, 'C’était le mien.'), S(X, 'Emma. Ta sœur. Tu te souviens de moi ?'),
-      C(['Évidemment.', [S('me', 'Évidemment. T’es où ?'), S(X, 'Dans ta chambre. Derrière toi.')]], ['J’ai pas de sœur.', [S('me', 'J’ai pas de sœur.'), S(X, 'Alors toi aussi, tu m’as oubliée.')]])], 'etrange'],
-  ] },
+      ['Ce numéro existe plus.', [S('me', 'Ce numéro existe plus.'), S(X, 'Je sais.'), S(X, 'C’était le mien.'), S(X, 'Emma. Ta sœur. Tu te souviens de moi ?'),
+      C(['Évidemment.', [S('me', 'Évidemment. T’es où ?'), S(X, 'Dans ta chambre. Derrière toi.')]], ['J’ai pas de sœur.', [S('me', 'J’ai pas de sœur.'), S(X, 'Alors toi aussi, tu m’as oubliée.')]])], 'etrange'])]]),
 ];
 
 // ---- drawing a world ----
 const spr = (sprite, pose, x, h, top, cls = '') => `<img class="spr ${cls}" src="chars/${sprite}/${pose}.webp" alt="" style="left:${x}%;height:${h}%;top:${top}%">`;
-function art(k, withNotif) {
+function art(k, withNotif, shape = 'poster') {
   const a = ARCH[k];
   return `<div class="art a-${k}"><div class="bg"></div>${k === 'danger' ? '<div class="door"></div>' : ''}
-    ${(a?.poster || []).map(([s, p, x, h, t, c]) => spr(s, p, x, h, t, c)).join('')}
+    ${(a?.[shape] || []).map(([s, p, x, h, t, c]) => spr(s, p, x, h, t, c)).join('')}
     ${withNotif && a?.notif ? `<div class="notif"><i></i><div><b>${esc(a.notif[0])}</b><span>${esc(a.notif[1])}</span></div></div>` : ''}</div>`;
 }
 const poster = (k) => `<div class="poster" data-k="${k}">${art(k, true)}<div class="shade"></div><div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div></div>`;
@@ -347,7 +371,7 @@ function drawFeed(box) {
   const leave = () => { if (cur) run.dwell[cur.dataset.k] = (run.dwell[cur.dataset.k] || 0) + Math.round(performance.now() - since); clearInterval(loop); };
   const enter = (el) => {
     leave(); cur = el; since = performance.now();
-    const said = ARCH[el.dataset.k].lines.filter((l) => !l.c).slice(0, 4);
+    const said = ARCH[el.dataset.k].lines.filter((l) => !l.c && !l.pick).slice(0, 4);
     let i = 0; const f = $('.fline', el);
     const next = () => { f.innerHTML = lineHtml(said[i % said.length], true); i++; };
     next(); loop = setInterval(next, 2000); timers.push(loop);
@@ -358,9 +382,9 @@ function drawFeed(box) {
 // 4 · the feeling, in words, nothing else
 function drawQuestion(box) {
   box.className = 'screen question'; run.order = shuffle(KEYS);
-  box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${esc(ARCH[k].verb)}</button>`).join('')}`;
+  box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${art(k, false, 'row')}<b>${esc(ARCH[k].verb)}</b></button>`).join('')}`;
   $$('button', box).forEach((b) => b.onclick = () => {
-    const k = b.dataset.k; b.style.color = ARCH[k].color; picked(k);
+    const k = b.dataset.k; $('b', b).style.color = ARCH[k].color; picked(k);
     setTimeout(() => { box.style.transition = 'opacity .3s'; box.style.opacity = 0; setTimeout(() => { box.style.opacity = ''; scene(k, ARCH[k].lines); }, 300); }, 250);
   });
 }
@@ -369,11 +393,11 @@ function drawInside(box) { scene('nuit', INSIDE); }
 
 // ---- an opening: tap to go on ----
 function lineHtml(l, small) {
-  if (l.n) return `<div class="narr">${esc(l.n)}</div>`;
-  if (l.me) return `<div class="bub me">${esc(l.me)}</div>`;
-  if (l.o) return `<div class="who">${esc(CAST[l.o][0])}</div><div class="bub them">${esc(l.t)}</div>`;
-  if (l.v) return `<div class="who">${esc(l.v)}</div><div class="bub voice">${esc(l.t)}</div>`;
-  if (l.sms && small) return `<div class="who">${esc(l.from)}</div><div class="bub them">${esc(l.sms)}</div>`;
+  if (l.n) return `<div class="narr">${esc(fill(l.n))}</div>`;
+  if (l.me) return `<div class="bub me">${esc(fill(l.me))}</div>`;
+  if (l.o) return `<div class="who">${esc(who(l.o)[0])}</div><div class="bub them">${esc(fill(l.t))}</div>`;
+  if (l.v) return `<div class="who">${esc(l.v)}</div><div class="bub voice">${esc(fill(l.t))}</div>`;
+  if (l.sms && small) return `<div class="who">${esc(l.from)}</div><div class="bub them">${esc(fill(l.sms))}</div>`;
   return '';
 }
 function scene(k, lines) {
@@ -387,8 +411,8 @@ function scene(k, lines) {
   // who's there, kept from line to line (one in the middle, two side by side); whoever isn't talking is dimmed
   const drawCast = (speaker) => order.forEach((w, i) => {
     let im = $(`[data-w="${w}"]`, castBox);
-    if (!im) { castBox.insertAdjacentHTML('beforeend', spr(CAST[w][1], on[w], 50, 92, 12)); im = castBox.lastElementChild; im.dataset.w = w; }
-    const src = `chars/${CAST[w][1]}/${on[w]}.webp`;
+    const src = `chars/${who(w)[1]}/${poseOf(w, on[w])}.webp`;
+    if (!im) { castBox.insertAdjacentHTML('beforeend', `<img class="spr" alt="" src="${src}">`); im = castBox.lastElementChild; im.dataset.w = w; }
     if (!im.src.endsWith(src)) im.src = src;
     const two = order.length > 1;
     Object.assign(im.style, { left: (two ? (i ? 72 : 28) : 50) + '%', height: (two ? 84 : 92) + '%', top: (two ? 18 : 12) + '%' });
@@ -397,21 +421,22 @@ function scene(k, lines) {
   const sms = (l) => {
     phone.hidden = false;
     if (l.from !== 'me' && l.from !== thread) { thread = l.from; phone.innerHTML = `<div class="from">${esc(thread)}</div>`; }
-    phone.insertAdjacentHTML('beforeend', `<div class="m ${l.from === 'me' ? 'out' : 'in'}">${esc(l.sms)}</div>`);
+    phone.insertAdjacentHTML('beforeend', `<div class="m ${l.from === 'me' ? 'out' : 'in'}">${esc(fill(l.sms))}</div>`);
     const ms = $$('.m', phone); if (ms.length > 4) ms[0].remove();
   };
   const next = () => {
     if (waiting) return;
     const l = q.shift();
     if (!l) return end();
+    if (l.pick) { waiting = true; return lovePick(box, () => { waiting = false; next(); }); }
     if (l.o) { if (!on[l.o]) order.push(l.o); on[l.o] = l.pose; drawCast(l.o); } else if (order.length) drawCast(null);
     if (l.sms) { sms(l); say.innerHTML = ''; return; }
     if (l.c) {
       waiting = true; run.atChoice = Math.round(performance.now() - run.t0); save();
-      say.innerHTML = `<div class="choices">${l.c.map(([t], i) => `<button data-i="${i}">${esc(t)}</button>`).join('')}</div>`;
+      say.innerHTML = `<div class="choices">${l.c.map(([t], i) => `<button data-i="${i}">${esc(fill(t))}</button>`).join('')}</div>`;
       $$('.choices button', say).forEach((b) => b.onclick = (e) => {
         e.stopPropagation(); const [t, after, taste] = l.c[+b.dataset.i];
-        if (taste) picked(taste); else { run.choice = t; save(); }
+        if (taste) picked(taste); else { run.choice = fill(t); save(); }
         q.unshift(...after); waiting = false; next();
       });
       return;
@@ -423,6 +448,19 @@ function scene(k, lines) {
   next(); if (jump) for (let i = 0; i < +jump[1]; i++) next();
 }
 
+// the romance asks two things before it starts: who you are, then who you fall for (shown, not described)
+function lovePick(box, then) {
+  const card = document.createElement('div'); card.className = 'pick';
+  card.onclick = (e) => e.stopPropagation();
+  card.innerHTML = '<h2>Tu es</h2><div class="two"><button data-me="m">Un gars</button><button data-me="f">Une fille</button></div>';
+  box.append(card);
+  $$('[data-me]', card).forEach((b) => b.onclick = () => {
+    run.me = b.dataset.me; save();
+    card.innerHTML = `<h2>Tu craques pour</h2><div class="two">${['brooke', 'cam'].map((s) => `<button class="face" data-li="${s}"><div class="art a-desir"><div class="bg"></div>${spr(s, s === 'cam' ? 'flirty' : 'drunk_smile', 50, 190, 4)}</div><b>${LOVE[s].name}</b></button>`).join('')}</div>`;
+    $$('[data-li]', card).forEach((f) => f.onclick = () => { run.li = f.dataset.li; save(); card.remove(); then(); });
+  });
+}
+
 // ---- the end: what this run measured ----
 function end() {
   stopTimers(); run.done = Math.round(performance.now() - run.t0); save();
@@ -431,6 +469,7 @@ function end() {
   const rows = [['Choisi en', sec(run.pick)]];
   if (run.rerolls) rows.push(['↻', run.rerolls + ' fois']);
   if (run.dwell) rows.push(['Regardé', run.order.filter((k) => run.dwell[k]).map((k) => `${ARCH[k].title} ${sec(run.dwell[k])}`).join(' · ')]);
+  if (run.me) rows.push(['Toi', run.me === 'f' ? 'une fille' : 'un gars'], ['Craque pour', love().name]);
   if (run.choice) rows.push(['Son choix', run.choice]);
   rows.push(['En tout', sec(run.done)]);
   box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">La suite arrive.</div>
@@ -461,7 +500,8 @@ stage.addEventListener('click', (e) => {
     unstats: () => $('#stats').remove(), wipe: () => { RUNS.length = 0; save(); $('#stats').remove(); stats(); } })[b.dataset.act]();
 }, true);
 // preload the faces so a scene never waits on an image
-for (const k of KEYS) for (const l of ARCH[k].lines.flatMap((l) => l.c ? [l, ...l.c.flatMap((o) => o[1])] : [l])) if (l.o) new Image().src = `chars/${CAST[l.o][1]}/${l.pose}.webp`;
+const every = (ls) => ls.flatMap((l) => l.c ? l.c.flatMap((o) => every(o[1])) : [l]);
+for (const k of KEYS) for (const l of every(ARCH[k].lines)) if (l.o) for (const sp of l.o === 'li' ? Object.keys(LOVE) : [CAST[l.o][1]]) new Image().src = `chars/${sp}/${(sp === 'brooke' && LOVE.brooke.poses[l.pose]) || l.pose}.webp`;
 start();
 </script>
 </body>
