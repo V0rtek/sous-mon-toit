@@ -426,6 +426,9 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .look .lk-name svg { width: 2.6em; height: 2.6em; flex: none; }
 .look .lk-big { position: relative; width: 56%; aspect-ratio: 3 / 4; margin: 0 auto 2.6em; border-radius: 2.4em; overflow: hidden; transition: background .2s; }
 .look .lk-big img, .look .lk-poses img { position: absolute; left: 4%; right: 4%; bottom: 0; width: 92%; height: 94%; object-fit: contain; object-position: 50% 100%; }
+.look .lk-big { cursor: pointer; }
+.look .lk-big.pic { background: #1c1c1e !important; display: grid; place-items: center; }
+.look .lk-big.pic .pp { width: 70%; height: auto; aspect-ratio: 1; transition: background .2s; }
 .look .lk-cols { display: flex; justify-content: center; gap: 1.5em; margin-bottom: 2.8em; }
 .look .lk-cols button { width: 4.4em; height: 4.4em; border-radius: 50%; }
 .look .lk-cols button.on { box-shadow: 0 0 0 .3em #111113, 0 0 0 .6em #fff; }
@@ -1270,10 +1273,11 @@ const face = (c) => `<span class="pp"${myColor() ? ` style="background:${myColor
 function lookSheet(id) {
   const c = owned().find((x) => x.id === id); if (!c) return;
   const box = sheet('<div class="look"></div>');
+  let asPic = false;   // tap the big picture: how it will show as your round profile picture, and back
   const paint = () => {
     const col = myColor() || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`, n = savedName();
     $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(n)}" placeholder="Ton nom" size="${Math.max(6, n.length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Nom">${I.pen}</label>
-      <div class="lk-big" ${bg}><img src="${picOf(c)}" alt=""></div>
+      <div class="lk-big${asPic ? ' pic' : ''}" ${asPic ? '' : bg}>${asPic ? `<span class="pp" style="background:${col}"><img src="${picOf(c)}" alt=""></span>` : `<img src="${picOf(c)}" alt="">`}</div>
       <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Couleur"></button>`).join('')}</div>
       ${ps.length > 1 ? `<div class="lk-poses">${ps.map((p) => `<button class="${picOf(c) === c.poses[p] ? 'on' : ''}" data-pose="${p}" ${bg}><img src="${c.poses[p]}" alt=""></button>`).join('')}</div>` : ''}`;
   };
@@ -1287,6 +1291,7 @@ function lookSheet(id) {
   box.addEventListener('focusout', (e) => { if (e.target.closest('.lk-name') && !e.target.value.trim()) e.target.value = savedName(); });
   box.onkeydown = (e) => { if (e.key === 'Enter') e.target.blur(); };
   box.onclick = (e) => {   // a tap applies it right away
+    if (e.target.closest('.lk-big')) { asPic = !asPic; paint(); return; }
     const b = e.target.closest('[data-col], [data-pose]'); if (!b) return;
     if (b.dataset.col) keep.set('color', b.dataset.col);
     else { looks[c.id] = { ...looks[c.id], p: b.dataset.pose }; keep.set('looks', looks); }
@@ -1354,7 +1359,7 @@ function gotInvite(v) {
   })();
   const s = document.createElement('script'); s.src = 'https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js';
   s.onload = () => {
-    const c = mqtt.connect(BROKER, { clientId: 'smtd-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 8000, keepalive: 20 });
+    const c = mqtt.connect(BROKER, { clientId: 'smtd-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 3000, connectTimeout: 15000, keepalive: 20 });
     PEOPLE.attach(c, myId, { me: () => ({ n: savedName(), ch: me().custom ? null : me().id }), invite: gotInvite,
       change: () => { if (page() === 'social') renderSocial(); } });
   };
