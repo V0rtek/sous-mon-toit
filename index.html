@@ -581,15 +581,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261026145905"></script>
-<script src="story.js?v=20261026145905"></script>
-<script src="play.js?v=20261026145905"></script>
-<script src="bar.js?v=20261026145905"></script>
-<script src="games.js?v=20261026145905"></script>
-<script src="gen.js?v=20261026145905"></script>
-<script src="demos.js?v=20261026145905"></script>
-<script src="episodes.js?v=20261026145905"></script>
-<script src="people.js?v=20261026145905"></script>
+<script src="chars.js?v=20261026150524"></script>
+<script src="story.js?v=20261026150524"></script>
+<script src="play.js?v=20261026150524"></script>
+<script src="bar.js?v=20261026150524"></script>
+<script src="games.js?v=20261026150524"></script>
+<script src="gen.js?v=20261026150524"></script>
+<script src="demos.js?v=20261026150524"></script>
+<script src="episodes.js?v=20261026150524"></script>
+<script src="people.js?v=20261026150524"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -904,9 +904,10 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // how loud each file plays (the files are levelled alike, ~-21 LUFS): a room's sound stays under the voices, the campfire
 // lowest; a one-off (a stinger: the boss's arrival, the important moment, the glitch) a little above the rooms.
 // Rooms: bar, bathroom, dark, campfire, crowd (a busy public interior), party (a house party), crickets (outside, evening),
-// wrong (something is wrong, horror), suspense (tense). One-offs: boss, moment, glitch
+// wrong (something is wrong, horror), suspense (tense). One-offs: boss, moment, glitch, intro (a show's opening jingle,
+// 5 s: under the "You are" card that opens every story)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3 };
 async function sfx(name, loop = false, rate = 1) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -1513,6 +1514,7 @@ async function introCard(who, at) {
   await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
   if (run !== at) return;
   box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
+  sfx('intro');   // the story opens like a show
   const timers = [[150, 'in'], [500, 'in rise'], [1100, 'in rise named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
   await new Promise((ok) => { const t = setTimeout(ok, 3200); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
   timers.forEach(clearTimeout); box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
@@ -2062,7 +2064,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261026145905';
+const BUILD = '20261026150524';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;

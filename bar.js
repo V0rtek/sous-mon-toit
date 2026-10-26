@@ -21,8 +21,11 @@ GALLERY.push({ sprite: 'suit', name: 'Stranger', src: 'perso_suit', ref: ['suit_
 // subtler); what he doesn't have yet plays with his closest pose
 FACE.brooke = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_point: 'r', texting: 'f', thinking: 'r',
   pee: 'f', pee_relief: 'f', pee_look: 'r', drunk_smile: 'r', drunk_joke: 'r', drunk_letdown: 'r', nervous: 'r', sit_fire: 'r', shoulder_hit: 'r' };
-// Justin: his new sheet (bar, 23/10) is the only one he plays with here — never the old urban sheets
-FACE.justin_bar = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_flirt: 'r', texting: 'r' };
+// Justin: his new sheet (bar, 23/10) is the only one he plays with here — never the old urban sheets. His 2nd sheet (26/10,
+// « Justin looks too happy when he talks »): drunk_talk is now a plain talk (the smiling one stays as drunk_joke), and
+// drunk_serious, explaining (both hands, worried), angry (fists), phone_shock, sit_fire (sitting) are drawn, not stand-ins
+FACE.justin_bar = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_sad: 'r', drunk_flirt: 'r', texting: 'r', drunk_joke: 'r',
+  drunk_serious: 'r', explaining: 'r', angry: 'r', phone_shock: 'r', sit_fire: 'r' };
 // the house's poses (sheets to come, 23/10) play meanwhile as the closest pose each one has
 window.POSE_ALIAS = {
   brooke: {
@@ -31,9 +34,9 @@ window.POSE_ALIAS = {
     scared: 'thinking', pleading: 'drunk_talk', punch: 'shoulder_hit', confess: 'drunk_sad',
   },
   justin_bar: {
-    listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'drunk_listen',
-    thinking: 'drunk_listen', drunk_point: 'drunk_talk', phone_shock: 'texting',
-    fake_smile: 'drunk_happy', shocked: 'drunk_listen', knock: 'drunk_talk', wine: 'drunk_listen', sit_fire: 'drunk_sad', sit_hurt: 'drunk_sad',
+    listen: 'drunk_listen', holding: 'drunk_sad', surprised: 'drunk_listen', pleading: 'explaining',
+    thinking: 'drunk_listen', drunk_point: 'drunk_talk',
+    fake_smile: 'drunk_happy', shocked: 'drunk_listen', knock: 'drunk_talk', wine: 'drunk_listen', sit_hurt: 'sit_fire',
   },
   cam: { holding: 'worried', surprised: 'awkward', angry: 'worried', amused: 'tipsy_laugh',   // her own smile (a laugh behind her hand); her "amused" sheet pose looked at the camera
     wine: 'sip', dizzy: 'awkward', scared: 'worried', sit_fire: 'worried', cold_stare: 'thinking' },
@@ -52,7 +55,7 @@ FACE.diane = { listen: 'r', surprised: 'r', thinking: 'r', explaining: 'r', angr
 // explaining, thinking, worried, amused, sip) is her base; the first one keeps only her laugh, her awkward and her flirt
 FACE.cam = { listen: 'r', explaining: 'r', thinking: 'r', worried: 'r', sip: 'r', tipsy_laugh: 'r', awkward: 'r', flirty: 'l' };
 // the gallery shows the new Justin (the old sheet only plays in the older stories)
-GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar'] };
+GALLERY[GALLERY.findIndex((g) => g.sprite === 'justin')] = { sprite: 'justin_bar', name: 'Justin', src: 'perso_justin', ref: ['justin_bar', 'justin_bar2'] };
 GALLERY.splice(1, 0, { sprite: 'brooke', name: 'Brooke', src: 'perso_brooke', ref: ['brooke_bar', 'brooke_toilettes'] },
   { sprite: 'cam', name: 'Cam', src: 'perso_cam', ref: ['cam_neutral', 'cam_bar'] });
 
@@ -660,7 +663,7 @@ const houseMeet = (f) => [
     one('pb'), hush(1500), say('pb', 'scared', '…I didn’t.', { to: 'cam' }),
     one('cam'), hush(800), say('cam', 'worried', 'Then who texted me?', { to: 'pb' }),
     one('pb'), hush(1000), narr('Brooke looks up at the balcony.'),
-    one('pa'), say('pa', 'drunk_talk', 'Brooke. Who’s the guy?', { to: 'pb' }),
+    one('pa'), say('pa', 'drunk_serious', 'Brooke. Who’s the guy?', { to: 'pb' }),
     one('pb'), say('pb', 'nervous', 'Nobody. A job. Let’s just… let’s have a drink.', { to: 'pa' }),
   ]),
   // two guys dressed for a bar in a room full of money
@@ -1107,7 +1110,7 @@ window.BAR = [
   ] },
   hush(800),   // the laugh dies down
   one('pa'),
-  say('pa', 'drunk_listen', 'Rent’s due Monday, man. I’m not covering you again.', { to: 'pb' }),   // serious: not his happy talking pose
+  say('pa', 'drunk_serious', 'Rent’s due Monday, man. I’m not covering you again.', { to: 'pb' }),   // serious: not his happy talking pose
   one('pb'), hush(1100),   // Brooke takes it
   { by: 'pb', choice: [
     { t: 'Something’ll come up.', intent: 'the universe', set: { rent: 'universe' }, then: [
