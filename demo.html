@@ -556,8 +556,9 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
    its name, a big white padlock, how far you are, then a glimpse of what's behind ---- */
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
-#current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }   /* the same top as the other tabs: the padlock at the same height */
-.lkv { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
+#current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
+.view.locked { overflow: hidden; }   /* a tab not open yet: one screen, nothing to scroll */   /* the same top as the other tabs: the padlock at the same height */
+.lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
 .lkv > :not(.lkbg) { position: relative; }
@@ -1395,7 +1396,7 @@ const LOCKED = {
 function renderLocked(v) {
   stopLock();
   const need = SERIES.LADDER[tab], n = Math.min(SERIES.episodesDone(), need), L = LOCKED[tab] || {};
-  const box = $('#' + v);
+  const box = $('#' + v); box.scrollTop = 0;
   box.innerHTML = `<div class="lkv"><div class="lkbg">${L.back ? L.back() : ''}</div><div class="lkt">${SERIES.LABEL[tab]}</div>
     <svg class="lkic" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
     <div class="lkn">${n} / ${need} épisodes</div><div class="lkx">${L.show ? L.show() : ''}</div></div>`;
