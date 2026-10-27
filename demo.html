@@ -1537,7 +1537,7 @@ function renderHome() {
     document.body.classList.toggle('hxbig', big && top < 40);
   };
   $('#home').onscroll = barFor;
-  const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
+  const wait = () => { close(); homeOpen = setTimeout(open, 3000); };
   $('#homeCar').addEventListener('scroll', wait, { passive: true });
   // a swipe anywhere on the page or a tap on either side (homeGo): the next / previous one; a cover at the side: that one
   homeGo = (k) => {
