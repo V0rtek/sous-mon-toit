@@ -15,7 +15,7 @@
   const heroSolo = { justin: 'Justin' };
 
   // single-sheet characters (drawn 25/10): they all look to the right
-  for (const [id, poses] of Object.entries({ alex: ['beach'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand', 'sunglasses', 'shy', 'hip', 'wink', 'nervous', 'hands', 'volleyball'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
+  for (const [id, poses] of Object.entries({ alex: ['beach'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand', 'sunglasses', 'shy', 'hip', 'wink', 'nervous', 'hands', 'volleyball', 'thinking', 'embarrassed', 'top_off', 'top_lift', 'hands_hips', 'sitting'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
 
   // ---------- decors ----------
   const wood = [[40, 70], [260, 50], [560, 60], [1100, 50], [1600, 80], [1800, 60]];
@@ -265,23 +265,25 @@
 
   // ---------- 5. Un été de trop ----------
   story('d_ete', 'Un été de trop', [
-    scene('e_terrasse', { plage: 'sunglasses', justin: 'listen' }),
+    scene('e_terrasse', { plage: 'sitting', justin: 'listen' }),
     cam('two', 'plage', 'justin'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · cinq ans plus tard' },
-    ...L('plage', 'sunglasses', 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
+    ...L('plage', 'sitting', 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
     ...L('justin', 'surprised', 'Maya…'),
-    ...L('plage', 'sunglasses', "T'as pas changé. Enfin… un peu."),
+    ...L('plage', 'sitting', "T'as pas changé. Enfin… un peu."),
     cam('one', 'justin'),
     { by: 'justin', choice: [
-      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L('plage', 'shy', 'Ne commence pas.')] },
-      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L('plage', 'wink', 'Tu comptais ?')] },
-      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L('plage', 'hip', 'Même question.')] },
+      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L('plage', 'sitting', 'Ne commence pas.')] },
+      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L('plage', 'sitting', 'Tu comptais ?')] },
+      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L('plage', 'sitting', 'Même question.')] },
     ] },
-    N('Elle enlève ses lunettes. Elle le regarde comme avant.'),
-    ...L('plage', 'stand', 'Tu savais que je serais là, hein ?'),
+    N('Elle se lève, les mains sur les hanches. Elle le regarde comme avant.'),
+    ...L('plage', 'hands_hips', 'Tu savais que je serais là, hein ?'),
     ...L('justin', 'thinking', 'On m’a juste dit de venir à six heures.'),
-    ...L('plage', 'hip', 'Personne vient ici par hasard.'),
+    N('Elle attrape le bas de son haut.'),
+    ...L('plage', 'top_lift', 'Personne vient ici par hasard.'),
+    N('Elle l’enlève, lentement.'),
     ...T('justin', 'La dernière fois que je l’ai vue ici, elle partait avec mon meilleur ami. Je n’ai jamais su pourquoi.'),
-    ...L('plage', 'hands', "Tu veux la vérité, ou la version qui fait le moins mal ?"),
+    ...L('plage', 'top_off', "Tu veux la vérité, ou la version qui fait le moins mal ?"),
     cam('one', 'justin'),
     { by: 'justin', choice: [
       { t: 'La vérité.', intent: 'veut savoir', set: { veut: 'vérité' }, then: [...L('justin', 'angry', 'La vérité. Pour une fois.'), ...L('plage', 'nervous', 'Alors tu vas détester ce que je vais dire.')] },
