@@ -557,15 +557,19 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
 #current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
-.view.locked { overflow-y: auto; }   /* a tab not open yet: the title and the padlock, the glimpse of it one swipe up */   /* the same top as the other tabs: the padlock at the same height */
-.lkv { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 14em; box-sizing: border-box; overflow: hidden; }
+.view.locked { overflow: hidden; }   /* a tab not open yet: the title, the padlock and the count; a swipe up reveals the glimpse of it (no scroll) */   /* the same top as the other tabs: the padlock at the same height */
+.lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
 .lkv > :not(.lkbg) { position: relative; flex: none; }   /* never squeezed: the padlock the same size on every tab */
 .lkt { font-size: 3.4em; font-weight: 800; letter-spacing: -.02em; }
 .lkic { width: 11em; height: 11em; color: #fff; margin: .8em 0 .6em; }
 .lkn { font-size: 1.9em; font-weight: 600; color: #d1d1d6; }
-.lkx { width: 100%; margin-top: 12em; }
+.lkx { position: absolute !important; left: 0; right: 0; top: 29em; padding: 0 5%; box-sizing: border-box; opacity: 0; transform: translateY(8em); pointer-events: none; transition: opacity .45s, transform .45s; }
+.lkt, .lkic { transition: transform .45s; }
+.lkv.up .lkx { opacity: 1; transform: none; pointer-events: auto; }
+.lkv.up .lkt, .lkv.up .lkic { transform: translateY(-10em); }
+.lkv.up .lkn, .lkv.up .lkup { opacity: 0; }
 .lkic { cursor: pointer; }
 .lkup { display: flex; flex-direction: column; align-items: center; gap: .1em; margin-top: 1.6em; font-size: 1.6em; font-weight: 600; color: rgba(255,255,255,.6); }
 .lkup svg { width: 1.6em; height: 1.6em; animation: lkup 1.8s ease-in-out infinite; }
@@ -616,6 +620,7 @@ body.t-search #switch { visibility: hidden; }
 .lzm { display: flex; align-items: center; justify-content: center; gap: 1.2em; }
 .lzm .lzp { width: 13em; aspect-ratio: 3 / 4; border-radius: 1.4em; overflow: hidden; position: relative; background: #1c1c1e; }
 .lzm .lzp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lzm .lzp img.sp.sm { top: 0; height: 100%; }   /* a whole dog, not cropped to the chest */
 .lzm .lzp img.sp { inset: auto; left: 50%; top: 3%; width: auto; height: 175%; transform: translateX(-50%); object-fit: fill; }
 .lzm .lzp .lzx { position: absolute; inset: 0; display: grid; place-items: center; color: #48484a; font-size: 6em; font-weight: 800; }
 .lzm > svg { width: 2.6em; height: 2.6em; color: #86868b; flex: none; }
@@ -1389,7 +1394,7 @@ const LOCKED = {
       `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
       `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span><em>✓ Épisode 1 créé</em></div>
         <div class="lzgo"><div class="lzg">${SPARK}Générer</div>
-        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:12%;height:80%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
     ]),
   },
   social: {
@@ -1409,7 +1414,12 @@ function renderLocked(v) {
     <svg class="lkic" data-act="lockinfo" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
     <div class="lkn">${n} / ${need} épisodes</div>
     ${L.show ? `<div class="lkup">Glisse vers le haut<svg viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}<div class="lkx">${L.show ? L.show() : ''}</div></div>`;
-  box.onscroll = () => { const o = Math.max(0, 1 - box.scrollTop / 80); $$('.lkn, .lkup', box).forEach((e) => { e.style.opacity = o; }); };   // the count and the hint go as the glimpse comes up
+  // a swipe up reveals the glimpse (the count and the hint go), a swipe down (or the hint, or the padlock's tap) brings the padlock screen back
+  const lk = $('.lkv', box); let y0 = null;
+  box.onpointerdown = (e) => { y0 = e.clientY; };
+  box.onpointerup = (e) => { if (y0 === null || !lk) return; const dy = e.clientY - y0; y0 = null; if (dy < -40) lk.classList.add('up'); else if (dy > 40) lk.classList.remove('up'); };
+  box.onpointercancel = () => { y0 = null; };
+  const hint = $('.lkup', box); if (hint) hint.onclick = () => lk.classList.add('up');
   liven(box);
 }
 // the glimpses move: ‹ › and swipes between slides, searches that type themselves and find, a character that changes pose,
@@ -1457,7 +1467,7 @@ function liven(box) {
     lockTimers.push(setInterval(() => {
       k = (k + 1) % ANY.length; const [src, l, sp, p] = ANY[k];
       $('img', from).src = src; label.textContent = l;
-      to.innerHTML = sp ? `<img class="sp" src="chars/${sp}/${p}.webp" alt="">` : '<div class="lzx">?</div>';
+      to.innerHTML = sp ? `<img class="sp${sp === 'toutou' ? ' sm' : ''}" src="chars/${sp}/${p}.webp" alt="">` : '<div class="lzx">?</div>';
     }, 1700));
   }
   const cels = $$('.lzd .lzcel', box);
