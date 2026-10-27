@@ -216,11 +216,13 @@ function endOf(box, k, n, opts) {
   const ser = get('ser', {}); ser[k] = Math.max(ser[k] || 0, n); put('ser', ser);
   const after = episodesDone();
   const opened = progressive() ? Object.keys(LADDER).filter((t) => before < LADDER[t] && after >= LADDER[t]) : [];
-  const w = winOf(k), won = w.ep === n;
-  if (won) {   // the game's own list of won characters (Full demo shows them in « Ton perso »)
+  const w = winOf(k);
+  let won = w.ep === n;
+  if (won) {   // the game's own list of won characters (Full demo shows them in « Ton perso »); already won: not shown again
     try {
       const l = JSON.parse(localStorage.getItem('smt-won')) || [];
-      if (!l.some((x) => x.sprite === w.sprite)) { l.push({ sprite: w.sprite, pose: w.pose, name: w.name }); localStorage.setItem('smt-won', JSON.stringify(l)); }
+      if (l.some((x) => x.sprite === w.sprite)) won = false;
+      else { l.push({ sprite: w.sprite, pose: w.pose, name: w.name }); localStorage.setItem('smt-won', JSON.stringify(l)); }
     } catch { /* private window */ }
   }
   const nx = nextEp();

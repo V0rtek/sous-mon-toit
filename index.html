@@ -1239,9 +1239,11 @@ function episodeEnd(ep, r) {
   return new Promise((done) => {
     const box = $('#epCard'), w = ep.win, timers = [];
     const later = (ms, f) => timers.push(setTimeout(() => { if (run !== r) { box.hidden = true; done(false); return; } f(); }, ms));
+    let already = false;   // a character you already won isn't won again: no « you won » screen
     try {
       const won = JSON.parse(localStorage.getItem('smt-won') || '[]');
-      if (!won.some((x) => x.sprite === w.sprite)) localStorage.setItem('smt-won', JSON.stringify([...won, { sprite: w.sprite, name: w.name, from: state.story, ep: ep.n }]));
+      if (won.some((x) => x.sprite === w.sprite)) already = true;
+      else localStorage.setItem('smt-won', JSON.stringify([...won, { sprite: w.sprite, name: w.name, from: state.story, ep: ep.n }]));
     } catch { /* private window */ }
     saveEp(ep.next ? ep.next.n : ep.n + 1);   // where you are now: the next episode, one past the last once it's over (Full demo's En cours shows it)
     bubble.hidden = true; choicesEl.hidden = true; hint.hidden = true;
@@ -1262,6 +1264,7 @@ function episodeEnd(ep, r) {
       $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
     };
     later(60, () => box.className = 'done');                             // "you finished episode N"
+    if (already) { later(2200, tease); return; }                         // nobody new: straight to what comes next
     later(2000, () => box.className = 'won');                            // "you won…"
     later(3300, () => box.className = 'won quake');                      // the silhouette comes, everything shakes
     later(5700, () => box.className = 'won quake hint');                 // a light starts coming through him
