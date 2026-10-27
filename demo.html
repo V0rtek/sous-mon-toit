@@ -1489,7 +1489,7 @@ function renderHome() {
   const close = () => {
     clearTimeout(homeOpen); document.body.classList.remove('hxbig');
     const x = $('#homeX'); if (!x) return;
-    x.className = 'hx'; const f = $('iframe', x); if (f) setTimeout(() => f.remove(), 300);   // the game unloads once it's faded out
+    x.className = 'hx'; x.style.transform = ''; const f = $('iframe', x); if (f) setTimeout(() => f.remove(), 300);   // the game unloads once it's faded out
   };
   const open = () => {
     const card = $(`#homeCar .card[data-id="${centre}"]`), x = $('#homeX'), home = $('#home');
@@ -1505,7 +1505,12 @@ function renderHome() {
     requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = `hx on big${g ? ' wait' : ''}`; barFor(); }));
   };
   // the opened preview hides the tab bar; scrolled down towards the infos, the bar comes back (and goes again back at the top)
-  const barFor = () => { const x = $('#homeX'); document.body.classList.toggle('hxbig', !!(x && x.classList.contains('big')) && $('#home').scrollTop < 40); };
+  // the opened preview stays pinned to the screen while the infos slide up over it: it keeps playing, sound included
+  const barFor = () => {
+    const x = $('#homeX'), big = !!(x && x.classList.contains('big')), top = $('#home').scrollTop;
+    if (x) x.style.transform = big && top ? `translateY(${top}px)` : '';
+    document.body.classList.toggle('hxbig', big && top < 40);
+  };
   $('#home').onscroll = barFor;
   const wait = () => { close(); homeOpen = setTimeout(open, 1400); };
   $('#homeCar').addEventListener('scroll', wait, { passive: true });
