@@ -557,15 +557,20 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
 #current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
-.view.locked { overflow: hidden; }   /* a tab not open yet: one screen, nothing to scroll */   /* the same top as the other tabs: the padlock at the same height */
-.lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
+.view.locked { overflow-y: auto; }   /* a tab not open yet: the title and the padlock, the glimpse of it one swipe up */   /* the same top as the other tabs: the padlock at the same height */
+.lkv { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 14em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
 .lkv > :not(.lkbg) { position: relative; flex: none; }   /* never squeezed: the padlock the same size on every tab */
 .lkt { font-size: 3.4em; font-weight: 800; letter-spacing: -.02em; }
 .lkic { width: 11em; height: 11em; color: #fff; margin: .8em 0 .6em; }
 .lkn { font-size: 1.9em; font-weight: 600; color: #d1d1d6; }
-.lkx { width: 100%; margin-top: 3em; }
+.lkx { width: 100%; margin-top: 12em; }
+.lkic { cursor: pointer; }
+.lkup { display: flex; flex-direction: column; align-items: center; gap: .1em; margin-top: 1.6em; font-size: 1.6em; font-weight: 600; color: rgba(255,255,255,.6); }
+.lkup svg { width: 1.6em; height: 1.6em; animation: lkup 1.8s ease-in-out infinite; }
+@keyframes lkup { 50% { transform: translateY(-.3em); } }
+.lkn, .lkup { transition: opacity .15s; }
 /* Explorer: three covers, fanned like a bouquet */
 .bq { position: relative; height: 26em; }
 .bq .tz { position: absolute; left: 50%; top: 0; width: 15em; transform: translateX(calc(-50% + var(--x))) rotate(var(--r)); transform-origin: 50% 110%; box-shadow: 0 1em 3em rgba(0,0,0,.6); }
@@ -1401,8 +1406,10 @@ function renderLocked(v) {
   const need = SERIES.LADDER[tab], n = Math.min(SERIES.episodesDone(), need), L = LOCKED[tab] || {};
   const box = $('#' + v); box.scrollTop = 0;
   box.innerHTML = `<div class="lkv"><div class="lkbg">${L.back ? L.back() : ''}</div><div class="lkt">${SERIES.LABEL[tab]}</div>
-    <svg class="lkic" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
-    <div class="lkn">${n} / ${need} épisodes</div><div class="lkx">${L.show ? L.show() : ''}</div></div>`;
+    <svg class="lkic" data-act="lockinfo" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+    <div class="lkn">${n} / ${need} épisodes</div>
+    ${L.show ? `<div class="lkup">Glisse vers le haut<svg viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}<div class="lkx">${L.show ? L.show() : ''}</div></div>`;
+  box.onscroll = () => { const o = Math.max(0, 1 - box.scrollTop / 80); $$('.lkn, .lkup', box).forEach((e) => { e.style.opacity = o; }); };   // the count and the hint go as the glimpse comes up
   liven(box);
 }
 // the glimpses move: ‹ › and swipes between slides, searches that type themselves and find, a character that changes pose,
@@ -2128,6 +2135,7 @@ stage.addEventListener('click', (e) => {
     case 'ownroom': closeSheet(() => playEp(id, epTo(byId(id)))); break;
     case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;
+    case 'lockinfo': { const k = SERIES.LADDER[tab] - SERIES.episodesDone(); if (k > 0) sheet(`<p class="lead">Tu dois avoir fini ${k} épisode${k > 1 ? 's' : ''} supplémentaire${k > 1 ? 's' : ''} pour avoir accès à cette section.</p>`); break; }
     case 'hdown': $('#home').scrollTo({ top: $('#homeMore').offsetTop - 40, behavior: 'smooth' }); break;
     case 'ep': playEp(id, +el.dataset.n); break;
     case 'friend': friendSheet(el.dataset.f); break;
