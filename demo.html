@@ -1528,10 +1528,12 @@ function renderHome() {
     requestAnimationFrame(() => requestAnimationFrame(() => { x.style.cssText = ''; x.className = `hx on big${g ? ' wait' : ''}`; barFor(); }));
   };
   // the opened preview hides the tab bar; scrolled down towards the infos, the bar comes back (and goes again back at the top)
-  // the opened preview stays pinned to the screen while the infos slide up over it: it keeps playing, sound included
+  // the opened preview hides the tab bar; scrolled down towards the infos, the preview folds back into its card (and the bar comes back);
+  // back at the top, it opens up again
   const barFor = () => {
     const x = $('#homeX'), big = !!(x && x.classList.contains('big')), top = $('#home').scrollTop;
-    if (x) x.style.transform = big && top ? `translateY(${top}px)` : '';
+    if (big && top > 40) close();
+    else if (!big && top <= 40 && x && !x.classList.contains('on')) wait();
     document.body.classList.toggle('hxbig', big && top < 40);
   };
   $('#home').onscroll = barFor;
