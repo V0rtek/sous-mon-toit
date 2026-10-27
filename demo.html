@@ -666,8 +666,10 @@ body.t-search #switch { visibility: hidden; }
 .chr .im img { position: absolute; left: 50%; top: 4%; height: 170%; transform: translateX(-50%); }
 .chr { cursor: pointer; }
 .poses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; max-height: 60vh; overflow-y: auto; margin-top: 1em; }
-.pz { display: flex; flex-direction: column; align-items: center; gap: .3em; background: #1c1c1e; border-radius: 1.2em; padding: .8em .4em; }
+.pz { font: inherit; color: inherit; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; background: #1c1c1e; border-radius: 1.2em; padding: .8em .4em; }
 .pz img { height: 14em; width: 100%; object-fit: contain; }
+.closeup { display: flex; justify-content: center; }
+.closeup img { max-height: 55vh; max-width: 100%; object-fit: contain; filter: drop-shadow(0 1em 1.5em rgba(0,0,0,.6)); }
 .pz span { font-size: 1.3em; color: var(--mute); text-align: center; }
 .chr b { display: block; font-size: 1.6em; margin-top: .4em; }
 #sePlayer { position: absolute; inset: 0; z-index: 90; }
@@ -1490,6 +1492,12 @@ function liven(box) {
 }
 // Recherche: the stories by name, or the characters by name and by how they're drawn (series.js STYLE)
 let sKind = 'stories', sStyle = 'semi', sQ = '';
+// a character not yet won: the episode of the show that gives it (null once it's yours, or when nothing gives it)
+const lockedChar = (id) => {
+  if (SERIES.get('all', false) || CHARS.some((c) => c.id === id && (c.custom || c.won || c.id === STARTER))) return null;
+  const src = [...toWin(), ...Object.values(SERIES.TASTES).filter((t) => t.win && t.win.sprite).map((t) => ({ ...t.win, from: t.title }))];
+  return src.find((w) => w.sprite === id) || null;
+};
 const charName = (id) => ({ isa_nuit: 'Isa · Minuit', isa_or: 'Isa · Doré', isa_noir: 'Isa · Braise', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
 function renderSearch() {
   if (!SERIES.isOpen('search')) return;
@@ -2190,7 +2198,13 @@ stage.addEventListener('click', (e) => {
     case 'sKind': sKind = el.dataset.k; renderSearch(); break;
     case 'chr': {   // a character: all its poses
       const ps = Object.keys(SPRITES[id].poses);
-      sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${ps.length} pose${ps.length > 1 ? 's' : ''}</p><div class="poses">${ps.map((p) => `<div class="pz"><img src="chars/${id}/${p}.webp" alt="" loading="lazy"><span>${esc(p.replace(/_/g, ' '))}</span></div>`).join('')}</div>`);
+      sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${ps.length} pose${ps.length > 1 ? 's' : ''}</p><div class="poses">${ps.map((p) => `<button class="pz" data-act="pose" data-id="${id}" data-p="${p}"><img src="chars/${id}/${p}.webp" alt="" loading="lazy"><span>${esc(p.replace(/_/g, ' '))}</span></button>`).join('')}</div>`);
+      break;
+    }
+    case 'pose': {   // a pose up close; a character you don't have yet says what it takes to get it
+      const w = lockedChar(id);
+      if (w) sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${I.lock} Tu dois finir l’épisode ${w.ep} de « ${esc(w.from)} » pour avoir ce perso.</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Retour</button>`);
+      else sheet(`<div class="closeup"><img src="chars/${id}/${el.dataset.p}.webp" alt=""></div><h3>${esc(charName(id))}</h3><p class="lead">${esc(el.dataset.p.replace(/_/g, ' '))}</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Retour</button>`);
       break;
     }
     case 'sStyle': sStyle = el.dataset.k; renderSearch(); break;
