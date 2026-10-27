@@ -15,7 +15,7 @@
   const heroSolo = { justin: 'Justin' };
 
   // single-sheet characters (drawn 25/10): they all look to the right
-  for (const [id, poses] of Object.entries({ alex: ['beach'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand', 'sunglasses', 'shy', 'hip', 'wink', 'nervous', 'hands', 'volleyball', 'thinking', 'embarrassed', 'top_off', 'top_lift', 'hands_hips', 'sitting'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
+  for (const [id, poses] of Object.entries({ alex: ['beach', 'neck', 'glasses', 'thinking', 'smirk', 'top_off', 'bag'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand', 'sunglasses', 'shy', 'hip', 'wink', 'nervous', 'hands', 'volleyball', 'thinking', 'embarrassed', 'top_off', 'top_lift', 'hands_hips', 'sitting'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
 
   // ---------- decors ----------
   const wood = [[40, 70], [260, 50], [560, 60], [1100, 50], [1600, 80], [1800, 60]];
@@ -56,8 +56,8 @@
   };
   SCENES.e_terrasse = {   // the terrace, no table (the chalet's): three spots
     image: 'bg/terrasse.jpg', size: [1920, 1440],
-    spots: { dan: [700, 1300, 740], plage: [1060, 1300, 780], justin: [1420, 1300, 760] },
-    face: { dan: 'r', plage: 'r', justin: 'l' }, front: [],
+    spots: { dan: [700, 1300, 740], plage: [1060, 1300, 780], alex: [1060, 1300, 780], justin: [1420, 1300, 760] },
+    face: { dan: 'r', plage: 'r', alex: 'r', justin: 'l' }, front: [],
   };
   SCENES.e_salon = {
     image: 'bg/salon.jpg', size: [1920, 1440],
@@ -264,49 +264,53 @@
   });
 
   // ---------- 5. Un été de trop ----------
-  story('d_ete', 'Un été de trop', [
-    scene('e_terrasse', { plage: 'sitting', justin: 'listen' }),
-    cam('two', 'plage', 'justin'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · cinq ans plus tard' },
-    ...L('plage', 'sitting', 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
-    ...L('justin', 'surprised', 'Maya…'),
-    ...L('plage', 'sitting', "T'as pas changé. Enfin… un peu."),
+  // the love interest you pick (Maya or Alex): the same story, their own poses (P maps the beats to what each has)
+  const ete = (id, M) => story(id, 'Un été de trop', [
+    scene('e_terrasse', { [M.k]: M.P('sitting'), justin: 'listen' }),
+    cam('two', M.k, 'justin'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · cinq ans plus tard' },
+    ...L(M.k, M.P('sitting'), 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
+    ...L('justin', 'surprised', `${M.name}…`),
+    ...L(M.k, M.P('sitting'), "T'as pas changé. Enfin… un peu."),
     cam('one', 'justin'),
     { by: 'justin', choice: [
-      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L('plage', 'sitting', 'Ne commence pas.')] },
-      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L('plage', 'sitting', 'Tu comptais ?')] },
-      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L('plage', 'sitting', 'Même question.')] },
+      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L(M.k, M.P('sitting'), 'Ne commence pas.')] },
+      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L(M.k, M.P('sitting'), 'Tu comptais ?')] },
+      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L(M.k, M.P('sitting'), 'Même question.')] },
     ] },
-    ...L('plage', 'hands_hips', 'Tu savais que je serais là, hein ?'),
+    ...L(M.k, M.P('hands_hips'), 'Tu savais que je serais là, hein ?'),
     ...L('justin', 'thinking', 'On m’a juste dit de venir à six heures.'),
-    ...L('plage', 'top_lift', 'Personne vient ici par hasard.'),
-    ...L('plage', 'top_off', 'Quoi ? T’as déjà vu.'),
-    ...L('plage', 'stand', 'Tu me regardes comme avant.'),
-    ...T('justin', 'La dernière fois que je l’ai vue ici, elle partait avec mon meilleur ami. Je n’ai jamais su pourquoi.'),
-    ...L('plage', 'shy', 'Arrête. Tu vas me faire perdre mes mots.'),
-    ...L('plage', 'thinking', "Tu veux la vérité, ou la version qui fait le moins mal ?"),
+    ...L(M.k, M.P('top_lift'), 'Personne vient ici par hasard.'),
+    ...L(M.k, M.P('top_off'), 'Quoi ? T’as déjà vu.'),
+    ...L(M.k, M.P('stand'), 'Tu me regardes comme avant.'),
+    ...T('justin', `La dernière fois que je l’ai ${M.vu} ici, ${M.il} partait avec mon meilleur ami. Je n’ai jamais su pourquoi.`),
+    ...L(M.k, M.P('shy'), 'Arrête. Tu vas me faire perdre mes mots.'),
+    ...L(M.k, M.P('thinking'), "Tu veux la vérité, ou la version qui fait le moins mal ?"),
     cam('one', 'justin'),
     { by: 'justin', choice: [
-      { t: 'La vérité.', intent: 'veut savoir', set: { veut: 'vérité' }, then: [...L('justin', 'angry', 'La vérité. Pour une fois.'), ...L('plage', 'nervous', 'Alors tu vas détester ce que je vais dire.')] },
-      { t: 'La version douce.', intent: 'esquive', set: { veut: 'douce' }, then: [...L('justin', 'thinking', 'Celle qui fait le moins mal.'), ...L('plage', 'wink', 'Je savais que tu dirais ça.')] },
+      { t: 'La vérité.', intent: 'veut savoir', set: { veut: 'vérité' }, then: [...L('justin', 'angry', 'La vérité. Pour une fois.'), ...L(M.k, M.P('nervous'), 'Alors tu vas détester ce que je vais dire.')] },
+      { t: 'La version douce.', intent: 'esquive', set: { veut: 'douce' }, then: [...L('justin', 'thinking', 'Celle qui fait le moins mal.'), ...L(M.k, M.P('wink'), 'Je savais que tu dirais ça.')] },
     ] },
-    ...L('plage', 'sunglasses', 'Pas ici. Pas maintenant.'),
-    N('Derrière elle, la porte du chalet s’ouvre.'),
+    ...L(M.k, M.P('sunglasses'), 'Pas ici. Pas maintenant.'),
+    N(`Derrière ${M.lui}, la porte du chalet s’ouvre.`),
     { enter: { dan: 'stand' } },
-    ...L('dan', 'stand', 'Maya, j’ai trouvé les clés… Oh.'),
+    ...L('dan', 'stand', `${M.name}, j’ai trouvé les clés… Oh.`),
     ...L('justin', 'surprised', 'Théo ?'),
     N('Ton ex-meilleur ami. Une valise à la main.'),
-    ...L('plage', 'embarrassed', 'Ah. J’aurais dû te le dire.'),
+    ...L(M.k, M.P('embarrassed'), 'Ah. J’aurais dû te le dire.'),
     ...L('dan', 'stand', "Il ne devait pas être là. Tu m'avais promis."),
-    ...L('plage', 'hip', 'Je sais ce que j’ai promis, Théo.'),
-    ...L('justin', 'thinking', 'Promis quoi, Maya ?'),
-    ...L('plage', 'hands', 'Que personne ne saurait pour l’été.'),
-    ...end(1, { sprite: 'plage', pose: 'stand', name: 'Maya' }, "Fin de l'épisode 1", 'Un été de trop', '{LEDE}'),
+    ...L(M.k, M.P('hip'), 'Je sais ce que j’ai promis, Théo.'),
+    ...L('justin', 'thinking', `Promis quoi, ${M.name} ?`),
+    ...L(M.k, M.P('hands'), 'Que personne ne saurait pour l’été.'),
+    ...end(1, { sprite: M.k, pose: M.P('stand'), name: M.name }, "Fin de l'épisode 1", 'Un été de trop', '{LEDE}'),
   ], {
-    seats: ['justin'], solo: heroSolo,
-    pick: { justin: { pose: 'surprised', line: 'Maya…' } },
-    cast: { ...hero, plage: { name: 'Maya', color: '#c98a4a', sprite: 'plage' }, dan: { name: 'Théo', color: '#2d6a7a', sprite: 'dan' } },
-    words: { LEDE: (f) => `${f.veut === 'vérité' ? 'Tu as demandé la vérité.' : 'Tu as préféré la version douce.'} Maya et Théo cachent un été que tu n’as pas vécu.` },
+    seats: ['justin'], solo: heroSolo, lovers: [['d_ete', 'plage', 'Maya'], ['d_ete_alex', 'alex', 'Alex']],   // the waiting room lets you pick who
+    pick: { justin: { pose: 'surprised', line: `${M.name}…` } },
+    cast: { ...hero, [M.k]: { name: M.name, color: M.color, sprite: M.k }, dan: { name: 'Théo', color: '#2d6a7a', sprite: 'dan' } },
+    words: { LEDE: (f) => `${f.veut === 'vérité' ? 'Tu as demandé la vérité.' : 'Tu as préféré la version douce.'} ${M.name} et Théo cachent un été que tu n’as pas vécu.` },
   });
+  ete('d_ete', { k: 'plage', name: 'Maya', color: '#c98a4a', il: 'elle', lui: 'elle', vu: 'vue', P: (p) => p });
+  const ALEX = { sitting: 'beach', hands_hips: 'smirk', top_lift: 'top_off', top_off: 'bag', stand: 'glasses', shy: 'neck', thinking: 'thinking', nervous: 'neck', wink: 'smirk', sunglasses: 'glasses', embarrassed: 'neck', hip: 'smirk', hands: 'thinking' };
+  ete('d_ete_alex', { k: 'alex', name: 'Alex', color: '#b5733a', il: 'il', lui: 'lui', vu: 'vu', P: (p) => ALEX[p] });
 
   // ---------- 6. Sous la table ----------
   story('d_table', 'Sous la table', [

@@ -890,6 +890,18 @@ const POSTER = {
   ete: { bg: 'beach', cast: [['plage', 'stand']] },
   ile: { bg: 'beach', cast: [['alex', 'beach'], ['mila', 'beach']] },
 };
+// Un été de trop follows who you're into: Maya for girls, Alex for guys (the onboarding's pick, or the one chosen in the waiting room)
+const loveAlex = (() => {
+  try { const v = localStorage.getItem('smtDemo.love'); if (v) return v === 'alex'; } catch { /* private window */ }
+  const o = SERIES.onb(); return !!o && o.li === 'brooke';
+})();
+if (loveAlex) {
+  const d = DEMOS.find((x) => x.id === 'ete');
+  Object.assign(d, { full: 'd_ete_alex', cast: [['alex', 'beach']], eps: [{ title: 'Épisode 1', win: { sprite: 'alex', pose: 'beach', name: 'Alex' }, tease: 'La suite arrive.' }],
+    pitch: "Cinq ans après, tu retrouves Alex sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière lui.",
+    lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière lui, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] });
+  POSTER.ete = { bg: 'beach', cast: [['alex', 'beach']] };
+}
 for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // the onboarding's 4 stories (series.js), in the catalog like the others: their cover is their world, their preview their
 // opening in the game (onbstories.js: full = o_<taste>), their episodes series.js's (placeholders until they're written)

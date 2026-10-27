@@ -175,6 +175,12 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .wr-seat.me .wr-who i, .wr-seat.taken .wr-who i { background: #34c759; }
 .wr-seat.waiting img { opacity: .5; }
 .wr-seat.waiting .wr-who i { background: #ff9f0a; animation: blink 1s infinite; }
+.wr-lk { margin-top: 1.6em; }
+.wr-lovers { display: flex; justify-content: center; gap: 2em; margin-top: .8em; }
+.wr-lovers button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: .4em; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 1.6em; padding: .8em 1.4em; color: #fff; cursor: pointer; }
+.wr-lovers button.on { border-color: #34c759; background: rgba(52,199,89,.08); }
+.wr-lovers .wr-head { width: 7em; height: 7em; }
+.wr-lovers b { font-size: 1.9em; font-weight: 700; }
 .wr-opts { display: flex; gap: 1em; margin-top: 2em; }
 .wr-opts button { flex: 1; font: inherit; font-size: 1.75em; font-weight: 700; padding: .85em .3em; border-radius: 1.4em; border: 0; background: #2c2c2e; color: #fff; cursor: pointer; }
 .wr-opts button:first-child { background: #f5f5f7; color: #000; }
@@ -1602,7 +1608,12 @@ function renderWait() {
       <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
-  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>
+  // a story with a love interest to pick (Un été de trop: Maya or Alex), under your character
+  const lovers = story().lovers && !full ? `<div class="wr-kick wr-lk">Choisis ton love interest</div><div class="wr-lovers">${story().lovers.map(([id, k, n]) => {
+    const sp = SPRITES[k], pose = sp && Object.keys(sp.poses)[0];
+    return `<button type="button" class="${id === state.story ? 'on' : ''}" data-love="${id}"><span class="wr-head"><span><img src="${charUrl(k, pose)}" alt=""></span></span><b>${esc(n)}</b></button>`;
+  }).join('')}</div>` : '';
+  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${lovers}
     ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
     ${host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
@@ -1611,6 +1622,11 @@ function renderWait() {
     e.stopPropagation(); const k = b.dataset.seat;
     if (ROLE !== 'host') return sendIn('seat', { s: k });
     if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
+  });
+  document.querySelectorAll('#room .wr-lovers button').forEach((b) => b.onclick = (e) => {   // another love interest = the same story with them
+    e.stopPropagation(); const id = b.dataset.love; if (id === state.story) return;
+    try { localStorage.setItem('smtDemo.love', id === 'd_ete_alex' ? 'alex' : 'maya'); } catch { /* private window */ }
+    state.story = id; renderWait(); share();
   });
   document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); otherSeat(b.dataset.o); });
   const list = friendsNow(); friendsKey = list.map((f) => f.to || f.n).join('|');
