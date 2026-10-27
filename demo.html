@@ -622,7 +622,8 @@ body.t-search #switch { visibility: hidden; }
 .lzm { display: flex; align-items: center; justify-content: center; gap: 1.2em; }
 .lzm .lzp { width: 13em; aspect-ratio: 3 / 4; border-radius: 1.4em; overflow: hidden; position: relative; background: #1c1c1e; }
 .lzm .lzp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.lzm .lzp img.sp.sm { top: 0; height: 100%; }   /* a whole dog, not cropped to the chest */
+.lzm .lzp img.sp.sm { top: 30%; height: 66%; }   /* a small dog, low in the frame */
+.lzm .lzp img.sp.md { top: 8%; height: 86%; }   /* the whole drawn character, zoomed out */
 .lzm .lzp img.sp { inset: auto; left: 50%; top: 3%; width: auto; height: 175%; transform: translateX(-50%); object-fit: fill; }
 .lzm .lzp .lzx { position: absolute; inset: 0; display: grid; place-items: center; color: #48484a; font-size: 6em; font-weight: 800; }
 .lzm > svg { width: 2.6em; height: 2.6em; color: #86868b; flex: none; }
@@ -1396,7 +1397,7 @@ const LOCKED = {
       `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
       `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span><em>✓ Épisode 1 créé</em></div>
         <div class="lzgo"><div class="lzg">${SPARK}Générer</div>
-        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:12%;height:80%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:34%;height:60%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
     ]),
   },
   social: {
@@ -1472,7 +1473,7 @@ function liven(box) {
     lockTimers.push(setInterval(() => {
       k = (k + 1) % ANY.length; const [src, l, sp, p] = ANY[k];
       $('img', from).src = src; label.textContent = l;
-      to.innerHTML = sp ? `<img class="sp${sp === 'toutou' ? ' sm' : ''}" src="chars/${sp}/${p}.webp" alt="">` : '<div class="lzx">?</div>';
+      to.innerHTML = sp ? `<img class="sp${sp === 'toutou' ? ' sm' : sp === 'astro' ? ' md' : ''}" src="chars/${sp}/${p}.webp" alt="">` : '<div class="lzx">?</div>';
     }, 1700));
   }
   const cels = $$('.lzd .lzcel', box);
