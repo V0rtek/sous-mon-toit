@@ -20,7 +20,7 @@ SCENES.o_party = {
     box(266, 1186, 268, 10, '#ffcf8a', { glow: '0 0 30px 10px rgba(255,200,120,.45)' }),
     box(0, 1196, 1920, 244, 'linear-gradient(#1a0810, #0a0306)'),
   ],
-  spots: { li: [1140, 1330, 820] }, face: { li: 'l' }, front: [],
+  spots: { li: [1140, 1330, 820], toi: [650, 1330, 820] }, face: { li: 'l', toi: 'r' }, front: [],   // Interdite: you're on screen too, facing them
 };
 SCENES.o_gala = {
   size: [1920, 1440], ambience: 'crowd',
@@ -81,24 +81,25 @@ oRevanche.cast = { julian: { name: 'Julian', color: '#5c4a1e', sprite: 'julian' 
 const li = P.get('li') === 'brooke' ? 'brooke' : 'cam', f = P.get('me') === 'f';
 const L = li === 'cam' ? { name: 'Cam', partner: 'Max', pm: true, she: true } : { name: 'Brooke', partner: 'Léa', pm: false, she: false };
 const pose = (p) => (li === 'brooke' ? { flirty: 'drunk_smile', sip: 'drunk_listen', worried: 'nervous', awkward: 'drunk_letdown' }[p] : p);
+const tp = f ? { surprised: 'nervous', listen: 'stand', thinking: 'thinking' } : { surprised: 'surprised', listen: 'listen', thinking: 'thinking' };   // your poses (a girl plays as Maya's look)
 const oDesir = [
-  scene('o_party', { li: pose('flirty') }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Samedi, 2 h' },
+  scene('o_party', { li: pose('flirty'), toi: tp.listen }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Samedi, 2 h' },
   narr(`Le party de ${L.partner} tire à sa fin.`),
   one('li'), T('li', `${L.partner} dort. ${L.pm ? 'Il' : 'Elle'} s’endort toujours quand ça devient intéressant.`, pose('flirty')),
-  T('toi', `${L.name}… t’as bu.`),
-  T('li', `Un peu. Assez pour te dire que t’es ${f ? 'belle' : 'beau'} quand t’es ${f ? 'gênée' : 'gêné'}.`, pose('sip')),
+  one('toi'), T('toi', `${L.name}… t’as bu.`, tp.surprised),
+  one('li'), T('li', `Un peu. Assez pour te dire que t’es ${f ? 'belle' : 'beau'} quand t’es ${f ? 'gênée' : 'gêné'}.`, pose('sip')),
   T('li', `Pis un autre truc. Au chalet, l’été passé… C’est toi que je voulais embrasser. Pas ${L.pm ? 'lui' : 'elle'}.`, pose('flirty')),
   cam('wide'), narr('Derrière la porte de la chambre, quelqu’un se lève.'),
   one('li'), T('li', 'Dis quelque chose. Vite.', pose('worried')),
   { choice: [
-    { t: 'Moi aussi.', intent: 'avoue', then: [T('toi', 'Moi aussi. Depuis le chalet.'), T('li', 'Alors on a un problème.', pose('flirty')), cam('wide'), narr('La poignée tourne.')] },
-    { t: `Va ${L.pm ? 'le' : 'la'} rejoindre.`, intent: 'recule', then: [T('toi', `Va ${L.pm ? 'le' : 'la'} rejoindre, ${L.name}.`), T('li', 'Ok. Mais tu vas y penser toute la nuit.', pose('awkward')),
+    { t: 'Moi aussi.', intent: 'avoue', then: [one('toi'), T('toi', 'Moi aussi. Depuis le chalet.', tp.listen), one('li'), T('li', 'Alors on a un problème.', pose('flirty')), cam('wide'), narr('La poignée tourne.')] },
+    { t: `Va ${L.pm ? 'le' : 'la'} rejoindre.`, intent: 'recule', then: [one('toi'), T('toi', `Va ${L.pm ? 'le' : 'la'} rejoindre, ${L.name}.`, tp.thinking), one('li'), T('li', 'Ok. Mais tu vas y penser toute la nuit.', pose('awkward')),
       narr(`${L.she ? 'Elle' : 'Il'} a raison.`)] },
   ] },
   fin,
 ];
 oDesir.title = 'Interdite';
-oDesir.cast = { li: { name: L.name, color: li === 'cam' ? '#3b1f6e' : '#2a4f8f', sprite: li }, toi: TOI };
+oDesir.cast = { li: { name: L.name, color: li === 'cam' ? '#3b1f6e' : '#2a4f8f', sprite: li }, toi: { ...TOI, sprite: f ? 'plage' : 'justin' } };   // you, on screen: your look (a girl: Maya's, a guy: Justin)
 
 // ---- Le danger · Ouvre pas: you, on screen, with the phone ----
 const text = (t) => ({ sms: { from: 'num', to: 'justin', text: t } });
