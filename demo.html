@@ -664,6 +664,11 @@ body.t-search #switch { visibility: hidden; }
 .chr { text-align: center; }
 .chr .im { position: relative; aspect-ratio: 3 / 4; border-radius: 1.2em; overflow: hidden; background: #1c1c1e; }
 .chr .im img { position: absolute; left: 50%; top: 4%; height: 170%; transform: translateX(-50%); }
+.chr { cursor: pointer; }
+.poses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; max-height: 60vh; overflow-y: auto; margin-top: 1em; }
+.pz { display: flex; flex-direction: column; align-items: center; gap: .3em; background: #1c1c1e; border-radius: 1.2em; padding: .8em .4em; }
+.pz img { height: 14em; width: 100%; object-fit: contain; }
+.pz span { font-size: 1.3em; color: var(--mute); text-align: center; }
 .chr b { display: block; font-size: 1.6em; margin-top: .4em; }
 #sePlayer { position: absolute; inset: 0; z-index: 90; }
 #sePlayer[hidden] { display: none; }
@@ -1485,6 +1490,7 @@ function liven(box) {
 }
 // Recherche: the stories by name, or the characters by name and by how they're drawn (series.js STYLE)
 let sKind = 'stories', sStyle = 'semi', sQ = '';
+const charName = (id) => ({ isa_nuit: 'Isa · Minuit', isa_or: 'Isa · Doré', isa_noir: 'Isa · Braise', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
 function renderSearch() {
   if (!SERIES.isOpen('search')) return;
   const kinds = [['stories', 'Histoires'], ['chars', 'Persos']], styles = [['semi', 'Semi-réaliste'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
@@ -1498,10 +1504,9 @@ function renderSearch() {
 function searchRes() {
   const q = sQ.trim().toLowerCase(), has = (s) => !q || String(s).toLowerCase().includes(q);
   const face = (id) => { const ps = SPRITES[id].poses; return ps.listen ? 'listen' : ps.stand ? 'stand' : Object.keys(ps)[0]; };
-  const nameOf = (id) => ({ isa_nuit: 'Isa · Minuit', isa_or: 'Isa · Doré', isa_noir: 'Isa · Braise', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
   $('#sRes').innerHTML = sKind === 'chars'
-    ? `<div class="grid g3">${Object.keys(SERIES.STYLE).filter((id) => window.SPRITES && SPRITES[id] && (!sStyle || SERIES.STYLE[id] === sStyle) && has(nameOf(id)))
-        .map((id) => `<div class="chr"><div class="im"><img src="chars/${id}/${face(id)}.webp" alt="" loading="lazy"></div><b>${esc(nameOf(id))}</b></div>`).join('')}</div>`
+    ? `<div class="grid g3">${Object.keys(SERIES.STYLE).filter((id) => window.SPRITES && SPRITES[id] && (!sStyle || SERIES.STYLE[id] === sStyle) && has(charName(id)))
+        .map((id) => `<div class="chr" data-act="chr" data-id="${id}"><div class="im"><img src="chars/${id}/${face(id)}.webp" alt="" loading="lazy"></div><b>${esc(charName(id))}</b></div>`).join('')}</div>`
     : `<div class="grid g2">${all().filter((d) => has(d.title)).map((d) => card(d, { byocB: false })).join('')}</div>`;
 }
 function renderHome() {
@@ -2183,6 +2188,11 @@ stage.addEventListener('click', (e) => {
     case 'tab': setTab(el.dataset.tab); break;
     case 'nextep': { const nx = SERIES.nextEp(); if (nx && nx.k === 'lastcall') openPlayer('lastcall'); else if (nx) playSe(nx.k, nx.n); break; }
     case 'sKind': sKind = el.dataset.k; renderSearch(); break;
+    case 'chr': {   // a character: all its poses
+      const ps = Object.keys(SPRITES[id].poses);
+      sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${ps.length} pose${ps.length > 1 ? 's' : ''}</p><div class="poses">${ps.map((p) => `<div class="pz"><img src="chars/${id}/${p}.webp" alt="" loading="lazy"><span>${esc(p.replace(/_/g, ' '))}</span></div>`).join('')}</div>`);
+      break;
+    }
     case 'sStyle': sStyle = el.dataset.k; renderSearch(); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
     case 'pick': if (el.dataset.c === me().id) lookSheet(el.dataset.c); else { keep.set('me', el.dataset.c); renderSocial(); } break;   // yours again: its look
