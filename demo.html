@@ -558,6 +558,7 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
 #current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
+.view.locked img { -webkit-user-drag: none; user-select: none; }
 .view.locked, .view.locked .c3 { overflow: hidden; touch-action: none; }   /* the finger's swipe is ours: left to the browser it would be cancelled */   /* a tab not open yet: the title, the padlock and the count; a swipe up reveals the glimpse of it (no scroll) */   /* the same top as the other tabs: the padlock at the same height */
 .lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
@@ -1417,9 +1418,12 @@ function renderLocked(v) {
     ${L.show ? `<div class="lkup">Glisse vers le haut<svg viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}<div class="lkx">${L.show ? L.show() : ''}</div></div>`;
   // a swipe up reveals the glimpse (the count and the hint go), a swipe down (or the hint, or the padlock's tap) brings the padlock screen back
   const lk = $('.lkv', box); let y0 = null;
+  const swipe = (y) => { if (y0 === null || !lk) return; const dy = y - y0; y0 = null; if (dy < -40) lk.classList.add('up'); else if (dy > 40) lk.classList.remove('up'); };
   box.onpointerdown = (e) => { y0 = e.clientY; };
-  box.onpointerup = (e) => { if (y0 === null || !lk) return; const dy = e.clientY - y0; y0 = null; if (dy < -40) lk.classList.add('up'); else if (dy > 40) lk.classList.remove('up'); };
+  box.onpointerup = (e) => swipe(e.clientY);
   box.onpointercancel = () => { y0 = null; };
+  box.ontouchstart = (e) => { y0 = e.touches[0].clientY; };   // the same by touch events, where the pointer ones don't make it
+  box.ontouchend = (e) => swipe(e.changedTouches[0].clientY);
   const hint = $('.lkup', box); if (hint) hint.onclick = () => lk.classList.add('up');
   liven(box);
 }
