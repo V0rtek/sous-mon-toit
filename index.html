@@ -1530,7 +1530,6 @@ async function introCard(who, at) {
   await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
   if (run !== at) return;
   box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
-  if (state.story !== 'o_desir') sfx('intro');   // the story opens like a show (not Interdite: a romance isn't a podcast / TV show)
   const timers = [[150, 'in'], [500, 'in rise'], [1100, 'in rise named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
   await new Promise((ok) => { const t = setTimeout(ok, 3200); box.onclick = (e) => { e.stopPropagation(); clearTimeout(t); ok(); }; });
   timers.forEach(clearTimeout); box.onclick = null; box.style.transition = ''; box.style.opacity = 0;
