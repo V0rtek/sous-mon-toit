@@ -191,7 +191,7 @@ function art(k, withNotif, shape = 'poster') {
     ${(a?.[shape] || []).map(([s, p, x, h, t, c]) => spr(s, p, x, h, t, c)).join('')}
     ${withNotif && a?.notif ? `<div class="notif"><i></i><div><b>${esc(a.notif[0])}</b><span>${esc(a.notif[1])}</span></div></div>` : ''}</div>`;
 }
-const tease = (c) => `<div class="tz"><div class="art a-${c.w}"><div class="bg"></div>${c.s.map(([s, p, x, h, t]) => spr(s, p, x, h, t)).join('')}</div><b>${esc(c.t)}</b></div>`;
+const tease = (c, titled = true) => `<div class="tz"><div class="art a-${c.w}"><div class="bg"></div>${c.s.map(([s, p, x, h, t]) => spr(s, p, x, h, t)).join('')}</div>${titled ? `<b>${esc(c.t)}</b>` : ''}</div>`;
 
 // ---- an episode (placeholder until it's written), then its end card: what was won, what opened, the next one ----
 // opts: home() back to the app · next(k, n) the next episode (default: right here) · profile(win) put the won character in

@@ -294,12 +294,21 @@ function start(i = vi) {
   const v = VERSIONS[vi];
   $('#vName').innerHTML = `<small>${vi + 1}</small>${esc(v.name)}`;
   // a stranger's run counts as soon as it's shown (the funnel); mine only once I pick (switching versions isn't a try)
-  run = { v: v.id, at: Date.now(), t0: performance.now(), ...(LOCKED && { rid: Math.random().toString(36).slice(2, 12), src: NEWP ? 'demo' : 'lien' }) };
+  run = { v: v.id, at: Date.now(), t0: performance.now(), lid: Date.now().toString(36), ...(LOCKED && { rid: Math.random().toString(36).slice(2, 12), src: NEWP ? 'demo' : 'lien' }) };
   if (LOCKED) { RUNS.push(run); save(); }
   const box = $('#screen'); box.className = 'screen'; box.innerHTML = ''; box.onclick = null; box.style.opacity = '';
   const go = location.hash.match(/^#go=(\w+)/);   // #go=desir&at=4: straight into an opening (to check a line)
   if (go && ARCH[go[1]]) { picked(go[1]); return scene(go[1], ARCH[go[1]].lines); }
   v.draw(box);
+}
+// back from the game (?after=<run>&picked=<its choice>): that run again, finished, and its end (a new profile: the rest of
+// episode 1 then Full demo; a stranger: « La suite arrive »; me testing: what it measured)
+function resume(lid) {
+  run = RUNS.find((r) => r.lid === lid); if (!run || !run.k) return false;
+  vi = Math.max(0, VERSIONS.findIndex((v) => v.id === run.v)); $('#vName').innerHTML = `<small>${vi + 1}</small>${esc(VERSIONS[vi].name)}`;
+  run.choice = ARGS.get('picked') || run.choice;
+  history.replaceState(null, '', location.pathname + '?' + [...ARGS].filter(([k]) => k !== 'after' && k !== 'picked').map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&'));
+  end(); return true;
 }
 function picked(k) {
   if (run.k) return;
@@ -317,7 +326,19 @@ function grow(el, then) {
   Object.assign(c.style, { left: '0px', top: '0px', width: s.width + 'px', height: s.height + 'px' });
   setTimeout(() => { then(); c.remove(); }, 400);
 }
-const choose = (el) => { const k = el.dataset.k; picked(k); grow(el, () => scene(k, ARCH[k].lines)); };
+const choose = (el) => { const k = el.dataset.k; picked(k); grow(el, () => playGame(k)); };
+// the opening plays in the game itself (its camera, its bubbles), then comes back here (?after) for the end of episode 1.
+// The romance asks its two things first (who you are, who you fall for): the game builds the story from them
+function playGame(k) {
+  const go = () => {
+    save();
+    const back = new URLSearchParams(location.search); back.delete('picked'); back.set('after', run.lid);
+    const q = new URLSearchParams({ play: 'o_' + k, back: 'onboarding.html?' + back });
+    if (k === 'desir') { q.set('me', run.me || 'm'); q.set('li', run.li || 'cam'); }
+    location.href = 'index.html?' + q;
+  };
+  if (k === 'desir') { const box = $('#screen'); box.className = 'screen scene'; box.innerHTML = art('desir', false).replace(/<img[^>]*>/g, ''); lovePick(box, go); } else go();
+}
 
 // 1 · the four at once
 function drawGrid(box) {
@@ -361,7 +382,7 @@ function drawQuestion(box) {
   box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${art(k, false, 'row')}<b>${esc(ARCH[k].verb)}</b></button>`).join('')}`;
   $$('button', box).forEach((b) => b.onclick = () => {
     const k = b.dataset.k; $('b', b).style.color = ARCH[k].color; picked(k);
-    setTimeout(() => { box.style.transition = 'opacity .3s'; box.style.opacity = 0; setTimeout(() => { box.style.opacity = ''; scene(k, ARCH[k].lines); }, 300); }, 250);
+    setTimeout(() => { box.style.transition = 'opacity .3s'; box.style.opacity = 0; setTimeout(() => { box.style.opacity = ''; playGame(k); }, 300); }, 250);
   });
 }
 // 5 · no poster: the story starts, its first answer says the taste
@@ -439,7 +460,7 @@ function lovePick(box, then) {
 
 // ---- the end: what this run measured ----
 function end() {
-  stopTimers(); run.done = Math.round(performance.now() - run.t0); save();
+  stopTimers(); run.done = Date.now() - run.at; save();
   const a = ARCH[run.k], box = $('#screen'); box.onclick = null;
   box.className = 'screen end';
   if (NEWP) {   // a new profile keeps the taste picked (Full demo puts it first), and the opening goes on into the rest of
@@ -484,7 +505,7 @@ stage.addEventListener('click', (e) => {
 // preload the faces so a scene never waits on an image
 const every = (ls) => ls.flatMap((l) => l.c ? l.c.flatMap((o) => every(o[1])) : [l]);
 for (const k of KEYS) for (const l of every(ARCH[k].lines)) if (l.o) for (const sp of l.o === 'li' ? Object.keys(LOVE) : [CAST[l.o][1]]) new Image().src = `chars/${sp}/${(sp === 'brooke' && LOVE.brooke.poses[l.pose]) || l.pose}.webp`;
-start();
+if (!(ARGS.get('after') && resume(ARGS.get('after')))) start();
 </script>
 </body>
 </html>

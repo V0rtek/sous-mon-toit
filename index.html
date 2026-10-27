@@ -341,6 +341,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #menuPop button { font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(28,28,30,.92); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #menuPop svg { width: 2.8em; height: 2.8em; }
 body.preview #menuBtn, body.preview #menuPop { display: none !important; }
+body.playonly #back, body.playonly #qrBtn, body.playonly #eyes, body.playonly #galBtn, body.playonly #menuBtn, body.playonly #menuPop { display: none !important; }
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #galBtn svg { width: 3.8em; height: 3.8em; }
@@ -594,15 +595,16 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261026150524"></script>
-<script src="story.js?v=20261026150524"></script>
-<script src="play.js?v=20261026150524"></script>
-<script src="bar.js?v=20261026150524"></script>
-<script src="games.js?v=20261026150524"></script>
-<script src="gen.js?v=20261026150524"></script>
-<script src="demos.js?v=20261026150524"></script>
-<script src="episodes.js?v=20261026150524"></script>
-<script src="people.js?v=20261026150524"></script>
+<script src="chars.js?v=20261026221500"></script>
+<script src="story.js?v=20261026221500"></script>
+<script src="play.js?v=20261026221500"></script>
+<script src="bar.js?v=20261026221500"></script>
+<script src="games.js?v=20261026221500"></script>
+<script src="gen.js?v=20261026221500"></script>
+<script src="demos.js?v=20261026221500"></script>
+<script src="onbstories.js?v=20261026221500"></script>
+<script src="episodes.js?v=20261026221500"></script>
+<script src="people.js?v=20261026221500"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -817,7 +819,8 @@ async function readTexts(id, r) {
 const PHONE = '<svg viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm3 14.5h2v1h-2z"/></svg>';
 const nameOf = (id) => (id && castOf(id) && castOf(id).name) || '';
 const mineTo = (id) => seatsOf().includes(id) && sees(id);   // the one (one of those) you play
-const faceOf = (id) => `<span class="sf">${id && castOf(id) ? `<img src="${poseSrc(id, 'listen')}" alt="" onload="headCrop(this)">` : ''}</span>`;
+// a sender with no picture (an unknown number) has an empty circle
+const faceOf = (id) => `<span class="sf">${id && castOf(id) && castOf(id).sprite ? `<img src="${poseSrc(id, 'listen')}" alt="" onload="headCrop(this)">` : ''}</span>`;
 // a round face from a whole-body sprite: finds his head in the picture (the top of the figure, wherever he leans) and
 // centres it in the circle
 const HEADS = {};
@@ -1461,7 +1464,7 @@ async function next() {
       if (FAST || PREVIEW || (remote && s.episode.n < (remote.j || 0))) continue;   // not while jumping, not in Full demo's previews
       if (!(await episodeEnd(s.episode, r))) return;
     }
-    else if (s.end) { endCard(s.end); return; }
+    else if (s.end) { if (PLAY_ONLY) { playDone(); return; } endCard(s.end); return; }
   }
 }
 
@@ -1540,7 +1543,7 @@ function begin(id = state.story) {
   bump((st) => { st.s = st.s || {}; const r = (st.s[id] = st.s[id] || {}); r.plays = (r.plays || 0) + 1; });
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
-  firstLine = id === 't1';   // the "tap to continue" hint is chapter 1's; the 2-player stories have none
+  firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
   if (!seatsOf(id).length) state.seats = {};
@@ -2061,6 +2064,14 @@ idbDo('readonly', (st) => st.getAll()).then((all) => (all || []).forEach(registe
 const WATCH = new URLSearchParams(location.search).get('watch');
 const ROLE = WATCH && /^[a-z0-9]{4,12}$/.test(WATCH) ? 'watch' : 'host';
 const PREVIEW = ROLE === 'host' && (s => STORIES[s] ? s : null)(new URLSearchParams(location.search).get('preview'));
+// ?play=<story>&back=<page>: that one story, straight in, on this phone alone (the onboarding's opening, onbstories.js): no
+// name, no menu, no waiting room; its end goes back to <page> with the last choice made (&picked=)
+const PLAY_ONLY = ROLE === 'host' && !PREVIEW && (s => STORIES[s] ? s : null)(new URLSearchParams(location.search).get('play'));
+function playDone() {
+  const b = new URLSearchParams(location.search).get('back') || '', last = state.picks[state.picks.length - 1];
+  const to = /^[\w.-]+\.html(\?[^#]*)?$/.test(b) ? b : 'onboarding.html';
+  location.replace(to + (to.includes('?') ? '&' : '?') + 'picked=' + encodeURIComponent(last ? fill(last.t) : ''));
+}
 let live = null, room = ROLE === 'watch' ? WATCH : null, game = null, tape = [];
 let myName = '', sentK = -1, hostId = null;   // joiner: its name, the last line it asked to move past, the host's id
 const myId = (() => {
@@ -2078,7 +2089,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261026150524';
+const BUILD = '20261026221500';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -2337,7 +2348,8 @@ if (PREVIEW) {
     if (el) el.click();
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
-} else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
+} else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
+else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
   const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?(?:&invite=([a-z0-9]+)&iname=([^&]+))?$/);
