@@ -558,7 +558,7 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
 #current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
-.view.locked { overflow: hidden; }   /* a tab not open yet: the title, the padlock and the count; a swipe up reveals the glimpse of it (no scroll) */   /* the same top as the other tabs: the padlock at the same height */
+.view.locked, .view.locked .c3 { overflow: hidden; touch-action: none; }   /* the finger's swipe is ours: left to the browser it would be cancelled */   /* a tab not open yet: the title, the padlock and the count; a swipe up reveals the glimpse of it (no scroll) */   /* the same top as the other tabs: the padlock at the same height */
 .lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
