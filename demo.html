@@ -948,13 +948,7 @@ const shelf = (pick) => typeof pick === 'function' ? all().filter(pick) : pick.m
 // ---- every alternative: L = layouts (‹ › at the top), the rest in ⚙ ----
 const LAYOUTS = [['rows', 'Rangées'], ['grid2', 'Grille 2'], ['grid3', 'Mur d\'affiches'], ['feed', 'Plein écran'], ['carousel', 'Carrousel'], ['stack', 'Pile à swiper'], ['list', 'Liste'], ['magazine', 'Magazine'], ['live', 'En direct d\'abord'], ['spotlight', 'Projecteur'], ['bubbles', 'Test bulles']];
 const OPTIONS = [
-  ['layout', 'Mise en page', 'Aussi avec ‹ › en haut.', LAYOUTS],
-  ['live', 'Quelqu\'un attend dans une salle', 'Sur l\'affiche. Vert = un inconnu, rose = un ami.', [['dot', 'Point qui clignote'], ['badge', 'Étiquette'], ['ring', 'Contour lumineux'], ['avatar', 'Avatar']]],
-  ['play', 'Bouton Jouer quand quelqu\'un attend', '', [['dot', 'Point sur le bouton'], ['color', 'Bouton coloré']]],
-  ['byoc', 'Amène ton perso', '', [['icon', 'Icône'], ['tag', 'Étiquette'], ['corner', 'Bandeau en coin']]],
-  ['save', 'Sauver', '', [['bookmark', 'Signet'], ['heart', 'Cœur'], ['plus', '+ Ma liste']]],
   ['detail', 'Voir plus', '', [['veil', 'Voile noir plein écran'], ['zoom', 'Affiche zoomée'], ['sheet', 'Panneau du bas']]],
-  ['progress', 'Progression dans l\'aperçu', '', [['corner', '#/N en coin'], ['bar', 'Barre en segments'], ['ring', 'Cercle'], ['pill', 'En bas']]],
   ['tabs', 'Onglets', '', [['labels', 'Icônes + texte'], ['icons', 'Icônes seules'], ['pill', 'Pilule flottante']]],
 ];
 const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
@@ -1977,10 +1971,9 @@ function closeSheet(then) {
   if (top && top.k === 'sheet') back(then); else { $('#sheet').hidden = true; if (then) then(); }
 }
 function options() {
-  const box = sheet(`<h3>Les variantes</h3><p class="lead">Mélange-les, puis dis-moi la combinaison gagnante (ex. « D, point qui clignote, panneau du bas »).</p>` +
+  const box = sheet(`<h3>Réglages</h3>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
-    `<button class="btn" id="reset" style="width:100%">Tout remettre par défaut</button>
-    <button class="btn" id="wipe" style="width:100%;margin-top:1em;color:#ff453a">Réinitialiser mon profil</button>
+    `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Réinitialiser mon profil</button>
     <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>
     ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Parcours progressif' : 'Tout débloqué (démo)'}</button>` : ''}
     <button class="btn" id="toGame" style="width:100%;margin-top:1em">Menu du jeu</button>`);
