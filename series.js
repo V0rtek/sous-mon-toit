@@ -144,7 +144,7 @@ const TEASE = [
 // ---- how each character is drawn (Recherche filters by it) ----
 const STYLE = {};
 for (const [st, ids] of Object.entries({
-  semi: ['alex', 'brooke', 'cam', 'dan', 'julian', 'justin', 'justin_bar', 'mila', 'plage', 'rae', 'suit'],
+  semi: ['alex', 'brooke', 'cam', 'dan', 'julian', 'justin', 'justin_bar', 'mila', 'plage', 'rae', 'suit', 'astro_gore', 'astro_tentacle', 'astro_orion', 'astro_retro', 'astro_saint', 'astro_nasa'],
   anime: ['diane', 'exile', 'isa_noir', 'isa_nuit', 'isa_or', 'melissa', 'ninja', 'ruby'],
   cartoon: ['amare', 'belier_blanc', 'belier_noir', 'candy', 'james', 'ombre'],
 })) for (const id of ids) STYLE[id] = st;

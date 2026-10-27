@@ -739,7 +739,7 @@ const I = {
 
 // ---- the community's demos (fake). cast: [sprite, pose]; you: which cast member the player brings their own
 // character into (-1 = the player isn't on screen); lines: [who (-1 = narration), text, pose?] ----
-const NAMES = { brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', melissa: 'Melissa', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
+const NAMES = { astro_gore: 'Vesper', astro_tentacle: 'Abysse', astro_orion: 'Orion', astro_retro: 'Laïka', astro_saint: 'Séraphin', astro_nasa: 'Apollo', brooke: 'Brooke', cam: 'Cam', julian: 'Julian', suit: 'Victor', justin: 'Justin', justin_bar: 'Justin', ruby: 'Ruby', james: 'James', diane: 'Diane', amare: 'Amare', isa_nuit: 'Isa', isa_or: 'Isa', candy: 'Candy', melissa: 'Melissa', alex: 'Alex', mila: 'Mila', dan: 'Dan', rae: 'Rae', belier_noir: 'Ébène', belier_blanc: 'Neige', ombre: "L'Ombre", exile: 'Itsuki', ninja: 'Sora', plage: 'Maya' };
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', ch: 'mila', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', ch: 'ninja', on: true },
@@ -1404,7 +1404,7 @@ const LOCKED = {
     back: () => `<div class="chips" style="justify-content:center">${FRIENDS.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}</div>`,
     // one story, two phones: each plays their own character and has their own choices; while one chooses, the other waits
     // (Brooke on the left, Cam on the right: they face each other)
-    show: () => slides([`<h3>Une histoire, un perso chacun</h3><div class="lzd">${[['Léa', 'brooke', 'drunk_smile', ['L’embrasser.', 'Partir.']], ['Toi', 'cam', 'flirty', ['Lui avouer.', 'Changer de sujet.']]].map(([n, sp, p, opts], i) =>
+    show: () => slides([`<h3>Une histoire avec des amis, un perso chacun</h3><div class="lzd">${[['Léa', 'brooke', 'drunk_smile', ['L’embrasser.', 'Partir.']], ['Toi', 'cam', 'flirty', ['Lui avouer.', 'Changer de sujet.']]].map(([n, sp, p, opts], i) =>
       `<div class="lzcel${i ? ' mine' : ''}"><div class="art a-desir"><div class="bg"></div>${SERIES.spr(sp, p, 50, 120, 14)}</div><div class="lzn"><i></i>${n}</div>
         <div class="lzo">${opts.map((o) => `<b>${o}</b>`).join('')}</div><div class="lzw">${i ? 'Léa' : 'Toi'} choisit…</div></div>`).join('')}</div>`]),
   },
@@ -1480,10 +1480,10 @@ function liven(box) {
   if (cels.length) { let k = 1; lockTimers.push(setInterval(() => { k = 1 - k; cels.forEach((c, i) => c.classList.toggle('mine', i === k)); }, 1800)); }
 }
 // Recherche: the stories by name, or the characters by name and by how they're drawn (series.js STYLE)
-let sKind = 'stories', sStyle = '', sQ = '';
+let sKind = 'stories', sStyle = 'semi', sQ = '';
 function renderSearch() {
   if (!SERIES.isOpen('search')) return;
-  const kinds = [['stories', 'Histoires'], ['chars', 'Persos']], styles = [['', 'Tous'], ['semi', 'Semi-réaliste'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
+  const kinds = [['stories', 'Histoires'], ['chars', 'Persos']], styles = [['semi', 'Semi-réaliste'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
   $('#search').innerHTML = `<div class="srw"><input class="sq" id="sQ" placeholder="Rechercher" value="${esc(sQ)}" autocomplete="off" enterkeyhint="search">
     <div class="chips">${kinds.map(([k, l]) => `<button class="chip${sKind === k ? ' on' : ''}" data-act="sKind" data-k="${k}">${l}</button>`).join('')}</div>
     ${sKind === 'chars' ? `<div class="chips">${styles.map(([k, l]) => `<button class="chip${sStyle === k ? ' on' : ''}" data-act="sStyle" data-k="${k}">${l}</button>`).join('')}</div>` : ''}
