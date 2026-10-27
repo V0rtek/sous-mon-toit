@@ -561,7 +561,7 @@ body.t-search #switch { visibility: hidden; }
 .lkv { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
-.lkv > :not(.lkbg) { position: relative; }
+.lkv > :not(.lkbg) { position: relative; flex: none; }   /* never squeezed: the padlock the same size on every tab */
 .lkt { font-size: 3.4em; font-weight: 800; letter-spacing: -.02em; }
 .lkic { width: 11em; height: 11em; color: #fff; margin: .8em 0 .6em; }
 .lkn { font-size: 1.9em; font-weight: 600; color: #d1d1d6; }
@@ -592,6 +592,15 @@ body.t-search #switch { visibility: hidden; }
 .lzch { display: flex; gap: .5em; justify-content: center; flex-wrap: wrap; }
 .lzch b { font-size: 1.4em; line-height: 1; padding: .4em .75em; border-radius: 2em; background: #fff; color: #000; }
 .lzl { font-size: 1.6em; color: #86868b; font-weight: 600; margin-top: .8em; }
+.lzq em { display: none; font-style: normal; font-weight: 700; color: #30d158; }
+.lzq.done { justify-content: center; background: none; }
+.lzq.done > :not(em) { display: none; } .lzq.done em { display: inline; }
+/* « Générer » sits where the story will be: pressed, it goes, and the generation takes its place */
+.lzgo { position: relative; width: 18em; margin: 1.2em auto 0; }
+.lzgo .lzg { position: absolute; left: 50%; top: 0; transform: translateX(-50%); margin: 0; transition: background .2s, color .2s, transform .2s, opacity .25s; }
+.lzgo .lzg.on { transform: translateX(-50%) scale(.96); }
+.lzgo .lzg.off { opacity: 0; }
+.lzgo .lzs { width: 100%; margin: 0; }
 .lzg { display: inline-flex; align-items: center; gap: .4em; margin-top: 1em; font-size: 1.7em; font-weight: 700; padding: .5em 1.1em; border-radius: 2em; background: #2c2c2e; color: #f5f5f7; transition: background .2s, color .2s, transform .2s; }
 .lzg svg { width: 1.1em; height: 1.1em; }
 .lzg.on { background: #fff; color: #000; transform: scale(.96); }
@@ -1379,9 +1388,9 @@ const LOCKED = {
     show: () => slides([
       `<h3>Transforme un selfie en personnage jouable</h3><div class="lzm"><div class="lzp"><img src="ref/perso_justin.webp" alt=""></div>${ARR}<div class="lzp"><img class="sp" data-poses="holding,punch,thinking,surprised,explaining" src="chars/justin/holding.webp" alt=""></div></div>`,
       `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
-      `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span></div>
-        <div class="lzg">${SPARK}Générer</div>
-        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/justin/punch.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div>`,
+      `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span><em>✓ Épisode 1 créé</em></div>
+        <div class="lzgo"><div class="lzg">${SPARK}Générer</div>
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/justin/punch.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
     ]),
   },
   social: {
@@ -1423,16 +1432,19 @@ function liven(box) {
       if (++hold > 28) { i = 0; hold = 0; res.forEach((r) => r.classList.remove('on')); }
     }, 90));
   }
-  for (const sp of $$('[data-gen]', box)) {   // an idea typed, « Générer » pressed, it generates, the story's poster
-    const full = sp.dataset.gen, sl = sp.closest('.c3s'), btn = $('.lzg', sl), st = $('.lzs', sl);
+  for (const sp of $$('[data-gen]', box)) {   // an idea typed, « Générer » pressed and gone, it generates in its place, the
+    // story's poster, and the bar now says « Épisode 1 créé »
+    const full = sp.dataset.gen, sl = sp.closest('.c3s'), bar = sp.parentNode, btn = $('.lzg', sl), st = $('.lzs', sl);
     let i = 0, t = 0;
     lockTimers.push(setInterval(() => {
       if (i <= full.length) { sp.textContent = full.slice(0, i++); return; }
       t++;
       btn.classList.toggle('on', t > 3 && t < 7);
+      btn.classList.toggle('off', t >= 7);
       st.classList.toggle('gen', t >= 7 && t < 20);
       st.classList.toggle('on', t >= 20);
-      if (t > 48) { i = 0; t = 0; st.classList.remove('on', 'gen'); }
+      bar.classList.toggle('done', t >= 20);
+      if (t > 48) { i = 0; t = 0; st.classList.remove('on', 'gen'); btn.classList.remove('off'); bar.classList.remove('done'); }
     }, 90));
   }
   for (const im of $$('[data-poses]', box)) {   // the character made from the selfie, moving
