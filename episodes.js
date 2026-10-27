@@ -54,8 +54,8 @@
       ...Array.from({ length: 14 }, (_, i) => R(i * 140 + 10, 880, 10, 160, '#2a221b')), R(0, 870, 1920, 12, '#3a2e24')],
     spots: { itsuki: [600, 1180, 690], sora: [1180, 1180, 690] }, face: { itsuki: 'r', sora: 'l' },
   };
-  SCENES.e_terrasse = {   // the terrace, no table (the chalet's): three spots
-    image: 'bg/terrasse.jpg', size: [1920, 1440],
+  SCENES.e_terrasse = {   // the chalet's deck over the beach at sunset (bg/chalet.jpg): three spots
+    image: 'bg/chalet.jpg', size: [1920, 1440],
     spots: { dan: [700, 1300, 740], plage: [1060, 1300, 780], alex: [1060, 1300, 780], justin: [1420, 1300, 760] },
     face: { dan: 'r', plage: 'r', alex: 'r', justin: 'l' }, front: [],
   };

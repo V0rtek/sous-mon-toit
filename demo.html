@@ -797,7 +797,7 @@ const DEMOS = [
     cast: [['exile', 'stand'], ['ninja', 'stand']], players: 2, byoc: false, live: { strangers: 2, since: 1 }, you: 0,
     pitch: "Six ans qu'il cherche son frère d'armes. Ce soir, il le retrouve sur le pont — et c'est l'autre qui a les réponses.",
     lines: [[1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
-  { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'terrasse', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
+  { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'chalet', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
     full: 'd_ete', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'plage', pose: 'stand', name: 'Maya' }, tease: 'La suite arrive.' }],
     cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
     pitch: "Cinq ans après, tu retrouves Maya sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière elle.",
@@ -887,7 +887,7 @@ const POSTER = {
   beliers: { bg: 'forest', fx: 'hue-rotate(60deg) brightness(.9)', cast: [['belier_noir', 'stand']] },
   ombre: { bg: 'forest', fx: 'hue-rotate(320deg) saturate(3) brightness(.7)', cast: [['ombre', 'stand']] },
   serment: { bg: 'maison', pos: '30% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-30deg) brightness(.4)', cast: [['exile', 'stand']] },
-  ete: { bg: 'beach', cast: [['plage', 'stand']] },
+  ete: { bg: 'chalet', cast: [['plage', 'stand']] },
   ile: { bg: 'beach', cast: [['alex', 'beach'], ['mila', 'beach']] },
 };
 // Un été de trop follows who you're into: Maya for girls, Alex for guys (the onboarding's pick, or the one chosen in the waiting room)
@@ -900,7 +900,7 @@ if (loveAlex) {
   Object.assign(d, { full: 'd_ete_alex', cast: [['alex', 'beach']], eps: [{ title: 'Épisode 1', win: { sprite: 'alex', pose: 'beach', name: 'Alex' }, tease: 'La suite arrive.' }],
     pitch: "Cinq ans après, tu retrouves Alex sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière lui.",
     lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière lui, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] });
-  POSTER.ete = { bg: 'beach', cast: [['alex', 'beach']] };
+  POSTER.ete = { bg: 'chalet', cast: [['alex', 'beach']] };
 }
 for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // the onboarding's 4 stories (series.js), in the catalog like the others: their cover is their world, their preview their
