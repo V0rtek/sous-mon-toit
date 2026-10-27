@@ -1365,7 +1365,7 @@ const face3 = (id, p) => `<div class="lzc"><img src="chars/${id}/${p}.webp" alt=
 const SPARK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2.5l2.1 6.4 6.4 2.1-6.4 2.1L11 19.5l-2.1-6.4L2.5 11l6.4-2.1z"/><path d="M19 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></svg>';
 // « à partir d'une image quelconque »: the picture keeps changing (a drawing, a plush, a photo, an AI picture) and so does
 // what it becomes (a « ? » until that character exists)
-const ANY = [['ref/tease_dessin.webp', 'Un dessin'], ['ref/tease_toutou.webp', 'Un toutou'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
+const ANY = [['ref/tease_dessin.webp', 'Un dessin'], ['ref/tease_toutou.webp', 'Un toutou', 'toutou', 'gentleman'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
 const LOCKED = {
   explore: {
     back: () => `<div class="grid g2">${SERIES.TEASE.map((c) => SERIES.tease(c)).join('')}</div>`,
@@ -1389,7 +1389,7 @@ const LOCKED = {
       `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
       `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span><em>✓ Épisode 1 créé</em></div>
         <div class="lzgo"><div class="lzg">${SPARK}Générer</div>
-        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/justin/punch.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
     ]),
   },
   social: {
