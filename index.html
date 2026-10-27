@@ -1547,7 +1547,7 @@ function begin(id = state.story) {
   show(null); $('#looks').hidden = true;
   if (!seatsOf(id).length) state.seats = {};
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
-  const me = FAST || replay ? null : myCharacter(id), at = run;
+  const me = FAST || replay || PREVIEW ? null : myCharacter(id), at = run;
   if (me) introCard(me, at).then(() => { if (run === at) next(); }); else next();
 }
 // leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)

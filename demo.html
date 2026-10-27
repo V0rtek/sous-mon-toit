@@ -1545,7 +1545,6 @@ function renderHome() {
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = homeCentre = id;
     $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}</p>` : ''}
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : started(d) ? 'Continuer' : 'Jouer'}${epOf(d) && !done(id) ? ` · Épisode ${epOf(d)}` : ''}</button>
       <button class="hdown" data-act="hdown">Infos${I.down}</button>`;
     $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
