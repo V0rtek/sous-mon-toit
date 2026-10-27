@@ -311,6 +311,9 @@ body.tabs-pill #tabs span { display: none; }
 .people button.on::after { content: '✓'; position: absolute; top: .5em; right: .7em; font-size: 2em; font-weight: 900; }
 .opt { margin-bottom: 2em; }
 .opt > b { display: block; font-size: 1.9em; margin-bottom: .2em; }
+.kn { display: flex; justify-content: space-between; gap: 1em; font-size: 1.6em; padding: .45em 0; border-bottom: .06em solid var(--line); }
+.kn span { color: var(--mute); }
+.kn b.no { color: var(--mute); font-weight: 500; }
 .opt > p { margin: 0 0 .7em; font-size: 1.5em; color: var(--mute); }
 .opt .chips { padding: 0; flex-wrap: wrap; overflow: visible; }
 .opt .chip { font-size: 1.65em; }
@@ -1456,12 +1459,13 @@ function liven(box) {
     lockTimers.push(setInterval(() => {
       if (i <= full.length) { sp.textContent = full.slice(0, i++); return; }
       t++;
-      btn.classList.toggle('on', t > 3 && t < 7);
-      btn.classList.toggle('off', t >= 7);
-      st.classList.toggle('gen', t >= 7 && t < 20);
-      st.classList.toggle('on', t >= 20);
-      bar.classList.toggle('done', t >= 20);
-      if (t > 48) { i = 0; t = 0; st.classList.remove('on', 'gen'); btn.classList.remove('off'); bar.classList.remove('done'); }
+      // a pause after the typed idea, then « Générer » pressed, the generation, then a pause on the result
+      btn.classList.toggle('on', t > 16 && t < 20);
+      btn.classList.toggle('off', t >= 20);
+      st.classList.toggle('gen', t >= 20 && t < 38);
+      st.classList.toggle('on', t >= 38);
+      bar.classList.toggle('done', t >= 38);
+      if (t > 66) { i = 0; t = 0; st.classList.remove('on', 'gen'); btn.classList.remove('off'); bar.classList.remove('done'); }
     }, 90));
   }
   for (const im of $$('[data-poses]', box)) {   // the character made from the selfie, moving
@@ -2022,9 +2026,16 @@ function closeSheet(then) {
   const top = cur().ov;
   if (top && top.k === 'sheet') back(then); else { $('#sheet').hidden = true; if (then) then(); }
 }
+// what the app knows about the player, from the onboarding (smtDemo.onb {k, me, li}): the taste picked, boy or girl, and who they're into
+function knownHtml() {
+  const o = SERIES.onb() || {}, t = SERIES.TASTES[o.k], lv = SERIES.LOVE[o.li];
+  const row = (l, v) => `<div class="kn"><span>${l}</span><b${v ? '' : ' class="no"'}>${v || 'On ne sait pas encore'}</b></div>`;
+  return `<div class="opt"><b>Ce qu'on sait de toi</b>${row('Ce que tu aimes', t && t.name)}${row('Tu es', o.me === 'f' ? 'Une fille' : o.me === 'm' ? 'Un gars' : '')}${row('Tu es attiré par', lv ? (lv.fem ? 'Les filles' : 'Les gars') : '')}</div>`;
+}
 function options() {
   const box = sheet(`<h3>Réglages</h3>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
+    knownHtml() +
     `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Réinitialiser mon profil</button>
     <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>
     ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Parcours progressif' : 'Tout débloqué (démo)'}</button>` : ''}
