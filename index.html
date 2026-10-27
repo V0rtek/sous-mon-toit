@@ -163,6 +163,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .wr-kick { text-align: center; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; }
 .wr-title { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .5em; }
 .wr-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; }
+.wr-seats.one { grid-template-columns: 1fr; width: 55%; margin: 0 auto; }   /* a single character: centred, not left in a two-column grid */
 .wr-seat { font: inherit; color: inherit; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 2.4em; padding: 1.6em 1em 1.4em; display: flex; flex-direction: column; align-items: center; gap: .5em; cursor: pointer; transition: border-color .2s, background .2s; }
 .wr-seat img { height: 33em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 1em 1.5em rgba(0,0,0,.6)); transition: opacity .3s; }
 .wr-seat b { font-family: var(--display); font-weight: 400; font-size: 2.8em; margin-top: .2em; }
@@ -419,9 +420,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 .ep-t .ep-kick { margin-top: 13%; animation: epIn 1.2s ease-out both; }
 .ep-t h2 { font-family: var(--display); font-weight: 400; font-size: 4.6em; margin: .2em 0 .5em; text-align: center; }
 .ep-img { width: 72%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 2em; box-shadow: 0 2em 5em rgba(0,0,0,.8); }
-.ep-t p { font-size: 2.1em; line-height: 1.4; color: #d1d1d6; text-align: center; margin: 1.2em 0 auto; }
+.ep-t p { font-size: 2.1em; line-height: 1.4; color: #d1d1d6; text-align: center; margin: 1.2em 0 0; }
 .ep-t button { font: inherit; font-size: 2.4em; font-weight: 700; width: 100%; padding: .75em; border-radius: 2em; border: 0; cursor: pointer; margin-bottom: .6em; }
-.ep-go { background: #fff; color: #000; }
+.ep-go { background: #fff; color: #000; margin-top: auto; }   /* the buttons at the bottom, with or without a next episode */
 .ep-home { background: rgba(255,255,255,.12); color: #fff; margin-bottom: 9% !important; }
 @media (prefers-reduced-motion: reduce) { .actor.talk, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
 </style>
@@ -1598,7 +1599,7 @@ function renderWait() {
       <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
-  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats">${seats.map(card).join('')}</div>
+  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>
     ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
     ${host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
