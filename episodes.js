@@ -15,7 +15,7 @@
   const heroSolo = { justin: 'Justin' };
 
   // single-sheet characters (drawn 25/10): they all look to the right
-  for (const [id, poses] of Object.entries({ alex: ['beach'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
+  for (const [id, poses] of Object.entries({ alex: ['beach'], mila: ['beach'], dan: ['stand', 'scared'], rae: ['kneel', 'possessed'], belier_noir: ['stand'], belier_blanc: ['stand'], ombre: ['stand'], exile: ['stand'], ninja: ['stand'], plage: ['stand', 'sunglasses', 'shy', 'hip', 'wink', 'nervous', 'hands', 'volleyball'] })) FACE[id] = FACE[id] || Object.fromEntries(poses.map((q) => [q, 'r']));
 
   // ---------- decors ----------
   const wood = [[40, 70], [260, 50], [560, 60], [1100, 50], [1600, 80], [1800, 60]];
@@ -265,37 +265,37 @@
 
   // ---------- 5. Un été de trop ----------
   story('d_ete', 'Un été de trop', [
-    scene('e_terrasse', { plage: 'stand', justin: 'listen' }),
+    scene('e_terrasse', { plage: 'sunglasses', justin: 'listen' }),
     cam('two', 'plage', 'justin'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · cinq ans plus tard' },
-    ...L('plage', 'stand', 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
+    ...L('plage', 'sunglasses', 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
     ...L('justin', 'surprised', 'Maya…'),
-    ...L('plage', 'stand', "T'as pas changé. Enfin… un peu."),
+    ...L('plage', 'sunglasses', "T'as pas changé. Enfin… un peu."),
     cam('one', 'justin'),
     { by: 'justin', choice: [
-      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L('plage', 'stand', 'Ne commence pas.')] },
-      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L('plage', 'stand', 'Tu comptais ?')] },
-      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L('plage', 'stand', 'Même question.')] },
+      { t: 'Toi non plus.', intent: 'doux', set: { ton: 'doux' }, then: [...L('justin', 'explaining', 'Toi non plus. Même regard.'), ...L('plage', 'shy', 'Ne commence pas.')] },
+      { t: 'Cinq ans et deux mois.', intent: 'compte', set: { ton: 'compte' }, then: [...L('justin', 'thinking', 'Cinq ans et deux mois.'), ...L('plage', 'wink', 'Tu comptais ?')] },
+      { t: 'Qu’est-ce que tu fais là ?', intent: 'sec', set: { ton: 'sec' }, then: [...L('justin', 'angry', "Qu'est-ce que tu fais là ?"), ...L('plage', 'hip', 'Même question.')] },
     ] },
-    N('Elle enlève ses lunettes. Elle le regarde comme avant.'),
-    ...L('plage', 'stand', 'Tu savais que je serais là, hein ?'),
+    N('Elle enlève ses lunettes. Un ballon de volley sous le bras, elle le regarde comme avant.'),
+    ...L('plage', 'volleyball', 'Tu savais que je serais là, hein ?'),
     ...L('justin', 'thinking', 'On m’a juste dit de venir à six heures.'),
-    ...L('plage', 'stand', 'Personne vient ici par hasard.'),
+    ...L('plage', 'volleyball', 'Personne vient ici par hasard.'),
     ...T('justin', 'La dernière fois que je l’ai vue ici, elle partait avec mon meilleur ami. Je n’ai jamais su pourquoi.'),
-    ...L('plage', 'stand', "Tu veux la vérité, ou la version qui fait le moins mal ?"),
+    ...L('plage', 'hands', "Tu veux la vérité, ou la version qui fait le moins mal ?"),
     cam('one', 'justin'),
     { by: 'justin', choice: [
-      { t: 'La vérité.', intent: 'veut savoir', set: { veut: 'vérité' }, then: [...L('justin', 'angry', 'La vérité. Pour une fois.'), ...L('plage', 'stand', 'Alors tu vas détester ce que je vais dire.')] },
-      { t: 'La version douce.', intent: 'esquive', set: { veut: 'douce' }, then: [...L('justin', 'thinking', 'Celle qui fait le moins mal.'), ...L('plage', 'stand', 'Je savais que tu dirais ça.')] },
+      { t: 'La vérité.', intent: 'veut savoir', set: { veut: 'vérité' }, then: [...L('justin', 'angry', 'La vérité. Pour une fois.'), ...L('plage', 'nervous', 'Alors tu vas détester ce que je vais dire.')] },
+      { t: 'La version douce.', intent: 'esquive', set: { veut: 'douce' }, then: [...L('justin', 'thinking', 'Celle qui fait le moins mal.'), ...L('plage', 'shy', 'Je savais que tu dirais ça.')] },
     ] },
     N('Derrière elle, la porte du chalet s’ouvre.'),
     { enter: { dan: 'stand' } },
     ...L('dan', 'stand', 'Maya, j’ai trouvé les clés… Oh.'),
     ...L('justin', 'surprised', 'Théo ?'),
     N('Ton ex-meilleur ami. Une valise à la main.'),
-    ...L('plage', 'stand', 'Ah. J’aurais dû te le dire.'),
+    ...L('plage', 'nervous', 'Ah. J’aurais dû te le dire.'),
     ...L('dan', 'stand', "Il ne devait pas être là. Tu m'avais promis."),
     ...L('justin', 'thinking', 'Promis quoi, Maya ?'),
-    ...L('plage', 'stand', 'Que personne ne saurait pour l’été.'),
+    ...L('plage', 'hands', 'Que personne ne saurait pour l’été.'),
     ...end(1, { sprite: 'plage', pose: 'stand', name: 'Maya' }, "Fin de l'épisode 1", 'Un été de trop', '{LEDE}'),
   ], {
     seats: ['justin'], solo: heroSolo,
