@@ -552,6 +552,54 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .gframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
 .catch { position: absolute; inset: 0; z-index: 4; }
 
+/* ---- the app opens up as you play (series.js): a tab not open yet stays, dimmed (its icon too); its page teases what's behind
+   it, then what opens it and the way there ---- */
+#tabs button.locked { opacity: .35; }
+body.t-search #switch { visibility: hidden; }
+#current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }
+.lk { padding: 0 3.5% 2em; }
+.lk .grid { padding: 0; }
+.lkp { position: sticky; bottom: 0; padding: 4em 6% 1.4em; background: linear-gradient(transparent, #000 3.5em); text-align: center; }
+.lkp b { display: block; font-size: 3em; font-weight: 800; letter-spacing: -.02em; }
+.lkp p { font-size: 1.8em; color: var(--mute); margin: .4em 0 1.2em; }
+.lkp .btn { width: 100%; }
+.lkh { font-size: 3em; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: .2em 0 .3em; }
+.lkl { font-size: 1.9em; color: #d1d1d6; line-height: 1.4; margin: 0 0 1.4em; }
+.ba { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1em; margin-bottom: 1.2em; }
+.ba .im { position: relative; aspect-ratio: 3 / 4; border-radius: 1.4em; overflow: hidden; background: #1c1c1e; }
+.ba .im img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ba .im img.sp { inset: auto; left: 50%; top: 4%; width: auto; height: 190%; transform: translateX(-50%); }
+.ba .im .q { position: absolute; inset: 0; display: grid; place-items: center; color: #48484a; }
+.ba .im .q svg { width: 40%; height: 40%; }
+.ba > svg { width: 2.6em; height: 2.6em; color: var(--mute); }
+.sty { display: flex; gap: 1em; }
+.sty > div { flex: 1; text-align: center; }
+.sty .im { position: relative; aspect-ratio: 3 / 5; border-radius: 1.4em; overflow: hidden; background: #1c1c1e; }
+.sty .im img { position: absolute; left: 50%; top: 4%; height: 150%; transform: translateX(-50%); }
+.sty span { display: block; font-size: 1.7em; font-weight: 700; margin-top: .5em; }
+/* Accueil while the app is still opening up: your story big, two others, then what you saved */
+.ph { padding: 0 3.5% 2em; }
+.ph-big { position: relative; display: block; width: 100%; aspect-ratio: 9 / 13; border-radius: 2em; overflow: hidden; text-align: left; }
+.ph-big::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,.9)); }
+.ph-txt { position: absolute; left: 6%; right: 6%; bottom: 5%; z-index: 1; }
+.ph-txt h2 { font-size: 4.2em; font-weight: 800; letter-spacing: -.025em; margin: 0 0 .4em; color: var(--fg); }
+.ph-more { margin-top: 1.4em; padding: 0; }
+.hsaved { padding: 0 3.5% 2em; }
+.hsaved .h2 { padding: 0; }
+.hsaved .grid { padding: 0; }
+/* Recherche */
+.srw { padding: 0 3.5% 2em; }
+.sq { width: 100%; box-sizing: border-box; font: inherit; font-size: 2em; padding: .7em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: var(--fg); outline: none; margin: 0 0 .6em; }
+.srw .chips { padding-left: 0; padding-right: 0; }
+.srw .chip.on { background: var(--fg); color: #000; }
+.srw .grid { padding: 0; }
+.chr { text-align: center; }
+.chr .im { position: relative; aspect-ratio: 3 / 4; border-radius: 1.2em; overflow: hidden; background: #1c1c1e; }
+.chr .im img { position: absolute; left: 50%; top: 4%; height: 170%; transform: translateX(-50%); }
+.chr b { display: block; font-size: 1.6em; margin-top: .4em; }
+#sePlayer { position: absolute; inset: 0; z-index: 90; }
+#sePlayer[hidden] { display: none; }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -564,6 +612,7 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
     <section id="saved" class="view" hidden></section>
     <section id="add" class="view" hidden></section>
     <section id="social" class="view" hidden></section>
+    <section id="search" class="view" hidden></section>
   </div>
   <header id="top">
     <button class="round" data-act="back" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -579,9 +628,11 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
   <div id="series" hidden></div>
   <div id="sheet" hidden></div>
   <div id="player" hidden></div>
+  <div id="sePlayer" hidden></div>
 </div>
 <script src="chars.js"></script>
 <script src="people.js"></script>
+<script src="series.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -617,6 +668,7 @@ const I = {
   explore: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="10" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="10" rx="1.6"/><rect x="3" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/><rect x="13.5" y="15" width="7.5" height="6" rx="1.6" opacity=".5"/></svg>',
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg>',
   pen: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="currentColor" stroke-width="2"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
   share: '<svg viewBox="0 0 24 24"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7.5h14V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
@@ -777,7 +829,7 @@ const ONE = [['belier_noir', 'Ébène'], ['belier_blanc', 'Neige'], ['ombre', "L
 const WON = (() => { try { return JSON.parse(localStorage.getItem('smt-won')) || []; } catch { return []; } })()
   .filter((w) => window.SPRITES && SPRITES[w.sprite])
   .map((w) => ({ id: w.sprite, name: w.name, won: true, poses: Object.fromEntries(Object.keys(SPRITES[w.sprite].poses).map((p) => [p, `chars/${w.sprite}/${p}.webp`])) }));
-const CHARS = [...WON, ...BASIC, ...ONE];
+const CHARS = [...WON, ...[...BASIC, ...ONE].filter((c) => !WON.some((w) => w.id === c.id))];   // won = every pose, so it wins
 // yours to play: the ones you made, the ones you won (episodes), and Justin to start with — not every character there is
 const STARTER = 'justin';
 const owned = () => CHARS.filter((c) => c.custom || c.won || c.id === STARTER);
@@ -1128,9 +1180,10 @@ function openStory(stamp) {
   paint();
 }
 function renderTabs() {
-  const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span></button>`;
-  // En cours, the main tab, in the middle
-  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('saved', saveIcon(tab === 'saved'), O.save === 'heart' ? 'Coups de cœur' : O.save === 'plus' ? 'Ma liste' : 'Sauvés') + t('home', `<i>${I.home}</i>`, 'En cours', 'main') + t('add', I.plus, 'Ajouter') + t('social', I.people, 'Social');
+  // a tab not open yet (series.js: the app opens up as you play) stays, dimmed; its page says what opens it
+  const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}${SERIES.isOpen(k) ? '' : ' locked'}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span></button>`;
+  // Accueil, the main tab, in the middle; what you saved is in it (no tab of its own)
+  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('search', I.search, 'Recherche') + t('home', `<i>${I.home}</i>`, 'Accueil', 'main') + t('add', I.plus, 'Créer') + t('social', I.people, 'Social');
 }
 // which page shows: one of the tabs (Explorer = the Current scroll, or All's layouts while testing)
 const page = () => tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
@@ -1140,14 +1193,16 @@ function render() {
   const i = LAYOUTS.findIndex(([k]) => k === O.layout);
   $('#vName').innerHTML = `<b>${L(i)}</b>${LAYOUTS[i][1]}`;
   const v = page();
-  for (const x of ['home', 'current', 'explore', 'saved', 'add', 'social']) $('#' + x).hidden = x !== v;
+  for (const x of ['home', 'current', 'explore', 'saved', 'add', 'social', 'search']) $('#' + x).hidden = x !== v;
   renderTabs();
-  ({ home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial })[v]();
+  $('#' + v).classList.toggle('locked', !SERIES.isOpen(tab));
+  if (!SERIES.isOpen(tab)) return renderLocked(v);
+  ({ home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial, search: renderSearch })[v]();
 }
 
 // ---- En cours (the main tab): the story you're in the middle of, with Continuer, then the others you started,
 // alone or with someone. Only playing counts (Jouer), not watching a preview in the feed; a finished one stays. ----
-const prog = keep.get('prog', (() => {   // a first visit already has a few (fake) ones going
+const prog = keep.get('prog', SERIES.progressive() ? {} : (() => {   // a first visit already has a few (fake) ones going (not a new profile's)
   const now = Date.now();
   return { mensonge: { i: 5, with: ['Max'], at: now - 40 * 60000 }, nuit: { i: 3, with: [], at: now - 5 * 3600000 }, cles: { i: 6, with: ['Léa', 'Inès'], at: now - 2 * 86400000 }, table: { i: 4, with: [], at: now - 4 * 86400000 } };
 })());
@@ -1203,13 +1258,80 @@ function homeTap(e) {
   if (x < .25 || x > .75) { homeGo(x < .25 ? -1 : 1); return true; }
   return false;
 }
+// what you saved (no tab of its own: under Accueil)
+function savedHtml() {
+  const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
+  return ids.length ? `<div class="h2">Sauvés <small>${ids.length}</small></div><div class="grid g2">${ids.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
+}
+// Accueil while the app is still opening up: your story (the taste picked at the start) big, with its next episode, then
+// two others: one more of your taste, one of another (Last call, the one story fully written, is one of them), then what you saved
+const SAME = { revanche: 'table', desir: 'verre', etrange: 'nuit', danger: 'lastcall' };
+const OTHER = { revanche: 'lastcall', desir: 'lastcall', etrange: 'lastcall', danger: 'verre' };
+function renderHomeP() {
+  const o = SERIES.onb(), T = SERIES.TASTES[o.k], nx = SERIES.nextEp();
+  $('#home').innerHTML = `<div class="ph">
+    <button class="ph-big" data-act="sep">${SERIES.art(o.k, false)}<div class="ph-txt"><h2>${esc(T.title)}</h2>
+      <span class="btn main">${I.play}${nx && nx.k === o.k ? `Épisode ${nx.n}` : 'Rejouer'}</span></div></button>
+    <div class="grid g2 ph-more">${[SAME[o.k], OTHER[o.k]].filter(byId).map((id) => card(byId(id), { byocB: false })).join('')}</div>
+    <div class="hsaved" style="padding:0">${savedHtml()}</div></div>`;
+}
+// an episode of your story (series.js), over the app; its end card says what it opened
+function playSe(k, n) {
+  SERIES.episode($('#sePlayer'), k, n, {
+    home: closeSe,
+    lastcall: () => { closeSe(); openPlayer('lastcall'); },
+    profile: (w) => {   // the character just won becomes yours, in your profile (Social opens at that same episode)
+      if (!CHARS.some((c) => c.id === w.sprite && c.won) && window.SPRITES && SPRITES[w.sprite])
+        CHARS.unshift({ id: w.sprite, name: w.name, won: true, poses: Object.fromEntries(Object.keys(SPRITES[w.sprite].poses).map((p) => [p, `chars/${w.sprite}/${p}.webp`])) });
+      keep.set('me', w.sprite); closeSe(); setTab('social');
+    },
+  });
+}
+function closeSe() { const b = $('#sePlayer'); b.hidden = true; b.innerHTML = ''; render(); }
+// a tab not open yet: what's behind it, teased, then what opens it and the way there (your next episode)
+function renderLocked(v) {
+  const need = SERIES.LADDER[tab], n = SERIES.episodesDone(), nx = SERIES.nextEp();
+  const ARROW = '<svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const pair = (from, to) => `<div class="ba"><div class="im"><img src="${from}" alt=""></div>${ARROW}<div class="im">${to ? `<img class="sp" src="${to}" alt="">` : `<div class="q">${I.person}</div>`}</div></div>`;
+  const show = {
+    explore: () => `<div class="grid g2">${SERIES.TEASE.map(SERIES.tease).join('')}</div>`,
+    search: () => `<div class="sty">${[['Semi-réaliste', 'cam', 'flirty'], ['Anime', 'isa_or', 'holding'], ['Cartoon', 'amare', 'angry']].map(([l, s, p]) => `<div><div class="im"><img src="chars/${s}/${p}.webp" alt=""></div><span>${l}</span></div>`).join('')}</div>`,
+    // his words (26/10): TOI dans le jeu, TES histoires/mondes, tes personnages à partir de selfie/dessins/images/toutou
+    add: () => `<div class="lkh">Toi dans le jeu.</div><p class="lkl">Tes histoires, tes mondes. Tes persos à partir d’un selfie, d’un dessin, d’une image, d’un toutou.</p>
+      ${pair('ref/perso_justin.webp', 'chars/justin/holding.webp')}${pair('ref/perso_cam.webp', 'chars/cam/flirty.webp')}${pair('ref/tease_dessin.webp')}${pair('ref/tease_toutou.webp')}`,
+    social: () => `<div class="lkh">Joue avec tes amis.</div><div class="chips" style="padding:0">${FRIENDS.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}</div>`,
+  }[tab];
+  $('#' + v).innerHTML = `<div class="lk">${show ? show() : ''}</div><div class="lkp"><b>${SERIES.LABEL[tab]}</b><p>S’ouvre après ${need} épisodes · ${Math.min(n, need)} sur ${need}</p>
+    ${nx ? `<button class="btn main" data-act="nextep">${I.play}${esc(nx.title)} · Épisode ${nx.n}</button>` : ''}</div>`;
+}
+// Recherche: the stories by name, or the characters by name and by how they're drawn (series.js STYLE)
+let sKind = 'stories', sStyle = '', sQ = '';
+function renderSearch() {
+  const kinds = [['stories', 'Histoires'], ['chars', 'Persos']], styles = [['', 'Tous'], ['semi', 'Semi-réaliste'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
+  $('#search').innerHTML = `<div class="srw"><input class="sq" id="sQ" placeholder="Rechercher" value="${esc(sQ)}" autocomplete="off" enterkeyhint="search">
+    <div class="chips">${kinds.map(([k, l]) => `<button class="chip${sKind === k ? ' on' : ''}" data-act="sKind" data-k="${k}">${l}</button>`).join('')}</div>
+    ${sKind === 'chars' ? `<div class="chips">${styles.map(([k, l]) => `<button class="chip${sStyle === k ? ' on' : ''}" data-act="sStyle" data-k="${k}">${l}</button>`).join('')}</div>` : ''}
+    <div id="sRes"></div></div>`;
+  $('#sQ').oninput = (e) => { sQ = e.target.value; searchRes(); };
+  searchRes();
+}
+function searchRes() {
+  const q = sQ.trim().toLowerCase(), has = (s) => !q || String(s).toLowerCase().includes(q);
+  const face = (id) => { const ps = SPRITES[id].poses; return ps.listen ? 'listen' : ps.stand ? 'stand' : Object.keys(ps)[0]; };
+  const nameOf = (id) => ({ isa_nuit: 'Isa · Minuit', isa_or: 'Isa · Doré', isa_noir: 'Isa · Braise', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
+  $('#sRes').innerHTML = sKind === 'chars'
+    ? `<div class="grid g3">${Object.keys(SERIES.STYLE).filter((id) => window.SPRITES && SPRITES[id] && (!sStyle || SERIES.STYLE[id] === sStyle) && has(nameOf(id)))
+        .map((id) => `<div class="chr"><div class="im"><img src="chars/${id}/${face(id)}.webp" alt="" loading="lazy"></div><b>${esc(nameOf(id))}</b></div>`).join('')}</div>`
+    : `<div class="grid g2">${all().filter((d) => has(d.title)).map((d) => card(d, { byocB: false })).join('')}</div>`;
+}
 function renderHome() {
+  if (SERIES.progressive()) return renderHomeP();
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
-  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
+  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div><div class="hsaved">${savedHtml()}</div>`; return; }
   const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
-    <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
+    <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div><div class="hsaved">${savedHtml()}</div>`;
   let centre = ids[0];
   const close = () => {
     clearTimeout(homeOpen); document.body.classList.remove('hxbig');
@@ -1708,11 +1830,13 @@ function options() {
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
     `<button class="btn" id="reset" style="width:100%">Tout remettre par défaut</button>
     <button class="btn" id="wipe" style="width:100%;margin-top:1em;color:#ff453a">Réinitialiser mon profil</button>
-    <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>`);
+    <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>
+    ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Parcours progressif' : 'Tout débloqué (démo)'}</button>` : ''}`);
   box.onclick = (e) => {
     const c = e.target.closest('[data-k]');
     if (c) { O[c.dataset.k] = c.dataset.v; keep.set('opts', O); $$(`[data-k="${c.dataset.k}"]`, box).forEach((x) => x.classList.toggle('on', x === c)); render(); }
     if (e.target.id === 'reset') { keep.set('opts', {}); location.reload(); }
+    if (e.target.id === 'allOpen') { SERIES.set('all', !SERIES.get('all', false)); location.reload(); }   // show everything (a demo), or back to opening up
     // two taps: the first says what goes, the second wipes
     const w = e.target.closest('#wipe');
     if (w && w.dataset.sure) wipeProfile();
@@ -1847,6 +1971,10 @@ stage.addEventListener('click', (e) => {
     case 'withplay': closeSheet(() => openPlayer(id, false, 0, +el.dataset.n, el.dataset.f)); break;
     case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
+    case 'sep': { const o = SERIES.onb(), nx = SERIES.nextEp(); playSe(o.k, nx && nx.k === o.k ? nx.n : SERIES.TASTES[o.k].eps.length); break; }   // your story (Rejouer: its last one)
+    case 'nextep': { const nx = SERIES.nextEp(); if (nx && nx.k === 'lastcall') openPlayer('lastcall'); else if (nx) playSe(nx.k, nx.n); break; }
+    case 'sKind': sKind = el.dataset.k; renderSearch(); break;
+    case 'sStyle': sStyle = el.dataset.k; renderSearch(); break;
     case 'chars': charsOpen = !charsOpen; renderSocial(); break;
     case 'pick': if (el.dataset.c === me().id) lookSheet(el.dataset.c); else { keep.set('me', el.dataset.c); renderSocial(); } break;   // yours again: its look
     case 'vprev': case 'vnext': {
@@ -1874,11 +2002,13 @@ addEventListener('keydown', (e) => {
 addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });   // back from the game (a new story, a new character)
 // where to start: this tab's own entry (kept on reload), else the address (#current, #all/saved...), else the menu
 {
-  const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add|social))?$/);
+  const m = location.hash.match(/^#(current|all)(?:\/(explore|saved|add|social|search))?$/);
+  const pl = (location.hash.match(/^#play=(\w+)$/) || [])[1];   // from the onboarding's end card: straight into episode 2
   const st = history.state && history.state.screen ? { ...history.state } : { screen: m ? m[1] : 'current', tab: (m && m[2]) || BASE, ov: null, tabFrom: null, depth: 0 };
   if (st.ov && st.ov.k === 'sheet') st.ov = st.ov.under;   // a sheet can't come back from a reload
   history.replaceState(st, '', hashOf(st));
   apply(st);
+  if (pl) { const nx = SERIES.nextEp(); if (nx && nx.k === pl) playSe(pl, nx.n); }
 }
 </script>
 </body>

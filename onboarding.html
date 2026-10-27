@@ -14,45 +14,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #stage { position: relative; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; }
 .screen { position: absolute; inset: 0; }
 
-/* ---- the worlds (drawn, no photo): one per taste ---- */
-.art { position: absolute; inset: 0; overflow: hidden; background: #000; }
-.art .bg { position: absolute; inset: -6%; }
-.art .spr, .cast .spr { position: absolute; transform: translateX(-50%); pointer-events: none; transition: filter .3s, left .4s; }
-.a-desir .bg { filter: blur(.5em); background:
-  radial-gradient(circle at 18% 22%, rgba(255,110,150,.6) 0 3%, transparent 9%),
-  radial-gradient(circle at 78% 16%, rgba(255,185,95,.55) 0 2.5%, transparent 8%),
-  radial-gradient(circle at 62% 38%, rgba(255,80,140,.35) 0 4%, transparent 12%),
-  radial-gradient(circle at 8% 58%, rgba(255,200,120,.3) 0 3%, transparent 9%),
-  radial-gradient(circle at 92% 52%, rgba(255,110,170,.4) 0 3%, transparent 10%),
-  radial-gradient(circle at 35% 8%, rgba(255,150,110,.35) 0 2%, transparent 7%),
-  radial-gradient(ellipse at 50% 35%, #521628 0%, #1c0711 55%, #070204 100%); }
-.a-revanche .bg { background:
-  radial-gradient(ellipse 34% 75% at 50% -8%, rgba(255,214,130,.6), rgba(255,200,100,.12) 60%, transparent 75%),
-  radial-gradient(circle at 20% 10%, rgba(255,220,150,.5) 0 .5%, transparent 1.5%),
-  radial-gradient(circle at 80% 12%, rgba(255,220,150,.5) 0 .5%, transparent 1.5%),
-  radial-gradient(circle at 35% 6%, rgba(255,220,150,.4) 0 .4%, transparent 1.2%),
-  radial-gradient(circle at 66% 5%, rgba(255,220,150,.4) 0 .4%, transparent 1.2%),
-  radial-gradient(ellipse at 50% 105%, rgba(232,194,90,.25), transparent 55%),
-  linear-gradient(180deg, #1f170a, #0b0905 70%, #000); }
-.a-danger .bg { background: radial-gradient(ellipse 45% 14% at 50% 71%, rgba(255,69,58,.4), transparent 70%), linear-gradient(#05080f, #0b1222 55%, #04060b); }
-.a-danger .door { position: absolute; left: 24%; right: 24%; top: 12%; bottom: 31%; border: .8em solid #1e2945; border-bottom: 0;
-  background: linear-gradient(90deg, #111a2e, #18233d 50%, #111a2e); box-shadow: 0 0 6em rgba(0,0,0,.7) inset; }
-.a-danger .door::before { content: ''; position: absolute; right: 12%; top: 52%; width: 1.4em; height: 1.4em; border-radius: 50%; background: #3a4560; }
-.a-danger .door::after { content: ''; position: absolute; left: 0; right: 0; bottom: -.7em; height: .7em;
-  background: linear-gradient(90deg, transparent 4%, #ff453a 12%, #ff453a 34%, transparent 38%, transparent 56%, #ff453a 60%, #ff453a 88%, transparent 96%);
-  box-shadow: 0 0 2.4em .6em rgba(255,69,58,.45); }
-.a-etrange .bg { background:
-  radial-gradient(circle at 72% 16%, rgba(235,235,255,.95) 0 4.5%, rgba(180,165,255,.28) 6.5%, transparent 20%),
-  radial-gradient(ellipse at 50% 102%, rgba(70,200,170,.28), transparent 58%),
-  radial-gradient(ellipse at 15% 70%, rgba(140,110,255,.18), transparent 50%),
-  linear-gradient(#0e0822, #170c2e 50%, #06040c); }
-.a-etrange .ghost { opacity: .5; mix-blend-mode: screen; filter: drop-shadow(0 0 1.6em rgba(167,139,250,.9)) blur(.06em); }
-.a-nuit .bg { background: radial-gradient(ellipse 60% 40% at 50% 62%, rgba(80,130,255,.2), transparent 70%), linear-gradient(#020306, #070a14 60%, #020306); }
-.notif { position: absolute; left: 6%; right: 6%; top: 5%; padding: 1.1em 1.3em; border-radius: 1.8em; background: rgba(44,44,48,.82);
-  -webkit-backdrop-filter: blur(1em); backdrop-filter: blur(1em); display: flex; gap: 1em; align-items: center; }
-.notif i { width: 3.2em; height: 3.2em; border-radius: .8em; background: #3a3a3e; flex: none; }
-.notif b { display: block; font-size: 1.5em; }
-.notif span { display: block; font-size: 1.5em; color: #e5e5ea; }
+/* the worlds (drawn, no photo): series.js */
 
 /* ---- a poster: the world + its title + its hook ---- */
 .poster { position: absolute; overflow: hidden; cursor: pointer; }
@@ -124,7 +86,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .pick .face { flex: 1; position: relative; height: 46em; border-radius: 1.8em; overflow: hidden; }
 .pick .face::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
 .pick .face b { position: absolute; left: 0; right: 0; bottom: 1em; z-index: 1; font-size: 2.6em; font-weight: 600; text-align: center; }
-.end .go { align-self: flex-start; padding: .9em 2.6em; border-radius: 3em; background: #fff; color: #000; font-weight: 600; font-size: 2em; }
 @keyframes in { from { opacity: 0; transform: translateY(.6em); } }
 
 /* ---- the end ---- */
@@ -170,6 +131,7 @@ body.locked #top { display: none; }
     <button id="statBtn" data-act="stats" aria-label="Résultats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
   </header>
 </div>
+<script src="series.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -204,10 +166,10 @@ const poseOf = (w, p) => (w === 'li' && love().poses?.[p]) || p;
 const fill = (t) => String(t).replace(/\{LI\}/g, love().name).replace(/\{P\}/g, love().partner)
   .replace(/\{(me|li|p):([^|}]*)\|([^}]*)\}/g, (_, k, a, b) => ({ me: run?.me === 'f', li: love().fem, p: love().partnerFem })[k] ? b : a);
 
-// ---- the four tastes: each one written for what that taste comes for (the player is « toi », seen through their eyes) ----
+// ---- the four tastes' openings: each one written for what that taste comes for (the player is « toi », seen through their
+// eyes). Their name, poster and episodes: series.js ----
 const ARCH = {
-  desir: { name: 'Le désir', color: '#ff5c8a', title: 'Interdite', hook: 'La blonde de ton meilleur ami te regarde comme ça depuis une heure.',
-    poster: [['cam', 'flirty', 56, 108, 9]], row: [['cam', 'flirty', 78, 330, -10]], verb: 'Tomber pour quelqu’un',
+  desir: { ...SERIES.TASTES.desir,
     lines: [
       { pick: true },
       N('Samedi, 2 h. Le party de {P} tire à sa fin.'),
@@ -220,8 +182,7 @@ const ARCH = {
       C(['Moi aussi.', [T('Moi aussi. Depuis le chalet.'), O('li', 'flirty', 'Alors on a un problème.'), N('La poignée tourne.')]],
         ['Va {p:le|la} rejoindre.', [T('Va {p:le|la} rejoindre, {LI}.'), O('li', 'awkward', 'Ok. Mais tu vas y penser toute la nuit.'), N('{li:Il|Elle} a raison.')]]),
     ] },
-  revanche: { name: 'La revanche', color: '#e8c25a', title: 'Regarde-moi bien', hook: 'Il y a un an, il a ri de toi devant 200 personnes. Ce soir, tu reviens.',
-    poster: [['julian', 'smirk', 50, 104, 8]], row: [['julian', 'smirk', 78, 320, -12]], verb: 'Te venger',
+  revanche: { ...SERIES.TASTES.revanche,
     lines: [
       N('Gala Delorme. Un an plus tard.'),
       O('julian', 'smirk', 'Wow. Je pensais pas qu’ils te laisseraient entrer.'),
@@ -233,8 +194,7 @@ const ARCH = {
       C(['Lis-lui le contrat.', [T('Victor. Lis-lui le contrat.'), O('victor', 'listen', 'Acquisition complète de Delorme inc. Effective ce soir.'), O('julian', 'hands_up', 'C’est une blague.'), N('Deux cents têtes se tournent vers lui.')]],
         ['Pas devant eux.', [T('On se reparle lundi, Julian.'), O('julian', 'cold', 'Lundi ?'), N('Tu le laisses avec la question. Toute la fin de semaine.')]]),
     ] },
-  danger: { name: 'Le danger', color: '#ff453a', title: 'Ouvre pas', hook: '3 h 12. Un texto de ton propre numéro.',
-    poster: [], notif: ['Toi', 'Ouvre pas la porte.'], verb: 'Avoir peur',
+  danger: { ...SERIES.TASTES.danger,
     lines: [
       N('3 h 12. Ton cell vibre.'),
       S('Toi', 'Ouvre pas la porte.'),
@@ -246,8 +206,7 @@ const ARCH = {
       C(['J’ouvre.', [T('J’arrive, Léa.'), N('La chaîne est encore mise. Par l’ouverture, tu vois son manteau. Trempé.'), N('Il ne pleut pas.')]],
         ['Dis mon 2e nom.', [T('Léa. C’est quoi, mon deuxième nom ?'), N('Silence.'), S('Toi', 'Elle le sait pas. Moi oui.')]]),
     ] },
-  etrange: { name: 'L’étrange', color: '#a78bfa', title: 'Personne se souvient', hook: 'Ce matin, ta sœur n’existe plus. Sauf pour toi.',
-    poster: [['isa_nuit', 'listen', 46, 100, 12, 'ghost']], row: [['isa_nuit', 'listen', 74, 300, -8, 'ghost']], verb: 'L’inexpliqué',
+  etrange: { ...SERIES.TASTES.etrange,
     lines: [
       N('Mardi, 7 h 40. La chambre d’Emma est vide. Pas rangée. Vide.'),
       T('M’man ? Où sont les affaires d’Emma ?'),
@@ -282,13 +241,7 @@ const INSIDE = [
 ];
 
 // ---- drawing a world ----
-const spr = (sprite, pose, x, h, top, cls = '') => `<img class="spr ${cls}" src="chars/${sprite}/${pose}.webp" alt="" style="left:${x}%;height:${h}%;top:${top}%">`;
-function art(k, withNotif, shape = 'poster') {
-  const a = ARCH[k];
-  return `<div class="art a-${k}"><div class="bg"></div>${k === 'danger' ? '<div class="door"></div>' : ''}
-    ${(a?.[shape] || []).map(([s, p, x, h, t, c]) => spr(s, p, x, h, t, c)).join('')}
-    ${withNotif && a?.notif ? `<div class="notif"><i></i><div><b>${esc(a.notif[0])}</b><span>${esc(a.notif[1])}</span></div></div>` : ''}</div>`;
-}
+const { spr, art } = SERIES;
 const poster = (k) => `<div class="poster" data-k="${k}">${art(k, true)}<div class="shade"></div><div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div></div>`;
 
 // ---- the versions: each one changes only HOW the taste is picked; the openings after are the same ----
@@ -489,10 +442,11 @@ function end() {
   stopTimers(); run.done = Math.round(performance.now() - run.t0); save();
   const a = ARCH[run.k], box = $('#screen'); box.onclick = null;
   box.className = 'screen end';
-  if (NEWP) {   // the new profile keeps what was picked (Full demo puts that taste first), then goes in
+  if (NEWP) {   // a new profile keeps the taste picked (Full demo puts it first), and the opening goes on into the rest of
+    // episode 1 (a placeholder until it's written); its end card leads to episode 2, in Full demo, or to Full demo's home
     try { localStorage.setItem('smtDemo.onb', JSON.stringify({ k: run.k, me: run.me || null, li: run.li || null, at: Date.now() })); } catch { /* private window */ }
-    box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">La suite arrive.</div><div class="row"><button class="go" data-act="back">Continuer</button></div>`;
-    return;
+    box.className = 'screen';
+    return SERIES.episode(box, run.k, 1, { home: () => location.replace(BACK), next: (k) => location.replace(BACK + '#play=' + k) });
   }
   const rows = [['Choisi en', sec(run.pick)]];
   if (run.rerolls) rows.push(['↻', run.rerolls + ' fois']);
@@ -524,7 +478,7 @@ function stats() {
 stage.addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   e.stopPropagation();
-  ({ vprev: () => start(vi - 1), vnext: () => start(vi + 1), restart: () => start(vi), stats, back: () => location.replace(BACK),
+  ({ vprev: () => start(vi - 1), vnext: () => start(vi + 1), restart: () => start(vi), stats,
     unstats: () => $('#stats').remove(), wipe: () => { RUNS.length = 0; save(); $('#stats').remove(); stats(); } })[b.dataset.act]();
 }, true);
 // preload the faces so a scene never waits on an image
