@@ -130,6 +130,7 @@ body.tabs-pill #tabs span { display: none; }
 .btn.main { background: var(--fg); color: #000; }
 .btn.wide { flex: 1; }
 .btn.ghost { background: rgba(255,255,255,.12); }
+.row .btn.ghost[data-act="save"] { width: 2.6em; padding: 0; flex: none; }   /* Sauver beside Jouer: the icon alone */
 .btn .pd { position: absolute; top: -.25em; right: -.25em; width: .9em; height: .9em; border-radius: 50%; background: var(--c); border: .18em solid #000; animation: blink 1s infinite, pulse 1.5s infinite; }
 .btn .pd.f { width: 1.3em; height: 1.3em; display: grid; place-items: center; color: #fff; font-size: .7em; font-weight: 900; animation: pulse 1.3s infinite; width: 1.9em; height: 1.9em; top: -.6em; right: -.6em; }
 .btn.live-s { background: var(--stranger); color: #000; animation: pulse 1.6s infinite; --c: rgba(52,199,89,.7); }
@@ -1055,7 +1056,7 @@ function playBtn(d, cls = '', how = O.play) {
   const dot = how === 'dot' ? playDot(d) : '';
   return `<button class="btn main ${cls}" data-act="play" data-id="${d.id}">${I.play}Jouer${dot}</button>`;
 }
-const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}${saveWord(d.id)}</button>`;
+const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>`;
 const actions = (d) => `<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
 
 // ---- explore: one renderer per layout ----
