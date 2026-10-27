@@ -996,15 +996,15 @@ const charOf = (n) => { const f = friend(n); if (!f.ch) return null; return CHAR
   || (window.SPRITES && SPRITES[f.ch] ? { id: f.ch, poses: Object.fromEntries(Object.keys(SPRITES[f.ch].poses).map((p) => [p, `chars/${f.ch}/${p}.webp`])) } : null); };
 const mug = (n) => { const c = charOf(n); return c ? `<img class="mug" src="${poseOf(c, 'listen')}" alt="">` : `<b>${esc(friend(n).n[0])}</b>`; };
 const av = (n, extra = '') => { const f = friend(n); return `<span class="av" style="--c:${f.c};background:${f.c}"${extra}>${mug(n)}</span>`; };
-function sprites(d, cls = '') {
+function sprites(d, cls = '', eager = false) {
   const fl = flips(d.cast.map(([s, p]) => ({ s, p })), -1);
-  return d.cast.map(([s, p], i) => `<img class="sp p${i}${cls}" style="--fx:${fl[i] ? -1 : 1}" src="chars/${s}/${p}.webp" alt="" loading="lazy" draggable="false">`).join('');
+  return d.cast.map(([s, p], i) => `<img class="sp p${i}${cls}" style="--fx:${fl[i] ? -1 : 1}" src="chars/${s}/${p}.webp" alt=""${eager ? '' : ' loading="lazy"'} draggable="false">`).join('');
 }
 // the cover: its poster (another moment of the story) when it has one, else the preview's own setting
-function cover(d) {
+function cover(d, eager = false) {
   if (d.series) return `<div class="cv n0" style="--glow:${d.glow}">${SERIES.art(d.series, false)}<div class="cvfade"></div><div class="cvt">${esc(d.title)}</div></div>`;
   const v = posterOf(d);
-  const art = v.img ? `<img class="cvimg" src="${v.img}" alt="">` : `<div class="cvbg" style="${place(v)}"></div>${sprites(v)}`;
+  const art = v.img ? `<img class="cvimg" src="${v.img}" alt="">` : `<div class="cvbg" style="${place(v)}"></div>${sprites(v, '', eager)}`;
   return `<div class="cv n${v.img ? 0 : v.cast.length}" style="--glow:${v.glow || '#fff'}">${art}<div class="cvfade"></div><div class="cvt">${esc(d.title)}</div></div>`;
 }
 const posterOf = (d) => d.poster ? { ...d, ...d.poster } : d;
@@ -1973,15 +1973,15 @@ function swipe(yes) {
 function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
   if (inCurrent) {   // Current: the cover, full screen, black at the bottom (not the scene where you left off)
-    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
+    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d, true)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
     box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
   }
   delete box.dataset.cur;
   const body = `<h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${actions(d)}`;
   const marks = d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';   // who's waiting: on Jouer
-  if (O.detail === 'veil') box.innerHTML = `<div class="veil"><div class="cvw">${cover(d)}${marks}</div><div class="shade"></div><div class="txt">${body}</div><button class="x" data-act="closeD">${I.close}</button></div>`;
-  else if (O.detail === 'zoom') box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="zoom"><div class="cvw">${cover(d)}${marks}<div class="over">${body}</div></div></div>`;
-  else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
+  if (O.detail === 'veil') box.innerHTML = `<div class="veil"><div class="cvw">${cover(d, true)}${marks}</div><div class="shade"></div><div class="txt">${body}</div><button class="x" data-act="closeD">${I.close}</button></div>`;
+  else if (O.detail === 'zoom') box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="zoom"><div class="cvw">${cover(d, true)}${marks}<div class="over">${body}</div></div></div>`;
+  else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d, true)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
   box.dataset.id = id; box.hidden = false;
 }
 const refreshDetail = () => {
@@ -1994,7 +1994,7 @@ function openSeries(id) {
   const d = byId(id), box = $('#series'), n = epTo(d), eps = (d.eps || [d]).length;
   const go = finished(d) ? 'Rejouer' : `${started(d) ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${n}` : ''}`;
   box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[n - 1].img } : d)}</div>
+    <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[n - 1].img } : d, true)}</div>
     <div class="sr-body"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>
       <div class="row"><button class="btn main wide" data-act="ep" data-id="${id}" data-n="${n}">${I.play}${go}</button>${saveWide(d)}</div>${epsHtml(d)}</div>`;
   box.dataset.id = id; box.hidden = false; box.scrollTop = 0;
@@ -2017,7 +2017,15 @@ function playNow(id) {
 function toggleSave(id) {
   if (saved[id]) delete saved[id]; else saved[id] = { at: Date.now() };
   keep.set('saved', saved);
-  after();
+  // in place: a re-render would redraw every cover (a blink)
+  const on = !!saved[id];
+  $$(`[data-act="save"][data-id="${id}"]`).forEach((b) => {
+    b.classList.toggle('on', on);
+    const i = $('i', b), w = $('span', b);
+    if (i) { i.innerHTML = saveIconOf(id); if (w) w.textContent = saveWord(id); } else b.innerHTML = saveIconOf(id);
+  });
+  if (page() === 'saved') { const c = $(`#saved .card[data-id="${id}"]`); if (c && !on) { c.remove(); if (!$('#saved .card')) renderSaved(); else { const n = $('#saved .h2 small'); if (n) n.textContent = $$('#saved .card').length; } } else renderSaved(); }
+  renderTabs();
 }
 const saveIconOf = (id) => saveIcon(!!saved[id]);
 const saveWord = (id) => saved[id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver');
