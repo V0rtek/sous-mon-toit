@@ -1718,6 +1718,17 @@ function renderCurrent() {
   if (START) { const c = $(`.ci[data-id="${START}"]`, box); if (c) box.scrollTop = c.offsetTop; }
   $$('.ci', box).forEach((ci) => seen.observe(ci));
 }
+// a game preview that isn't what you're looking at (another tab, an overlay over it, scrolled away, a hidden page) has no sound
+const heard = (f) => {
+  if (!f.getClientRects().length) return false;
+  const r = f.getBoundingClientRect(), vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+  if (document.hidden || vis < r.height * .5 || r.right < 0 || r.left > innerWidth) return false;
+  return !$$('#detail, #series, #sheet, #player').some((o) => !o.hidden && !o.contains(f));
+};
+setInterval(() => $$('iframe[src*="preview="], iframe[data-src*="preview="]').forEach((f) => {
+  const on = heard(f);   // every tick: a frame still loading misses the first message
+  try { f.contentWindow.postMessage({ hush: !on }, location.origin); } catch { /* not loaded */ }
+}), 250);
 // the drawn line writes itself, like the game's (4 characters every 13 ms); typing(root) finishes it, true if it was writing
 function typeIn(root) {
   const p = $('.gb p, .tb, .tn', root); if (!p) return;

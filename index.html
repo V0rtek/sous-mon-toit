@@ -898,10 +898,10 @@ function drawTexts(wait = 0) {
 let actx = null;
 const sfxBuf = {}, sfxLoops = {};
 // the menu's sound on / off (kept on this phone): every sound plays through this one gain
-let muted = (() => { try { return localStorage.getItem('smt-mute') === '1'; } catch { return false; } })(), master = null;
-const out = () => { if (!master) { master = actx.createGain(); master.connect(actx.destination); } master.gain.value = muted ? 0 : 1; return master; };
+let muted = (() => { try { return localStorage.getItem('smt-mute') === '1'; } catch { return false; } })(), master = null, hushed = false;   // hushed: Full demo's preview that isn't on screen
+const out = () => { if (!master) { master = actx.createGain(); master.connect(actx.destination); } master.gain.value = muted || hushed ? 0 : 1; return master; };
 function setMuted(m) {
-  muted = m; if (master) master.gain.value = m ? 0 : 1;
+  muted = m; if (master) master.gain.value = m || hushed ? 0 : 1;
   try { localStorage.setItem('smt-mute', m ? '1' : '0'); } catch { /* private window */ }
 }
 function audio() {
@@ -2343,6 +2343,7 @@ if (PREVIEW) {
   const goTo = async (n) => { jumping = true; veil.style.opacity = 1; await skipTo(n, PREVIEW); await sleep(150); veil.style.opacity = 0; jumping = false; report(); };
   if (cut.length) goTo(cut[0][0]); else { veil.style.opacity = 0; begin(PREVIEW); setTimeout(report, 900); }   // report = "ready" for Full demo
   addEventListener('message', (e) => {
+    if (e.origin === location.origin && e.data && 'hush' in e.data) { hushed = !!e.data.hush; if (master) master.gain.value = muted || hushed ? 0 : 1; return; }   // not on Full demo's screen: no sound
     if (e.origin !== location.origin || !e.data || !e.data.tap || jumping) return;
     const [fx, fy] = e.data.tap, el = document.elementFromPoint(fx * innerWidth, fy * innerHeight);
     if (el) el.click();
