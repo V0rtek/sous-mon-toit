@@ -1365,7 +1365,7 @@ const face3 = (id, p) => `<div class="lzc"><img src="chars/${id}/${p}.webp" alt=
 const SPARK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2.5l2.1 6.4 6.4 2.1-6.4 2.1L11 19.5l-2.1-6.4L2.5 11l6.4-2.1z"/><path d="M19 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></svg>';
 // « à partir d'une image quelconque »: the picture keeps changing (a drawing, a plush, a photo, an AI picture) and so does
 // what it becomes (a « ? » until that character exists)
-const ANY = [['ref/tease_dessin.webp', 'Un dessin'], ['ref/tease_toutou.webp', 'Un toutou', 'toutou', 'gentleman'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
+const ANY = [['ref/tease_dessin.webp', 'Un dessin', 'astro', 'bw'], ['ref/tease_toutou.webp', 'Un toutou', 'toutou', 'gentleman'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
 const LOCKED = {
   explore: {
     back: () => `<div class="grid g2">${SERIES.TEASE.map((c) => SERIES.tease(c)).join('')}</div>`,
