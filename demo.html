@@ -556,8 +556,8 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
    its name, a big white padlock, how far you are, then a glimpse of what's behind ---- */
 body.atroot #top [data-act="back"] { visibility: hidden; }   /* a tab's own page: nothing to go back to */
 body.t-search #switch { visibility: hidden; }
-#current.locked { padding: 0; scroll-snap-type: none; }
-.lkv { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10em 5% 3em; box-sizing: border-box; overflow: hidden; }
+#current.locked { padding: 9.5em 0 0; scroll-snap-type: none; }   /* the same top as the other tabs: the padlock at the same height */
+.lkv { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15em 5% 3em; box-sizing: border-box; overflow: hidden; }
 .lkbg { position: absolute; inset: -4%; filter: blur(1.4em) brightness(.32); pointer-events: none; }
 .lkbg .grid { padding: 0 4%; }
 .lkv > :not(.lkbg) { position: relative; }
@@ -569,29 +569,34 @@ body.t-search #switch { visibility: hidden; }
 .bq { position: relative; height: 26em; }
 .bq .tz { position: absolute; left: 50%; top: 0; width: 15em; transform: translateX(calc(-50% + var(--x))) rotate(var(--r)); transform-origin: 50% 110%; box-shadow: 0 1em 3em rgba(0,0,0,.6); }
 /* a few slides: ‹ › or a swipe */
-.c3 { position: relative; overflow: hidden; }
+.c3 { position: relative; overflow: hidden; touch-action: pan-y; cursor: grab; }
 .c3t { display: flex; transition: transform .35s ease; }
 .c3s { flex: 0 0 100%; box-sizing: border-box; padding: 0 9%; text-align: center; }
 .c3s h3 { font-size: 2.2em; font-weight: 700; margin: 0 0 .8em; letter-spacing: -.01em; }
-.c3 .lzv { position: absolute; top: 40%; width: 4.4em; height: 4.4em; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; display: grid; place-items: center; }
-.c3 .lzv svg { width: 2em; height: 2em; }
-.c3 .prev { left: 0; } .c3 .next { right: 0; }
 .c3d { display: flex; justify-content: center; gap: .7em; margin-top: 1.4em; }
-.c3d i { width: .8em; height: .8em; border-radius: 50%; background: #48484a; }
+.c3d i { width: .8em; height: .8em; border-radius: 50%; background: #48484a; cursor: pointer; }
 .c3d i.on { background: #fff; }
 /* a search, shown working */
 .lzq { display: flex; align-items: center; gap: .6em; text-align: left; font-size: 1.9em; padding: .6em .8em; border-radius: .8em; background: #1c1c1e; color: #f5f5f7; min-height: 1.4em; }
 .lzq svg { width: 1.1em; height: 1.1em; color: #86868b; flex: none; }
 .lzq span::after { content: ''; display: inline-block; width: .08em; height: 1em; background: #fff; vertical-align: -.12em; margin-left: .08em; }
-.lzr { display: flex; gap: 1em; justify-content: center; margin-top: 1.2em; min-height: 15em; }
+.lzr { display: flex; gap: 1em; justify-content: center; margin-top: 1.2em; min-height: 13em; }
+.lzr.lztg { min-height: 0; margin-top: .9em; }
 .lzr > * { opacity: 0; transform: translateY(.6em); transition: opacity .4s, transform .4s; }
 .lzr.on > * { opacity: 1; transform: none; }
 .lzr.on > *:nth-child(2) { transition-delay: .12s; } .lzr.on > *:nth-child(3) { transition-delay: .24s; }
 .lzr .tz { width: 10em; }
 .lzc { width: 9em; aspect-ratio: 3 / 4; position: relative; border-radius: 1.2em; overflow: hidden; background: #1c1c1e; }
 .lzc img { position: absolute; left: 50%; top: 4%; height: 170%; transform: translateX(-50%); }
-.lzch { display: flex; gap: .6em; justify-content: center; margin-top: 1em; flex-wrap: wrap; }
-.lzch b { font-size: 1.5em; padding: .35em .8em; border-radius: 2em; background: #fff; color: #000; }
+.lzch { display: flex; gap: .5em; justify-content: center; flex-wrap: wrap; }
+.lzch b { font-size: 1.4em; line-height: 1; padding: .4em .75em; border-radius: 2em; background: #fff; color: #000; }
+.lzl { font-size: 1.6em; color: #86868b; font-weight: 600; margin-top: .8em; }
+.lzg { display: inline-flex; align-items: center; gap: .4em; margin-top: 1em; font-size: 1.7em; font-weight: 700; padding: .5em 1.1em; border-radius: 2em; background: #2c2c2e; color: #f5f5f7; transition: background .2s, color .2s, transform .2s; }
+.lzg svg { width: 1.1em; height: 1.1em; }
+.lzg.on { background: #fff; color: #000; transform: scale(.96); }
+.lzsh { position: absolute; inset: 0; z-index: 2; background: linear-gradient(100deg, #1c1c1e 30%, #3a3a3c 50%, #1c1c1e 70%); background-size: 200% 100%; animation: lzsh 1s linear infinite; opacity: 0; transition: opacity .3s; }
+.lzs.gen .lzsh { opacity: 1; }
+@keyframes lzsh { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 /* a character made from a picture, shown moving */
 .lzm { display: flex; align-items: center; justify-content: center; gap: 1.2em; }
 .lzm .lzp { width: 13em; aspect-ratio: 3 / 4; border-radius: 1.4em; overflow: hidden; position: relative; background: #1c1c1e; }
@@ -600,8 +605,8 @@ body.t-search #switch { visibility: hidden; }
 .lzm .lzp .lzx { position: absolute; inset: 0; display: grid; place-items: center; color: #48484a; font-size: 6em; font-weight: 800; }
 .lzm > svg { width: 2.6em; height: 2.6em; color: #86868b; flex: none; }
 .lzm.two .lzp { width: 9em; }
-.lzs { position: relative; width: 22em; margin: 1.2em auto 0; aspect-ratio: 9 / 12; border-radius: 1.6em; overflow: hidden; opacity: 0; transition: opacity .5s; }
-.lzs.on { opacity: 1; }
+.lzs { position: relative; width: 20em; margin: 1.2em auto 0; aspect-ratio: 9 / 12; border-radius: 1.6em; overflow: hidden; opacity: 0; transition: opacity .5s; }
+.lzs.on, .lzs.gen { opacity: 1; }
 .lzs::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
 .lzs b { position: absolute; left: 7%; right: 7%; bottom: 6%; z-index: 1; font-size: 2.2em; font-weight: 800; text-align: left; }
 /* two phones, one story: each plays their own character */
@@ -853,6 +858,10 @@ const POSTER = {
   ile: { bg: 'beach', cast: [['alex', 'beach'], ['mila', 'beach']] },
 };
 for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
+// the onboarding's 4 stories (series.js), in the catalog like the others: their cover is their world, their preview their
+// opening in the game (onbstories.js: full = o_<taste>), their episodes series.js's (placeholders until they're written)
+for (const [k, T] of Object.entries(SERIES.TASTES)) DEMOS.push({ id: 's_' + k, series: k, full: 'o_' + k, title: T.title, by: '@sousmontoit', plays: '—',
+  glow: T.color, players: 1, byoc: false, live: null, you: -1, taps: 12, pitch: T.hook, cast: [], lines: [], eps: T.eps.map((e) => ({ title: e.title, tease: '' })) });
 // ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
 const BASIC = [['justin', 'Justin'], ['ruby', 'Ruby'], ['james', 'James'], ['diane', 'Diane'], ['amare', 'Amare'], ['isa_nuit', 'Isa']]
@@ -917,7 +926,7 @@ const actors = (cast, who = -1) => { const fl = flips(cast, who); return cast.ma
 const turn = (imgs, cast, who) => { const fl = flips(cast, who); imgs.forEach((img, k) => img.style.setProperty('--fx', fl[k] ? -1 : 1)); };
 
 // the player's own demos (from the + tab) go first, then the stories of the taste picked at the start (onboarding), then the rest
-const TASTE = { verre: 'desir', pacte: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
+const TASTE = { s_desir: 'desir', s_revanche: 'revanche', s_danger: 'danger', s_etrange: 'etrange', verre: 'desir', pacte: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
   lastcall: 'danger', appel: 'danger', cles: 'danger', gala: 'danger', contrat: 'danger', ombre: 'etrange', ile: 'etrange', nuit: 'etrange', coloc: 'etrange', feu: 'etrange' };
 const myTaste = (keep.get('onb', {}) || {}).k;
 const ofMyTaste = (d) => !!myTaste && TASTE[d.id] === myTaste;
@@ -966,6 +975,7 @@ function sprites(d, cls = '') {
 }
 // the cover: its poster (another moment of the story) when it has one, else the preview's own setting
 function cover(d) {
+  if (d.series) return `<div class="cv n0" style="--glow:${d.glow}">${SERIES.art(d.series, false)}<div class="cvfade"></div><div class="cvt">${esc(d.title)}</div></div>`;
   const v = posterOf(d);
   const art = v.img ? `<img class="cvimg" src="${v.img}" alt="">` : `<div class="cvbg" style="${place(v)}"></div>${sprites(v)}`;
   return `<div class="cv n${v.img ? 0 : v.cast.length}" style="--glow:${v.glow || '#fff'}">${art}<div class="cvfade"></div><div class="cvt">${esc(d.title)}</div></div>`;
@@ -1257,7 +1267,7 @@ function track(id, i, w) {
 const done = (id) => { const d = byId(id); return d.full ? finished(d) : prog[id].i >= total(d); };
 // the real game's episodes (index.html keeps the next one to play in smt-ep, one past the last once it's over): Last call at
 // episode 2 shows it, with its cover
-const epOf = (d) => { try { return d.full && (JSON.parse(localStorage.getItem('smt-ep')) || {})[d.full] || 0; } catch { return 0; } };
+const epOf = (d) => { if (d.series) return (SERIES.get('ser', {})[d.series] || 0) + 1; try { return d.full && (JSON.parse(localStorage.getItem('smt-ep')) || {})[d.full] || 0; } catch { return 0; } };   // a series: series.js's
 const finished = (d) => !!d.full && epOf(d) > (d.eps || [d]).length;
 const epd = (d) => { const e = d.eps && d.eps[epOf(d) - 1]; return epOf(d) > 1 && e && e.img ? { ...d, img: e.img } : d; };
 // where you stopped, as a still: the setting, everyone in the pose they had there, the line on screen
@@ -1303,17 +1313,24 @@ function savedHtml() {
   const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
   return ids.length ? `<div class="h2">Sauvés <small>${ids.length}</small></div><div class="grid g2">${ids.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
 }
-// Accueil while the app is still opening up: your story (the taste picked at the start) big, with its next episode, then
-// two others: one more of your taste, one of another (Last call, the one story fully written, is one of them), then what you saved
+// a new profile's En cours: its story (the taste picked at the start) first, then one more of its taste and one of another
+// (Last call, the one story fully written, is one of them)
 const SAME = { revanche: 'table', desir: 'verre', etrange: 'nuit', danger: 'lastcall' };
 const OTHER = { revanche: 'lastcall', desir: 'lastcall', etrange: 'lastcall', danger: 'verre' };
-function renderHomeP() {
-  const o = SERIES.onb(), T = SERIES.TASTES[o.k], nx = SERIES.nextEp();
-  $('#home').innerHTML = `<div class="ph">
-    <button class="ph-big" data-act="sep">${SERIES.art(o.k, false)}<div class="ph-txt"><h2>${esc(T.title)}</h2>
-      <span class="btn main">${I.play}${nx && nx.k === o.k ? `Épisode ${nx.n}` : 'Rejouer'}</span></div></button>
-    <div class="grid g2 ph-more">${[SAME[o.k], OTHER[o.k]].filter(byId).map((id) => card(byId(id), { byocB: false })).join('')}</div>
-    <div class="hsaved" style="padding:0">${savedHtml()}</div></div>`;
+function seedHome() {
+  const o = SERIES.onb(); if (!o || !SERIES.TASTES[o.k]) return;
+  const sid = 's_' + o.k;
+  if (!prog[sid] && !gone[sid]) prog[sid] = { i: 0, with: [], at: Date.now() };
+  [SAME[o.k], OTHER[o.k]].forEach((id, k) => { if (byId(id) && !prog[id] && !gone[id]) prog[id] = { i: 0, with: [], at: 2 - k }; });
+  keep.set('prog', prog);
+}
+// one of the onboarding's stories: episode 1 opens in the game (onbstories.js) and comes back here (?rest) for the rest of it;
+// the others are their placeholders
+function playSeriesEp(k, n) {
+  if (n > 1) return playSe(k, n);
+  const o = SERIES.onb() || {}, q = new URLSearchParams({ play: 'o_' + k, back: 'demo.html?rest=' + k });
+  if (k === 'desir' && o.li) { q.set('me', o.me || 'm'); q.set('li', o.li); }
+  location.href = 'index.html?' + q;
 }
 // an episode of your story (series.js), over the app; its end card says what it opened
 function playSe(k, n) {
@@ -1333,11 +1350,13 @@ function closeSe() { const b = $('#sePlayer'); b.hidden = true; b.innerHTML = ''
 let lockTimers = [];
 const stopLock = () => { lockTimers.forEach(clearInterval); lockTimers = []; };
 const ARR = '<svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const PREV = '<svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const NEXT = '<svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const slides = (list) => `<div class="c3"><div class="c3t">${list.map((s) => `<div class="c3s">${s}</div>`).join('')}</div>
-  ${list.length > 1 ? `<button class="lzv prev" data-c3="-1">${PREV}</button><button class="lzv next" data-c3="1">${NEXT}</button><div class="c3d">${list.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</div>` : ''}</div>`;
+  ${list.length > 1 ? `<div class="c3d">${list.map((_, i) => `<i data-c3="${i}"${i ? '' : ' class="on"'}></i>`).join('')}</div>` : ''}</div>`;
 const face3 = (id, p) => `<div class="lzc"><img src="chars/${id}/${p}.webp" alt=""></div>`;
+const SPARK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2.5l2.1 6.4 6.4 2.1-6.4 2.1L11 19.5l-2.1-6.4L2.5 11l6.4-2.1z"/><path d="M19 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></svg>';
+// « à partir d'une image quelconque »: the picture keeps changing (a drawing, a plush, a photo, an AI picture) and so does
+// what it becomes (a « ? » until that character exists)
+const ANY = [['ref/tease_dessin.webp', 'Un dessin'], ['ref/tease_toutou.webp', 'Un toutou'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
 const LOCKED = {
   explore: {
     back: () => `<div class="grid g2">${SERIES.TEASE.map((c) => SERIES.tease(c)).join('')}</div>`,
@@ -1348,7 +1367,7 @@ const LOCKED = {
     back: () => `<div class="grid g3">${['cam', 'isa_or', 'brooke', 'amare', 'julian', 'isa_nuit', 'suit', 'candy', 'melissa'].map((id) => face3(id, SPRITES[id].poses.listen ? 'listen' : Object.keys(SPRITES[id].poses)[0])).join('')}</div>`,
     show: () => slides([
       `<h3>Des histoires faites pour toi</h3><div class="lzq">${I.search}<span data-type="romance, fin heureuse, 10 min"></span></div>
-        <div class="lzr"><div class="lzch"><b>Romance</b><b>Fin heureuse</b><b>10 min</b></div></div><div class="lzr">${SERIES.tease(SERIES.TEASE[0], false)}${SERIES.tease(SERIES.TEASE[3], false)}</div>`,
+        <div class="lzr lztg"><div class="lzch"><b>Romance</b><b>Fin heureuse</b><b>10 min</b></div></div><div class="lzr">${SERIES.tease(SERIES.TEASE[0], false)}${SERIES.tease(SERIES.TEASE[3], false)}</div>`,
       `<h3>Trouve un perso</h3><div class="lzq">${I.search}<span data-type="elfe, anime"></span></div>
         <div class="lzr">${face3('isa_or', 'holding')}${face3('isa_nuit', 'listen')}${face3('melissa', 'listen')}</div>`,
     ]),
@@ -1358,17 +1377,19 @@ const LOCKED = {
     // his words (26/10): « Transforme un selfie en personnage jouable », « à partir d'une image quelconque », « intègre-les dans tes propres histoires »
     show: () => slides([
       `<h3>Transforme un selfie en personnage jouable</h3><div class="lzm"><div class="lzp"><img src="ref/perso_justin.webp" alt=""></div>${ARR}<div class="lzp"><img class="sp" data-poses="holding,punch,thinking,surprised,explaining" src="chars/justin/holding.webp" alt=""></div></div>`,
-      `<h3>À partir d’une image quelconque</h3><div class="lzm two"><div class="lzp"><img src="ref/tease_toutou.webp" alt=""></div><div class="lzp"><img src="ref/tease_dessin.webp" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div>`,
-      `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-type="Mon toutou se venge du chat du voisin"></span></div>
-        <div class="lzs">${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/justin/punch.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div>`,
+      `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
+      `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge du chat du voisin"></span></div>
+        <div class="lzg">${SPARK}Générer</div>
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/justin/punch.webp" alt="" style="position:absolute;left:50%;top:10%;height:110%;transform:translateX(-50%)"><b>La revanche du toutou</b></div>`,
     ]),
   },
   social: {
     back: () => `<div class="chips" style="justify-content:center">${FRIENDS.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}</div>`,
-    // one story, two phones: each plays their own character; while one chooses, the other sees « Léa choisit… »
-    show: () => slides([`<h3>Une histoire, un perso chacun</h3><div class="lzd">${[['Toi', 'cam', 'flirty'], ['Léa', 'brooke', 'drunk_smile']].map(([n, s, p], i) =>
-      `<div class="lzcel${i ? '' : ' mine'}" data-cel="${i}"><div class="art a-desir"><div class="bg"></div>${SERIES.spr(s, p, 50, 120, 14)}</div><div class="lzn"><i></i>${n}</div>
-        <div class="lzo"><b>Moi aussi.</b><b>Va le rejoindre.</b></div><div class="lzw">${i ? 'Toi' : 'Léa'} choisit…</div></div>`).join('')}</div>`]),
+    // one story, two phones: each plays their own character and has their own choices; while one chooses, the other waits
+    // (Brooke on the left, Cam on the right: they face each other)
+    show: () => slides([`<h3>Une histoire, un perso chacun</h3><div class="lzd">${[['Léa', 'brooke', 'drunk_smile', ['L’embrasser.', 'Partir.']], ['Toi', 'cam', 'flirty', ['Lui avouer.', 'Changer de sujet.']]].map(([n, sp, p, opts], i) =>
+      `<div class="lzcel${i ? ' mine' : ''}"><div class="art a-desir"><div class="bg"></div>${SERIES.spr(sp, p, 50, 120, 14)}</div><div class="lzn"><i></i>${n}</div>
+        <div class="lzo">${opts.map((o) => `<b>${o}</b>`).join('')}</div><div class="lzw">${i ? 'Léa' : 'Toi'} choisit…</div></div>`).join('')}</div>`]),
   },
 };
 function renderLocked(v) {
@@ -1384,29 +1405,49 @@ function renderLocked(v) {
 // two phones taking turns to choose
 function liven(box) {
   const c3 = $('.c3', box);
-  if (c3) {
-    const n = $$('.c3s', c3).length; let at = 0;
-    const go = (k) => { at = (at + k + n) % n; $('.c3t', c3).style.transform = `translateX(-${at * 100}%)`; $$('.c3d i', c3).forEach((d, i) => d.classList.toggle('on', i === at)); };
-    $$('[data-c3]', c3).forEach((b) => b.onclick = (e) => { e.stopPropagation(); go(+b.dataset.c3); });
-    let x0 = null;
-    c3.ontouchstart = (e) => { x0 = e.touches[0].clientX; };
-    c3.ontouchend = (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); };
+  if (c3) {   // a swipe (finger or mouse) or a tap on a dot
+    const n = $$('.c3s', c3).length; let at = 0, x0 = null;
+    const go = (k) => { at = Math.max(0, Math.min(n - 1, k)); $('.c3t', c3).style.transform = `translateX(-${at * 100}%)`; $$('.c3d i', c3).forEach((d, i) => d.classList.toggle('on', i === at)); };
+    $$('[data-c3]', c3).forEach((d) => d.onclick = (e) => { e.stopPropagation(); go(+d.dataset.c3); });
+    c3.onpointerdown = (e) => { x0 = e.clientX; };
+    c3.onpointerup = (e) => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); };
+    c3.onpointercancel = () => { x0 = null; };
   }
-  for (const sp of $$('[data-type]', box)) {   // a search (or an idea) typing itself, then its results
+  for (const sp of $$('[data-type]', box)) {   // a search typing itself, then what it finds
     const full = sp.dataset.type, res = $$('.lzr', sp.closest('.c3s'));
     let i = 0, hold = 0;
     lockTimers.push(setInterval(() => {
       if (i <= full.length) { sp.textContent = full.slice(0, i++); return; }
-      res.forEach((r) => r.classList.add('on')); $$('.lzs', sp.closest('.c3s')).forEach((r) => r.classList.add('on'));
-      if (++hold > 28) { i = 0; hold = 0; res.forEach((r) => r.classList.remove('on')); $$('.lzs', sp.closest('.c3s')).forEach((r) => r.classList.remove('on')); }
+      res.forEach((r) => r.classList.add('on'));
+      if (++hold > 28) { i = 0; hold = 0; res.forEach((r) => r.classList.remove('on')); }
+    }, 90));
+  }
+  for (const sp of $$('[data-gen]', box)) {   // an idea typed, « Générer » pressed, it generates, the story's poster
+    const full = sp.dataset.gen, sl = sp.closest('.c3s'), btn = $('.lzg', sl), st = $('.lzs', sl);
+    let i = 0, t = 0;
+    lockTimers.push(setInterval(() => {
+      if (i <= full.length) { sp.textContent = full.slice(0, i++); return; }
+      t++;
+      btn.classList.toggle('on', t > 3 && t < 7);
+      st.classList.toggle('gen', t >= 7 && t < 20);
+      st.classList.toggle('on', t >= 20);
+      if (t > 48) { i = 0; t = 0; st.classList.remove('on', 'gen'); }
     }, 90));
   }
   for (const im of $$('[data-poses]', box)) {   // the character made from the selfie, moving
     const ps = im.dataset.poses.split(','); let k = 0;
     lockTimers.push(setInterval(() => { k = (k + 1) % ps.length; im.src = `chars/justin/${ps[k]}.webp`; }, 900));
   }
+  for (const m of $$('[data-any]', box)) {   // any picture: it keeps changing, and so does what it becomes
+    const [from, to] = $$('.lzp', m), label = m.nextElementSibling; let k = 0;
+    lockTimers.push(setInterval(() => {
+      k = (k + 1) % ANY.length; const [src, l, sp, p] = ANY[k];
+      $('img', from).src = src; label.textContent = l;
+      to.innerHTML = sp ? `<img class="sp" src="chars/${sp}/${p}.webp" alt="">` : '<div class="lzx">?</div>';
+    }, 1700));
+  }
   const cels = $$('.lzd .lzcel', box);
-  if (cels.length) { let k = 0; lockTimers.push(setInterval(() => { k = 1 - k; cels.forEach((c, i) => c.classList.toggle('mine', i === k)); }, 1800)); }
+  if (cels.length) { let k = 1; lockTimers.push(setInterval(() => { k = 1 - k; cels.forEach((c, i) => c.classList.toggle('mine', i === k)); }, 1800)); }
 }
 // Recherche: the stories by name, or the characters by name and by how they're drawn (series.js STYLE)
 let sKind = 'stories', sStyle = '', sQ = '';
@@ -1430,7 +1471,7 @@ function searchRes() {
     : `<div class="grid g2">${all().filter((d) => has(d.title)).map((d) => card(d, { byocB: false })).join('')}</div>`;
 }
 function renderHome() {
-  if (SERIES.progressive()) return renderHomeP();
+  if (SERIES.progressive()) seedHome();
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div><div class="hsaved">${savedHtml()}</div>`; return; }
@@ -1469,7 +1510,7 @@ function renderHome() {
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = homeCentre = id;
     $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}</p>` : ''}
-      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : 'Continuer'}${epOf(d) && !done(id) ? ` · Épisode ${epOf(d)}` : ''}</button>
+      <button class="btn main" data-act="resume" data-id="${id}">${I.play}${done(id) ? 'Rejouer' : started(d) ? 'Continuer' : 'Jouer'}${epOf(d) && !done(id) ? ` · Épisode ${epOf(d)}` : ''}</button>
       <button class="hdown" data-act="hdown">Infos${I.down}</button>`;
     $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
@@ -1749,7 +1790,7 @@ function homeReady(f) {
   const next = () => { if (!f.isConnected) return; f.contentWindow.postMessage({ tap: [.5, .3] }, location.origin); if (++n < 2) homeOpen = setTimeout(next, 2600); };
   homeOpen = setTimeout(next, 2600);
 }
-const bgOf = (d) => d.img ? `background:url(${d.img}) center/cover` : place(d);
+const bgOf = (d) => d.series ? `background:radial-gradient(circle at 50% 30%, ${d.glow}, #000 70%)` : d.img ? `background:url(${d.img}) center/cover` : place(d);
 function lineHtml(d, who, text) {
   if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
   const m = castOf(d)[who];
@@ -1807,6 +1848,7 @@ function setTab(t) {
 // to: a real friend to invite ({id, n}: their device rings)
 function openPlayer(id, host = false, from = 0, ep = null, w = null, inRoom = null, to = null) {
   const d = byId(id), n = ep || epTo(d);
+  if (d.series) { track(id, 0); return playSeriesEp(d.series, Math.min(n, d.eps.length)); }
   if (d.full) {   // the real game; its back comes here
     track(id, 0, inRoom || (w ? [w] : to ? [to.n] : null));
     location.href = `index.html#open=${d.full}${n > 1 ? '&ep=' + n : ''}${w ? '&with=' + encodeURIComponent(w) : ''}${inRoom ? '&in=' + encodeURIComponent(inRoom.join(',')) : ''}${to ? `&invite=${to.id}&iname=${encodeURIComponent(to.n)}` : ''}`;
@@ -2081,7 +2123,6 @@ stage.addEventListener('click', (e) => {
     case 'withplay': closeSheet(() => openPlayer(id, false, 0, +el.dataset.n, el.dataset.f)); break;
     case 'unlist': track(id, null); gone[id] = 1; keep.set('gone', gone); $('#home').scrollTop = 0; renderHome(); break;
     case 'tab': setTab(el.dataset.tab); break;
-    case 'sep': { const o = SERIES.onb(), nx = SERIES.nextEp(); playSe(o.k, nx && nx.k === o.k ? nx.n : SERIES.TASTES[o.k].eps.length); break; }   // your story (Rejouer: its last one)
     case 'nextep': { const nx = SERIES.nextEp(); if (nx && nx.k === 'lastcall') openPlayer('lastcall'); else if (nx) playSe(nx.k, nx.n); break; }
     case 'sKind': sKind = el.dataset.k; renderSearch(); break;
     case 'sStyle': sStyle = el.dataset.k; renderSearch(); break;
@@ -2119,6 +2160,9 @@ addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });   
   history.replaceState(st, '', hashOf(st));
   apply(st);
   if (pl) { const nx = SERIES.nextEp(); if (nx && nx.k === pl) playSe(pl, nx.n); }
+  // back from the game after an episode 1 started here (?rest=<taste>): the rest of it
+  const rest = new URLSearchParams(location.search).get('rest');
+  if (rest && SERIES.TASTES[rest]) { history.replaceState(history.state, '', location.pathname + location.hash); playSe(rest, 1); }
 }
 </script>
 </body>
