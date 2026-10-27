@@ -1574,7 +1574,7 @@ function epsHtml(d) {
 }
 function moreHtml(d) {
   return `${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${epsHtml(d)}
-    <button class="hout" data-act="unlist" data-id="${d.id}">${I.close}Retirer de En cours</button>`;
+    ${SERIES.isOpen('explore') ? `<button class="hout" data-act="unlist" data-id="${d.id}">${I.close}Retirer de En cours</button>` : ''}`;   // nothing to take it out for before Explorer opens
 }
 
 // ---- Social (very simple for now): you — tap to see and pick your characters — then your friends and what they're doing ----
