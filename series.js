@@ -63,32 +63,66 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .se-k { font-size: 1.7em; color: #86868b; font-weight: 600; }
 .se h2 { font-size: 4em; font-weight: 700; letter-spacing: -.025em; line-height: 1.05; margin: .2em 0 .6em; }
 .se-sum { font-size: 2.1em; line-height: 1.45; color: #e5e5ea; }
-.se-hook { font-size: 2.4em; line-height: 1.35; font-style: italic; color: #f5f5f7; margin: .6em 0 1em; }
 .se-go { align-self: stretch; margin-top: 2.4em; padding: 1em; border-radius: 3em; background: #fff; color: #000; font-weight: 700; font-size: 2.1em; display: flex; align-items: center; justify-content: center; gap: .4em; }
 .se-go svg { width: 1em; height: 1em; }
 .se-home { align-self: center; margin-top: 1.2em; font-size: 1.8em; color: #86868b; font-weight: 600; padding: .5em 1em; }
-.se-win { display: flex; align-items: center; gap: 1.6em; margin-top: 1.4em; padding: 1.4em; border-radius: 2em; background: #1c1c1e; }
-.se-win .pic { width: 9em; height: 12em; flex: none; border-radius: 1.2em; overflow: hidden; position: relative; background: #2c2c2e; }
-.se-win .pic img { position: absolute; left: 50%; top: 4%; height: 190%; transform: translateX(-50%); }
-.se-win small { display: block; font-size: 1.5em; color: #86868b; font-weight: 600; }
-.se-win b { display: block; font-size: 2.6em; font-weight: 700; margin: .1em 0 .4em; }
-.se-win button { font-size: 1.6em; font-weight: 700; padding: .55em 1.1em; border-radius: 2em; background: #fff; color: #000; }
 .se-new { margin-top: 1.4em; font-size: 1.9em; font-weight: 700; color: #30d158; }
-.se-later { margin-top: 2.4em; font-size: 2em; color: #86868b; }
-/* the end of an episode: like the game's own end card (centred, the poster font, the buttons at the bottom) */
-.se-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8%; overflow-y: auto; animation: seIn .8s ease-out both; }
-.se-end::before { content: ''; position: absolute; left: 50%; top: 34%; width: 120%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(var(--c), transparent 62%); opacity: .22; pointer-events: none; }
-.se-end > * { position: relative; }
-.se-end .se-kick { margin-top: auto; padding-top: 12%; font-size: 1.9em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.7); }
-.se-end h2 { font-family: 'Yeseva One', Georgia, serif; font-weight: 400; font-size: 5.4em; line-height: 1.05; letter-spacing: 0; margin: .25em 0 .5em; }
-.se-end .se-hook { font-family: 'Yeseva One', Georgia, serif; font-style: normal; font-size: 2.8em; line-height: 1.3; color: var(--c); margin: 0 0 .4em; }
-.se-end .se-win { align-self: stretch; text-align: left; margin-top: 1.6em; }
-.se-end .se-later { margin-top: 1.6em; }
+/* the end of an episode (the game's card): « Tu as fini », the reveal of who you won, then the next episode */
+.sw { position: absolute; inset: 0; z-index: 90; background: radial-gradient(circle at 50% 45%, #2a0a10, #000 70%); color: #fff; overflow: hidden; }
+.sw-a { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
+.sw-kick { margin-top: 12%; font-size: 1.9em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.75); text-align: center; }
+.sw-a .sw-kick { opacity: 0; transition: opacity .8s, letter-spacing 1.2s; letter-spacing: .6em; }
+.won .sw-a .sw-kick { opacity: 1; letter-spacing: .3em; }
+.sw-done { position: absolute; left: 0; right: 0; top: 36%; text-align: center; opacity: 0; transform: scale(.94); transition: opacity .7s, transform 1.4s ease-out; }
+.done .sw-done { opacity: 1; transform: none; }
+.won .sw-done { opacity: 0; }
+.sw-done small { display: block; font-size: 2em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.sw-done b { display: block; font-family: 'Yeseva One', Georgia, serif; font-weight: 400; font-size: 7em; line-height: 1.1; }
+.sw-glow { position: absolute; left: 50%; top: 55%; width: 90%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(rgba(255,40,70,.45), transparent 65%); opacity: .4; transition: opacity 2.5s, background 2.5s; }
+.sw-shake { position: absolute; inset: 0; }
+.sw-fig { position: absolute; left: 50%; bottom: 20%; height: 58%; opacity: 0; transform: translateX(-50%) scale(.9); filter: brightness(0) drop-shadow(0 0 1.5em rgba(255,40,70,.9)); transition: opacity .5s, filter 1.6s ease-in, transform 3.2s ease-out; }
+.quake .sw-fig, .burst .sw-fig { opacity: 1; }
+.quake .sw-shake { animation: swShake .11s steps(2) infinite; }
+.quake .sw-glow { opacity: 1; animation: swPulse .9s ease-in-out infinite; }
+.hint .sw-fig { filter: brightness(.16) drop-shadow(0 0 2.6em rgba(255,110,90,1)); }
+.burst .sw-fig { filter: brightness(1) drop-shadow(0 0 2.2em rgba(255,200,140,.55)); transform: translateX(-50%) scale(1); transition: opacity .5s, filter .7s ease-out, transform 1.1s cubic-bezier(.2,.9,.25,1.15); }
+.burst .sw-glow { opacity: .9; background: radial-gradient(rgba(255,190,120,.4), transparent 65%); }
+.sw-rays { position: absolute; left: 50%; top: 52%; width: 170%; aspect-ratio: 1; transform: translate(-50%, -50%); background: repeating-conic-gradient(rgba(255,214,160,.14) 0 3deg, transparent 3deg 15deg); -webkit-mask: radial-gradient(closest-side, #000 15%, transparent 72%); mask: radial-gradient(closest-side, #000 15%, transparent 72%); opacity: 0; transition: opacity 1.4s; }
+.burst .sw-rays { opacity: 1; animation: swSpin 50s linear infinite; }
+.sw-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 52%, #fff, rgba(255,226,180,.65) 35%, transparent 75%); }
+.burst .sw-flash { animation: swFlash 1.2s ease-out; }
+.sw-ring { position: absolute; left: 50%; top: 52%; width: 34%; aspect-ratio: 1; border-radius: 50%; border: .35em solid rgba(255,228,190,.95); box-shadow: 0 0 1.4em rgba(255,200,140,.7), inset 0 0 1.4em rgba(255,200,140,.5); transform: translate(-50%, -50%) scale(0); opacity: 0; }
+.burst .sw-ring { animation: swRing 1.3s cubic-bezier(.15,.75,.3,1); }
+.sw-sparks i { position: absolute; width: var(--s); height: var(--s); border-radius: 50%; background: #ffe9c2; box-shadow: 0 0 .7em .15em rgba(255,196,120,.85); opacity: 0; }
+.sw-sparks i.g { width: 3em; height: 3em; background: none; box-shadow: none; }
+.sw-sparks i.g::before, .sw-sparks i.g::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: .14em; margin-top: -.07em; background: linear-gradient(90deg, transparent, #fff, transparent); }
+.sw-sparks i.g::after { transform: rotate(90deg); }
+.burst .sw-sparks i { animation: swSpark var(--d) ease-out var(--w) infinite; }
+.burst .sw-sparks i.g { animation: swGlint var(--d) ease-in-out var(--w) infinite; }
+.sw-won { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; opacity: 0; transform: translateY(1.5em); transition: opacity .8s, transform .8s; }
+.named .sw-won { opacity: 1; transform: none; }
+.sw-won b { display: block; font-family: 'Yeseva One', Georgia, serif; font-weight: 400; font-size: 5.6em; line-height: 1.1; }
+.sw-won span { font-size: 1.8em; color: #ffcf8a; }
+.sw-t { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 0 9%; animation: swIn .8s ease-out both; }
+.sw-t .sw-kick { margin-top: 13%; animation: swIn 1.2s ease-out both; }
+.sw-t h2 { font-family: 'Yeseva One', Georgia, serif; font-weight: 400; font-size: 4.6em; line-height: 1.1; margin: .2em 0 .5em; text-align: center; }
+.sw-t .sw-later { margin-top: auto; }
+.sw-img { position: relative; width: 72%; aspect-ratio: 3 / 4; flex: none; border-radius: 2em; overflow: hidden; box-shadow: 0 2em 5em rgba(0,0,0,.8); }
+.sw-img > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sw-img.tall { width: 60%; aspect-ratio: 9 / 14; }   /* a series' poster: drawn for a tall frame */
+.sw-t .se-new { margin-top: 1.2em; }
+@keyframes swSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes swFlash { 6% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes swRing { 0% { opacity: 1; transform: translate(-50%, -50%) scale(.15); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(4.2); border-width: .04em; } }
+@keyframes swSpark { 0% { opacity: 0; transform: translate(0, 0) scale(.5); } 12% { opacity: 1; } 70% { opacity: .8; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1); } }
+@keyframes swGlint { 0%, 100% { opacity: 0; transform: scale(.2) rotate(0); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } }
+@keyframes swShake { 0% { transform: translate(.5em, -.3em) rotate(.4deg); } 50% { transform: translate(-.6em, .4em) rotate(-.5deg); } 100% { transform: translate(.3em, .5em) rotate(.2deg); } }
+@keyframes swPulse { 50% { transform: translate(-50%, -50%) scale(1.15); } }
+@keyframes swIn { from { opacity: 0; } }
 .se-btns { align-self: stretch; margin-top: auto; padding: 2.4em 0 9%; display: flex; flex-direction: column; align-items: center; gap: 1.6em; }
 .se-btns button { font: inherit; font-size: 2.2em; font-weight: 700; width: 78%; padding: .75em 1.4em; border-radius: 2em; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4em; }
 .se-btns .se-go { margin: 0; align-self: center; background: #fff; color: #000; }   /* .se-go's own stretch would pin it left at 78% */
 .se-btns .se-home { margin: 0; background: rgba(255,255,255,.12); color: #fff; }
-@keyframes seIn { from { opacity: 0; transform: translateY(1.5em); } }
 </style>`);
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -227,8 +261,14 @@ function episode(box, k, n, opts = {}) {
     if (b.dataset.x === 'done') endOf(box, k, n, opts);
   };
 }
+// the end of an episode, the game's own way (index.html's episode card): « Tu as fini · Épisode N »; a character won: the
+// reveal (its silhouette, the shaking, the light, there it is); then the next episode, with Continuer and Retour à l'accueil
+const sparks = () => Array.from({ length: 30 }, (_, k) => {
+  const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2), g = k % 6 === 0;   // one in six: a glint, the rest embers
+  return `<i class="${g ? 'g' : ''}" style="left:${r(18, 82)}%;top:${r(g ? 22 : 35, g ? 70 : 80)}%;--s:${r(.25, .7)}em;--d:${r(2.2, 4.6)}s;--w:${r(0, 2)}s;--x:${r(-4, 4)}em;--y:${r(-14, -6)}em"></i>`;
+}).join('');
 function endOf(box, k, n, opts) {
-  const T = TASTES[k], before = episodesDone();
+  const before = episodesDone();
   const ser = get('ser', {}); ser[k] = Math.max(ser[k] || 0, n); put('ser', ser);
   const after = episodesDone();
   const opened = progressive() ? Object.keys(LADDER).filter((t) => before < LADDER[t] && after >= LADDER[t]) : [];
@@ -241,16 +281,34 @@ function endOf(box, k, n, opts) {
       else { l.push({ sprite: w.sprite, pose: w.pose, name: w.name }); localStorage.setItem('smt-won', JSON.stringify(l)); }
     } catch { /* private window */ }
   }
-  const nx = nextEp();
-  box.innerHTML = `<div class="se"><div class="se-end" style="--c:${T.color}">
-    <div class="se-kick">Fin de l’épisode ${n}</div>
-    <h2>${esc(T.title)}</h2>
-    ${won ? `<div class="se-win"><div class="pic"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""></div><div><small>Tu gagnes</small><b>${esc(w.name)}</b>
-      ${opts.profile ? '<button data-x="profile">Ajouter à mon profil</button>' : ''}</div></div>` : ''}
-    ${opened.map((t) => `<div class="se-new">Nouveau : ${LABEL[t]}</div>`).join('')}
-    ${nx ? '' : '<div class="se-later">La suite arrive.</div>'}
-    <div class="se-btns">${nx ? `<button class="se-go" data-x="next">${PLAY}Continuer · ${nx.k === k ? `Épisode ${nx.n}` : `${esc(nx.title)} ${nx.n}`}</button>` : ''}
-      <button class="se-home" data-x="home">Retour à l’accueil</button></div></div></div>`;
+  const nx = nextEp(), timers = [];
+  const later = (ms, f) => timers.push(setTimeout(() => { if (box.contains(card)) f(); }, ms));
+  box.innerHTML = `<div class="sw"><div class="sw-a"><div class="sw-done"><small>Tu as fini</small><b>Épisode ${n}</b></div>
+    ${won ? `<div class="sw-kick">Tu gagnes…</div><div class="sw-rays"></div><div class="sw-shake"><div class="sw-glow"></div><img class="sw-fig" src="chars/${w.sprite}/${w.pose}.webp" alt=""></div>
+      <div class="sw-ring"></div><div class="sw-sparks">${sparks()}</div><div class="sw-flash"></div>
+      <div class="sw-won"><b>${esc(w.name)}</b><span>Ajouté à tes persos</span></div>` : ''}</div></div>`;
+  const card = box.firstChild;
+  const tease = () => {
+    timers.forEach(clearTimeout); card.onclick = null;
+    const pic = !nx ? '' : nx.k === 'lastcall' ? `<img src="covers/lastcall${nx.n > 1 ? '_ep' + nx.n : ''}.jpg" alt="">` : art(nx.k, false);
+    const title = !nx ? '' : nx.k === 'lastcall' ? 'Last call' : fill(TASTES[nx.k].eps[nx.n - 1].title);
+    card.className = 'sw';
+    card.innerHTML = `<div class="sw-t">${nx ? `<div class="sw-kick">Épisode ${nx.n}</div><h2>${esc(title)}</h2><div class="sw-img${nx.k === 'lastcall' ? '' : ' tall'}">${pic}</div>` : '<h2 class="sw-later">La suite arrive.</h2>'}
+      ${opened.map((t) => `<div class="se-new">Nouveau : ${LABEL[t]}</div>`).join('')}
+      <div class="se-btns">${nx ? `<button class="se-go" data-x="next">${PLAY}Continuer</button>` : ''}
+        ${won && opts.profile ? '<button class="se-home" data-x="profile">Voir dans mon profil</button>' : ''}
+        <button class="se-home" data-x="home">Retour à l’accueil</button></div></div>`;
+  };
+  later(60, () => card.classList.add('done'));
+  if (!won) later(2200, tease);
+  else {
+    later(2000, () => card.className = 'sw won');                  // « Tu gagnes… »
+    later(3300, () => card.className = 'sw won quake');            // the silhouette comes, everything shakes
+    later(5700, () => card.className = 'sw won quake hint');       // a light starts coming through
+    later(7300, () => card.className = 'sw won burst');            // flash, shockwave, there they are
+    later(8300, () => { card.className = 'sw won burst named'; card.onclick = tease; });   // who it is (a tap: on to what's next)
+    later(12500, tease);
+  }
   box.onclick = (e) => {
     const b = e.target.closest('[data-x]'); if (!b) return;
     e.stopPropagation();
