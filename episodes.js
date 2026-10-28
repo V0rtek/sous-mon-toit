@@ -425,44 +425,6 @@
     words: { LEDE: (f) => `${f.fin === 'regarde' ? 'Tu as regardé la télé.' : f.fin === 'court' ? 'La porte était fermée de l’extérieur.' : 'Tu as raccroché.'} Quelqu’un est derrière toi.` },
   });
 
-  // ---------- 9. Le pacte du bar ----------
-  story('d_pacte', 'Le pacte du bar', [
-    scene('e_bar', { justin: 'drunk_listen', cam: 'sip' }),
-    cam('two', 'justin', 'cam'), { fade: 'in', ms: 900 }, { caption: 'Samedi · 2 h 10 du matin' },
-    ...L('cam', 'sip', 'En 2016, t’as signé une serviette. Tu te souviens de ce qu’il y avait dessus ?'),
-    ...L('justin', 'drunk_listen', 'Que si personne était casé à 30 ans…'),
-    ...L('cam', 'flirty', 'Joyeux anniversaire.'),
-    ...L('justin', 'drunk_happy', 'Attends. T’es sérieuse ?'),
-    ...L('cam', 'awkward', 'J’ai gardé la serviette, Justin.'),
-    cam('one', 'justin'),
-    { by: 'justin', choice: [
-      { t: 'Donc on est fiancés.', intent: 'blague', set: { ton: 'blague' }, then: [...L('justin', 'drunk_flirt', 'Donc techniquement, on est fiancés.'), ...L('cam', 'worried', 'Techniquement, j’ai quelqu’un.')] },
-      { t: 'Elle est où, la serviette ?', intent: 'curieux', set: { ton: 'curieux' }, then: [...L('justin', 'drunk_listen', 'Elle est où, cette serviette ?'), ...L('cam', 'awkward', 'Dans mon sac. Je l’ai amenée pour toi.')] },
-      { t: 'Qui est-ce ?', intent: 'jaloux', set: { ton: 'jaloux' }, then: [...L('justin', 'drunk_sad', 'T’as quelqu’un ? Depuis quand ?'), ...L('cam', 'worried', 'Depuis assez longtemps pour que ça compte.')] },
-    ] },
-    N('Elle sort la serviette de son sac. Un rond de verre, une écriture ronde, deux signatures.'),
-    ...L('cam', 'thinking', 'Lis le bas de la page.'),
-    ...T('justin', "En bas, en tout petit : « Si l'un des deux ment, l'autre doit le dire en face. » Je ne me souviens pas de l'avoir écrit.", { only: 'justin' }),
-    ...T('cam', "Il ne sait pas pourquoi j'ai sorti cette serviette ce soir. Je dois lui dire pour Sam avant minuit.", { only: 'cam' }),
-    ...L('justin', 'drunk_listen', 'C’est quoi, cette phrase ?'),
-    cam('one', 'cam'),
-    { by: 'cam', choice: [
-      { t: 'Dire la vérité.', intent: 'avoue', set: { cam: 'vérité' }, then: [...L('cam', 'worried', 'Je vais me marier. Avec Sam. En juin.'), hush(900), ...L('justin', 'drunk_sad', '…En juin.')] },
-      { t: 'Changer de sujet.', intent: 'esquive', set: { cam: 'esquive' }, then: [...L('cam', 'tipsy_laugh', 'Rien. Une vieille blague. Commande-nous un verre.'), ...L('justin', 'drunk_listen', 'Tu me caches quelque chose.')] },
-      { t: 'Embrasser Justin.', intent: 'embrasse', set: { cam: 'baiser' }, then: [N('Elle se penche. Le temps d’une seconde, le bar disparaît.'), ...L('justin', 'drunk_happy', 'Wow. D’accord.')] },
-    ] },
-    N('Son téléphone vibre sur le comptoir. « Sam ❤ ». Elle ne le retourne pas.'),
-    ...L('justin', 'drunk_sad', 'Tu réponds pas ?'),
-    sms('inconnu', 'cam', 'tu devrais pas être avec lui ce soir. j’ai tout vu sur la caméra du bar'),
-    ...L('cam', 'worried', 'Justin… c’est pas Sam qui écrit.'),
-    ...end(1, { sprite: 'justin_bar', pose: 'drunk_happy', name: 'Justin' }, "Fin de l'épisode 1", 'Le pacte du bar', '{LEDE}'),
-  ], {
-    seats: ['justin', 'cam'], solo: { justin: 'Justin', cam: 'Cam' },
-    pick: { justin: { pose: 'drunk_happy', line: 'Que si personne était casé à 30 ans…' }, cam: { pose: 'sip', line: 'J’ai gardé la serviette, Justin.' } },
-    cast: { justin: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' }, cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 }, inconnu: { name: 'Inconnu', color: '#26262b', sprite: 'suit' } },
-    words: { LEDE: (f) => `${f.cam === 'vérité' ? 'Cam a dit pour Sam.' : f.cam === 'baiser' ? 'Cam a préféré embrasser Justin.' : 'Cam a changé de sujet.'} Quelqu’un les observait depuis le début.` },
-  });
-
   // ---------- 10. Où étais-tu hier soir ? ----------
   story('d_mensonge', 'Où étais-tu hier soir ?', [
     scene('e_maison2', { ruby: 'angry', james: 'listen' }),

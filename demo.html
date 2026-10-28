@@ -753,7 +753,7 @@ const NAMES = { astro_gore: 'Vesper', astro_tentacle: 'Abysse', astro_orion: 'Or
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', ch: 'mila', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', ch: 'ninja', on: true },
-  { n: 'Sam', c: '#ff9f2e', ch: 'belier_blanc', on: true, doing: 'pacte' }, { n: 'Inès', c: '#9b6bff', ch: 'plage', on: false, seen: 'il y a 3 h' },
+  { n: 'Sam', c: '#ff9f2e', ch: 'belier_blanc', on: true }, { n: 'Inès', c: '#9b6bff', ch: 'plage', on: false, seen: 'il y a 3 h' },
   { n: 'Noé', c: '#25c48a', ch: 'exile', on: false, seen: 'hier' },
 ];
 const STRANGERS = [{ n: 'Nico', c: '#5ac8c8', ch: 'dan' }, { n: 'Zoé', c: '#c97b4a', ch: 'ruby' }, { n: 'Malik', c: '#7f8cff', ch: 'amare' }, { n: 'Jade', c: '#d4609b', ch: 'isa_nuit' }, { n: 'Hugo', c: '#8bbf4a', ch: 'alex' }];
@@ -822,11 +822,6 @@ const DEMOS = [
     cast: [['justin', 'phone_shock']], players: 1, byoc: false, live: null, you: 0,
     pitch: "17 appels manqués de ton frère. Quand tu arrives chez lui, la porte est ouverte, la télé allumée, et il t'a laissé une note : « Ne me cherche pas. »",
     lines: [[0, "Marco ? Marco, réponds !", "phone_call"], [-1, "Messagerie. Pour la dix-septième fois."], [0, "T'as laissé ta porte ouverte, man…", "surprised"], [-1, "La télé allumée. Le son coupé. Une assiette encore chaude."], [0, "Il était là. Il y a cinq minutes.", "thinking"], [-1, "Sur la table, une note. Son écriture."], [0, "« Ne me cherche pas. Ils écoutent. »", "phone_shock"], [0, "Qui ça, « ils » ?", "listen"], [-1, "Ton téléphone vibre. Numéro inconnu."], [0, "…Allô ?", "phone_call"]] },
-  { id: 'pacte', title: 'Le pacte du bar', by: '@lastcall', plays: '17,9 k', bg: 'terrasse', pos: '70% 50%', fx: 'sepia(.6) saturate(1.6) brightness(.7)', glow: '#ffb15c',
-    full: 'd_pacte', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'justin_bar', pose: 'drunk_happy', name: 'Justin' }, tease: 'La suite arrive.' }],
-    cast: [['justin_bar', 'drunk_talk'], ['cam', 'sip']], players: 2, byoc: false, live: { friend: 'Sam', strangers: 2, since: 1 }, you: 0,
-    pitch: "En 2016, ils ont signé un pacte sur une serviette de bar. Ce soir, elle l'a ressortie — mais pas pour la raison qu'il espère.",
-    lines: [[1, "En 2016, t'as signé une serviette. Tu te souviens de ce qu'il y avait dessus ?", "sip"], [0, "Que si personne était casé à 30 ans…", "drunk_listen"], [1, "Joyeux anniversaire.", "flirty"], [0, "Attends. T'es sérieuse ?", "drunk_happy"], [1, "J'ai gardé la serviette, Justin.", "awkward"], [0, "Donc techniquement on est fiancés.", "drunk_flirt"], [1, "Techniquement, j'ai quelqu'un.", "worried"], [0, "…Depuis quand ?", "drunk_sad"]] },
   { id: 'mensonge', title: 'Où étais-tu hier soir ?', by: '@ruby_writes', plays: '9,3 k', bg: 'salon', pos: '40% 50%', fx: 'hue-rotate(320deg) brightness(.6) saturate(1.4)', glow: '#ff5c8a',
     full: 'd_mensonge', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'james_noir', pose: 'angry', name: 'James' }, tease: 'La suite arrive.' }],
     cast: [['ruby', 'angry'], ['james', 'listen']], players: 2, byoc: false, live: { friend: 'Max', since: 6 }, you: 0,
@@ -876,7 +871,6 @@ const POSTER = {
   table: { bg: 'maison', pos: '80% 50%', fx: 'hue-rotate(200deg) saturate(.6) brightness(.35)', cast: [['suit', 'angry']] },
   cles: { bg: 'salon', pos: '70% 50%', fx: 'hue-rotate(330deg) saturate(1.6) brightness(.4)', cast: [['ruby', 'surprised'], ['james', 'surprised'], ['diane', 'angry']] },
   appel: { bg: 'salon', pos: '40% 50%', fx: 'grayscale(.5) brightness(.35) hue-rotate(190deg)', cast: [['justin', 'punch']] },
-  pacte: { bg: 'maison', pos: '20% 50%', fx: 'hue-rotate(210deg) brightness(.4)', cast: [['cam', 'flirty'], ['justin_bar', 'drunk_sad']] },
   mensonge: { bg: 'terrasse', pos: '75% 50%', fx: 'sepia(.6) hue-rotate(-30deg) brightness(.55)', cast: [['james', 'surprised'], ['ruby', 'holding']] },
   nuit: { bg: 'maison', pos: '50% 50%', fx: 'hue-rotate(300deg) saturate(1.8) brightness(.35)', cast: [['isa_nuit', 'angry']] },
   gala: { bg: 'terrasse', pos: '30% 50%', fx: 'hue-rotate(220deg) brightness(.35)', cast: [['julian', 'smirk'], ['isa_or', 'angry']] },
@@ -971,7 +965,7 @@ const actors = (cast, who = -1) => { const fl = flips(cast, who); return cast.ma
 const turn = (imgs, cast, who) => { const fl = flips(cast, who); imgs.forEach((img, k) => img.style.setProperty('--fx', fl[k] ? -1 : 1)); };
 
 // the player's own demos (from the + tab) go first, then the stories of the taste picked at the start (onboarding), then the rest
-const TASTE = { s_desir: 'desir', s_revanche: 'revanche', s_danger: 'danger', s_etrange: 'etrange', verre: 'desir', pacte: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
+const TASTE = { s_desir: 'desir', s_revanche: 'revanche', s_danger: 'danger', s_etrange: 'etrange', verre: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
   lastcall: 'danger', appel: 'danger', cles: 'danger', gala: 'danger', contrat: 'danger', ombre: 'etrange', ile: 'etrange', nuit: 'etrange', coloc: 'etrange', feu: 'etrange' };
 const myTaste = (keep.get('onb', {}) || {}).k;
 const ofMyTaste = (d) => !!myTaste && TASTE[d.id] === myTaste;
@@ -980,7 +974,7 @@ const all = () => [...mine, ...DEMOS.filter(ofMyTaste), ...DEMOS.filter((d) => !
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
   ...(myTaste ? [['Pour toi', ofMyTaste]] : []),
-  ['Tendances', ['lastcall', 'ile', 'serment', 'cles', 'pacte', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Tendances', ['lastcall', 'ile', 'serment', 'cles', 'verre', 'gala', 'feu', 'mensonge']],
   ['Quelqu\'un t\'attend', (d) => d.live],
   ['À plusieurs', (d) => d.players > 1],
   ['Amène ton perso', (d) => d.byoc],
