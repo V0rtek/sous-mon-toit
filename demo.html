@@ -367,6 +367,10 @@ html, body, #home, #homeCar { overscroll-behavior-x: none; }
 /* the preview opened up: the bottom bar steps aside */
 #tabs { transition: transform .35s ease; }
 body.hxbig #tabs { transform: translateY(100%); }
+/* the preview open full screen: down to the bottom (the tab bar is gone), the infos box out of the way (Infos ⌄ stays) */
+body.hxbig #views { bottom: 0; }
+body.hxbig .hmore { opacity: 0; pointer-events: none; }
+.hmore { transition: opacity .3s; }
 body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 #home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
 #home .carInfo { padding-top: 2.4em; }
