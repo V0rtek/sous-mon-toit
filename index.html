@@ -460,8 +460,6 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="tiles">
       <a href="demo.html" id="fullDemo"><span>Full demo</span></a>
       <button type="button" id="bar"><span>Last call</span></button>
-      <button type="button" id="play"><span>Le café</span></button>
-      <button type="button" id="test1"><span>Sous mon toit</span></button>
       <button type="button" id="lab"><span>Mini-jeux</span></button>
       <button type="button" id="mine"><span>Ton histoire</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
@@ -1749,7 +1747,6 @@ $('#whoForm').addEventListener('submit', (e) => {
   if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
   else { myName = v || 'Kev'; show('#lobby'); goLive(); }
 });
-$('#play').onclick = (e) => { e.stopPropagation(); openWait('play'); };
 $('#bar').onclick = (e) => { e.stopPropagation(); openWait('bar'); };
 // ---- analytics, on this device only: plays and finishes per story, how each choice splits (a real choice is closer to
 // 50/50 than 90/10), the answers to the 5 reviewer questions, what the generations cost ----
@@ -1871,7 +1868,6 @@ $('#genGo').onclick = async (e) => {
   catch (err) { $('#genMsg').textContent = err.message || "Ça n'a pas marché."; }
   $('#genGo').disabled = false;
 };
-$('#test1').onclick = (e) => { e.stopPropagation(); show('#cover'); };
 // Full demo is its own page: coming back (its ‹ or the phone's back) lands on these tiles, not on the name screen
 $('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
@@ -2139,7 +2135,7 @@ function announce(on) {
   const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
   live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now(), v: BUILD }) : '', { retain: true });
 }
-const TILES = { play: '#play', bar: '#bar', ...Object.fromEntries(GAME_LIST.map((g) => [g.id, '#game-' + g.id])) };
+const TILES = { bar: '#bar', ...Object.fromEntries(GAME_LIST.map((g) => [g.id, '#game-' + g.id])) };
 function showRooms() {
   for (const [s, sel] of Object.entries(TILES)) {
     const r = roomFor(s), tile = $(sel);
