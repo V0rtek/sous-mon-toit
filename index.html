@@ -369,6 +369,7 @@ body.watch #choices button.mine { pointer-events: auto; }
 #qrBtn svg { width: 4em; height: 4em; }
 #qrBtn:focus-visible { outline: .25em solid #fff; }
 body:has(#todoBtn:not([hidden])) #qrBtn { right: calc(4% + 9.2em); }   /* next to the waiting room's ? */
+body.inwait.roomfull #qrBtn { display: none !important; }   /* everyone's in: nobody left to scan in */
 #eyes { position: absolute; top: calc(2.2% + 1.2em); right: calc(4% + 9.2em); z-index: 30; height: 5.6em; padding: 0 1.8em; border-radius: 2.8em; background: rgba(15,12,20,.6); color: #fff; display: flex; align-items: center; gap: .8em; pointer-events: none; }
 #eyes svg { width: 2.8em; height: 2.8em; }
 #eyes span { font-size: 2.6em; font-weight: 800; }
@@ -1528,6 +1529,7 @@ function show(id) {
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
   document.body.classList.toggle('inwait', id === '#wait');
+  if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
 function halt() {
@@ -1637,6 +1639,7 @@ function renderWait() {
       <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
+  document.body.classList.toggle('roomfull', full);
   // a story with a love interest to pick (Un été de trop: Maya or Alex), under your character
   const lovers = story().lovers && !full ? `<div class="wr-kick wr-lk">Choisis ton love interest</div><div class="wr-lovers">${story().lovers.map(([id, k, n]) => {
     const sp = SPRITES[k], pose = sp && Object.keys(sp.poses)[0];

@@ -86,7 +86,7 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .se-end .se-later { margin-top: 1.6em; }
 .se-btns { align-self: stretch; margin-top: auto; padding: 2.4em 0 9%; display: flex; flex-direction: column; align-items: center; gap: 1.6em; }
 .se-btns button { font: inherit; font-size: 2.2em; font-weight: 700; width: 78%; padding: .75em 1.4em; border-radius: 2em; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4em; }
-.se-btns .se-go { margin: 0; background: #fff; color: #000; }
+.se-btns .se-go { margin: 0; align-self: center; background: #fff; color: #000; }   /* .se-go's own stretch would pin it left at 78% */
 .se-btns .se-home { margin: 0; background: rgba(255,255,255,.12); color: #fff; }
 @keyframes seIn { from { opacity: 0; transform: translateY(1.5em); } }
 </style>`);
