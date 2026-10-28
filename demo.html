@@ -43,6 +43,17 @@ svg { display: block; fill: currentColor; }
 #vName b { color: var(--gold); margin-right: .25em; }
 body.t-saved #switch, body.t-add #switch, body.t-home #switch, body.t-social #switch, body.s-current #switch { visibility: hidden; }
 body:not(.t-social) .gearBtn { visibility: hidden; }   /* the UI settings: in Social only */
+/* what you saved: an icon in the corner of Accueil, a dot while something new is in it */
+#savedBtn { position: relative; }
+body:not(.t-home) #savedBtn, body.hxbig #savedBtn { display: none; }
+#savedBtn i { position: absolute; top: 1.2em; right: 1.2em; width: 1.3em; height: 1.3em; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 .3em #000; }
+#savedBtn i[hidden] { display: none; }
+/* a save: a small note at the bottom, for a moment */
+.saveNote { position: absolute; left: 50%; top: 10em; z-index: 96; display: flex; align-items: center; gap: .6em; padding: .7em 1.4em; border-radius: 2em; background: rgba(28,28,30,.94); color: #fff; font-size: 1.7em; font-weight: 700; white-space: nowrap; transform: translateX(-50%); animation: noteIn .25s ease-out; transition: opacity .35s; pointer-events: none; }
+.saveNote svg { width: 1.2em; height: 1.2em; }
+.saveNote.out { opacity: 0; }
+@keyframes noteIn { from { opacity: 0; transform: translate(-50%, -.8em); } }
+body.t-saved.atroot #top [data-act="back"], body.t-saved #top [data-act="back"] { visibility: visible; }   /* Sauvés: back to Accueil */
 body.s-current.t-explore #top { background: none; }
 body.s-current.t-explore #top [data-act=back] { visibility: hidden; }
 
@@ -333,7 +344,7 @@ body.tabs-pill #tabs span { display: none; }
 .empty svg { width: 8em; height: 8em; margin: 0 auto 2em; opacity: .5; }
 .empty p { font-size: 2.1em; line-height: 1.4; margin: 0; }
 /* En cours: big cards (where you stopped), the centred one's title and Continuer under it */
-.car.home { padding: 1em 13% 0; }
+.car.home { padding: 1em 13% 0; touch-action: pan-y; }   /* sideways: the page's swipe (homeGo), not the browser's */
 .car.home .card { width: 100%; }
 .car.home .cv { border-radius: 2em; }
 /* the opened-up card: from the card's place to the whole screen, the cover giving way to the scene and its last 3 lines */
@@ -547,7 +558,7 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .ci .pbub { bottom: 3.5%; right: 5%; }
 .ci .pnar { bottom: 6%; }
 .ci .pc-corner { top: 3em; }
-.rail { position: absolute; right: 2.5%; bottom: 27%; z-index: 6; display: flex; flex-direction: column; gap: 1em; opacity: .8; }
+.rail { display: none; }   /* Explorer: no buttons on the side (the infos open by themselves at the end) */
 .rb { position: relative; width: 6em; height: 6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .35em rgba(0,0,0,.6)); }
 .rb svg { width: 3em; height: 3em; }
 .rb.play svg { width: 3.5em; height: 3.5em; }
@@ -561,6 +572,12 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .imm .sp { height: 70%; } .imm .n3 .sp { height: 60%; } .imm .n3 .sp.p1 { height: 65%; }
 .imm .shade { position: absolute; left: 0; right: 0; bottom: 0; top: 38%; background: linear-gradient(transparent, rgba(0,0,0,.85) 35%, #000); }
 .imm .txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 6% 4em; }
+/* scrolled down: its episodes */
+.imm.scroll { overflow-y: auto; scrollbar-width: none; }
+.imm.scroll::-webkit-scrollbar { display: none; }
+.imm-first { position: relative; height: 100%; }
+.imm-more { background: #000; padding: 0 6% 6em; }
+.imm-more .h2 { padding: 0; margin-top: 0; }
 .gframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
 .catch { position: absolute; inset: 0; z-index: 4; }
 
@@ -705,6 +722,7 @@ body.t-search #switch { visibility: hidden; }
       <button class="round" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <button class="round gearBtn" data-act="gear" aria-label="Réglages"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
+    <button class="round" id="savedBtn" data-act="tab" data-tab="saved" aria-label="Sauvés"></button>
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
@@ -1289,6 +1307,8 @@ function render() {
   renderTabs();
   $('#' + v).classList.toggle('locked', !SERIES.isOpen(tab));
   if (!SERIES.isOpen(tab)) return renderLocked(v);
+  if (v === 'saved') keep.set('savedSeen', Date.now());
+  paintSavedBtn();
   ({ home: renderHome, current: renderCurrent, explore: renderExplore, saved: renderSaved, add: renderAdd, social: renderSocial, search: renderSearch })[v]();
 }
 
@@ -1324,11 +1344,24 @@ function replay(stage, d, i, step = 0) {
 // En cours: a carousel of the stories you're in, the last one you left unfinished first; finished ones after. The card in the
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
 let homeOpen = null, homeGo = null, homeCentre = null;
+// a quick slide to the next cover (the browser's smooth scroll is slow): 260 ms, easing out, the snapping off meanwhile
+let glideRaf = 0;
+function glide(el, to, ms = 260) {
+  cancelAnimationFrame(glideRaf);
+  const from = el.scrollLeft, t0 = performance.now();
+  el.style.scrollSnapType = 'none';
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / ms);
+    el.scrollLeft = from + (to - from) * (1 - (1 - k) ** 3);
+    if (k < 1) glideRaf = requestAnimationFrame(step); else el.style.scrollSnapType = '';
+  };
+  glideRaf = requestAnimationFrame(step);
+}
 {
-  // a swipe at any height (the covers scroll by themselves); a tap on either quarter, or on a cover at the side
+  // a swipe at any height, on the covers too (homeGo: quicker than the browser's own); a tap on either quarter, or on a cover at the side
   let t0 = null;
   const home = $('#home');
-  home.addEventListener('touchstart', (e) => { const t = e.touches[0]; t0 = e.touches.length === 1 && !e.target.closest('#homeCar') ? { x: t.clientX, y: t.clientY, side: null } : null; }, { passive: true });
+  home.addEventListener('touchstart', (e) => { const t = e.touches[0]; t0 = e.touches.length === 1 ? { x: t.clientX, y: t.clientY, side: null } : null; }, { passive: true });
   // once it's clearly sideways, the browser doesn't get it (no page scroll, no back / forward)
   home.addEventListener('touchmove', (e) => {
     if (!t0) return; const t = e.touches[0], dx = Math.abs(t.clientX - t0.x), dy = Math.abs(t.clientY - t0.y);
@@ -1338,7 +1371,7 @@ let homeOpen = null, homeGo = null, homeCentre = null;
   home.addEventListener('touchend', (e) => {
     const t = e.changedTouches[0]; if (!t0 || !homeGo) return;
     const dx = t.clientX - t0.x, dy = t.clientY - t0.y; t0 = null;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) homeGo(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy) * 1.2) homeGo(dx < 0 ? 1 : -1);
   }, { passive: true });
 }
 // true when the tap moved the carousel instead of doing what's under it
@@ -1350,10 +1383,17 @@ function homeTap(e) {
   if (x < .25 || x > .75) { homeGo(x < .25 ? -1 : 1); return true; }
   return false;
 }
-// what you saved (no tab of its own: under Accueil)
-function savedHtml() {
-  const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
-  return ids.length ? `<div class="h2">Sauvés <small>${ids.length}</small></div><div class="grid g2">${ids.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
+// what you saved: no tab of its own, an icon in Accueil's corner; its dot = something saved since you last looked
+function paintSavedBtn() {
+  const seen = keep.get('savedSeen', 0), fresh = Object.keys(saved).some((id) => byId(id) && saved[id].at > seen);
+  $('#savedBtn').innerHTML = `${I.bookmark}<i${fresh ? '' : ' hidden'}></i>`;
+}
+let noteT = 0;
+function saveNote() {
+  $$('.saveNote').forEach((n) => n.remove()); clearTimeout(noteT);
+  const n = document.createElement('div'); n.className = 'saveNote'; n.innerHTML = `${I.bookmarkOn}Sauvé`;
+  stage.appendChild(n);
+  noteT = setTimeout(() => { n.classList.add('out'); setTimeout(() => n.remove(), 400); }, 1400);
 }
 // a new profile's En cours: its story (the taste picked at the start) first, then one more of its taste and one of another
 // (Last call, the one story fully written, is one of them)
@@ -1536,10 +1576,10 @@ function renderHome() {
   if (SERIES.progressive()) seedHome();
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
-  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div><div class="hsaved">${savedHtml()}</div>`; return; }
+  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
   const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
-    <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div><div class="hsaved">${savedHtml()}</div>`;
+    <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
   let centre = ids[0];
   const close = () => {
     clearTimeout(homeOpen); document.body.classList.remove('hxbig');
@@ -1574,7 +1614,7 @@ function renderHome() {
   // a swipe anywhere on the page or a tap on either side (homeGo): the next / previous one; a cover at the side: that one
   homeGo = (k) => {
     const car = $('#homeCar'), c = car && car.children[typeof k === 'number' ? ids.indexOf(centre) + k : ids.indexOf(k)];
-    if (c) car.scrollTo({ left: c.offsetLeft - (car.clientWidth - c.offsetWidth) / 2, behavior: 'smooth' });
+    if (c) glide(car, c.offsetLeft - (car.clientWidth - c.offsetWidth) / 2);
   };
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = homeCentre = id;
@@ -2034,7 +2074,7 @@ function swipe(yes) {
 function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
   if (inCurrent) {   // Current: the cover, full screen, black at the bottom (not the scene where you left off)
-    box.innerHTML = `<div class="imm"><div class="cvw" data-act="closeD">${cover(d, true)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div>`;
+    box.innerHTML = `<div class="imm scroll"><div class="imm-first"><div class="cvw">${cover(d, true)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div><div class="imm-more">${epsHtml(d)}</div></div>`;
     box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
   }
   delete box.dataset.cur;
@@ -2078,6 +2118,8 @@ function playNow(id) {
 function toggleSave(id) {
   if (saved[id]) delete saved[id]; else saved[id] = { at: Date.now() };
   keep.set('saved', saved);
+  if (saved[id]) saveNote();
+  paintSavedBtn();
   // in place: a re-render would redraw every cover (a blink)
   const on = !!saved[id];
   $$(`[data-act="save"][data-id="${id}"]`).forEach((b) => {
@@ -2232,6 +2274,7 @@ stage.addEventListener('click', (e) => {
   if (homeTap(e)) return;
   const el = e.target.closest('[data-act]');
   if (!el) {
+    if (e.target.closest('#detail .imm')) { back(); return; }   // Explorer's end screen: a tap anywhere closes it
     if (P && !$('#player').hidden) { if (!$('.pjoin', $('#player'))) step(e); return; }
     const ci = e.target.closest('.ci');
     if (ci) tapCurrent(ci, e);
