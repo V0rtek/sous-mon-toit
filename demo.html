@@ -370,6 +370,9 @@ body.hxbig #tabs { transform: translateY(100%); }
 /* the preview open full screen: down to the bottom (the tab bar is gone), the infos box out of the way (Infos ⌄ stays) */
 body.hxbig #views { bottom: 0; }
 body.hxbig .hmore { opacity: 0; pointer-events: none; }
+/* its Continuer: hidden while the preview plays, back once it's over */
+#homeInfo .btn { transition: opacity .4s; }
+body.hxbig:not(.hxdone) #homeInfo .btn { opacity: 0; pointer-events: none; }
 .hmore { transition: opacity .3s; }
 body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 #home .carInfo { position: relative; z-index: 3; }.sdone { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); z-index: 5; font-size: 2em; font-weight: 800; padding: .5em 1.1em; border-radius: 2em; background: rgba(0,0,0,.6); white-space: nowrap; }
@@ -1356,11 +1359,12 @@ const epd = (d) => { const e = d.eps && d.eps[epOf(d) - 1]; return epOf(d) > 1 &
 function replay(stage, d, i, step = 0) {
   const from = Math.max(0, Math.min(i, d.lines.length - 1) - 2), k = from + step, upto = Math.min(i, d.lines.length - 1);
   stage.innerHTML = stageHtml(d, k, 4, true); typeIn(stage);
-  if (k < upto) homeOpen = setTimeout(() => replay(stage, d, i, step + 1), 1500 + d.lines[k][1].length * 4);
+  homeOpen = setTimeout(k < upto ? () => replay(stage, d, i, step + 1) : hxDone, 1500 + d.lines[k][1].length * 4);
 }
 // En cours: a carousel of the stories you're in, the last one you left unfinished first; finished ones after. The card in the
 // middle shows its cover; stay on it a moment and it opens up full screen on where you left off
 let homeOpen = null, homeGo = null, homeCentre = null;
+const hxDone = () => document.body.classList.add('hxdone');   // the preview is over: Continuer comes back
 // a quick slide to the next cover (the browser's smooth scroll is slow): 260 ms, easing out, the snapping off meanwhile
 let glideRaf = 0;
 function glide(el, to, ms = 260) {
@@ -1599,7 +1603,7 @@ function renderHome() {
     <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
   let centre = ids[0];
   const close = () => {
-    clearTimeout(homeOpen); document.body.classList.remove('hxbig');
+    clearTimeout(homeOpen); document.body.classList.remove('hxbig', 'hxdone');
     const x = $('#homeX'); if (!x) return;
     x.className = 'hx'; x.style.transform = ''; const f = $('iframe', x); if (f) setTimeout(() => f.remove(), 300);   // the game unloads once it's faded out
   };
@@ -1970,7 +1974,7 @@ function homeReady(f) {
   const x = $('#homeX'); if (!x.classList.contains('wait')) return;
   x.classList.remove('wait');
   let n = 0;
-  const next = () => { if (!f.isConnected) return; f.contentWindow.postMessage({ tap: [.5, .3] }, location.origin); if (++n < 2) homeOpen = setTimeout(next, 2600); };
+  const next = () => { if (!f.isConnected) return; f.contentWindow.postMessage({ tap: [.5, .3] }, location.origin); homeOpen = setTimeout(++n < 2 ? next : hxDone, 2600); };
   homeOpen = setTimeout(next, 2600);
 }
 const bgOf = (d) => d.series ? `background:radial-gradient(circle at 50% 30%, ${d.glow}, #000 70%)` : d.img ? `background:url(${d.img}) center/cover` : place(d);
