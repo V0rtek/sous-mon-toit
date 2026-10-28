@@ -75,6 +75,20 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .se-win button { font-size: 1.6em; font-weight: 700; padding: .55em 1.1em; border-radius: 2em; background: #fff; color: #000; }
 .se-new { margin-top: 1.4em; font-size: 1.9em; font-weight: 700; color: #30d158; }
 .se-later { margin-top: 2.4em; font-size: 2em; color: #86868b; }
+/* the end of an episode: like the game's own end card (centred, the poster font, the buttons at the bottom) */
+.se-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 8%; overflow-y: auto; animation: seIn .8s ease-out both; }
+.se-end::before { content: ''; position: absolute; left: 50%; top: 34%; width: 120%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(var(--c), transparent 62%); opacity: .22; pointer-events: none; }
+.se-end > * { position: relative; }
+.se-end .se-kick { margin-top: auto; padding-top: 12%; font-size: 1.9em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.se-end h2 { font-family: 'Yeseva One', Georgia, serif; font-weight: 400; font-size: 5.4em; line-height: 1.05; letter-spacing: 0; margin: .25em 0 .5em; }
+.se-end .se-hook { font-family: 'Yeseva One', Georgia, serif; font-style: normal; font-size: 2.8em; line-height: 1.3; color: var(--c); margin: 0 0 .4em; }
+.se-end .se-win { align-self: stretch; text-align: left; margin-top: 1.6em; }
+.se-end .se-later { margin-top: 1.6em; }
+.se-btns { align-self: stretch; margin-top: auto; padding: 2.4em 0 9%; display: flex; flex-direction: column; gap: 1em; }
+.se-btns button { font: inherit; font-size: 2.4em; font-weight: 700; width: 100%; padding: .75em; border-radius: 2em; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4em; }
+.se-btns .se-go { margin: 0; background: #fff; color: #000; }
+.se-btns .se-home { margin: 0; background: rgba(255,255,255,.12); color: #fff; }
+@keyframes seIn { from { opacity: 0; transform: translateY(1.5em); } }
 </style>`);
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -228,14 +242,16 @@ function endOf(box, k, n, opts) {
     } catch { /* private window */ }
   }
   const nx = nextEp();
-  box.innerHTML = `<div class="se"><div class="se-body">
-    <div class="se-k">Fin de l’épisode ${n}</div>
+  box.innerHTML = `<div class="se"><div class="se-end" style="--c:${T.color}">
+    <div class="se-kick">Fin de l’épisode ${n}</div>
+    <h2>${esc(T.title)}</h2>
     <p class="se-hook">${esc(fill(ep.end))}</p>
     ${won ? `<div class="se-win"><div class="pic"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""></div><div><small>Tu gagnes</small><b>${esc(w.name)}</b>
       ${opts.profile ? '<button data-x="profile">Ajouter à mon profil</button>' : ''}</div></div>` : ''}
     ${opened.map((t) => `<div class="se-new">Nouveau : ${LABEL[t]}</div>`).join('')}
-    ${nx ? `<button class="se-go" data-x="next">${PLAY}${nx.k === k ? `Épisode ${nx.n}` : `${esc(nx.title)} · Épisode ${nx.n}`}</button>` : '<div class="se-later">La suite arrive.</div>'}
-    <button class="se-home" data-x="home">Accueil</button></div></div>`;
+    ${nx ? '' : '<div class="se-later">La suite arrive.</div>'}
+    <div class="se-btns">${nx ? `<button class="se-go" data-x="next">${PLAY}Continuer · ${nx.k === k ? `Épisode ${nx.n}` : `${esc(nx.title)} ${nx.n}`}</button>` : ''}
+      <button class="se-home" data-x="home">Retour à l’accueil</button></div></div></div>`;
   box.onclick = (e) => {
     const b = e.target.closest('[data-x]'); if (!b) return;
     e.stopPropagation();
