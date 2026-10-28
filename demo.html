@@ -1222,13 +1222,17 @@ function renderExplore() {
   if (O.layout === 'stack') deck();
   if (O.layout === 'spotlight') { const s = $('.strip .sel'); if (s) s.scrollIntoView({ inline: 'center', block: 'nearest' }); }
 }
+// the stories you finished: in Sauvés (under what you saved), not in En cours
+const finishedIds = () => Object.keys(prog).filter((id) => byId(id) && !gone[id] && done(id)).sort((a, b) => prog[b].at - prog[a].at);
 function renderSaved() {
-  const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at);
+  const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at), fin = finishedIds();
+  const finHtml = fin.length ? `<div class="h2">Finis <small>${fin.length}</small></div><div class="grid g2">${fin.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
+  if (!ids.length && fin.length) { $('#saved').innerHTML = finHtml.replace('<div class="h2">', '<div class="h2" style="margin-top:0">'); return; }
   if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.</p></div>`; return; }
   $('#saved').innerHTML = `<div class="h2" style="margin-top:0">Sauvés <small>${ids.length}</small></div>
     <div class="grid g2">${ids.map((id) => {
       return card(byId(id), { byocB: false, live: false });
-    }).join('')}</div>`;
+    }).join('')}</div>${finHtml}`;
 }
 // ---- + : write a story or make a character (both in the game), then the stories you wrote (same browser). Tap one: its
 // lines, pick the first and the last, and that stretch becomes a demo in the feed ----
@@ -1389,7 +1393,7 @@ function homeTap(e) {
 }
 // what you saved: no tab of its own, an icon in Accueil's corner; its dot = something saved since you last looked
 function paintSavedBtn() {
-  const seen = keep.get('savedSeen', 0), fresh = Object.keys(saved).some((id) => byId(id) && saved[id].at > seen);
+  const seen = keep.get('savedSeen', 0), fresh = Object.keys(saved).some((id) => byId(id) && saved[id].at > seen) || finishedIds().some((id) => prog[id].at > seen);
   $('#savedBtn').innerHTML = `${I.bookmark}<i${fresh ? '' : ' hidden'}></i>`;
 }
 let noteT = 0;
@@ -1579,7 +1583,7 @@ function searchRes() {
 function renderHome() {
   if (SERIES.progressive()) seedHome();
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
-  const ids = Object.keys(prog).filter(byId).sort((a, b) => (done(a) - done(b)) || prog[b].at - prog[a].at);
+  const ids = Object.keys(prog).filter((id) => byId(id) && !done(id)).sort((a, b) => prog[b].at - prog[a].at);   // a finished one goes to Sauvés
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
   const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
@@ -2131,7 +2135,7 @@ function toggleSave(id) {
     const i = $('i', b), w = $('span', b);
     if (i) { i.innerHTML = saveIconOf(id); if (w) w.textContent = saveWord(id); } else b.innerHTML = saveIconOf(id);
   });
-  if (page() === 'saved') { const c = $(`#saved .card[data-id="${id}"]`); if (c && !on) { c.remove(); if (!$('#saved .card')) renderSaved(); else { const n = $('#saved .h2 small'); if (n) n.textContent = $$('#saved .card').length; } } else renderSaved(); }
+  if (page() === 'saved') renderSaved();   // with Finis under it, simplest to redraw
   renderTabs();
 }
 const saveIconOf = (id) => saveIcon(!!saved[id]);
