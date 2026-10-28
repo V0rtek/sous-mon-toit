@@ -156,10 +156,10 @@ const TEASE = [
   { t: 'Plage privée', w: 'plage', s: [['plage', 'stand', 50, 110, 8]] },
 ];
 
-// ---- how each character is drawn (Recherche filters by it) ----
+// ---- how each character is drawn (Recherche lists and filters by it: a character left out isn't in Recherche, e.g. Mila) ----
 const STYLE = {};
 for (const [st, ids] of Object.entries({
-  semi: ['alex', 'brooke', 'cam', 'dan', 'julian', 'justin', 'justin_bar', 'mila', 'plage', 'rae', 'suit', 'astro_gore', 'astro_tentacle', 'astro_orion', 'astro_retro', 'astro_saint', 'astro_nasa'],
+  semi: ['alex', 'brooke', 'cam', 'dan', 'julian', 'justin', 'justin_bar', 'plage', 'rae', 'suit', 'astro_gore', 'astro_tentacle', 'astro_orion', 'astro_retro', 'astro_saint', 'astro_nasa'],
   anime: ['diane', 'exile', 'isa_noir', 'isa_nuit', 'isa_or', 'melissa', 'ninja', 'ruby'],
   cartoon: ['amare', 'belier_blanc', 'belier_noir', 'candy', 'james', 'ombre'],
 })) for (const id of ids) STYLE[id] = st;
