@@ -58,7 +58,8 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .se { position: absolute; inset: 0; z-index: 90; background: #000; color: #f5f5f7; overflow: hidden; }
 .se .art { opacity: .35; }
 .se-body { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 8%; overflow-y: auto; }
-.se-inc { align-self: flex-start; font-size: 1.4em; font-weight: 700; padding: .35em .9em; border-radius: 2em; background: #ff9f0a; color: #000; margin-bottom: 1.6em; }
+.se-inc { align-self: flex-start; font-size: 5.2em; font-weight: 900; letter-spacing: -.02em; text-transform: uppercase; line-height: 1; padding: .18em .4em; border-radius: .25em; background: #ff9f0a; color: #000; box-shadow: 0 0 1.2em rgba(255,159,10,.45); }
+.se-hyp { font-size: 2.3em; font-weight: 700; color: #ff9f0a; margin: .9em 0 2.2em; line-height: 1.3; }
 .se-k { font-size: 1.7em; color: #86868b; font-weight: 600; }
 .se h2 { font-size: 4em; font-weight: 700; letter-spacing: -.025em; line-height: 1.05; margin: .2em 0 .6em; }
 .se-sum { font-size: 2.1em; line-height: 1.45; color: #e5e5ea; }
@@ -193,13 +194,14 @@ function art(k, withNotif, shape = 'poster') {
 }
 const tease = (c, titled = true) => `<div class="tz"><div class="art a-${c.w}"><div class="bg"></div>${c.s.map(([s, p, x, h, t]) => spr(s, p, x, h, t)).join('')}</div>${titled ? `<b>${esc(c.t)}</b>` : ''}</div>`;
 
-// ---- an episode (placeholder until it's written), then its end card: what was won, what opened, the next one ----
+// ---- an episode (placeholder until it's written: a black screen, a big Incomplet), then its end card: what was won, what opened, the next one ----
 // opts: home() back to the app · next(k, n) the next episode (default: right here) · profile(win) put the won character in
 // your profile · lastcall() Last call's next episode, in the game
 function episode(box, k, n, opts = {}) {
   const T = TASTES[k], ep = T.eps[n - 1];
-  box.innerHTML = `<div class="se">${art(k, false)}<div class="se-body">
+  box.innerHTML = `<div class="se"><div class="se-body">
     <span class="se-inc">Incomplet</span>
+    <p class="se-hyp">Voici la suite hypothétique de cet épisode</p>
     <div class="se-k">${esc(T.title)} · Épisode ${n}</div>
     <h2>${esc(fill(ep.title))}</h2>
     <p class="se-sum">${esc(fill(ep.sum))}</p>
