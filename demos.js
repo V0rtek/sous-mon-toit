@@ -13,7 +13,7 @@ const dVerre = [
   scene('d_terrasse', { brooke: 'drunk_listen', cam: 'flirty' }),
   cam('one', 'cam'),
   { fade: 'in', ms: 500 },
-  { caption: 'Terrasse du Larina · 1 h 10' },
+  { caption: '1 h 10' },
   say('cam', 'flirty', 'Si je te dis un secret, tu me promets de pas partir ?', { to: 'brooke' }),
   cam('one', 'brooke'), say('brooke', 'drunk_joke', "Ça dépend. C'est un beau secret ou un laid ?", { to: 'cam' }),
   cam('one', 'cam'), say('cam', 'tipsy_laugh', 'Les deux.', { to: 'brooke' }),

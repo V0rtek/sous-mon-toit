@@ -58,7 +58,7 @@ const one = (who) => cam('one', who);
 
 // ---- La revanche · Regarde-moi bien ----
 const oRevanche = [
-  scene('o_gala', { julian: 'smirk' }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Gala Delorme · un an plus tard' },
+  scene('o_gala', { julian: 'smirk' }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Un an plus tard' },
   one('julian'), T('julian', 'Wow. Je pensais pas qu’ils te laisseraient entrer.', 'smirk'),
   T('toi', 'Moi, je pensais pas que tu resterais.'),
   T('julian', 'C’est mon gala. Mes investisseurs. Ma compagnie.', 'talk'),
@@ -83,7 +83,7 @@ const L = li === 'cam' ? { name: 'Cam', partner: 'Max', pm: true, she: true } : 
 const pose = (p) => (li === 'brooke' ? { flirty: 'drunk_smile', sip: 'drunk_listen', worried: 'nervous', awkward: 'drunk_letdown' }[p] : p);
 const tp = f ? { surprised: 'nervous', listen: 'stand', thinking: 'thinking' } : { surprised: 'surprised', listen: 'listen', thinking: 'thinking' };   // your poses (a girl plays as Maya's look)
 const oDesir = [
-  scene('o_party', { li: pose('flirty'), toi: tp.listen }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Samedi, 2 h' },
+  scene('o_party', { li: pose('flirty'), toi: tp.listen }), cam('wide'), { fade: 'in', ms: 600 }, { caption: '2 h' },
   narr(`Le party de ${L.partner} tire à sa fin.`),
   one('li'), T('li', `${L.partner} dort. ${L.pm ? 'Il' : 'Elle'} s’endort toujours quand ça devient intéressant.`, pose('flirty')),
   one('toi'), T('toi', `${L.name}… t’as bu.`, tp.surprised),
@@ -126,7 +126,7 @@ oDanger.cast = { justin: { name: 'Toi', color: '#1f7a74', sprite: 'justin' }, nu
 
 // ---- L'étrange · Personne se souvient ----
 const oEtrange = [
-  scene('o_kitchen', { maman: 'listen' }), cam('wide'), { fade: 'in', ms: 600 }, { caption: 'Mardi, 7 h 40' },
+  scene('o_kitchen', { maman: 'listen' }), cam('wide'), { fade: 'in', ms: 600 }, { caption: '7 h 40' },
   narr('La chambre d’Emma est vide. Pas rangée. Vide.'),
   T('toi', 'M’man ? Où sont les affaires d’Emma ?'),
   one('maman'), T('maman', 'Qui ?', 'listen'),

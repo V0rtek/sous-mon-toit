@@ -37,7 +37,7 @@ window.PLAY = [
   scene('cafe', { rocco: 'listen', ruby: 'listen', pb: 'listen', pa: 'listen' }),
   cam('three', 'ruby', 'pb', 'pa'),
   { fade: 'in', ms: 900 },
-  { caption: 'Samedi, 22 h · Café Larina' },
+  { caption: 'Café Larina' },
   say('pb', 'explaining', "Trois semaines de cut. C'est fini. Ce soir, je mange.", { to: 'pa' }),
   say('ruby', 'thinking', "Vous parlez juste de gym, vous deux."),
   say('pa', 'explaining', "Faux. On parle aussi de protéines.", { to: 'ruby' }),

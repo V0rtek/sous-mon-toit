@@ -1073,7 +1073,7 @@ window.BAR = [
   scene('bar', { pa: 'drunk_listen', cam: 'listen', pb: 'drunk_listen' }),
   { cam: 'wide', at: 1500 },
   { fade: 'in', ms: 1400 },
-  { caption: 'Saturday, 1:40 a.m.' },
+  { caption: '1:40 a.m.' },
   { wait: 900 },
   { pan: 1010, ms: 2400 },
   cam('three', 'pa', 'cam', 'pb'), hush(800),

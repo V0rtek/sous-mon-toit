@@ -79,7 +79,7 @@ window.STORY = [
   scene('terrasse', { melissa: 'listen', candy: 'listen', ruby: 'listen', justin: 'listen' }),
   { cam: 'wide', at: 420 },
   { fade: 'in', ms: 1400 },
-  { caption: 'Vendredi, 16 h · Café Larina' },
+  { caption: 'Café Larina' },
   { pan: 1350, ms: 4200 },
   { wait: 900 },
   cam('three', 'melissa', 'candy', 'ruby'),
@@ -196,7 +196,7 @@ window.STORY = [
   scene('maison', { ruby: 'holding', justin: 'listen' }),
   cam('two', 'ruby', 'justin'),
   { fade: 'in', ms: 1100 },
-  { caption: 'Chez toi, 17 h 30' },
+  { caption: 'Chez toi' },
   say('justin', 'explaining', "Merci de m'avoir déposé."),
   say('ruby', 'holding', "Mm-hm."),
   narr("Elle texte. Elle a texté tout le trajet."), // trou

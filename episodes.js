@@ -100,7 +100,7 @@
   // ---------- 1. Ce qui reste de l'île ----------
   story('d_ile', "Ce qui reste de l'île", [
     scene('e_foret', { dan: 'stand', rae: 'kneel' }),
-    cam('wide', 'dan', 'rae'), { fade: 'in', ms: 900 }, { caption: 'Nuit 3 · La forêt de l’île' },
+    cam('wide', 'dan', 'rae'), { fade: 'in', ms: 900 }, { caption: 'Nuit 3' },
     N("Deux jours que le bateau devait revenir. Le feu s'est éteint il y a une heure."),
     ...L('dan', 'stand', 'Rae. Lève-toi. Il fait presque nuit.'),
     ...L('rae', 'kneel', 'Deux minutes. Juste… deux minutes.'),
@@ -144,7 +144,7 @@
   // ---------- 2. Deux béliers ----------
   story('d_beliers', 'Deux béliers', [
     scene('e_colline', { ebene: 'stand', neige: 'stand' }),
-    cam('wide', 'ebene', 'neige'), { fade: 'in', ms: 900 }, { caption: 'Le sommet de la colline · l’aube' },
+    cam('wide', 'ebene', 'neige'), { fade: 'in', ms: 900 }, { caption: 'Le sommet de la colline' },
     ...L('ebene', 'stand', 'Tu es en retard, Neige.'),
     ...L('neige', 'stand', "Je suis en avance. C'est toi qui as dormi ici."),
     ...L('ebene', 'stand', 'Quelqu’un doit garder le sommet.'),
@@ -190,7 +190,7 @@
   // ---------- 3. Ce qui dort sous la ville ----------
   story('d_ombre', 'Ce qui dort sous la ville', [
     scene('e_metro', { justin: 'thinking' }),
-    cam('wide'), { fade: 'in', ms: 900 }, { caption: '3 h 12 · Station Jarry, dernier métro passé' },
+    cam('wide'), { fade: 'in', ms: 900 }, { caption: '3 h 12 · Dernier métro passé' },
     N('Les néons grésillent. Le quai est vide. Les rails vibrent encore, comme si une rame venait de passer.'),
     ...L('justin', 'thinking', 'Y a quelqu’un ?'),
     N('Une voix répond. Elle vient de dessous.'),
@@ -230,7 +230,7 @@
   // ---------- 4. Le serment brisé ----------
   story('d_serment', 'Le serment brisé', [
     scene('e_pont', { itsuki: 'stand', sora: 'stand' }),
-    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Le pont de Kuro · minuit' },
+    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Six ans plus tard' },
     N('Les chaînes du pont cliquettent. Six lames tournent lentement autour de Sora.'),
     ...L('itsuki', 'stand', 'Six ans. Six ans que je te cherche.'),
     ...L('sora', 'stand', 'Et tu m’as trouvé. Félicitations.'),
@@ -267,7 +267,7 @@
   // the love interest you pick (Maya or Alex): the same story, their own poses (P maps the beats to what each has)
   const ete = (id, M) => story(id, 'Un été de trop', [
     scene('e_terrasse', { [M.k]: M.P('sitting'), justin: 'listen' }),
-    cam('two', M.k, 'justin'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · cinq ans plus tard' },
+    cam('two', M.k, 'justin'), { fade: 'in', ms: 900 }, { caption: 'Cinq ans plus tard' },
     ...L(M.k, M.P('sitting'), 'Toi ? Ici ? Ça fait quoi, cinq ans ?'),
     ...L('justin', 'surprised', `${M.name}…`),
     ...L(M.k, M.P('sitting'), "T'as pas changé. Enfin… un peu."),
@@ -315,7 +315,7 @@
   // ---------- 6. Sous la table ----------
   story('d_table', 'Sous la table', [
     scene('e_salon', { justin: 'listen', suit: 'adjust', julian: 'smirk' }),
-    cam('three', 'justin', 'suit', 'julian'), { fade: 'in', ms: 900 }, { caption: 'Salle du conseil · 23 h 50' },
+    cam('three', 'justin', 'suit', 'julian'), { fade: 'in', ms: 900 }, { caption: 'Salle du conseil' },
     N('Deux millions sur la table. Un stylo doré. Dix secondes pour signer.'),
     ...L('suit', 'offer', 'Signez, et personne n’apprendra ce que vous avez fait à Montréal.'),
     ...L('justin', 'surprised', 'Je ne suis jamais allé à Montréal.'),
@@ -352,7 +352,7 @@
   // ---------- 7. Trois clés, une porte ----------
   story('d_cles', 'Trois clés, une porte', [
     scene('e_maison3', { ruby: 'holding', james: 'surprised', diane: 'explaining' }),
-    cam('three', 'ruby', 'james', 'diane'), { fade: 'in', ms: 900 }, { caption: 'Le couloir de la coloc · 19 h' },
+    cam('three', 'ruby', 'james', 'diane'), { fade: 'in', ms: 900 },
     ...L('ruby', 'holding', 'Qui a mis une clé dans ma boîte aux lettres ?'),
     ...L('james', 'surprised', "Moi aussi, j'en ai reçu une."),
     ...L('diane', 'explaining', 'Moi aussi. Et il y a un mot : « Chambre de Sophie ».'),
@@ -389,7 +389,7 @@
   // ---------- 8. Appel manqué ----------
   story('d_appel', 'Appel manqué', [
     scene('e_maison2', { justin: 'phone_call' }),
-    cam('one', 'justin'), { fade: 'in', ms: 900 }, { caption: 'Chez Marco · 22 h 40' },
+    cam('one', 'justin'), { fade: 'in', ms: 900 }, { caption: 'Chez Marco' },
     ...L('justin', 'phone_call', 'Marco ? Marco, réponds !'),
     N('Messagerie. Pour la dix-septième fois.'),
     ...L('justin', 'surprised', 'T’as laissé ta porte ouverte, man…'),
@@ -428,7 +428,7 @@
   // ---------- 10. Où étais-tu hier soir ? ----------
   story('d_mensonge', 'Où étais-tu hier soir ?', [
     scene('e_maison2', { ruby: 'angry', james: 'listen' }),
-    cam('two', 'ruby', 'james'), { fade: 'in', ms: 900 }, { caption: 'Mercredi · 7 h 15' },
+    cam('two', 'ruby', 'james'), { fade: 'in', ms: 900 }, { caption: 'Le lendemain matin' },
     ...L('ruby', 'angry', "C'est qui, « Marc », qui commande le tiramisu pour deux ?"),
     ...L('james', 'explaining', 'Un client.'),
     ...L('ruby', 'thinking', 'Un mardi. À 22 h.'),
@@ -467,7 +467,7 @@
   // ---------- 11. Nuit blanche ----------
   story('d_nuit', 'Nuit blanche', [
     scene('e_toit', { justin: 'thinking', isa: 'listen' }),
-    cam('wide'), { fade: 'in', ms: 900 }, { caption: '4 h 02 · Le toit' },
+    cam('wide'), { fade: 'in', ms: 900 }, { caption: '4 h 02' },
     ...L('isa', 'listen', 'Enfin. Je pensais que tu viendrais plus tôt.'),
     ...L('justin', 'surprised', 'On se connaît ?'),
     ...L('isa', 'explaining', 'Fais pas cette tête. On s’est déjà parlé.'),
@@ -506,7 +506,7 @@
   // ---------- 12. Gala d'or ----------
   story('d_gala', "Gala d'or", [
     scene('e_gala', { isa: 'holding', suit: 'adjust', julian: 'cold' }),
-    cam('three', 'isa', 'suit', 'julian'), { fade: 'in', ms: 900 }, { caption: 'Hôtel Danubia · Gala annuel, 22 h' },
+    cam('three', 'isa', 'suit', 'julian'), { fade: 'in', ms: 900 }, { caption: 'Gala annuel' },
     ...L('isa', 'angry', 'Mon collier était à mon cou il y a dix minutes.'),
     ...L('suit', 'angry', 'Et vous m’accusez ? Je ne touche pas aux bijoux.'),
     ...L('julian', 'smirk', 'Seulement aux contrats.'),
@@ -543,7 +543,7 @@
   // ---------- 13. Le colocataire ----------
   story('d_coloc', 'Le colocataire', [
     scene('e_maison2', { justin: 'listen', amare: 'listen' }),
-    cam('two', 'justin', 'amare'), { fade: 'in', ms: 900 }, { caption: 'Samedi · 7 h · Ton premier matin' },
+    cam('two', 'justin', 'amare'), { fade: 'in', ms: 900 }, { caption: 'Ton premier matin' },
     ...L('amare', 'listen', "T'as bien dormi ? Je t'ai entendu rêver."),
     ...L('justin', 'surprised', 'Rêver ?'),
     ...L('amare', 'thinking', 'De la mer. Encore.'),
@@ -582,7 +582,7 @@
   // ---------- 14. Autour du feu ----------
   story('d_feu', 'Autour du feu', [
     scene('e_feu', { brooke: 'sit_fire', justin: 'listen' }),
-    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Le chalet · Le lac · Minuit' },
+    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Minuit' },
     ...L('brooke', 'sit_fire', 'Tu veux la vraie histoire du lac ou celle qu’on raconte aux enfants ?'),
     ...L('justin', 'listen', 'La vraie.'),
     ...L('brooke', 'drunk_talk', 'Une fille nageait ici toutes les nuits. Un soir, elle est remontée… avec quelqu’un.'),
@@ -622,7 +622,7 @@
   // ---------- 15. Candy ne ment jamais ----------
   story('d_candy', 'Candy ne ment jamais', [
     scene('e_brunch', { mere: 'listen', candy: 'explaining', chum: 'listen', justin: 'listen' }),
-    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Brunch du dimanche · Chez ta mère' },
+    cam('wide'), { fade: 'in', ms: 900 }, { caption: 'Brunch chez ta mère' },
     ...L('candy', 'explaining', "J'adore ta mère ! Elle est exactement comme tu l'as décrite."),
     ...L('mere', 'surprised', 'Décrite ?'),
     ...L('candy', 'thinking', 'Non mais pas dans le mauvais sens. Juste… intense.'),
@@ -661,7 +661,7 @@
   // ---------- 16. Un dernier boulot ----------
   story('d_contrat', 'Un dernier boulot', [
     scene('e_rue', { justin: 'listen', julian: 'talk', suit: 'listen' }),
-    cam('two', 'justin', 'julian'), { fade: 'in', ms: 900 }, { caption: 'Ruelle Saint-Roch · 23 h 15' },
+    cam('two', 'justin', 'julian'), { fade: 'in', ms: 900 },
     ...L('julian', 'talk', 'Un dernier boulot. Après, tu me revois plus jamais.'),
     ...L('justin', 'angry', 'Tu as déjà dit ça la dernière fois.'),
     ...L('julian', 'hands_up', 'Je sais. J’ai dit ça la dernière fois.'),
