@@ -302,6 +302,12 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .step[hidden] { display: none; }
 .step h2 { margin: 0; font-size: 3em; }
 .step .lead { margin: 0; font-size: 2em; color: #c7c7cc; line-height: 1.35; }
+.ncAct { font: inherit; display: flex; align-items: center; gap: 2em; padding: 1.8em 2.2em; border-radius: 2.2em; border: 0; background: #141416; color: #fff; text-align: left; cursor: pointer; }
+.ncAct i { width: 6em; height: 6em; border-radius: 1.6em; background: #ff9f0a; display: grid; place-items: center; flex: none; overflow: hidden; }
+.ncAct i svg { width: 3.2em; height: 3.2em; }
+.ncAct i img { width: 100%; height: 100%; object-fit: cover; }
+.ncAct b { display: block; font-size: 2.4em; margin-bottom: .15em; }
+.ncAct span { font-size: 1.75em; color: #86868b; }
 .step textarea { font: inherit; font-size: 2.2em; padding: .8em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; resize: none; user-select: text; }
 .step input { font: inherit; font-size: 2em; padding: .8em .9em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; user-select: text; }
 .step textarea::placeholder { color: #86868b; }
@@ -539,13 +545,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="newChar" class="card menu" hidden>
     <div class="step" id="nc1">
       <h2>Étape 1 sur 3</h2>
+      <input id="actorPhoto" type="file" accept="image/*" hidden>
+      <button class="ncAct" id="actorPhotoBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2.5h6L16.5 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.5"/></svg></i><div><b>Ajouter une photo</b><span>Prends-en une ou choisis-en une</span></div></button>
       <p class="lead">Décris ton acteur : son look et son langage corporel.</p>
       <textarea id="actorDesc" rows="6" maxlength="600" placeholder="Ex. : homme début trentaine, cheveux courts bruns, veston bleu marine. Posé, regarde en coin, parle avec les mains." aria-label="Décris ton acteur"></textarea>
       <button class="pill" id="nc1Go" type="button">Suivant</button>
     </div>
     <div class="step" id="nc2" hidden>
       <h2>Étape 2 sur 3</h2>
-      <p class="lead">Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l'image qu'il te donne.</p>
+      <p class="lead" id="nc2Lead">Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l'image qu'il te donne.</p>
     <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
       <button class="pill" id="nc2Go" type="button">J'ai mon image</button>
       <button class="ghost" id="nc2Back" type="button">Retour</button>
@@ -1995,8 +2003,29 @@ for (const g of GALLERY.filter((x) => !x.recolor)) galTile(g);
 }
 $('#poseCard').onclick = (e) => { e.stopPropagation(); $('#poseCard').hidden = true; };
 // "+" = 3 screens: describe the actor, the prompt (with that description in it) to copy into ChatGPT, drop the sheet + name
-const sheetPrompt = () => SHEET_PROMPT.replace('[describe the character, or attach a picture of them]', $('#actorDesc').value.trim() || '[describe the character, or attach a picture of them]');
-function ncStep(n) { for (const k of [1, 2, 3]) $('#nc' + k).hidden = k !== n; if (n === 2) $('#promptText').textContent = sheetPrompt(); $('#newChar').scrollTop = 0; }
+// Étape 1: a photo (taken or picked) to give ChatGPT with the prompt, and/or the description
+let actorPhoto = null;
+const sheetPrompt = () => {
+  const t = $('#actorDesc').value.trim();
+  return SHEET_PROMPT.replace('[describe the character, or attach a picture of them]',
+    actorPhoto ? (t ? `${t} (see the attached photo)` : 'the person in the attached photo') : t || '[describe the character, or attach a picture of them]');
+};
+$('#actorPhotoBtn').onclick = (e) => { e.stopPropagation(); $('#actorPhoto').click(); };
+$('#actorPhoto').onchange = () => {
+  const f = $('#actorPhoto').files[0]; if (!f) return;
+  if (actorPhoto) URL.revokeObjectURL(actorPhoto);
+  actorPhoto = URL.createObjectURL(f);
+  $('#actorPhotoBtn i').innerHTML = `<img src="${actorPhoto}" alt="">`;
+  $('#actorPhotoBtn b').textContent = 'Photo ajoutée'; $('#actorPhotoBtn span').textContent = 'Touche pour la changer';
+};
+function ncStep(n) {
+  for (const k of [1, 2, 3]) $('#nc' + k).hidden = k !== n;
+  if (n === 2) {
+    $('#promptText').textContent = sheetPrompt();
+    $('#nc2Lead').textContent = actorPhoto ? 'Copie ce prompt dans ChatGPT et joins-lui ta photo. Garde l’image qu’il te donne.' : 'Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l’image qu’il te donne.';
+  }
+  $('#newChar').scrollTop = 0;
+}
 $('#nc1Go').onclick = (e) => { e.stopPropagation(); ncStep(2); };
 $('#nc2Go').onclick = (e) => { e.stopPropagation(); ncStep(3); };
 $('#nc2Back').onclick = (e) => { e.stopPropagation(); ncStep(1); };
