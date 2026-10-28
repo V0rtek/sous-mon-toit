@@ -295,6 +295,14 @@ body.tabs-pill #tabs span { display: none; }
 #sheet h3 { font-size: 3em; margin: 0 0 .3em; }
 #sheet .lead { font-size: 1.9em; color: var(--mute); margin: 0 0 1.4em; line-height: 1.35; }
 #sheet .pick { display: flex; flex-direction: column; gap: 1em; }
+.ping { position: absolute; left: 4%; right: 4%; top: 9em; z-index: 90; display: flex; align-items: center; gap: 1.2em; padding: 1.1em 1.3em; border-radius: 2.2em; background: rgba(28,28,30,.96); box-shadow: 0 1.2em 3em rgba(0,0,0,.6); font-size: 2em; animation: drop .3s ease-out; transition: opacity .3s, transform .3s; }
+.ping.out { opacity: 0; transform: translateY(-1.5em); }
+.ping .av { flex: none; width: 2.6em; height: 2.6em; font-size: 1em; }
+.ping div { flex: 1; min-width: 0; line-height: 1.3; }
+.ping b { display: block; }
+.ping span { color: var(--mute); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ping .btn { flex: none; font-size: 1em; padding: .6em 1.1em; }
+@keyframes drop { from { transform: translateY(-2em); opacity: 0; } }
 #sheet .fsCv { width: 48%; margin: 0 auto 2em; }
 #sheet .fsCv .cv { border-radius: 1.2em; }
 #sheet .grid { padding: 0; margin-bottom: 2em; }
@@ -701,6 +709,7 @@ body.t-search #switch { visibility: hidden; }
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
   <div id="series" hidden></div>
+  <div id="ping" hidden></div>
   <div id="sheet" hidden></div>
   <div id="player" hidden></div>
   <div id="sePlayer" hidden></div>
@@ -1725,6 +1734,52 @@ function renderSocial() {
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
       ${charsOpen ? `<div class="mcs">${chars}<button class="mc add" data-act="newperso">${I.plus}<span>Créer</span></button>${locked}</div>` : ''}</div>
     <div class="h2">Amis <small>${everyone.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
+}
+
+// ---- the fake friends live a little: they come online, play something for a few minutes, stop, leave. Now and then one
+// opens a room and invites you: a small banner for a few seconds (tap it to join), never over a sheet or a game; the
+// first after 1.5-3 min, the next 5 then 10 min later, 3 per session at most. They stop waiting after ~3 min. ----
+{
+  const MIN = 60000, rnd = (a, b) => a + Math.random() * (b - a), pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+  const S = (() => { try { return JSON.parse(sessionStorage.getItem('smt-pings')) || {}; } catch { return {}; } })();   // across the game and back
+  const saveS = () => { try { sessionStorage.setItem('smt-pings', JSON.stringify(S)); } catch { /* private window */ } };
+  S.n = S.n || 0; S.next = S.next || Date.now() + rnd(1.5, 3) * MIN;   // the first one never as soon as you land
+  for (const f of FRIENDS) f.until = Date.now() + rnd(1, 5) * MIN;
+  const busy = () => FRIENDS.filter((f) => f.doing).map((f) => f.doing);
+  const free = (duo) => all().filter((d) => !d.series && (duo ? d.players > 1 : true) && !busy().includes(d.id));
+  let hideT = 0;
+  function hidePing() { const p = $('#ping'); clearTimeout(hideT); if (p.hidden) return; p.firstChild && p.firstChild.classList.add('out'); setTimeout(() => { p.hidden = true; p.innerHTML = ''; }, 300); }
+  function ping(f, d) {
+    const p = $('#ping');
+    p.innerHTML = `<div class="ping" data-act="friend" data-f="${esc(f.n)}">${av(f.n)}<div><b>${esc(f.n)} t'invite</b><span>${esc(d.title)}</span></div>
+      <button class="btn main" data-act="joinf" data-id="${d.id}" data-f="${esc(f.n)}">Rejoindre</button></div>`;
+    p.hidden = false; clearTimeout(hideT); hideT = setTimeout(hidePing, 9000);
+  }
+  $('#ping').addEventListener('click', () => setTimeout(hidePing, 0));
+  const calm = () => !document.hidden && $('#sheet').hidden && $('#player').hidden && $('#sePlayer').hidden && $('#ping').hidden;
+  function step(f, now) {
+    if (f.doing && f.waits) { f.waits = false; f.until = now + rnd(4, 9) * MIN; return; }   // nobody came: they start without you
+    if (f.doing) { f.doing = null; f.until = now + rnd(2, 6) * MIN; return; }               // done playing
+    if (!f.on) { f.on = true; delete f.seen; f.until = now + rnd(3, 8) * MIN; return; }   // back online
+    const r = Math.random(), d = r < .35 && pickOf(free(false));
+    if (d) { f.doing = d.id; f.until = now + rnd(4, 10) * MIN; }                            // plays something
+    else if (r > .75) { f.on = false; f.seen = "à l'instant"; f.until = now + rnd(10, 30) * MIN; }   // leaves
+    else f.until = now + rnd(2, 5) * MIN;
+  }
+  function tick() {
+    const now = Date.now(); let moved = false;
+    for (const f of FRIENDS) if (now >= f.until) { step(f, now); moved = true; }
+    if (S.n < 3 && now >= S.next && calm() && Math.random() < .5) {
+      const f = pickOf(FRIENDS.filter((x) => x.on && !x.doing)), d = f && pickOf(free(true));
+      if (f && d) {
+        f.doing = d.id; f.waits = true; f.until = now + rnd(2.5, 3.5) * MIN;
+        S.n++; S.next = now + 5 * MIN * 2 ** (S.n - 1); saveS();
+        ping(f, d); moved = true;
+      }
+    }
+    if (moved) renderSocial();
+  }
+  setInterval(tick, 20000);
 }
 
 // ---- Current: every demo plays right in the feed; the one on screen moves on with a tap ----
