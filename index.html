@@ -429,7 +429,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 .ep-t h2 { font-family: var(--display); font-weight: 400; font-size: 4.6em; margin: .2em 0 .5em; text-align: center; }
 .ep-img { width: 72%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 2em; box-shadow: 0 2em 5em rgba(0,0,0,.8); }
 .ep-t p { font-size: 2.1em; line-height: 1.4; color: #d1d1d6; text-align: center; margin: 1.2em 0 0; }
-.ep-t button { font: inherit; font-size: 2.4em; font-weight: 700; width: 100%; padding: .75em; border-radius: 2em; border: 0; cursor: pointer; margin-bottom: .6em; }
+.ep-t button { font: inherit; font-size: 2.2em; font-weight: 700; width: 78%; padding: .75em 1.4em; border-radius: 2em; border: 0; cursor: pointer; margin-bottom: 1em; }
 .ep-go { background: #fff; color: #000; margin-top: auto; }   /* the buttons at the bottom, with or without a next episode */
 .ep-home { background: rgba(255,255,255,.12); color: #fff; margin-bottom: 9% !important; }
 @media (prefers-reduced-motion: reduce) { .actor.talk, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
@@ -908,8 +908,22 @@ function drawTexts(wait = 0) {
 let actx = null;
 const sfxBuf = {}, sfxLoops = {};
 // the menu's sound on / off (kept on this phone): every sound plays through this one gain
-let muted = (() => { try { return localStorage.getItem('smt-mute') === '1'; } catch { return false; } })(), master = null, hushed = false;   // hushed: Full demo's preview that isn't on screen
-const out = () => { if (!master) { master = actx.createGain(); master.connect(actx.destination); } master.gain.value = muted || hushed ? 0 : 1; return master; };
+let muted = (() => { try { return localStorage.getItem('smt-mute') === '1'; } catch { return false; } })(), master = null, hushed = false, muffle = null, ducker = null;   // hushed: Full demo's preview that isn't on screen
+const out = () => {
+  if (!master) {
+    master = actx.createGain(); muffle = actx.createBiquadFilter(); ducker = actx.createGain();
+    muffle.type = 'lowpass'; muffle.frequency.value = 20000;
+    master.connect(muffle).connect(ducker).connect(actx.destination);
+  }
+  master.gain.value = muted || hushed ? 0 : 1; return master;
+};
+// the episode's end card: the room's sound goes on under it, lower and muffled (as if through a wall); back to normal after
+function duck(on) {
+  if (!actx || !muffle) return;
+  const t = actx.currentTime, f = muffle.frequency, g = ducker.gain;
+  for (const p of [f, g]) { p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); }
+  f.exponentialRampToValueAtTime(on ? 450 : 20000, t + (on ? 1.5 : 0.4)); g.linearRampToValueAtTime(on ? 0.35 : 1, t + (on ? 1.5 : 0.4));
+}
 function setMuted(m) {
   muted = m; if (master) master.gain.value = m || hushed ? 0 : 1;
   try { localStorage.setItem('smt-mute', m ? '1' : '0'); } catch { /* private window */ }
@@ -1245,7 +1259,8 @@ function sparks() {
   }).join('');
 }
 function episodeEnd(ep, r) {
-  return new Promise((done) => {
+  return new Promise((resolve) => {
+    const done = (v) => { stopSfx(); setTimeout(() => duck(false), 700); resolve(v); };   // the room's sound ends with the card
     const box = $('#epCard'), w = ep.win, timers = [];
     const later = (ms, f) => timers.push(setTimeout(() => { if (run !== r) { box.hidden = true; done(false); return; } f(); }, ms));
     let already = false;   // a character you already won isn't won again: no « you won » screen
@@ -1260,16 +1275,15 @@ function episodeEnd(ep, r) {
       <div class="ep-kick">${ui('won')}</div><div class="ep-rays"></div><div class="ep-shake"><div class="ep-glow"></div><img class="ep-fig" src="${charUrl(w.sprite, w.pose)}" alt=""></div>
       <div class="ep-ring"></div><div class="ep-sparks">${sparks()}</div><div class="ep-flash"></div><div class="ep-won"><b>${w.name}</b><span>${ui('added')}</span></div></div>`;
     box.className = ''; box.hidden = false; box.onclick = null;
-    // the room's sound stops with the episode; under the card, the house's dark sound slowed down (Continue stops it,
-    // the next scene brings its own; leaving the story stops everything)
-    stopSfx(); sfx('dark', 'card', 0.6);
+    // the room's sound goes on under the card, lower and muffled (Continue stops it, the next scene brings its own)
+    duck(true);
     const tease = () => {
       timers.forEach(clearTimeout); box.onclick = null;
       const nx = ep.next;
       box.className = 'teasing';
-      box.innerHTML = `<div class="ep-t">${nx ? `<div class="ep-kick">${ui('episode')} ${nx.n}</div><h2>${nx.title}</h2><img class="ep-img" src="${nx.img}" alt=""><p>${nx.tease}</p>` : ''}
+      box.innerHTML = `<div class="ep-t">${nx ? `<div class="ep-kick">${ui('episode')} ${nx.n}</div><h2>${nx.title}</h2><img class="ep-img" src="${nx.img}" alt="">` : ''}
         <button type="button" class="ep-go">${nx ? ui('next') : ui('finale')}</button><button type="button" class="ep-home">${ui('home')}</button></div>`;
-      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; stopSfx('dark'); done(true); };
+      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(true); };
       $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
     };
     later(60, () => box.className = 'done');                             // "you finished episode N"
@@ -1586,6 +1600,17 @@ function openWait(id, own = false) {
 // taken. Real players join by the code / QR or a real invite; Léa, Max, Sam and the strangers are simulated ----
 const SIM_FRIENDS = [{ n: 'Léa', ch: 'mila' }, { n: 'Max', ch: 'ninja' }, { n: 'Sam', ch: 'belier_blanc' }], SIM_STRANGERS = ['Nico', 'Zoé', 'Malik', 'Jade', 'Hugo'];
 let invite = null;   // the host's call for the other seat: { seat, kind: 'friend' | 'public', n, to: a real friend's id }
+// Full demo opens up as you play (series.js: Social after 2 episodes): until then its waiting rooms have no friends and no
+// Ouvrir au public. Outside Full demo (or a profile with everything open), always.
+function social() {
+  if (!fromDemo) return true;
+  try {
+    const g = (k) => JSON.parse(localStorage.getItem('smtDemo.' + k));
+    if (!g('onb') || g('all')) return true;
+    const lc = Math.max(0, ((JSON.parse(localStorage.getItem('smt-ep')) || {}).bar || 0) - 1);
+    return Object.values(g('ser') || {}).reduce((a, b) => a + b, 0) + lc >= 2;
+  } catch { return true; }
+}
 let friendsKey = '';   // who was in the row of friends (under the buttons, always there while the other seat is free)
 // who you can invite: everyone with the app open on another device (their invite rings there), then Léa, Max, Sam
 const friendsNow = () => [...(window.PEOPLE ? PEOPLE.online() : []).map((p) => ({ n: p.n, ch: p.ch, to: p.id })), ...SIM_FRIENDS];
@@ -1618,9 +1643,9 @@ function renderWait() {
     return `<button type="button" class="${id === state.story ? 'on' : ''}" data-love="${id}"><span class="wr-head"><span><img src="${charUrl(k, pose)}" alt=""></span></span><b>${esc(n)}</b></button>`;
   }).join('')}</div>` : '';
   $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${lovers}
-    ${host && mine && !full && !invite ? '<div class="wr-opts"><button type="button" data-o="public">Ouvrir au public</button><button type="button" data-o="alone">Jouer seul</button></div>' : ''}
+    ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Ouvrir au public</button>' : ''}<button type="button" data-o="alone">Jouer seul</button></div>` : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
-    ${host && mine && !full && !invite ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
+    ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
@@ -2381,6 +2406,7 @@ else if (auto && $('#whoName').value) $('#whoForm .pill').click();
   if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire' || o[1] === 'perso')) {
     openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
     if (screen === '#hub') { openAfterName = null; openFromDemo(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();
+    else { openAfterName = null; state.name = 'Toi'; show('#hub'); share(); openFromDemo(o[1]); }   // Full demo never asks your name
   }
 }
 const jump = location.hash.match(/^#([tpb])(\d+)$/);

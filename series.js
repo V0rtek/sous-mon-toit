@@ -84,8 +84,8 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .se-end .se-hook { font-family: 'Yeseva One', Georgia, serif; font-style: normal; font-size: 2.8em; line-height: 1.3; color: var(--c); margin: 0 0 .4em; }
 .se-end .se-win { align-self: stretch; text-align: left; margin-top: 1.6em; }
 .se-end .se-later { margin-top: 1.6em; }
-.se-btns { align-self: stretch; margin-top: auto; padding: 2.4em 0 9%; display: flex; flex-direction: column; gap: 1em; }
-.se-btns button { font: inherit; font-size: 2.4em; font-weight: 700; width: 100%; padding: .75em; border-radius: 2em; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4em; }
+.se-btns { align-self: stretch; margin-top: auto; padding: 2.4em 0 9%; display: flex; flex-direction: column; align-items: center; gap: 1.6em; }
+.se-btns button { font: inherit; font-size: 2.2em; font-weight: 700; width: 78%; padding: .75em 1.4em; border-radius: 2em; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .4em; }
 .se-btns .se-go { margin: 0; background: #fff; color: #000; }
 .se-btns .se-home { margin: 0; background: rgba(255,255,255,.12); color: #fff; }
 @keyframes seIn { from { opacity: 0; transform: translateY(1.5em); } }
@@ -228,7 +228,7 @@ function episode(box, k, n, opts = {}) {
   };
 }
 function endOf(box, k, n, opts) {
-  const T = TASTES[k], ep = T.eps[n - 1], before = episodesDone();
+  const T = TASTES[k], before = episodesDone();
   const ser = get('ser', {}); ser[k] = Math.max(ser[k] || 0, n); put('ser', ser);
   const after = episodesDone();
   const opened = progressive() ? Object.keys(LADDER).filter((t) => before < LADDER[t] && after >= LADDER[t]) : [];
@@ -245,7 +245,6 @@ function endOf(box, k, n, opts) {
   box.innerHTML = `<div class="se"><div class="se-end" style="--c:${T.color}">
     <div class="se-kick">Fin de l’épisode ${n}</div>
     <h2>${esc(T.title)}</h2>
-    <p class="se-hook">${esc(fill(ep.end))}</p>
     ${won ? `<div class="se-win"><div class="pic"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""></div><div><small>Tu gagnes</small><b>${esc(w.name)}</b>
       ${opts.profile ? '<button data-x="profile">Ajouter à mon profil</button>' : ''}</div></div>` : ''}
     ${opened.map((t) => `<div class="se-new">Nouveau : ${LABEL[t]}</div>`).join('')}
