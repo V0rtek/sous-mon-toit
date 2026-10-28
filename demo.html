@@ -558,7 +558,8 @@ body.tabs-pill.hxbig #tabs { transform: translateY(calc(100% + 3em)); }
 .ci .pbub { bottom: 3.5%; right: 5%; }
 .ci .pnar { bottom: 6%; }
 .ci .pc-corner { top: 3em; }
-.rail { display: none; }   /* Explorer: no buttons on the side (the infos open by themselves at the end) */
+.rail { position: absolute; right: 2.5%; bottom: 2.5%; z-index: 6; opacity: .8; }   /* Explorer: only Infos, in the bottom corner */
+.rail .rb:not([data-act="info"]) { display: none; }
 .rb { position: relative; width: 6em; height: 6em; display: grid; place-items: center; color: #fff; filter: drop-shadow(0 0 .35em rgba(0,0,0,.6)); }
 .rb svg { width: 3em; height: 3em; }
 .rb.play svg { width: 3.5em; height: 3.5em; }
@@ -826,7 +827,7 @@ const DEMOS = [
     pitch: "Six ans qu'il cherche son frère d'armes. Ce soir, il le retrouve sur le pont — et c'est l'autre qui a les réponses.",
     lines: [[1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
   { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'chalet', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
-    full: 'd_ete', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'plage', pose: 'stand', name: 'Maya' }, tease: 'La suite arrive.' }],
+    full: 'd_ete', taps: 9, cut: '0-9', eps: [{ title: 'Épisode 1', win: { sprite: 'plage', pose: 'stand', name: 'Maya' }, tease: 'La suite arrive.' }],
     cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
     pitch: "Cinq ans après, tu retrouves Maya sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière elle.",
     lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
