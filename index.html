@@ -347,11 +347,19 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips .art img { position: absolute; left: 55%; top: 7%; height: 240%; transform: translateX(-50%); }   /* head and shoulders */
 .strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
-#infos .strips > *, #more .strips > * { height: 15em; }
+#infos .strips > * { height: 13em; }
+#more .strips > * { height: 15em; }
 #infos .strips b, #more .strips b { font-size: 3.2em; }
 /* Marketing: one screen per promise, its world then its line */
 #marketing, #validate, #investors { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
-#validate, #investors { padding: 13em 7% 6em; scroll-snap-type: none; }
+#validate, #investors, #system { padding: 13em 7% 6em; scroll-snap-type: none; }
+#system { justify-content: flex-start; overflow-y: auto; }
+/* System: the 5 steps, each number in a ring of its own colour */
+.sys { margin: 1em 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3.2em; }
+.sys li { display: flex; align-items: center; gap: 2.4em; }
+.sys i { flex: none; width: 2.85em; height: 2.85em; border-radius: 50%; box-sizing: border-box; border: .15em solid var(--c); display: grid; place-items: center; font-style: normal; font-size: 2.6em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sys b { display: block; font-size: 2.6em; font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
+.sys p { margin: .35em 0 0; font-size: 2.2em; color: #86868b; line-height: 1.3; }
 .mk { position: relative; flex: none; height: 100%; scroll-snap-align: start; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 7% 14%; box-sizing: border-box; background: radial-gradient(ellipse 80% 55% at 50% 42%, var(--g), transparent 75%), #000; }
 .mkArt { position: absolute; left: 0; right: 0; top: 14%; height: 58%; display: flex; justify-content: center; align-items: flex-end; }
 .mkArt img { height: 82%; max-width: 30%; object-fit: contain; object-position: bottom; margin: 0 -3%; filter: drop-shadow(0 1em 2em rgba(0,0,0,.6)); }
@@ -542,6 +550,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée</b></button>
       <button type="button" id="invBtn"><span class="art" style="--g:#33415c"><img src="chars/suit/adjust.webp" alt=""></span><b>Investisseurs</b></button>
       <button type="button" id="statsBtn"><span class="art" style="--g:#c4622d"><img src="chars/justin_bar/explaining.webp" alt=""></span><b>Stats</b></button>
+      <button type="button" id="sysBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/thinking.webp" alt=""></span><b>System</b></button>
     </div>
   </div>
   <div id="more" class="card menu" hidden>
@@ -582,6 +591,16 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <small>AI video: Veo 3.1 Lite, $0.05 per second, 1 min per video. Us: about 1¢ of text per branch, played on the phone.</small>
     </div>
     <div class="dots"><i></i><i></i><i></i></div>
+  </div>
+  <div id="system" class="card menu" hidden>
+    <div class="step"><h2>System</h2>
+      <ol class="sys">
+        <li style="--c:#0a84ff"><i>01</i><div><b>Investment + Anticipation</b><p>"I want to see what happens."</p></div></li>
+        <li style="--c:#ff9f0a"><i>02</i><div><b>Escalation + Complication</b><p>"This is harder than I expected."</p></div></li>
+        <li style="--c:#bf5af2"><i>03</i><div><b>Revelation + Recontextualization</b><p>"Wait. I misunderstood everything."</p></div></li>
+        <li style="--c:#ff453a"><i>04</i><div><b>Crisis + Maximum Suspense</b><p>"How can this possibly work out?"</p></div></li>
+        <li style="--c:#30d158"><i>05</i><div><b>Payoff + Emotional Resolution</b><p>"It was worth watching."</p></div></li>
+      </ol></div>
   </div>
   <div id="validate" class="card menu" hidden>
     <div class="step"><h2>Valider l'idée</h2><p class="lead">Ils finissent l'épisode, puis en veulent un 2e.</p><div id="valBody"></div></div>
@@ -724,17 +743,17 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261028141438"></script>
-<script src="story.js?v=20261028141438"></script>
-<script src="play.js?v=20261028141438"></script>
-<script src="bar.js?v=20261028141438"></script>
-<script src="games.js?v=20261028141438"></script>
-<script src="gen.js?v=20261028141438"></script>
-<script src="demos.js?v=20261028141438"></script>
-<script src="onbstories.js?v=20261028141438"></script>
-<script src="episodes.js?v=20261028141438"></script>
-<script src="people.js?v=20261028141438"></script>
-<script src="usage.js?v=20261028141438"></script>
+<script src="chars.js?v=20261028143259"></script>
+<script src="story.js?v=20261028143259"></script>
+<script src="play.js?v=20261028143259"></script>
+<script src="bar.js?v=20261028143259"></script>
+<script src="games.js?v=20261028143259"></script>
+<script src="gen.js?v=20261028143259"></script>
+<script src="demos.js?v=20261028143259"></script>
+<script src="onbstories.js?v=20261028143259"></script>
+<script src="episodes.js?v=20261028143259"></script>
+<script src="people.js?v=20261028143259"></script>
+<script src="usage.js?v=20261028143259"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1639,9 +1658,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate'];
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system'];
 const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos',
-  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos' };   // where ‹ goes
+  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -2038,6 +2057,7 @@ $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
 $('#pitchBtn').onclick = (e) => { e.stopPropagation(); show('#pitch'); };
+$('#sysBtn').onclick = (e) => { e.stopPropagation(); $('#system').scrollTop = 0; show('#system'); };
 // ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
 // A tap = the next idea: one episode (3 choices: 15 videos), five episodes (65,535), what that costs ----
 const AIV = [{ depth: 3, label: '1 episode · 3 choices', n: '15 videos' }, { depth: 10, label: '5 episodes · 15 choices', n: '65,535 videos' }, { cost: true }];
@@ -2377,7 +2397,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261028141438';
+const BUILD = '20261028143259';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
