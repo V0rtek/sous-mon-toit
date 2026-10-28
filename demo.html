@@ -1632,6 +1632,7 @@ function renderHome() {
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = homeCentre = id;
     $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}</p>` : ''}
+      <button class="btn main" data-act="ep" data-id="${id}" data-n="${epTo(d)}">${I.play}${goLabel(d)}</button>
       <button class="hdown" data-act="hdown">Infos${I.down}</button>`;
     $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
@@ -2103,10 +2104,15 @@ const refreshDetail = () => {
   const s = $('#series'); if (!s.hidden) { const y = s.scrollTop; openSeries(s.dataset.id); s.scrollTop = y; }
 };
 
+// what its play button says: Continuer · Épisode 2, Jouer · Épisode 1, Rejouer once it's all over
+// (in En cours, a story with lines played counts as started)
+function goLabel(d) {
+  const n = epTo(d), eps = (d.eps || [d]).length, on = started(d) || (prog[d.id] && prog[d.id].i > 0);
+  return finished(d) ? 'Rejouer' : `${on ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${n}` : ''}`;
+}
 // ---- Jouer (Explorer): not the preview again, the series: its cover, what it is, Jouer the episode you're at, all its episodes ----
 function openSeries(id) {
-  const d = byId(id), box = $('#series'), n = epTo(d), eps = (d.eps || [d]).length;
-  const go = finished(d) ? 'Rejouer' : `${started(d) ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${n}` : ''}`;
+  const d = byId(id), box = $('#series'), n = epTo(d), go = goLabel(d);
   box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[n - 1].img } : d, true)}</div>
     <div class="sr-body"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>
