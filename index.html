@@ -352,8 +352,9 @@ body.playonly #back, body.playonly #qrBtn, body.playonly #eyes, body.playonly #g
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #galBtn svg { width: 3.8em; height: 3.8em; }
-/* the QR, the spectator count and the gallery live in the menu only */
-body:not(.home) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
+/* the QR, the spectator count and the gallery live in the menu only (the QR in a waiting room too: Full demo's Play lands
+   there, so a friend can scan in and take the other seat) */
+body:not(.home):not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
 /* two players: the one whose turn it is not waits on the last shot */
 #waitOther { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 20; padding: .7em 1.4em; border-radius: 2em; background: rgba(15,12,20,.75); color: #fff; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; }
 #waitOther i { font-style: normal; animation: blink 1.2s infinite; }
@@ -367,6 +368,7 @@ body.watch #choices button.mine { pointer-events: auto; }
 #qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #qrBtn svg { width: 4em; height: 4em; }
 #qrBtn:focus-visible { outline: .25em solid #fff; }
+body:has(#todoBtn:not([hidden])) #qrBtn { right: calc(4% + 9.2em); }   /* next to the waiting room's ? */
 #eyes { position: absolute; top: calc(2.2% + 1.2em); right: calc(4% + 9.2em); z-index: 30; height: 5.6em; padding: 0 1.8em; border-radius: 2.8em; background: rgba(15,12,20,.6); color: #fff; display: flex; align-items: center; gap: .8em; pointer-events: none; }
 #eyes svg { width: 2.8em; height: 2.8em; }
 #eyes span { font-size: 2.6em; font-weight: 800; }
@@ -459,7 +461,6 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="hub" class="card menu" hidden>
     <div class="tiles">
       <a href="demo.html" id="fullDemo"><span>Full demo</span></a>
-      <button type="button" id="bar"><span>Last call</span></button>
       <button type="button" id="lab"><span>Mini-jeux</span></button>
       <button type="button" id="mine"><span>Ton histoire</span></button>
       <button type="button" id="t3d"><span>3D</span></button>
@@ -1512,6 +1513,7 @@ function show(id) {
   screen = id;
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
+  document.body.classList.toggle('inwait', id === '#wait');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
 function halt() {
@@ -1747,7 +1749,6 @@ $('#whoForm').addEventListener('submit', (e) => {
   if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
   else { myName = v || 'Kev'; show('#lobby'); goLive(); }
 });
-$('#bar').onclick = (e) => { e.stopPropagation(); openWait('bar'); };
 // ---- analytics, on this device only: plays and finishes per story, how each choice splits (a real choice is closer to
 // 50/50 than 90/10), the answers to the 5 reviewer questions, what the generations cost ----
 const STATS_KEY = 'smt-stats';
@@ -2135,7 +2136,7 @@ function announce(on) {
   const names = [state.name, ...[...watchers.values()].map((w) => w.n)].filter(Boolean);
   live.publish(`${OPEN}/${room}`, on ? JSON.stringify({ room, s: state.story, n: names, t: Date.now(), v: BUILD }) : '', { retain: true });
 }
-const TILES = { bar: '#bar', ...Object.fromEntries(GAME_LIST.map((g) => [g.id, '#game-' + g.id])) };
+const TILES = { ...Object.fromEntries(GAME_LIST.map((g) => [g.id, '#game-' + g.id])) };
 function showRooms() {
   for (const [s, sel] of Object.entries(TILES)) {
     const r = roomFor(s), tile = $(sel);
