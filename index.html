@@ -380,6 +380,10 @@ body.watch #stage { cursor: default; }
 body.watch #start, body.watch #again, body.watch #lookGo, body.watch #hint { display: none !important; }
 body.watch #choices button, body.watch .looks button { pointer-events: none; }
 #choices button.picked { background: var(--choice-hi); box-shadow: 0 0 0 .2em #fff; }
+/* Full demo's preview: a tap beside the choices makes them glow for a moment (a second one picks) */
+#choices.nudge button { animation: chNudge .6s ease-out; }
+#choices.nudge button:nth-child(2) { animation-delay: .05s; } #choices.nudge button:nth-child(3) { animation-delay: .1s; }
+@keyframes chNudge { 35% { background: var(--choice-hi); box-shadow: 0 0 0 .2em rgba(255,255,255,.55); transform: scale(1.02); } }
 /* the end of an episode: shake, a silhouette, the reveal; then the next episode's picture */
 #epCard { position: absolute; inset: 0; z-index: 50; background: radial-gradient(circle at 50% 45%, #2a0a10, #000 70%); color: #fff; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; overflow: hidden; cursor: default; }
 .ep-a { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; }
@@ -1120,6 +1124,7 @@ function drawCall() {
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
   options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
+  choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
   if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(by)} ${ui('choosing')}`, by); }
   else if (ring) {
@@ -2382,7 +2387,7 @@ if (PREVIEW) {
   const veil = document.createElement('div');
   veil.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;transition:opacity .5s;pointer-events:none';
   document.body.appendChild(veil);
-  let part = 0, jumping = false;
+  let part = 0, jumping = false, missed = {};
   // where the preview is, in its own taps (the cut stretches end to end), for Full demo's n/N
   const report = () => {
     const pos = cut.length ? cut.slice(0, part).reduce((t, [a, b]) => t + b - a, 0) + Math.max(0, tape.length - cut[part][0]) : tape.length;
@@ -2394,7 +2399,12 @@ if (PREVIEW) {
     if (e.origin === location.origin && e.data && 'hush' in e.data) { hushed = !!e.data.hush; if (master) master.gain.value = muted || hushed ? 0 : 1; return; }   // not on Full demo's screen: no sound
     if (e.origin !== location.origin || !e.data || !e.data.tap || jumping) return;
     const [fx, fy] = e.data.tap, el = document.elementFromPoint(fx * innerWidth, fy * innerHeight);
-    if (el) el.click();
+    // a tap beside the choices: the first makes them glow, the second picks the first one (Explorer has no time to lose)
+    if (waiting === 'choice' && mineFor(optionsBy) && !(el && el.closest('#choices button, #ringBtns button'))) {
+      if (missed.on !== options) missed = { on: options, n: 0 };
+      if (++missed.n >= 2) pickChoice(0);
+      else { choicesEl.classList.remove('nudge'); void choicesEl.offsetWidth; choicesEl.classList.add('nudge'); }
+    } else if (el) el.click();
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
 } else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
