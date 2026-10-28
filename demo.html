@@ -746,6 +746,7 @@ body.t-search #switch { visibility: hidden; }
 </div>
 <script src="chars.js"></script>
 <script src="people.js"></script>
+<script src="usage.js"></script>
 <script src="series.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
@@ -1732,11 +1733,13 @@ function friendSheet(k) {
 // a fake one accepts after a moment
 function inviteTo(id, k) {
   const d = byId(id), f = friend(k);
+  USAGE.feature('Inviter un ami');
   if (f.id) openPlayer(id, false, 0, epTo(d), null, null, { id: f.id, n: f.n }); else openPlayer(id, false, 0, epTo(d), f.n);
 }
 // a friend waiting in a film: a real one = their room (as if you'd scanned their QR), a fake one = simulated
 function joinFriend(id, k) {
   const d = byId(id), f = friend(k);
+  USAGE.feature('Rejoindre une salle');
   if (f.room) goJoin(f.room, d); else openPlayer(id, false, 0, epTo(d), null, [f.n]);
 }
 function goJoin(room, d) {
@@ -2026,8 +2029,10 @@ function apply(st) {
   if (!layers.length || layers[0].k !== 'sheet') $('#sheet').hidden = true;
   document.body.classList.toggle('atroot', !st.ov);
 }
+const TAB_NAME = { explore: 'Explorer', search: 'Recherche', home: 'Accueil', add: 'Créer', social: 'Social', saved: 'Sauvés' };
 function setTab(t) {
   if (t === tab) { $('#' + page()).scrollTop = 0; return; }
+  if (TAB_NAME[t]) USAGE.feature(TAB_NAME[t]);   // a closed tab counts too: they wanted it
   if (t === BASE && cur().tabFrom === BASE) return back();
   if (tab === BASE) push({ tab: t, ov: null, tabFrom: BASE }); else swap({ tab: t, ov: null });
 }
@@ -2035,6 +2040,7 @@ function setTab(t) {
 // to: a real friend to invite ({id, n}: their device rings)
 function openPlayer(id, host = false, from = 0, ep = null, w = null, inRoom = null, to = null) {
   const d = byId(id), n = ep || epTo(d);
+  USAGE.played(id, d.title);
   if (d.series) { track(id, 0); return playSeriesEp(d.series, Math.min(n, d.eps.length)); }
   if (d.full) {   // the real game; its back comes here
     track(id, 0, inRoom || (w ? [w] : to ? [to.n] : null));
@@ -2143,7 +2149,7 @@ function playNow(id) {
 
 // ---- saving: a tap saves, another takes it back out ----
 function toggleSave(id) {
-  if (saved[id]) delete saved[id]; else saved[id] = { at: Date.now() };
+  if (saved[id]) delete saved[id]; else { saved[id] = { at: Date.now() }; USAGE.feature('Sauver une histoire'); }
   keep.set('saved', saved);
   if (saved[id]) saveNote();
   paintSavedBtn();
@@ -2204,9 +2210,10 @@ function options() {
   };
 }
 // a new profile: everything this browser kept about the player (characters made or won, name, progress, saved, looks, who
-// they are to the others), then a fresh start. The API key typed for « Ton histoire » stays, and so do the onboarding test's results.
+// they are to the others), then a fresh start. The API key typed for « Ton histoire » stays, and so do the onboarding test's
+// results and the usage counts (usage.js).
 function wipeProfile() {
-  const KEEP = ['smt-key', 'smt-onb', 'smt-onb-v'];
+  const KEEP = ['smt-key', 'smt-onb', 'smt-onb-v', 'smt-stats', 'smt-stats-sent'];   // + the usage counts: still the same device
   try { Object.keys(localStorage).filter((k) => k.startsWith('smt') && !KEEP.includes(k)).forEach((k) => localStorage.removeItem(k)); } catch { /* private window */ }
   try { Object.keys(sessionStorage).filter((k) => k.startsWith('smt')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* private window */ }
   const done = () => location.reload();
@@ -2313,14 +2320,14 @@ stage.addEventListener('click', (e) => {
   switch (act) {
     case 'back': back(); break;
     case 'mode': push({ screen: el.dataset.s, tab: 'explore', ov: null, tabFrom: null }); $('#' + page()).scrollTop = 0; break;   // Versions et tests: All's layouts
-    case 'open': push({ ov: { k: 'detail', id } }); break;
-    case 'info': push({ ov: { k: 'detail', id, cur: true } }); break;
+    case 'open': USAGE.opened(id, byId(id).title); push({ ov: { k: 'detail', id } }); break;
+    case 'info': USAGE.opened(id, byId(id).title); push({ ov: { k: 'detail', id, cur: true } }); break;
     case 'save': toggleSave(id); break;
     case 'play': playNow(id); break;   // the game's waiting room, not the episodes
-    case 'joinroom': { const d = byId(id), r = realIn(d)[0]; closeSheet(() => (r ? goJoin(r.room, d) : openPlayer(id, false, 0, epTo(d), null, othersIn(d)))); break; }
+    case 'joinroom': { USAGE.feature('Rejoindre une salle'); const d = byId(id), r = realIn(d)[0]; closeSheet(() => (r ? goJoin(r.room, d) : openPlayer(id, false, 0, epTo(d), null, othersIn(d)))); break; }
     case 'invite': { const k = el.dataset.f; closeSheet(() => inviteTo(id, k)); break; }
     case 'joinf': { const k = el.dataset.f; closeSheet(() => joinFriend(id, k)); break; }
-    case 'accept': { const v = pendingInvite; pendingInvite = null; closeSheet(() => v && goJoin(v.invite.room, DEMOS.find((x) => x.full === v.invite.s))); break; }
+    case 'accept': { USAGE.feature('Rejoindre une salle'); const v = pendingInvite; pendingInvite = null; closeSheet(() => v && goJoin(v.invite.room, DEMOS.find((x) => x.full === v.invite.s))); break; }
     case 'later': { const v = pendingInvite; pendingInvite = null; if (v) PEOPLE.decline(v, savedName()); closeSheet(); break; }
     case 'sheetTab': closeSheet(() => setTab(el.dataset.tab)); break;
     case 'ownroom': closeSheet(() => playEp(id, epTo(byId(id)))); break;
@@ -2359,8 +2366,8 @@ stage.addEventListener('click', (e) => {
     case 'deckYes': swipe(true); break;
     case 'deckNo': swipe(false); break;
     case 'deckReset': deckGone = []; renderExplore(); break;
-    case 'write': try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=histoire'; break;
-    case 'newperso': try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=perso'; break;
+    case 'write': USAGE.feature('Écrire une histoire'); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=histoire'; break;
+    case 'newperso': USAGE.feature('Créer un perso'); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } location.href = 'index.html#open=perso'; break;
     case 'story': openStory(el.dataset.at); break;
     case 'mystories': myStories(); break;
     case 'pclose': back(); break;

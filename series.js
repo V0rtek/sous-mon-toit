@@ -270,6 +270,7 @@ const sparks = () => Array.from({ length: 30 }, (_, k) => {
 function endOf(box, k, n, opts) {
   const before = episodesDone();
   const ser = get('ser', {}); ser[k] = Math.max(ser[k] || 0, n); put('ser', ser);
+  if (window.USAGE) USAGE.episode('s_' + k, TASTES[k].title, n);   // how far people go (the game's Stats)
   const after = episodesDone();
   const opened = progressive() ? Object.keys(LADDER).filter((t) => before < LADDER[t] && after >= LADDER[t]) : [];
   const w = winOf(k);
@@ -316,6 +317,7 @@ function endOf(box, k, n, opts) {
     if (x === 'home') opts.home && opts.home();
     if (x === 'profile') opts.profile && opts.profile(w);
     if (x === 'next') {
+      if (window.USAGE) USAGE.next('s_' + k, TASTES[k].title);   // they want the next one
       if (nx.k === 'lastcall') opts.lastcall && opts.lastcall();
       else if (opts.next) opts.next(nx.k, nx.n);
       else episode(box, nx.k, nx.n, opts);

@@ -328,9 +328,6 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #poseCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2em; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
 #poseCard img { height: 76%; max-width: 90%; object-fit: contain; }
 #poseCard span { font-size: 2.4em; font-weight: 600; color: #f5f5f7; }
-/* home: the tiles scroll when there are more stories than fit (centred while they fit) */
-#hub { justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; }
-#hub .tiles { margin: auto 0; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; }
 .tiles > * { font: inherit; aspect-ratio: 1; box-sizing: border-box; display: flex; align-items: flex-start; padding: 2.4em; border: 0; border-radius: 2.6em; background: #1c1c1e; color: #f5f5f7; text-decoration: none; text-align: left; cursor: pointer; }
 .tiles span { font-size: 2.6em; font-weight: 600; letter-spacing: -.01em; }
@@ -340,6 +337,69 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles .here i { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; background: #34c759; }
 .tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
+/* the menus (home, Infos, Plus): full-width strips, each a picture of its world, black on the words' side (the onboarding's question) */
+#hub, #infos, #more { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
+.strips { display: flex; flex-direction: column; margin: auto 0; }
+.strips > * { font: inherit; position: relative; flex: none; height: 24em; overflow: hidden; display: flex; align-items: center; padding: 0 7%; border: 0; border-top: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-align: left; text-decoration: none; cursor: pointer; }
+.strips > *::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 30%, rgba(0,0,0,.55) 52%, transparent 78%); pointer-events: none; }
+.strips .art { position: absolute; top: 0; bottom: 0; left: 30%; right: 0; background: radial-gradient(ellipse 60% 75% at 55% 60%, var(--g, #444), transparent 72%); }
+.strips .art.photo { left: 0; background-size: cover; background-position: center top; }
+.strips .art img { position: absolute; left: 55%; top: 7%; height: 240%; transform: translateX(-50%); }   /* head and shoulders */
+.strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
+.strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
+#infos .strips > *, #more .strips > * { height: 15em; }
+#infos .strips b, #more .strips b { font-size: 3.2em; }
+/* Marketing: one screen per promise, its world then its line */
+#marketing, #validate, #investors { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
+#validate, #investors { padding: 13em 7% 6em; scroll-snap-type: none; }
+.mk { position: relative; flex: none; height: 100%; scroll-snap-align: start; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 7% 14%; box-sizing: border-box; background: radial-gradient(ellipse 80% 55% at 50% 42%, var(--g), transparent 75%), #000; }
+.mkArt { position: absolute; left: 0; right: 0; top: 14%; height: 58%; display: flex; justify-content: center; align-items: flex-end; }
+.mkArt img { height: 82%; max-width: 30%; object-fit: contain; object-position: bottom; margin: 0 -3%; filter: drop-shadow(0 1em 2em rgba(0,0,0,.6)); }
+.mkArt img.boss { max-width: none; position: absolute; left: 50%; bottom: 10%; height: 112%; transform: translateX(-50%); opacity: .9; filter: drop-shadow(0 0 3em rgba(255,40,40,.35)); }
+.mkArt.duo img { max-width: 48%; }
+.mkArt.idea { align-items: center; gap: 4%; }
+.mkArt.idea img { height: 74%; max-width: 40%; margin: 0; }
+.mkArt.idea img:first-child { height: 58%; border-radius: 1.4em; filter: none; }
+.mkArt.idea i { font-style: normal; font-size: 6em; color: #86868b; }
+.mk h2 { position: relative; margin: 0; font-size: 5.6em; font-weight: 600; letter-spacing: -.03em; line-height: 1.05; }
+/* Pitch: the questions; a tap opens the answer */
+#pitch { padding: 0 7%; }
+.qs { display: flex; flex-direction: column; }
+.qs button { font: inherit; font-size: 3.6em; font-weight: 600; letter-spacing: -.02em; text-align: left; padding: .8em 0; border: 0; border-bottom: .03em solid #2c2c2e; background: none; color: #f5f5f7; cursor: pointer; }
+/* Why not AI videos?: the tree of choices, one tap = one more idea */
+#aiv { justify-content: flex-start; padding: 13em 7% 6em; cursor: pointer; }
+#aivTree { width: 100%; height: 46em; flex: none; overflow: visible; }
+#aivTree path { fill: none; stroke: #f5f5f7; stroke-linecap: round; opacity: 0; transition: opacity .35s; }
+#aivTree rect { fill: #1c1c1e; stroke: #f5f5f7; opacity: 0; transition: opacity .35s; }
+#aivTree polygon { fill: #f5f5f7; opacity: 0; transition: opacity .35s; }
+#aivTree .on { opacity: 1; }
+#aiv.cost #aivTree { visibility: hidden; }
+#aivNum { display: flex; flex-direction: column; align-items: center; gap: .3em; margin-top: 2em; }
+#aivNum span { font-size: 2.4em; color: #86868b; }
+#aivNum b { font-size: 7em; font-weight: 600; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+#aiv.cost #aivNum { display: none; }
+#aivCost { position: absolute; left: 7%; right: 7%; top: 50%; transform: translateY(-55%); display: flex; flex-direction: column; gap: 3em; }
+#aivCost > span { font-size: 2.4em; color: #86868b; }
+#aivCost .cost { display: grid; grid-template-columns: 1fr auto; gap: 1em 2em; align-items: end; }
+#aivCost .cost em { font-style: normal; font-size: 2.6em; font-weight: 600; }
+#aivCost .cost b { grid-row: 1; grid-column: 2; font-size: 5em; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+#aivCost .bar { grid-column: 1 / -1; height: 1.6em; border-radius: .8em; background: #1c1c1e; overflow: hidden; }
+#aivCost .bar i { display: block; height: 100%; min-width: .4em; background: #f5f5f7; border-radius: .8em; }
+#aivCost small { font-size: 1.7em; line-height: 1.4; color: #86868b; }
+#aiv .dots { position: absolute; left: 0; right: 0; bottom: 5%; display: flex; justify-content: center; gap: 1.2em; }
+#aiv .dots i { width: 1em; height: 1em; border-radius: 50%; background: #3a3a3c; }
+#aiv .dots i.on { background: #f5f5f7; }
+/* Stats and Valider l'idée: every device, live */
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4em; }
+.kpis div { background: #1c1c1e; border-radius: 1.6em; padding: 1.6em 1.4em; display: flex; flex-direction: column; gap: .4em; }
+.kpis b { font-size: 4.4em; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.kpis span { font-size: 1.8em; color: #86868b; line-height: 1.25; }
+.st .row { display: grid; grid-template-columns: 1fr auto; gap: .4em 1em; align-items: baseline; margin-top: .6em; }
+.st .row span { font-size: 2.1em; color: #f5f5f7; }
+.st .row em { font-style: normal; font-size: 2.1em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.st .row .bar { grid-column: 1 / -1; }
+.st .row small { grid-column: 1 / -1; font-size: 1.7em; color: #86868b; }
+.st > small { font-size: 1.7em; color: #86868b; }
 #investors .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
 #investors .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
 #investors .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
@@ -469,14 +529,62 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </form>
   </div>
   <div id="hub" class="card menu" hidden>
-    <div class="tiles">
-      <a href="demo.html" id="fullDemo"><span>Full demo</span></a>
-      <button type="button" id="lab"><span>Mini-jeux</span></button>
-      <button type="button" id="mine"><span>Ton histoire</span></button>
-      <button type="button" id="t3d"><span>3D</span></button>
-      <button type="button" id="statsBtn"><span>Stats</span></button>
-      <button type="button" id="invBtn"><span>Investisseurs</span></button>
+    <div class="strips">
+      <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
+      <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos</b></button>
+      <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus</b></button>
     </div>
+  </div>
+  <div id="infos" class="card menu" hidden>
+    <div class="strips">
+      <button type="button" id="mkBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Marketing</b></button>
+      <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
+      <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée</b></button>
+      <button type="button" id="invBtn"><span class="art" style="--g:#33415c"><img src="chars/suit/adjust.webp" alt=""></span><b>Investisseurs</b></button>
+      <button type="button" id="statsBtn"><span class="art" style="--g:#c4622d"><img src="chars/justin_bar/explaining.webp" alt=""></span><b>Stats</b></button>
+    </div>
+  </div>
+  <div id="more" class="card menu" hidden>
+    <div class="strips">
+      <button type="button" id="lab"><span class="art" style="--g:#b3261e"><img src="chars/justin/punch.webp" alt=""></span><b>Mini-jeux</b></button>
+      <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
+      <button type="button" id="t3d"><span class="art" style="--g:#6b3fa0"><img src="chars/amare/listen.webp" alt=""></span><b>3D</b></button>
+    </div>
+  </div>
+  <div id="marketing" class="card menu" hidden>
+    <section class="mk" style="--g:#b3261e">
+      <div class="mkArt"><img class="boss" src="chars/ombre/stand.webp" alt=""><img src="chars/amare/angry.webp" alt=""><img src="chars/justin/punch.webp" alt=""><img src="chars/candy/angry.webp" alt=""></div>
+      <h2>Face the boss with your homies</h2>
+    </section>
+    <section class="mk" style="--g:#2f7a4a">
+      <div class="mkArt"><img src="chars/james/explaining.webp" alt=""><img src="chars/ruby/listen.webp" alt=""><img src="chars/melissa/surprised.webp" alt=""><img src="chars/amare/listen.webp" alt=""></div>
+      <h2>Go on a quest with your family</h2>
+    </section>
+    <section class="mk" style="--g:#2c6fb3">
+      <div class="mkArt idea"><img src="chars/astro/bw.webp" alt=""><i>→</i><img src="chars/astro_orion/listen.webp" alt=""></div>
+      <h2>Your ideas to life</h2>
+    </section>
+    <section class="mk" style="--g:#a3367a">
+      <div class="mkArt duo"><img src="chars/isa_or/explaining.webp" alt=""><img src="chars/isa_noir/listen.webp" alt=""></div>
+      <h2>Live the dreams with your bestie</h2>
+    </section>
+  </div>
+  <div id="pitch" class="card menu" hidden>
+    <div class="qs"><button type="button" id="qAiv">Why not AI videos?</button></div>
+  </div>
+  <div id="aiv" class="card menu" hidden>
+    <svg id="aivTree" viewBox="0 0 560 460" aria-hidden="true"></svg>
+    <div id="aivNum"><span></span><b></b></div>
+    <div id="aivCost" hidden>
+      <span>5 episodes, every path</span>
+      <div class="cost"><em>AI video</em><div class="bar"><i style="width:100%"></i></div><b>$196,605</b></div>
+      <div class="cost"><em>Us</em><div class="bar"><i style="width:.6%"></i></div><b>$655</b></div>
+      <small>AI video: Veo 3.1 Lite, $0.05 per second, 1 min per video. Us: about 1¢ of text per branch, played on the phone.</small>
+    </div>
+    <div class="dots"><i></i><i></i><i></i></div>
+  </div>
+  <div id="validate" class="card menu" hidden>
+    <div class="step"><h2>Valider l'idée</h2><p class="lead">Ils finissent l'épisode, puis en veulent un 2e.</p><div id="valBody"></div></div>
   </div>
   <div id="about3d" class="card menu" hidden>
     <p class="note">This is a version in a 3D environment where the story/acting/dialog is generated by AI from a single prompt.</p>
@@ -521,9 +629,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="statsScreen" class="card menu" hidden>
-    <div class="step"><h2>Stats</h2><p class="lead">Sur cet appareil seulement.</p><div id="statsBody"></div>
-      <a class="ghost" href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener">Info</a>
-      <button class="ghost" id="statsReset" type="button">Effacer les stats</button></div>
+    <div class="step"><h2>Stats</h2><p class="lead" id="statsLead"></p><div id="statsBody"></div>
+      <a class="ghost" href="https://claude.ai/artifact/Bn5MRrBoHwgaxGctw8uLG1" target="_blank" rel="noopener">Info</a></div>
   </div>
   <div id="investors" class="card menu" hidden>
     <div class="step"><h2>Investisseurs</h2>
@@ -617,16 +724,17 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
 </div>
 
-<script src="chars.js?v=20261026221500"></script>
-<script src="story.js?v=20261026221500"></script>
-<script src="play.js?v=20261026221500"></script>
-<script src="bar.js?v=20261026221500"></script>
-<script src="games.js?v=20261026221500"></script>
-<script src="gen.js?v=20261026221500"></script>
-<script src="demos.js?v=20261026221500"></script>
-<script src="onbstories.js?v=20261026221500"></script>
-<script src="episodes.js?v=20261026221500"></script>
-<script src="people.js?v=20261026221500"></script>
+<script src="chars.js?v=20261028141438"></script>
+<script src="story.js?v=20261028141438"></script>
+<script src="play.js?v=20261028141438"></script>
+<script src="bar.js?v=20261028141438"></script>
+<script src="games.js?v=20261028141438"></script>
+<script src="gen.js?v=20261028141438"></script>
+<script src="demos.js?v=20261028141438"></script>
+<script src="onbstories.js?v=20261028141438"></script>
+<script src="episodes.js?v=20261028141438"></script>
+<script src="people.js?v=20261028141438"></script>
+<script src="usage.js?v=20261028141438"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1165,8 +1273,8 @@ function pickChoice(i, afar = false) {
   const by = optionsBy;
   const go = () => {
     state.picks.push({ ...o, by }); if (o.set) Object.assign(state.f, o.set);
-    bump((st) => {   // which option, among which (a choice = its options' texts): the share of each tells if the choice is a real one
-      st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.picks = r.picks || {};
+    if (!quiet) tally((r) => {   // which option, among which (a choice = its options' texts): the share of each tells if the choice is a real one
+      r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
     choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote('');
@@ -1282,6 +1390,7 @@ function episodeEnd(ep, r) {
       if (won.some((x) => x.sprite === w.sprite)) already = true;
       else localStorage.setItem('smt-won', JSON.stringify([...won, { sprite: w.sprite, name: w.name, from: state.story, ep: ep.n }]));
     } catch { /* private window */ }
+    tally((x) => { x.ep = x.ep || {}; x.ep[ep.n] = (x.ep[ep.n] || 0) + 1; });   // how far people go (the drop-off, episode by episode)
     saveEp(ep.next ? ep.next.n : ep.n + 1);   // where you are now: the next episode, one past the last once it's over (Full demo's En cours shows it)
     bubble.hidden = true; choicesEl.hidden = true; hint.hidden = true;
     box.innerHTML = `<div class="ep-a"><div class="ep-done"><small>${ui('finished')}</small><b>${ui('episode')} ${ep.n}</b></div>
@@ -1296,7 +1405,7 @@ function episodeEnd(ep, r) {
       box.className = 'teasing';
       box.innerHTML = `<div class="ep-t">${nx ? `<div class="ep-kick">${ui('episode')} ${nx.n}</div><h2>${nx.title}</h2><img class="ep-img" src="${nx.img}" alt="">` : ''}
         <button type="button" class="ep-go">${nx ? ui('next') : ui('finale')}</button><button type="button" class="ep-home">${ui('home')}</button></div>`;
-      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(true); };
+      $('.ep-go', box).onclick = (e) => { e.stopPropagation(); if (nx) tally((x) => { x.nx = (x.nx || 0) + 1; }); box.hidden = true; done(true); };   // they want the next one
       $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
     };
     later(60, () => box.className = 'done');                             // "you finished episode N"
@@ -1312,7 +1421,7 @@ function episodeEnd(ep, r) {
 function endCard(d) {
   const eps = story().filter((s) => s.episode).map((s) => s.episode.n);
   if (eps.length) saveEp(Math.max(...eps) + 1);   // the whole story is done: it stays done (Full demo: Fini, Rejouer)
-  bump((st) => { st.s = st.s || {}; const r = (st.s[state.story] = st.s[state.story] || {}); r.done = (r.done || 0) + 1; });
+  tally((r) => { r.done = (r.done || 0) + 1; });
   const e = typeof d === 'object' ? d : END0, two = duo();
   bubble.hidden = true; stopSfx();   // the last room's sound ends with the story, not under the end card
   $('#endKicker').textContent = fill(e.kicker || ''); $('#endTitle').textContent = fill(e.title || '');
@@ -1530,8 +1639,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors'];
-const UP = { '#wait': '#hub', '#about3d': '#hub', '#video3d': '#hub', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#hub', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#hub', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#hub', '#investors': '#hub' };   // where ‹ goes
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate'];
+const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos',
+  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -1581,7 +1691,8 @@ function begin(id = state.story) {
   const replay = screen === '#end';
   if (!jumpEp) startEp = 0;   // from the top (a jump's own begin keeps the episode it's heading to)
   curEp = 1;
-  bump((st) => { st.s = st.s || {}; const r = (st.s[id] = st.s[id] || {}); r.plays = (r.plays || 0) + 1; });
+  // a play from Full demo was counted there, when Play was pressed
+  if (!fromDemo && !PLAY_ONLY) bump((st) => { st.s = st.s || {}; const k = sid(id), r = (st.s[k] = st.s[k] || {}); if (storyName(id) !== id) r.n = storyName(id); r.plays = (r.plays || 0) + 1; });
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
   firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
@@ -1672,7 +1783,7 @@ function renderWait() {
     try { localStorage.setItem('smtDemo.love', id === 'd_ete_alex' ? 'alex' : 'maya'); } catch { /* private window */ }
     state.story = id; renderWait(); share();
   });
-  document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); otherSeat(b.dataset.o); });
+  document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); if (b.dataset.o !== 'cancel') feat(b.dataset.o === 'public' ? 'Ouvrir au public' : 'Jouer seul'); otherSeat(b.dataset.o); });
   const list = friendsNow(); friendsKey = list.map((f) => f.to || f.n).join('|');
   document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = seatsOf().find((j) => !state.seats[j]), f = list[+b.dataset.f];
@@ -1748,7 +1859,7 @@ for (const g of GAME_LIST) {
   b.onclick = (e) => { e.stopPropagation(); openWait(g.id); };
   $('#labTiles').appendChild(b);
 }
-$('#lab').onclick = (e) => { e.stopPropagation(); show('#labScreen'); };
+$('#lab').onclick = (e) => { e.stopPropagation(); feat('Mini-jeux'); show('#labScreen'); };
 $('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
 function takeSeat(k, id, n) {
   if (!waitRoom || !seatsOf().includes(k)) return;
@@ -1791,13 +1902,15 @@ $('#whoForm').addEventListener('submit', (e) => {
 });
 // ---- analytics, on this device only: plays and finishes per story, how each choice splits (a real choice is closer to
 // 50/50 than 90/10), the answers to the 5 reviewer questions, what the generations cost ----
-const STATS_KEY = 'smt-stats';
-const getStats = () => { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch { return {}; } };
+// Every device sends its own (usage.js): the Stats screen adds them all up. A story has one name everywhere: Last call
+// is « lastcall » and the onboarding's openings are their series (s_<taste>), as in Full demo
+const sid = (id) => id === 'bar' ? 'lastcall' : /^o_/.test(id) ? 's_' + id.slice(2) : id;
 function bump(f) {
   if (ROLE !== 'host' || PREVIEW) return;   // Full demo's previews aren't plays
-  const st = getStats(); f(st);
-  try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch { /* private window */ }
+  USAGE.bump(f);
 }
+const feat = (name) => bump((st) => { st.f = st.f || {}; st.f[name] = (st.f[name] || 0) + 1; });   // a feature used
+const tally = (f) => bump((st) => { st.s = st.s || {}; const id = sid(state.story), r = (st.s[id] = st.s[id] || {}); if (storyName(state.story) !== state.story) r.n = storyName(state.story); f(r); });
 const FB_QS = ['Tu restes accroché à chaque tap?', "L'histoire démarre assez vite?", 'Tu as assez de contrôle sur les choix?', 'Les dialogues marchent?', "C'est fun?"];
 let fbAns = {};
 function openFb() {
@@ -1820,7 +1933,7 @@ $('#fbCard').onclick = (e) => { e.stopPropagation(); };
 $('#fbSend').onclick = (e) => {
   e.stopPropagation(); const text = $('#fbText').value.trim(), id = state.story;
   if (Object.keys(fbAns).length || text) bump((st) => {
-    st.s = st.s || {}; const r = (st.s[id] = st.s[id] || {}); r.fb = r.fb || {};
+    st.s = st.s || {}; const r = (st.s[sid(id)] = st.s[sid(id)] || {}); r.fb = r.fb || {};
     for (const [i, v] of Object.entries(fbAns)) { const c = (r.fb[i] = r.fb[i] || [0, 0]); c[v ? 0 : 1]++; }
     if (text) { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: id, text }); st.notes.length = Math.min(st.notes.length, 30); }
   });
@@ -1828,39 +1941,133 @@ $('#fbSend').onclick = (e) => {
   $('#fbBtn').textContent = 'Merci';
 };
 const storyName = (id) => ({ t1: 'Sous mon toit', play: 'Le café', bar: 'Last call', gen: 'Ton histoire' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || id;
-function renderStats() {
-  const st = getStats(), body = $('#statsBody'); body.innerHTML = '';
-  const card = (title, lines) => {
-    const d = document.createElement('div'); d.className = 'st'; const b = document.createElement('b'); b.textContent = title; d.appendChild(b);
-    for (const l of lines) {
-      if (l.bar !== undefined) { const bar = document.createElement('div'); bar.className = 'bar'; const i = document.createElement('i'); i.style.width = l.bar + '%'; bar.appendChild(i); d.appendChild(bar); continue; }
-      const p = document.createElement('p'); p.textContent = l.t; if (l.warn) p.className = 'warn'; d.appendChild(p);
+// ---- Stats and Valider l'idée: every device's tally (usage.js), added up live ----
+function sumUp(devs) {
+  const S = {}, F = {}, A = { n: 0, back: 0, play: 0, ep: 0, next: 0, gen: { n: 0, in: 0, out: 0 }, notes: [] };
+  for (const st of devs.values()) {
+    A.n++;
+    if ((st.d || []).length > 1) A.back++;
+    let played = false, fin = false, more = false;
+    for (const [raw, r] of Object.entries(st.s || {})) {
+      const id = sid(raw), m = (S[id] = S[id] || { id, n: '', o: 0, plays: 0, done: 0, nx: 0, ep: {}, picks: {}, fb: {} });
+      if (r.n) m.n = r.n;
+      m.o += r.o || 0; m.plays += r.plays || 0; m.done += r.done || 0; m.nx += r.nx || 0;
+      for (const [k, c] of Object.entries(r.ep || {})) m.ep[k] = (m.ep[k] || 0) + c;
+      for (const [k, o] of Object.entries(r.picks || {})) { const t = (m.picks[k] = m.picks[k] || {}); for (const [x, c] of Object.entries(o)) t[x] = (t[x] || 0) + c; }
+      for (const [k, c] of Object.entries(r.fb || {})) { const t = (m.fb[k] = m.fb[k] || [0, 0]); t[0] += c[0]; t[1] += c[1]; }
+      if (r.plays) played = true;
+      if (r.done || Object.keys(r.ep || {}).length) fin = true;
+      if (r.nx) more = true;
     }
-    body.appendChild(d);
-  };
-  const ids = Object.keys(st.s || {});
-  if (!ids.length && !st.gen) { const p = document.createElement('p'); p.className = 'lead'; p.textContent = 'Rien encore : joue une histoire.'; body.appendChild(p); }
-  for (const id of ids) {
-    const r = st.s[id], lines = [{ t: `${r.plays || 0} parties · ${r.done || 0} finies${r.plays ? ' (' + Math.round(100 * (r.done || 0) / r.plays) + ' %)' : ''}` }];
-    Object.entries(r.picks || {}).forEach(([k, o], n) => {
-      const tot = Object.values(o).reduce((a, b) => a + b, 0), top = Math.max(...Object.values(o));
-      lines.push({ t: `Choix ${n + 1} : ${k}`, warn: tot >= 4 && top / tot > 0.8 });
-      for (const [t, c] of Object.entries(o)) lines.push({ t: `${Math.round(100 * c / tot)} % · ${t}` }, { bar: 100 * c / tot });
-    });
-    const fb = Object.entries(r.fb || {});
-    if (fb.length) lines.push({ t: 'Avis' }, ...fb.map(([i, c]) => ({ t: `${FB_QS[i]} ${Math.round(100 * c[0] / (c[0] + c[1]))} % 👍 (${c[0] + c[1]})` })));
-    card(storyName(id), lines);
+    if (played) A.play++;
+    if (fin) A.ep++;
+    if (more) A.next++;
+    for (const k of Object.keys(st.f || {})) F[k] = (F[k] || 0) + 1;   // how many devices used it
+    if (st.gen) { A.gen.n += st.gen.n || 0; A.gen.in += st.gen.in || 0; A.gen.out += st.gen.out || 0; }
+    A.notes.push(...(st.notes || []));
   }
-  if (st.gen) card('Générations', [{ t: `${st.gen.n} histoires · ~${GEN.cost({ in: st.gen.in, out: st.gen.out }).toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $` }]);
-  if ((st.notes || []).length) card('Mots des testeurs', st.notes.slice(0, 8).map((n) => ({ t: `${storyName(n.story)} : ${n.text}` })));
+  A.notes.sort((x, y) => y.at - x.at);
+  return { S, F, A };
 }
-$('#statsBtn').onclick = (e) => { e.stopPropagation(); renderStats(); show('#statsScreen'); };
-$('#invBtn').onclick = (e) => { e.stopPropagation(); show('#investors'); };   // Justin's notes for investors, his words
-$('#statsReset').onclick = (e) => { e.stopPropagation(); try { localStorage.removeItem(STATS_KEY); } catch { /* nothing */ } renderStats(); };
+const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+// a card: its title, a line of small text maybe, then rows {t, v, bar (0-100), sub, warn}
+function statCard(box, title, rows, note) {
+  const d = document.createElement('div'); d.className = 'st';
+  const b = document.createElement('b'); b.textContent = title; d.appendChild(b);
+  if (note) { const s = document.createElement('small'); s.textContent = note; d.appendChild(s); }
+  for (const r of rows) {
+    const row = document.createElement('div'); row.className = 'row';
+    const t = document.createElement('span'); t.textContent = r.t; if (r.warn) t.className = 'warn'; row.appendChild(t);
+    const v = document.createElement('em'); v.textContent = r.v ?? ''; row.appendChild(v);
+    if (r.bar !== undefined) { const bar = document.createElement('div'); bar.className = 'bar'; const i = document.createElement('i'); i.style.width = Math.min(100, r.bar) + '%'; bar.appendChild(i); row.appendChild(bar); }
+    if (r.sub) { const s = document.createElement('small'); s.textContent = r.sub; row.appendChild(s); }
+    d.appendChild(row);
+  }
+  box.appendChild(d);
+}
+let devs = null, devsT = 0;
+function liveStats() {
+  if (!devs) USAGE.all((m) => { devs = m; clearTimeout(devsT); devsT = setTimeout(() => { if (screen === '#statsScreen') renderStats(); if (screen === '#validate') renderVal(); }, 250); });
+}
+function renderStats() {
+  const { S, F, A } = sumUp(devs || new Map()), body = $('#statsBody'); body.innerHTML = '';
+  $('#statsLead').textContent = `${A.n} appareil${A.n > 1 ? 's' : ''} · en direct`;
+  if (!A.n) return;
+  const k = document.createElement('div'); k.className = 'kpis';
+  for (const [v, t] of [[A.n, 'joueurs'], [pct(A.back, A.n) + ' %', 'reviennent un autre jour'], [pct(A.next, A.ep) + ' %', 'veulent la suite après un épisode']]) {
+    const c = document.createElement('div'), b = document.createElement('b'), s = document.createElement('span');
+    b.textContent = v; s.textContent = t; c.append(b, s); k.appendChild(c);
+  }
+  body.appendChild(k);
+  // the stories, the most played first: views, plays, then how far they go (episode by episode)
+  const list = Object.values(S).filter((m) => m.o || m.plays).sort((x, y) => (y.plays - x.plays) || (y.o - x.o));
+  const top = Math.max(1, ...list.map((m) => m.plays));
+  if (list.length) statCard(body, 'Histoires', list.map((m) => {
+    const eps = Object.keys(m.ep).map(Number).sort((x, y) => x - y);
+    const how = eps.length ? eps.map((n) => `ép. ${n} : ${pct(m.ep[n], m.plays)} %`).join(' · ') : m.done ? `finies : ${pct(m.done, m.plays)} %` : '';
+    return { t: m.n || storyName(m.id), v: `${m.plays} partie${m.plays > 1 ? 's' : ''}`, bar: 100 * m.plays / top,
+      sub: [`${m.o} vue${m.o > 1 ? 's' : ''}`, how, m.nx ? `suite : ${m.nx}` : ''].filter(Boolean).join(' · ') };
+  }));
+  const feats = Object.entries(F).sort((x, y) => y[1] - x[1]);
+  if (feats.length) statCard(body, 'Fonctionnalités', feats.map(([f, c]) => ({ t: f, v: pct(c, A.n) + ' %', bar: pct(c, A.n) })), '% des joueurs qui l’ont utilisée');
+  // a real choice splits close to 50/50; one option above 80 % isn't a choice
+  const ch = [];
+  for (const m of Object.values(S)) Object.values(m.picks).forEach((o, n) => {
+    const tot = Object.values(o).reduce((x, y) => x + y, 0), hi = Math.max(...Object.values(o));
+    ch.push({ t: `${m.n || storyName(m.id)} · choix ${n + 1}`, v: `${tot}`, warn: tot >= 4 && hi / tot > 0.8 });
+    for (const [t, c] of Object.entries(o).sort((x, y) => y[1] - x[1])) ch.push({ t, v: pct(c, tot) + ' %', bar: pct(c, tot) });
+  });
+  if (ch.length) statCard(body, 'Choix', ch, 'Un vrai choix est proche de 50/50 (orange : plus de 80 % prennent la même option)');
+  const fb = {};
+  for (const m of Object.values(S)) for (const [i, c] of Object.entries(m.fb)) { const t = (fb[i] = fb[i] || [0, 0]); t[0] += c[0]; t[1] += c[1]; }
+  if (Object.keys(fb).length) statCard(body, 'Avis', Object.entries(fb).map(([i, c]) => ({ t: FB_QS[i], v: `${pct(c[0], c[0] + c[1])} % 👍`, bar: pct(c[0], c[0] + c[1]), sub: `${c[0] + c[1]} réponse${c[0] + c[1] > 1 ? 's' : ''}` })));
+  if (A.notes.length) statCard(body, 'Mots des testeurs', A.notes.slice(0, 8).map((n) => ({ t: n.text, sub: storyName(n.story) })));
+  if (A.gen.n) statCard(body, 'Ton histoire', [{ t: `${A.gen.n} histoire${A.gen.n > 1 ? 's' : ''} générée${A.gen.n > 1 ? 's' : ''}`, v: `~${GEN.cost({ in: A.gen.in, out: A.gen.out }).toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $` }]);
+}
+// the core of the idea, step by step: of everyone who opened the app, who played, finished an episode, wanted the next, came back
+function renderVal() {
+  const { A } = sumUp(devs || new Map()), body = $('#valBody'); body.innerHTML = '';
+  if (!A.n) return;
+  const steps = [['Ouvrent l’app', A.n, A.n], ['Jouent une histoire', A.play, A.n], ['Finissent un épisode', A.ep, A.play], ['Veulent la suite', A.next, A.ep], ['Reviennent un autre jour', A.back, A.n]];
+  statCard(body, `${A.n} appareil${A.n > 1 ? 's' : ''} · en direct`, steps.map(([t, v, of], i) => ({ t, v: String(v), bar: pct(v, A.n), sub: i ? `${pct(v, of)} % ${i === 4 ? 'des joueurs' : 'de l’étape d’avant'}` : '' })));
+}
+$('#statsBtn').onclick = (e) => { e.stopPropagation(); show('#statsScreen'); liveStats(); renderStats(); };
+$('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
+$('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
+$('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
+$('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
+$('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
+$('#pitchBtn').onclick = (e) => { e.stopPropagation(); show('#pitch'); };
+// ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
+// A tap = the next idea: one episode (3 choices: 15 videos), five episodes (65,535), what that costs ----
+const AIV = [{ depth: 3, label: '1 episode · 3 choices', n: '15 videos' }, { depth: 10, label: '5 episodes · 15 choices', n: '65,535 videos' }, { cost: true }];
+let aivStep = 0;
+function aivDraw(D) {
+  const W = 560, H = 460, pad = 24, dy = (H - 2 * pad) / D, svg = $('#aivTree');
+  let h = '';
+  for (let k = 0; k <= D; k++) {
+    const n = 2 ** k, y = pad + k * dy, d = `style="transition-delay:${(k * (D > 3 ? .1 : .4)).toFixed(2)}s"`;
+    for (let i = 0; i < n; i++) {
+      const x = W * (i + .5) / n;
+      if (k) { const px = W * ((i >> 1) + .5) / (n / 2), py = y - dy; h += `<path ${d} d="M${px} ${py}C${px} ${py + dy / 2} ${x} ${y - dy / 2} ${x} ${y}" stroke-width="${D > 3 ? Math.max(.35, 2.4 - k * .22).toFixed(2) : 2.4}"/>`; }
+      if (D <= 3) h += `<rect ${d} x="${x - 24}" y="${y - 15}" width="48" height="30" rx="7" stroke-width="2"/><polygon ${d} points="${x - 5},${y - 8} ${x - 5},${y + 8} ${x + 9},${y}"/>`;
+    }
+  }
+  svg.innerHTML = h;
+  requestAnimationFrame(() => requestAnimationFrame(() => svg.querySelectorAll('*').forEach((el) => el.classList.add('on'))));
+}
+function aivShow(k) {
+  aivStep = k; const a = AIV[k];
+  $('#aiv').classList.toggle('cost', !!a.cost); $('#aivCost').hidden = !a.cost;
+  if (!a.cost) { aivDraw(a.depth); $('#aivNum span').textContent = a.label; $('#aivNum b').textContent = a.n; }
+  [...$('#aiv .dots').children].forEach((d, i) => d.classList.toggle('on', i === k));
+}
+$('#qAiv').onclick = (e) => { e.stopPropagation(); show('#aiv'); aivShow(0); };
+$('#aiv').onclick = (e) => { e.stopPropagation(); aivShow((aivStep + 1) % AIV.length); };
 
 // "Ton histoire": the idea goes to Haiku (gen.js) with the key typed here, and the story plays like any other
 try { $('#genKey').value = localStorage.getItem('smt-key') || ''; $('#genIdea').value = localStorage.getItem('smt-idea') || ''; } catch { /* private window */ }
-$('#mine').onclick = (e) => { e.stopPropagation(); $('#genMsg').textContent = ''; show('#genScreen'); };
+$('#mine').onclick = (e) => { e.stopPropagation(); feat('Écrire une histoire'); $('#genMsg').textContent = ''; show('#genScreen'); };
 // the last generations: the idea + the model's json, kept on this phone; each one plays again (rebuilt from the json) or reads as text
 const getGens = () => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } };
 function playGen(steps) { STORIES.gen = steps; steps.credits = ''; begin('gen'); }
@@ -1912,7 +2119,7 @@ $('#genGo').onclick = async (e) => {
 // Full demo is its own page: coming back (its ‹ or the phone's back) lands on these tiles, not on the name screen
 $('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
-$('#t3d').onclick = (e) => { e.stopPropagation(); show('#about3d'); };
+$('#t3d').onclick = (e) => { e.stopPropagation(); feat('3D'); show('#about3d'); };
 $('#watch3d').onclick = (e) => {
   e.stopPropagation();
   $('#yt').src = `https://www.youtube-nocookie.com/embed/${VIDEO_3D}?autoplay=1&playsinline=1&rel=0`;
@@ -2170,7 +2377,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261026221500';
+const BUILD = '20261028141438';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -2223,7 +2430,7 @@ function goHome() {
 // ---- an invite from a friend's device (PEOPLE): the card rises over the menu, never in the middle of a story ----
 let invNow = null;
 function gotInvite(v) {
-  if (!['#hub', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
+  if (!['#hub', '#infos', '#more', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
   invNow = v;
   $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} t'invite`;
   $('#invTitle').textContent = storyTitle(v.invite.s) || v.invite.s;
