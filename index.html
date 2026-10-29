@@ -536,6 +536,15 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .mkScene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,.85) 88%); }
 .mkPic { position: absolute; top: 0; bottom: 0; left: 50%; aspect-ratio: 2 / 3; transform: translateX(-50%); }
 .mkPic img { width: 100%; height: 100%; display: block; }
+/* Face the boss: the city at peace, the dragon arrives (a roar, the frame shakes), then its fire; the names last */
+.mkPic.boss img { position: absolute; inset: 0; object-fit: cover; opacity: 0; transition: opacity .9s ease; }
+.mkPic.boss img.calm { object-position: 50% 50%; }
+.mkPic.boss[data-s="calm"] .calm, .mkPic.boss[data-s="arrive"] .arrive, .mkPic.boss[data-s="breath"] .breath { opacity: 1; }
+.mkPic.boss[data-s="arrive"] .arrive { transition-duration: .35s; }
+.mkPic.boss .tag { opacity: 0; transition: opacity .6s ease; }
+.mkPic.boss.named .tag { opacity: 1; }
+.mkPic.boss.shake { animation: mkShake .6s cubic-bezier(.36,.07,.19,.97); }
+@keyframes mkShake { 10%, 90% { transform: translate(-50.4%, 0); } 20%, 80% { transform: translate(-49.4%, .3%); } 30%, 50%, 70% { transform: translate(-51%, -.4%); } 40%, 60% { transform: translate(-49%, .4%); } }
 .mkPic .tag { position: absolute; transform: translate(-50%, -100%); padding: .15em .5em; border-radius: .25em; background: rgba(0,0,0,.55); color: var(--c); font-size: 1.4em; font-weight: 700; white-space: nowrap; z-index: 1; }   /* like a game's name over a head: only the name in colour */
 .mkArt.idea { align-items: center; gap: 4%; }
 .mkArt.idea img { height: 74%; max-width: 40%; margin: 0; }
@@ -929,7 +938,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="marketing" class="card menu" hidden>
     <section class="mk" style="--g:#b3261e">
-      <div class="mkScene"><div class="mkPic"><img src="ref/boss_homies.webp" alt="">
+      <div class="mkScene"><div class="mkPic boss named" id="mkBoss" data-s="breath"><img class="calm" src="ref/city_calm.webp" alt=""><img class="arrive" src="ref/boss_homies.webp" alt=""><img class="breath" src="ref/boss_breath.webp" alt="">
         <span class="tag" style="left:17%;top:43%;--c:#ff9f0a">Justin</span><span class="tag" style="left:33%;top:58.5%;--c:#30d158">Léa</span>
         <span class="tag" style="left:63%;top:58.5%;--c:#0a84ff">Max</span><span class="tag" style="left:86%;top:60.5%;--c:#bf5af2">Sam</span></div></div>
       <h2>Face the boss with your homies</h2>
@@ -1733,9 +1742,10 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // lowest; a one-off (a stinger: the boss's arrival, the important moment, the glitch) a little above the rooms.
 // Rooms: bar, bathroom, dark, campfire, crowd (a busy public interior), party (a house party), crickets (outside, evening),
 // wrong (something is wrong, horror), suspense (tense). One-offs: boss, moment, glitch, intro (a show's opening jingle,
-// 5 s: under the "You are" card that opens every story)
+// 5 s: under the "You are" card that opens every story), dragon_arrive (a short epic roar, 3 s), dragon_fire (a long
+// roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3 };
 async function sfx(name, loop = false, rate = 1) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -2930,7 +2940,18 @@ $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTo
 $('#moatWarn').onclick = (e) => { e.stopPropagation(); $('#moatWarn').hidden = true; };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
-$('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
+$('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); bossPlay(); };
+// Marketing · Face the boss: the city at peace, then the dragon lands on it with a roar, then its fire with the long one;
+// the four names come last. Plays when Marketing opens (the tap that opened it lets the sound through); a tap replays it
+let bossRun = 0;
+function bossPlay() {
+  const pic = $('#mkBoss'), run = ++bossRun, at = (ms, f) => setTimeout(() => { if (run === bossRun && screen === '#marketing') f(); }, ms);
+  stopSfx(); pic.classList.remove('named', 'shake'); pic.dataset.s = 'calm';
+  at(1600, () => { pic.dataset.s = 'arrive'; sfx('dragon_arrive'); void pic.offsetWidth; pic.classList.add('shake'); });
+  at(3600, () => { pic.dataset.s = 'breath'; sfx('dragon_fire'); pic.classList.remove('shake'); void pic.offsetWidth; pic.classList.add('shake'); });
+  at(5200, () => pic.classList.add('named'));
+}
+$('#mkBoss').closest('.mk').onclick = (e) => { e.stopPropagation(); bossPlay(); };
 $('#pitchBtn').onclick = (e) => { e.stopPropagation(); show('#pitch'); };
 $('#sysBtn').onclick = (e) => { e.stopPropagation(); $('#system').scrollTop = 0; show('#system'); };
 $('#cosmoBtn').onclick = (e) => { e.stopPropagation(); show('#cosmo'); };
