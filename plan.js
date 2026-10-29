@@ -317,5 +317,5 @@ window.PLAN = (() => {
     const s = sheet(); s.oninput = onInput; closeSheet();
     render();
   }
-  return { GOALS, LC, mount, closeSheet, get: () => P };
+  return { GOALS, LC, mount, closeSheet, redraw: () => render(), get: () => P };
 })();

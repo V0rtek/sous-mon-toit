@@ -1385,7 +1385,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261029180000"></script>
+<script src="plan.js?v=20261029190000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -1448,6 +1448,7 @@ function fit() {
   const bw = document.body.clientWidth, bh = document.body.clientHeight;
   H = Math.min(bh, bw * 16 / 9); W = H * 9 / 16;
   if (TV) { H = bh; W = bw; }   // the TV: the whole screen, the camera frames to its shape
+  else if (document.body.classList.contains('wide')) W = bw;   // the scene plan: the whole width (a computer), same text size
   Object.assign(stage.style, { width: W + 'px', height: H + 'px', fontSize: H / 100 + 'px' });
   if (TV) document.querySelectorAll('.tv-side').forEach((d) => Object.assign(d.style, { width: Math.max(0, (W - 76 * H / 100) / 2) + 'px', fontSize: H / 100 + 'px' }));
   if (camNow) applyCam(camNow, 0);
@@ -2506,6 +2507,7 @@ function show(id) {
   screen = id;
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
+  if (document.body.classList.contains('wide') !== (id === '#plan')) { document.body.classList.toggle('wide', id === '#plan'); fit(); }
   document.body.classList.toggle('inwait', id === '#wait');
   document.body.classList.toggle('instory', id === null);
   if (TV && id === '#tvPick') tvHome();
@@ -3573,7 +3575,7 @@ async function skipTo(n, id, stop = null, keep = false) {
   FAST = false;
 }
 
-addEventListener('resize', fit);
+addEventListener('resize', () => { fit(); if (screen === '#plan') PLAN.redraw(); });
 if (ROLE === 'watch') document.body.classList.add('watch');
 let auto = false, home = false;
 try {
