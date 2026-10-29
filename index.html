@@ -254,6 +254,9 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .fb .q span { flex: 1; }
 .fb .q button { font: inherit; font-size: 1.1em; width: 2em; height: 2em; border-radius: 50%; border: .08em solid #d2d2d7; background: #fff; cursor: pointer; padding: 0; }
 .fb .q button.on { background: #1d1d1f; border-color: #1d1d1f; }
+.fb .why { margin-top: -.3em; font-size: 1.9em !important; }
+.histFb { white-space: pre-line; color: #ff9f0a !important; }
+.fb .why[hidden] { display: none; }
 .fb textarea { box-sizing: border-box; width: 100%; font: inherit; font-size: 2.1em; padding: .6em .7em; border-radius: .6em; border: .06em solid #d2d2d7; background: #f5f5f7; color: #1d1d1f; outline: none; resize: none; user-select: text; }
 .st { background: #1c1c1e; border-radius: 1.6em; padding: 1.6em 1.8em; margin-top: 1.4em; display: flex; flex-direction: column; gap: .5em; }
 .st b { font-size: 2.4em; }
@@ -478,6 +481,8 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pPlans span { font-size: 1.5em; color: #86868b; }
 .pPlans div button[data-pldel] { font: inherit; font-size: 2.2em; border: 0; background: none; color: #86868b; cursor: pointer; }
 .pMsg { margin: 0; font-size: 1.7em; color: #ff453a; }
+.pCheck { display: flex; gap: .6em; align-items: flex-start; font-size: 1.6em; line-height: 1.3; color: #d1d1d6; cursor: pointer; }
+.pCheck input { width: 1.2em; height: 1.2em; margin: .05em 0 0; accent-color: #0a84ff; flex: none; }
 .pLinking { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
 .pLinking button { font: inherit; font-size: .85em; border: 0; border-radius: 2em; padding: .3em .8em; background: #000; color: #ff9f0a; cursor: pointer; }
 .pBox { padding: 1.2em 1em .6em; background: #0b0b0d; border-radius: 1.8em; border: .12em solid #2c2c2e; }
@@ -1453,14 +1458,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
-<script src="gen.js?v=20261030040000"></script>
+<script src="gen.js?v=20261030050000"></script>
 <script src="demos.js?v=20261028143259"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261030040000"></script>
+<script src="plan.js?v=20261030050000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -2897,10 +2902,12 @@ function openFb() {
     const t = document.createElement('span'); t.textContent = q; row.appendChild(t);
     for (const [v, ico] of [[1, '👍'], [0, '👎']]) {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = ico;
-      b.onclick = (e) => { e.stopPropagation(); fbAns[k] = v; [...row.querySelectorAll('button')].forEach((x) => x.classList.toggle('on', x === b)); };
+      b.onclick = (e) => { e.stopPropagation(); fbAns[k] = v; [...row.querySelectorAll('button')].forEach((x) => x.classList.toggle('on', x === b)); why.hidden = false; why.focus(); };
       row.appendChild(b);
     }
-    $('#fbQs').appendChild(row);
+    const why = document.createElement('textarea'); why.className = 'why'; why.rows = 2; why.maxLength = 300; why.hidden = true; why.dataset.k = k;
+    why.placeholder = 'Pourquoi ?'; why.setAttribute('aria-label', 'Pourquoi');
+    $('#fbQs').append(row, why);
   });
   $('#fbCard').hidden = false;
 }
@@ -2908,14 +2915,21 @@ $('#fbBtn').onclick = (e) => { e.stopPropagation(); openFb(); };
 $('#fbClose').onclick = (e) => { e.stopPropagation(); $('#fbCard').hidden = true; };
 $('#fbCard').onclick = (e) => { e.stopPropagation(); };
 $('#fbSend').onclick = (e) => {
-  e.stopPropagation(); const text = $('#fbText').value.trim(), id = state.story;
+  e.stopPropagation(); const id = state.story;
+  const whys = Object.fromEntries([...$('#fbQs').querySelectorAll('.why')].map((w) => [w.dataset.k, w.value.trim()]).filter(([, w]) => w));
+  // the note: each answer with its why, then the rest
+  const text = [...FB_QS.filter((x) => x.k in fbAns).map((x) => `${x.q} ${fbAns[x.k] ? '👍' : '👎'}${whys[x.k] ? ' — ' + whys[x.k] : ''}`), $('#fbText').value.trim()].filter(Boolean).join('\n');
+  try {   // every feedback kept here
+    const all = JSON.parse(localStorage.getItem('smt-fbs') || '[]');
+    all.unshift({ at: Date.now(), story: id, title: storyName(id), ans: fbAns, whys, text: $('#fbText').value.trim() }); localStorage.setItem('smt-fbs', JSON.stringify(all.slice(0, 200)));
+  } catch { /* private window */ }
   if (Object.keys(fbAns).length || text) bump((st) => {
     st.s = st.s || {}; const r = (st.s[sid(id)] = st.s[sid(id)] || {}); r.fb = r.fb || {};
     for (const [i, v] of Object.entries(fbAns)) { const c = (r.fb[i] = r.fb[i] || [0, 0]); c[v ? 0 : 1]++; }
     if (text) { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: id, text, n: (ROLE === 'watch' ? myName : state.name) || '' }); st.notes.length = Math.min(st.notes.length, 30); }
   });
   if (id === 'gen') try {   // a generated story: its answers stay with it (Dernières histoires)
-    const all = getGens(); if (all[0]) { all[0].fb = { ...fbAns, text }; localStorage.setItem('smt-gens', JSON.stringify(all)); }
+    const all = getGens(); if (all[0]) { all[0].fb = { ans: fbAns, whys, text }; localStorage.setItem('smt-gens', JSON.stringify(all)); }
   } catch { /* private window */ }
   $('#fbCard').hidden = true;
   $('#fbBtn').textContent = 'Merci';
@@ -3059,7 +3073,20 @@ $('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (
 // ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
 $('#planBtn').onclick = (e) => { e.stopPropagation(); show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // the story written from a plan (its prompt 2): plays like a generated story and joins the last ones (Ton histoire)
-window.PLAN_PLAY = (json, title) => { const st = GEN.build(json); saveGen('Plan · ' + (title || json.title || ''), json); playGen(st); };
+window.PLAN_PLAY = (json, title) => {
+  const plan = PLAN.get(), decor = SCENES[json.scene] ? json.scene : plan.scene, base = SCENES[decor];
+  const mine = plan.chars.filter((c) => c.poses && c.sprite && SPRITES[c.sprite]), slots = base ? Object.keys(base.spots).filter((k) => k !== 'justin') : [];
+  let cast = null;
+  if (base && mine.length) {   // the plan's own characters stand where the decor's people stand
+    const ids = mine.slice(0, slots.length).map((c) => c.id);
+    SCENES.plan = { ...base, spots: { justin: base.spots.justin }, face: { justin: base.face.justin } };
+    ids.forEach((id, i) => { SCENES.plan.spots[id] = base.spots[slots[i]]; SCENES.plan.face[id] = base.face[slots[i]]; });
+    json = { ...json, scene: 'plan', cast: ids, poses: Object.fromEntries(mine.map((c) => [c.id, c.poses])) };
+    cast = { justin: CAST.justin, ...Object.fromEntries(mine.map((c, i) => [c.id, { name: c.name, sprite: c.sprite, color: ['#7a3fb0', '#2c6fb3', '#b3261e'][i % 3] }])) };
+  }
+  const st = GEN.build(json); if (cast) st.cast = cast;
+  saveGen('Plan · ' + (title || json.title || ''), json); playGen(st);
+};
 $('#techBody').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techGo(b.dataset.t); };
 $('#techPath').onclick = (e) => { const b = e.target.closest('[data-i]'); if (!b) return; e.stopPropagation(); techPath.length = +b.dataset.i + 1; techOpen(); };
 // ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
@@ -3113,7 +3140,13 @@ function renderHist() {
     const pre = document.createElement('pre'); pre.hidden = true; pre.textContent = GEN.text(steps);
     play.onclick = (e) => { e.stopPropagation(); playGen(steps); };
     txt.onclick = (e) => { e.stopPropagation(); pre.hidden = !pre.hidden; };
-    row.append(play, txt); d.append(b, sm, p, row, pre); list.appendChild(d);
+    row.append(play, txt); d.append(b, sm, p, row, pre);
+    if (g.fb && g.fb.ans) {   // its feedback, kept with it
+      const f = document.createElement('p'); f.className = 'histFb';
+      f.textContent = [...FB_QS.filter((x) => x.k in g.fb.ans).map((x) => `${x.q} ${g.fb.ans[x.k] ? '👍' : '👎'}${(g.fb.whys || {})[x.k] ? ' — ' + g.fb.whys[x.k] : ''}`), (g.fb.text || '').split('\n').filter((l) => !FB_QS.some((x) => l.startsWith(x.q))).join(' ')].filter(Boolean).join('\n');
+      d.appendChild(f);
+    }
+    list.appendChild(d);
   }
 }
 $('#genHistBtn').onclick = (e) => { e.stopPropagation(); renderHist(); show('#genHist'); };
@@ -3308,7 +3341,7 @@ function figureOf(W, x0, y0, x1, y1, alpha) {
   if (!keep.length) return null;
   return { lab, w, ids: new Set(keep.map((c) => c.id)), bx0: Math.min(...keep.map((c) => c.bx0)), by0: Math.min(...keep.map((c) => c.by0)), bx1: Math.max(...keep.map((c) => c.bx1)), by1: Math.max(...keep.map((c) => c.by1)) };
 }
-async function cutSheet(file) {
+async function cutSheet(file, ORDER = POSE_ORDER) {
   const bmp = await createImageBitmap(file), k = Math.min(1, 2400 / bmp.width);
   const W = Math.round(bmp.width * k), H = Math.round(bmp.height * k);
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
@@ -3327,7 +3360,7 @@ async function cutSheet(file) {
     } else alpha[i] = Math.min(1, Math.max(0, (Math.max(Math.abs(r - bg[0]), Math.abs(g - bg[1]), Math.abs(b - bg[2])) - 25) / 35));
   }
   const cells = [];
-  for (let n = 0; n < POSE_ORDER.length; n++) {
+  for (let n = 0; n < ORDER.length; n++) {
     const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2, x0 = Math.round(c * cw + cw * 0.015), y0 = Math.round(r * ch + ch * 0.015);
     const f = figureOf(W, x0, y0, Math.round((c + 1) * cw - cw * 0.015), Math.round((r + 1) * ch - ch * 0.015), alpha);
     if (!f) throw new Error(`Je ne vois personne dans la case ${n + 1} (3 colonnes × 2 rangées, un fond uni).`);
@@ -3344,7 +3377,7 @@ async function cutSheet(file) {
     const a = document.createElement('canvas'); a.width = w; a.height = h; a.getContext('2d').putImageData(src, 0, 0);
     const ow = Math.max(1, Math.round(w * scale)), oh = Math.max(1, Math.round(h * scale)), o = document.createElement('canvas'); o.width = ow; o.height = oh;
     const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(a, 0, 0, ow, oh);
-    out.push({ pose: POSE_ORDER[n], w: ow, h: oh, blob: await new Promise((ok) => o.toBlob(ok, 'image/webp', 0.9)) });
+    out.push({ pose: ORDER[n], w: ow, h: oh, blob: await new Promise((ok) => o.toBlob(ok, 'image/webp', 0.9)) });
   }
   return out;
 }
@@ -3380,6 +3413,17 @@ $('#charDel').onclick = async (e) => {
   show('#gallery');
 };
 idbDo('readonly', (st) => st.getAll()).then((all) => (all || []).forEach(registerChar)).catch(() => { /* no storage: only the built-in characters */ });
+// for the scene plan (plan.js): a new character's pose sheet prompt (its look, its own 6 poses, the shared art style),
+// then its sheet dropped in = a character of the gallery, with those poses
+window.SHEET = {
+  prompt: (look, poses) => SHEET_PROMPT.replace('[describe the character, or attach a picture of them]', look || '[describe the character]')
+    .replace(/Row 1, left to right:[^\n]*\nRow 2, left to right:[^\n]*/, `Row 1, left to right: ${poses.slice(0, 3).map((p) => p.replace(/_/g, ' ')).join(', ')}.\nRow 2, left to right: ${poses.slice(3, 6).map((p) => p.replace(/_/g, ' ')).join(', ')}.`),
+  async add(file, name, poses) {
+    const rec = { id: 'c_' + Date.now().toString(36), name, poses: await cutSheet(file, poses) };
+    try { await idbDo('readwrite', (st) => st.put(rec)); } catch { /* private window: it lives until the page closes */ }
+    registerChar(rec); return rec.id;
+  },
+};
 
 // ---- live: whoever scans the QR in the menu joins. The host's phone runs the story: its state goes to a public MQTT
 // relay as one retained message (story + game id + names + waiting-room seats + every tap so far); a joiner replays the

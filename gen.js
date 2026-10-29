@@ -116,7 +116,10 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
   const ahead = (j) => (Array.isArray(j.next) && j.next.length ? j.next.map((b) => clip(b, 160)).filter(Boolean).slice(0, 7).map((b) => '• ' + b).join(NL) : clip(j.end, 200));
   // json from the model -> steps the player plays. Throws a sentence the model is shown on its retry.
   function build(j) {
-    const sc = SCENE_CAST[j.scene] ? j.scene : 'maison', cast = SCENE_CAST[sc];
+    // j.cast / j.poses: a plan's own characters (index.html: PLAN_PLAY puts them in a scene of their own)
+    const own = Array.isArray(j.cast) && window.SCENES && SCENES[j.scene];
+    const sc = own || SCENE_CAST[j.scene] ? j.scene : 'maison', cast = own ? j.cast : SCENE_CAST[sc];
+    const posesOf = (id) => (j.poses && j.poses[id]) || POSES;
     if (!Array.isArray(j.steps)) throw new Error('"steps" must be a list.');
     let last = null, inChoice = false;
     let turns = 0;
@@ -129,7 +132,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       const to = ok.includes(s.to) && s.to !== s.who ? { to: s.to } : last && last !== s.who ? { to: last } : undefined;
       last = s.who;
       if (s.who === 'justin' && !inChoice) return [...out, { think: 'justin', text: clip(s.text, 160) }];   // his inner voice
-      return [...out, say(s.who, POSES.includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
+      return [...out, say(s.who, posesOf(s.who).includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
     };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 }, most = j.seed || j.episode ? 3 : 2;   // an episode (ep1.js has a seed, the scene plan's prompt 2 says episode): 3 choices
     for (const s of j.steps) {

@@ -116,7 +116,7 @@ window.PLAN = (() => {
     if (!p || !Array.isArray(p.boxes)) return LC();
     if ((p.v || 0) < 5 && p.title === 'Last Call · épisode 1') return LC();
     p.boxes.forEach((b, i) => { if (!b.id) b.id = 'x' + i; if (b.col == null) b.col = i; if (!Array.isArray(b.beats)) b.beats = []; });
-    if (!Array.isArray(p.chars) && Array.isArray(p.characters)) { p.chars = p.characters.map((c, i) => ({ ...c, id: 'k' + i })); delete p.characters; }   // a generated plan
+    if (!Array.isArray(p.chars) && Array.isArray(p.characters)) { p.chars = p.characters.map((c, i) => ({ ...c, id: c.id || 'k' + i })); delete p.characters; }   // a generated plan
     return { title: '', turn: '', needs: [], chars: [], infos: [], links: [], ...p, v: 5 };
   };
   const store = (() => {
@@ -321,17 +321,30 @@ window.PLAN = (() => {
       + `<small>Nom</small><input data-f="name" value="${esc(c.name)}">`
       + `<small>Traits qui le rendent attachant (1-2, un par ligne)</small><textarea data-f="traits" rows="2">${esc((c.traits || []).join('\n'))}</textarea>`
       + (P.infos.length ? `<small>Infos sur lui</small><div class="pPick">${P.infos.map((x) => `<button type="button" data-ci="${x.id}" class="${(c.infos || []).includes(x.id) ? 'on' : ''}" style="--c:#bf5af2">${esc(x.text)}</button>`).join('')}</div>` : '')
+      + (c.poses ? `<small>Son look (pour la pose sheet)</small><textarea data-f="look" rows="2">${esc(c.look || '')}</textarea>`
+        + `<small>Ses 6 poses (la 1re = listen)</small><input data-f="poses" value="${esc(c.poses.join(', '))}">`
+        + '<div class="pRow"><button type="button" data-s="sheetp">Copier le prompt de la pose sheet</button><button type="button" data-s="sheetf">Déposer la feuille de poses</button></div>'
+        + '<input type="file" accept="image/*" hidden data-sheet><p class="pMsg"></p>' : '')
       + `<small>Visuel</small><div class="pSprites">${sprites.map((sp) => `<button type="button" data-sp="${sp}" class="${c.sprite === sp ? 'on' : ''}" title="${sp}">${face(sp)}</button>`).join('')}</div>`
       + '<div class="pRow"><button type="button" data-s="delchar" class="del">Supprimer</button></div></div>';
     s.oninput = (e) => { const f = e.target.dataset.f;
       if (f === 'name') c.name = e.target.value;
       if (f === 'traits') c.traits = e.target.value.split('\n').map((t) => t.trim()).filter(Boolean).slice(0, 2);
+      if (f === 'look') c.look = e.target.value;
+      if (f === 'poses') { const p = e.target.value.split(',').map((x) => x.trim().toLowerCase().replace(/\s+/g, '_')).filter(Boolean); if (p.length) c.poses = ['listen', ...p.filter((x) => x !== 'listen')].slice(0, 6); }
       save(); };
+    const file = s.querySelector('[data-sheet]');
+    if (file) file.onchange = async () => {   // the sheet: cut into its 6 poses, a character of the gallery, its visual here
+      const f = file.files[0], msg = s.querySelector('.pMsg'); if (!f) return; msg.textContent = 'Découpe…';
+      try { c.sprite = await window.SHEET.add(f, c.name, c.poses); save(); render(); openChar(id); } catch (err) { msg.textContent = err.message || 'Cette image ne s’ouvre pas.'; }
+    };
     s.onclick = (e) => {
       e.stopPropagation(); const ci = e.target.closest('[data-ci]'), sp = e.target.closest('[data-sp]'), a = e.target.closest('[data-s]');
       if (ci) { const on = new Set(c.infos || []); on.has(ci.dataset.ci) ? on.delete(ci.dataset.ci) : on.add(ci.dataset.ci); c.infos = [...on]; save(); openChar(id); return; }
       if (sp) { c.sprite = sp.dataset.sp; save(); openChar(id); return; }
       if (!a) return;
+      if (a.dataset.s === 'sheetp') { copy(window.SHEET.prompt(c.look, c.poses), a); return; }
+      if (a.dataset.s === 'sheetf') { s.querySelector('[data-sheet]').click(); return; }
       if (a.dataset.s === 'delchar') { if (!confirm('Supprimer ce personnage ?')) return; P.chars = P.chars.filter((x) => x !== c); }
       s.oninput = onInput; save(); closeSheet(); render();
     };
@@ -364,6 +377,7 @@ window.PLAN = (() => {
     };
     s.hidden = false;
   }
+  const freshOn = () => { try { return localStorage.getItem('smt-plan-fresh') === '1'; } catch { return false; } };
   const copy = (text, btn) => { const was = btn.textContent;
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { btn.textContent = 'Copié'; setTimeout(() => (btn.textContent = was), 1400); }, () => { btn.textContent = 'Copie impossible'; }); };
   // the two prompts, without scrolling: 1 = an idea -> the characters and the plan (paste it in Plans: it shows here);
@@ -372,17 +386,21 @@ window.PLAN = (() => {
     editing = '*'; const s = sheet();
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>Prompts</b><button type="button" data-s="close">OK</button></div>`
       + '<small>1 · Les personnages et le plan</small><textarea data-f="idea" rows="2" placeholder="Ton idée, en une ou deux phrases"></textarea>'
+      + `<label class="pCheck"><input type="checkbox" data-f="fresh"${freshOn() ? ' checked' : ''}> Nouveaux personnages (l’AI les invente et choisit leurs poses ; leur pose sheet est dans leur fiche)</label>`
       + '<div class="pRow"><button type="button" data-s="p1">Copier le prompt 1</button><button type="button" data-s="plans">Coller le plan généré</button></div>'
       + `<small>2 · L’histoire, à partir de ce plan (${esc(P.title || 'sans titre')})</small>`
       + '<div class="pRow"><button type="button" data-s="p2">Copier le prompt 2 (avec ce plan)</button></div>'
       + '<textarea data-f="story" rows="2" placeholder="Colle ici la réponse du prompt 2"></textarea>'
       + '<div class="pRow"><button type="button" data-s="play">Jouer l’histoire</button></div><p class="pMsg"></p></div>';
     try { s.querySelector('[data-f="idea"]').value = localStorage.getItem('smt-plan-idea') || ''; } catch { /* private window */ }
-    s.oninput = (e) => { if (e.target.dataset.f === 'idea') try { localStorage.setItem('smt-plan-idea', e.target.value); } catch { /* private window */ } };
+    s.oninput = (e) => {
+      if (e.target.dataset.f === 'idea') try { localStorage.setItem('smt-plan-idea', e.target.value); } catch { /* private window */ }
+      if (e.target.dataset.f === 'fresh') try { localStorage.setItem('smt-plan-fresh', e.target.checked ? '1' : ''); } catch { /* private window */ }
+    };
     s.onclick = (e) => {
       e.stopPropagation(); const a = e.target.closest('[data-s]'); if (!a) return; const msg = s.querySelector('.pMsg');
       switch (a.dataset.s) {
-        case 'p1': copy(prompt1(s.querySelector('[data-f="idea"]').value.trim() || '[ton idée]'), a); return;
+        case 'p1': copy(prompt1(s.querySelector('[data-f="idea"]').value.trim() || '[ton idée]', s.querySelector('[data-f="fresh"]').checked), a); return;
         case 'p2': copy(prompt2(), a); return;
         case 'plans': s.oninput = onInput; openPlans(); return;
         case 'play': { const v = s.querySelector('[data-f="story"]').value;
@@ -398,11 +416,11 @@ window.PLAN = (() => {
   // techniques above, so a change here changes them ----
   const DECORS = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
   const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}${t.ex ? ' Examples (shapes, never copy them): ' + t.ex.map((x) => `"${x}"`).join(' / ') : ''}`).join('\n')).join('\n');
-  const prompt1 = (idea) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays the main character (his id is "justin"). Write every text in the language of the idea.
+  const prompt1 = (idea, fresh) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays the main character (his id is "justin"). Write every text in the language of the idea.
 Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:
 
-1. "scene": the decor that fits the idea: ${DECORS}.
-2. "characters": 2 or 3 people of that decor (the main character is the player: not in this list). id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.
+1. "scene": the decor that fits the idea: ${DECORS}.${fresh ? ' (Only the place: the characters are new, below.)' : ''}
+${fresh ? `2. "characters": 2 or 3 NEW characters made for this story (the main character is the player: not in this list). For each: "id" (one lowercase word), "name", "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them, "look" = what they look like, one sentence (age, build, hair, clothes, one detail that says who they are; nothing green), "poses" = exactly 6 pose names, the first one "listen" (neutral, listening), the 5 others the ones this character needs in this episode (snake_case: "laughing", "arms_crossed", "pointing"). "sprite": "". Nothing else.` : `2. "characters": 2 or 3 people of that decor (the main character is the player: not in this list). id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.`}
 3. "turn": decided first: the event at the end of the episode that turns everything, in one sentence.
 4. "needs": what the turn needs in place: 2 to 4 things the player must already know or have seen, or the turn makes no sense. Each one becomes an info (step 5) or a rectangle that plants it (step 6); "by" = its id.
 5. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 5 to 9 infos. Each info is revealed by exactly one rectangle: in box "ep" (this episode) or in box "later" (a later episode). For an info revealed in "later", a rectangle of "ep" raises its question without answering it ("hints": its id): that is the curiosity the episode ends on.
@@ -428,14 +446,14 @@ RULES:
 
 THE JSON:
 {"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
- "characters": [{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}],
+ "characters": [${fresh ? '{"id": "mara", "name": "Mara", "sprite": "", "traits": ["..."], "infos": ["i1"], "look": "...", "poses": ["listen", "...", "...", "...", "...", "..."]}' : '{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}'}],
  "infos": [{"id": "i1", "text": "..."}, {"id": "i2", "text": "...", "parent": "i1"}],
  "boxes": [{"id": "ep", "title": "...", "col": 0, "beats": [{"id": "r1", "goals": ["char"], "tech": "Show contrast", "lines": 3, "what": "...", "reveals": [], "hints": []}, {"id": "r5", "kind": "choice", "goals": [], "tech": "", "lines": 2, "what": "...", "opts": ["...", "..."]}]},
            {"id": "later", "title": "Plus tard", "col": 1, "beats": [{"id": "f1", "goals": ["stakes"], "tech": "", "lines": 1, "what": "...", "reveals": ["i5"]}]}],
  "links": [{"from": "r4", "to": "r5", "label": "..."}]}
 
 The idea: ${idea}`;
-  const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ id, ...c }) => c) };
+  const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ x, y, ...c }) => c) };
     return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
 HOW TO TRANSLATE THE PLAN:
@@ -458,7 +476,7 @@ E. No line talks to the player or comments on the story ("You're wondering what 
 
 THE MAIN CHARACTER (id "justin"): outside a choice, his lines are his inner voice, first person ("I"). Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: "t" = the button, a short line in his voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
-POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak, with their id.
+POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
 
 THE JSON (exactly this shape):
 {"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",
