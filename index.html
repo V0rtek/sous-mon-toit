@@ -247,8 +247,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .endRow { display: flex; gap: 1em; }
 .endRow #again { flex: 1; width: auto; }
 #fbBtn { width: auto; flex: none; background: rgba(255,255,255,.16); box-shadow: none; padding-left: 1.2em; padding-right: 1.2em; }
-#fbCard { position: absolute; inset: 0; z-index: 45; background: rgba(8,6,12,.6); display: grid; place-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
-.fb { width: 80%; max-height: 86%; overflow-y: auto; box-sizing: border-box; background: #fff; color: #1d1d1f; border-radius: 2.4em; padding: 2.6em 2.8em; display: flex; flex-direction: column; gap: 1em; }
+#fbCard { position: absolute; inset: 0; z-index: 45; background: #fff; display: grid; place-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
+.fb { width: 100%; max-height: 100%; justify-content: center; min-height: 100%; overflow-y: auto; box-sizing: border-box; background: #fff; color: #1d1d1f; border-radius: 2.4em; padding: 2.6em 2.8em; display: flex; flex-direction: column; gap: 1em; }
 .fb b { font-size: 2.8em; font-weight: 600; }
 .fb .q { display: flex; align-items: center; gap: .8em; font-size: 2.1em; line-height: 1.25; }
 .fb .q span { flex: 1; }
@@ -505,6 +505,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pCh { display: flex; flex-direction: column; gap: .3em; }
 .pCh span { font-size: 1.6em; line-height: 1.3; padding: .3em .6em; border-radius: .6em; background: #213528; }
 .pInfo span { display: block; font-size: 1.55em; color: #bf5af2; }
+.pInfo.hint span { color: #ff9f0a; }
 .pLoop { font-size: 1.55em; line-height: 1.3; color: #ff9f0a; }
 .pLoop.in { color: #ffcc80; }
 .pSvg { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; overflow: visible; }
@@ -878,13 +879,6 @@ body.tv:has(#epCard:not([hidden])) #tvSides, body.tv:has(#intro:not([hidden])) #
 #eyes svg { width: 2.8em; height: 2.8em; }
 #eyes span { font-size: 2.6em; font-weight: 800; }
 /* a reminder to himself (Justin), every time the menu opens: in his face until he taps OK */
-#moatWarn { position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,.82); display: grid; place-items: center; padding: 0 7%; }
-#moatWarn[hidden] { display: none; }
-#moatWarn .mw { display: flex; flex-direction: column; align-items: center; gap: 1.4em; padding: 3em 2.4em 2.4em; border-radius: 2.4em; background: #ffcc00; color: #000; text-align: center; box-shadow: 0 0 0 .4em #000, 0 0 0 .8em #ffcc00, 0 2em 6em rgba(255,204,0,.35); animation: mwIn .35s cubic-bezier(.2,.9,.3,1.3); }
-#moatWarn i { font-style: normal; font-size: 8em; line-height: 1; }
-#moatWarn b { font-size: 3.6em; font-weight: 900; line-height: 1.15; letter-spacing: -.01em; }
-#moatWarn button { font: inherit; font-size: 2.4em; font-weight: 800; padding: .6em 2.4em; border-radius: 2em; border: 0; background: #000; color: #ffcc00; cursor: pointer; margin-top: .4em; }
-@keyframes mwIn { from { transform: scale(.7); opacity: 0; } }
 #qrCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.92); display: grid; place-items: center; cursor: pointer; }
 #qrBox { width: 50%; aspect-ratio: 1; background: #fff; border-radius: 1.8em; padding: 3%; box-sizing: border-box; }
 #qrBox svg { width: 100%; height: 100%; display: block; }
@@ -976,7 +970,6 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button class="pill" type="submit">Entrer</button>
     </form>
   </div>
-  <div id="moatWarn" hidden><div class="mw"><i>⚠</i><b>Implement the moat story techniques.</b><button type="button">OK</button></div></div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
@@ -1460,14 +1453,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
-<script src="gen.js?v=20261030030000"></script>
+<script src="gen.js?v=20261030040000"></script>
 <script src="demos.js?v=20261028143259"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261030030000"></script>
+<script src="plan.js?v=20261030040000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -2224,15 +2217,16 @@ function fade(dir, ms) {
   black.style.opacity = dir === 'out' ? 1 : 0;
   return sleep(ms);
 }
-// {establish: picture, ms, out}: out of black, the place seen from afar, a slow zoom in on it (out: away from it, the scene
-// closing), back to black; the scene's own fade then takes over
+// {establish: picture, ms, out}: the place seen from afar, a slow zoom in on it, then a cut to the scene (the story's start
+// comes out of black onto it); out: a cut from the scene to it, a slow zoom out (the next step fades to black over it)
 async function establish(src, ms, out) {
   const box = $('#establish'), img = box.querySelector('img'), slow = FAST || REDUCED ? 0 : ms, far = 'scale(1)', near = 'scale(1.45)';
-  img.src = src; img.style.transitionDuration = '0ms'; img.style.transform = out ? near : far; box.hidden = false;
+  img.src = src; img.style.transitionDuration = '0ms'; img.style.transform = out ? near : far; box.hidden = false; bubble.hidden = true;
   void img.offsetWidth;
   img.style.transitionDuration = slow + 'ms'; img.style.transform = out ? far : near;
-  await fade('in', FAST ? 0 : 600); await sleep(Math.max(0, slow - 1100)); await fade('out', FAST ? 0 : 500);
-  box.hidden = true;
+  if (out) { await sleep(slow); await fade('out', FAST ? 0 : 800); box.hidden = true; return; }
+  await fade('in', FAST ? 0 : 600); await sleep(Math.max(0, slow - 600));
+  box.hidden = true;   // the cut
 }
 function showCaption(t) {
   caption.textContent = t; caption.classList.add('on');
@@ -2381,6 +2375,7 @@ function endCard(d) {
   $('#credits').textContent = story().credits ?? CREDITS;
   $('#end .art').style.backgroundImage = e.art === null ? 'none' : `url(${e.art || 'bg/salon.jpg'})`;   // null = plain black
   show('#end');
+  if (!PREVIEW && ROLE !== 'watch') { clearTimeout(endCard.fb); endCard.fb = setTimeout(() => { if (screen === '#end') openFb(); }, 1400); }   // the feedback comes by itself
 }
 
 // ---- a split ({split: f => ({pa: steps, pb: steps}), watch: f => seat, hold: f => ({seat: text})}): each player
@@ -2597,7 +2592,6 @@ function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
-  if (id === '#hub' && screen !== '#hub') $('#moatWarn').hidden = false;   // every time the menu opens
   screen = id;
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
@@ -2894,16 +2888,16 @@ function bump(f) {
 }
 const feat = (name) => bump((st) => { st.f = st.f || {}; st.f[name] = (st.f[name] || 0) + 1; });   // a feature used
 const tally = (f) => bump((st) => { st.s = st.s || {}; const id = sid(state.story), r = (st.s[id] = st.s[id] || {}); if (storyName(state.story) !== state.story) r.n = storyName(state.story); f(r); });
-const FB_QS = ['Tu restes accroché à chaque tap?', "L'histoire démarre assez vite?", 'Tu as assez de contrôle sur les choix?', 'Les dialogues marchent?', "C'est fun?"];
+const FB_QS = [{ k: 'compris', q: "J'ai compris ?" }, { k: 'suite', q: "J'ai envie de voir la suite ?" }];   // by key: older answers (by number) stay out
 let fbAns = {};
 function openFb() {
   fbAns = {}; $('#fbText').value = ''; $('#fbQs').innerHTML = '';
-  FB_QS.forEach((q, i) => {
+  FB_QS.forEach(({ k, q }) => {
     const row = document.createElement('div'); row.className = 'q';
     const t = document.createElement('span'); t.textContent = q; row.appendChild(t);
     for (const [v, ico] of [[1, '👍'], [0, '👎']]) {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = ico;
-      b.onclick = (e) => { e.stopPropagation(); fbAns[i] = v; [...row.querySelectorAll('button')].forEach((x) => x.classList.toggle('on', x === b)); };
+      b.onclick = (e) => { e.stopPropagation(); fbAns[k] = v; [...row.querySelectorAll('button')].forEach((x) => x.classList.toggle('on', x === b)); };
       row.appendChild(b);
     }
     $('#fbQs').appendChild(row);
@@ -2920,6 +2914,9 @@ $('#fbSend').onclick = (e) => {
     for (const [i, v] of Object.entries(fbAns)) { const c = (r.fb[i] = r.fb[i] || [0, 0]); c[v ? 0 : 1]++; }
     if (text) { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: id, text, n: (ROLE === 'watch' ? myName : state.name) || '' }); st.notes.length = Math.min(st.notes.length, 30); }
   });
+  if (id === 'gen') try {   // a generated story: its answers stay with it (Dernières histoires)
+    const all = getGens(); if (all[0]) { all[0].fb = { ...fbAns, text }; localStorage.setItem('smt-gens', JSON.stringify(all)); }
+  } catch { /* private window */ }
   $('#fbCard').hidden = true;
   $('#fbBtn').textContent = 'Merci';
 };
@@ -3003,7 +3000,7 @@ function renderStats() {
   if (ch.length) statCard(body, 'Choix', ch, 'Un vrai choix est proche de 50/50 (orange : plus de 80 % prennent la même option)');
   const fb = {};
   for (const m of Object.values(S)) for (const [i, c] of Object.entries(m.fb)) { const t = (fb[i] = fb[i] || [0, 0]); t[0] += c[0]; t[1] += c[1]; }
-  if (Object.keys(fb).length) statCard(body, 'Avis', Object.entries(fb).map(([i, c]) => ({ t: FB_QS[i], v: `${pct(c[0], c[0] + c[1])} % 👍`, bar: pct(c[0], c[0] + c[1]), sub: `${c[0] + c[1]} réponse${c[0] + c[1] > 1 ? 's' : ''}` })));
+  if (Object.keys(fb).length) statCard(body, 'Avis', Object.entries(fb).filter(([k]) => FB_QS.some((x) => x.k === k)).map(([k, c]) => ({ t: FB_QS.find((x) => x.k === k).q, v: `${pct(c[0], c[0] + c[1])} % 👍`, bar: pct(c[0], c[0] + c[1]), sub: `${c[0] + c[1]} réponse${c[0] + c[1] > 1 ? 's' : ''}` })));
   if (A.notes.length) statCard(body, 'Mots des testeurs', A.notes.slice(0, 8).map((n) => ({ t: n.text, sub: storyName(n.story) })));
   if (A.gen.n) statCard(body, 'Ton histoire', [{ t: `${A.gen.n} histoire${A.gen.n > 1 ? 's' : ''} générée${A.gen.n > 1 ? 's' : ''}`, v: `~${GEN.cost({ in: A.gen.in, out: A.gen.out }).toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $` }]);
 }
@@ -3017,7 +3014,6 @@ $('#statsBtn').onclick = (e) => { e.stopPropagation(); show('#statsScreen'); liv
 $('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
-$('#moatWarn').onclick = (e) => { e.stopPropagation(); $('#moatWarn').hidden = true; };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); bossPlay(); };

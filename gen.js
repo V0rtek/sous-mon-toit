@@ -153,9 +153,9 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     const est = window.SCENES && SCENES[sc] && SCENES[sc].establish;   // a decor seen from afar: it opens the scene and closes it
     return [
       scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
-      cam('wide'), ...(est ? [{ establish: est, ms: 3400 }] : []), { fade: 'in', ms: 700 },
+      cam('wide'), est ? { establish: est, ms: 3400 } : { fade: 'in', ms: 700 },
       ...steps,
-      { fade: 'out', ms: 800 }, ...(est ? [{ establish: est, ms: 2800, out: true }] : []),
+      ...(est ? [{ establish: est, ms: 2800, out: true }] : []), { fade: 'out', ms: 800 },
       { end: { kicker: 'Ton histoire · la suite', title: clip(j.title, 40) || 'Ton histoire', lede: ahead(j), art: null } },
     ];
   }

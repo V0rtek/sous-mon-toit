@@ -9,20 +9,25 @@ window.PLAN = (() => {
   const GOALS = [
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
     { id: 'char', name: 'Create char engagingness', c: '#0a84ff', d: 'Faire aimer un perso : on veut passer du temps avec lui.',
-      tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
-        { n: 'Tell a story', d: 'Une seule réplique : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+      tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', ex: ['She counts her coins twice. He tips with money he doesn’t have.', '« Man… I think we’re getting too old for this. » / « Man… I think it’s the best night of my life. »'], s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
+        { n: 'Tell a story', d: 'Une seule réplique, dite à quelqu’un : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
     { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', d: 'Faire aimer le lien entre deux persos, pas seulement chacun.',
-      tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.' }, { n: 'Shared memory', d: 'Ils se rappellent un moment vécu ensemble, chacun avec sa version.' },
-        { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement.' }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
+      tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.', ex: ['He plans every step, she improvises, and she still finishes his sentences.'] },
+        { n: 'Shared memory', d: 'Ils se rappellent ensemble un moment vécu à deux, chacun avec sa version, en se répondant.', ex: ['« I loved that dog. » / « I hated her, she was so loud. » / « You cried so much when it happened. »', '« Remember the night the roof leaked? » / « You mean the night you blamed me for the roof. »'] },
+        { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement, sans le dire.', ex: ['She pushes her plate toward him without a word.', '« You didn’t eat. » / « I’m fine. » / « Eat. »'] }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
     { id: 'desire', name: 'Show desire / goal', c: '#ff375f', d: 'Montrer clairement ce qu’un perso veut.',
-      tech: [{ n: 'Direct confession', d: 'Le perso dit tout haut ce qu’il veut ou ressent, sans sous-entendu.' }, { n: 'Phrase pas finie', d: 'Il commence à dire ce qu’il veut, ne finit pas, et se sauve.' }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
+      tech: [{ n: 'Direct confession', d: 'Le perso dit tout haut, à quelqu’un en face de lui, ce qu’il veut ou ressent, sans sous-entendu (jamais dans sa tête).', ex: ['« I don’t think I could survive someone taking Cam away from me. »', '« I want out. Tonight. »'] },
+        { n: 'Phrase pas finie', d: 'Il commence à dire à quelqu’un ce qu’il veut, ne finit pas, et se sauve.', ex: ['« Cam. You’re just… Yeah. Just… » then « I gotta pee. »'] }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
     { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', d: 'Montrer ce qui peut être perdu : à mettre juste avant un choix, lié à lui.',
-      tech: [{ n: 'Mention consequences', d: 'Quelqu’un dit ce qui arrivera si ça tourne mal.' }, { n: 'Show character positioning', d: 'Un perso prend position (« I’m against that ») : le joueur sait qui il va décevoir.' }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
+      tech: [{ n: 'Mention consequences', d: 'Quelqu’un dit à un autre ce qui arrivera si ça tourne mal.', ex: ['« If the guard finds one bottle, we lose the license. »', '« Rent’s due Monday. I’m not covering you again. »'] },
+        { n: 'Show character positioning', d: 'Un perso prend position, devant les autres : le joueur sait qui il va décevoir.', ex: ['« I’m against that. »', '« I’m with Ruby on this. »'] }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
     { id: 'info', name: 'Reveal info', c: '#bf5af2', d: 'Faire découvrir une info de l’intrigue, une à la fois, après celle dont elle dépend.',
-      tech: [{ n: 'Tell a story', d: 'Pour l’instant, une info sort seulement par là. Une seule réplique : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+      tech: [{ n: 'Tell a story', d: 'Pour l’instant, une info sort seulement par là. Une seule réplique, dite à quelqu’un : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
     { id: 'callback', name: 'Callback', c: '#30d158', d: 'Une chose plantée tôt revient plus tard avec un autre sens.',
-      tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.' }, { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.' },
-        { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.' }, { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.' }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
+      tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.', ex: ['Early: « Something will come up. » Later the money comes from the wrong man: « …Something came up. »'] },
+        { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.', ex: ['Early, his friend: « Rent’s due Monday. » Later, the enemy: « Rent’s due Monday, Brooke. »'] },
+        { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.', ex: ['Early: « What do you drink? » « Red. » Later: « Don’t drink the red wine. »'] },
+        { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.', ex: ['Early: « You’re just… » Later: « What was he gonna say? »'] }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
   // a goal: d = what it's for; its techniques: { n: name, d: what it is, s: [the techniques under it] } (a category opens
   // on what's under it)
@@ -145,6 +150,7 @@ window.PLAN = (() => {
       + (b.what ? `<p>${esc(b.what)}</p>` : '')
       + (b.kind === 'choice' && b.opts && b.opts.length ? `<div class="pCh">${b.opts.map((o) => `<span>${esc(o)}</span>`).join('')}</div>` : '')
       + (infos.length ? `<div class="pInfo">${infos.map((x) => `<span>révèle : ${esc(x.text)}</span>`).join('')}</div>` : '')
+      + ((b.hints || []).length ? `<div class="pInfo hint">${b.hints.map((r) => P.infos.find((x) => x.id === r)).filter(Boolean).map((x) => `<span>soulève : ${esc(x.text)}</span>`).join('')}</div>` : '')
       + back.map((l) => `<div class="pLoop in">↰ ${num(l.from)}${l.label ? ' · ' + esc(l.label) : ''}</div>`).join('')
       + out.map((l) => `<div class="pLoop">↳ ${num(l.to)}${l.label ? ' · ' + esc(l.label) : ''}</div>`).join('')
       + '</div></div>';
@@ -270,7 +276,8 @@ window.PLAN = (() => {
       + `<small>Ce qui se passe (pas de dialogue)</small><textarea data-f="what" rows="3">${esc(b.what)}</textarea>`
       + `<small>Répliques</small><div class="pStep"><button type="button" data-s="minus">−</button><b>${b.lines || 1}</b><button type="button" data-s="plus">+</button></div>`
       + (b.kind === 'choice' ? `<small>Options : des attitudes (une par ligne)</small><textarea data-f="opts" rows="3">${esc((b.opts || []).join('\n'))}</textarea>` : '')
-      + (P.infos.length ? `<small>Révèle</small><div class="pPick">${P.infos.map((x) => `<button type="button" data-r="${x.id}" class="${(b.reveals || []).includes(x.id) ? 'on' : ''}" style="--c:#bf5af2">${esc(x.text)}</button>`).join('')}</div>` : '')
+      + (P.infos.length ? `<small>Révèle</small><div class="pPick">${P.infos.map((x) => `<button type="button" data-r="${x.id}" class="${(b.reveals || []).includes(x.id) ? 'on' : ''}" style="--c:#bf5af2">${esc(x.text)}</button>`).join('')}</div>`
+        + `<small>Soulève la question (sans révéler)</small><div class="pPick">${P.infos.map((x) => `<button type="button" data-h="${x.id}" class="${(b.hints || []).includes(x.id) ? 'on' : ''}" style="--c:#ff9f0a">${esc(x.text)}</button>`).join('')}</div>` : '')
       + `<small>Liens</small><div class="pLinks">${P.links.map((l, i) => (l.from === id || l.to === id ? `<div><span>${l.from === id ? '↳ ' + num(l.to) : '↰ ' + num(l.from)}</span><input data-l="${i}" value="${esc(l.label)}" placeholder="Ce qui revient"><button type="button" data-x="${i}">×</button></div>` : '')).join('')}`
       + '<button type="button" data-s="link">+ Lier à un rectangle</button></div>'
       + '<div class="pRow"><button type="button" data-s="up">↑ Monter</button><button type="button" data-s="down">↓ Descendre</button><button type="button" data-s="del" class="del">Supprimer</button></div></div>';
@@ -398,11 +405,12 @@ Reply with ONE JSON object and nothing else (its shape is at the end). Fill it i
 2. "characters": 2 or 3 people of that decor (the main character is the player: not in this list). id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.
 3. "turn": decided first: the event at the end of the episode that turns everything, in one sentence.
 4. "needs": what the turn needs in place: 2 to 4 things the player must already know or have seen, or the turn makes no sense. Each one becomes an info (step 5) or a rectangle that plants it (step 6); "by" = its id.
-5. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 5 to 9 infos; at least one is never revealed in this episode (curiosity).
+5. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 5 to 9 infos. Each info is revealed by exactly one rectangle: in box "ep" (this episode) or in box "later" (a later episode). For an info revealed in "later", a rectangle of "ep" raises its question without answering it ("hints": its id): that is the curiosity the episode ends on.
    The first infos, revealed first, are the opening: where we are, who the main character is to each person present (his sister, his boss, his ex), what he is doing there right now. They come out like the others: in a rectangle, with its technique.
 6. "boxes": exactly two. Box "ep" (col 0) = the episode, 6 to 10 rectangles in order. Box "later" (col 1, title "Plus tard") = 1 to 3 events or choices of later episodes that this one sets up.
-   A rectangle: "goals" (1 or 2 goal ids below), "tech" (one technique of those goals, its exact name), "lines" (how many lines of dialogue it will take, 1 to 5), "what" (what happens, one sentence, NO dialogue, no quotes), "reveals" (ids of the infos it reveals).
-   A choice: "kind": "choice", "goals": [], "tech": "", "what" (the question the player faces), "opts" (2 or 3 attitudes, not lines: "Defy him", "Lie to protect her"), "lines" (2 or 3).
+   A rectangle: "goals" (1 or 2 goal ids below), "tech" (one technique of those goals, its exact name), "lines" (how many lines of dialogue it will take, 1 to 5), "what", "reveals" (ids of the infos it reveals), "hints" (ids of the infos whose question it raises without answering).
+   "what" = how the technique is done in this scene, concretely, in one sentence, NO dialogue, no quotes. Start from the technique: "Shared memory: Ruby and the main character remember the night they opened the tavern, each with a different version." If what happens does not do its technique, change one of them: a goal on a rectangle means its technique really happens there.
+   A choice: "kind": "choice", "goals": [], "tech": "", "what" (the question the MAIN CHARACTER faces), "opts" (2 or 3 of HIS attitudes, not lines: "Defy him", "Lie to protect her"), "lines" (2 or 3). Every choice is the main character's: never another character's decision.
    2 or 3 choices in the episode. Right before each one, a "stakes" rectangle, linked to it.
 7. "links": {"from", "to", "label"}: a setup to what it sets off: each stakes rectangle to its choice; a callback (something planted early that comes back later, in the episode or in "later").
 
@@ -412,6 +420,7 @@ ${techList()}
 RULES:
 - Box "ep": 24 lines at most in total.
 - An info comes out after its parent (in rectangle order), one at a time, only through "Tell a story".
+- Each technique's description (above) says how it is done: follow it (who says it to whom, aloud or not).
 - Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
 - At least one desire is shown ("desire" goal).
 - Every item of "needs" is revealed or planted before the turn.
@@ -421,8 +430,8 @@ THE JSON:
 {"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
  "characters": [{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}],
  "infos": [{"id": "i1", "text": "..."}, {"id": "i2", "text": "...", "parent": "i1"}],
- "boxes": [{"id": "ep", "title": "...", "col": 0, "beats": [{"id": "r1", "goals": ["char"], "tech": "Show contrast", "lines": 3, "what": "...", "reveals": []}, {"id": "r5", "kind": "choice", "goals": [], "tech": "", "lines": 2, "what": "...", "opts": ["...", "..."]}]},
-           {"id": "later", "title": "Plus tard", "col": 1, "beats": [{"id": "f1", "goals": ["stakes"], "tech": "", "lines": 1, "what": "..."}]}],
+ "boxes": [{"id": "ep", "title": "...", "col": 0, "beats": [{"id": "r1", "goals": ["char"], "tech": "Show contrast", "lines": 3, "what": "...", "reveals": [], "hints": []}, {"id": "r5", "kind": "choice", "goals": [], "tech": "", "lines": 2, "what": "...", "opts": ["...", "..."]}]},
+           {"id": "later", "title": "Plus tard", "col": 1, "beats": [{"id": "f1", "goals": ["stakes"], "tech": "", "lines": 1, "what": "...", "reveals": ["i5"]}]}],
  "links": [{"from": "r4", "to": "r5", "label": "..."}]}
 
 The idea: ${idea}`;
@@ -430,9 +439,9 @@ The idea: ${idea}`;
     return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
 HOW TO TRANSLATE THE PLAN:
-- Follow the rectangles of the first box ("ep") in order. Each one becomes exactly its "lines" lines, written with its technique (below), for its goals. "what" says what happens: never copy it as a line.
+- Follow the rectangles of the first box ("ep") in order, every one of them: never skip one, never merge two. Each one becomes exactly its "lines" lines, written with its technique (below), for its goals. "what" says what happens: never copy it as a line.
 - A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
-- An info comes out exactly in the rectangle that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice).
+- An info comes out exactly in the rectangle of "ep" that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice). An info revealed in "later" is never said in this episode: where a rectangle "hints" it, only its question is raised (something seen or said that makes the player wonder), never its answer.
 - A link is a promise: what the "from" rectangle plants comes back, recognizably, in the "to" rectangle. A link to "later" is only planted.
 - The characters talk with their traits: you know who speaks without the name.
 - The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If he ..., ...").
@@ -467,6 +476,8 @@ ${JSON.stringify(plan)}`; };
     const t = e.target, g = t.closest('[data-g]'), r = t.closest('[data-r]'), sug = t.closest('[data-tech]'), x = t.closest('[data-x]'), a = t.closest('[data-s]');
     if (g) { const on = new Set(b.goals || []); on.has(g.dataset.g) ? on.delete(g.dataset.g) : on.add(g.dataset.g); b.goals = GOALS.map((q) => q.id).filter((q) => on.has(q)); save(); openBeat(b.id); return; }
     if (r) { const on = new Set(b.reveals || []); on.has(r.dataset.r) ? on.delete(r.dataset.r) : on.add(r.dataset.r); b.reveals = [...on]; save(); openBeat(b.id); return; }
+    const h = t.closest('[data-h]');
+    if (h) { const on = new Set(b.hints || []); on.has(h.dataset.h) ? on.delete(h.dataset.h) : on.add(h.dataset.h); b.hints = [...on]; save(); openBeat(b.id); return; }
     if (sug) { b.tech = sug.dataset.tech; save(); openBeat(b.id); return; }
     if (x) { P.links.splice(+x.dataset.x, 1); save(); openBeat(b.id); return; }
     if (!a) return;
