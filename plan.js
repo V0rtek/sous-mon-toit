@@ -20,13 +20,16 @@ window.PLAN = (() => {
 
   // the example: Last call, episode 1, reverse-engineered from bar.js (what happens, never the lines)
   const LC = () => ({
-    v: 2,
+    v: 3,
     title: 'Last Call · épisode 1',
     turn: 'Un inconnu offre 5000 $ cash à Brooke pour une soirée louche, et lui demande d’amener Cam.',
     infos: [
-      { id: 'i1', text: 'Brooke est cassé' }, { id: 'i2', text: 'Justin paie son loyer, et c’est fini' }, { id: 'i3', text: 'Brooke veut Cam' },
-      { id: 'i4', text: 'Un homme en complet cherche Brooke' }, { id: 'i5', text: 'Il sait ce que Cam boit' }, { id: 'i6', text: 'L’offre : 5000 $, une nuit' },
-      { id: 'i7', text: 'La règle : pas de vin rouge' }, { id: 'i8', text: 'Il veut Cam aussi' }, { id: 'i9', text: 'Qui est l’inconnu' },
+      // a chain: an info under another needs it first (the job before what the job is, the job before its rule)
+      { id: 'i1', text: 'Brooke est cassé' }, { id: 'i2', text: 'Justin paie son loyer, et c’est fini', parent: 'i1' },
+      { id: 'i3', text: 'Brooke veut Cam' },
+      { id: 'i4', text: 'Un homme en complet cherche Brooke' }, { id: 'i5', text: 'Il sait ce que Cam boit', parent: 'i4' },
+      { id: 'i6', text: 'L’offre : un job, 5000 $, une nuit', parent: 'i4' }, { id: 'i7', text: 'La règle : pas de vin rouge', parent: 'i6' },
+      { id: 'i8', text: 'Il veut Cam aussi', parent: 'i6' }, { id: 'i9', text: 'Qui est l’inconnu', parent: 'i4' },
     ],
     boxes: [
       { id: 'bar', title: 'Le bar · 1 h 40', col: 0, beats: [
@@ -72,16 +75,16 @@ window.PLAN = (() => {
       { from: 's6', to: 'c5', label: 'Le texto arrive chez Justin' },
     ],
   });
-  const EMPTY = () => ({ v: 2, title: 'Nouveau plan', turn: '', infos: [], links: [],
+  const EMPTY = () => ({ v: 3, title: 'Nouveau plan', turn: '', infos: [], links: [],
     boxes: [{ id: 'x1', title: 'Scène 1', col: 0, beats: [] }, { id: 'x2', title: 'Plus tard', col: 1, beats: [] }] });
 
   const KEY = 'smt-plan';
   // an older plan: the example comes back as it is now; a plan of your own gets a column per box
   const fix = (p) => {
     if (!p || !Array.isArray(p.boxes)) return LC();
-    if (!p.v && p.title === 'Last Call · épisode 1') return LC();
+    if ((p.v || 0) < 3 && p.title === 'Last Call · épisode 1') return LC();
     p.boxes.forEach((b, i) => { if (!b.id) b.id = 'x' + i; if (b.col == null) b.col = i; });
-    return { title: '', turn: '', infos: [], links: [], ...p, v: 2 };
+    return { title: '', turn: '', infos: [], links: [], ...p, v: 3 };
   };
   let P = (() => { try { return fix(JSON.parse(localStorage.getItem(KEY))); } catch { return LC(); } })();
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch { /* private window */ } };
@@ -114,6 +117,20 @@ window.PLAN = (() => {
       + '</div></div>';
   }
 
+  // the infos as a tree: under an info, the ones it unlocks (they need it first). Each one: where it comes out, or not yet;
+  // ⚠ when it comes out before what it needs. ⠿ drags it: onto an info = under it, onto its top edge = just before it
+  function infoTree(revealed) {
+    const at = (id) => { const b = revealed(id); return b ? num(b.id) : 0; };
+    const kids = (pid) => P.infos.filter((x) => (x.parent || null) === pid && (pid === null || P.infos.some((y) => y.id === pid)));
+    const roots = P.infos.filter((x) => !x.parent || !P.infos.some((y) => y.id === x.parent));
+    const row = (x, d, need) => {
+      const n = at(x.id), early = n && (!need || need > n);
+      return `<div class="pI${n ? ' ok' : ''}${early && d ? ' warn' : ''}" data-i="${x.id}" style="--d:${d}"><b class="pGrip" data-grip="${x.id}">⠿</b>${d ? '<i class="pUp">↳</i>' : ''}<span>${esc(x.text)}</span>`
+        + `<em>${early && d ? '⚠ ' : ''}${n ? 'au ' + n : 'pas encore'}</em></div>` + kids(x.id).map((k) => row(k, d + 1, n)).join('');
+    };
+    return roots.map((x) => row(x, 0, 0)).join('');
+  }
+
   // the page: a fixed bar on top, then the canvas (scrolls both ways): the head (turn, infos, legend) top left, the boxes
   function render() {
     if (!el) return;
@@ -125,8 +142,7 @@ window.PLAN = (() => {
       + (linking ? '<div class="pLinking">Touche le rectangle où ça mène <button type="button" data-a="cancel">Annuler</button></div>' : '') + '</div>'
       + `<div class="pView"><div class="pCanvas${focusId ? ' pFocus' : ''}" style="font-size:${zoom}em">`
       + `<div class="pHeadBox" data-box="head"><div class="pTurn" data-a="turn"><small>Le tournant · décidé en premier</small><p>${esc(P.turn) || '<span class="pDim">Touche pour l’écrire</span>'}</p></div>`
-      + `<div class="pInfos"><small>Infos à exposer</small>${P.infos.map((x) => { const b = revealed(x.id);
-        return `<div class="${b ? 'ok' : ''}" data-i="${x.id}"><span>${esc(x.text)}</span><em>${b ? 'au ' + num(b.id) : 'pas encore'}</em></div>`; }).join('')}`
+      + `<div class="pInfos"><small data-root>Infos à exposer</small>${infoTree(revealed)}`
       + '<button type="button" data-a="info">+ Info</button></div>'
       + `<div class="pLegend">${GOALS.map((g) => `<span style="--c:${g.c}">${ico(g)}${esc(g.name)}</span>`).join('')}<span class="lk">lien</span></div></div>`
       + P.boxes.map((box, k) => `<section class="pBox" data-k="${k}" data-box="${box.id}"><h3 data-a="box">${esc(box.title)}</h3>${box.beats.map(rect).join('')}`
@@ -277,7 +293,9 @@ window.PLAN = (() => {
       render(); openBeat(from); return;
     }
     if (info) { const x = P.infos.find((i) => i.id === info.dataset.i);
-      return openText('Info à exposer', x.text, (v) => { if (v) x.text = v; }, () => { P.infos = P.infos.filter((i) => i !== x); for (const b of all()) b.reveals = (b.reveals || []).filter((r) => r !== x.id); }); }
+      return openText('Info à exposer', x.text, (v) => { if (v) x.text = v; }, () => {   // what it unlocked moves up to what it needed
+        for (const k of P.infos) if (k.parent === x.id) k.parent = x.parent;
+        P.infos = P.infos.filter((i) => i !== x); for (const b of all()) b.reveals = (b.reveals || []).filter((r) => r !== x.id); }); }
     if (beat) { if (focusId === beat.dataset.b) openBeat(beat.dataset.b); else { focusId = beat.dataset.b; render(); } return; }
     if (!a) { if (focusId) { focusId = null; render(); } return; }
     const boxEl = a.closest('[data-k]'), k = boxEl ? +boxEl.dataset.k : -1;
@@ -304,8 +322,29 @@ window.PLAN = (() => {
 
   // a box's title drags the box anywhere (finger or mouse; a tap still opens it); with a mouse, dragging the background
   // pans the canvas (a finger already scrolls it both ways)
-  let drag = null, dragged = false, moving = null;
+  let drag = null, dragged = false, moving = null, infoDrag = null;
+  // where an info is dropped: onto another one (its top edge = before it, same level; the rest = under it), or onto the
+  // title "Infos à exposer" = back to the top level. Never under itself or what it unlocks
+  const under = (id, anc) => { for (let x = P.infos.find((i) => i.id === id); x; x = P.infos.find((i) => i.id === x.parent)) if (x.id === anc) return true; return false; };
+  function infoTarget(e) {
+    for (const n of el.querySelectorAll('.pI.drop, .pI.before, [data-root].drop')) n.classList.remove('drop', 'before');
+    const t = document.elementFromPoint(e.clientX, e.clientY), row = t && t.closest('.pI'), top = t && t.closest('[data-root]');
+    if (top) { top.classList.add('drop'); return { root: true }; }
+    if (!row || under(row.dataset.i, infoDrag.id)) return null;
+    const r = row.getBoundingClientRect(), before = e.clientY < r.top + r.height * .3;
+    row.classList.add(before ? 'before' : 'drop'); return { id: row.dataset.i, before };
+  }
+  function infoDrop(t) {
+    const x = P.infos.find((i) => i.id === infoDrag.id); if (!x || !t) return;
+    P.infos = P.infos.filter((i) => i !== x);
+    if (t.root) { delete x.parent; P.infos.push(x); }
+    else { const y = P.infos.find((i) => i.id === t.id), k = P.infos.indexOf(y);
+      if (t.before) { if (y.parent) x.parent = y.parent; else delete x.parent; P.infos.splice(k, 0, x); } else { x.parent = y.id; P.infos.push(x); } }
+    save();
+  }
   function onDown(e) {
+    const grip = e.target.closest('[data-grip]');
+    if (grip) { infoDrag = { id: grip.dataset.grip, row: grip.parentNode }; grip.setPointerCapture(e.pointerId); infoDrag.row.classList.add('lift'); dragged = false; e.preventDefault(); return; }
     const h = e.target.closest('.pBox > h3');
     if (h) {
       const n = h.parentNode; dragged = false;
@@ -316,6 +355,7 @@ window.PLAN = (() => {
     drag = { x: e.clientX, y: e.clientY, l: v.scrollLeft, t: v.scrollTop, v }; dragged = false;
   }
   function onMove(e) {
+    if (infoDrag) { dragged = true; infoDrag.t = infoTarget(e); return; }
     if (moving) {
       const dx = e.clientX - moving.x, dy = e.clientY - moving.y; if (Math.abs(dx) + Math.abs(dy) > 5) dragged = true;
       if (!dragged) return;
@@ -330,8 +370,10 @@ window.PLAN = (() => {
   function mount(root) {
     el = root; focusId = null; linking = null;
     root.onclick = onClick; root.onpointerdown = onDown; root.onpointermove = onMove;
-    root.onpointerup = root.onpointercancel = () => {
-      drag = null; if (!moving) return;
+    root.onpointerup = root.onpointercancel = (e) => {
+      drag = null;
+      if (infoDrag) { if (e.type === 'pointerup' && infoDrag.t) infoDrop(infoDrag.t); infoDrag = null; render(); return; }
+      if (!moving) return;
       const m = moving; moving = null; if (!dragged) return;
       const cv = el.querySelector('.pCanvas'), em = parseFloat(getComputedStyle(cv).fontSize), box = P.boxes[m.k];
       box.x = +(m.n.offsetLeft / em).toFixed(1); box.y = +(m.n.offsetTop / em).toFixed(1); save(); size(cv, em);
