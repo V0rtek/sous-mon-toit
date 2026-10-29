@@ -493,6 +493,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #menuPop button { font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(28,28,30,.92); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #menuPop svg { width: 2.8em; height: 2.8em; }
 body.preview #menuBtn, body.preview #menuPop { display: none !important; }
+/* a phone on a TV's story: no "…", its options are right there (quit; the sound and the restart belong to the TV) */
+body.hosttv.instory #menuBtn { display: none !important; }
+body.hosttv.instory #menuPop[hidden] { display: flex !important; bottom: 2.2%; }
 body.playonly #back, body.playonly #qrBtn, body.playonly #eyes, body.playonly #galBtn, body.playonly #menuBtn, body.playonly #menuPop { display: none !important; }
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -2880,7 +2883,7 @@ const MENU_ICON = {
 };
 function paintMenu() {
   const set = (m, icon, label) => { const b = $(`#menuPop [data-m="${m}"]`); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICON[icon]}</svg>`; b.setAttribute('aria-label', label); return b; };
-  set('sound', muted ? 'off' : 'on', ui(muted ? 'unmute' : 'mute'));
+  set('sound', muted ? 'off' : 'on', ui(muted ? 'unmute' : 'mute')).hidden = hostTv;
   set('again', 'again', ui(hasEps(state.story) ? 'restartEp' : 'restart')).hidden = ROLE !== 'host';
   set('quit', 'quit', ui('quit'));
 }
@@ -2895,6 +2898,7 @@ $('#menuPop').onclick = (e) => {
   if (m.dataset.m === 'sound') { setMuted(!muted); paintMenu(); return; }
   $('#menuPop').hidden = true;
   if (m.dataset.m === 'again') restartEpisode();
+  else if (hostTv) sendIn('menu');   // a TV's story: back to the TV's home, everyone
   else if (ROLE !== 'host') goHome();
   else if (fromDemo) { toHub(); history.back(); }
   else toHub();
@@ -3309,7 +3313,7 @@ const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTime
 function follow(msg) {
   hostId = msg && msg.h;
   if (MIRROR && msg && msg.seats && msg.seats[MIRROR]) myId = msg.seats[MIRROR].id;   // see what he sees
-  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); minView(); }   // the sound comes from the TV
+  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); minView(); paintMenu(); }   // the sound comes from the TV
   if (msg && (msg.p || null) !== paused) { paused = msg.p || null; showPause(); }
   if (msg) showAbsent((msg.x || []).filter((n) => n !== myName));
   newer(msg && msg.v);
