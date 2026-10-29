@@ -134,7 +134,8 @@ window.PLAN = (() => {
     const v = el.querySelector('.pView'); v.scrollLeft = keep[0]; v.scrollTop = keep[1];
   }
 
-  // where each box goes: its column; its top under the box it starts after, else under the head (column 0) or at the top
+  // where each box goes: where it was dragged (x, y in em); else its column, its top under the box it starts after,
+  // else under the head (column 0) or at the top
   function place() {
     const cv = el.querySelector('.pCanvas'), em = parseFloat(getComputedStyle(cv).fontSize), head = cv.querySelector('.pHeadBox');
     const x = (col) => (2 + col * (W + GAP)) * em, gap = 2 * em;
@@ -142,14 +143,19 @@ window.PLAN = (() => {
     const top = {}, bottom = {}, nodes = Object.fromEntries([...cv.querySelectorAll('.pBox')].map((n) => [n.dataset.box, n]));
     const at = (box, seen = new Set()) => {
       if (top[box.id] != null) return top[box.id];
+      if (box.y != null) { top[box.id] = box.y * em; bottom[box.id] = top[box.id] + nodes[box.id].offsetHeight; return top[box.id]; }
       const after = P.boxes.find((b) => b.id === box.after && b !== box && !seen.has(b.id));
       const t = after ? (at(after, seen.add(box.id)), bottom[after.id] + gap) : box.col === 0 ? head.offsetHeight + gap : 0;
       top[box.id] = t; bottom[box.id] = t + nodes[box.id].offsetHeight; return t;
     };
-    for (const box of P.boxes) { const n = nodes[box.id]; n.style.left = x(box.col || 0) + 'px'; n.style.top = at(box) + 'px'; }
-    const cols = Math.max(0, ...P.boxes.map((b) => b.col || 0)) + 1;
-    cv.style.width = (x(cols) + 2 * em) + 'px';
-    cv.style.height = (Math.max(head.offsetHeight, ...Object.values(bottom)) + 6 * em) + 'px';
+    for (const box of P.boxes) { const n = nodes[box.id]; n.style.left = (box.x != null ? box.x * em : x(box.col || 0)) + 'px'; n.style.top = at(box) + 'px'; }
+    size(cv, em);
+  }
+  // the canvas reaches past the farthest box (room to drag one further)
+  function size(cv, em) {
+    const boxes = [...cv.querySelectorAll('.pBox, .pHeadBox')];
+    cv.style.width = (Math.max(...boxes.map((n) => n.offsetLeft + n.offsetWidth)) + (W + GAP) * em) + 'px';
+    cv.style.height = (Math.max(...boxes.map((n) => n.offsetTop + n.offsetHeight)) + 20 * em) + 'px';
     draw(cv, em);
   }
 
@@ -197,18 +203,15 @@ window.PLAN = (() => {
   }
   function openBox(k) {
     const box = P.boxes[k]; editing = '*'; const s = sheet();
-    const others = P.boxes.filter((b) => b !== box);
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>Boîte</b><button type="button" data-s="close">OK</button></div>`
       + `<small>Titre</small><input data-f="title" value="${esc(box.title)}">`
-      + `<small>Colonne (à droite = en même temps, ou plus tard)</small><div class="pStep"><button type="button" data-s="left">←</button><b>${(box.col || 0) + 1}</b><button type="button" data-s="right">→</button></div>`
-      + `<small>Commence après</small><div class="pPick"><button type="button" data-after="" class="${box.after ? '' : 'on'}">Le début</button>${others.map((b) => `<button type="button" data-after="${b.id}" class="${box.after === b.id ? 'on' : ''}">${esc(b.title)}</button>`).join('')}</div>`
-      + '<div class="pRow"><button type="button" data-s="delbox" class="del">Supprimer la boîte</button></div></div>';
+      + '<small>Pour la déplacer : glisse son titre</small>'
+      + `<div class="pRow">${box.x != null ? '<button type="button" data-s="auto">Remettre à sa place</button>' : ''}<button type="button" data-s="delbox" class="del">Supprimer la boîte</button></div></div>`;
     s.oninput = (e) => { if (e.target.dataset.f === 'title') { box.title = e.target.value; save(); } };
     s.onclick = (e) => {
-      e.stopPropagation(); const a = e.target.closest('[data-s]'), af = e.target.closest('[data-after]');
-      if (af) { box.after = af.dataset.after || undefined; save(); render(); openBox(k); return; }
+      e.stopPropagation(); const a = e.target.closest('[data-s]');
       if (!a) return;
-      if (a.dataset.s === 'left' || a.dataset.s === 'right') { box.col = Math.max(0, (box.col || 0) + (a.dataset.s === 'left' ? -1 : 1)); save(); render(); openBox(k); return; }
+      if (a.dataset.s === 'auto') { delete box.x; delete box.y; }
       if (a.dataset.s === 'delbox') {
         if (!confirm('Supprimer la boîte et ses rectangles ?')) return;
         const ids = new Set(box.beats.map((b) => b.id)); P.boxes.splice(k, 1); P.links = P.links.filter((l) => !ids.has(l.from) && !ids.has(l.to));
@@ -297,14 +300,26 @@ window.PLAN = (() => {
     save(); render();
   }
 
-  // with a mouse, dragging the background pans the canvas (a finger already scrolls it both ways)
-  let drag = null, dragged = false;
+  // a box's title drags the box anywhere (finger or mouse; a tap still opens it); with a mouse, dragging the background
+  // pans the canvas (a finger already scrolls it both ways)
+  let drag = null, dragged = false, moving = null;
   function onDown(e) {
+    const h = e.target.closest('.pBox > h3');
+    if (h) {
+      const n = h.parentNode; dragged = false;
+      moving = { n, k: +n.dataset.k, x: e.clientX, y: e.clientY, l: n.offsetLeft, t: n.offsetTop }; h.setPointerCapture(e.pointerId); return;
+    }
     if (e.pointerType !== 'mouse' || e.target.closest('.pBeat, button, input, textarea, h3, .pTurn, [data-i]')) return;
     const v = el.querySelector('.pView'); if (!v || !v.contains(e.target)) return;
     drag = { x: e.clientX, y: e.clientY, l: v.scrollLeft, t: v.scrollTop, v }; dragged = false;
   }
   function onMove(e) {
+    if (moving) {
+      const dx = e.clientX - moving.x, dy = e.clientY - moving.y; if (Math.abs(dx) + Math.abs(dy) > 5) dragged = true;
+      if (!dragged) return;
+      moving.n.style.left = Math.max(0, moving.l + dx) + 'px'; moving.n.style.top = Math.max(0, moving.t + dy) + 'px';
+      const cv = el.querySelector('.pCanvas'); draw(cv, parseFloat(getComputedStyle(cv).fontSize)); return;
+    }
     if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (Math.abs(dx) + Math.abs(dy) > 5) dragged = true;
     drag.v.scrollLeft = drag.l - dx; drag.v.scrollTop = drag.t - dy;
@@ -313,7 +328,13 @@ window.PLAN = (() => {
   function mount(root) {
     el = root; focusId = null; linking = null;
     root.onclick = onClick; root.onpointerdown = onDown; root.onpointermove = onMove;
-    root.onpointerup = root.onpointerleave = () => { drag = null; };
+    root.onpointerup = root.onpointercancel = () => {
+      drag = null; if (!moving) return;
+      const m = moving; moving = null; if (!dragged) return;
+      const cv = el.querySelector('.pCanvas'), em = parseFloat(getComputedStyle(cv).fontSize), box = P.boxes[m.k];
+      box.x = +(m.n.offsetLeft / em).toFixed(1); box.y = +(m.n.offsetTop / em).toFixed(1); save(); size(cv, em);
+    };
+    root.onpointerleave = () => { drag = null; };
     const s = sheet(); s.oninput = onInput; closeSheet();
     render();
   }
