@@ -10,7 +10,7 @@ window.PLAN = (() => {
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
     { id: 'char', name: 'Create char engagingness', c: '#0a84ff', d: 'Faire aimer un perso : on veut passer du temps avec lui.',
       tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
-        { n: 'Tell a story', d: 'Une seule réplique, son passé en une ligne : « Yeah, I used to x, but y. »' }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+        { n: 'Tell a story', d: 'Une seule réplique : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
     { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', d: 'Faire aimer le lien entre deux persos, pas seulement chacun.',
       tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.' }, { n: 'Shared memory', d: 'Ils se rappellent un moment vécu ensemble, chacun avec sa version.' },
         { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement.' }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
@@ -19,7 +19,7 @@ window.PLAN = (() => {
     { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', d: 'Montrer ce qui peut être perdu : à mettre juste avant un choix, lié à lui.',
       tech: [{ n: 'Mention consequences', d: 'Quelqu’un dit ce qui arrivera si ça tourne mal.' }, { n: 'Show character positioning', d: 'Un perso prend position (« I’m against that ») : le joueur sait qui il va décevoir.' }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
     { id: 'info', name: 'Reveal info', c: '#bf5af2', d: 'Faire découvrir une info de l’intrigue, une à la fois, après celle dont elle dépend.',
-      tech: [{ n: 'Tell a story', d: 'Pour l’instant, une info sort seulement par Tell a story : un perso la raconte en une ligne.' }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+      tech: [{ n: 'Tell a story', d: 'Pour l’instant, une info sort seulement par là. Une seule réplique : un moment de son passé en une ligne, qui dit qui il est (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', 'Three years at that bar, never saw the owner sober.', 'First thing I ever sold, the buyer came back crying.'] }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
     { id: 'callback', name: 'Callback', c: '#30d158', d: 'Une chose plantée tôt revient plus tard avec un autre sens.',
       tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.' }, { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.' },
         { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.' }, { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.' }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
@@ -37,9 +37,12 @@ window.PLAN = (() => {
 
   // the example: Last call, episode 1, reverse-engineered from bar.js (what happens, never the lines)
   const LC = () => ({
-    v: 4,
+    v: 5,
     title: 'Last Call · épisode 1',
     turn: 'Un inconnu offre 5000 $ cash à Brooke pour une soirée louche, et lui demande d’amener Cam.',
+    // what the turn needs in place: what the player must already know or have seen for it to land (by = the info or the
+    // rectangle that gives it)
+    needs: [{ text: 'Brooke est cassé', by: 'i1' }, { text: 'Il doit tout à Justin, qui arrête de payer', by: 'i2' }, { text: 'Brooke veut Cam', by: 'i3' }, { text: 'Un homme en complet le cherche', by: 'i4' }],
     chars: [
       { id: 'k1', name: 'Justin', sprite: 'justin_bar', traits: ['Se sent trop vieux pour ça', 'Paie le loyer de son ami'], infos: ['i2'] },
       { id: 'k2', name: 'Brooke', sprite: 'brooke', traits: ['Cassé et fier de l’être', 'Drôle même quand ça va mal'], infos: ['i1', 'i3'] },
@@ -98,7 +101,7 @@ window.PLAN = (() => {
       { from: 's6', to: 'c5', label: 'Le texto arrive chez Justin' },
     ],
   });
-  const EMPTY = () => ({ v: 4, title: 'Nouveau plan', turn: '', chars: [], infos: [], links: [],
+  const EMPTY = () => ({ v: 5, title: 'Nouveau plan', turn: '', needs: [], chars: [], infos: [], links: [],
     boxes: [{ id: 'x1', title: 'Scène 1', col: 0, beats: [] }, { id: 'x2', title: 'Plus tard', col: 1, beats: [] }] });
 
   // the plans kept on this phone (smt-plans: every plan, the one open); a generated plan pasted in is a new one, so each
@@ -106,10 +109,10 @@ window.PLAN = (() => {
   const KEY = 'smt-plans';
   const fix = (p) => {
     if (!p || !Array.isArray(p.boxes)) return LC();
-    if ((p.v || 0) < 4 && p.title === 'Last Call · épisode 1') return LC();
+    if ((p.v || 0) < 5 && p.title === 'Last Call · épisode 1') return LC();
     p.boxes.forEach((b, i) => { if (!b.id) b.id = 'x' + i; if (b.col == null) b.col = i; if (!Array.isArray(b.beats)) b.beats = []; });
     if (!Array.isArray(p.chars) && Array.isArray(p.characters)) { p.chars = p.characters.map((c, i) => ({ ...c, id: 'k' + i })); delete p.characters; }   // a generated plan
-    return { title: '', turn: '', chars: [], infos: [], links: [], ...p, v: 4 };
+    return { title: '', turn: '', needs: [], chars: [], infos: [], links: [], ...p, v: 5 };
   };
   const store = (() => {
     try { const k = JSON.parse(localStorage.getItem(KEY)); if (k && Array.isArray(k.list) && k.list.length) return { cur: Math.min(k.cur || 0, k.list.length - 1), list: k.list.map(fix) }; } catch { /* none yet */ }
@@ -170,8 +173,9 @@ window.PLAN = (() => {
     if (!pal.g || !G[pal.g]) return '';
     const g = G[pal.g]; let list = g.tech, d = g.d; const crumbs = [`<button type="button" data-crumb="-1">${esc(g.name)}</button>`];
     pal.path.forEach((i, k) => { crumbs.push(`<button type="button" data-crumb="${k}">${esc(list[i].n)}</button>`); d = list[i].d; list = list[i].s || []; });
-    if (pal.sel != null && list[pal.sel]) d = list[pal.sel].d;   // a technique tapped: what it is
-    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><p class="pD">${esc(d)}</p><div class="pChips">`
+    let ex = [];
+    if (pal.sel != null && list[pal.sel]) { d = list[pal.sel].d; ex = list[pal.sel].ex || []; }   // a technique tapped: what it is, its examples
+    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><p class="pD">${esc(d)}</p>${ex.length ? `<ul class="pEx">${ex.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}<div class="pChips">`
       + (list.length ? list.map((t, i) => `<b data-tn="${i}" class="${pal.sel === i ? 'on' : ''}" title="${esc(t.d)}">${esc(t.n)}${t.s && t.s.length ? ' <i>›</i>' : ''}</b>`).join('') : '<em>Aucune technique encore.</em>')
       + '</div><small>Touche une technique pour la voir ; glisse-la sur un rectangle, ou dans une boîte pour en créer un.</small></div>';
   }
@@ -187,7 +191,10 @@ window.PLAN = (() => {
       + palette()
       + (linking ? '<div class="pLinking">Touche le rectangle où ça mène <button type="button" data-a="cancel">Annuler</button></div>' : '') + '</div>'
       + `<div class="pView"><div class="pCanvas${focusId ? ' pFocus' : ''}" style="font-size:${zoom}em">`
-      + `<div class="pHeadBox" data-box="head"><div class="pTurn" data-a="turn"><small>Le tournant · décidé en premier</small><p>${esc(P.turn) || '<span class="pDim">Touche pour l’écrire</span>'}</p></div>`
+      + `<div class="pHeadBox" data-box="head"><div class="pTurn" data-a="turn"><small>Le tournant · décidé en premier</small><p>${esc(P.turn) || '<span class="pDim">Touche pour l’écrire</span>'}</p>`
+      + `<small>Ce qu’il doit trouver en place</small><div class="pNeeds">${P.needs.map((n, i) => { const ok = n.by && (find(n.by) || revealed(n.by));
+        return `<div class="${ok ? 'ok' : ''}" data-need="${i}"><span>${esc(n.text)}</span><em>${ok ? (find(n.by) ? 'au ' + num(n.by) : 'au ' + num(revealed(n.by).id)) : 'pas en place'}</em></div>`; }).join('')}`
+      + '<button type="button" data-a="need">+ À mettre en place</button></div></div>'
       + `<div class="pChars"><small>Personnages</small>${P.chars.map((c) => `<div class="pChar" data-c="${c.id}">${face(c.sprite)}<div><b>${esc(c.name)}</b>`
         + (c.traits || []).map((t) => `<span>${esc(t)}</span>`).join('')
         + `${(c.infos || []).length ? `<em>${c.infos.map((i) => P.infos.find((x) => x.id === i)).filter(Boolean).map((x) => esc(x.text)).join(' · ')}</em>` : ''}</div></div>`).join('')}`
@@ -383,19 +390,21 @@ window.PLAN = (() => {
   // ---- the prompts (for a basic model; English, the story comes out in the idea's language). Both list the goals and
   // techniques above, so a change here changes them ----
   const DECORS = '"terrasse" = melissa, candy, ruby (a café terrace) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
-  const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}`).join('\n')).join('\n');
-  const prompt1 = (idea) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays "justin". Write every text in the language of the idea.
+  const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}${t.ex ? ' Examples (shapes, never copy them): ' + t.ex.map((x) => `"${x}"`).join(' / ') : ''}`).join('\n')).join('\n');
+  const prompt1 = (idea) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays the main character (his id is "justin"). Write every text in the language of the idea.
 Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:
 
 1. "scene": the decor that fits the idea: ${DECORS}.
-2. "characters": justin + 2 or 3 people of that decor. id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.
+2. "characters": 2 or 3 people of that decor (the main character is the player: not in this list). id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.
 3. "turn": decided first: the event at the end of the episode that turns everything, in one sentence.
-4. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 4 to 8 infos; at least one is never revealed in this episode (curiosity).
-5. "boxes": exactly two. Box "ep" (col 0) = the episode, 6 to 10 rectangles in order. Box "later" (col 1, title "Plus tard") = 1 to 3 events or choices of later episodes that this one sets up.
+4. "needs": what the turn needs in place: 2 to 4 things the player must already know or have seen, or the turn makes no sense. Each one becomes an info (step 5) or a rectangle that plants it (step 6); "by" = its id.
+5. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 5 to 9 infos; at least one is never revealed in this episode (curiosity).
+   The first infos, revealed first, are the opening: where we are, who the main character is to each person present (his sister, his boss, his ex), what he is doing there right now. They come out like the others: in a rectangle, with its technique.
+6. "boxes": exactly two. Box "ep" (col 0) = the episode, 6 to 10 rectangles in order. Box "later" (col 1, title "Plus tard") = 1 to 3 events or choices of later episodes that this one sets up.
    A rectangle: "goals" (1 or 2 goal ids below), "tech" (one technique of those goals, its exact name), "lines" (how many lines of dialogue it will take, 1 to 5), "what" (what happens, one sentence, NO dialogue, no quotes), "reveals" (ids of the infos it reveals).
    A choice: "kind": "choice", "goals": [], "tech": "", "what" (the question the player faces), "opts" (2 or 3 attitudes, not lines: "Defy him", "Lie to protect her"), "lines" (2 or 3).
    2 or 3 choices in the episode. Right before each one, a "stakes" rectangle, linked to it.
-6. "links": {"from", "to", "label"}: a setup to what it sets off: each stakes rectangle to its choice; a callback (something planted early that comes back later, in the episode or in "later").
+7. "links": {"from", "to", "label"}: a setup to what it sets off: each stakes rectangle to its choice; a callback (something planted early that comes back later, in the episode or in "later").
 
 GOALS AND THEIR TECHNIQUES (use only these):
 ${techList()}
@@ -403,11 +412,13 @@ ${techList()}
 RULES:
 - Box "ep": 24 lines at most in total.
 - An info comes out after its parent (in rectangle order), one at a time, only through "Tell a story".
-- Each character gets an engaging rectangle (char goal) before the first stakes.
+- Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
+- At least one desire is shown ("desire" goal).
+- Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
 
 THE JSON:
-{"title": "2-4 words", "scene": "...", "turn": "...",
+{"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
  "characters": [{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}],
  "infos": [{"id": "i1", "text": "..."}, {"id": "i2", "text": "...", "parent": "i1"}],
  "boxes": [{"id": "ep", "title": "...", "col": 0, "beats": [{"id": "r1", "goals": ["char"], "tech": "Show contrast", "lines": 3, "what": "...", "reveals": []}, {"id": "r5", "kind": "choice", "goals": [], "tech": "", "lines": 2, "what": "...", "opts": ["...", "..."]}]},
@@ -416,15 +427,15 @@ THE JSON:
 
 The idea: ${idea}`;
   const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ id, ...c }) => c) };
-    return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays "justin". Same language as the plan.
+    return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
 HOW TO TRANSLATE THE PLAN:
 - Follow the rectangles of the first box ("ep") in order. Each one becomes exactly its "lines" lines, written with its technique (below), for its goals. "what" says what happens: never copy it as a line.
 - A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
-- An info comes out exactly in the rectangle that reveals it, never before, as a one-line story from a character's past ("Yeah, I used to x, but y.").
+- An info comes out exactly in the rectangle that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice).
 - A link is a promise: what the "from" rectangle plants comes back, recognizably, in the "to" rectangle. A link to "later" is only planted.
 - The characters talk with their traits: you know who speaks without the name.
-- The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If justin ..., ...").
+- The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If he ..., ...").
 
 TECHNIQUES:
 ${techList()}
@@ -434,9 +445,10 @@ A. One new thing per line. Lines are short: 4 to 12 words, 70 characters at most
 B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 lines. Someone absent: a name AND what identifies them.
 C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
+E. No line talks to the player or comments on the story ("You're wondering what this is about").
 
-JUSTIN: outside a choice, justin's lines are his inner voice, first person ("I"). Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
-CHOICES: "t" = the button, a short line in justin's voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
+THE MAIN CHARACTER (id "justin"): outside a choice, his lines are his inner voice, first person ("I"). Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
+CHOICES: "t" = the button, a short line in his voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
 POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak, with their id.
 
 THE JSON (exactly this shape):
@@ -494,6 +506,8 @@ ${JSON.stringify(plan)}`; };
     for (const n of el.querySelectorAll('[data-goal].show')) if (n !== goal) n.classList.remove('show');
     if (goal) { goal.classList.toggle('show'); return; }   // a goal's tab: its name, nothing else
     const ch = e.target.closest('[data-c]'); if (ch) return openChar(ch.dataset.c);
+    const need = e.target.closest('[data-need]');
+    if (need) { const n = P.needs[+need.dataset.need]; return openText('À mettre en place', n.text, (v) => { if (v) n.text = v; }, () => { P.needs.splice(+need.dataset.need, 1); }); }
     const a = e.target.closest('[data-a]'), beat = e.target.closest('.pBeat'), info = e.target.closest('[data-i]');
     if (linking && beat) {   // the second tap of a link: where it leads; then the sheet, for what comes back
       const from = linking, to = beat.dataset.b; linking = null;
@@ -510,6 +524,7 @@ ${JSON.stringify(plan)}`; };
     switch (a.dataset.a) {
       case 'title': return openText('Titre', P.title, (v) => { if (v) P.title = v; });
       case 'turn': return openText('Le tournant', P.turn, (v) => { P.turn = v; });
+      case 'need': return openText('Ce que le tournant doit trouver en place', '', (v) => { if (v) P.needs.push({ text: v }); });
       case 'box': return openBox(k);
       case 'info': return openText('Nouvelle info à exposer', '', (v) => { if (v) P.infos.push({ id: fresh('i'), text: v }); });
       case 'beat': case 'choice': {

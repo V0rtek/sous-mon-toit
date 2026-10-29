@@ -438,6 +438,15 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pGhost { position: fixed; z-index: 90; transform: translate(-50%, -130%); padding: .45em .9em; border-radius: .7em; background: var(--c); color: #000; font: 600 14px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; pointer-events: none; white-space: nowrap; box-shadow: 0 .6em 1.6em rgba(0,0,0,.5); }
 .pBeat.drop, .pBox.drop { outline: .2em solid #f5f5f7; outline-offset: .15em; }
 .pChips b.on { background: var(--c); color: #000; }
+.pEx { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: .2em; font-size: 1.5em; color: #aeaeb2; font-style: italic; }
+/* what the turn needs in place: ✓ where it comes out, or not in place yet */
+.pNeeds { display: flex; flex-direction: column; gap: .35em; margin-bottom: .4em; }
+.pNeeds div { display: flex; justify-content: space-between; gap: 1em; font-size: 1.75em; line-height: 1.3; cursor: pointer; }
+.pNeeds div span::before { content: '○ '; color: #636366; }
+.pNeeds div.ok span::before { content: '✓ '; color: #30d158; }
+.pNeeds div em { font-style: normal; color: #ff9f0a; white-space: nowrap; }
+.pNeeds div.ok em { color: #30d158; }
+.pTurn > button { font: inherit; font-size: 1.6em; background: none; border: 0; color: #86868b; cursor: pointer; padding: 0; }
 .pD { margin: 0; font-size: 1.6em; line-height: 1.35; color: #d1d1d6; }
 .pSh .pD { font-size: 1.6em; color: #aeaeb2; }
 /* characters: a face, a name, 1-2 traits, the infos about them */
@@ -1453,7 +1462,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261030010000"></script>
+<script src="plan.js?v=20261030020000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
