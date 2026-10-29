@@ -131,9 +131,9 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       if (s.who === 'justin' && !inChoice) return [...out, { think: 'justin', text: clip(s.text, 160) }];   // his inner voice
       return [...out, say(s.who, POSES.includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
     };
-    const steps = [], saysN = { n: 0 }, choices = { n: 0 };
+    const steps = [], saysN = { n: 0 }, choices = { n: 0 }, most = j.seed ? 3 : 2;   // an episode (ep1.js, it has a seed): 3 choices
     for (const s of j.steps) {
-      if (choices.n >= 2) break;   // nothing after the second choice: the story stops on its hook
+      if (choices.n >= most) break;   // nothing after the last choice: the story stops on its hook
       if (s && Array.isArray(s.choice)) {
         const prev = last && last !== 'justin' ? last : undefined;   // who justin answers
         const opts = s.choice.map((o) => {
