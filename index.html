@@ -564,11 +564,23 @@ body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #viewBtn svg { width: 4em; height: 4em; }
 body.hosttv.instory #viewBtn { display: grid; }
 body.watch.hosttv.instory #back { display: none !important; }
-#minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 16%; }
-body.phonemin.instory #minView { display: flex; }
-#minView img { height: 46%; filter: drop-shadow(0 0 2.4em color-mix(in srgb, var(--c, #ff9a4d) 50%, transparent)); }
-#minView .who { font-size: 3em; font-weight: 800; color: #fff; margin-top: .6em; display: flex; align-items: center; }
-body.phonemin #ui { z-index: 14; }
+#minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; place-items: center; cursor: pointer; }
+body.phonemin.instory #minView { display: grid; }
+#minView svg { width: 22em; height: 22em; opacity: .22; }
+body.phonemin.privline #minView svg, body.phonemin.choosing #minView svg { display: none; }
+body.phonemin #pauseBtn, body.phonemin #menuPop, body.phonemin.instory #menuPop[hidden] { display: none !important; }   /* Quitter is in the pause */
+body.phonemin #ui { z-index: 14; inset: 2.5% 3%; top: 2.5%; pointer-events: none; justify-content: center; }
+body.phonemin #choices:not([hidden]) { flex: 1; height: 100%; gap: 1.4em; }
+body.phonemin #choices button { flex: 1; pointer-events: auto; text-align: center; font-size: 3.4em; border-radius: .7em; padding: .6em; display: grid; place-items: center; }
+body.phonemin #ringCard { z-index: 26; }
+body.phonemin #ringBtns { flex: 1; width: 100%; gap: 0; margin: 0; }
+body.phonemin #ringBtns button { flex: 1; justify-content: center; }
+/* paused, on the phone: Reprendre is the whole screen, Quitter a strip at the bottom */
+body.phonemin #pauseCard { padding: 3%; justify-content: stretch; background: #000; }
+body.phonemin #pauseCard > :not(.pc-btns) { display: none !important; }
+body.phonemin #pauseCard .pc-btns { flex: 1; flex-direction: column; margin: 0; }
+body.phonemin #pauseCard .pc-go { flex: 1; font-size: 4em; border-radius: .7em; }
+body.phonemin #pauseCard .pc-quit { flex: 0 0 auto; font-size: 2.4em; padding: 1em; }
 body.phonemin:not(.privline) #bubble, body.phonemin #waitOther, body.phonemin #caption, body.phonemin #callBar { visibility: hidden; }
 body.hosttv.instory #pauseBtn { display: grid; }
 body.watch.hosttv #again { display: block !important; }
@@ -641,11 +653,11 @@ body.tvpaused .tv-side:hover .fig { transform: scale(1.04); filter: drop-shadow(
 /* while it plays, the only thing on the TV besides the story: the badge of whom it waits on (his turn: it pulses),
    in his corner; a player whose phone dropped: his badge, greyed, with a cut-off sign */
 #tvWho { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
-#tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 3em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
+#tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 2.1em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
 #tvWho > .l { left: 3%; } #tvWho > .r { right: 3%; flex-direction: row-reverse; }
 #tvWho .pbadge { font-size: 1.3em; margin: 0; }
 #tvWho .turn .pbadge { animation: tvTurn 1.4s ease-in-out infinite; }
-@keyframes tvTurn { 50% { box-shadow: 0 0 0 .12em var(--c), 0 0 1.4em .5em var(--c); transform: scale(1.08); } }
+@keyframes tvTurn { 0%, 100% { box-shadow: 0 0 0 .12em var(--c), 0 0 .4em 0 color-mix(in srgb, var(--c) 40%, transparent); } 50% { box-shadow: 0 0 0 .12em var(--c), 0 0 1em .25em color-mix(in srgb, var(--c) 70%, transparent); } }
 #tvWho .gone .pbadge { filter: grayscale(1) brightness(.6); }
 #tvWho .gone .pb-off { position: absolute; left: -.3em; top: -.3em; width: 1em; height: 1em; border-radius: 50%; background: #ff453a; display: grid; place-items: center; }
 #tvWho .gone .pb-off svg { width: .7em; height: .7em; }
@@ -1780,7 +1792,8 @@ function drawCall() {
 }
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
-  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
+  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = '';
+  document.body.classList.toggle('choosing', mineFor(by)); $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
   if (waitsFor(by) || (TV && duo())) { choicesEl.hidden = true; waitNote(`${seatName(seatFor(by))} ${ui('choosing')}`, seatFor(by)); }   // a TV never shows the options: they're the player's secret
@@ -1806,7 +1819,7 @@ function choose(opts, by, ring) {
     holder.appendChild(b);
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   }
-  if (TV && duo()) { $('#waitOther').classList.remove('done'); tvSides(seatFor(by)); }
+  if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
   if (isBot(by) && ROLE === 'host') botPick();
 }
 // the pick lights up for a moment on the other phones before the story goes on
@@ -1820,7 +1833,7 @@ function pickChoice(i, afar = false) {
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
-    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote('');
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing');
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
@@ -1925,12 +1938,10 @@ function minView() {
   const on = ROLE === 'watch' && hostTv && !seeStory;
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
-  const k = on && seatsOf().find((j) => state.seats[j] && state.seats[j].id === myId);
-  if (!k) { $('#minView').innerHTML = ''; return; }
-  const pose = ((story().pick || {})[k] || {}).pose || 'listen';
-  $('#minView').style.setProperty('--c', (castOf(k) || {}).color || '#ff9a4d');
-  $('#minView').innerHTML = `<img src="${poseSrc(k, pose)}" alt=""><div class="who">${badge(k)}${esc(seatName(k))}</div>`;
+  $('#minView').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
 }
+// the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
+$('#minView').onclick = (e) => { e.stopPropagation(); if (document.body.classList.contains('privline')) advance(); else if (hostTv && !paused) sendIn('pause'); };
 $('#viewBtn').onclick = (e) => { e.stopPropagation(); seeStory = !seeStory; try { localStorage.setItem('smt-see', seeStory ? '1' : '0'); } catch { /* private window */ } minView(); };
 // the TV, for a demo on stage: a click on its screen pauses (the cursor comes back), the big button goes on
 const TV_PAUSE = '·tv';
@@ -2363,6 +2374,7 @@ function show(id) {
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
 function halt() {
+  document.body.classList.remove('choosing', 'privline');
   $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
   run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
