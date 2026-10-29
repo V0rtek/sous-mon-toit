@@ -382,57 +382,86 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tEx p:last-child::before { content: '→ '; color: #30d158; font-weight: 700; }
 .tLeads { display: flex; flex-direction: column; gap: 1em; align-items: flex-start; }
 .tLeads small { display: block; margin-top: .3em; font-size: .8em; color: #ff9f0a; }
-/* Plan de scène: the turn and what it needs, then the beats in order, each as tall as its lines (one tick per line);
-   orange = a loop, from the right edge of a setup to its payoff, each in its own lane of the gutter */
-#plan { justify-content: flex-start; overflow-y: auto; padding: 13em 5% 8em; scroll-snap-type: none; }
+/* Plan de scène (plan.js): boxes of rectangles stacked in order, each as tall as its lines (one tick per line), its goals
+   as colour tabs on its left; orange links in the right gutter; a bottom sheet edits what's tapped */
+#plan { justify-content: flex-start; overflow-y: auto; padding: 13em 5% 10em; scroll-snap-type: none; }
 #planBody { gap: 0; }
-#planBody .kick { font-size: 1.7em; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #ff9f0a; }
-#planBody h2 { margin: .25em 0 .8em; font-size: 3.8em; letter-spacing: -.025em; }
-.pTurn { padding: 1.8em 2em; border-radius: 1.8em; background: #141416; margin-bottom: 2.4em; }
-.pTurn small { display: block; font-size: 1.6em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin: 1.4em 0 .6em; }
-.pTurn small:first-child { margin-top: 0; }
-.pTurn > p { margin: 0; font-size: 2.2em; line-height: 1.35; font-weight: 600; }
-.pTurn ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .5em; font-size: 1.95em; line-height: 1.3; color: #d1d1d6; }
-.pTurn li b { color: #fff; margin-right: .3em; }
-.pTurn .pLeg { font-size: 1.8em; font-weight: 400; color: #86868b; display: flex; align-items: center; gap: .4em; flex-wrap: wrap; }
-.pLeg .tk { display: inline-block; width: .5em; height: 1.1em; border-radius: .2em; background: #48484a; }
-.pLeg .lp { display: inline-block; width: 1.6em; height: .25em; border-radius: .2em; background: #ff9f0a; }
+.pBar { display: flex; gap: .6em; flex-wrap: wrap; margin-bottom: 1.4em; }
+.pBar button, .pAdd button { font: inherit; font-size: 1.7em; padding: .45em .9em; border-radius: 2em; border: 0; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
+#planBody h2 { margin: 0 0 .6em; font-size: 3.6em; letter-spacing: -.025em; cursor: pointer; }
+.pTurn, .pInfos { padding: 1.5em 1.7em; border-radius: 1.6em; background: #141416; margin-bottom: 1.2em; cursor: pointer; }
+.pTurn small, .pInfos small { display: block; font-size: 1.55em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin-bottom: .5em; }
+.pTurn p { margin: 0; font-size: 2.1em; line-height: 1.35; font-weight: 600; }
+.pDim { color: #636366; font-weight: 400; }
+.pInfos { cursor: default; display: flex; flex-direction: column; gap: .5em; }
+.pInfos div { display: flex; justify-content: space-between; gap: 1em; font-size: 1.8em; line-height: 1.3; cursor: pointer; }
+.pInfos div span::before { content: '○ '; color: #636366; }
+.pInfos div.ok span::before { content: '● '; color: #bf5af2; }
+.pInfos div em { font-style: normal; color: #636366; white-space: nowrap; }
+.pInfos div.ok em { color: #bf5af2; }
+.pInfos button { align-self: flex-start; margin-top: .4em; font: inherit; font-size: 1.6em; background: none; border: 0; color: #86868b; cursor: pointer; padding: 0; }
+.pLegend { display: flex; flex-wrap: wrap; gap: .4em 1.2em; margin: .6em 0 1.8em; font-size: 1.5em; color: #aeaeb2; }
+.pLegend span::before { content: ''; display: inline-block; width: .7em; height: .7em; border-radius: .2em; background: var(--c); margin-right: .4em; }
+.pLegend .lk::before { width: 1.4em; height: .22em; background: #ff9f0a; vertical-align: middle; }
+.pLinking { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 1em; margin-bottom: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
+.pLinking button { font: inherit; font-size: .85em; border: 0; border-radius: 2em; padding: .3em .8em; background: #000; color: #ff9f0a; cursor: pointer; }
 .pFlow { position: relative; padding-right: 17%; }
-.pFlow h3 { margin: 1.6em 0 .2em; font-size: 2.6em; letter-spacing: -.015em; }
-.pFlow h3:first-child { margin-top: 0; }
-.pWho { margin: 0 0 1em; font-size: 1.8em; color: #86868b; }
-.pSplit { margin-top: 2.4em; padding-left: 1.4em; border-left: .3em solid #3a3a3c; }
-.pSplit h3 { margin: 0 0 .4em; font-size: 2.2em; color: #c7c7cc; }
-.pLane h4 { margin: 1.6em 0 .8em; font-size: 2em; font-weight: 600; color: #f5f5f7; }
-.pBeat { position: relative; display: flex; gap: 1em; margin-bottom: .9em; padding: 1.2em 1.4em 1.3em 1em; border-radius: 1.4em; background: #141416; box-sizing: border-box; transition: opacity .2s; }
-.pTicks { flex: none; display: flex; flex-direction: column; gap: .35em; padding-top: .3em; }
-.pTicks i { flex: 1; width: .45em; min-height: 1.4em; border-radius: .2em; background: #48484a; }
-.pIn { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .7em; }
-.pTop { display: flex; align-items: baseline; gap: .6em; }
-.pTop .pN { font-size: 1.7em; font-weight: 700; color: #86868b; font-variant-numeric: tabular-nums; }
-.pTop b { flex: 1; font-size: 2.2em; letter-spacing: -.01em; }
-.pTop em { font-style: normal; font-size: 1.55em; color: #86868b; white-space: nowrap; }
-.pTags { display: flex; flex-wrap: wrap; gap: .5em; align-items: center; }
-.pTags button { font: inherit; font-size: 1.6em; padding: .3em .75em; border-radius: 2em; border: .1em solid #0a84ff; background: none; color: #64d2ff; cursor: pointer; }
-.pTags span { font-size: 1.6em; color: #c7c7cc; font-style: italic; }
-.pIn > p { margin: 0; font-size: 1.85em; line-height: 1.35; color: #d1d1d6; }
-.pEx { display: flex; flex-direction: column; gap: .35em; padding-left: .9em; border-left: .2em solid #3a3a3c; }
-.pEx span { font-size: 1.65em; line-height: 1.3; color: #aeaeb2; }
-.pCh { display: flex; flex-direction: column; gap: .4em; }
-.pCh small { font-size: 1.5em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #30d158; }
-.pCh span { font-size: 1.7em; line-height: 1.3; padding: .35em .7em; border-radius: .7em; background: #1f2a22; }
-.pCh i { font-style: normal; color: #86868b; }
-.pCh u { display: block; text-decoration: none; font-size: .85em; color: #ff9f0a; }
-.pLoop { font-size: 1.6em; line-height: 1.3; color: #ff9f0a; }
+.pBox { margin-bottom: 2.2em; padding: 1.2em 1em .6em; border-radius: 1.8em; border: .12em solid #2c2c2e; }
+.pBox h3 { margin: 0 0 .7em .2em; font-size: 2.2em; letter-spacing: -.01em; cursor: pointer; }
+.pAdd { display: flex; gap: .6em; margin: .2em 0 .6em; }
+.pAdd button { background: none; border: .1em dashed #48484a; color: #86868b; }
+.pBeat { position: relative; display: flex; gap: .8em; margin-bottom: .8em; padding: 1em 1.2em 1.1em 0; border-radius: 1.2em; background: #1c1c1e; box-sizing: border-box; overflow: hidden; cursor: pointer; transition: opacity .2s; }
+.pBeat.ch { background: #17241b; }
+.pTabs { flex: none; width: .55em; display: flex; flex-direction: column; margin: -1em 0 -1.1em; }
+.pTabs i { flex: 1; background: #3a3a3c; }
+.pTicks { flex: none; display: flex; flex-direction: column; gap: .3em; padding-top: .3em; }
+.pTicks i { flex: 1; width: .4em; min-height: 1.2em; border-radius: .2em; background: #48484a; }
+.pIn { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .55em; }
+.pTop { display: flex; align-items: baseline; gap: .5em; }
+.pTop .pN { font-size: 1.6em; font-weight: 700; color: #86868b; }
+.pTop b { flex: 1; font-size: 2em; letter-spacing: -.01em; line-height: 1.2; }
+.pBeat.ch .pTop b { color: #30d158; }
+.pTop em { font-style: normal; font-size: 1.45em; color: #86868b; white-space: nowrap; }
+.pTech { font-size: 1.7em; font-weight: 600; color: #f5f5f7; }
+.pGoals { display: flex; flex-wrap: wrap; gap: .3em .8em; }
+.pGoals span { font-size: 1.45em; color: var(--c); }
+.pIn > p { margin: 0; font-size: 1.75em; line-height: 1.35; color: #d1d1d6; }
+.pCh { display: flex; flex-direction: column; gap: .3em; }
+.pCh span { font-size: 1.6em; line-height: 1.3; padding: .3em .6em; border-radius: .6em; background: #213528; }
+.pInfo span { display: block; font-size: 1.55em; color: #bf5af2; }
+.pLoop { font-size: 1.55em; line-height: 1.3; color: #ff9f0a; }
 .pLoop.in { color: #ffcc80; }
-.pExt { margin: 1.4em 0 .6em; padding: .9em 1.2em; border-radius: 1.2em; border: .12em dashed #ff9f0a; color: #ff9f0a; font-size: 1.9em; font-weight: 600; }
 .pSvg { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; overflow: visible; }
 .pSvg path { fill: none; stroke: #ff9f0a; stroke-width: 2; opacity: .75; transition: opacity .2s; }
 .pSvg circle { fill: #ff9f0a; }
-.pFocus .pSvg path { opacity: .12; }
+.pFocus .pSvg path { opacity: .1; }
 .pFocus .pSvg path.on { opacity: 1; stroke-width: 2.6; }
 .pFocus .pBeat { opacity: .35; }
 .pFocus .pBeat.on { opacity: 1; }
+#planSheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; max-height: 78%; overflow-y: auto; background: #1c1c1e; border-radius: 2.4em 2.4em 0 0; box-shadow: 0 -1em 4em rgba(0,0,0,.6); }
+#planSheet[hidden] { display: none; }
+.pSh { display: flex; flex-direction: column; gap: .7em; padding: 2em 5% 3em; }
+.pShTop { display: flex; justify-content: space-between; align-items: center; }
+.pShTop b { font-size: 2.4em; }
+.pShTop button { font: inherit; font-size: 1.9em; font-weight: 700; border: 0; border-radius: 2em; padding: .35em 1.1em; background: #0a84ff; color: #fff; cursor: pointer; }
+.pSh small { font-size: 1.5em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin-top: .8em; }
+.pSh input, .pSh textarea { font: inherit; font-size: 1.9em; padding: .6em .8em; border-radius: .7em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; resize: none; user-select: text; }
+.pPick, .pSug { display: flex; flex-wrap: wrap; gap: .5em; }
+.pPick button, .pSug button { font: inherit; font-size: 1.6em; padding: .4em .8em; border-radius: 2em; border: .1em solid var(--c, #48484a); background: none; color: #c7c7cc; cursor: pointer; }
+.pPick button.on { background: var(--c); color: #000; font-weight: 600; }
+.pSug button { border-style: dashed; color: #f5f5f7; }
+.pStep { display: flex; align-items: center; gap: 1.2em; }
+.pStep button { font: inherit; font-size: 2.4em; width: 1.6em; height: 1.6em; border-radius: 50%; border: 0; background: #2c2c2e; color: #fff; cursor: pointer; }
+.pStep b { font-size: 2.4em; min-width: 1.4em; text-align: center; }
+.pLinks { display: flex; flex-direction: column; gap: .5em; }
+.pLinks div { display: flex; align-items: center; gap: .5em; }
+.pLinks div span { font-size: 1.8em; color: #ff9f0a; white-space: nowrap; }
+.pLinks div input { flex: 1; min-width: 0; font-size: 1.7em; }
+.pLinks div button { font: inherit; font-size: 2em; border: 0; background: none; color: #86868b; cursor: pointer; }
+.pLinks > button { align-self: flex-start; font: inherit; font-size: 1.7em; padding: .4em .9em; border-radius: 2em; border: .1em solid #ff9f0a; background: none; color: #ff9f0a; cursor: pointer; }
+.pRow { display: flex; gap: .6em; margin-top: 1.4em; }
+.pRow button { flex: 1; font: inherit; font-size: 1.7em; padding: .6em; border-radius: 1em; border: 0; background: #2c2c2e; color: #f5f5f7; cursor: pointer; }
+.pRow .del { color: #ff453a; }
 /* System: the 5 steps, each number in a ring of its own colour */
 .sys { margin: 1em 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3.2em; }
 .sys li { display: flex; align-items: center; gap: 2.4em; }
@@ -941,6 +970,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="plan" class="card menu" hidden>
     <div class="step" id="planBody"></div>
+    <div id="planSheet" hidden></div>
   </div>
   <div id="cosmo" class="card menu" hidden>
     <div class="strips">
@@ -1350,7 +1380,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261029140000"></script>
+<script src="plan.js?v=20261029160000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -2917,15 +2947,9 @@ function techGo(id) { const i = techPath.indexOf(id); if (i >= 0) techPath.lengt
 $('#techStages').innerHTML = TECH_STAGES.map((st) => `<section class="tStage"><header><i style="--c:${st.c}">${st.n}</i><div><b>${esc(st.name)}</b><p>${esc(st.line)}</p></div></header>`
   + `<div class="tChips">${st.techs.map((id) => techChip(id, st.c)).join('')}</div></section>`).join('');
 $('#techBtn').onclick = (e) => { e.stopPropagation(); $('#tech').scrollTop = 0; show('#tech'); };
-$('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techFrom = null; techPath = [b.dataset.t]; techOpen(); };
-// ---- Infos · Plan de scène (plan.js): a scene planned before its dialogue. A tap on a beat lights its loops only;
-// its technique opens the technique's card (‹ comes back here) ----
-let techFrom = null, planOn = null;
-$('#planBtn').onclick = (e) => { e.stopPropagation(); show('#plan'); $('#plan').scrollTop = 0; PLAN.render($('#planBody')); planOn = null; };
-$('#planBody').onclick = (e) => {
-  const t = e.target.closest('[data-t]'); if (t && TECH[t.dataset.t]) { e.stopPropagation(); techFrom = '#plan'; techPath = [t.dataset.t]; techOpen(); return; }
-  const b = e.target.closest('.pBeat'); planOn = b && b.dataset.b !== planOn ? b.dataset.b : null; PLAN.focus($('#planBody'), planOn);
-};
+$('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techPath = [b.dataset.t]; techOpen(); };
+// ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
+$('#planBtn').onclick = (e) => { e.stopPropagation(); show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 $('#techBody').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techGo(b.dataset.t); };
 $('#techPath').onclick = (e) => { const b = e.target.closest('[data-i]'); if (!b) return; e.stopPropagation(); techPath.length = +b.dataset.i + 1; techOpen(); };
 // ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
@@ -3030,7 +3054,7 @@ $('#back').onclick = (e) => {
   e.stopPropagation();
   if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
   if (screen === '#techCard' && techPath.length > 1) { techPath.pop(); techOpen(); return; }   // a card: back one step of the path
-  if (screen === '#techCard' && techFrom) { show(techFrom); return; }   // opened from the scene plan: back there
+  if (screen === '#plan') PLAN.closeSheet();
   const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
 // only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
