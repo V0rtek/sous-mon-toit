@@ -2750,6 +2750,7 @@ let live = null, room = ROLE === 'watch' ? WATCH : null, game = null, tape = [];
 let myName = '', sentK = -1, hostId = null;   // joiner: its name, the last line it asked to move past, the host's id
 const myId = (() => {
   const fresh = () => Math.random().toString(36).slice(2, 10);
+  if (TV) return 'tv' + fresh();   // the TV's own: a player's tab in the same browser (the TV shown from that computer) keeps the stored one
   try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
 })();
 const topic = () => `${NS}/${room}`;
