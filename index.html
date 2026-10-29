@@ -406,9 +406,11 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pInfos div em { font-style: normal; color: #636366; white-space: nowrap; }
 .pInfos div.ok em { color: #bf5af2; }
 .pInfos button { align-self: flex-start; margin-top: .4em; font: inherit; font-size: 1.6em; background: none; border: 0; color: #86868b; cursor: pointer; padding: 0; }
-.pLegend { display: flex; flex-wrap: wrap; gap: .4em 1.2em; margin: .6em 0 1.8em; font-size: 1.5em; color: #aeaeb2; }
-.pLegend span::before { content: ''; display: inline-block; width: .7em; height: .7em; border-radius: .2em; background: var(--c); margin-right: .4em; }
-.pLegend .lk::before { width: 1.4em; height: .22em; background: #ff9f0a; vertical-align: middle; }
+.gi { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -.2em; }
+.pLegend { display: flex; flex-wrap: wrap; gap: .5em 1.2em; margin: .6em 0 1.8em; font-size: 1.5em; color: #aeaeb2; }
+.pLegend span { display: inline-flex; align-items: center; gap: .35em; }
+.pLegend span .gi { color: var(--c); }
+.pLegend .lk::before { content: ''; display: inline-block; width: 1.4em; height: .22em; background: #ff9f0a; }
 .pLinking { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
 .pLinking button { font: inherit; font-size: .85em; border: 0; border-radius: 2em; padding: .3em .8em; background: #000; color: #ff9f0a; cursor: pointer; }
 .pBox { padding: 1.2em 1em .6em; background: #0b0b0d; border-radius: 1.8em; border: .12em solid #2c2c2e; }
@@ -417,8 +419,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pAdd button { background: none; border: .1em dashed #48484a; color: #86868b; }
 .pBeat { position: relative; display: flex; gap: .8em; margin-bottom: .8em; padding: 1em 1.2em 1.1em 0; border-radius: 1.2em; background: #1c1c1e; box-sizing: border-box; overflow: hidden; cursor: pointer; transition: opacity .2s; }
 .pBeat.ch { background: #17241b; }
-.pTabs { flex: none; width: .55em; display: flex; flex-direction: column; margin: -1em 0 -1.1em; }
-.pTabs i { flex: 1; background: #3a3a3c; }
+.pTabs { flex: none; width: 3.4em; display: flex; flex-direction: column; margin: -1em 0 -1.1em; }
+.pTabs i { flex: 1; min-height: 3.4em; background: #3a3a3c; display: flex; justify-content: center; padding-top: .6em; box-sizing: border-box; color: rgba(0,0,0,.8); }
+.pTabs i .gi { width: 2.3em; height: 2.3em; stroke-width: 2.3; }
 .pTicks { flex: none; display: flex; flex-direction: column; gap: .3em; padding-top: .3em; }
 .pTicks i { flex: 1; width: .4em; min-height: 1.2em; border-radius: .2em; background: #48484a; }
 .pIn { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .55em; }
@@ -429,7 +432,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pTop em { font-style: normal; font-size: 1.45em; color: #86868b; white-space: nowrap; }
 .pTech { font-size: 1.7em; font-weight: 600; color: #f5f5f7; }
 .pGoals { display: flex; flex-wrap: wrap; gap: .3em .8em; }
-.pGoals span { font-size: 1.45em; color: var(--c); }
+.pGoals span { display: inline-flex; align-items: center; gap: .3em; font-size: 1.45em; color: var(--c); }
 .pIn > p { margin: 0; font-size: 1.75em; line-height: 1.35; color: #d1d1d6; }
 .pCh { display: flex; flex-direction: column; gap: .3em; }
 .pCh span { font-size: 1.6em; line-height: 1.3; padding: .3em .6em; border-radius: .6em; background: #213528; }
@@ -452,6 +455,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pSh small { font-size: 1.5em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin-top: .8em; }
 .pSh input, .pSh textarea { font: inherit; font-size: 1.9em; padding: .6em .8em; border-radius: .7em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; resize: none; user-select: text; }
 .pPick, .pSug { display: flex; flex-wrap: wrap; gap: .5em; }
+.pPick button .gi { margin-right: .35em; }
 .pPick button, .pSug button { font: inherit; font-size: 1.6em; padding: .4em .8em; border-radius: 2em; border: .1em solid var(--c, #48484a); background: none; color: #c7c7cc; cursor: pointer; }
 .pPick button.on { background: var(--c); color: #000; font-weight: 600; }
 .pSug button { border-style: dashed; color: #f5f5f7; }
@@ -1385,7 +1389,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261029200000"></script>
+<script src="plan.js?v=20261029213000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>

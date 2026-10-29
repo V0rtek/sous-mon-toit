@@ -7,14 +7,16 @@
 // On top, the turn and the infos to expose: each one says where it comes out, or that it hasn't yet. Kept on this phone ----
 window.PLAN = (() => {
   const GOALS = [
-    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', tech: ['Show contrast'] },
-    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', tech: ['Show contrast'] },
-    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', tech: ['Phrase pas finie'] },
-    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', tech: [] },
-    { id: 'info', name: 'Reveal info', c: '#bf5af2', tech: ['Info en morceaux'] },
-    { id: 'callback', name: 'Callback', c: '#30d158', tech: [] },
+    // icon: a person / two people / a target / a rising arrow / an eye / a loop back
+    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', tech: ['Show contrast'], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', tech: ['Show contrast'], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
+    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', tech: ['Phrase pas finie'], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
+    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', tech: [], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
+    { id: 'info', name: 'Reveal info', c: '#bf5af2', tech: ['Info en morceaux'], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+    { id: 'callback', name: 'Callback', c: '#30d158', tech: [], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
   const G = Object.fromEntries(GOALS.map((g) => [g.id, g]));
+  const ico = (g) => `<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>`;
 
   // the example: Last call, episode 1, reverse-engineered from bar.js (what happens, never the lines)
   const LC = () => ({
@@ -95,8 +97,8 @@ window.PLAN = (() => {
 
   function rect(b) {
     const out = P.links.filter((l) => l.from === b.id), back = P.links.filter((l) => l.to === b.id);
-    const tabs = (b.goals || []).map((g) => (G[g] ? `<i style="background:${G[g].c}"></i>` : '')).join('') || '<i></i>';
-    const goals = (b.goals || []).filter((g) => G[g]).map((g) => `<span style="--c:${G[g].c}">${esc(G[g].name)}</span>`).join('');
+    const tabs = (b.goals || []).filter((g) => G[g]).map((g) => `<i style="background:${G[g].c}">${ico(G[g])}</i>`).join('') || '<i></i>';
+    const goals = (b.goals || []).filter((g) => G[g]).map((g) => `<span style="--c:${G[g].c}">${ico(G[g])}${esc(G[g].name)}</span>`).join('');
     const ticks = Array.from({ length: b.lines || 1 }, () => '<i></i>').join('');
     const infos = (b.reveals || []).map((r) => P.infos.find((x) => x.id === r)).filter(Boolean);
     return `<div class="pBeat${b.kind === 'choice' ? ' ch' : ''}" data-b="${b.id}" style="min-height:${(b.lines || 1) * NL}em">`
@@ -126,7 +128,7 @@ window.PLAN = (() => {
       + `<div class="pInfos"><small>Infos à exposer</small>${P.infos.map((x) => { const b = revealed(x.id);
         return `<div class="${b ? 'ok' : ''}" data-i="${x.id}"><span>${esc(x.text)}</span><em>${b ? 'au ' + num(b.id) : 'pas encore'}</em></div>`; }).join('')}`
       + '<button type="button" data-a="info">+ Info</button></div>'
-      + `<div class="pLegend">${GOALS.map((g) => `<span style="--c:${g.c}">${esc(g.name)}</span>`).join('')}<span class="lk">lien</span></div></div>`
+      + `<div class="pLegend">${GOALS.map((g) => `<span style="--c:${g.c}">${ico(g)}${esc(g.name)}</span>`).join('')}<span class="lk">lien</span></div></div>`
       + P.boxes.map((box, k) => `<section class="pBox" data-k="${k}" data-box="${box.id}"><h3 data-a="box">${esc(box.title)}</h3>${box.beats.map(rect).join('')}`
         + '<div class="pAdd"><button type="button" data-a="beat">+ Rectangle</button><button type="button" data-a="choice">+ Choix</button></div></section>').join('')
       + '<svg class="pSvg" aria-hidden="true"></svg></div></div>';
@@ -189,7 +191,7 @@ window.PLAN = (() => {
     const b = find(id); if (!b) return; editing = id; const s = sheet(); s.onclick = beatSheet; s.oninput = onInput;
     const sug = [...new Set((b.goals || []).flatMap((g) => (G[g] ? G[g].tech : [])))];
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>${b.kind === 'choice' ? 'Choix' : 'Rectangle'} ${num(id)}</b><button type="button" data-s="close">OK</button></div>`
-      + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${esc(g.name)}</button>`).join('')}</div>`
+      + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}</div>`
       + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">`
       + (sug.length ? `<div class="pSug">${sug.map((t) => `<button type="button" data-tech="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : '')
       + `<small>Ce qui se passe (pas de dialogue)</small><textarea data-f="what" rows="3">${esc(b.what)}</textarea>`
