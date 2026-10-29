@@ -7,9 +7,11 @@
 <meta name="theme-color" content="#000">
 <title>Full demo</title>
 <script>
+// ?tv belongs to the game: the TV's own screen (index.html?tv), never Full demo's previews
+if (new URLSearchParams(location.search).has('tv')) location.replace('index.html?tv');
 // a brand-new profile (first visit, or just reset in the settings) starts with the onboarding: what you're in the mood for,
 // then that taste's opening; it comes back here after, with the taste kept (smtDemo.onb)
-try {
+else try {
   if (!Object.keys(localStorage).some((k) => k === 'smt-name' || (k.startsWith('smtDemo.') && k !== 'smtDemo.opts')))
     location.replace('onboarding.html?v=4&new=1&back=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
 } catch { /* no storage: straight in */ }
