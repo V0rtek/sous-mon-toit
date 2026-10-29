@@ -100,15 +100,14 @@ window.PLAN = (() => {
 
   function rect(b) {
     const out = P.links.filter((l) => l.from === b.id), back = P.links.filter((l) => l.to === b.id);
-    const tabs = (b.goals || []).filter((g) => G[g]).map((g) => `<i style="background:${G[g].c}">${ico(G[g])}</i>`).join('') || '<i></i>';
-    const goals = (b.goals || []).filter((g) => G[g]).map((g) => `<span style="--c:${G[g].c}">${ico(G[g])}${esc(G[g].name)}</span>`).join('');
+    // the goals are only their colour and icon; a hover or a tap on one shows its name
+    const tabs = (b.goals || []).filter((g) => G[g]).map((g) => `<i style="background:${G[g].c};--c:${G[g].c}" data-goal="${esc(G[g].name)}">${ico(G[g])}</i>`).join('') || '<i></i>';
     const ticks = Array.from({ length: b.lines || 1 }, () => '<i></i>').join('');
     const infos = (b.reveals || []).map((r) => P.infos.find((x) => x.id === r)).filter(Boolean);
     return `<div class="pBeat${b.kind === 'choice' ? ' ch' : ''}" data-b="${b.id}" style="min-height:${(b.lines || 1) * NL}em">`
       + `<div class="pTabs">${tabs}</div><div class="pTicks">${ticks}</div><div class="pIn">`
       + `<div class="pTop"><span class="pN">${num(b.id)}</span><b>${b.kind === 'choice' ? 'Choix' : esc(b.tech) || '…'}</b><em>${b.lines || 1} répl.</em></div>`
       + (b.kind === 'choice' && b.tech ? `<div class="pTech">${esc(b.tech)}</div>` : '')
-      + (goals ? `<div class="pGoals">${goals}</div>` : '')
       + (b.what ? `<p>${esc(b.what)}</p>` : '')
       + (b.kind === 'choice' && b.opts && b.opts.length ? `<div class="pCh">${b.opts.map((o) => `<span>${esc(o)}</span>`).join('')}</div>` : '')
       + (infos.length ? `<div class="pInfo">${infos.map((x) => `<span>révèle : ${esc(x.text)}</span>`).join('')}</div>` : '')
@@ -286,6 +285,9 @@ window.PLAN = (() => {
   function onClick(e) {
     e.stopPropagation();
     if (dragged) { dragged = false; return; }
+    const goal = e.target.closest('[data-goal]');
+    for (const n of el.querySelectorAll('[data-goal].show')) if (n !== goal) n.classList.remove('show');
+    if (goal) { goal.classList.toggle('show'); return; }   // a goal's tab: its name, nothing else
     const a = e.target.closest('[data-a]'), beat = e.target.closest('.pBeat'), info = e.target.closest('[data-i]');
     if (linking && beat) {   // the second tap of a link: where it leads; then the sheet, for what comes back
       const from = linking, to = beat.dataset.b; linking = null;
