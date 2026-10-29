@@ -8,23 +8,44 @@
 window.PLAN = (() => {
   const GOALS = [
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
-    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', tech: [{ n: 'Show contrast', s: [{ n: 'Même début de phrase, fins opposées' }] }, { n: 'Tell a story' }, { n: 'Le perso qui voit à travers' }, { n: 'Unexpected' }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
-    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', tech: [{ n: 'Show contrast' }, { n: 'Shared memory' }, { n: 'Show care' }, { n: 'Options = façons d’être ami' }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
-    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', tech: [{ n: 'Phrase pas finie' }, { n: 'Expose desire', s: [{ n: 'Direct confession' }] }, { n: 'Conflicting desire' }, { n: 'Ne pas décider le désir trop tôt' }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
-    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', tech: [{ n: 'Le rire meurt, phrase sérieuse' }, { n: 'Character positioning', s: [{ n: 'Show position' }] }, { n: 'Painful consequences' }, { n: 'Personal win' }, { n: 'Tease choice' }, { n: 'La menace vise le désir' }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
-    { id: 'info', name: 'Reveal info', c: '#bf5af2', tech: [{ n: 'Info en morceaux' }, { n: 'Règle sur un objet' }, { n: 'Lieu banal, rencontre qui ne l’est pas' }, { n: 'Un tiers pose la question qu’on évite' }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
-    { id: 'callback', name: 'Callback', c: '#30d158', tech: [{ n: 'Devise retournée' }, { n: 'Écho' }, { n: 'Objet planté' }, { n: 'Phrase pas finie reprise' }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
+    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', d: 'Faire aimer un perso : on veut passer du temps avec lui.',
+      tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
+        { n: 'Tell a story', d: 'Une seule réplique, son passé en une ligne : « Yeah, I used to x, but y. »' }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', d: 'Faire aimer le lien entre deux persos, pas seulement chacun.',
+      tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.' }, { n: 'Shared memory', d: 'Ils se rappellent un moment vécu ensemble, chacun avec sa version.' },
+        { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement.' }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
+    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', d: 'Montrer clairement ce qu’un perso veut.',
+      tech: [{ n: 'Direct confession', d: 'Le perso dit tout haut ce qu’il veut ou ressent, sans sous-entendu.' }, { n: 'Phrase pas finie', d: 'Il commence à dire ce qu’il veut, ne finit pas, et se sauve.' }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
+    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', d: 'Montrer ce qui peut être perdu : à mettre juste avant un choix, lié à lui.',
+      tech: [{ n: 'Mention consequences', d: 'Quelqu’un dit ce qui arrivera si ça tourne mal.' }, { n: 'Show character positioning', d: 'Un perso prend position (« I’m against that ») : le joueur sait qui il va décevoir.' }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
+    { id: 'info', name: 'Reveal info', c: '#bf5af2', d: 'Faire découvrir une info de l’intrigue, une à la fois, après celle dont elle dépend.',
+      tech: [{ n: 'Tell a story', d: 'Pour l’instant, une info sort seulement par Tell a story : un perso la raconte en une ligne.' }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+    { id: 'callback', name: 'Callback', c: '#30d158', d: 'Une chose plantée tôt revient plus tard avec un autre sens.',
+      tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.' }, { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.' },
+        { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.' }, { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.' }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
-  // a goal's techniques: { n: name, s: [the techniques under it] } (a category opens on what's under it)
+  // a goal: d = what it's for; its techniques: { n: name, d: what it is, s: [the techniques under it] } (a category opens
+  // on what's under it)
   const G = Object.fromEntries(GOALS.map((g) => [g.id, g]));
   const flat = (list) => (list || []).flatMap((t) => [t.n, ...flat(t.s)]);
+  const flatT = (list) => (list || []).flatMap((t) => [t, ...flatT(t.s)]);
+  const techD = (n) => { for (const g of GOALS) { const t = flatT(g.tech).find((x) => x.n === n); if (t) return t.d; } return ''; };
+  // a character's face: its sheet in a circle, head and shoulders
+  const face = (sp) => { const S = window.SPRITES && SPRITES[sp]; const pose = S ? (S.poses.listen ? 'listen' : Object.keys(S.poses)[0]) : null;
+    return `<span class="pFace">${pose ? `<img src="chars/${sp}/${pose}.webp" alt="">` : ''}</span>`; };
   const ico = (g) => `<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>`;
 
   // the example: Last call, episode 1, reverse-engineered from bar.js (what happens, never the lines)
   const LC = () => ({
-    v: 3,
+    v: 4,
     title: 'Last Call · épisode 1',
     turn: 'Un inconnu offre 5000 $ cash à Brooke pour une soirée louche, et lui demande d’amener Cam.',
+    chars: [
+      { id: 'k1', name: 'Justin', sprite: 'justin_bar', traits: ['Se sent trop vieux pour ça', 'Paie le loyer de son ami'], infos: ['i2'] },
+      { id: 'k2', name: 'Brooke', sprite: 'brooke', traits: ['Cassé et fier de l’être', 'Drôle même quand ça va mal'], infos: ['i1', 'i3'] },
+      { id: 'k3', name: 'Cam', sprite: 'cam', traits: ['Voit à travers tout le monde'], infos: ['i5'] },
+      { id: 'k4', name: 'L’inconnu', sprite: 'suit', traits: ['Sait tout sur tout le monde'], infos: ['i4', 'i6', 'i7', 'i8', 'i9'] },
+    ],
     infos: [
       // a chain: an info under another needs it first (the job before what the job is, the job before its rule)
       { id: 'i1', text: 'Brooke est cassé' }, { id: 'i2', text: 'Justin paie son loyer, et c’est fini', parent: 'i1' },
@@ -77,19 +98,27 @@ window.PLAN = (() => {
       { from: 's6', to: 'c5', label: 'Le texto arrive chez Justin' },
     ],
   });
-  const EMPTY = () => ({ v: 3, title: 'Nouveau plan', turn: '', infos: [], links: [],
+  const EMPTY = () => ({ v: 4, title: 'Nouveau plan', turn: '', chars: [], infos: [], links: [],
     boxes: [{ id: 'x1', title: 'Scène 1', col: 0, beats: [] }, { id: 'x2', title: 'Plus tard', col: 1, beats: [] }] });
 
-  const KEY = 'smt-plan';
-  // an older plan: the example comes back as it is now; a plan of your own gets a column per box
+  // the plans kept on this phone (smt-plans: every plan, the one open); a generated plan pasted in is a new one, so each
+  // one can be looked at again. An older plan: the example comes back as it is now; a plan of your own gets a column per box
+  const KEY = 'smt-plans';
   const fix = (p) => {
     if (!p || !Array.isArray(p.boxes)) return LC();
-    if ((p.v || 0) < 3 && p.title === 'Last Call · épisode 1') return LC();
-    p.boxes.forEach((b, i) => { if (!b.id) b.id = 'x' + i; if (b.col == null) b.col = i; });
-    return { title: '', turn: '', infos: [], links: [], ...p, v: 3 };
+    if ((p.v || 0) < 4 && p.title === 'Last Call · épisode 1') return LC();
+    p.boxes.forEach((b, i) => { if (!b.id) b.id = 'x' + i; if (b.col == null) b.col = i; if (!Array.isArray(b.beats)) b.beats = []; });
+    if (!Array.isArray(p.chars) && Array.isArray(p.characters)) { p.chars = p.characters.map((c, i) => ({ ...c, id: 'k' + i })); delete p.characters; }   // a generated plan
+    return { title: '', turn: '', chars: [], infos: [], links: [], ...p, v: 4 };
   };
-  let P = (() => { try { return fix(JSON.parse(localStorage.getItem(KEY))); } catch { return LC(); } })();
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch { /* private window */ } };
+  const store = (() => {
+    try { const k = JSON.parse(localStorage.getItem(KEY)); if (k && Array.isArray(k.list) && k.list.length) return { cur: Math.min(k.cur || 0, k.list.length - 1), list: k.list.map(fix) }; } catch { /* none yet */ }
+    let old = null; try { old = JSON.parse(localStorage.getItem('smt-plan')); } catch { /* none */ }
+    return { cur: 0, list: [fix(old)] };
+  })();
+  let P = store.list[store.cur];
+  const save = () => { store.list[store.cur] = P; try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { /* private window */ } };
+  const openPlan = (p) => { store.list.push(p); store.cur = store.list.length - 1; P = p; focusId = null; save(); };
   let el = null, focusId = null, linking = null, editing = null, zoom = 1;
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -126,7 +155,8 @@ window.PLAN = (() => {
     const roots = P.infos.filter((x) => !x.parent || !P.infos.some((y) => y.id === x.parent));
     const row = (x, d, need) => {
       const n = at(x.id), early = n && (!need || need > n);
-      return `<div class="pI${n ? ' ok' : ''}${early && d ? ' warn' : ''}" data-i="${x.id}" style="--d:${d}"><b class="pGrip" data-grip="${x.id}">⠿</b>${d ? '<i class="pUp">↳</i>' : ''}<span>${esc(x.text)}</span>`
+      const who = P.chars.filter((c) => (c.infos || []).includes(x.id)).map((c) => face(c.sprite)).join('');
+      return `<div class="pI${n ? ' ok' : ''}${early && d ? ' warn' : ''}" data-i="${x.id}" style="--d:${d}"><b class="pGrip" data-grip="${x.id}">⠿</b>${d ? '<i class="pUp">↳</i>' : ''}<span>${esc(x.text)}</span>${who}`
         + `<em>${early && d ? '⚠ ' : ''}${n ? 'au ' + n : 'pas encore'}</em></div>` + kids(x.id).map((k) => row(k, d + 1, n)).join('');
     };
     return roots.map((x) => row(x, 0, 0)).join('');
@@ -134,15 +164,16 @@ window.PLAN = (() => {
 
   // the goals on top: a tap on one opens its techniques (a category opens on the ones under it); each one drags onto a
   // rectangle (it takes the technique and the goal) or into a box (a new rectangle with them)
-  const pal = { g: null, path: [] };
+  const pal = { g: null, path: [], sel: null };
   const palList = () => { let list = G[pal.g].tech; for (const i of pal.path) list = (list[i] && list[i].s) || []; return list; };
   function palette() {
     if (!pal.g || !G[pal.g]) return '';
-    const g = G[pal.g]; let list = g.tech; const crumbs = [`<button type="button" data-crumb="-1">${esc(g.name)}</button>`];
-    pal.path.forEach((i, k) => { crumbs.push(`<button type="button" data-crumb="${k}">${esc(list[i].n)}</button>`); list = list[i].s || []; });
-    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><div class="pChips">`
-      + (list.length ? list.map((t, i) => `<b data-tn="${i}">${esc(t.n)}${t.s && t.s.length ? ' <i>›</i>' : ''}</b>`).join('') : '<em>Aucune technique encore.</em>')
-      + '</div><small>Glisse une technique sur un rectangle, ou dans une boîte pour en créer un.</small></div>';
+    const g = G[pal.g]; let list = g.tech, d = g.d; const crumbs = [`<button type="button" data-crumb="-1">${esc(g.name)}</button>`];
+    pal.path.forEach((i, k) => { crumbs.push(`<button type="button" data-crumb="${k}">${esc(list[i].n)}</button>`); d = list[i].d; list = list[i].s || []; });
+    if (pal.sel != null && list[pal.sel]) d = list[pal.sel].d;   // a technique tapped: what it is
+    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><p class="pD">${esc(d)}</p><div class="pChips">`
+      + (list.length ? list.map((t, i) => `<b data-tn="${i}" class="${pal.sel === i ? 'on' : ''}" title="${esc(t.d)}">${esc(t.n)}${t.s && t.s.length ? ' <i>›</i>' : ''}</b>`).join('') : '<em>Aucune technique encore.</em>')
+      + '</div><small>Touche une technique pour la voir ; glisse-la sur un rectangle, ou dans une boîte pour en créer un.</small></div>';
   }
 
   // the page: a fixed bar on top, then the canvas (scrolls both ways): the head (turn, infos, legend) top left, the boxes
@@ -151,13 +182,16 @@ window.PLAN = (() => {
     const view = el.querySelector('.pView'), keep = view ? [view.scrollLeft, view.scrollTop] : [0, 0];
     const revealed = (id) => all().find((b) => (b.reveals || []).includes(id));
     el.innerHTML = `<div class="pHead"><b data-a="title">${esc(P.title)}</b><div class="pBar"><button type="button" data-a="out">−</button><button type="button" data-a="in">+</button>`
-      + '<button type="button" data-a="addbox">+ Boîte</button><button type="button" data-a="example">Exemple</button><button type="button" data-a="new">Nouveau</button>'
-      + '<button type="button" data-a="copy">Copier</button><button type="button" data-a="paste">Coller</button></div>'
-      + `<div class="pGoalBar">${GOALS.map((g) => `<button type="button" data-pg="${g.id}" class="${pal.g === g.id ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}<span class="lk">lien</span></div>`
+      + '<button type="button" data-a="addbox">+ Boîte</button><button type="button" data-a="plans">Plans</button><button type="button" data-a="prompts">Prompts</button></div>'
+      + `<div class="pGoalBar">${GOALS.map((g) => `<button type="button" data-pg="${g.id}" class="${pal.g === g.id ? 'on' : ''}" title="${esc(g.d)}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}<span class="lk">lien</span></div>`
       + palette()
       + (linking ? '<div class="pLinking">Touche le rectangle où ça mène <button type="button" data-a="cancel">Annuler</button></div>' : '') + '</div>'
       + `<div class="pView"><div class="pCanvas${focusId ? ' pFocus' : ''}" style="font-size:${zoom}em">`
       + `<div class="pHeadBox" data-box="head"><div class="pTurn" data-a="turn"><small>Le tournant · décidé en premier</small><p>${esc(P.turn) || '<span class="pDim">Touche pour l’écrire</span>'}</p></div>`
+      + `<div class="pChars"><small>Personnages</small>${P.chars.map((c) => `<div class="pChar" data-c="${c.id}">${face(c.sprite)}<div><b>${esc(c.name)}</b>`
+        + (c.traits || []).map((t) => `<span>${esc(t)}</span>`).join('')
+        + `${(c.infos || []).length ? `<em>${c.infos.map((i) => P.infos.find((x) => x.id === i)).filter(Boolean).map((x) => esc(x.text)).join(' · ')}</em>` : ''}</div></div>`).join('')}`
+      + '<button type="button" data-a="char">+ Perso</button></div>'
       + `<div class="pInfos"><small data-root>Infos à exposer</small>${infoTree(revealed)}`
       + '<button type="button" data-a="info">+ Info</button></div>'
       + '</div>'
@@ -224,7 +258,7 @@ window.PLAN = (() => {
     const sug = [...new Set((b.goals || []).flatMap((g) => (G[g] ? flat(G[g].tech) : [])))];
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>${b.kind === 'choice' ? 'Choix' : 'Rectangle'} ${num(id)}</b><button type="button" data-s="close">OK</button></div>`
       + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}</div>`
-      + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">`
+      + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">${techD(b.tech) ? `<p class="pD">${esc(techD(b.tech))}</p>` : ''}`
       + (sug.length ? `<div class="pSug">${sug.map((t) => `<button type="button" data-tech="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : '')
       + `<small>Ce qui se passe (pas de dialogue)</small><textarea data-f="what" rows="3">${esc(b.what)}</textarea>`
       + `<small>Répliques</small><div class="pStep"><button type="button" data-s="minus">−</button><b>${b.lines || 1}</b><button type="button" data-s="plus">+</button></div>`
@@ -265,6 +299,156 @@ window.PLAN = (() => {
     s.hidden = false; s.querySelector('textarea').focus();
   }
 
+  // a character: a name, a face (its sheet), 1-2 engaging traits, the infos about them. Nothing else
+  function openChar(id) {
+    const c = P.chars.find((x) => x.id === id); if (!c) return; editing = '*'; const s = sheet();
+    const sprites = Object.keys(window.SPRITES || {});
+    s.innerHTML = `<div class="pSh"><div class="pShTop"><b>Personnage</b><button type="button" data-s="close">OK</button></div>`
+      + `<small>Nom</small><input data-f="name" value="${esc(c.name)}">`
+      + `<small>Traits qui le rendent attachant (1-2, un par ligne)</small><textarea data-f="traits" rows="2">${esc((c.traits || []).join('\n'))}</textarea>`
+      + (P.infos.length ? `<small>Infos sur lui</small><div class="pPick">${P.infos.map((x) => `<button type="button" data-ci="${x.id}" class="${(c.infos || []).includes(x.id) ? 'on' : ''}" style="--c:#bf5af2">${esc(x.text)}</button>`).join('')}</div>` : '')
+      + `<small>Visuel</small><div class="pSprites">${sprites.map((sp) => `<button type="button" data-sp="${sp}" class="${c.sprite === sp ? 'on' : ''}" title="${sp}">${face(sp)}</button>`).join('')}</div>`
+      + '<div class="pRow"><button type="button" data-s="delchar" class="del">Supprimer</button></div></div>';
+    s.oninput = (e) => { const f = e.target.dataset.f;
+      if (f === 'name') c.name = e.target.value;
+      if (f === 'traits') c.traits = e.target.value.split('\n').map((t) => t.trim()).filter(Boolean).slice(0, 2);
+      save(); };
+    s.onclick = (e) => {
+      e.stopPropagation(); const ci = e.target.closest('[data-ci]'), sp = e.target.closest('[data-sp]'), a = e.target.closest('[data-s]');
+      if (ci) { const on = new Set(c.infos || []); on.has(ci.dataset.ci) ? on.delete(ci.dataset.ci) : on.add(ci.dataset.ci); c.infos = [...on]; save(); openChar(id); return; }
+      if (sp) { c.sprite = sp.dataset.sp; save(); openChar(id); return; }
+      if (!a) return;
+      if (a.dataset.s === 'delchar') { if (!confirm('Supprimer ce personnage ?')) return; P.chars = P.chars.filter((x) => x !== c); }
+      s.oninput = onInput; save(); closeSheet(); render();
+    };
+    s.hidden = false;
+  }
+  // the plans kept here: open one, delete one, start one, paste a generated one (it becomes a new plan), copy this one
+  function openPlans() {
+    editing = '*'; const s = sheet();
+    s.innerHTML = `<div class="pSh"><div class="pShTop"><b>Plans</b><button type="button" data-s="close">OK</button></div>`
+      + `<div class="pPlans">${store.list.map((p, i) => `<div class="${i === store.cur ? 'on' : ''}"><button type="button" data-pl="${i}"><b>${esc(p.title || 'Sans titre')}</b>`
+        + `<span>${p.boxes.reduce((n, b) => n + b.beats.length, 0)} rectangles · ${(p.chars || []).length} persos</span></button>${store.list.length > 1 ? `<button type="button" data-pldel="${i}">×</button>` : ''}</div>`).join('')}</div>`
+      + '<div class="pRow"><button type="button" data-s="new">Nouveau</button><button type="button" data-s="example">Exemple</button><button type="button" data-s="copy">Copier ce plan</button></div>'
+      + '<small>Coller un plan généré (JSON)</small><textarea data-f="paste" rows="3" placeholder="Colle ici la réponse du prompt 1"></textarea>'
+      + '<div class="pRow"><button type="button" data-s="paste">Ouvrir ce plan</button></div><p class="pMsg"></p></div>';
+    s.oninput = null;
+    s.onclick = (e) => {
+      e.stopPropagation(); const pl = e.target.closest('[data-pl]'), del = e.target.closest('[data-pldel]'), a = e.target.closest('[data-s]');
+      if (pl) { store.cur = +pl.dataset.pl; P = store.list[store.cur]; focusId = null; save(); closeSheet(); render(); return; }
+      if (del) { if (!confirm('Supprimer ce plan ?')) return; store.list.splice(+del.dataset.pldel, 1); store.cur = Math.min(store.cur, store.list.length - 1); P = store.list[store.cur]; save(); render(); openPlans(); return; }
+      if (!a) return;
+      switch (a.dataset.s) {
+        case 'new': openPlan(EMPTY()); break;
+        case 'example': openPlan(LC()); break;
+        case 'copy': copy(JSON.stringify(P), a); return;
+        case 'paste': { const v = s.querySelector('textarea').value;
+          try { const j = JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1)); if (!Array.isArray(j.boxes)) throw 0; openPlan(fix(j)); }
+          catch { s.querySelector('.pMsg').textContent = 'Ce n’est pas un plan.'; return; } break; }
+      }
+      s.oninput = onInput; closeSheet(); render();
+    };
+    s.hidden = false;
+  }
+  const copy = (text, btn) => { const was = btn.textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { btn.textContent = 'Copié'; setTimeout(() => (btn.textContent = was), 1400); }, () => { btn.textContent = 'Copie impossible'; }); };
+  // the two prompts, without scrolling: 1 = an idea -> the characters and the plan (paste it in Plans: it shows here);
+  // 2 = this plan -> the story (paste the answer: it plays)
+  function openPrompts() {
+    editing = '*'; const s = sheet();
+    s.innerHTML = `<div class="pSh"><div class="pShTop"><b>Prompts</b><button type="button" data-s="close">OK</button></div>`
+      + '<small>1 · Les personnages et le plan</small><textarea data-f="idea" rows="2" placeholder="Ton idée, en une ou deux phrases"></textarea>'
+      + '<div class="pRow"><button type="button" data-s="p1">Copier le prompt 1</button><button type="button" data-s="plans">Coller le plan généré</button></div>'
+      + `<small>2 · L’histoire, à partir de ce plan (${esc(P.title || 'sans titre')})</small>`
+      + '<div class="pRow"><button type="button" data-s="p2">Copier le prompt 2 (avec ce plan)</button></div>'
+      + '<textarea data-f="story" rows="2" placeholder="Colle ici la réponse du prompt 2"></textarea>'
+      + '<div class="pRow"><button type="button" data-s="play">Jouer l’histoire</button></div><p class="pMsg"></p></div>';
+    try { s.querySelector('[data-f="idea"]').value = localStorage.getItem('smt-plan-idea') || ''; } catch { /* private window */ }
+    s.oninput = (e) => { if (e.target.dataset.f === 'idea') try { localStorage.setItem('smt-plan-idea', e.target.value); } catch { /* private window */ } };
+    s.onclick = (e) => {
+      e.stopPropagation(); const a = e.target.closest('[data-s]'); if (!a) return; const msg = s.querySelector('.pMsg');
+      switch (a.dataset.s) {
+        case 'p1': copy(prompt1(s.querySelector('[data-f="idea"]').value.trim() || '[ton idée]'), a); return;
+        case 'p2': copy(prompt2(), a); return;
+        case 'plans': s.oninput = onInput; openPlans(); return;
+        case 'play': { const v = s.querySelector('[data-f="story"]').value;
+          try { const j = JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1)); window.PLAN_PLAY(j, P.title); closeSheet(); }
+          catch (err) { msg.textContent = err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'; } return; }
+      }
+      s.oninput = onInput; closeSheet(); render();
+    };
+    s.hidden = false;
+  }
+
+  // ---- the prompts (for a basic model; English, the story comes out in the idea's language). Both list the goals and
+  // techniques above, so a change here changes them ----
+  const DECORS = '"terrasse" = melissa, candy, ruby (a café terrace) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}`).join('\n')).join('\n');
+  const prompt1 = (idea) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays "justin". Write every text in the language of the idea.
+Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:
+
+1. "scene": the decor that fits the idea: ${DECORS}.
+2. "characters": justin + 2 or 3 people of that decor. id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.
+3. "turn": decided first: the event at the end of the episode that turns everything, in one sentence.
+4. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 4 to 8 infos; at least one is never revealed in this episode (curiosity).
+5. "boxes": exactly two. Box "ep" (col 0) = the episode, 6 to 10 rectangles in order. Box "later" (col 1, title "Plus tard") = 1 to 3 events or choices of later episodes that this one sets up.
+   A rectangle: "goals" (1 or 2 goal ids below), "tech" (one technique of those goals, its exact name), "lines" (how many lines of dialogue it will take, 1 to 5), "what" (what happens, one sentence, NO dialogue, no quotes), "reveals" (ids of the infos it reveals).
+   A choice: "kind": "choice", "goals": [], "tech": "", "what" (the question the player faces), "opts" (2 or 3 attitudes, not lines: "Defy him", "Lie to protect her"), "lines" (2 or 3).
+   2 or 3 choices in the episode. Right before each one, a "stakes" rectangle, linked to it.
+6. "links": {"from", "to", "label"}: a setup to what it sets off: each stakes rectangle to its choice; a callback (something planted early that comes back later, in the episode or in "later").
+
+GOALS AND THEIR TECHNIQUES (use only these):
+${techList()}
+
+RULES:
+- Box "ep": 24 lines at most in total.
+- An info comes out after its parent (in rectangle order), one at a time, only through "Tell a story".
+- Each character gets an engaging rectangle (char goal) before the first stakes.
+- No dialogue anywhere: what happens, not what is said.
+
+THE JSON:
+{"title": "2-4 words", "scene": "...", "turn": "...",
+ "characters": [{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}],
+ "infos": [{"id": "i1", "text": "..."}, {"id": "i2", "text": "...", "parent": "i1"}],
+ "boxes": [{"id": "ep", "title": "...", "col": 0, "beats": [{"id": "r1", "goals": ["char"], "tech": "Show contrast", "lines": 3, "what": "...", "reveals": []}, {"id": "r5", "kind": "choice", "goals": [], "tech": "", "lines": 2, "what": "...", "opts": ["...", "..."]}]},
+           {"id": "later", "title": "Plus tard", "col": 1, "beats": [{"id": "f1", "goals": ["stakes"], "tech": "", "lines": 1, "what": "..."}]}],
+ "links": [{"from": "r4", "to": "r5", "label": "..."}]}
+
+The idea: ${idea}`;
+  const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ id, ...c }) => c) };
+    return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays "justin". Same language as the plan.
+
+HOW TO TRANSLATE THE PLAN:
+- Follow the rectangles of the first box ("ep") in order. Each one becomes exactly its "lines" lines, written with its technique (below), for its goals. "what" says what happens: never copy it as a line.
+- A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
+- An info comes out exactly in the rectangle that reveals it, never before, as a one-line story from a character's past ("Yeah, I used to x, but y.").
+- A link is a promise: what the "from" rectangle plants comes back, recognizably, in the "to" rectangle. A link to "later" is only planted.
+- The characters talk with their traits: you know who speaks without the name.
+- The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If justin ..., ...").
+
+TECHNIQUES:
+${techList()}
+
+CLARITY (the player knows nothing you know):
+A. One new thing per line. Lines are short: 4 to 12 words, 70 characters at most.
+B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 lines. Someone absent: a name AND what identifies them.
+C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
+D. No line that only carries information, greets or explains a feeling: show it in how they talk.
+
+JUSTIN: outside a choice, justin's lines are his inner voice, first person ("I"). Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
+CHOICES: "t" = the button, a short line in justin's voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
+POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak, with their id.
+
+THE JSON (exactly this shape):
+{"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",
+ "steps": [ {"who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"choice": [ {"t": "...", "say": "...", "tone": "...", "then": [ {"who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
+ "next": ["If ..., ...", "..."]}
+
+CHECK BEFORE YOU REPLY: every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
+
+THE PLAN:
+${JSON.stringify(plan)}`; };
+
   // a rectangle's sheet: taps change it at once; what's typed is kept as it's typed; the page redraws when the sheet closes
   function beatSheet(e) {
     e.stopPropagation(); const b = find(editing); if (!b) return;
@@ -303,12 +487,13 @@ window.PLAN = (() => {
     e.stopPropagation();
     if (dragged) { dragged = false; return; }
     const pg = e.target.closest('[data-pg]'), crumb = e.target.closest('[data-crumb]'), tn = e.target.closest('[data-tn]');
-    if (pg) { pal.g = pal.g === pg.dataset.pg ? null : pg.dataset.pg; pal.path = []; render(); return; }
-    if (crumb) { pal.path = pal.path.slice(0, +crumb.dataset.crumb + 1); render(); return; }
-    if (tn) { const t = palList()[+tn.dataset.tn]; if (t && t.s && t.s.length) { pal.path.push(+tn.dataset.tn); render(); } return; }
+    if (pg) { pal.g = pal.g === pg.dataset.pg ? null : pg.dataset.pg; pal.path = []; pal.sel = null; render(); return; }
+    if (crumb) { pal.path = pal.path.slice(0, +crumb.dataset.crumb + 1); pal.sel = null; render(); return; }
+    if (tn) { const i = +tn.dataset.tn, t = palList()[i]; if (t && t.s && t.s.length) { pal.path.push(i); pal.sel = null; } else pal.sel = pal.sel === i ? null : i; render(); return; }
     const goal = e.target.closest('[data-goal]');
     for (const n of el.querySelectorAll('[data-goal].show')) if (n !== goal) n.classList.remove('show');
     if (goal) { goal.classList.toggle('show'); return; }   // a goal's tab: its name, nothing else
+    const ch = e.target.closest('[data-c]'); if (ch) return openChar(ch.dataset.c);
     const a = e.target.closest('[data-a]'), beat = e.target.closest('.pBeat'), info = e.target.closest('[data-i]');
     if (linking && beat) {   // the second tap of a link: where it leads; then the sheet, for what comes back
       const from = linking, to = beat.dataset.b; linking = null;
@@ -334,11 +519,9 @@ window.PLAN = (() => {
       case 'in': zoom = Math.min(1.6, +(zoom + .15).toFixed(2)); break;
       case 'out': zoom = Math.max(.4, +(zoom - .15).toFixed(2)); break;
       case 'cancel': linking = null; break;
-      case 'example': if (!confirm('Remplacer ce plan par l’exemple Last Call ?')) return; P = LC(); focusId = null; break;
-      case 'new': if (!confirm('Commencer un plan vide ? Celui-ci sera remplacé.')) return; P = EMPTY(); focusId = null; break;
-      case 'copy': if (navigator.clipboard) navigator.clipboard.writeText(JSON.stringify(P)).then(() => { a.textContent = 'Copié'; setTimeout(() => (a.textContent = 'Copier'), 1400); }); return;
-      case 'paste': return openText('Colle un plan (JSON)', '', (v) => {
-        try { P = fix(JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1))); focusId = null; } catch { alert('Ce n’est pas un plan.'); } });
+      case 'char': { const c = { id: fresh('k'), name: 'Nouveau perso', sprite: '', traits: [], infos: [] }; P.chars.push(c); save(); render(); return openChar(c.id); }
+      case 'plans': return openPlans();
+      case 'prompts': return openPrompts();
     }
     save(); render();
   }
@@ -438,5 +621,5 @@ window.PLAN = (() => {
     const s = sheet(); s.oninput = onInput; closeSheet();
     render();
   }
-  return { GOALS, LC, mount, closeSheet, redraw: () => render(), get: () => P };
+  return { GOALS, LC, mount, closeSheet, redraw: () => render(), get: () => P, prompt1, prompt2 };
 })();

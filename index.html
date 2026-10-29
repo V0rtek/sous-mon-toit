@@ -437,6 +437,34 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pPal small { font-size: 1.4em; color: #636366; }
 .pGhost { position: fixed; z-index: 90; transform: translate(-50%, -130%); padding: .45em .9em; border-radius: .7em; background: var(--c); color: #000; font: 600 14px -apple-system, BlinkMacSystemFont, system-ui, sans-serif; pointer-events: none; white-space: nowrap; box-shadow: 0 .6em 1.6em rgba(0,0,0,.5); }
 .pBeat.drop, .pBox.drop { outline: .2em solid #f5f5f7; outline-offset: .15em; }
+.pChips b.on { background: var(--c); color: #000; }
+.pD { margin: 0; font-size: 1.6em; line-height: 1.35; color: #d1d1d6; }
+.pSh .pD { font-size: 1.6em; color: #aeaeb2; }
+/* characters: a face, a name, 1-2 traits, the infos about them */
+.pFace { flex: none; position: relative; display: inline-block; width: 4.2em; height: 4.2em; border-radius: 50%; overflow: hidden; background: #2c2c2e; }
+.pFace img { position: absolute; left: 50%; top: 4%; height: 260%; transform: translateX(-50%); }
+.pChars { display: flex; flex-direction: column; gap: .8em; padding: 1.5em 1.7em; border-radius: 1.6em; background: #141416; margin-bottom: 1.2em; }
+.pChars small { font-size: 1.55em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; }
+.pChar { display: flex; gap: 1em; align-items: flex-start; cursor: pointer; }
+.pChar > div { display: flex; flex-direction: column; gap: .2em; min-width: 0; }
+.pChar b { font-size: 1.9em; }
+.pChar > div > span { font-size: 1.6em; color: #d1d1d6; }
+.pChar > div > span::before { content: '♥ '; color: #ff375f; }
+.pChar em { font-style: normal; font-size: 1.45em; color: #bf5af2; }
+.pChars > button { align-self: flex-start; font: inherit; font-size: 1.6em; background: none; border: 0; color: #86868b; cursor: pointer; padding: 0; }
+.pI .pFace { width: 1.3em; height: 1.3em; margin-left: .2em; }
+.pSprites { display: flex; flex-wrap: wrap; gap: .5em; }
+.pSprites button { padding: .15em; border-radius: 50%; border: .15em solid transparent; background: none; cursor: pointer; }
+.pSprites button.on { border-color: #0a84ff; }
+.pSprites .pFace { font-size: 1.1em; }
+.pPlans { display: flex; flex-direction: column; gap: .5em; }
+.pPlans div { display: flex; gap: .5em; }
+.pPlans div button:first-child { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: .2em; font: inherit; padding: .7em 1em; border-radius: 1em; border: .12em solid #2c2c2e; background: #2c2c2e; color: #f5f5f7; cursor: pointer; text-align: left; }
+.pPlans div.on button:first-child { border-color: #0a84ff; }
+.pPlans b { font-size: 1.9em; }
+.pPlans span { font-size: 1.5em; color: #86868b; }
+.pPlans div button[data-pldel] { font: inherit; font-size: 2.2em; border: 0; background: none; color: #86868b; cursor: pointer; }
+.pMsg { margin: 0; font-size: 1.7em; color: #ff453a; }
 .pLinking { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
 .pLinking button { font: inherit; font-size: .85em; border: 0; border-radius: 2em; padding: .3em .8em; background: #000; color: #ff9f0a; cursor: pointer; }
 .pBox { padding: 1.2em 1em .6em; background: #0b0b0d; border-radius: 1.8em; border: .12em solid #2c2c2e; }
@@ -965,7 +993,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="marketing" class="card menu" hidden>
     <section class="mk" style="--g:#b3261e">
-      <div class="mkScene"><div class="mkPic boss named" id="mkBoss" data-s="breath"><img class="calm" src="ref/city_calm.webp" alt=""><img class="arrive" src="ref/boss_homies.webp" alt=""><img class="breath" src="ref/boss_breath.webp" alt="">
+      <div class="mkScene"><div class="mkPic boss named" id="mkBoss" data-s="breath"><img class="calm" src="ref/city_calm.webp" alt=""><img class="arrive" src="ref/boss_breath.webp" alt=""><img class="breath" src="ref/boss_homies.webp" alt="">
         <span class="tag" style="left:17%;top:43%;--c:#ff9f0a">Justin</span><span class="tag" style="left:33%;top:58.5%;--c:#30d158">Léa</span>
         <span class="tag" style="left:63%;top:58.5%;--c:#0a84ff">Max</span><span class="tag" style="left:86%;top:60.5%;--c:#bf5af2">Sam</span></div></div>
       <h2>Face the boss with your homies</h2>
@@ -1418,14 +1446,14 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
-<script src="gen.js?v=20261029130000"></script>
+<script src="gen.js?v=20261030010000"></script>
 <script src="demos.js?v=20261028143259"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261030000000"></script>
+<script src="plan.js?v=20261030010000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -3009,6 +3037,8 @@ $('#techBtn').onclick = (e) => { e.stopPropagation(); $('#tech').scrollTop = 0; 
 $('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techPath = [b.dataset.t]; techOpen(); };
 // ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
 $('#planBtn').onclick = (e) => { e.stopPropagation(); show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
+// the story written from a plan (its prompt 2): plays like a generated story and joins the last ones (Ton histoire)
+window.PLAN_PLAY = (json, title) => { const st = GEN.build(json); saveGen('Plan · ' + (title || json.title || ''), json); playGen(st); };
 $('#techBody').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techGo(b.dataset.t); };
 $('#techPath').onclick = (e) => { const b = e.target.closest('[data-i]'); if (!b) return; e.stopPropagation(); techPath.length = +b.dataset.i + 1; techOpen(); };
 // ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
