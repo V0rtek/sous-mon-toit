@@ -355,6 +355,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #validate, #investors, #brainstorm, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
 #brainstorm { justify-content: flex-start; overflow-y: auto; }
 #brainstorm .brainImg { width: 100%; border-radius: 1.6em; display: block; }
+#brainstorm .brainNote { margin: 1em 0 0; padding: 1em 1.2em; border-left: .3em solid #ff9f0a; border-radius: .4em; background: #1c1c1e; font-size: 2.4em; font-weight: 700; line-height: 1.3; }
 #system, #cosmoOP, #cosmoCites { justify-content: flex-start; overflow-y: auto; }
 /* System: the 5 steps, each number in a ring of its own colour */
 .sys { margin: 1em 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3.2em; }
@@ -926,7 +927,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <li>Lovecraft / Oxenfree horror (undercity, the bus)</li>
         <li>On a quest with your homie(s). Fantasy.</li>
         <li>Maybe a sci-fi</li>
-      </ul></div>
+      </ul>
+      <p class="brainNote">7 excellent stories beat 14 good ones.</p></div>
   </div>
   <div id="genHist" class="card menu" hidden>
     <div class="step"><h2>Dernières histoires</h2><p class="lead" id="histEmpty">Rien encore.</p><div id="histList"></div></div>
