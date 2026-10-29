@@ -382,13 +382,19 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tEx p:last-child::before { content: '→ '; color: #30d158; font-weight: 700; }
 .tLeads { display: flex; flex-direction: column; gap: 1em; align-items: flex-start; }
 .tLeads small { display: block; margin-top: .3em; font-size: .8em; color: #ff9f0a; }
-/* Plan de scène (plan.js): boxes of rectangles stacked in order, each as tall as its lines (one tick per line), its goals
-   as colour tabs on its left; orange links in the right gutter; a bottom sheet edits what's tapped */
-#plan { justify-content: flex-start; overflow-y: auto; padding: 13em 5% 10em; scroll-snap-type: none; }
-#planBody { gap: 0; }
-.pBar { display: flex; gap: .6em; flex-wrap: wrap; margin-bottom: 1.4em; }
+/* Plan de scène (plan.js): a 2D canvas under a fixed bar: boxes in columns (time goes down, same time / later to the
+   right), rectangles stacked in order, each as tall as its lines (one tick per line), its goals as colour tabs on its
+   left; orange links between them; a bottom sheet edits what's tapped */
+#plan { justify-content: flex-start; overflow: hidden; padding: 12em 0 0; scroll-snap-type: none; }
+#planBody { gap: 0; flex: 1; min-height: 0; width: 100%; }
+.pHead { flex: none; display: flex; flex-direction: column; gap: .8em; padding: 0 5% 1em 16%; }
+.pHead > b { font-size: 2.6em; letter-spacing: -.02em; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pView { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; border-top: .1em solid #2c2c2e; }
+.pCanvas { position: relative; }
+.pHeadBox, .pBox { position: absolute; width: 34em; box-sizing: border-box; }
+.pHeadBox { padding-top: 2em; }
+.pBar { display: flex; gap: .6em; flex-wrap: wrap; }
 .pBar button, .pAdd button { font: inherit; font-size: 1.7em; padding: .45em .9em; border-radius: 2em; border: 0; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
-#planBody h2 { margin: 0 0 .6em; font-size: 3.6em; letter-spacing: -.025em; cursor: pointer; }
 .pTurn, .pInfos { padding: 1.5em 1.7em; border-radius: 1.6em; background: #141416; margin-bottom: 1.2em; cursor: pointer; }
 .pTurn small, .pInfos small { display: block; font-size: 1.55em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin-bottom: .5em; }
 .pTurn p { margin: 0; font-size: 2.1em; line-height: 1.35; font-weight: 600; }
@@ -403,10 +409,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pLegend { display: flex; flex-wrap: wrap; gap: .4em 1.2em; margin: .6em 0 1.8em; font-size: 1.5em; color: #aeaeb2; }
 .pLegend span::before { content: ''; display: inline-block; width: .7em; height: .7em; border-radius: .2em; background: var(--c); margin-right: .4em; }
 .pLegend .lk::before { width: 1.4em; height: .22em; background: #ff9f0a; vertical-align: middle; }
-.pLinking { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 1em; margin-bottom: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
+.pLinking { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: .8em 1.2em; border-radius: 1.2em; background: #ff9f0a; color: #000; font-size: 1.9em; font-weight: 700; }
 .pLinking button { font: inherit; font-size: .85em; border: 0; border-radius: 2em; padding: .3em .8em; background: #000; color: #ff9f0a; cursor: pointer; }
-.pFlow { position: relative; padding-right: 17%; }
-.pBox { margin-bottom: 2.2em; padding: 1.2em 1em .6em; border-radius: 1.8em; border: .12em solid #2c2c2e; }
+.pBox { padding: 1.2em 1em .6em; background: #0b0b0d; border-radius: 1.8em; border: .12em solid #2c2c2e; }
 .pBox h3 { margin: 0 0 .7em .2em; font-size: 2.2em; letter-spacing: -.01em; cursor: pointer; }
 .pAdd { display: flex; gap: .6em; margin: .2em 0 .6em; }
 .pAdd button { background: none; border: .1em dashed #48484a; color: #86868b; }
@@ -1380,7 +1385,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261029160000"></script>
+<script src="plan.js?v=20261029180000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
