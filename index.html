@@ -338,7 +338,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
 /* the menus (home, Infos, Plus): full-width strips, each a picture of its world, black on the words' side (the onboarding's question) */
-#hub, #infos, #more { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
+#hub, #infos, #more, #cosmo { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
 .strips { display: flex; flex-direction: column; margin: auto 0; }
 .strips > * { font: inherit; position: relative; flex: none; height: 24em; overflow: hidden; display: flex; align-items: center; padding: 0 7%; border: 0; border-top: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-align: left; text-decoration: none; cursor: pointer; }
 .strips > *::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 30%, rgba(0,0,0,.55) 52%, transparent 78%); pointer-events: none; }
@@ -347,23 +347,67 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips .art img { position: absolute; left: 55%; top: 7%; height: 240%; transform: translateX(-50%); }   /* head and shoulders */
 .strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
-#infos .strips > * { height: 13em; }
+#infos .strips > *, #cosmo .strips > * { height: 13em; }
 #more .strips > * { height: 15em; }
-#infos .strips b, #more .strips b { font-size: 3.2em; }
+#infos .strips b, #more .strips b, #cosmo .strips b { font-size: 3.2em; }
 /* Marketing: one screen per promise, its world then its line */
 #marketing, #validate, #investors { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
-#validate, #investors, #system, #cosmo { padding: 13em 7% 6em; scroll-snap-type: none; }
-#system, #cosmo { justify-content: flex-start; overflow-y: auto; }
+#validate, #investors, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
+#system, #cosmoOP, #cosmoCites { justify-content: flex-start; overflow-y: auto; }
 /* System: the 5 steps, each number in a ring of its own colour */
 .sys { margin: 1em 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3.2em; }
 .sys li { display: flex; align-items: center; gap: 2.4em; }
 .sys i { flex: none; width: 2.85em; height: 2.85em; border-radius: 50%; box-sizing: border-box; border: .15em solid var(--c); display: grid; place-items: center; font-style: normal; font-size: 2.6em; font-weight: 600; font-variant-numeric: tabular-nums; }
 .sys b { display: block; font-size: 2.6em; font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
 .sys p { margin: .35em 0 0; font-size: 2.2em; color: #86868b; line-height: 1.3; }
-/* Cosmograph: One Piece read as a geographer (Le Cosmograph), the 3 spheres in the System rings */
-#cosmo .lead { margin-bottom: 1em; }
-#cosmo .sys + .lead { margin: 1.4em 0 0; }
-#cosmo .src { margin-top: 2em; font-size: 2em; color: #0a84ff; text-decoration: none; }
+/* Cosmograph: Maxime Blondeau's articles (Le Cosmograph) in detail, one page each, a header in the colour of the world */
+.cg { display: flex; flex-direction: column; gap: 4.4em; }
+.cg header { margin: 0 -7.8%; padding: 3.2em 7.8% 3.6em; background: radial-gradient(ellipse 90% 120% at 85% 0%, var(--g), transparent 70%); }
+.cg .kick { display: block; font-size: 1.7em; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #86868b; }
+.cg h2 { margin: .35em 0 .3em; font-size: 4.6em; letter-spacing: -.03em; line-height: 1.05; }
+.cg .deck { margin: 0; font-size: 2.3em; color: #c7c7cc; line-height: 1.35; }
+.cg h3 { margin: 0 0 .7em; font-size: 2.9em; letter-spacing: -.02em; }
+.cg p { margin: 0 0 .8em; font-size: 2.15em; line-height: 1.45; color: #d1d1d6; }
+.cg p:last-child { margin-bottom: 0; }
+.cg em { font-style: normal; color: #fff; font-weight: 600; }
+.cg .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; margin-bottom: 1.6em; }
+.cg .facts div { padding: 1.6em 1.8em; border-radius: 1.8em; background: #141416; }
+.cg .facts b { display: block; font-size: 3em; letter-spacing: -.02em; }
+.cg .facts span { font-size: 1.7em; color: #86868b; line-height: 1.3; }
+.cg .sales { display: flex; flex-direction: column; gap: 1.3em; margin: 1.4em 0 1.8em; }
+.cg .sales div { display: grid; grid-template-columns: 6.4em 1fr 3.4em; align-items: center; gap: 1em; font-size: 1.9em; }
+.cg .sales i { display: block; height: .9em; border-radius: 1em; background: #3a3a3c; }
+.cg .sales .me i { background: #ffd60a; }
+.cg .sales b { text-align: right; font-variant-numeric: tabular-nums; }
+.cg .chips { display: flex; flex-wrap: wrap; gap: .8em; margin-top: 1.2em; }
+.cg .chips span { padding: .55em 1em; border-radius: 2em; background: rgba(255,255,255,.08); font-size: 1.75em; color: #c7c7cc; }
+.cg blockquote { margin: 1.4em 0 0; padding: .2em 0 .2em 1.6em; border-left: .3em solid #ffd60a; }
+.cg blockquote p { color: #f5f5f7; font-style: italic; }
+.cg blockquote small { font-size: 1.7em; color: #86868b; }
+.cg .score { display: flex; align-items: center; gap: 1.2em; margin: 0 0 1.2em; }
+.cg .stars { font-size: 2.6em; letter-spacing: .1em; color: #ffd60a; }
+.cg .stars s { text-decoration: none; color: #3a3a3c; }
+.cg .score small { font-size: 1.9em; color: #86868b; }
+.cg .sphere { padding: 2.6em 2.6em 2.8em; border-radius: 2.6em; background: #111113; border-top: .35em solid var(--c); }
+.cg .sphere h3 { color: var(--c); }
+.cg .cap { font-size: 1.75em; color: #86868b; }
+.cg .total { text-align: center; padding: 3em 2.4em; border-radius: 2.6em; background: radial-gradient(ellipse 80% 90% at 50% 0%, var(--g), #0b0b0d 75%); }
+.cg .total b { display: block; margin: .15em 0; font-size: 6em; letter-spacing: -.03em; }
+.cg .total .stars { font-size: 3em; }
+.cg .total p { margin-top: 1em; }
+.cg .recs { display: flex; flex-direction: column; gap: 1.4em; }
+.cg .rec { padding: 2.2em 2.4em; border-radius: 2.2em; background: #141416; }
+.cg .rec small { font-size: 1.6em; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #86868b; }
+.cg .rec h4 { margin: .3em 0 .5em; font-size: 2.6em; }
+.cg .city { position: relative; padding: 2.8em 2.6em; border-radius: 2.6em; background: radial-gradient(ellipse 80% 60% at 100% 0%, var(--c), #111113 72%); overflow: hidden; }
+.cg .city .n { position: absolute; top: -.05em; right: .3em; font-size: 9em; font-weight: 800; color: rgba(255,255,255,.08); letter-spacing: -.05em; }
+.cg .e { font-size: 4em; line-height: 1; }
+.cg .city h3 { margin: .45em 0 .2em; font-size: 3.2em; }
+.cg .city .arch { display: inline-block; margin-bottom: .8em; font-size: 1.8em; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #f5f5f7; opacity: .75; }
+.cg .city .w { margin: 0 0 1em; font-size: 1.9em; color: #86868b; }
+.cg .next { padding: 2.6em; border-radius: 2.6em; border: .2em dashed #3a3a3c; text-align: center; }
+.cg .next b { display: block; margin: .3em 0 .4em; font-size: 3em; }
+.cg .src { align-self: flex-start; font-size: 2.1em; font-weight: 600; padding: .8em 1.3em; border-radius: 2em; background: #f5f5f7; color: #000; text-decoration: none; }
 .mk { position: relative; flex: none; height: 100%; scroll-snap-align: start; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 7% 14%; box-sizing: border-box; background: radial-gradient(ellipse 80% 55% at 50% 42%, var(--g), transparent 75%), #000; }
 .mkArt { position: absolute; left: 0; right: 0; top: 14%; height: 58%; display: flex; justify-content: center; align-items: flex-end; }
 .mkArt img { height: 82%; max-width: 30%; object-fit: contain; object-position: bottom; margin: 0 -3%; filter: drop-shadow(0 1em 2em rgba(0,0,0,.6)); }
@@ -555,7 +599,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="invBtn"><span class="art" style="--g:#33415c"><img src="chars/suit/adjust.webp" alt=""></span><b>Investisseurs</b></button>
       <button type="button" id="statsBtn"><span class="art" style="--g:#c4622d"><img src="chars/justin_bar/explaining.webp" alt=""></span><b>Stats</b></button>
       <button type="button" id="sysBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/thinking.webp" alt=""></span><b>System</b></button>
-      <button type="button" id="cosmoBtn"><span class="art" style="--g:#1f6f8b"><img src="chars/melissa/thinking.webp" alt=""></span><b>Cosmograph</b></button>
+      <button type="button" id="cosmoBtn"><span class="art" style="--g:#1f6f8b"><img src="chars/diane/thinking.webp" alt=""></span><b>Cosmograph</b></button>
     </div>
   </div>
   <div id="more" class="card menu" hidden>
@@ -608,14 +652,195 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       </ol></div>
   </div>
   <div id="cosmo" class="card menu" hidden>
-    <div class="step"><h2>Cosmograph</h2><p class="lead">One Piece, read by a geographer: how deep does the world go?</p>
-      <ol class="sys">
-        <li style="--c:#30d158"><i>01</i><div><b>Geosphere · strong</b><p>An archipelago that holds: Grand Line, Red Line, 4 seas. Each island its own culture, climate, terrain. The ocean drives the story; ruins carry the history.</p></div></li>
-        <li style="--c:#ff453a"><i>02</i><div><b>Biosphere · weak</b><p>Inventive creatures, but animals as gags, few plants, no real ecology.</p></div></li>
-        <li style="--c:#ff9f0a"><i>03</i><div><b>Technosphere · mixed</b><p>Archaic islands vs Marine tech. Franky, transhuman with no questions asked. Only Egghead faces the ethics of technology.</p></div></li>
-      </ol>
-      <p class="lead">The world is the engine, not the backdrop: coherent across every arc.</p>
-      <a class="src" href="https://thecosmograph.substack.com/p/one-piece" target="_blank" rel="noopener">Read the article · Maxime Blondeau</a></div>
+    <div class="strips">
+      <button type="button" id="cgOP"><span class="art" style="--g:#1d3a7a"><img src="chars/alex/glasses.webp" alt=""></span><b>One Piece</b></button>
+      <button type="button" id="cgCites"><span class="art" style="--g:#7a5a1d"><img src="chars/exile/stand.webp" alt=""></span><b>Cités imaginaires</b></button>
+    </div>
+  </div>
+  <div id="cosmoOP" class="card menu" hidden>
+    <article class="cg" style="--g:#1d3a7a">
+      <header>
+        <span class="kick">Le Cosmograph · Maxime Blondeau · 13 mai 2025</span>
+        <h2>One Piece 🏴‍☠️</h2>
+        <p class="deck">Plus fort qu’Harry Potter : depuis 1997, les aventures de Luffy ont passé les 550 millions d’exemplaires. Inspiré de L’Île au trésor, de l’Odyssée et de Sandokan. La question : quelle place pour la nature et le vivant dans cet univers?</p>
+      </header>
+
+      <section>
+        <h3>L’univers</h3>
+        <p>Un jeune pirate et son équipage partent chercher le trésor le plus convoité de tous, le One Piece.</p>
+        <p>Le monde de Luffy est vaste et coloré. On y croise des marins <em>enthousiastes ou patibulaires</em>, des créatures fantastiques, des îles exotiques. Capitaines et matelots ont des pouvoirs magiques, <em>tantôt absurdes, tantôt impressionnants</em>, et les équipages s’affrontent sans pitié.</p>
+        <p>L’ambiance : joyeuse, parfois tragique, souvent épique. La logique du « grand tournoi » et le classement des niveaux de force en font un shōnen typique, comme Dragon Ball ou Naruto. Ce qui le distingue : <em>la profondeur géographique et l’intensité des quêtes</em>.</p>
+        <p>Le dessin est cartoon, mais ça ne l’empêche pas de traiter la liberté, la justice et l’amitié avec beaucoup de fraîcheur.</p>
+        <p class="cap">La carte de départ a été dessinée par Oda lui-même. Chaque île est ensuite détaillée et redessinée à part par Arimo.</p>
+      </section>
+
+      <section>
+        <h3>Le succès</h3>
+        <div class="facts">
+          <div><b>109</b><span>tomes de manga, depuis 1997</span></div>
+          <div><b>1000+</b><span>épisodes d’anime (Toei, depuis 1999)</span></div>
+          <div><b>10 ans+</b><span>public visé</span></div>
+          <div><b>🇯🇵</b><span>Japon · Shōnen Jump</span></div>
+        </div>
+        <p>La série littéraire la plus vendue de tous les temps, <em>tous livres, mangas, BD et comics confondus</em> :</p>
+        <div class="sales">
+          <div class="me"><span>One Piece</span><i style="width:100%"></i><b>550 M</b></div>
+          <div><span>Harry Potter</span><i style="width:91%"></i><b>500 M</b></div>
+          <div><span>Astérix</span><i style="width:72%"></i><b>395 M</b></div>
+          <div><span>Tintin</span><i style="width:49%"></i><b>270 M</b></div>
+        </div>
+        <p>Genre : manga, shōnen, <em>nekketsu</em>, comédie, pirate. Thèmes : aventure, amitié, liberté, combat.</p>
+        <p>Créé par Eiichiro Oda dans le Shōnen Jump. Vite devenu un anime à succès, plusieurs films, des jeux vidéo. En 2023, une série live-action américaine sur Netflix, <em>plutôt réussie</em>, qui a plu autant aux fans qu’aux nouveaux venus.</p>
+        <p>One Piece fait partie de la culture pop, d’autant plus que <em>l’œuvre est toujours vivante</em>.</p>
+      </section>
+
+      <section>
+        <h3>Le fandom</h3>
+        <div class="facts">
+          <div><b>5,2 M</b><span>membres sur r/OnePiece : hors jeux vidéo, le plus grand forum de la planète</span></div>
+          <div><b>7000+</b><span>pages dans l’encyclopédie One Piece en ligne</span></div>
+        </div>
+        <p>Un des fandoms les plus immenses et passionnés, présent partout dans le monde, surtout chez les gens nés <em>entre 1990 et 2010</em>. Il a marqué des générations, et son impact culturel est profond, même si les plus vieux en ignorent souvent la portée.</p>
+      </section>
+
+      <section>
+        <h3>Le test des « Trois Sphères »</h3>
+        <p>Quelle place pour le territoire et la nature? La méthode de Maxime Blondeau mesure la <em>profondeur écologique</em> d’un monde imaginaire.</p>
+        <blockquote><p>« Honnêtement, je n’ai pas tout lu et vu de cette œuvre gigantesque. Je me suis arrêté il y a 15 ans vers le 40e tome. […] Un véritable tour de force en termes de construction d’univers, avec une carte et des personnages qui restent cohérents tout au long des arcs. C’est sensationnel. »</p><small>Il note aussi : presque toute une génération est montée à bord, parmi les 15-25 ans.</small></blockquote>
+      </section>
+
+      <section class="sphere" style="--c:#30d158">
+        <h3>Géosphère</h3>
+        <div class="score"><span class="stars">★★★★<s>★</s></span><small>C’est très fort.</small></div>
+        <p><em>Un monde-archipel aussi vaste et riche qu’inventif, et cohérent.</em> Sans doute un des univers les plus géographiés de la fiction contemporaine.</p>
+        <p>Chaque île a son identité : un nom, une culture, sa faune, sa topographie, <em>jusqu’à son climat précis</em>.</p>
+        <p>Une architecture globale de l’espace (Grand Line, Red Line, les mers cardinales) structure trois choses : <em>les itinéraires, les flux de pouvoir, les quêtes individuelles</em>.</p>
+        <p>L’océan n’est pas un décor mais une force active, <em>presque morale</em>.</p>
+        <p>Le sol, les ressources, les ruines anciennes et les cycles longs du temps font partie de l’histoire, <em>comme les strates d’un monde réellement habité</em>.</p>
+        <p>L’émerveillement ne s’arrête pas : <em>chaque nouvel arc est un choc géographique et culturel</em>. Une prouesse de « géoconscience de l’imaginaire ». Il manque peu de chose pour être complet.</p>
+      </section>
+
+      <section class="sphere" style="--c:#ffd60a">
+        <h3>Biosphère · faune et flore</h3>
+        <div class="score"><span class="stars">★★★<s>★★</s></span><small>C’est plutôt bien.</small></div>
+        <p><em>Une biologie inventive, symbolique, mais assez limitée.</em></p>
+        <p>Des animaux de compagnie aux monstres marins géants, des bêtes fantastiques aux créatures mythologiques : une faune d’une richesse inouïe. Les frontières entre <em>l’humain, l’animal et le végétal sont floues</em>.</p>
+        <p>Mais deux nuances. Un : <em>les animaux pèsent beaucoup plus que les végétaux</em> dans la composition du monde. Deux : ce sont souvent des personnages à part entière, mais leur côté loufoque et comique <em>ne pousse pas à prendre conscience de leur présence dans notre monde</em>.</p>
+        <p>Le verdict exact : ils font partie intégrante de l’univers, <em>pas occultés, mais simplifiés</em>.</p>
+        <p class="cap">Image choisie : l’Arbre de la connaissance, sur l’île d’Ohara (arc Enies Lobby, tome 41).</p>
+      </section>
+
+      <section class="sphere" style="--c:#0a84ff">
+        <h3>Technosphère</h3>
+        <div class="score"><span class="stars">★★★<s>★★</s></span><small>C’est plutôt bien.</small></div>
+        <p><em>La technologie n’est pas un gros sujet de réflexion critique, sauf dans l’arc Egghead.</em></p>
+        <p>Un contraste : l’archaïsme de certaines sociétés insulaires et des pirates qui misent sur la magie, contre <em>la technologie avancée de la Marine et du Gouvernement mondial</em>.</p>
+        <p>Navires, armes et inventions restent souvent rudimentaires, à la hauteur de l’âge des pirates. Mais Franky, dans l’équipage de Luffy, incarne le transhumanisme, <em>sans grand questionnement éthique</em>.</p>
+        <p>Le Dr Vegapunk interroge la gouvernance technologique de façon intéressante : elle sert l’intrigue et les grandes batailles, mais <em>reste toujours subordonnée aux thèmes classiques</em> de liberté et de lutte contre l’oppression.</p>
+        <p>En général, l’éthique technologique est faible. Mais un arc entier traite le sujet, Egghead, et <em>ça change la donne</em>.</p>
+        <p class="cap">Image choisie : le Vogue Merry, le premier navire de l’équipage.</p>
+      </section>
+
+      <section class="total">
+        <small class="kick">Résultat global</small>
+        <b>3,3 / 5</b>
+        <span class="stars">★★★<s>★★</s></span>
+        <p>Un bijou, amusant et puissant. Même côté cosmographie, c’est plutôt bon. One Piece n’a <em>pas une grande ambition militante ou critique</em>, mais il construit un univers intense, riche et cohérent. <em>Un univers à part entière.</em></p>
+      </section>
+
+      <section>
+        <h3>Si tu aimes One Piece</h3>
+        <div class="recs">
+          <div class="rec"><small>Tu adoreras</small><h4>Hunter x Hunter</h4>
+            <p>L’univers de Gon et Kirua a une profondeur narrative proche : personnages complexes, monde vaste, intrigue qui mêle combats, aventure et quêtes variées. Avec des <em>thèmes plus adultes</em>.</p>
+            <div class="chips"><span>📖 Manga, 38 tomes (Kana)</span><span>📺 Anime 2011, Netflix</span></div></div>
+          <div class="rec"><small>Pour les passionnés</small><h4>Fullmetal Alchemist: Brotherhood</h4>
+            <p>Aventure, enjeux politiques et émotion forte, autour de deux frères soudés, dans un monde intense, cohérent et <em>moralement complexe</em>.</p>
+            <div class="chips"><span>📖 Manga, 27 tomes (Kurokawa)</span><span>📺 Anime 2009, Netflix</span></div></div>
+        </div>
+      </section>
+
+      <a class="src" href="https://thecosmograph.substack.com/p/one-piece" target="_blank" rel="noopener">Lire l’original ↗</a>
+    </article>
+  </div>
+  <div id="cosmoCites" class="card menu" hidden>
+    <article class="cg" style="--g:#7a5a1d">
+      <header>
+        <span class="kick">Le Cosmograph · Maxime Blondeau · 17 mars 2026</span>
+        <h2>Cités imaginaires <small style="font-size:.45em;color:#86868b">1/4</small></h2>
+        <p class="deck">Les grands archétypes de villes de la fiction : chacun a sa cité d’origine, puis toutes celles qui en descendent.</p>
+      </header>
+
+      <section class="city" style="--c:#8a7a5a"><span class="n">1</span><div class="e">🏛️</div>
+        <h3>Minas Tirith</h3><span class="arch">Cité capitale</span>
+        <p class="w">Le Seigneur des Anneaux · Tolkien · 1954</p>
+        <p>La cité blanche du Gondor, un hommage architectural à la royauté. Inspirée du <em>Mont-Saint-Michel</em>, elle monte en <em>sept niveaux sur un éperon rocheux</em>. Tolkien a fait <em>des dizaines de croquis</em> pour la dessiner.</p>
+        <p>L’archétype de la capitale souveraine : hiérarchisée, centrée sur un pouvoir dynastique en majesté. La colonne vertébrale de la noblesse, dans une vision <em>très britannique</em> de l’ordre et de l’aristocratie.</p>
+        <div class="chips"><span>King’s Landing · Game of Thrones</span><span>Camelot · mythes arthuriens</span><span>Alticcio · La Horde du Contrevent</span></div>
+      </section>
+
+      <section class="city" style="--c:#5a3a6a"><span class="n">2</span><div class="e">🕳️</div>
+        <h3>La Cour des Miracles</h3><span class="arch">Cité basse</span>
+        <p class="w">Notre-Dame de Paris · Victor Hugo · 1831</p>
+        <p>Dans le Paris du XIIIe siècle, le quartier des mendiants, voleurs, lépreux et exclus. <em>Le jour</em>, les estropiés simulent leurs infirmités pour faire pitié. <em>La nuit</em>, les « miracles » arrivent : les corps se redressent.</p>
+        <p>Hugo en fait l’archétype de la cité basse, cachée dans les marges obscures de la ville officielle. Un monde autonome avec <em>ses propres lois, ses hiérarchies criminelles, sa solidarité brutale</em>.</p>
+        <p>L’envers du pouvoir : une société parallèle nourrie par <em>la revanche, la ruse et l’espoir populaire</em>.</p>
+        <div class="chips"><span>Undercity · Arcane</span><span>Slums de Midgar · Final Fantasy VII</span><span>The Shades d’Ankh-Morpork · Discworld</span><span>Heaven’s Gate · Hyperion</span><span>District 9</span><span>Bas-fonds de Gunnm</span><span>Gachiakuta</span></div>
+      </section>
+
+      <section class="city" style="--c:#2a3a7a"><span class="n">3</span><div class="e">🌌</div>
+        <h3>Trantor</h3><span class="arch">Ville-monde</span>
+        <p class="w">Fondation · Isaac Asimov · 1951</p>
+        <p>En géographie de l’imaginaire, le mot est <em>œcuménopole</em> : l’extrémité théorique de la civilisation, une ville-planète totale où l’urbanisation a gagné <em>au point d’effacer les paysages</em>.</p>
+        <p>Capitale d’un Empire galactique, <em>40 milliards d’habitants</em>. Avec Coruscant, l’expression ultime de la cité-planète.</p>
+        <div class="chips"><span>Coruscant · Star Wars</span><span>Alpha · Valérian & Laureline</span></div>
+      </section>
+
+      <section class="city" style="--c:#1a5a7a"><span class="n">4</span><div class="e">🌊</div>
+        <h3>Atlantis</h3><span class="arch">Cité engloutie</span>
+        <p class="w">L’Atlantide · Platon · vers -400</p>
+        <p>Le mythe fondateur : la cité parfaite qui rayonne sur les mers, <em>punie pour son orgueil, son hubris</em>. Chez Platon, une civilisation brillante et techniquement avancée qui <em>disparaît d’un coup sous les flots</em>.</p>
+        <p>L’avertissement ultime : toute civilisation, aussi puissante soit-elle, reste vulnérable <em>face à la puissance de la Terre et aux excès de sa propre grandeur</em>.</p>
+        <div class="chips"><span>Kitezh · mythologie russe</span><span>Ys · légende bretonne</span><span>Mu · mythes du Pacifique</span><span>Vineta · Baltique</span><span>Lyonesse · Cornouailles</span><span>Tartessos · mythes bibliques</span><span>Valinor · Tolkien</span></div>
+      </section>
+
+      <section class="city" style="--c:#5a7a9a"><span class="n">5</span><div class="e">☁️</div>
+        <h3>Laputa</h3><span class="arch">Cité volante</span>
+        <p class="w">Les Voyages de Gulliver · Jonathan Swift · 1726</p>
+        <p>Suspendue dans le ciel, elle domine les peuples d’en bas, et peut <em>les punir en projetant son ombre ou en leur bloquant le soleil</em>.</p>
+        <p>Chez Swift, une satire du pouvoir technocratique : <em>brillant, mais incapable de comprendre le réel</em>.</p>
+        <p>Au XXe siècle, Miyazaki la reprend dans <em>Le Château dans le ciel (1986)</em> : une cité aérienne abandonnée, envahie par la végétation, couverte de machines et d’armes anciennes.</p>
+        <div class="chips"><span>Cloud City · Star Wars</span><span>Columbia · BioShock Infinite</span><span>Zalem · Gunnm (Alita)</span><span>Bay City · Altered Carbon</span><span>Palais céleste · mythologie chinoise</span></div>
+      </section>
+
+      <section class="city" style="--c:#3a3a4a"><span class="n">6</span><div class="e">🦇</div>
+        <h3>Gotham City</h3><span class="arch">Cité du crime</span>
+        <p class="w">Batman · DC Comics · 1940</p>
+        <p>Inspirée de <em>New York et Chicago</em>, l’archétype de la métropole criminelle.</p>
+        <p>Architecture <em>gothique et industrielle</em>, ruelles sombres, gratte-ciel menaçants : une atmosphère permanente de <em>corruption et de décadence morale</em>.</p>
+        <div class="chips"><span>Sin City · Frank Miller</span><span>Yorknew City · Hunter x Hunter</span><span>San Andreas · GTA</span></div>
+      </section>
+
+      <section class="city" style="--c:#2a6a3a"><span class="n">7</span><div class="e">🌿</div>
+        <h3>Rivendell <small style="font-size:.55em;color:#86868b">Fondcombe</small></h3><span class="arch">Cité jardin</span>
+        <p class="w">Silmarillion · J.R.R. Tolkien · 1954</p>
+        <p>Un sanctuaire niché dans une vallée escarpée, où l’architecture elfique <em>se fond dans les cascades, la roche et les forêts</em>.</p>
+        <p>Un <em>urbanisme de la symbiose</em> : une cité qui s’inscrit dans l’harmonie de la nature, au cœur du paysage.</p>
+        <div class="chips"><span>Jardins suspendus de Babylone</span><span>Avalon · mythes arthuriens</span><span>Shambhala · mythes hindous</span><span>La Comté · Tolkien</span></div>
+      </section>
+
+      <section class="city" style="--c:#7a6a2a"><span class="n">8</span><div class="e">📚</div>
+        <h3>Alexandrie</h3><span class="arch">Cité du savoir</span>
+        <p class="w">Le Phare · Égypte ptolémaïque</p>
+        <p>Depuis Alexandrie, l’imaginaire mondial nourrit le mythe d’une cité entière vouée au savoir, où <em>l’architecture devient un temple de la mémoire humaine</em>.</p>
+        <p>Ces villes-bibliothèques rassemblent manuscrits, savants et archives : le rêve d’un lieu capable de <em>conserver et d’organiser tout le savoir du monde</em>.</p>
+        <div class="chips"><span>Terminus · Fondation (1951)</span><span>Roke · Earthsea, Le Guin (1968)</span><span>La Grande Bibliothèque · Doctor Who (2008)</span><span>L’Université Invisible · Discworld</span><span>Le Temple Jedi · Star Wars</span></div>
+      </section>
+
+      <section class="next"><div class="e" style="font-size:4em">🏰</div><b>9. La cité forteresse</b><p>La prochaine, dans la partie 2. L’auteur demande aux lecteurs leurs propres archétypes de cités imaginaires, à ajouter ensuite.</p></section>
+
+      <a class="src" href="https://thecosmograph.substack.com/p/anthologie-des-villes-imaginaires" target="_blank" rel="noopener">Lire l’original ↗</a>
+    </article>
   </div>
   <div id="validate" class="card menu" hidden>
     <div class="step"><h2>Valider l'idée</h2><p class="lead">Ils finissent l'épisode, puis en veulent un 2e.</p><div id="valBody"></div></div>
@@ -1673,9 +1898,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo'];
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites'];
 const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos',
-  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos', '#cosmo': '#infos' };   // where ‹ goes
+  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -2073,7 +2298,9 @@ $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
 $('#pitchBtn').onclick = (e) => { e.stopPropagation(); show('#pitch'); };
 $('#sysBtn').onclick = (e) => { e.stopPropagation(); $('#system').scrollTop = 0; show('#system'); };
-$('#cosmoBtn').onclick = (e) => { e.stopPropagation(); $('#cosmo').scrollTop = 0; show('#cosmo'); };
+$('#cosmoBtn').onclick = (e) => { e.stopPropagation(); show('#cosmo'); };
+$('#cgOP').onclick = (e) => { e.stopPropagation(); $('#cosmoOP').scrollTop = 0; show('#cosmoOP'); };
+$('#cgCites').onclick = (e) => { e.stopPropagation(); $('#cosmoCites').scrollTop = 0; show('#cosmoCites'); };
 // ---- Pitch · Why not AI videos?: a choice game is a tree, and with AI video every branch is a video someone pays for.
 // A tap = the next idea: one episode (3 choices: 15 videos), five episodes (65,535), what that costs ----
 const AIV = [{ depth: 3, label: '1 episode · 3 choices', n: '15 videos' }, { depth: 10, label: '5 episodes · 15 choices', n: '65,535 videos' }, { cost: true }];
