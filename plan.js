@@ -8,14 +8,16 @@
 window.PLAN = (() => {
   const GOALS = [
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
-    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', tech: ['Show contrast'], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
-    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', tech: ['Show contrast'], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
-    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', tech: ['Phrase pas finie'], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
-    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', tech: [], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
-    { id: 'info', name: 'Reveal info', c: '#bf5af2', tech: ['Info en morceaux'], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
-    { id: 'callback', name: 'Callback', c: '#30d158', tech: [], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
+    { id: 'char', name: 'Create char engagingness', c: '#0a84ff', tech: [{ n: 'Show contrast', s: [{ n: 'Même début de phrase, fins opposées' }] }, { n: 'Tell a story' }, { n: 'Le perso qui voit à travers' }, { n: 'Unexpected' }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+    { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', tech: [{ n: 'Show contrast' }, { n: 'Shared memory' }, { n: 'Show care' }, { n: 'Options = façons d’être ami' }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
+    { id: 'desire', name: 'Show desire / goal', c: '#ff375f', tech: [{ n: 'Phrase pas finie' }, { n: 'Expose desire', s: [{ n: 'Direct confession' }] }, { n: 'Conflicting desire' }, { n: 'Ne pas décider le désir trop tôt' }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
+    { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', tech: [{ n: 'Le rire meurt, phrase sérieuse' }, { n: 'Character positioning', s: [{ n: 'Show position' }] }, { n: 'Painful consequences' }, { n: 'Personal win' }, { n: 'Tease choice' }, { n: 'La menace vise le désir' }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
+    { id: 'info', name: 'Reveal info', c: '#bf5af2', tech: [{ n: 'Info en morceaux' }, { n: 'Règle sur un objet' }, { n: 'Lieu banal, rencontre qui ne l’est pas' }, { n: 'Un tiers pose la question qu’on évite' }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+    { id: 'callback', name: 'Callback', c: '#30d158', tech: [{ n: 'Devise retournée' }, { n: 'Écho' }, { n: 'Objet planté' }, { n: 'Phrase pas finie reprise' }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
+  // a goal's techniques: { n: name, s: [the techniques under it] } (a category opens on what's under it)
   const G = Object.fromEntries(GOALS.map((g) => [g.id, g]));
+  const flat = (list) => (list || []).flatMap((t) => [t.n, ...flat(t.s)]);
   const ico = (g) => `<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${g.icon}</svg>`;
 
   // the example: Last call, episode 1, reverse-engineered from bar.js (what happens, never the lines)
@@ -130,6 +132,19 @@ window.PLAN = (() => {
     return roots.map((x) => row(x, 0, 0)).join('');
   }
 
+  // the goals on top: a tap on one opens its techniques (a category opens on the ones under it); each one drags onto a
+  // rectangle (it takes the technique and the goal) or into a box (a new rectangle with them)
+  const pal = { g: null, path: [] };
+  const palList = () => { let list = G[pal.g].tech; for (const i of pal.path) list = (list[i] && list[i].s) || []; return list; };
+  function palette() {
+    if (!pal.g || !G[pal.g]) return '';
+    const g = G[pal.g]; let list = g.tech; const crumbs = [`<button type="button" data-crumb="-1">${esc(g.name)}</button>`];
+    pal.path.forEach((i, k) => { crumbs.push(`<button type="button" data-crumb="${k}">${esc(list[i].n)}</button>`); list = list[i].s || []; });
+    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><div class="pChips">`
+      + (list.length ? list.map((t, i) => `<b data-tn="${i}">${esc(t.n)}${t.s && t.s.length ? ' <i>›</i>' : ''}</b>`).join('') : '<em>Aucune technique encore.</em>')
+      + '</div><small>Glisse une technique sur un rectangle, ou dans une boîte pour en créer un.</small></div>';
+  }
+
   // the page: a fixed bar on top, then the canvas (scrolls both ways): the head (turn, infos, legend) top left, the boxes
   function render() {
     if (!el) return;
@@ -138,12 +153,14 @@ window.PLAN = (() => {
     el.innerHTML = `<div class="pHead"><b data-a="title">${esc(P.title)}</b><div class="pBar"><button type="button" data-a="out">−</button><button type="button" data-a="in">+</button>`
       + '<button type="button" data-a="addbox">+ Boîte</button><button type="button" data-a="example">Exemple</button><button type="button" data-a="new">Nouveau</button>'
       + '<button type="button" data-a="copy">Copier</button><button type="button" data-a="paste">Coller</button></div>'
+      + `<div class="pGoalBar">${GOALS.map((g) => `<button type="button" data-pg="${g.id}" class="${pal.g === g.id ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}<span class="lk">lien</span></div>`
+      + palette()
       + (linking ? '<div class="pLinking">Touche le rectangle où ça mène <button type="button" data-a="cancel">Annuler</button></div>' : '') + '</div>'
       + `<div class="pView"><div class="pCanvas${focusId ? ' pFocus' : ''}" style="font-size:${zoom}em">`
       + `<div class="pHeadBox" data-box="head"><div class="pTurn" data-a="turn"><small>Le tournant · décidé en premier</small><p>${esc(P.turn) || '<span class="pDim">Touche pour l’écrire</span>'}</p></div>`
       + `<div class="pInfos"><small data-root>Infos à exposer</small>${infoTree(revealed)}`
       + '<button type="button" data-a="info">+ Info</button></div>'
-      + `<div class="pLegend">${GOALS.map((g) => `<span style="--c:${g.c}">${ico(g)}${esc(g.name)}</span>`).join('')}<span class="lk">lien</span></div></div>`
+      + '</div>'
       + P.boxes.map((box, k) => `<section class="pBox" data-k="${k}" data-box="${box.id}"><h3 data-a="box">${esc(box.title)}</h3>${box.beats.map(rect).join('')}`
         + '<div class="pAdd"><button type="button" data-a="beat">+ Rectangle</button><button type="button" data-a="choice">+ Choix</button></div></section>').join('')
       + '<svg class="pSvg" aria-hidden="true"></svg></div></div>';
@@ -204,7 +221,7 @@ window.PLAN = (() => {
   function closeSheet() { editing = null; const s = sheet(); if (s) s.hidden = true; }
   function openBeat(id) {
     const b = find(id); if (!b) return; editing = id; const s = sheet(); s.onclick = beatSheet; s.oninput = onInput;
-    const sug = [...new Set((b.goals || []).flatMap((g) => (G[g] ? G[g].tech : [])))];
+    const sug = [...new Set((b.goals || []).flatMap((g) => (G[g] ? flat(G[g].tech) : [])))];
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>${b.kind === 'choice' ? 'Choix' : 'Rectangle'} ${num(id)}</b><button type="button" data-s="close">OK</button></div>`
       + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}</div>`
       + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">`
@@ -285,6 +302,10 @@ window.PLAN = (() => {
   function onClick(e) {
     e.stopPropagation();
     if (dragged) { dragged = false; return; }
+    const pg = e.target.closest('[data-pg]'), crumb = e.target.closest('[data-crumb]'), tn = e.target.closest('[data-tn]');
+    if (pg) { pal.g = pal.g === pg.dataset.pg ? null : pg.dataset.pg; pal.path = []; render(); return; }
+    if (crumb) { pal.path = pal.path.slice(0, +crumb.dataset.crumb + 1); render(); return; }
+    if (tn) { const t = palList()[+tn.dataset.tn]; if (t && t.s && t.s.length) { pal.path.push(+tn.dataset.tn); render(); } return; }
     const goal = e.target.closest('[data-goal]');
     for (const n of el.querySelectorAll('[data-goal].show')) if (n !== goal) n.classList.remove('show');
     if (goal) { goal.classList.toggle('show'); return; }   // a goal's tab: its name, nothing else
@@ -324,7 +345,22 @@ window.PLAN = (() => {
 
   // a box's title drags the box anywhere (finger or mouse; a tap still opens it); with a mouse, dragging the background
   // pans the canvas (a finger already scrolls it both ways)
-  let drag = null, dragged = false, moving = null, infoDrag = null;
+  let drag = null, dragged = false, moving = null, infoDrag = null, techDrag = null;
+  // a technique dragged from the goals on top: a copy follows the finger; where it lands lights up
+  function techTarget(e) {
+    for (const n of el.querySelectorAll('.pBeat.drop, .pBox.drop')) n.classList.remove('drop');
+    const t = document.elementFromPoint(e.clientX, e.clientY), b = t && t.closest('.pBeat'), box = t && t.closest('.pBox');
+    if (b) { b.classList.add('drop'); return { beat: b.dataset.b }; }
+    if (box) { box.classList.add('drop'); return { box: +box.dataset.k }; }
+    return null;
+  }
+  function techDrop(t) {
+    const { n, g } = techDrag; let b;
+    if (t.beat) { b = find(t.beat); b.tech = n; }
+    else { b = { id: fresh('r'), goals: [], tech: n, lines: 2, what: '' }; P.boxes[t.box].beats.push(b); }
+    if (!(b.goals || []).includes(g)) b.goals = GOALS.map((q) => q.id).filter((q) => q === g || (b.goals || []).includes(q));
+    focusId = b.id; save();
+  }
   // where an info is dropped: onto another one (its top edge = before it, same level; the rest = under it), or onto the
   // title "Infos à exposer" = back to the top level. Never under itself or what it unlocks
   const under = (id, anc) => { for (let x = P.infos.find((i) => i.id === id); x; x = P.infos.find((i) => i.id === x.parent)) if (x.id === anc) return true; return false; };
@@ -345,6 +381,12 @@ window.PLAN = (() => {
     save();
   }
   function onDown(e) {
+    dragged = false;   // a drag whose click never came (its element was redrawn) must not eat the next tap
+    const chip = e.target.closest('[data-tn]');
+    if (chip) {
+      const t = palList()[+chip.dataset.tn]; if (!t) return;
+      techDrag = { n: t.n, g: pal.g, x: e.clientX, y: e.clientY, ghost: null }; chip.setPointerCapture(e.pointerId); dragged = false; e.preventDefault(); return;
+    }
     const grip = e.target.closest('[data-grip]');
     if (grip) { infoDrag = { id: grip.dataset.grip, row: grip.parentNode }; grip.setPointerCapture(e.pointerId); infoDrag.row.classList.add('lift'); dragged = false; e.preventDefault(); return; }
     const h = e.target.closest('.pBox > h3');
@@ -357,6 +399,14 @@ window.PLAN = (() => {
     drag = { x: e.clientX, y: e.clientY, l: v.scrollLeft, t: v.scrollTop, v }; dragged = false;
   }
   function onMove(e) {
+    if (techDrag) {
+      if (!techDrag.ghost) {
+        if (Math.abs(e.clientX - techDrag.x) + Math.abs(e.clientY - techDrag.y) < 6) return;
+        dragged = true; const gh = techDrag.ghost = document.createElement('div'); gh.className = 'pGhost'; gh.textContent = techDrag.n;
+        gh.style.setProperty('--c', G[techDrag.g].c); document.body.appendChild(gh);
+      }
+      techDrag.ghost.style.left = e.clientX + 'px'; techDrag.ghost.style.top = e.clientY + 'px'; techDrag.t = techTarget(e); return;
+    }
     if (infoDrag) { dragged = true; infoDrag.t = infoTarget(e); return; }
     if (moving) {
       const dx = e.clientX - moving.x, dy = e.clientY - moving.y; if (Math.abs(dx) + Math.abs(dy) > 5) dragged = true;
@@ -374,6 +424,10 @@ window.PLAN = (() => {
     root.onclick = onClick; root.onpointerdown = onDown; root.onpointermove = onMove;
     root.onpointerup = root.onpointercancel = (e) => {
       drag = null;
+      if (techDrag) {
+        const d = techDrag; techDrag = null; if (!d.ghost) return;   // a tap: the click opens what's under it
+        d.ghost.remove(); techDrag = d; if (e.type === 'pointerup' && d.t) techDrop(d.t); techDrag = null; render(); return;
+      }
       if (infoDrag) { if (e.type === 'pointerup' && infoDrag.t) infoDrop(infoDrag.t); infoDrag = null; render(); return; }
       if (!moving) return;
       const m = moving; moving = null; if (!dragged) return;
