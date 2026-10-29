@@ -497,6 +497,14 @@ body.inwait.roomfull #qrBtn { display: none !important; }   /* everyone's in: no
 #eyes { position: absolute; top: calc(2.2% + 1.2em); right: calc(4% + 9.2em); z-index: 30; height: 5.6em; padding: 0 1.8em; border-radius: 2.8em; background: rgba(15,12,20,.6); color: #fff; display: flex; align-items: center; gap: .8em; pointer-events: none; }
 #eyes svg { width: 2.8em; height: 2.8em; }
 #eyes span { font-size: 2.6em; font-weight: 800; }
+/* a reminder to himself (Justin), every time the menu opens: in his face until he taps OK */
+#moatWarn { position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,.82); display: grid; place-items: center; padding: 0 7%; }
+#moatWarn[hidden] { display: none; }
+#moatWarn .mw { display: flex; flex-direction: column; align-items: center; gap: 1.4em; padding: 3em 2.4em 2.4em; border-radius: 2.4em; background: #ffcc00; color: #000; text-align: center; box-shadow: 0 0 0 .4em #000, 0 0 0 .8em #ffcc00, 0 2em 6em rgba(255,204,0,.35); animation: mwIn .35s cubic-bezier(.2,.9,.3,1.3); }
+#moatWarn i { font-style: normal; font-size: 8em; line-height: 1; }
+#moatWarn b { font-size: 3.6em; font-weight: 900; line-height: 1.15; letter-spacing: -.01em; }
+#moatWarn button { font: inherit; font-size: 2.4em; font-weight: 800; padding: .6em 2.4em; border-radius: 2em; border: 0; background: #000; color: #ffcc00; cursor: pointer; margin-top: .4em; }
+@keyframes mwIn { from { transform: scale(.7); opacity: 0; } }
 #qrCard { position: absolute; inset: 0; z-index: 40; background: rgba(8,6,12,.92); display: grid; place-items: center; cursor: pointer; }
 #qrBox { width: 50%; aspect-ratio: 1; background: #fff; border-radius: 1.8em; padding: 3%; box-sizing: border-box; }
 #qrBox svg { width: 100%; height: 100%; display: block; }
@@ -587,6 +595,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button class="pill" type="submit">Entrer</button>
     </form>
   </div>
+  <div id="moatWarn" hidden><div class="mw"><i>⚠</i><b>Implement the moat story techniques.</b><button type="button">OK</button></div></div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
@@ -1932,6 +1941,7 @@ function show(id) {
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
+  if (id === '#hub' && screen !== '#hub') $('#moatWarn').hidden = false;   // every time the menu opens
   screen = id;
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
@@ -2320,6 +2330,7 @@ $('#statsBtn').onclick = (e) => { e.stopPropagation(); show('#statsScreen'); liv
 $('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
+$('#moatWarn').onclick = (e) => { e.stopPropagation(); $('#moatWarn').hidden = true; };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
