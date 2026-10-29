@@ -1,0 +1,52 @@
+{"episode": 1, "title": "The Oath on the Terrace", "scene": "taverne",
+ "steps": [
+  {"who": "ruby", "pose": "explaining", "to": "candy", "text": "Three years ago, Justin and I put everything into this tavern."},
+  {"who": "candy", "pose": "holding", "to": "justin", "text": "Eleven silver. Let me count that again."},
+  {"who": "justin", "pose": "holding", "to": "justin", "text": "The elf needs it more than I do."},
+  {"who": "candy", "pose": "listen", "to": "justin", "text": "You tipped him. You never count what leaves your hand."},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "I bought your loan last spring. Your interest comes to me."},
+  {"who": "ruby", "pose": "explaining", "to": "justin", "text": "Opening night, you lit the fire. Sober as a judge."},
+  {"who": "justin", "pose": "holding", "to": "justin", "text": "Ruby lit it. I was the one holding the match."},
+  {"who": "ruby", "pose": "listen", "to": "justin", "text": "You still tell it that way, don't you?"},
+  {"who": "ruby", "pose": "explaining", "to": "candy", "text": "I saw Justin sign a blood oath. Ask him what he remembers."},
+  {"hush": true},
+  {"who": "justin", "pose": "holding", "to": "justin", "text": "I want that debt gone before anyone learns what I signed."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "Tonight. Before the wrong person reads my name."},
+  {"who": "candy", "pose": "holding", "to": "justin", "text": "If tonight passes unpaid, the council takes the tavern."},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Every bottle, every chair, and whoever signed for it."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "The savings jar covers her. Barely."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "Or Ruby never learns about the oath, and I lie to her."},
+  {"choice": [
+    {"t": "Pay Candy from the savings", "say": "Candy, you'll have the savings jar. Tonight.", "tone": "decisive",
+     "then": [
+       {"who": "candy", "pose": "holding", "to": "justin", "text": "Good. I'll count it myself, then."},
+       {"who": "justin", "pose": "holding", "to": "justin", "text": "Three years of tips, gone in one count."}
+     ]},
+    {"t": "Hide the oath from Ruby", "say": "Keep the savings out of this. Give me time.", "tone": "evasive",
+     "then": [
+       {"who": "candy", "pose": "listen", "to": "justin", "text": "Keep your secret, then. I'll still collect."},
+       {"who": "justin", "pose": "surprised", "to": "justin", "text": "She's smiling. That's never good news."}
+     ]}
+  ]},
+  {"who": "ruby", "pose": "angry", "to": "justin", "text": "Not the savings, Justin. That's our tavern, not your debt."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "Boots on the stairs. Slow. Someone reading a list."},
+  {"who": "justin", "pose": "surprised", "to": "justin", "text": "My name is on that list. I know it before he speaks."},
+  {"choice": [
+    {"t": "Run out the back", "say": "Not tonight. I'm going out the back.", "tone": "desperate",
+     "then": [
+       {"who": "ruby", "pose": "angry", "to": "justin", "text": "Go on, run. Leave me with the bill, like always."},
+       {"who": "candy", "pose": "holding", "to": "justin", "text": "Then I'll collect from whoever's left."}
+     ]},
+    {"t": "Stay and face the council", "say": "I'm here. Read your list, then.", "tone": "defiant",
+     "then": [
+       {"who": "ruby", "pose": "holding", "to": "justin", "text": "Then take it alone. I won't pay for your oath."},
+       {"who": "justin", "pose": "holding", "to": "justin", "text": "Her footsteps go down the stairs. Mine stay."}
+     ]}
+  ]}
+ ],
+ "next": [
+  "If he paid from the savings, Ruby finds the jar empty and asks why.",
+  "If he hid the oath, Candy uses his silence to squeeze more interest from him.",
+  "If he stayed, the runner's list names him in front of Ruby.",
+  "If he ran, he has one night to find the money before the council does."
+ ]}

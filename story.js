@@ -55,7 +55,7 @@ window.SCENES = {
   // the same tavern seen from above, the shot that opens the scene (it zooms in on the tavern) and closes it (zooms out)
   taverne: {
     image: 'bg/taverne.webp', size: [1672, 940], establish: 'bg/taverne_haut.webp',
-    spots: { melissa: [610, 925, 430], candy: [830, 925, 430], ruby: [1050, 925, 430], justin: [1270, 925, 430] },
+    spots: { melissa: [640, 930, 560], candy: [810, 930, 560], ruby: [980, 930, 560], justin: [1150, 930, 560] },   // big and close: a 3-shot still keeps heads above the line
     face: { melissa: 'r', candy: 'r', ruby: 'r', justin: 'l' },
     front: [],
   },

@@ -474,7 +474,7 @@ C. Every line answers the line before it (answers, dodges, jokes, pushes back). 
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 
-THE MAIN CHARACTER (id "justin"): outside a choice, his lines are his inner voice, first person ("I"). Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
+THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: "t" = the button, a short line in his voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
 POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
 

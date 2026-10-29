@@ -131,7 +131,8 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       if (last !== s.who) out = [last && ++turns % 3 === 0 ? cam('two', last, s.who) : cam('one', s.who)];
       const to = ok.includes(s.to) && s.to !== s.who ? { to: s.to } : last && last !== s.who ? { to: last } : undefined;
       last = s.who;
-      if (s.who === 'justin' && !inChoice) return [...out, { think: 'justin', text: clip(s.text, 160) }];   // his inner voice
+      // his inner voice only when he talks to himself ("to": justin, or no one); to someone, he says it out loud
+      if (s.who === 'justin' && !inChoice && (!s.to || s.to === 'justin')) return [...out, { think: 'justin', text: clip(s.text, 160) }];
       return [...out, say(s.who, posesOf(s.who).includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
     };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 }, most = j.seed || j.episode ? 3 : 2;   // an episode (ep1.js has a seed, the scene plan's prompt 2 says episode): 3 choices
