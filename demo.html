@@ -818,6 +818,12 @@ const DEMOS = [
       { title: 'The red door', img: 'covers/lastcall_ep3.jpg', win: { sprite: 'suit', pose: 'adjust', name: 'The stranger' }, tease: 'Third door. The red light. Someone is already inside.' }],
     pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
+  // Test: the demo that runs through every system (test.js), clean enough to show anyone; always in Accueil
+  { id: 'test', title: 'Test', by: '@sousmontoit', plays: '—', bg: 'maison', pos: '50% 50%', fx: 'grayscale(.85) brightness(.32)', glow: '#fff3cf',
+    full: 'd_test', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'suit', pose: 'adjust', name: "L'étranger" }, tease: 'La suite arrive.' }],
+    cast: [['justin_bar', 'drunk_serious'], ['suit', 'adjust'], ['brooke', 'nervous']], players: 2, byoc: false, live: null, you: 0,
+    pitch: "2 h du matin. Justin et Brooke, une salle d'interrogatoire, et un homme en complet qui parle d'une mallette disparue. Il n'a montré de badge à personne.",
+    lines: [[-1, 'Poste 12 · 2 h 14'], [1, "Messieurs. Merci d'être venus.", 'adjust'], [0, 'On avait pas vraiment le choix.', 'drunk_serious'], [1, 'Une mallette a disparu du Larina ce soir.', 'listen'], [2, 'Une mallette ? On a même pas vu de mallette.', 'nervous'], [1, 'Vos téléphones sur la table.', 'offer'], [0, "Votre badge d'abord.", 'angry'], [1, 'Plus tard.', 'adjust']] },
   // a series: the island (its poster is the beach of day 1; the preview, night 3 in the forest)
   { id: 'ile', title: "Ce qui reste de l'île", by: '@ileperdue', plays: '19,7 k', bg: 'forest', glow: '#ff3b3b',
     full: 'd_ile', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'mila', pose: 'beach', name: 'Mila' }, tease: 'La suite arrive.' }],
@@ -1599,7 +1605,8 @@ function searchRes() {
 function renderHome() {
   if (SERIES.progressive()) seedHome();
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
-  const ids = Object.keys(prog).filter((id) => byId(id) && !done(id)).sort((a, b) => prog[b].at - prog[a].at);   // a finished one goes to Sauvés
+  if (byId('test') && !prog.test) track('test', 0);   // Test is always in Accueil, first
+  const ids = Object.keys(prog).filter((id) => byId(id) && (id === 'test' || !done(id))).sort((a, b) => (b === 'test') - (a === 'test') || prog[b].at - prog[a].at);   // a finished one goes to Sauvés
   if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
   const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
