@@ -498,12 +498,41 @@ body.inwait.roomfull #qrBtn { display: none !important; }   /* everyone's in: no
    room = the QR the two players scan, and in a story a panel each side of the screen: the player, their character,
    « choisit… » while it's their turn, their choices so far */
 body.tv #qrBtn, body.tv #eyes, body.tv #galBtn { display: none !important; }
+/* the TV is only watched: no button, no cursor, nothing to tap (the players do it all on their phones) */
+body.tv #back, body.tv #menuBtn, body.tv #menuPop, body.tv #hint, body.tv .endRow, body.tv .ep-go, body.tv .ep-home, body.tv #pauseCard .pc-btns { display: none !important; }
+body.tv, body.tv * { cursor: none !important; }
+#tvPick .tv-join .qr { width: 26em; height: 26em; }
+#tvNames { margin-top: 2em; text-align: center; font-size: 2.4em; font-weight: 800; color: #34c759; min-height: 1.3em; }
+/* a player's phone on a TV's story: the list of stories in the lobby, a pause button in the story, again on the end card */
+#lobbyList { width: 100%; margin-top: 3em; }
+#lobby:has(#lobbyList:not([hidden])) { justify-content: flex-start; padding-top: 14em; overflow-y: auto; }
+#lobbyKick { text-align: center; margin-top: 3em; }
+#pauseBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: none; place-items: center; cursor: pointer; padding: 0; }
+#pauseBtn svg { width: 3.6em; height: 3.6em; }
+body.hosttv.instory #pauseBtn { display: grid; }
+body.watch.hosttv #again { display: block !important; }
+/* paused: what just happened (the last 4 choices and what came of each) */
+#pauseCard { position: absolute; inset: 0; z-index: 60; background: rgba(8,6,12,.88); backdrop-filter: blur(.6em); -webkit-backdrop-filter: blur(.6em); color: #f5f5f7; display: flex; flex-direction: column; justify-content: center; padding: 0 7%; cursor: default; }
+body.tv #pauseCard { padding: 0 calc(50% - 46em); }
+#pauseCard[hidden] { display: none; }
+#pauseCard h2 { font-family: var(--display); font-weight: 400; font-size: 6em; margin: 0; text-align: center; }
+#pauseCard .pc-who { text-align: center; font-size: 2em; font-weight: 700; color: #8e8e93; margin: .3em 0 1.6em; }
+#pauseCard .wr-kick { margin-bottom: 1em; }
+#pauseCard ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.2em; }
+#pauseCard li { background: rgba(255,255,255,.07); border-left: .35em solid var(--c, #ff9a4d); border-radius: .8em; padding: 1em 1.3em; }
+#pauseCard li b { display: block; font-size: 2.2em; font-weight: 800; }
+#pauseCard li b i { font-style: normal; color: var(--c, #ff9a4d); font-weight: 700; }
+#pauseCard li span { display: block; font-size: 1.9em; color: #d1d1d6; margin-top: .3em; font-style: italic; }
+#pauseCard li.none { border-left-color: #555; font-size: 2em; color: #8e8e93; }
+#pauseCard .pc-btns { display: flex; gap: 1.2em; margin-top: 2.4em; }
+#pauseCard .pc-btns button { flex: 1; font: inherit; font-size: 2.4em; font-weight: 800; border: 0; border-radius: 1em; padding: .8em; cursor: pointer; color: #fff; background: #34c759; }
+#pauseCard .pc-btns button + button { flex: 0 1 auto; background: rgba(255,255,255,.14); }
 #tvPick { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 10em 6% 4em; overflow-y: auto; }
 #tvPick h2 { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .8em; }
-#tvList { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; }
-#tvList button { font: inherit; font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 1em; padding: 1em .8em; cursor: pointer; text-align: center; }
-#tvList button:hover, #tvList button:focus-visible { background: rgba(255,255,255,.22); outline: none; }
-#tvList h3 { grid-column: 1 / -1; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; text-align: center; margin: 1em 0 0; }
+.tv-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; }
+.tv-list button { font: inherit; font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 1em; padding: 1em .8em; cursor: pointer; text-align: center; }
+.tv-list button:hover, .tv-list button:focus-visible { background: rgba(255,255,255,.22); outline: none; }
+.tv-list h3 { grid-column: 1 / -1; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; text-align: center; margin: 1em 0 0; }
 .tv-join { margin-top: 1.6em; display: flex; flex-direction: column; align-items: center; gap: 1.2em; text-align: center; }
 .tv-join .qr { width: 17em; height: 17em; background: #fff; border-radius: 1.4em; padding: 1.4em; box-sizing: border-box; }
 .tv-join .qr svg { width: 100%; height: 100%; display: block; }
@@ -903,8 +932,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <button class="pill" id="watch3d" type="button" aria-label="Voir la vidéo"><svg viewBox="0 0 24 24" fill="#000" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg></button>
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
-  <div id="lobby" class="card menu" hidden><div class="names" id="names"></div></div>
-  <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>Choisis l'histoire</h2><div id="tvList"></div></div>
+  <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Choisis l'histoire</div><div id="lobbyList" class="tv-list" hidden></div></div>
+  <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>Sous mon toit</h2>
+    <div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell (ou ouvre ce lien), puis choisis l'histoire</p><code id="tvLink"></code></div><div id="tvNames"></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="fbCard" hidden><div class="fb">
@@ -1057,6 +1087,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
+  <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  <div id="pauseCard" hidden><h2>Pause</h2><div class="pc-who"></div><div class="wr-kick">Ce qui vient de se passer</div><ol></ol>
+    <div class="pc-btns"><button type="button" class="pc-go">Reprendre</button><button type="button" class="pc-quit">Quitter</button></div></div>
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
@@ -1628,7 +1661,7 @@ function pickChoice(i, afar = false) {
   record('c' + i + tag(optionsLane));
   const by = optionsBy;
   const go = () => {
-    state.picks.push({ ...o, by, who: seatFor(by) }); if (o.set) Object.assign(state.f, o.set);
+    state.picks.push({ ...o, by, who: seatFor(by), after: afterOf(o) }); if (o.set) Object.assign(state.f, o.set);
     if (!quiet) tally((r) => {   // which option, among which (a choice = its options' texts): the share of each tells if the choice is a real one
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
@@ -1661,6 +1694,49 @@ function tvSides(choosing = null, fresh = null) {
       <ol>${mine.slice(-4).map((x, j, a) => `<li${fresh === k && j === a.length - 1 ? ' class="fresh"' : ''}>${esc(fill(x.t))}</li>`).join('')}</ol>`;
   });
 }
+
+// ---- a TV's story plays by itself: each line stays long enough to be read, then the next one (the players' taps still
+// move it on sooner); only the choices wait for the players. Either player can pause from their phone ----
+let paused = null;   // who paused (their name), or null
+// what came of a choice: the first line it leads to ("Kev : Une poutine triple, extra sauce.")
+function afterOf(o) {
+  const s = (o.then || []).find((x) => x && (x.say || x.narr || x.think) && (x.text || x.narr));
+  if (!s) return '';
+  const who = s.say || s.think;
+  return (who ? fill((castOf(who) || {}).name || '') + ' : ' : '') + fill(s.text || s.narr);
+}
+// the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
+function showPause() {
+  const on = !!paused && screen === null && (TV || hostTv);
+  $('#pauseCard').hidden = !on;
+  if (!on) return;
+  $('#pauseCard .pc-who').textContent = `${paused} a mis pause`;
+  const last = state.picks.slice(-4);
+  $('#pauseCard ol').innerHTML = last.length ? last.map((p) => {
+    const k = p.who || p.by, c = (k && castOf(k)) || {};
+    return `<li style="--c:${c.color || '#ff9a4d'}"><b>${esc(seatName(k) || seatLabel(k) || '')} <i>a choisi</i> « ${esc(fill(p.t))} »</b>${p.after ? `<span>${esc(p.after)}</span>` : ''}</li>`;
+  }).join('') : '<li class="none">Pas encore de choix : l\'histoire vient de commencer.</li>';
+}
+$('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
+$('#pauseCard').onclick = (e) => e.stopPropagation();
+$('#pauseCard .pc-go').onclick = (e) => { e.stopPropagation(); if (hostTv && paused) sendIn('pause'); };
+$('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sendIn('menu'); };
+// how long a line stays: time to read it (a private one: time for its owner to read it on their phone)
+const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
+let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
+function autoTick() {
+  if (!TV || paused || screen !== null || FAST) { autoKey = {}; return; }
+  const now = Date.now(), due = (k, id, ms) => { if (autoKey[k] !== id) { autoKey[k] = id; autoKey[k + 't'] = now + ms; } return now >= autoKey[k + 't']; };
+  if (waiting === 'click' && !typing) {
+    const id = run + ':' + tape.length, ms = !slateEl.hidden ? 3500 : onlyNow ? 5000 : readMs(typingFull);
+    if (due('m', id, ms)) { autoKey.m = null; record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
+  } else autoKey.m = null;
+  if (split) for (const g of Object.values(split.ghosts)) {
+    if (g.waiting === 'click') { if (due(g.seat, run + ':' + tape.length, 4000)) { autoKey[g.seat] = null; ghostTap(g); } }
+    else autoKey[g.seat] = null;
+  }
+}
+if (TV) setInterval(autoTick, 200);
 
 function fade(dir, ms) {
   bubble.hidden = true;
@@ -1783,6 +1859,7 @@ function episodeEnd(ep, r) {
         <button type="button" class="ep-go">${nx ? ui('next') : ui('finale')}</button><button type="button" class="ep-home">${ui('home')}</button></div>`;
       $('.ep-go', box).onclick = (e) => { e.stopPropagation(); if (nx) tally((x) => { x.nx = (x.nx || 0) + 1; }); box.hidden = true; done(true); };   // they want the next one
       $('.ep-home', box).onclick = (e) => { e.stopPropagation(); box.hidden = true; done(false); if (fromDemo) { toHub(); history.back(); } else toHub(); };
+      if (TV || hostTv) setTimeout(() => { if (run === r && !box.hidden && box.className === 'teasing') $('.ep-go', box).click(); }, 6000);   // nobody taps a TV
     };
     later(60, () => box.className = 'done');                             // "you finished episode N"
     if (already) { later(2200, tease); return; }                         // nobody new: straight to what comes next
@@ -1911,7 +1988,7 @@ function ghostTap(g) {
 function ghostPick(g, i) {
   const o = g.options && g.options[i]; if (!o || g.waiting !== 'choice') return;
   record(`c${i}@${g.seat}`);
-  state.picks.push({ ...o, by: g.seat }); if (o.set) Object.assign(state.f, o.set);
+  state.picks.push({ ...o, by: g.seat, who: g.seat, after: afterOf(o) }); if (o.set) Object.assign(state.f, o.set);
   g.waiting = null; g.q.unshift(...o.then); ghostRun(g);
 }
 // the host plays a ghost scene whose player left (first option, a tap every 1.6 s), so the story never gets stuck; during a
@@ -1994,6 +2071,7 @@ async function next() {
 }
 
 function advance() {
+  if (TV || paused) return;   // the TV is only watched; paused, nothing moves
   if (ROLE === 'watch') {
     // in a 2-player story the two players move the story (in a split, each his own scene); the host checks the tap is
     // for the line it is on (its count of taps so far, or of this scene's taps)
@@ -2030,6 +2108,8 @@ function show(id) {
   document.body.classList.toggle('home', id === '#hub');
   document.body.classList.toggle('inwait', id === '#wait');
   document.body.classList.toggle('instory', id === null);
+  if (TV && id === '#tvPick') tvHome();
+  if (id !== null) showPause();
   if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
@@ -2072,6 +2152,7 @@ function begin(id = state.story) {
   curEp = 1;
   // a play from Full demo was counted there, when Play was pressed
   if (!fromDemo && !PLAY_ONLY) bump((st) => { st.s = st.s || {}; const k = sid(id), r = (st.s[k] = st.s[k] || {}); if (storyName(id) !== id) r.n = storyName(id); r.plays = (r.plays || 0) + 1; });
+  paused = null; showPause();
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
   firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
@@ -2085,7 +2166,7 @@ function begin(id = state.story) {
 }
 // leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)
 function toHub() {
-  halt(); show('#hub');
+  paused = null; halt(); show('#hub');
   if (waitRoom) announce(false);
   waitRoom = false; state.seats = {}; game = null; tape = []; share(); withFriend = null; withFriendTo = null; invite = null;
 }
@@ -2154,7 +2235,7 @@ function renderWait() {
     ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell, ou ouvre ce lien sur ton ordi, puis prends un perso</p><code>${esc(joinUrl())}</code></div>`
       : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
-  if (TV && !full) tvQr();
+  if (TV && !full) tvQr($('#room .tv-join .qr'));
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
     if (ROLE !== 'host') return sendIn('seat', { s: k });
@@ -2244,11 +2325,18 @@ for (const g of GAME_LIST) {
 }
 $('#lab').onclick = (e) => { e.stopPropagation(); feat('Mini-jeux'); show('#labScreen'); };
 $('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
-if (TV) {
+// a TV's story is picked on a player's phone, in the lobby: every 2-player story, then the mini-games
+function tvStoryList(box) {
   const two = Object.keys(STORIES).filter((id) => seatsOf(id).length === 2), games = new Set(GAME_LIST.map((g) => g.id));
   const btns = (ids) => ids.map((id) => `<button type="button" data-s="${id}">${esc(storyTitle(id) || id)}</button>`).join('');
-  $('#tvList').innerHTML = btns(two.filter((id) => !games.has(id))) + (two.some((id) => games.has(id)) ? `<h3>Mini-jeux</h3>${btns(two.filter((id) => games.has(id)))}` : '');
-  $('#tvList').querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); openWait(b.dataset.s, true); });
+  box.innerHTML = btns(two.filter((id) => !games.has(id))) + (two.some((id) => games.has(id)) ? `<h3>Mini-jeux</h3>${btns(two.filter((id) => games.has(id)))}` : '');
+  box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); sendIn('story', { s: b.dataset.s }); });
+}
+// the TV's home: the QR, and who's already in
+function tvHome() {
+  $('#tvLink').textContent = joinUrl(); tvQr($('#tvPick .tv-join .qr'));
+  const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
+  $('#tvNames').textContent = names.length ? `Ici : ${names.join(', ')} · choisissez l'histoire sur un cell` : '';
 }
 function takeSeat(k, id, n) {
   if (!waitRoom || !seatsOf().includes(k)) return;
@@ -2524,7 +2612,7 @@ $('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
 $('#back').onclick = (e) => {
   e.stopPropagation();
   if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
-  const up = UP[screen]; if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
+  const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
 // only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
 const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).includes('"episode"');
@@ -2563,7 +2651,7 @@ addEventListener('click', (e) => {
   e.stopPropagation(); e.preventDefault(); $('#menuPop').hidden = true;
 }, true);
 $('#start').addEventListener('submit', (e) => { e.preventDefault(); begin('t1'); });
-$('#again').onclick = (e) => { e.stopPropagation(); begin(state.story); };
+$('#again').onclick = (e) => { e.stopPropagation(); if (ROLE === 'watch') { if (hostTv) sendIn('again'); return; } begin(state.story); };
 
 // ---- gallery: each character, every pose on its own, the picture it started from and the sheet it was cut from;
 // the + card at the end holds the prompt that makes a new character's sheet ----
@@ -2784,7 +2872,7 @@ function newer(v) {
 function share() {
   if (ROLE !== 'host' || quiet || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, p: paused || undefined }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share(); } }   // a jump sends its taps once, at its end
 
@@ -2851,9 +2939,16 @@ function countEyes() {
   if (changed) renderWait();
   if (split) for (const g of Object.values(split.ghosts)) autoGhost(g);   // a player left in the middle of his scene
   const now2 = [...watchers.values()].map((w) => w.n).join('|');
-  if (changed || now2 !== heard) { heard = now2; share(); if (waitRoom) announce(true); }
+  if (changed || now2 !== heard) { heard = now2; share(); if (waitRoom) announce(true); if (TV && screen === '#tvPick') tvHome(); }
 }
 function fromJoiner(m) {
+  if (TV && watchers.has(m.id)) {
+    if (m.e === 'story' && !game && STORIES[m.s] && seatsOf(m.s).length === 2) { openWait(m.s, true); return; }
+    if (m.e === 'menu' && screen !== '#tvPick') { toHub(); return; }
+    if (m.e === 'again' && screen === '#end') { begin(state.story); return; }
+    if (m.e === 'pause' && game && screen === null) { paused = paused ? null : String(m.n || '?').slice(0, 16); autoKey = {}; showPause(); share(); return; }
+  }
+  if (paused && (m.e === 'a' || /^c\d$/.test(m.e))) return;   // paused: nothing moves
   if (m.e === 'seat') { const w = watchers.get(m.id); takeSeat(m.s, m.id, (w && w.n) || m.n); return; }
   if (m.e === 'no') { if (invite && invite.to === m.id) { invite = null; if (waitRoom) renderWait(); } return; }   // "Plus tard" on their device
   if (!game || m.g !== game || !Object.values(state.seats).some((s) => s.id === m.id)) return;
@@ -2929,7 +3024,7 @@ async function qrSvg() {
   const qr = qrcode(0, 'M'); qr.addData(joinUrl()); qr.make();
   return qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
 }
-async function tvQr() { const svg = await qrSvg(), box = $('#room .tv-join .qr'); if (svg && box) box.innerHTML = svg; }
+async function tvQr(box) { const svg = room && await qrSvg(); if (svg && box) box.innerHTML = svg; }
 $('#qrBtn').onclick = async (e) => {
   e.stopPropagation();
   const svg = await qrSvg(); if (!svg) return;
@@ -2944,7 +3039,8 @@ let remote = null, applied = 0, pumping = false;
 const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTimeout(t, FAST ? 0 : 40)); t(); });
 function follow(msg) {
   hostId = msg && msg.h;
-  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; }   // the sound comes from the TV
+  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); }   // the sound comes from the TV
+  if (msg && (msg.p || null) !== paused) { paused = msg.p || null; showPause(); }
   newer(msg && msg.v);
   if (!msg || !msg.g) {
     remote = null;
@@ -2960,10 +3056,13 @@ function follow(msg) {
   pump();
 }
 function toLobby(msg) {
-  if (auto) { if (screen !== '#end') goHome(); return; }
+  if (auto && !msg.tv) { if (screen !== '#end') goHome(); return; }
   halt(); show('#lobby');
   const box = $('#names'); box.innerHTML = '';
-  for (const n of [msg.n, ...(msg.r || [])]) if (n) { const d = document.createElement('div'); d.textContent = n; box.appendChild(d); }
+  // a TV's room: the TV isn't anyone, and the story is picked here
+  for (const n of msg.tv ? msg.r || [] : [msg.n, ...(msg.r || [])]) if (n) { const d = document.createElement('div'); d.textContent = n; box.appendChild(d); }
+  $('#lobbyKick').hidden = $('#lobbyList').hidden = !msg.tv;
+  if (msg.tv && !$('#lobbyList').children.length) tvStoryList($('#lobbyList'));
 }
 async function pump() {
   if (pumping) return;
@@ -3046,7 +3145,7 @@ if (PREVIEW) {
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
 } else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
-else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; show('#hub'); goLive(); }
+else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
 else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
 else if (auto && $('#whoName').value) $('#whoForm .pill').click();
 {
