@@ -515,11 +515,15 @@ body.tv #choices button { pointer-events: none; }
 body.tv #choices.tvpicked button:not(.picked) { opacity: .35; transition: opacity .3s; }
 #choices button.picked { transition: transform .3s; }
 body.tv #choices.tvpicked button.picked { transform: scale(1.04); }
+/* the TV's screen is wide: the story fills it, the words and choices stay in a column at the bottom, the two players'
+   panels in the bottom corners, over the scene */
+body.tv #ui { left: 50%; right: auto; width: 72em; transform: translateX(-50%); top: auto; bottom: 5%; }
+body.tv #tvPick, body.tv #wait, body.tv #end { padding-left: calc(50% - 40em); padding-right: calc(50% - 40em); }
 #tvSides { display: none; }
 body.tv.instory #tvSides { display: block; }
-.tv-side { position: fixed; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1em; padding: 0 2%; box-sizing: border-box; color: #f5f5f7; font-family: var(--ui); text-align: center; }
-.tv-side.l { left: 0; } .tv-side.r { right: 0; }
-.tv-side .fig { height: 38em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 0 transparent); transition: filter .4s, transform .4s; }
+.tv-side { position: fixed; bottom: 0; height: 70%; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .6em; padding: 0 2% 3%; box-sizing: border-box; color: #f5f5f7; font-family: var(--ui); text-align: center; pointer-events: none; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
+.tv-side.l { left: 0; background: linear-gradient(to top right, rgba(0,0,0,.75), transparent 60%); } .tv-side.r { right: 0; background: linear-gradient(to top left, rgba(0,0,0,.75), transparent 60%); }
+.tv-side .fig { height: 24em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 0 transparent); transition: filter .4s, transform .4s; }
 .tv-side .who { font-size: 2.6em; font-weight: 800; }
 .tv-side .ch { font-size: 1.8em; font-weight: 700; color: var(--c, #ff9a4d); letter-spacing: .1em; text-transform: uppercase; }
 .tv-side .now { font-size: 2em; font-weight: 800; color: #ffd60a; min-height: 1.3em; }
@@ -528,7 +532,7 @@ body.tv.instory #tvSides { display: block; }
 .tv-side.on .now i { font-style: normal; animation: blink 1.2s infinite; }
 .tv-side.on .now i:nth-child(2) { animation-delay: .2s; } .tv-side.on .now i:nth-child(3) { animation-delay: .4s; }
 .tv-side ol { list-style: none; margin: .6em 0 0; padding: 0; display: flex; flex-direction: column; gap: .6em; width: 100%; max-width: 30em; }
-.tv-side li { font-size: 1.7em; font-weight: 700; background: rgba(255,255,255,.08); border-left: .3em solid var(--c, #ff9a4d); border-radius: .6em; padding: .5em .8em; text-align: left; color: #d1d1d6; }
+.tv-side li { font-size: 1.7em; font-weight: 700; background: rgba(20,16,28,.75); border-left: .3em solid var(--c, #ff9a4d); border-radius: .6em; padding: .5em .8em; text-align: left; color: #d1d1d6; }
 .tv-side li.fresh { background: rgba(255,255,255,.2); color: #fff; animation: rise .4s ease-out; }
 #eyes { position: absolute; top: calc(2.2% + 1.2em); right: calc(4% + 9.2em); z-index: 30; height: 5.6em; padding: 0 1.8em; border-radius: 2.8em; background: rgba(15,12,20,.6); color: #fff; display: flex; align-items: center; gap: .8em; pointer-events: none; }
 #eyes svg { width: 2.8em; height: 2.8em; }
@@ -1126,8 +1130,9 @@ const poseSrc = (id, pose) => charUrl(spriteOf(id), poseOf(id, pose));
 function fit() {
   const bw = document.body.clientWidth, bh = document.body.clientHeight;
   H = Math.min(bh, bw * 16 / 9); W = H * 9 / 16;
+  if (TV) { H = bh; W = bw; }   // the TV: the whole screen, the camera frames to its shape
   Object.assign(stage.style, { width: W + 'px', height: H + 'px', fontSize: H / 100 + 'px' });
-  if (TV) document.querySelectorAll('.tv-side').forEach((d) => Object.assign(d.style, { width: Math.max(0, (bw - W) / 2) + 'px', fontSize: H / 100 + 'px' }));
+  if (TV) document.querySelectorAll('.tv-side').forEach((d) => Object.assign(d.style, { width: Math.max(0, (W - 76 * H / 100) / 2) + 'px', fontSize: H / 100 + 'px' }));
   if (camNow) applyCam(camNow, 0);
 }
 
@@ -1195,6 +1200,7 @@ function setScene(id, cast) {
 }
 
 // ---- camera: a size + who to frame (or a point for wide shots) ----
+const ASP = () => (TV && W && H ? W / H : 9 / 16);   // the frame's width / height
 function frameOf(c) {
   const [bw, bh] = sc.size;
   let camH, cx, top;
@@ -1203,16 +1209,19 @@ function frameOf(c) {
     camH = bh; top = 0;
     const all = Object.values(actors);
     cx = c.at ?? (all.length ? (Math.min(...all.map((a) => a.x)) + Math.max(...all.map((a) => a.x))) / 2 : bw / 2);
+    // a frame wider than the decor shows less of its height: centred on the people (heads to feet), not on the sky
+    if (camH * ASP() > bw && all.length) { camH = bw / ASP(); top = (Math.min(...all.map((a) => a.feet - box(a).h)) + Math.max(...all.map((a) => a.feet))) / 2 - camH / 2; }
   } else {
     const [k, margin] = FRAME[c.size];
     const boxes = who.map((a) => ({ a, b: box(a) }));
     const left = Math.min(...boxes.map(({ a, b }) => a.x - b.w / 2)), right = Math.max(...boxes.map(({ a, b }) => a.x + b.w / 2));
     const tall = Math.max(...who.map((a) => a.h)), head = Math.min(...boxes.map(({ a, b }) => a.feet - b.h));
-    camH = Math.min(bh, Math.max(k * tall, (right - left) * 1.08 * 16 / 9));
+    camH = Math.min(bh, Math.max(k * tall, (right - left) * 1.08 / ASP()));
     cx = (left + right) / 2; top = head - margin * camH;
   }
   if (c.lift !== undefined) top = c.lift;
-  const camW = camH * 9 / 16;
+  camH = Math.min(camH, bw / ASP());   // never wider than the decor
+  const camW = camH * ASP();
   return { camH, left: Math.min(Math.max(0, cx - camW / 2), bw - camW), top: Math.min(Math.max(0, top), bh - camH) };
 }
 function applyCam(c, ms) {
