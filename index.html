@@ -532,13 +532,11 @@ body.mirror, body.mirror * { pointer-events: none !important; cursor: default !i
 .pbadge .pb-ph { position: absolute; right: -.35em; bottom: -.3em; width: .95em; height: .95em; border-radius: 50%; background: var(--c); display: grid; place-items: center; }
 .pbadge svg { width: .62em; height: .62em; }
 #pauseCard .pc-play { display: none; }
-body.tv #pauseCard .pc-play { display: grid; place-items: center; align-self: center; width: 9em; height: 9em; border-radius: 50%; border: 0; background: #fff; cursor: pointer; margin-bottom: 1.4em; box-shadow: 0 0 4em rgba(255,255,255,.35); transition: transform .2s; }
-body.tv #pauseCard .pc-play:hover { transform: scale(1.06); }
-body.tv #pauseCard .pc-play svg { width: 4.4em; height: 4.4em; margin-left: .5em; }
-body.tv #pauseCard { padding: 0 6%; }
+body.tv #pauseCard .pc-play { display: block; align-self: center; margin-bottom: 3em; }
+body.tv #pauseCard .pc-play svg { width: 10em; height: 10em; display: block; filter: drop-shadow(0 0 2em rgba(255,255,255,.3)); }
+body.tv #pauseCard { padding: 0 calc(50% - 34em); cursor: pointer; }
+body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #pauseCard .pc-players { display: none; }
-body.tv #pauseCard .pc-grid { display: grid; grid-template-columns: auto 1fr; gap: 5em; align-items: center; }
-body.tv #pauseCard .pc-players { display: flex; gap: 2.4em; }
 .pc-players button { font: inherit; color: #fff; display: flex; flex-direction: column; align-items: center; gap: .6em; padding: 1.6em 2em 1.4em; border: 0; border-radius: 1.8em; cursor: pointer; background: linear-gradient(170deg, color-mix(in srgb, var(--c) 30%, #141018), #0b0b0d 75%); box-shadow: inset 0 0 0 .15em color-mix(in srgb, var(--c) 60%, transparent); transition: transform .2s, box-shadow .2s; }
 .pc-players button:hover { transform: translateY(-.4em); box-shadow: inset 0 0 0 .2em var(--c), 0 1em 3em -1em var(--c); }
 .pc-players .pc-p { font-size: 2.6em; display: flex; align-items: center; }
@@ -559,6 +557,16 @@ body.tv #pauseCard .pc-players { display: flex; gap: 2.4em; }
 #lobbyKick { text-align: center; margin-top: 3em; }
 #pauseBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: none; place-items: center; cursor: pointer; padding: 0; }
 #pauseBtn svg { width: 3.6em; height: 3.6em; }
+#viewBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: none; place-items: center; cursor: pointer; padding: 0; }
+#viewBtn svg { width: 4em; height: 4em; }
+body.hosttv.instory #viewBtn { display: grid; }
+body.watch.hosttv.instory #back { display: none !important; }
+#minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 16%; }
+body.phonemin.instory #minView { display: flex; }
+#minView img { height: 46%; filter: drop-shadow(0 0 2.4em color-mix(in srgb, var(--c, #ff9a4d) 50%, transparent)); }
+#minView .who { font-size: 3em; font-weight: 800; color: #fff; margin-top: .6em; display: flex; align-items: center; }
+body.phonemin #ui { z-index: 14; }
+body.phonemin:not(.privline) #bubble, body.phonemin #waitOther, body.phonemin #caption, body.phonemin #callBar { visibility: hidden; }
 body.hosttv.instory #pauseBtn { display: grid; }
 body.watch.hosttv #again { display: block !important; }
 /* the TV's opening: black, then white words, one at a time, slowly: the title, what's going on, who plays whom (the
@@ -579,7 +587,7 @@ body.watch.hosttv #again { display: block !important; }
 #tvIntro .ti-c b { color: #fff; font-weight: 800; }
 #tvIntro .ti-c i { font-style: normal; font-weight: 800; color: var(--c, #ff9a4d); }
 #tvIntro .ti-h { font-size: 4.4em; font-weight: 600; color: #e5e5ea; }
-body.tv:has(#tvIntro:not([hidden])) #tvSides, body.tv.instory.tvpaused #tvSides { display: none; }
+body.tv:has(#tvIntro:not([hidden])) #tvSides, body:has(#mirrorCard:not([hidden])) #tvSides { display: none; }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
 #absentBar { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); z-index: 55; padding: .8em 1.5em; border-radius: 2em; background: rgba(255,159,10,.92); color: #1d1d1f; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; text-align: center; }
 #absentBar small { display: block; font-size: .75em; font-weight: 700; opacity: .75; }
@@ -622,13 +630,28 @@ body.tv #choices.tvpicked button.picked { transform: scale(1.04); }
    panels in the bottom corners, over the scene */
 body.tv #ui { left: 50%; right: auto; width: 72em; transform: translateX(-50%); top: auto; bottom: 5%; }
 body.tv #tvPick, body.tv #wait, body.tv #end { padding-left: calc(50% - 40em); padding-right: calc(50% - 40em); }
+/* the characters, each side: only in the pause (a click on one = his screen) */
 #tvSides { display: none; }
-body.tv.instory #tvSides { display: block; }
+body.tv.instory.tvpaused #tvSides { display: block; }
+body.tvpaused .tv-side { pointer-events: auto; cursor: pointer; z-index: 65; }
+body.tvpaused .tv-side:hover .fig { transform: scale(1.04); filter: drop-shadow(0 0 1.6em var(--c)); }
+/* while it plays, the only thing on the TV besides the story: the badge of whom it waits on (his turn: it pulses),
+   in his corner; a player whose phone dropped: his badge, greyed, with a cut-off sign */
+#tvWho { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+#tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 3em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
+#tvWho > .l { left: 3%; } #tvWho > .r { right: 3%; flex-direction: row-reverse; }
+#tvWho .pbadge { font-size: 1.3em; margin: 0; }
+#tvWho .turn .pbadge { animation: tvTurn 1.4s ease-in-out infinite; }
+@keyframes tvTurn { 50% { box-shadow: 0 0 0 .12em var(--c), 0 0 1.4em .5em var(--c); transform: scale(1.08); } }
+#tvWho .gone .pbadge { filter: grayscale(1) brightness(.6); }
+#tvWho .gone .pb-off { position: absolute; left: -.3em; top: -.3em; width: 1em; height: 1em; border-radius: 50%; background: #ff453a; display: grid; place-items: center; }
+#tvWho .gone .pb-off svg { width: .7em; height: .7em; }
+#tvWho .gone span:last-child { opacity: .6; }
 body.tv:has(#epCard:not([hidden])) #tvSides, body.tv:has(#intro:not([hidden])) #tvSides { display: none; }   /* the episode's end card is the whole screen */
 .tv-side { position: fixed; bottom: 0; height: 70%; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: .6em; padding: 0 2% 3%; box-sizing: border-box; color: #f5f5f7; font-family: var(--ui); text-align: center; pointer-events: none; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
 .tv-side.l { left: 0; background: linear-gradient(to top right, rgba(0,0,0,.75), transparent 60%); } .tv-side.r { right: 0; background: linear-gradient(to top left, rgba(0,0,0,.75), transparent 60%); }
-.tv-side .fig { height: 24em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 0 transparent); transition: filter .4s, transform .4s; }
-.tv-side .who { font-size: 2.6em; font-weight: 800; }
+.tv-side .fig { height: 40em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 0 transparent); transition: filter .4s, transform .4s; }
+.tv-side .who { font-size: 3em; font-weight: 800; display: flex; align-items: center; }
 .tv-side .ch { font-size: 1.8em; font-weight: 700; color: var(--c, #ff9a4d); letter-spacing: .1em; text-transform: uppercase; }
 .tv-side .now { font-size: 2em; font-weight: 800; color: #ffd60a; min-height: 1.3em; }
 .tv-side .now:empty { visibility: hidden; }
@@ -1186,9 +1209,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
   <div id="tvIntro" hidden></div>
+  <div id="tvWho"></div>
   <div id="absentBar" hidden></div>
+  <div id="minView"></div>
+  <button id="viewBtn" type="button" aria-label="Voir l'histoire"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
-  <div id="pauseCard" hidden><button type="button" class="pc-play" aria-label="Reprendre"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000" d="M8 5v14l11-7z"/></svg></button><h2>Pause</h2><div class="pc-who"></div>
+  <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
     <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">Ce qui vient de se passer</div><ol></ol></div></div>
     <div class="pc-btns"><button type="button" class="pc-go">Reprendre</button><button type="button" class="pc-quit">Quitter</button></div></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
@@ -1667,7 +1693,7 @@ const mineFor = (by) => {
 };
 let absentKey = '';
 function showAbsent(names = absentSeats().map((k) => seatName(k))) {
-  const bar = $('#absentBar'), on = names.length > 0 && screen === null;
+  const bar = $('#absentBar'), on = names.length > 0 && screen === null && !TV;
   bar.hidden = !on; bar.classList.toggle('take', on && ROLE === 'host' && !TV);
   if (on) bar.innerHTML = `${esc(names.join(', '))} ${names.length > 1 ? 'se sont déconnectés' : "s'est déconnecté"} · on l'attend…${ROLE === 'host' && !TV ? '<small>Touche pour jouer à sa place</small>' : ''}`;
   const key = names.join('|');
@@ -1699,6 +1725,7 @@ const byOf = (s) => s.by || laneNow;
 let held = [];   // the steps that lead into the other player's choice: they run once that player has picked
 // "Brooke is choosing…": with the face of who it waits on (their character), when it's someone
 function waitNote(t, who) {
+  if (TV) { $('#waitOther').hidden = true; return; }   // a TV shows, never tells (its badges: tvWho)
   $('#waitText').textContent = t; $('#waitOther').hidden = !t;
   $('#waitFace').hidden = !who; if (who) $('#waitFace img').src = poseSrc(who, 'listen');
 }
@@ -1797,9 +1824,7 @@ function pickChoice(i, afar = false) {
   const btn = [...optionButtons()].find((b) => +b.dataset.i === i);
   const shown = !choicesEl.hidden || !$('#ringCard').hidden;
   if (TV && duo() && !FAST) {   // « Kev a choisi » — never what
-    const k = seatFor(by); waiting = 'picked';
-    waitNote(`${seatName(k)} a choisi`, k); $('#waitOther').classList.add('done');
-    setTimeout(go, 1500);
+    waiting = 'picked'; setTimeout(go, 700);
   } else if ((ROLE === 'watch' || afar) && !FAST && shown && btn) { btn.classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
   else go();
 }
@@ -1812,10 +1837,9 @@ function tvSides(choosing = null, fresh = null) {
     const k = seats[i]; if (!k) { d.innerHTML = ''; return; }
     const c = castOf(k) || {}, pose = (pick[k] || {}).pose || 'listen';
     const nat = (FACE[spriteOf(k)] || {})[poseOf(k, pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');   // they face the screen
-    d.style.setProperty('--c', c.color || '#ff9a4d'); d.classList.toggle('on', choosing === k);
-    d.innerHTML = `<img class="fig" src="${poseSrc(k, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><div class="who">${badge(k)}${esc(seatName(k) || '…')}</div>
-      <div class="ch">${esc(seatLabel(k))}</div><div class="now">${choosing === k ? `${esc(ui('choosing'))}<i>.</i><i>.</i><i>.</i>` : ''}</div>
-`;
+    d.style.setProperty('--c', c.color || '#ff9a4d'); d.dataset.seat = k;
+    d.innerHTML = `<img class="fig" src="${poseSrc(k, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><div class="who">${badge(k)}${esc(seatName(k) || '…')}</div>`;
+    d.onclick = (e) => { e.stopPropagation(); openMirror(k); };
   });
 }
 
@@ -1881,10 +1905,7 @@ function showPause() {
   $('#pauseCard').hidden = !on;
   if (!on) return;
   $('#pauseCard .pc-who').textContent = paused === TV_PAUSE ? '' : `${paused} a mis pause`;
-  // the TV: who is who (each player's icon, his character); a click on one = his phone's screen
-  $('#pauseCard .pc-players').innerHTML = TV ? seatsOf().map((k) => `<button type="button" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">
-      <span class="pc-p">${badge(k)}<b>${esc(seatName(k) || '…')}</b></span><img src="${poseSrc(k, ((story().pick || {})[k] || {}).pose || 'listen')}" alt=""><i>${esc(seatLabel(k))}</i><small>Voir son écran</small></button>`).join('') : '';
-  $('#pauseCard .pc-players').querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); openMirror(b.dataset.seat); });
+  if (TV) tvSides();   // the TV: the characters each side (a click on one = his phone's screen)
   const last = state.picks.slice(-4);
   $('#pauseCard ol').innerHTML = last.length ? last.map((p) => {
     const k = p.who || p.by, c = (k && castOf(k)) || {};
@@ -1892,26 +1913,41 @@ function showPause() {
   }).join('') : '<li class="none">Pas encore de choix : l\'histoire vient de commencer.</li>';
 }
 $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
+// a phone on a TV's story: black with its character, its choices and its private lines (the story is on the TV);
+// the eye shows the story here too, for whoever wants it (kept on this phone)
+const EYE = { on: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg>',
+  off: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/><path stroke="#fff" stroke-width="2.4" stroke-linecap="round" d="M4 4l16 16"/></svg>' };
+let seeStory = (() => { try { return localStorage.getItem('smt-see') === '1'; } catch { return false; } })();
+function minView() {
+  const on = ROLE === 'watch' && hostTv && !seeStory;
+  document.body.classList.toggle('phonemin', on);
+  $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
+  const k = on && seatsOf().find((j) => state.seats[j] && state.seats[j].id === myId);
+  if (!k) { $('#minView').innerHTML = ''; return; }
+  const pose = ((story().pick || {})[k] || {}).pose || 'listen';
+  $('#minView').style.setProperty('--c', (castOf(k) || {}).color || '#ff9a4d');
+  $('#minView').innerHTML = `<img src="${poseSrc(k, pose)}" alt=""><div class="who">${badge(k)}${esc(seatName(k))}</div>`;
+}
+$('#viewBtn').onclick = (e) => { e.stopPropagation(); seeStory = !seeStory; try { localStorage.setItem('smt-see', seeStory ? '1' : '0'); } catch { /* private window */ } minView(); };
 // the TV, for a demo on stage: a click on its screen pauses (the cursor comes back), the big button goes on
 const TV_PAUSE = '·tv';
 function tvPause(on) {
   if (!TV || !game || screen !== null || !!paused === on) return;
   paused = on ? TV_PAUSE : null; autoKey = {}; showPause(); share();
 }
-$('#pauseCard .pc-play').onclick = (e) => { e.stopPropagation(); tvPause(false); };
 // a player's badge: his initial in a circle of his character's colour, a little phone (he plays on his phone)
 const PHONE_MINI = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5z"/></svg>';
 const badge = (k) => `<span class="pbadge" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">${esc(((seatName(k) || '?')[0] || '?').toUpperCase())}<span class="pb-ph">${PHONE_MINI}</span></span>`;
 // his phone's screen: the same story, his way (the mirror), in a phone on the TV; a click outside it closes it
 function openMirror(k) {
   if (!TV || !state.seats[k]) return;
-  $('#mirrorWho').innerHTML = `${badge(k)}<span>L'écran de <b>${esc(seatName(k))}</b> · ${esc(seatLabel(k))}</span>`;
+  $('#mirrorWho').innerHTML = `${badge(k)}<span>${esc(seatName(k))}</span>`;
   $('#mirrorPhone').innerHTML = `<iframe src="${location.pathname}?watch=${room}&mirror=${k}" title="L'écran de ${esc(seatName(k))}"></iframe>`;
   $('#mirrorCard').hidden = false;
 }
 function closeMirror() { $('#mirrorCard').hidden = true; $('#mirrorPhone').innerHTML = ''; }
 $('#mirrorCard').onclick = (e) => { e.stopPropagation(); closeMirror(); };
-$('#pauseCard').onclick = (e) => e.stopPropagation();
+$('#pauseCard').onclick = (e) => { e.stopPropagation(); if (TV) tvPause(false); };   // the TV: a click anywhere goes on
 $('#pauseCard .pc-go').onclick = (e) => { e.stopPropagation(); if (hostTv && paused) sendIn('pause'); };
 $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sendIn('menu'); };
 // how long a line stays: time to read it (a private one: time for its owner to read it on their phone)
@@ -1930,6 +1966,19 @@ function autoTick() {
   }
 }
 if (TV) setInterval(autoTick, 200);
+const OFF_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>';
+let tvWhoKey = '';
+function tvWho() {
+  const seats = seatsOf(), gone = absentSeats();
+  const on = TV && screen === null && game && duo() && !paused && $('#tvIntro').hidden;
+  const turn = on && (waiting === 'choice' ? seatFor(optionsBy) : waiting === 'click' && onlyNow ? onlyNow : null);
+  const list = on ? seats.filter((k) => k === turn || gone.includes(k)) : [];
+  const key = list.map((k) => `${k}${k === turn ? '+' : ''}${gone.includes(k) ? '-' : ''}${seatName(k)}`).join('|');
+  if (key === tvWhoKey) return; tvWhoKey = key;
+  $('#tvWho').innerHTML = list.map((k) => `<div class="${seats.indexOf(k) ? 'r' : 'l'} ${k === turn ? 'turn' : ''} ${gone.includes(k) ? 'gone' : ''}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">
+    ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${esc(seatName(k))}</span></div>`).join('');
+}
+if (TV) setInterval(tvWho, 250);
 
 function fade(dir, ms) {
   bubble.hidden = true;
@@ -2204,6 +2253,7 @@ async function next() {
   const r = run;
   slateEl.hidden = true;   // a slate stays until the tap that moves past it (black stays until the next fade in)
   if (onlyNow) { onlyNow = null; waitNote(''); }
+  document.body.classList.remove('privline');
   const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
   if (k > 0 && q[k].choice && waitsFor(byOf(q[k]))) held = q.splice(0, k);
   while (q.length && r === run) {
@@ -2246,6 +2296,7 @@ async function next() {
       // {only: seat}: a line only that player sees (a secret, his own version of the facts); the other one gets
       // "<name> is reading…" until that player taps on
       onlyNow = s.only || null;
+      document.body.classList.toggle('privline', !!onlyNow && sees(onlyNow));
       if (onlyNow && !sees(onlyNow)) { bubble.hidden = true; waitNote(`${seatName(onlyNow)} ${ui('reading')}`); } else line(s);
       waiting = 'click';
       if (isBot(onlyNow) && ROLE === 'host') botTap();
@@ -2358,6 +2409,7 @@ function begin(id = state.story) {
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
   if (!seatsOf(id).length) state.seats = {};
+  if (ROLE === 'watch') setTimeout(minView, 0);
   if (TV) tvPhase = duo() && !FAST ? 'ctx' : null;   // the TV's opening (before share: the phones wait for it)
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
   if (TV) tvSides();
@@ -3257,7 +3309,7 @@ const until = (ok) => new Promise((r) => { const t = () => (ok() ? r() : setTime
 function follow(msg) {
   hostId = msg && msg.h;
   if (MIRROR && msg && msg.seats && msg.seats[MIRROR]) myId = msg.seats[MIRROR].id;   // see what he sees
-  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); }   // the sound comes from the TV
+  if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); minView(); }   // the sound comes from the TV
   if (msg && (msg.p || null) !== paused) { paused = msg.p || null; showPause(); }
   if (msg) showAbsent((msg.x || []).filter((n) => n !== myName));
   newer(msg && msg.v);
