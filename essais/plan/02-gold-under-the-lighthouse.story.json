@@ -1,0 +1,55 @@
+{"episode": 1, "title": "Gold Under the Lighthouse", "scene": "terrasse",
+ "steps": [
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Easy money. That sailor bet his coin and lost."},
+  {"who": "ruby", "pose": "holding", "to": "candy", "text": "Put the coin back on the table, Candy."},
+  {"who": "candy", "pose": "listen", "to": "ruby", "text": "Relax, Ruby. He wanted to lose it."},
+  {"who": "melissa", "pose": "thinking", "to": "justin", "text": "Another napkin map. Nobody pays for these anymore."},
+  {"who": "melissa", "pose": "explaining", "to": "justin", "text": "Yeah, I used to draw for coins, but the coins dried up."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "Candy's grinning again. I know that look."},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Yeah, I used to hire loud crews. Now I want quiet ones."},
+  {"who": "melissa", "pose": "thinking", "to": "justin", "text": "You're wondering what the job actually is, aren't you?"},
+  {"who": "melissa", "pose": "explaining", "to": "justin", "text": "Yeah, I sketched that lighthouse once. Its map is buried under it."},
+  {"who": "ruby", "pose": "holding", "to": "justin", "text": "The last crew who dug at that lighthouse never came back."},
+  {"who": "candy", "pose": "explaining", "to": "ruby", "text": "Ruby, don't scare the new blood off."},
+  {"hush": true},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Tonight's the dig. Are you in, or are you scared?"},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "I need the money. But that lighthouse scares me."},
+  {"choice": [
+    {"t": "I'm in, Candy.", "say": "Fine, Candy. I'm in on the dig tonight.", "tone": "determined", "then": [
+      {"who": "candy", "pose": "explaining", "to": "justin", "text": "Knew you'd see reason. Smart crew, smart money."},
+      {"who": "ruby", "pose": "angry", "to": "justin", "text": "Then don't say I didn't warn you."}
+    ]},
+    {"t": "No. I'm walking out.", "say": "Count me out, Candy. I'm walking away.", "tone": "firm", "then": [
+      {"who": "candy", "pose": "surprised", "to": "justin", "text": "Walking away from the best payday I've offered?"},
+      {"who": "ruby", "pose": "listen", "to": "justin", "text": "Good call. That dig has eaten crews before."}
+    ]}
+  ]},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Ruby knows the lighthouse ship better than anyone."},
+  {"who": "ruby", "pose": "listen", "to": "candy", "text": "Yeah, I used to sail that ship, but I got off early."},
+  {"who": "melissa", "pose": "holding", "to": "candy", "text": "I won't follow any map you drew, Candy."},
+  {"who": "candy", "pose": "explaining", "to": "melissa", "text": "Then draw your own map, Melissa. Keep your pride."},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Here's my map. Follow it and we both eat well."},
+  {"who": "melissa", "pose": "angry", "to": "justin", "text": "Trust mine instead. Hers only looks old."},
+  {"choice": [
+    {"t": "Follow Candy's map", "say": "I'll follow your map, Candy. Let's move.", "tone": "trusting", "then": [
+      {"who": "candy", "pose": "explaining", "to": "justin", "text": "Good. Nobody doubts a map this good."},
+      {"who": "melissa", "pose": "angry", "to": "justin", "text": "Your funeral, then. Don't cry to me later."}
+    ]},
+    {"t": "Follow Melissa's map", "say": "I'm trusting your map, Melissa. Lead the way.", "tone": "loyal", "then": [
+      {"who": "melissa", "pose": "explaining", "to": "justin", "text": "Good. My map's honest, even if it's ugly."},
+      {"who": "candy", "pose": "holding", "to": "melissa", "text": "Ugly maps get people lost, Melissa."}
+    ]},
+    {"t": "Burn both maps", "say": "Neither. I'm burning both maps tonight.", "tone": "defiant", "then": [
+      {"who": "melissa", "pose": "surprised", "to": "justin", "text": "Burn both? Then we dig blind, kid."},
+      {"who": "candy", "pose": "holding", "to": "justin", "text": "Bold. Blind is how crews die out there."}
+    ]}
+  ]},
+  {"who": "ruby", "pose": "surprised", "to": "candy", "text": "That's the sailor's coin. You pocketed it earlier."},
+  {"who": "candy", "pose": "holding", "to": "justin", "text": "Look at the date. The lighthouse map is a forgery."}
+ ],
+ "next": [
+  "If justin signed on with Candy, the betrayed crew hunts him at the next port.",
+  "If justin walked out, Candy's betrayed crew still tracks him to the next port.",
+  "If justin followed Candy's map, the crew ambushes him where the dig begins.",
+  "If justin burned both maps, the crew corners him over the lost lighthouse gold."
+ ]}
