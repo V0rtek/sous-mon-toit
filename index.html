@@ -352,7 +352,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #infos .strips b, #more .strips b, #cosmo .strips b { font-size: 3.2em; }
 /* Marketing: one screen per promise, its world then its line */
 #marketing, #validate, #investors { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
-#validate, #investors, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
+#validate, #investors, #brainstorm, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
+#brainstorm { justify-content: flex-start; overflow-y: auto; }
+#brainstorm .brainImg { width: 100%; border-radius: 1.6em; display: block; }
 #system, #cosmoOP, #cosmoCites { justify-content: flex-start; overflow-y: auto; }
 /* System: the 5 steps, each number in a ring of its own colour */
 .sys { margin: 1em 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3.2em; }
@@ -456,9 +458,9 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .st .row .bar { grid-column: 1 / -1; }
 .st .row small { grid-column: 1 / -1; font-size: 1.7em; color: #86868b; }
 .st > small { font-size: 1.7em; color: #86868b; }
-#investors .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
-#investors .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
-#investors .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
+#investors .inv, #brainstorm .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
+#investors .inv li, #brainstorm .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
+#investors .inv li::before, #brainstorm .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #back svg { width: 3.6em; height: 3.6em; }
 /* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
@@ -597,6 +599,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée</b></button>
       <button type="button" id="invBtn"><span class="art" style="--g:#33415c"><img src="chars/suit/adjust.webp" alt=""></span><b>Investisseurs</b></button>
+      <button type="button" id="brainBtn"><span class="art" style="--g:#7a2e5c"><img src="chars/ruby/thinking.webp" alt=""></span><b>Brainstorming</b></button>
       <button type="button" id="statsBtn"><span class="art" style="--g:#c4622d"><img src="chars/justin_bar/explaining.webp" alt=""></span><b>Stats</b></button>
       <button type="button" id="sysBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/thinking.webp" alt=""></span><b>System</b></button>
       <button type="button" id="cosmoBtn"><span class="art" style="--g:#1f6f8b"><img src="chars/diane/thinking.webp" alt=""></span><b>Cosmograph</b></button>
@@ -902,6 +905,27 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <li>Montrer la démo : c’est une histoire qui est consistante (sans erreurs, sans bullshit inventé ou incongruence) sur de très longues périodes. Une problématique que le CEO de Showrunner disait impossible à régler.</li>
         <li>On pourrait s’attendre à quelque chose de cliché. L’AI n’a pas de créativité ? Han han, erreur, plus en 2027. J’ai reçu des comments du genre xyz (« j’aurais jamais cru que c’était AI »).</li>
         <li>Banque avec + de 200 techniques complexes pour hook les viewers. Éviter la redondance, créer des personnages engageants.</li>
+      </ul></div>
+  </div>
+  <div id="brainstorm" class="card menu" hidden>
+    <div class="step"><h2>Brainstorming</h2>
+      <img class="brainImg" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">
+      <p class="lead">Les démos, au lieu de celles d'avant :</p>
+      <ul class="inv">
+        <li>Quest of power (Dragon Ball / Solo Leveling)</li>
+        <li>Un été de trop (romance chaude et sexy)</li>
+        <li>Le dernier verre (romance cute, partying &amp; growing up)</li>
+        <li>Le serment brisé (knights / medieval, revenge &amp; quest &amp; epic &amp; war)</li>
+        <li>Vampire romance / dark fantasy ?</li>
+        <li>Thriller de négociation, power play froid et tendu. Fan de Suits &amp; Succession</li>
+        <li>Deux béliers : cartoon, funny, gigachad, very fast paced (Teen Titans Go, Family Guy paced)</li>
+        <li>Last call : « soirée qui dérape », thriller</li>
+        <li>Murder mystery (4 players ??)</li>
+        <li>Criminel charismatique (John Wick, Peaky Blinders, Breaking Bad) : mafia</li>
+        <li>Ceux qui aiment avoir peur à deux : island ?</li>
+        <li>Lovecraft / Oxenfree horror (undercity, the bus)</li>
+        <li>On a quest with your homie(s). Fantasy.</li>
+        <li>Maybe a sci-fi</li>
       </ul></div>
   </div>
   <div id="genHist" class="card menu" hidden>
@@ -1898,8 +1922,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites'];
-const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos',
+const SCREENS = ['#who', '#hub', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites'];
+const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
@@ -2293,6 +2317,7 @@ function renderVal() {
 $('#statsBtn').onclick = (e) => { e.stopPropagation(); show('#statsScreen'); liveStats(); renderStats(); };
 $('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
+$('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); };
