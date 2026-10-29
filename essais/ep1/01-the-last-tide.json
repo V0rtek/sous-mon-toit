@@ -1,0 +1,295 @@
+{
+    "seed": {
+        "premise": "Justin, a retired pirate running a quiet harbour caf\u00e9 with Melissa, is pulled back toward his old crew the night a stolen map is about to be sold, and he can lose the caf\u00e9, Melissa's trust, or the chance to ever leave the sea behind.",
+        "cast": [
+            {
+                "id": "melissa",
+                "is": "Justin's partner in the caf\u00e9, the one who gave him a quiet life on land",
+                "wants": "Justin to stay off the boats for good",
+                "wound": "Harrow ruined her family before, and she has never told anyone how",
+                "secret": "She borrowed money from Harrow to keep the caf\u00e9 open, and it is coming due",
+                "voice": "Short sentences, dry humour, goes very quiet when she is angry"
+            },
+            {
+                "id": "candy",
+                "is": "Justin's old quartermaster, who still calls him Cap'n",
+                "wants": "Justin back at the helm of the Gull for one last job",
+                "wound": "The crew left her behind when the Gull was seized, and she never forgave them",
+                "secret": "She is the one who told Harrow where the map was hidden",
+                "voice": "Teasing, swears a lot, gets loud when she is hurt"
+            },
+            {
+                "id": "ruby",
+                "is": "Justin's old navigator, the one who knows every chart and tide",
+                "wants": "To clear her debts, sell the map and vanish",
+                "wound": "Her brother died owing Harrow money",
+                "secret": "She already sold a copy of the map to Harrow",
+                "voice": "Talks fast, cracks jokes when nervous, deflects with puns"
+            }
+        ],
+        "offscreen": [
+            {
+                "name": "Harrow",
+                "is": "The shipping man who owns the docks and is paying five thousand cash for the map"
+            }
+        ],
+        "collision": "Candy needs Justin back at sea for one last job, while Melissa needs him on land and out of Harrow's reach, and the map sits between them.",
+        "question": "Can you ever really leave the life you lived, and do old loyalties outweigh a new one?",
+        "milestones": [
+            {
+                "step": 2,
+                "what": "Harrow corners Melissa over the caf\u00e9 loan, and the crew starts a fight at the docks that makes everything harder.",
+                "hinges_on": "Whether Justin shields Melissa or takes the job to save the caf\u00e9.",
+                "if_a": "He protects Melissa, Candy turns on him, and Harrow gets sharper.",
+                "if_b": "He takes the job, Melissa's loan comes due, and the caf\u00e9 is at risk."
+            },
+            {
+                "step": 3,
+                "what": "Melissa's debt to Harrow comes out, and Ruby's secret sale of the map is revealed to have happened long before.",
+                "hinges_on": "Whether Justin confronts Melissa or covers for her.",
+                "if_a": "He confronts Melissa, trust breaks, and she leaves him the caf\u00e9.",
+                "if_b": "He covers for her, and Candy and Ruby learn what he hid."
+            },
+            {
+                "step": 4,
+                "what": "Harrow's midnight deadline arrives at the docks, and Candy's betrayal about the hidden map is exposed.",
+                "hinges_on": "Whether Justin sails on the Gull or stays to face Harrow.",
+                "if_a": "He sails, and Melissa is left alone with Harrow's debt.",
+                "if_b": "He stays, the Gull sails without him, and Candy is lost to the sea."
+            },
+            {
+                "step": 5,
+                "what": "Justin's final decision settles where the map ends up and which people he can live with.",
+                "hinges_on": "Whether he hands the map to Harrow or destroys it.",
+                "if_a": "Harrow gets the map, the crew breaks apart, and the caf\u00e9 survives.",
+                "if_b": "The map is destroyed, Harrow becomes an enemy, and the crew scatters."
+            }
+        ],
+        "planted": [
+            {
+                "what": "Ruby says she sold a copy, and the real map is in her boot",
+                "for_step": 3
+            },
+            {
+                "what": "Melissa says Harrow has ruined people in this town before",
+                "for_step": 2
+            },
+            {
+                "what": "Candy says the Gull is still tied up at the docks",
+                "for_step": 4
+            },
+            {
+                "what": "Ruby admits Harrow already has her copy of the map",
+                "for_step": 3
+            }
+        ]
+    },
+    "title": "The Last Tide",
+    "scene": "terrasse",
+    "steps": [
+        {
+            "who": "justin",
+            "pose": "thinking",
+            "to": "justin",
+            "text": "Twelve years since I last hoisted a black flag."
+        },
+        {
+            "who": "candy",
+            "pose": "surprised",
+            "to": "justin",
+            "text": "Cap'n. Don't look at me like that."
+        },
+        {
+            "who": "justin",
+            "pose": "thinking",
+            "to": "justin",
+            "text": "One night at sea, and Melissa runs this caf\u00e9 alone."
+        },
+        {
+            "who": "candy",
+            "pose": "holding",
+            "to": "justin",
+            "text": "Ruby sold the map. The buyers land at midnight."
+        },
+        {
+            "choice": [
+                {
+                    "t": "Ruby. Tell me you didn't.",
+                    "say": "Ruby, what did you sell? Who to?",
+                    "tone": "accusing",
+                    "then": [
+                        {
+                            "who": "ruby",
+                            "pose": "angry",
+                            "to": "justin",
+                            "text": "Relax. I sold a copy. The real one's in my boot."
+                        },
+                        {
+                            "who": "candy",
+                            "pose": "angry",
+                            "to": "ruby",
+                            "text": "You swore on the crew, Ruby. You swore."
+                        }
+                    ]
+                },
+                {
+                    "t": "Count me out, Candy.",
+                    "say": "I'm done. Find someone else for the job.",
+                    "tone": "firm",
+                    "then": [
+                        {
+                            "who": "candy",
+                            "pose": "holding",
+                            "to": "justin",
+                            "text": "Done? You were the best I ever sailed with."
+                        },
+                        {
+                            "who": "ruby",
+                            "pose": "angry",
+                            "to": "justin",
+                            "text": "Then I sell the map to the buyers myself."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "who": "melissa",
+            "pose": "surprised",
+            "to": "justin",
+            "text": "Wait. Ruby sold the map? Sold it to who?"
+        },
+        {
+            "who": "ruby",
+            "pose": "holding",
+            "to": "melissa",
+            "text": "Harrow. The shipping man who owns the docks."
+        },
+        {
+            "who": "melissa",
+            "pose": "angry",
+            "to": "ruby",
+            "text": "Don't. Harrow's ruined people in this town before."
+        },
+        {
+            "who": "candy",
+            "pose": "explaining",
+            "to": "melissa",
+            "text": "Harrow wants a job done. Five thousand cash, one night."
+        },
+        {
+            "who": "melissa",
+            "pose": "listen",
+            "to": "candy",
+            "text": "Five thousand. And what does the Cap'n get out of it?"
+        },
+        {
+            "who": "candy",
+            "pose": "holding",
+            "to": "justin",
+            "text": "Your old ship, the Gull, is still tied up at the docks."
+        },
+        {
+            "who": "ruby",
+            "pose": "thinking",
+            "to": "justin",
+            "text": "Biscuit, our parrot, used to sit on that rail. Remember?"
+        },
+        {
+            "choice": [
+                {
+                    "t": "Mel's right. I'm staying.",
+                    "say": "Mel's right. I'm staying here with her.",
+                    "tone": "loyal",
+                    "then": [
+                        {
+                            "who": "melissa",
+                            "pose": "listen",
+                            "to": "justin",
+                            "text": "Thank you. Then stop looking at that sea."
+                        },
+                        {
+                            "who": "candy",
+                            "pose": "angry",
+                            "to": "melissa",
+                            "text": "Keep him on land, then. See how long he lasts."
+                        }
+                    ]
+                },
+                {
+                    "t": "Candy, I'll sail with you.",
+                    "say": "Candy. Get the Gull ready, I'm coming.",
+                    "tone": "torn",
+                    "then": [
+                        {
+                            "who": "candy",
+                            "pose": "holding",
+                            "to": "justin",
+                            "text": "Good. Ruby knows the tides, she'll pilot us."
+                        },
+                        {
+                            "who": "melissa",
+                            "pose": "surprised",
+                            "to": "justin",
+                            "text": "You're going? Harrow will come after this caf\u00e9."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "who": "ruby",
+            "pose": "holding",
+            "to": "justin",
+            "text": "Midnight, Cap'n. The buyers won't wait past the tide."
+        },
+        {
+            "choice": [
+                {
+                    "t": "I'm in. Give me the map.",
+                    "say": "Fine. I'm in. Hand me the map.",
+                    "tone": "resigned",
+                    "then": [
+                        {
+                            "who": "melissa",
+                            "pose": "angry",
+                            "to": "justin",
+                            "text": "Then don't you dare come back to this table."
+                        },
+                        {
+                            "who": "candy",
+                            "pose": "surprised",
+                            "to": "justin",
+                            "text": "Hold on. Ruby's been taking Harrow's money for a week."
+                        }
+                    ]
+                },
+                {
+                    "t": "No. Harrow gets nothing.",
+                    "say": "No. Harrow gets nothing from me.",
+                    "tone": "firm",
+                    "then": [
+                        {
+                            "who": "candy",
+                            "pose": "angry",
+                            "to": "justin",
+                            "text": "Then you're out, Cap'n. For good this time."
+                        },
+                        {
+                            "who": "ruby",
+                            "pose": "surprised",
+                            "to": "justin",
+                            "text": "Harrow already has my copy of the map. Did you know?"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "next": [
+        "If Justin protects Melissa, Candy turns on him and Harrow's pressure grows at the docks.",
+        "If Justin takes the job to save the caf\u00e9, Melissa's debt to Harrow comes out and her trust breaks.",
+        "If Justin sails for the Gull at midnight, Candy's betrayal is exposed and Melissa is left alone with the debt.",
+        "If Justin hands the map to Harrow, the crew breaks apart and the caf\u00e9 survives, but if he destroys it, Harrow becomes an enemy."
+    ]
+}
