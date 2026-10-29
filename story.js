@@ -51,6 +51,14 @@ window.SCENES = {
     face: { melissa: 'r', candy: 'r', ruby: 'r', justin: 'l' },
     front: TABLE,
   },
+  // the tavern's terrace over the city (fantasy, 29/10): the 4 stand on the flagstones in front of the tables; establish =
+  // the same tavern seen from above, the shot that opens the scene (it zooms in on the tavern) and closes it (zooms out)
+  taverne: {
+    image: 'bg/taverne.webp', size: [1672, 940], establish: 'bg/taverne_haut.webp',
+    spots: { melissa: [610, 925, 430], candy: [830, 925, 430], ruby: [1050, 925, 430], justin: [1270, 925, 430] },
+    face: { melissa: 'r', candy: 'r', ruby: 'r', justin: 'l' },
+    front: [],
+  },
   maison: {
     image: 'bg/maison.jpg', size: [1920, 1440],
     spots: { ruby: [420, 1425, 760], justin: [720, 1425, 770], james: [1075, 885, 400] },

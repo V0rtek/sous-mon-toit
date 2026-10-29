@@ -115,6 +115,10 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .in-name { position: absolute; left: 0; right: 0; bottom: 5%; text-align: center; font-family: var(--display); font-size: 8em; line-height: 1.1; opacity: 0; transform: translateY(.4em); transition: opacity .8s, transform .8s ease-out; }
 .named .in-name { opacity: 1; transform: none; }
 #black { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 1s; }
+/* a decor seen from afar ({establish}): fills the frame and slowly zooms in on the place (or out of it, to close) */
+#establish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+#establish[hidden] { display: none; }
+#establish img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; transform-origin: 64% 58%; transition: transform linear; }
 
 /* full-screen cards: cover, Isa's look, end */
 .card { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 7% 9%; color: #fff; cursor: default; background: #000; overflow: hidden; }
@@ -962,6 +966,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="waitOther" hidden><span id="waitFace" hidden><img alt=""></span><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
+  <div id="establish" hidden><img alt=""></div>
   <div id="black"></div>
   <div id="intro" hidden></div>
   <div id="slate" hidden></div>
@@ -1451,18 +1456,18 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
 <script src="chars.js?v=20261028143259"></script>
-<script src="story.js?v=20261028143259"></script>
+<script src="story.js?v=20261030030000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
-<script src="gen.js?v=20261030010000"></script>
+<script src="gen.js?v=20261030030000"></script>
 <script src="demos.js?v=20261028143259"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
-<script src="ep1.js?v=20261029130000"></script>
-<script src="plan.js?v=20261030020000"></script>
+<script src="ep1.js?v=20261030030000"></script>
+<script src="plan.js?v=20261030030000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script>
@@ -2219,6 +2224,16 @@ function fade(dir, ms) {
   black.style.opacity = dir === 'out' ? 1 : 0;
   return sleep(ms);
 }
+// {establish: picture, ms, out}: out of black, the place seen from afar, a slow zoom in on it (out: away from it, the scene
+// closing), back to black; the scene's own fade then takes over
+async function establish(src, ms, out) {
+  const box = $('#establish'), img = box.querySelector('img'), slow = FAST || REDUCED ? 0 : ms, far = 'scale(1)', near = 'scale(1.45)';
+  img.src = src; img.style.transitionDuration = '0ms'; img.style.transform = out ? near : far; box.hidden = false;
+  void img.offsetWidth;
+  img.style.transitionDuration = slow + 'ms'; img.style.transform = out ? far : near;
+  await fade('in', FAST ? 0 : 600); await sleep(Math.max(0, slow - 1100)); await fade('out', FAST ? 0 : 500);
+  box.hidden = true;
+}
 function showCaption(t) {
   caption.textContent = t; caption.classList.add('on');
   clearTimeout(showCaption.t); showCaption.t = setTimeout(() => caption.classList.remove('on'), 3200);
@@ -2522,6 +2537,7 @@ async function next() {
     else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
     else if (s.reveal) await reveal(s.reveal, s.ms);
     else if (s.fade) await fade(s.fade, s.ms);
+    else if (s.establish) { await establish(s.establish, s.ms, s.out); if (r !== run) return; }
     else if (s.caption) showCaption(s.caption);
     else if (s.wait) await sleep(s.wait);
     else if (s.custom) await CUSTOM[s.custom]();

@@ -79,7 +79,7 @@ CHOICES. Each option has:
 - "tone": one word.
 - "then": the branch, the lines after justin speaks (never justin's spoken line again).
 
-DECORS (pick one; only its characters speak, besides justin): "terrasse" = melissa, candy, ruby (a café terrace) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man. Use these ids in "who" and "to"; in the lines they are called by these names (Ruby, James...).
+DECORS (pick one; only its characters speak, besides justin): "taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man. Use these ids in "who" and "to"; in the lines they are called by these names (Ruby, James...).
 Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Lightly, not every line. "to" = who they talk to (or "justin").
 
 THE JSON (exactly this shape, "seed" first):
@@ -87,7 +87,7 @@ THE JSON (exactly this shape, "seed" first):
   "milestones": [{"step": 2, "what": "...", "hinges_on": "...", "if_a": "...", "if_b": "..."}, {"step": 3, ...}, {"step": 4, ...}, {"step": 5, ...}],
   "planted": [{"what": "...", "for_step": 2}]},
  "title": "2-4 words",
- "scene": "terrasse" | "maison" | "salon",
+ "scene": "taverne" | "maison" | "salon",
  "steps": [ {"who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"choice": [ {"t": "...", "say": "...", "tone": "...", "then": [ {"who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
  "next": ["4 short bullets: what can happen next, one per milestone, each with its 'if' ('If justin protects Ruby, James leaves with the money')"]}
 

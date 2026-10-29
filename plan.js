@@ -389,7 +389,7 @@ window.PLAN = (() => {
 
   // ---- the prompts (for a basic model; English, the story comes out in the idea's language). Both list the goals and
   // techniques above, so a change here changes them ----
-  const DECORS = '"terrasse" = melissa, candy, ruby (a café terrace) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const DECORS = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
   const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}${t.ex ? ' Examples (shapes, never copy them): ' + t.ex.map((x) => `"${x}"`).join(' / ') : ''}`).join('\n')).join('\n');
   const prompt1 = (idea) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays the main character (his id is "justin"). Write every text in the language of the idea.
 Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:

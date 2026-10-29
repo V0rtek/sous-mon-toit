@@ -5,17 +5,17 @@
 window.GEN = (() => {
   const MODEL = 'claude-haiku-4-5';
   // each decor and who is standing in it (the player, justin, is always there: his lines only come as choices)
-  const SCENE_CAST = { terrasse: ['melissa', 'candy', 'ruby'], maison: ['ruby', 'james'], salon: ['isa', 'amare', 'james'] };
+  const SCENE_CAST = { taverne: ['melissa', 'candy', 'ruby'], maison: ['ruby', 'james'], salon: ['isa', 'amare', 'james'], terrasse: ['melissa', 'candy', 'ruby'] };   // terrasse: the stories made before the tavern
   const POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
   const SYSTEM = `You write the beginning of an interactive story for a phone game, 12 taps at most: dialogue only, shown one line at a time over a picture of the characters, with 2 choices. The player plays "justin". Write every line, button and title in the same language as the player's idea: an idea written in English gets an English story, an idea written in French gets a French story. Natural spoken language, never an imitation of an accent.
 
 Reply with ONE JSON object and nothing else, shaped exactly like this:
 {"title": "2-4 words",
- "scene": "terrasse" | "maison" | "salon",
+ "scene": "taverne" | "maison" | "salon",
  "steps": [ {"who": "<character id>", "pose": "<pose>", "to": "<who they talk to>", "text": "<one spoken line>"}, {"hush": true}, ..., {"choice": [ {"t": "the button, 27 characters max", "say": "what justin actually says", "tone": "one word", "then": [ {"who","pose","to","text"}, ... ]}, {...} ]}, ... ],
  "next": ["what happens next, bullet 1", "bullet 2", ...]}
 
-Decors and who is in them besides justin: terrasse = melissa, candy, ruby (a café terrace) · maison = ruby, james (inside a house) · salon = isa, amare, james (a living room). Pick the decor that fits the idea and only use its characters (ruby and melissa are elves, candy is a feline woman, amare is a lion-man).
+Decors and who is in them besides justin: taverne = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · maison = ruby, james (inside a house) · salon = isa, amare, james (a living room). Pick the decor that fits the idea and only use its characters (ruby and melissa are elves, candy is a feline woman, amare is a lion-man).
 Poses: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed). Use them lightly and subtly, not every line. "to" = the character spoken to (or "justin"): people look at who they talk to.
 
 STRUCTURE: the first 12 taps, nothing more. One tap = one line, one choice, or what justin says after a choice. A phone player leaves if nothing happens in the first taps: drop them in the middle of the action, stakes clear, first choice at tap 5. No waking up, no arrival, no introductions, no backstory.
@@ -150,11 +150,12 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     }
     if (saysN.n < 3) throw new Error('Taps 1-4 come before the first choice: justin (inner voice), the threat, justin (the stakes), the ultimatum.');
     if (!choices.n) throw new Error('There must be 2 "choice" steps (tap 5 and tap 10), each with 2 options and a "then" list.');
+    const est = window.SCENES && SCENES[sc] && SCENES[sc].establish;   // a decor seen from afar: it opens the scene and closes it
     return [
       scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
-      cam('wide'), { fade: 'in', ms: 700 },
+      cam('wide'), ...(est ? [{ establish: est, ms: 3400 }] : []), { fade: 'in', ms: 700 },
       ...steps,
-      { fade: 'out', ms: 800 },
+      { fade: 'out', ms: 800 }, ...(est ? [{ establish: est, ms: 2800, out: true }] : []),
       { end: { kicker: 'Ton histoire · la suite', title: clip(j.title, 40) || 'Ton histoire', lede: ahead(j), art: null } },
     ];
   }
