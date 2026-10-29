@@ -1,0 +1,46 @@
+{"episode": 1, "title": "The Red Cellar", "scene": "taverne",
+ "steps": [
+  {"who": "justin", "pose": "listen", "to": "justin", "text": "The docks bell rings far below the terrace."},
+  {"who": "ruby", "pose": "holding", "to": "justin", "text": "Table four is still waiting for their wine."},
+  {"who": "candy", "pose": "listen", "to": "ruby", "text": "Put it on my tab, sweetie. I'll pay Friday."},
+  {"who": "ruby", "pose": "angry", "to": "candy", "text": "Friday never comes for you, Candy."},
+  {"who": "candy", "pose": "explaining", "to": "ruby", "text": "Friday always comes. It just brings a friend."},
+  {"who": "ruby", "pose": "thinking", "to": "justin", "text": "Justin, the apron is still by the back door."},
+  {"who": "justin", "pose": "thinking", "to": "justin", "text": "I still can't tell her I left it there."},
+  {"who": "candy", "pose": "explaining", "to": "justin", "text": "Remember what I pay you for, cook."},
+  {"who": "justin", "pose": "holding", "to": "justin", "text": "Rent for the cellar. Nobody goes down there."},
+  {"who": "ruby", "pose": "surprised", "to": "justin", "text": "Why would the cellar need rent, Justin?"},
+  {"who": "justin", "pose": "explaining", "to": "justin", "text": "The crates are stamped with a red vintage."},
+  {"who": "ruby", "pose": "angry", "to": "justin", "text": "Red wine? The guard fines anyone who keeps it."},
+  {"who": "justin", "pose": "angry", "to": "justin", "text": "I want out of this deal before the docks burn."},
+  {"hush": true},
+  {"choice": [
+    {"t": "Lie to protect Candy", "say": "Nothing down there but old barrels, Ruby.", "tone": "calm", "then": [
+      {"who": "ruby", "pose": "holding", "to": "justin", "text": "Then go show me the old barrels."},
+      {"who": "candy", "pose": "listen", "to": "justin", "text": "Good cook. Keep your mouth shut tonight."}
+    ]},
+    {"t": "Tell Ruby the truth", "say": "The crates are Candy's, and I'm sorry, Ruby.", "tone": "honest", "then": [
+      {"who": "ruby", "pose": "surprised", "to": "justin", "text": "You kept that from me for three months."},
+      {"who": "candy", "pose": "holding", "to": "ruby", "text": "Careful, Ruby. Your tavern's license is on the line."}
+    ]}
+  ]},
+  {"who": "ruby", "pose": "thinking", "to": "justin", "text": "The cellar lock changed three nights ago."},
+  {"who": "justin", "pose": "listen", "to": "justin", "text": "Someone with a key has been down there."},
+  {"who": "candy", "pose": "explaining", "to": "ruby", "text": "If you report that cellar, your license goes."},
+  {"choice": [
+    {"t": "Report it to the guard", "say": "I'm going to the guard before this gets worse.", "tone": "firm", "then": [
+      {"who": "ruby", "pose": "angry", "to": "justin", "text": "The guard will hear everything from me tonight."},
+      {"who": "candy", "pose": "holding", "to": "justin", "text": "You just cost me my cellar, cook."}
+    ]},
+    {"t": "Cover for Justin", "say": "The cellar stays shut, and nobody hears about it.", "tone": "gentle", "then": [
+      {"who": "ruby", "pose": "thinking", "to": "justin", "text": "I'm not going to lie to the guard for you."},
+      {"who": "candy", "pose": "listen", "to": "ruby", "text": "Smart choice. The tab is paid tonight."}
+    ]}
+  ]}
+ ],
+ "next": [
+  "If he lied to protect Candy, Ruby takes him down to the cellar herself.",
+  "If he told Ruby the truth, the guard hears about the crates by dawn.",
+  "If Ruby reported the cellar, the docks list posts Justin's name at dawn.",
+  "If Ruby covered for him, Candy keeps paying rent on the cellar."
+ ]}
