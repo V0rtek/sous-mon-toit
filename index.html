@@ -513,6 +513,11 @@ body.tv, body.tv * { cursor: none !important; }
 #pauseBtn svg { width: 3.6em; height: 3.6em; }
 body.hosttv.instory #pauseBtn { display: grid; }
 body.watch.hosttv #again { display: block !important; }
+/* a player's phone dropped (locked, closed): the story waits for them where it is */
+#absentBar { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); z-index: 55; padding: .8em 1.5em; border-radius: 2em; background: rgba(255,159,10,.92); color: #1d1d1f; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; text-align: center; }
+#absentBar small { display: block; font-size: .75em; font-weight: 700; opacity: .75; }
+#absentBar.take { pointer-events: auto; cursor: pointer; }
+#absentBar[hidden] { display: none; }
 /* paused: what just happened (the last 4 choices and what came of each) */
 #pauseCard { position: absolute; inset: 0; z-index: 60; background: rgba(8,6,12,.88); backdrop-filter: blur(.6em); -webkit-backdrop-filter: blur(.6em); color: #f5f5f7; display: flex; flex-direction: column; justify-content: center; padding: 0 7%; cursor: default; }
 body.tv #pauseCard { padding: 0 calc(50% - 46em); }
@@ -1092,6 +1097,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
+  <div id="absentBar" hidden></div>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><h2>Pause</h2><div class="pc-who"></div><div class="wr-kick">Ce qui vient de se passer</div><ol></ol>
     <div class="pc-btns"><button type="button" class="pc-go">Reprendre</button><button type="button" class="pc-quit">Quitter</button></div></div>
@@ -1548,7 +1554,7 @@ function line(s) {
   typeText(fill(s.text || s.narr));
   if (firstLine) { hint.hidden = false; firstLine = false; }
 }
-let options = null, optionsBy = 'p1', optionsLane = null;
+let options = null, optionsBy = 'p1', optionsLane = null, optionsRing = null;
 // each choice belongs to a character (by = its seat; none = the host's, as in chapter 1, or in a split the seat whose
 // scene it is). If whoever took it left, the host makes the choice so the story never gets stuck
 const seatFor = (by) => (by && state.seats[by] ? by : (TV || hostTv) && duo() ? seatsOf().find((k) => state.seats[k]) : by);
@@ -1557,7 +1563,36 @@ const seated = () => Object.values(state.seats).some((s) => s.id === myId);
 // a simulated player ("L'autre au hasard"): its seat's owner is BOT; it is nobody's to play, the host plays it by itself
 const BOT = 'bot';
 const isBot = (seat) => !!(seat && state.seats[seat] && state.seats[seat].id === BOT);
-const mineFor = (by) => { if (jumpAll) return true; if (isBot(by)) return false; const o = ownerOf(by); return o === myId || (ROLE === 'host' && !watchers.has(o)); };
+// a player whose phone dropped (locked, closed, out of signal) keeps his character: the story waits for him where it is,
+// and he picks up there when he comes back (the same id, his page replays the tape). The host can take over his
+// character if he's gone for good (the orange banner); a TV never does
+const takenOver = new Set();   // host: the seats it plays for a player who left
+const owned = (o) => o === myId || o === BOT || watchers.has(o);
+const absentSeats = () => (ROLE === 'host' && game && duo() && !jumpAll ? seatsOf().filter((k) => state.seats[k] && !owned(state.seats[k].id) && !takenOver.has(k)) : []);
+const mineFor = (by) => {
+  if (jumpAll) return true; if (isBot(by)) return false;
+  const k = seatFor(by), o = ownerOf(by);
+  return o === myId || (ROLE === 'host' && (takenOver.has(k) || !(k && state.seats[k])));
+};
+let absentKey = '';
+function showAbsent(names = absentSeats().map((k) => seatName(k))) {
+  const bar = $('#absentBar'), on = names.length > 0 && screen === null;
+  bar.hidden = !on; bar.classList.toggle('take', on && ROLE === 'host' && !TV);
+  if (on) bar.innerHTML = `${esc(names.join(', '))} ${names.length > 1 ? 'se sont déconnectés' : "s'est déconnecté"} · on l'attend…${ROLE === 'host' && !TV ? '<small>Touche pour jouer à sa place</small>' : ''}`;
+  const key = names.join('|');
+  if (ROLE === 'host' && key !== absentKey) {
+    absentKey = key; share();
+    // whose turn it is may have changed hands: redraw the choice, wake the scenes that were waiting on him
+    if (waiting === 'choice' && options && !split) choose(options, optionsBy, optionsRing);
+    if (split) for (const g of Object.values(split.ghosts)) autoGhost(g);
+    autoKey = {};
+  }
+}
+$('#absentBar').onclick = (e) => {
+  e.stopPropagation(); if (ROLE !== 'host' || TV) return;
+  for (const k of absentSeats()) takenOver.add(k);
+  showAbsent();
+};
 // the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
 function botPick() {
   const at = run, n = options.length;
@@ -1624,7 +1659,7 @@ function drawCall() {
 }
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
-  options = opts; optionsBy = by; optionsLane = laneNow; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
+  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
   if (waitsFor(by)) { choicesEl.hidden = true; waitNote(`${seatName(seatFor(by))} ${ui('choosing')}`, seatFor(by)); }
@@ -1643,7 +1678,7 @@ function choose(opts, by, ring) {
     if (mine && ROLE === 'watch') b.classList.add('mine');
     b.onclick = (e) => {
       e.stopPropagation();
-      if (!mine || waiting !== 'choice') return;
+      if (!mine || waiting !== 'choice' || absentSeats().length) return;   // someone's gone: we wait for him
       if (ROLE === 'host') pickChoice(i);
       else if (!holder.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
     };
@@ -1731,7 +1766,7 @@ $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sen
 const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
 let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
 function autoTick() {
-  if (!TV || paused || screen !== null || FAST) { autoKey = {}; return; }
+  if (!TV || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }
   const now = Date.now(), due = (k, id, ms) => { if (autoKey[k] !== id) { autoKey[k] = id; autoKey[k + 't'] = now + ms; } return now >= autoKey[k + 't']; };
   if (waiting === 'click' && !typing) {
     const id = run + ':' + tape.length, ms = !slateEl.hidden ? 3500 : onlyNow ? 5000 : readMs(typingFull);
@@ -2001,7 +2036,7 @@ function ghostPick(g, i) {
 // jump (Continuer at episode N) it plays every ghost scene, first option everywhere, the way a joiner will replay it
 function autoGhost(g) {
   if (ROLE !== 'host' || (g.waiting !== 'click' && g.waiting !== 'choice')) return;
-  const o = ownerOf(g.seat); if (!jumpAll && (o === myId || watchers.has(o))) return;
+  if (!jumpAll && !isBot(g.seat) && !takenOver.has(g.seat)) return;   // its player plays it (or will, once he's back)
   const pick = () => (isBot(g.seat) && !jumpAll ? Math.floor(Math.random() * g.options.length) : 0);   // a bot picks at random
   clearTimeout(g.t); g.t = setTimeout(() => (g.waiting === 'click' ? ghostTap(g) : ghostPick(g, pick())), FAST ? 0 : 800);
 }
@@ -2077,7 +2112,7 @@ async function next() {
 }
 
 function advance() {
-  if (TV || paused) return;   // the TV is only watched; paused, nothing moves
+  if (TV || paused || absentSeats().length) return;   // the TV is only watched; paused or someone's gone, nothing moves
   if (ROLE === 'watch') {
     // in a 2-player story the two players move the story (in a split, each his own scene); the host checks the tap is
     // for the line it is on (its count of taps so far, or of this scene's taps)
@@ -2115,7 +2150,7 @@ function show(id) {
   document.body.classList.toggle('inwait', id === '#wait');
   document.body.classList.toggle('instory', id === null);
   if (TV && id === '#tvPick') tvHome();
-  if (id !== null) showPause();
+  if (id !== null) { showPause(); $('#absentBar').hidden = true; }
   if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
@@ -2158,7 +2193,7 @@ function begin(id = state.story) {
   curEp = 1;
   // a play from Full demo was counted there, when Play was pressed
   if (!fromDemo && !PLAY_ONLY) bump((st) => { st.s = st.s || {}; const k = sid(id), r = (st.s[k] = st.s[k] || {}); if (storyName(id) !== id) r.n = storyName(id); r.plays = (r.plays || 0) + 1; });
-  paused = null; showPause();
+  paused = null; showPause(); takenOver.clear();
   run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
   firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
@@ -2877,7 +2912,7 @@ function newer(v) {
 function share() {
   if (ROLE !== 'host' || quiet || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, p: paused || undefined }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, p: paused || undefined, x: absentSeats().map((k) => seatName(k)) }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share(); } }   // a jump sends its taps once, at its end
 
@@ -2934,6 +2969,7 @@ $('#inviteCard').onclick = (e) => e.stopPropagation();
 const watchers = new Map();
 let heard = '';
 function countEyes() {
+  setTimeout(() => { for (const k of [...takenOver]) if (state.seats[k] && watchers.has(state.seats[k].id)) takenOver.delete(k); showAbsent(); }, 0);
   const now = Date.now();
   for (const [id, w] of watchers) if (now - w.t > 35000) watchers.delete(id);
   $('#eyes span').textContent = watchers.size;
@@ -2953,7 +2989,7 @@ function fromJoiner(m) {
     if (m.e === 'again' && screen === '#end') { begin(state.story); return; }
     if (m.e === 'pause' && game && screen === null) { paused = paused ? null : String(m.n || '?').slice(0, 16); autoKey = {}; showPause(); share(); return; }
   }
-  if (paused && (m.e === 'a' || /^c\d$/.test(m.e))) return;   // paused: nothing moves
+  if ((paused || absentSeats().length) && (m.e === 'a' || /^c\d$/.test(m.e))) return;   // paused, or someone's gone: nothing moves
   if (m.e === 'seat') { const w = watchers.get(m.id); takeSeat(m.s, m.id, (w && w.n) || m.n); return; }
   if (m.e === 'no') { if (invite && invite.to === m.id) { invite = null; if (waitRoom) renderWait(); } return; }   // "Plus tard" on their device
   if (!game || m.g !== game || !Object.values(state.seats).some((s) => s.id === m.id)) return;
@@ -3046,6 +3082,7 @@ function follow(msg) {
   hostId = msg && msg.h;
   if (msg && !!msg.tv !== hostTv) { hostTv = !!msg.tv; hushed = hostTv; if (master) master.gain.value = muted || hushed ? 0 : 1; document.body.classList.toggle('hosttv', hostTv); }   // the sound comes from the TV
   if (msg && (msg.p || null) !== paused) { paused = msg.p || null; showPause(); }
+  if (msg) showAbsent((msg.x || []).filter((n) => n !== myName));
   newer(msg && msg.v);
   if (!msg || !msg.g) {
     remote = null;
@@ -3152,7 +3189,7 @@ if (PREVIEW) {
 } else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
 else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
 else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
-else if (auto && $('#whoName').value) $('#whoForm .pill').click();
+else if ($('#whoName').value) $('#whoForm .pill').click();   // the name it had (a phone that comes back to the room goes straight in)
 {
   const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?(?:&invite=([a-z0-9]+)&iname=([^&]+))?$/);
   if (o && o[5]) { withFriend = decodeURIComponent(o[6]); withFriendTo = o[5]; }
