@@ -153,6 +153,7 @@ window.PLAY = [
 // this story stages itself: listeners turn to the speaker and stop gesturing (see line() in index.html)
 PLAY.gaze = true;
 PLAY.seats = ['pa', 'pb'];
+PLAY.intro = ['Café Larina, un soir de semaine. Trois amis à une table.', "Ça parle de gym, de protéines et de ce qu'on va manger. Puis quelqu'un arrive à la table."];   // the TV's opening
 PLAY.solo = { pa: 'Alex', pb: 'Kev' };   // a seat's name when nobody plays it under their own
 // the waiting room: each character in the pose that sums them up, and one line of them
 PLAY.pick = { pa: { pose: 'explaining', line: 'Faux. On parle aussi de protéines.' },

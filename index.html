@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b0a0f">
 </head>
 <body>
-<title>Sous mon toit</title>
+<title>UNWRITTEN</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&display=swap" media="print" onload="this.media='all'">
@@ -513,6 +513,24 @@ body.tv, body.tv * { cursor: none !important; }
 #pauseBtn svg { width: 3.6em; height: 3.6em; }
 body.hosttv.instory #pauseBtn { display: grid; }
 body.watch.hosttv #again { display: block !important; }
+/* the TV's opening: black, then white words, one at a time, slowly: the title, what's going on, who plays whom (the
+   phones show "Tu es …" at that moment), how it works; then it fades into the story */
+#tvIntro { position: absolute; inset: 0; z-index: 58; background: #000; color: #f5f5f7; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1.8em; padding: 0 calc(50% - 52em); text-align: center; transition: opacity 1.8s ease; cursor: default; }
+#tvIntro[hidden] { display: none; }
+#tvIntro.out { opacity: 0; }
+#tvIntro .ti { opacity: 0; transform: translateY(.5em); transition: opacity 2s ease, transform 2.6s cubic-bezier(.2,.7,.2,1); }
+#tvIntro .ti.in { opacity: 1; transform: none; }
+#tvIntro .ti-k { font-size: 1.9em; font-weight: 800; letter-spacing: .35em; text-transform: uppercase; color: #8e8e93; margin-bottom: -1em; }
+#tvIntro .ti-t { font-family: var(--display); font-weight: 400; font-size: 10em; line-height: 1.05; margin-bottom: .2em; }
+#tvIntro .ti-p { font-size: 4em; font-weight: 600; line-height: 1.4; color: #e5e5ea; max-width: 26em; }
+#tvIntro .ti-cast { display: flex; justify-content: center; gap: 8em; }
+#tvIntro .ti-c { display: flex; flex-direction: column; align-items: center; gap: .6em; }
+#tvIntro .ti-c img { height: 38em; filter: drop-shadow(0 0 2.2em color-mix(in srgb, var(--c, #ff9a4d) 55%, transparent)); }
+#tvIntro .ti-c span { font-size: 4em; font-weight: 600; color: #d1d1d6; white-space: nowrap; }
+#tvIntro .ti-c b { color: #fff; font-weight: 800; }
+#tvIntro .ti-c i { font-style: normal; font-weight: 800; color: var(--c, #ff9a4d); }
+#tvIntro .ti-h { font-size: 3em; font-weight: 600; color: #8e8e93; margin-top: 1em; }
+body.tv:has(#tvIntro:not([hidden])) #tvSides { display: none; }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
 #absentBar { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); z-index: 55; padding: .8em 1.5em; border-radius: 2em; background: rgba(255,159,10,.92); color: #1d1d1f; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; text-align: center; }
 #absentBar small { display: block; font-size: .75em; font-weight: 700; opacity: .75; }
@@ -943,7 +961,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Choisis l'histoire</div><div id="lobbyList" class="tv-list" hidden></div></div>
-  <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>Sous mon toit</h2>
+  <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>UNWRITTEN</h2>
     <div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell (ou ouvre ce lien), puis choisis l'histoire</p><code id="tvLink"></code></div><div id="tvNames"></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
@@ -1064,7 +1082,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <img class="hero" src="chars/isa_nuit/listen.webp" alt="">
     <div class="veil"></div>
     <div class="kicker">Chapitre 1</div>
-    <div class="title">Sous mon toit</div>
+    <div class="title">UNWRITTEN</div>
     <p class="lede">Ton père part un mois. Une amie à lui emménage ce soir. Ta blonde ne l'a pas encore vue.</p>
     <form id="start">
       <button class="go" type="submit">Commencer</button>
@@ -1097,6 +1115,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
+  <div id="tvIntro" hidden></div>
   <div id="absentBar" hidden></div>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><h2>Pause</h2><div class="pc-who"></div><div class="wr-kick">Ce qui vient de se passer</div><ol></ol>
@@ -1746,6 +1765,55 @@ function afterOf(o) {
   const who = s.say || s.think;
   return (who ? fill((castOf(who) || {}).name || '') + ' : ' : '') + fill(s.text || s.narr);
 }
+// ---- a TV's story opens on black: its title, what's going on (story.intro: a few sentences), who plays whom, how it
+// works — each line fades in slowly, in turn. "Who plays whom" is when each phone shows its "Tu es …" card (ip: the
+// opening's phase, in the shared state); the phones start the story with the TV, once the opening has faded out ----
+let tvPhase = null, tvOpen = null;   // TV: 'ctx' | 'cast' while it opens; a player's phone: its opening, waiting on the TV's
+async function tvIntro(at) {
+  const box = $('#tvIntro'), st = story();
+  const hold = async (ms) => {   // a wait that a pause stretches
+    for (let t = 0; t < ms; t += 100) { await new Promise((r) => setTimeout(r, 100)); if (run !== at) return false; while (paused) { await new Promise((r) => setTimeout(r, 200)); if (run !== at) return false; } }
+    return true;
+  };
+  const line = (cls, html) => { const d = document.createElement('div'); d.className = 'ti ' + cls; d.innerHTML = html; box.appendChild(d); return d; };
+  const show = async (els, ms) => { void box.offsetWidth; els.forEach((e) => e.classList.add('in')); return hold(ms); };
+  box.innerHTML = ''; box.className = ''; box.hidden = false;
+  const k = line('ti-k', 'UNWRITTEN'), t = line('ti-t', esc(storyTitle() || ''));
+  const ctx = (st.intro || []).map((x) => line('ti-p', esc(fill(x))));
+  // who plays whom: each character (the pose of the waiting room), facing the other, and its player's name. Built when
+  // its turn comes (what isn't shown yet takes no room: each step sits in the middle of the screen)
+  const castRow = () => { const row = document.createElement('div'); row.className = 'ti-cast'; box.appendChild(row); return row; };
+  let row = null;
+  const pick = st.pick || {}, cast = seatsOf().map((s, i) => {
+    const pose = (pick[s] || {}).pose || 'listen', nat = (FACE[spriteOf(s)] || {})[poseOf(s, pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');
+    const d = document.createElement('div'); d.className = 'ti ti-c'; d.style.setProperty('--c', (castOf(s) || {}).color || '#ff9a4d');
+    d.innerHTML = `<img src="${poseSrc(s, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><span><b>${esc(seatName(s) || '…')}</b> joue <i>${esc(seatLabel(s))}</i></span>`;
+    return d;
+  });
+  const how = document.createElement('div'); how.className = 'ti ti-h'; how.textContent = 'Chacun fait ses choix en secret sur son cell. Vous les verrez apparaître ici.';
+  if (!(await hold(1800)) || !(await show([k, t], 3200))) return false;
+  for (const p of ctx) if (!(await show([p], Math.max(3600, 1400 + 50 * p.textContent.length)))) return false;
+  // the context fades away, then who plays whom takes its place
+  if (!(await hold(800))) return false;
+  ctx.forEach((p) => p.classList.remove('in'));
+  if (!(await hold(2000))) return false;
+  ctx.forEach((p) => p.remove());
+  row = castRow(); cast.forEach((c) => row.appendChild(c));
+  tvPhase = 'cast'; share();   // now the phones show who each one is
+  for (const c of cast) if (!(await show([c], 2600))) return false;
+  box.appendChild(how);
+  if (!(await hold(1400)) || !(await show([how], 4200))) return false;
+  box.classList.add('out'); tvPhase = null; share();
+  if (!(await hold(1900))) return false;
+  box.hidden = true; return true;
+}
+// a player's phone: black until the TV says who's who, then its "Tu es …" card, then the story with the TV
+function tvOpenStep() {
+  const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; return; }
+  const ip = remote && remote.ip;
+  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at).then(() => { o.cardDone = true; tvOpenStep(); }); }
+  if (!ip && o.cardDone) { tvOpen = null; next(); }
+}
 // the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
 function showPause() {
   const on = !!paused && screen === null && (TV || hostTv);
@@ -2155,6 +2223,7 @@ function show(id) {
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
 }
 function halt() {
+  $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
   run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
 }
@@ -2200,9 +2269,12 @@ function begin(id = state.story) {
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
   show(null); $('#looks').hidden = true;
   if (!seatsOf(id).length) state.seats = {};
+  if (TV) tvPhase = duo() && !FAST ? 'ctx' : null;   // the TV's opening (before share: the phones wait for it)
   if (ROLE === 'host') { if (waitRoom) announce(false); waitRoom = false; game = Date.now().toString(36); tape = []; share(); }
   if (TV) tvSides();
   const me = FAST || replay || PREVIEW ? null : myCharacter(id), at = run;
+  if (TV && tvPhase) { tvIntro(at).then((ok) => { if (ok) next(); }); return; }
+  if (ROLE === 'watch' && hostTv && !FAST) { tvOpen = { at, me, shown: false, cardDone: !me }; tvOpenStep(); return; }
   if (me) introCard(me, at).then(() => { if (run === at) next(); }); else next();
 }
 // leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)
@@ -2458,7 +2530,7 @@ $('#fbSend').onclick = (e) => {
   $('#fbCard').hidden = true;
   $('#fbBtn').textContent = 'Merci';
 };
-const storyName = (id) => ({ t1: 'Sous mon toit', play: 'Le café', bar: 'Last call', gen: 'Ton histoire' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
+const storyName = (id) => ({ t1: 'UNWRITTEN', play: 'Le café', bar: 'Last call', gen: 'Ton histoire' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
 // ---- Stats and Valider l'idée: every device's tally (usage.js), added up live ----
 function sumUp(devs) {
   const S = {}, F = {}, A = { n: 0, back: 0, play: 0, ep: 0, next: 0, gen: { n: 0, in: 0, out: 0 }, notes: [] };
@@ -2912,7 +2984,7 @@ function newer(v) {
 function share() {
   if (ROLE !== 'host' || quiet || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, p: paused || undefined, x: absentSeats().map((k) => seatName(k)) }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, ip: tvPhase || undefined, p: paused || undefined, x: absentSeats().map((k) => seatName(k)) }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share(); } }   // a jump sends its taps once, at its end
 
@@ -3095,6 +3167,7 @@ function follow(msg) {
     state.name = String(msg.n || 'Justin').slice(0, 16); state.seats = msg.seats || {};
     begin(STORIES[msg.s] ? msg.s : 't1');
   } else remote = msg;
+  if (tvOpen) tvOpenStep();   // the TV's opening moved on (who's who: the "Tu es …" card)
   pump();
 }
 function toLobby(msg) {

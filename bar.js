@@ -1166,6 +1166,7 @@ window.BAR = [
 BAR.gaze = true;
 BAR.credits = '';   // no photos: rectangles only
 BAR.seats = ['pa', 'pb'];
+BAR.intro = ['Samedi, 1 h 40. Trois amis, un dernier verre.', 'Brooke allait enfin dire quelque chose à Cam. Puis il part aux toilettes.', "Quelqu'un l'y attend déjà."];   // the TV's opening
 BAR.solo = { pa: 'Justin', pb: 'Brooke' };   // a seat's name when nobody plays it under their own
 // the waiting room: each character in the pose that sums them up, and one line of them
 BAR.pick = { pa: { pose: 'drunk_happy', line: 'Man… I think we’re getting too old for this shit.' },

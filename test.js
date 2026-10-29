@@ -174,6 +174,9 @@
     { end: { kicker: "Fin de l'épisode 1", title: '{TITLE}', lede: '{LEDE}', art: null } },
   ], {
     gaze: true, credits: '', title: 'Test',
+    // the TV's opening (before the first scene): what's going on, for a room that doesn't see the phones
+    intro: ['2 h du matin. Une mallette a disparu du bar Larina.', 'Justin et Brooke étaient les derniers clients. Un homme en complet les a emmenés dans une salle sans fenêtre.',
+      "Il dit qu'il est policier. Il n'a montré de badge à personne."],
     seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
     pick: { pa: { pose: 'drunk_serious', line: 'On avait pas vraiment le choix.' }, pb: { pose: 'nervous', line: 'Une mallette ? On a même pas vu de mallette.' } },
     cast: {
