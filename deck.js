@@ -9,8 +9,18 @@ window.DECK = (() => {
   const slot = (k, label) => `<label class="dkPic" data-k="${k}"${saved[k] ? ` style="background-image:url(${saved[k]})"` : ''}><span>${saved[k] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
   const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
   const typed = (k, def) => `<p class="dkTyped" contenteditable="true" spellcheck="false" data-t="${k}">${esc(saved['t_' + k] ?? def)}</p>`;
-  // every character we have the base image for, image → perso; the spotlight loops over them
-  const WALL = [['ref/perso_brooke.webp', 'chars/brooke/drunk_listen.webp'], ['ref/perso_cam.webp', 'chars/cam/listen.webp'], ['ref/perso_candy.webp', 'chars/candy/listen.webp'], ['ref/perso_james.webp', 'chars/james/listen.webp'], ['ref/perso_julian.webp', 'chars/julian/listen.webp'], ['ref/perso_justin.webp', 'chars/justin/listen.webp'], ['ref/perso_ruby.webp', 'chars/ruby/listen.webp'], ['ref/perso_suit.webp', 'chars/suit/listen.webp'], ['ref/perso_corsaire.webp', 'ref/corsaire_listen.webp']];
+  // every character we have the base image for: image → perso, the perso cycling through its poses to show it moves
+  const WALL = [
+    ['ref/perso_brooke.webp', 'chars/brooke', 'drunk_listen drunk_talk drunk_smile drunk_happy drunk_sad drunk_point'],
+    ['ref/perso_cam.webp', 'chars/cam', 'listen explaining flirty sip tipsy_laugh worried'],
+    ['ref/perso_candy.webp', 'chars/candy', 'listen explaining surprised thinking angry holding'],
+    ['ref/perso_james.webp', 'chars/james', 'listen explaining surprised thinking angry holding'],
+    ['ref/perso_julian.webp', 'chars/julian', 'listen talk smirk offer hands_up cold'],
+    ['ref/perso_justin.webp', 'chars/justin', 'listen explaining thinking surprised angry holding'],
+    ['ref/perso_ruby.webp', 'chars/ruby', 'listen explaining surprised thinking angry holding'],
+    ['ref/perso_suit.webp', 'chars/suit', 'listen adjust offer angry'],
+    ['ref/perso_corsaire.webp', 'ref/corsaire', 'listen smile surprised angry hurt back_walk'],
+  ].map(([img, dir, poses]) => [img, poses.split(' ').map((p) => `${dir}/${p}.webp`)]);
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2>[X]</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
@@ -26,17 +36,18 @@ window.DECK = (() => {
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Un nouveau perso entre : [Y].</h1><p>Pour la salle, un perso comme les autres.</p>` },
     { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure.</p>` },
     { c: '#30d158', h: () => `<h1>L'histoire te suit.</h1><p>Même au bol : elle continue sur ton cell.</p>` },
-    { c: '#30d158', wall: true, h: () => `<div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img src="${b}" alt=""></div>`).join('')}</div>` },
+    { c: '#30d158', wall: true, h: () => `<div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div>` },
   ];
   let spot = 0;
   function draw() {
     const s = S[i]; clearInterval(spot);
     root.style.setProperty('--c', s.c);
     root.querySelector('.dkSlide').innerHTML = T(s.h());
-    if (s.wall) {   // the spotlight goes from one pair to the next, and round again
-      const cells = [...root.querySelectorAll('.dkWall > div')]; let k = 0;
-      const lit = () => { if (!root.offsetParent) return clearInterval(spot); cells.forEach((c, n) => c.classList.toggle('on', n === k)); k = (k + 1) % cells.length; };
-      lit(); spot = setInterval(lit, 1400);
+    if (s.wall) {   // every perso plays its poses, each at its own offset, round and round
+      WALL.forEach(([, poses]) => poses.forEach((u) => { new Image().src = u; }));
+      const imgs = [...root.querySelectorAll('.dkAnim')]; let t = 0;
+      const tick = () => { if (!root.offsetParent) return clearInterval(spot); imgs.forEach((im, n) => { im.src = WALL[n][1][(t + n) % WALL[n][1].length]; }); t++; };
+      spot = setInterval(tick, 650);
     }
     root.querySelector('.dkN').textContent = `${i + 1} / ${S.length}`;
     root.querySelector('.dkBar i').style.width = `${(i + 1) / S.length * 100}%`;
