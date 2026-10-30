@@ -908,6 +908,10 @@ body.watch #choices button.mine { pointer-events: auto; }
 /* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
 #qrBtn { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #qrBtn svg { width: 4em; height: 4em; }
+/* Mettre à jour: top right on the menus, left of the QR (never in a story) */
+#freshBtn { position: absolute; top: 2.2%; right: calc(4% + 9.4em); z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; }
+#freshBtn svg { width: 3.6em; height: 3.6em; }
+body.instory #freshBtn, body.inwait #freshBtn, body.playonly #freshBtn, body.mirror #freshBtn, body.tv #freshBtn { display: none; }
 #qrBtn:focus-visible { outline: .25em solid #fff; }
 body:has(#todoBtn:not([hidden])) #qrBtn { right: calc(4% + 9.2em); }   /* next to the waiting room's ? */
 body.inwait.roomfull #qrBtn { display: none !important; }   /* everyone's in: nobody left to scan in */
@@ -1190,7 +1194,6 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
       <button type="button" id="t3d"><span class="art" style="--g:#6b3fa0"><img src="chars/amare/listen.webp" alt=""></span><b>3D</b></button>
       <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
-      <button type="button" id="freshBtn"><span class="art" style="--g:#30a46c"><img src="chars/justin/surprised.webp" alt=""></span><b>Mettre à jour</b></button>
       <button type="button" id="roadBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/justin/thinking.webp" alt=""></span><b>Roadmap</b></button>
     </div>
   </div>
@@ -1641,6 +1644,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="endRow"><button class="go" id="again" type="button">Rejouer</button><button class="go" id="fbBtn" type="button">Avis</button></div>
     <p class="credits" id="credits"></p>
   </div>
+  <button id="freshBtn" type="button" aria-label="Mettre à jour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
   <button id="qrBtn" type="button" hidden aria-label="Faire regarder quelqu'un"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
   <div id="eyes" hidden aria-label="Spectateurs"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
   <button id="galBtn" type="button" aria-label="Personnages"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
