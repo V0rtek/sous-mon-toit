@@ -131,6 +131,33 @@
     { cam: 'close', who: ['twin'] }, say('twin', 'bar', 'Et la carte qui mène au trésor.'),
     { cam: 'wide', at: 950 }, { hush: 1500 }, { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets };
-  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }];
+  // tcomptoir (31/10): Justin's 6 new poses at the counter, straight ahead (the mug drawn in): each one in a close shot
+  // and changed inside the same shot (bar -> bar_talk: the size must not jump), then wide with Léo beside him
+  const tcomptoir = [
+    { scene: 't_trois', cast: { leo: 'bar', justin: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Au comptoir · droit devant' }, { wait: 1200 },
+    { cam: 'close', who: ['justin'] }, { wait: 700 },
+    say('justin', 'bar_talk', 'Une dernière. Après, je rentre.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Tu dis ça depuis trois tournées.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_drink', '…'),
+    say('justin', 'bar_smile', 'Elle m’a souri, tantôt.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Elle sourit à tout le monde.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_stare', 'Pas comme ça.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'T’es saoul.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_laugh', 'Un peu. Beaucoup.'),
+    { cam: 'wide', at: 900 }, say('justin', 'bar_slump', 'Réveille-moi quand elle revient.'),
+    { cam: 'close', who: ['justin'] }, { poses: { justin: 'bar' } }, { wait: 900 }, { poses: { justin: 'bar_talk' } }, { wait: 900 }, { poses: { justin: 'bar' } }, { wait: 700 },
+    // toward the one next to him: the same body, the head turns
+    { caption: 'Au comptoir · vers l’autre' }, { cam: 'wide', at: 900 }, { wait: 1000 },
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_talk', 'Léo. Regarde-moi.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Quoi ?'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_flirt', 'Tu la trouves belle, toi aussi.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'J’ai rien dit.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_anger', 'T’as rien besoin de dire.'),
+    say('justin', 'bar_back', 'Elle revient.'),
+    say('justin', 'bar_slide', 'Tiens. T’en as plus besoin que moi.'),
+    { cam: 'wide', at: 900 }, say('justin', 'bar_toast', 'À celle qui sourit à tout le monde.'),
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }];
 })();

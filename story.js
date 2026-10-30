@@ -37,7 +37,13 @@ window.FACE = {
     walk_a: 'r', walk_mid: 'r', walk_b: 'r', bar: 'r', sit: 'r', wall: 'r',
     // medium close-ups (30/10): head to mid-chest, talking, small smile, side glance (eyes only), hurt, held-back anger,
     // and from behind for over-the-shoulder shots
-    cu_talk: 'r', cu_smile: 'r', cu_glance: 'r', cu_hurt: 'r', cu_anger: 'r', cu_back: 'r' },
+    cu_talk: 'r', cu_smile: 'r', cu_glance: 'r', cu_hurt: 'r', cu_anger: 'r', cu_back: 'r',
+    // at the counter, straight ahead (31/10, cut at the counter like bar, the mug drawn in): talking, drinking, staring into
+    // his mug, small smile, tipsy laugh, drunk and slumped
+    bar_talk: 'r', bar_drink: 'r', bar_stare: 'r', bar_smile: 'r', bar_laugh: 'r', bar_slump: 'r',
+    // at the counter, toward the one next to him (31/10, the same body, the head turns): talking, flirting, held-back
+    // anger, a toast, looking back over his far shoulder (back of the head), sliding his mug over
+    bar_to_talk: 'r', bar_to_flirt: 'r', bar_to_anger: 'r', bar_toast: 'r', bar_back: 'r', bar_slide: 'r' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   // Kai (30/10) = Justin recolored for the tests (black hair, dark red tank top): all his poses
   get kai() { return this.justin; },
