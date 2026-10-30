@@ -519,12 +519,12 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #deck .dkNote[hidden] { display: none; }
 #deck .dkSlide.full { padding: 0; }
 .dkFull { width: 100%; height: 100%; object-fit: contain; background: #000; }
-#deck .dkSlide:has(.dkCat) { gap: 1.2em; padding: 9em 6% 4em; justify-content: flex-start; }
+#deck .dkSlide:has(.dkCat) { gap: 1.2em; padding: 9em 21% 4em; justify-content: flex-start; }
 .dkSlide:has(.dkCat) h2 { font-size: 4.2em; }
 .dkCat { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 1.6em; }
-.dkCard { position: relative; overflow: hidden; border-radius: 1.4em; background: #111 center / cover; box-shadow: inset 0 0 0 .14em rgba(255,255,255,.1); cursor: pointer; }
+.dkCard { position: relative; background-color: #1a0d10; overflow: hidden; border-radius: 1.4em; background: #111 center / cover; box-shadow: inset 0 0 0 .14em rgba(255,255,255,.1); cursor: pointer; }
 .dkCard.pick { box-shadow: 0 0 0 .3em var(--c), 0 0 3em -.5em var(--c); }
-.dkCh { position: absolute; bottom: 0; height: 88%; max-width: 48%; object-fit: contain; object-position: center bottom; }
+.dkCh { position: absolute; bottom: 12%; height: 80%; max-width: 48%; object-fit: contain; object-position: center bottom; }
 .dkCh:nth-of-type(1) { left: 12%; }
 .dkCh:nth-of-type(2) { right: 12%; }
 .dkCh:only-of-type { left: 50%; transform: translateX(-50%); max-width: 90%; }
@@ -532,14 +532,12 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .dkHv { position: absolute; inset: 0; display: flex; align-items: flex-end; background: #000 center / cover; opacity: 0; transition: opacity .25s; }
 .dkHv::before { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,.85)); }
 .dkHv span { position: relative; padding: .8em; font-size: 2.6em; font-weight: 700; font-style: italic; }
-.dkHv img { position: absolute; bottom: 0; height: 80%; }
+.dkHv img { position: absolute; bottom: 12%; height: 80%; }
 .dkHv img:nth-of-type(1) { left: 18%; }
 .dkHv img:nth-of-type(2) { right: 18%; }
 .dkHv img:only-of-type { left: 50%; transform: translateX(-50%); }
-.dkHv.pee { background: linear-gradient(#2a2d33, #14161a); }
-.dkHv.pee img { height: 90%; }
-.dkHv.zoom { background: radial-gradient(80% 90% at 50% 40%, #3a1218, #0b0608); overflow: hidden; }
-.dkHv.zoom img { top: 2%; bottom: auto; height: 330%; }
+.dkHv.shadow { background: radial-gradient(80% 90% at 50% 40%, #3a1218, #0b0608); }
+.dkHv.wc { background: #cfd8d6 center / contain no-repeat; background-image: url(ref/lastcall_wc.webp); background-color: #1c1c1e; }
 .dkHv span { z-index: 1; }
 .dkHv::before { z-index: 1; }
 .dkCard:hover .dkHv { opacity: 1; }
@@ -1770,7 +1768,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261031550000"></script>
-<script src="deck.js?v=20261032400000"></script>
+<script src="deck.js?v=20261032600000"></script>
 <script src="bank.js?v=20261031700000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
