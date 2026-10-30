@@ -56,6 +56,10 @@ window.ACT = (() => {
       en: 'A and B ask for the same precise moment: he physically cannot do both. Each side has a reason we understand.',
       enEx: ['The eastern gate at six against the hearing at six (two more absent things).', 'Tomorrow at 7: Melissa leaves and waits for him at the door. Candy: "If you leave with her, don\'t come back."'] },
   };
+  AT.loop = { n: 'Une question ouverte', how: 'L’épisode ouvre une question que le joueur veut voir répondue, et ne la ferme pas. La plus forte : deux persos à l’écran ne racontent pas le même passé. Personne n’explique, quelqu’un change de sujet : le joueur reste avec la question. Un choix n’est pas une accroche (ce que Justin répond, le joueur le décide lui-même) ; un passé raconté puis fermé non plus.',
+    ex: ['Melissa : « Il y a trois ans, je suis partie sans adieu. » (dit, expliqué, fermé : plus rien à savoir)', 'Justin : « T’es partie sans un mot. » Melissa : « Sans un mot ? Je t’ai écrit. » Candy : « Qui veut un verre ? »'],
+    en: 'The episode opens a question the player wants answered, and does not close it. The strongest: two people on screen do not tell the same past. Nobody explains, someone changes the subject: the player is left with the question. A choice is not a hook (what justin answers, the player decides himself); a past told and closed is not one either.',
+    enEx: ['Melissa: "Three years ago, I left without saying goodbye." (said, explained, closed: nothing left to know)', 'justin: "You left without a word." Melissa: "Without a word? I wrote to you." Candy: "Who wants a drink?"'] };
   const atLine = (id) => `- ${AT[id].n}: ${AT[id].en} Flat: "${AT[id].enEx[0]}" -> works: "${AT[id].enEx[1]}"`;
 
   // the two people, drawn for the act's prompt ("Autre" draws again): who they are to justin, never a job
@@ -78,7 +82,7 @@ window.ACT = (() => {
     setups: [{ plant: '« Bonne nuit, Juju. » Isa l’appelle par son surnom d’enfance, en riant, comme une blague', pay: '« Juju », c’est comme ça que sa mère l’appelait' },
       { plant: '« Souris ! » Isa prend en photo Justin devant la photo de famille, « pour se souvenir de son séjour »', pay: 'Les photos sont pour sa mère' }],
     episodes: [
-      { ask: 'Isa lui demande de ne pas dire à James qu’elle sort la nuit', hurts: 'James lui a demandé de veiller sur elle : se taire, c’est mentir à son père', hook: 'À 3 h, Isa rentre et murmure au téléphone : « Il ressemble à toi. »' },
+      { ask: 'Isa lui demande de ne pas dire à James qu’elle sort la nuit', hurts: 'James lui a demandé de veiller sur elle : se taire, c’est mentir à son père', mystery: 'Justin : « Tu vas où, la nuit ? » Isa : « Voir quelqu’un qui t’aime. » Elle n’en dit pas plus', hook: 'À 3 h, Isa rentre et murmure au téléphone : « Il ressemble à toi. »' },
       { easy: 'Justin dit à James qu’Isa dormait', backfires: 'James l’a vue rentrer à 3 h : le menteur, maintenant, c’est Justin', hook: 'Une enveloppe tombe du sac d’Isa, adressée à « Juju »' },
       { reveal: 'Isa avoue : c’est la mère de Justin qui l’envoie', flip: 'On croyait qu’Isa cachait une liaison ; elle cachait une mère', hook: '« Elle est en ville. Demain soir. Seulement demain. »' },
       { clock: 'Demain soir, la mère repart à l’aube', a_asks: 'Isa : viens la voir demain soir, sans le dire à James', b_asks: 'James : demain soir, il présente Amare comme son fiancé, et il a besoin que Justin soit là' },
@@ -95,15 +99,16 @@ window.ACT = (() => {
   // the arc: per episode, its goal, what's at stake (it grows), its act techniques, and what it must contain:
   // [key, label here, label in the prompt, the act's value, thread]. Episode 1 carries three things and one plant
   const ARC = [
-    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'here', 'because', 'danger', 'plant'],
+    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'here', 'because', 'danger', 'loop', 'plant'],
       items: (A) => [['first', 'La 1re réplique', 'The FIRST line: one sentence that makes the player want to know what happens, about something visible or said (never a gesture or an object the screen does not show)', ''],
         ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel")`, ''],
         ['want', 'Justin veut', 'What justin wants for himself, said or thought, so the player wants it too', A.justin_wants],
         ['ask', `${nm(A, 'a')} demande`, `${nm(A, 'a')} asks justin, out loud, and we see what is lost if he says no`, [E(A, 1).ask, A.lost_if_no].filter(Boolean).join(' · ')],
         ['hurt', `Ça blesse ${nm(A, 'b')}`, `Why giving it hurts ${nm(A, 'b')}, shown`, E(A, 1).hurts],
+        ['loop', 'La question ouverte', 'The question this episode opens and does NOT answer (it is answered by the secret, in episode 3): justin reacts to it, nobody explains', E(A, 1).mystery, 'sec'],
         ['s1', 'Planté', 'Plant it in a line, passing for something else', S(A, 0).plant, 's1'],
-        ['end', 'Fin', 'The episode ends on (its turn)', E(A, 1).hook]] },
-    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['visible', 'easy', 'plant', 'secret'],
+        ['end', 'Fin', 'The episode ends on (its turn): something new, never the question justin just answered in a choice', E(A, 1).hook]] },
+    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['visible', 'loop', 'easy', 'plant', 'secret'],
       items: (A) => [['r1', 'Rappel', 'Bring it back, without explaining it', S(A, 0).plant, 's1'],
         ['easy', 'L’effort minimal', 'What justin tries first to keep both (the easy way)', E(A, 2).easy],
         ['s2', 'Planté', 'Plant it in a line, passing for something else', S(A, 1).plant, 's2'],
@@ -182,7 +187,7 @@ window.ACT = (() => {
     if (!a.secret || !a.secret.what) out.push('Il manque le secret');
     else if (a.a && a.b && ![a.a.id, a.b.id, 'a', 'b'].includes(w)) out.push('Le secret n’appartient ni à A ni à B (Un secret qui explique un geste)');
     if (!Array.isArray(a.setups) || a.setups.length < 2 || a.setups.some((s) => !s || !s.plant || !s.pay)) out.push('Il faut 2 plants, chacun avec ce qu’il paie');
-    ['ask hurts hook', 'easy backfires hook', 'reveal flip hook', 'clock a_asks b_asks', 'if_a if_b open'].forEach((f, i) => {
+    ['ask hurts mystery hook', 'easy backfires hook', 'reveal flip hook', 'clock a_asks b_asks', 'if_a if_b open'].forEach((f, i) => {
       const gone = f.split(' ').filter((k) => !(a.episodes && a.episodes[i] && a.episodes[i][k])); if (gone.length) out.push(`Épisode ${i + 1} : il manque ${gone.join(', ')}`); });
     const bad = JSON.stringify(a.episodes || []).concat(JSON.stringify(a.secret || {}), a.past || '').match(BANNED);
     if (bad) out.push(`« ${bad[0]} » : l’enjeu doit rester entre les gens`);
@@ -297,7 +302,7 @@ window.ACT = (() => {
     (e) => { const p = e.target.dataset.p; if (p) { setP(p, e.target.value); save(); } });
   }
   const EP_FIELDS = [
-    [['Ce que A demande', 'ask'], ['Pourquoi ça blesse B', 'hurts'], ['La fin', 'hook']],
+    [['Ce que A demande', 'ask'], ['Pourquoi ça blesse B', 'hurts'], ['La question ouverte', 'mystery'], ['La fin', 'hook']],
     [['L’effort minimal', 'easy'], ['Comment ça empire', 'backfires'], ['La fin', 'hook']],
     [['Comment le secret sort', 'reveal'], ['Ce qu’on croyait, retourné', 'flip'], ['La fin', 'hook']],
     [['L’horloge', 'clock'], ['Ce que A demande', 'a_asks'], ['Ce que B demande', 'b_asks']],
@@ -337,7 +342,7 @@ Reply with ONE JSON object and nothing else (its shape is at the end).
 
 THE ARC (always this one: you fill it, you never change it)
 justin is caught between two people he cares about, A and B. A asks him for something; giving it to A hurts B.
-- Episode 1: we like A and B; A asks, and we see what is lost if justin says no; we see why saying yes would hurt B. One small thing is planted.
+- Episode 1: we like A and B; A asks, and we see what is lost if justin says no; we see why saying yes would hurt B. A question about the past is opened and left open (the secret is its answer). One small thing is planted.
 - Episode 2: justin tries the easy way to keep both. It backfires: things get worse with B. A second small thing is planted; the one who has the secret does something odd.
 - Episode 3: the secret comes out. The two planted things suddenly make sense. What the player believed is turned around.
 - Episode 4: A and B each ask him for the same moment. He must choose: A or B.
@@ -358,7 +363,7 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
 7. "secret": "who" (the id of the character it belongs to: the one whose odd behaviour it explains) and "what" (Un secret qui explique un geste). Once out, the player sees that person differently. It explains both setups.
 8. "setups": exactly 2 (Un plant qui se voit). "plant" = the line that plants it (setup 1 in episode 1, setup 2 in episode 2), "pay" = what it means once the secret is out.
 9. "episodes": exactly 5 objects, in order, with these fields:
-   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "hook" (the last moment of the episode: a surprise or a question, never a summary).
+   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, best two people on screen telling a different past; the secret is its answer), "hook" (the last moment of the episode: a surprise or a new question, never a summary, never the request asked again).
    2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook".
    3: "reveal" (how the secret comes out, in the scene), "flip" (what the player believed, and what is true), "hook".
    4: "clock" (why it must be decided now), "a_asks", "b_asks" (Le même moment, deux demandes).
@@ -369,13 +374,13 @@ RULES:
 - Everything happens between the characters on screen. No institution, no hearing, no council, no gate, no key character who never appears.
 - The stakes are between people, never money: no debt, no money owed, no crate, no cellar, no landlord, no licence, no smuggling.
 - Nothing contradicts itself: the past, the secret and the episodes tell one story.
-- Before episode 3, the secret is never said: only planted and hinted.
+- Before episode 3, the secret is never said: only planted and hinted. But its question is open from episode 1 ("mystery").
 - Both sides of episode 4 must feel right: the player has to hesitate.
 
 THE JSON:
 {"title": "...", "scene": "...", "question": "...", "a": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "b": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "justin_wants": "...",
  "past": "...", "lost_if_no": "...", "secret": {"who": "<a character id>", "what": "..."}, "setups": [{"plant": "...", "pay": "..."}, {"plant": "...", "pay": "..."}],
- "episodes": [{"ask": "...", "hurts": "...", "hook": "..."}, {"easy": "...", "backfires": "...", "hook": "..."}, {"reveal": "...", "flip": "...", "hook": "..."}, {"clock": "...", "a_asks": "...", "b_asks": "..."}, {"if_a": "...", "if_b": "...", "open": "..."}]}
+ "episodes": [{"ask": "...", "hurts": "...", "mystery": "...", "hook": "..."}, {"easy": "...", "backfires": "...", "hook": "..."}, {"reveal": "...", "flip": "...", "hook": "..."}, {"clock": "...", "a_asks": "...", "b_asks": "..."}, {"if_a": "...", "if_b": "...", "open": "..."}]}
 
 The idea: ${idea || '(none: invent it from the two people)'}`;
   const copy = (text, btn) => { const was = btn.textContent;

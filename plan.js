@@ -459,6 +459,10 @@ ${act && act.n > 1 ? '- The first rectangle picks up where the last episode ende
 - At least one desire is shown ("desire" goal).
 - Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
+- At least one rectangle of "ep" hints an info of "later": the player ends the episode with a question nobody answered.
+- No rectangle where one character explains alone: a fact comes out because someone asks, accuses, dodges or disagrees.
+- When something hurts the main character (the past, a reproach), the next rectangle or choice is his reaction: he is never silent about it.
+- The turn brings something new (a fact, a surprise, a question): never a choice just made, asked again.
 - What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture or object the screen does not show (counting the lights, flipping a coin, a crate): what matters is said in a line, plainly, the first time.
 
 THE JSON:
@@ -491,6 +495,9 @@ B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 li
 C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
+H. Never more than 2 lines in a row from the same character: what comes out, comes out in an exchange (a question, a reproach, a disagreement), never in a speech.
+I. When a line hurts the main character (the past, a reproach), he answers it: a line or a choice, never silence.
+J. The last line brings something new: a fact, a surprise, a question nobody answers. Never the question of the choice the player just made, asked again.
 G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate). If something matters, a line says what it is, plainly, the first time.
 
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
