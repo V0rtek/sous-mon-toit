@@ -354,21 +354,24 @@ Example:
   let shown = null;   // { kind, imgs, msg }
   const importBox = (id) => { const s = shown && shown.kind === id ? shown : null;
     return `<div class="ncImport"><label class="ncBtn ncPick">${s && s.imgs ? 'Refaire avec une autre image' : 'Importer la feuille générée'}<input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
-      + (s && s.imgs ? `${s.imgs.some((m) => m.grip) ? '<p>Le point jaune = où le jeu met l’objet. Touche la main pour le déplacer.</p>' : ''}<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div><button type="button" class="bkCopy" data-ncadd="${id}">Ajouter au jeu</button>` : '')
+      + (s && s.imgs ? `${s.imgs.some((m) => m.grip) ? '<p>Le point jaune = où le jeu met l’objet. Touche la main pour le déplacer.</p>' : ''}<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>${s.moved ? `<button type="button" class="bkCopy" data-ncadd="${id}">Enregistrer la prise</button>` : ''}` : '')
       + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '') + '</div>'; };
+  // imported = cut, then added to the game and ticked at once (a hand moved afterwards: « Enregistrer la prise »)
   BANK.newCharFile = async (kind, file, redraw) => {
+    if (!String(load().name || '').trim()) { shown = { kind, msg: 'Donne-lui un nom d’abord (étape 1).' }; redraw(); return; }
     shown = { kind, msg: 'Découpe…' }; redraw();
-    try { shown = { kind, imgs: await IMPORT.cut(file, kind, load().name), msg: load().name ? '' : 'Donne-lui un nom (étape 1) avant d’ajouter.' }; }
-    catch (err) { shown = { kind, msg: err.message || 'Je n’arrive pas à la découper.' }; }
-    redraw();
+    const tell = (t) => { const m = document.querySelector('.ncMsg'); if (m) m.textContent = t; };
+    try { shown = { kind, imgs: await IMPORT.cut(file, kind, load().name, tell), msg: 'Ajout au jeu…' }; }
+    catch (err) { shown = { kind, msg: err.message || 'Je n’arrive pas à la découper.' }; redraw(); return; }
+    redraw(); await BANK.newCharAdd(kind, redraw);
   };
   BANK.newCharAdd = async (kind, redraw) => {
-    shown = { ...shown, msg: 'Envoi…' }; redraw();
+    shown = { ...shown, moved: false, msg: 'Envoi…' }; redraw();
     try { shown = { ...shown, msg: await IMPORT.add() }; const c = load(); c.done = c.done || {}; c.done[kind] = true; keep(c); }
     catch (err) { shown = { ...shown, msg: `Pas ajouté : ${err.message}` }; }
     redraw();
   };
-  BANK.newCharGrip = (pose, fx, fy) => { const r = IMPORT.setGrip(pose, fx, fy), m = r && shown && shown.imgs && shown.imgs.find((x) => x.pose === pose); if (m) m.grip = r; return !!m; };
+  BANK.newCharGrip = (pose, fx, fy) => { const r = IMPORT.setGrip(pose, fx, fy), m = r && shown && shown.imgs && shown.imgs.find((x) => x.pose === pose); if (m) { m.grip = r; shown.moved = true; } return !!m; };
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
   BANK.newCharIsOpen = () => !!load().shown;

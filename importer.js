@@ -26,10 +26,11 @@
   const GUIDE = { counter: { h: 459, unit: 1483, ax: 285 }, belt: { h: 497, unit: 1230, face: 143, belt: 0.573 }, full: { h: 700 } };
 
   const slug = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const breathe = () => new Promise((ok) => setTimeout(ok, 0));
   const median = (a) => { const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
 
   // the sheet -> 6 cut poses, each with its canvas and its measures (in its own pixels)
-  async function cut(file, kind) {
+  async function cut(file, kind, tell = () => {}) {
     const K = KINDS[kind], bmp = await createImageBitmap(file), k = Math.min(1, 1536 / bmp.width);
     const W = Math.round(bmp.width * k), H = Math.round(bmp.height * k);
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
@@ -59,11 +60,16 @@
     }
     // green left near an edge (the image model's own green screen, removed badly): pulled back to grey. Only within 8 px
     // of the background, so green eyes stay green
-    let edge = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) edge[i] = alpha[i] < 0.5 ? 1 : 0;
-    for (let k = 0; k < 8; k++) { const n2 = edge.slice(); for (let i = W; i < W * (H - 1); i++) if (!edge[i] && (edge[i - 1] || edge[i + 1] || edge[i - W] || edge[i + W])) n2[i] = 1; edge = n2; }
-    for (let i = 0; i < W * H; i++) if (edge[i]) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; if (g > Math.max(r, b) + 12) d[i * 4 + 1] = Math.max(r, b); }
+    await breathe();
+    const dist = new Uint8Array(W * H).fill(255), q = new Int32Array(W * H); let qh = 0, qt = 0;
+    for (let i = 0; i < W * H; i++) if (alpha[i] < 0.5) { dist[i] = 0; q[qt++] = i; }
+    while (qh < qt) { const i = q[qh++], dd = dist[i] + 1; if (dd > 8) continue; const x = i % W;
+      for (const n of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) if (n >= 0 && n < W * H && dist[n] > dd) { dist[n] = dd; q[qt++] = n; } }
+    const edge = dist;
+    for (let i = 0; i < W * H; i++) if (edge[i] <= 8) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; if (g > Math.max(r, b) + 12) d[i * 4 + 1] = Math.max(r, b); }
     const out = [];
     for (let n = 0; n < 6; n++) {
+      tell(`Découpe ${n + 1}/6…`); await breathe();
       const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2;
       // a figure can lean past its cell (a raised mug): search a little wider, keep the blobs of this cell's figure
       const x0 = Math.max(0, Math.round(c * cw - cw * 0.05)), x1 = Math.min(W, Math.round((c + 1) * cw + cw * 0.05));
@@ -71,7 +77,8 @@
       const f = figureOf(W, x0, y0, x1, y1, alpha);
       if (!f) throw new Error(`Personne dans la case ${n + 1} : 3 colonnes × 2 rangées sur fond vert.`);
       // keep only the blobs whose centre is in this cell (not the neighbour's back that pokes in)
-      const own = new Set([...f.ids].filter((id) => { let sx = 0, m = 0; for (let i = 0; i < f.lab.length; i++) if (f.lab[i] === id) { sx += i % f.w; m++; } const mx = x0 + sx / m; return mx >= c * cw && mx < (c + 1) * cw; }));
+      const sums = new Map(); for (let i = 0; i < f.lab.length; i++) { const l = f.lab[i]; if (l && f.ids.has(l)) { const t = sums.get(l) || [0, 0]; t[0] += i % f.w; t[1]++; sums.set(l, t); } }
+      const own = new Set([...sums].filter(([, [sx, m]]) => { const mx = x0 + sx / m; return mx >= c * cw && mx < (c + 1) * cw; }).map(([id]) => id));
       let bx0 = 1e9, by0 = 1e9, bx1 = -1, by1 = -1;
       for (let i = 0; i < f.lab.length; i++) if (own.has(f.lab[i])) { const x = i % f.w, y = (i / f.w) | 0; if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y; }
       const w = bx1 - bx0 + 1, h = by1 - by0 + 1, img = cx.createImageData(w, h), solid = new Uint8Array(w * h);
@@ -189,14 +196,15 @@
   let last = null;   // the sheet cut and shown, waiting for « Ajouter au jeu »
   window.IMPORT = {
     KINDS, slug,
-    async cut(file, kind, name) {
-      const cells = await cut(file, kind), sp = measure(kind, cells);
+    async cut(file, kind, name, tell) {
+      const cells = await cut(file, kind, tell), sp = measure(kind, cells);
       for (const c of cells) {   // the picture at its final size (a full-body sheet is scaled to 700 tall)
         const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
         const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o;
       }
+      for (const c of cells) c.src = c.out.toDataURL('image/png');
       last = { id: slug(name), name: String(name || '').trim(), kind, cells, sp };
-      return cells.map((c) => ({ pose: c.pose, src: c.out.toDataURL('image/png'), grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
+      return cells.map((c) => ({ pose: c.pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
     },
     // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)
     setGrip(pose, fx, fy) {
@@ -206,10 +214,10 @@
     // in this page right away (a test can use him), then in the repo for every device
     async add() {
       if (!last || !last.id) throw new Error('Il manque son nom (étape 1).');
-      const urls = Object.fromEntries(last.cells.map((c) => [c.pose, c.out.toDataURL('image/png')]));
+      const urls = Object.fromEntries(last.cells.map((c) => [c.pose, c.src]));
       apply(last.id, { ...last.sp, name: last.name }, urls);
       const token = ls('smt-gh-token');
-      if (!token) return 'Jouable sur ce téléphone. Pour la télé et les autres : ajoute ton jeton GitHub (Acte › Générer › Garder pour Claude), puis refais « Ajouter au jeu ».';
+      if (!token) return 'Jouable sur ce téléphone. Pour la télé et les autres : ajoute ton jeton GitHub (Acte › Générer › Garder pour Claude), puis réimporte la feuille.';
       await push(token, last.id, last.name, last.kind, last.cells, last.sp);
       return `Ajouté au jeu : ${last.name}. Partout dans une minute environ.`;
     },
