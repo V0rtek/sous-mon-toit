@@ -67,6 +67,15 @@ window.SCENES = {
     face: { melissa: 'r', candy: 'r', ruby: 'r', justin: 'l' },
     front: [],
   },
+  // inside the tavern (30/10): the counter runs into the depth, its top's left edge measured; the patrons lean on it
+  // side by side, in depth, facing right (pose bar: forearms on the top, cut there). Horizon at y 510, the counter's top
+  // 0,25 m under the camera: at depth, height = 1,75 × (edge y − 510) / 0,25. Only Justin has the bar pose so far
+  taverne_bar: {
+    image: 'bg/taverne_bar.webp', size: [1672, 940],
+    spots: { justin: [904, 1030, 700], melissa: [996, 936, 574], candy: [1075, 864, 476], ruby: [1147, 806, 399] },
+    face: { justin: 'r', melissa: 'r', candy: 'r', ruby: 'r' },
+    front: [],
+  },
   maison: {
     image: 'bg/maison.jpg', size: [1920, 1440],
     spots: { ruby: [420, 1425, 760], justin: [720, 1425, 770], james: [1075, 885, 400] },
