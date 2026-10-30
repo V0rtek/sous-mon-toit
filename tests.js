@@ -31,6 +31,9 @@
           const hands = x + 0.12 * h, right = 980 + (712 - y) / 167 * 310 - 0.55 * w;   // the object stays on the top
           return { src, x: along < 0 ? hands + along * 0.1 * h : hands + (right - hands) * along, y, w, z: feet + 1 };   // < 0: in front of his arms, in tenths of his height
         }) },
+    // the kiss: face to face in pure profile; a kiss pose puts his lips 143 sheet px ahead of his spot (chars.js), so
+    // 2 × 143 × 430 / 1230 = 100 apart, their faces meet
+    t_baiser: { ...T, spots: { justin: [820, 925, 430], twin: [920, 925, 430] }, face: { justin: 'r', twin: 'l' } },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
@@ -158,6 +161,18 @@
     { cam: 'wide', at: 900 }, say('justin', 'bar_toast', 'À celle qui sourit à tout le monde.'),
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir };
-  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }];
+  // tbaiser (31/10): Justin and Sam (Justin again, turned around) face to face in pure profile: each pose of the kiss
+  // sheet on both, in a two-shot; the rejected one on Justin alone
+  const tbaiser = [
+    { scene: 't_baiser', cast: { justin: 'kiss_near', twin: 'kiss_near' } }, { cam: 'two', who: ['justin', 'twin'] }, { fade: 'in', ms: 600 }, { caption: 'Le baiser' }, { wait: 1200 },
+    say('twin', 'kiss_near', 'T’es sûr ?'), say('justin', 'kiss_near', 'Non.'),
+    { poses: { justin: 'kiss', twin: 'kiss' } }, { hush: 1800 },
+    { poses: { justin: 'kiss_after', twin: 'kiss_after' } }, say('twin', 'kiss_after', '…Wow.'),
+    { poses: { justin: 'kiss_forehead', twin: 'kiss_forehead' } }, { hush: 1500 },
+    { poses: { twin: 'kiss_whisper', justin: 'kiss_near' } }, say('twin', 'kiss_whisper', 'Personne le sait.'),
+    { poses: { twin: 'kiss_near', justin: 'kiss_near' } }, { wait: 600 }, { poses: { justin: 'kiss_rejected' } }, say('justin', 'kiss_rejected', 'Attends. Quoi ?'),
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }];
 })();

@@ -43,7 +43,10 @@ window.FACE = {
     bar_talk: 'r', bar_drink: 'r', bar_stare: 'r', bar_smile: 'r', bar_laugh: 'r', bar_slump: 'r',
     // at the counter, toward the one next to him (31/10, the same body, the head turns): talking, flirting, held-back
     // anger, a toast, looking back over his far shoulder (back of the head), sliding his mug over
-    bar_to_talk: 'r', bar_to_flirt: 'r', bar_to_anger: 'r', bar_toast: 'r', bar_back: 'r', bar_slide: 'r' },
+    bar_to_talk: 'r', bar_to_flirt: 'r', bar_to_anger: 'r', bar_toast: 'r', bar_back: 'r', bar_slide: 'r',
+    // the kiss (31/10), pure profile cut at the belt: the partner is the same pose turned around, their faces meet.
+    // About to, the kiss, just after, forehead to forehead, whispering in an ear, pulled back (rejected)
+    kiss_near: 'r', kiss: 'r', kiss_after: 'r', kiss_forehead: 'r', kiss_whisper: 'r', kiss_rejected: 'r' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   // Kai (30/10) = Justin recolored for the tests (black hair, dark red tank top): all his poses
   get kai() { return this.justin; },
