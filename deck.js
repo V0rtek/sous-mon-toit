@@ -92,6 +92,11 @@ window.DECK = (() => {
     img.onerror = () => no(new Error('Image illisible.'));
     img.src = url;
   });
+  const small = (src) => new Promise((ok) => {   // a pose, shrunk to 520 px tall (transparent png) to keep
+    const img = new Image();
+    img.onload = () => { const r = Math.min(1, 520 / img.height), c = document.createElement('canvas'); c.width = img.width * r; c.height = img.height * r; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); ok(c.toDataURL('image/png')); };
+    img.src = src;
+  });
   const pick = (file, k) => shrink(file).then((u) => { saved[k] = u; save(); draw(); });
 
   // ---- the control panel (before going on stage): for [X] and [Y], paste the photo, the name, copy the prompt of each sheet, paste each sheet.
@@ -109,7 +114,7 @@ window.DECK = (() => {
       const c = document.createElement('canvas'); c.width = m.width; c.height = m.height; c.getContext('2d').drawImage(m, 0, 0); c.toBlob(ok, 'image/png'); }));
     navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => { const t = btn.textContent; btn.textContent = 'Copié ✓'; setTimeout(() => { btn.textContent = t; }, 1500); }, () => { btn.textContent = 'Enregistre-la plutôt'; });
   };
-  const pslot = (key, label, src) => `<label class="pnSlot${src ? ' has' : ''}" tabindex="0" data-slot="${key}"${src ? ` style="background-image:url(${src})"` : ''}><span>${src ? '' : esc(label)}</span><input type="file" accept="image/*" data-file="${key}" hidden></label>`;
+  const pslot = (key, label, src) => `<label class="pnSlot${src ? ' has' : ''}${key.startsWith('img:') ? ' auto' : ''}" tabindex="0" data-slot="${key}"${src ? ` style="background-image:url(${src})"` : ''}><span>${src ? '' : esc(label)}</span>${key.startsWith('img:') ? '' : `<input type="file" accept="image/*" data-file="${key}" hidden>`}</label>`;
   let queue = Promise.resolve(), cur = null, pn = null;
   function drawPanel() {
     pn.innerHTML = '<p class="pnLead">Avant de monter sur scène. Survole une case et colle (Ctrl+V), ou touche-la pour choisir un fichier.</p><div class="pnCols">' + PEOPLE.map(([p, title]) => {
@@ -120,8 +125,8 @@ window.DECK = (() => {
           <div class="pnChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-she="${p}:${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>
           ${saved[p] ? `<button type="button" class="pnBtn" data-pimg="${p}">Copier la photo</button><a class="pnBtn" href="${saved[p]}" download="${esc(c.name || p)}.jpg">Enregistrer</a>` : ''}
         </div></div>
-        <h3>Son image</h3><p>Photo + <a href="ref/style.webp" target="_blank" rel="noopener">l'image de style</a> dans ChatGPT, puis colle ce qu'il te donne.</p>
-        <div class="pnRow">${pslot('img:' + p, 'Image du perso', saved[p + 'c'])}<div class="pnCol">${ex('photo', 'Copier le prompt')}
+        <h3>Son image</h3><p>Pour la feuille 1 : photo + <a href="ref/style.webp" target="_blank" rel="noopener">l'image de style</a> dans ChatGPT : son image est l'image 1 de ses feuilles. Sa photo sur scène sera la 1re pose de la feuille 1 (automatique).</p>
+        <div class="pnRow">${pslot('img:' + p, '1re pose de la feuille 1', saved[p + 'c'])}<div class="pnCol">${ex('photo', 'Copier le prompt')}
           <textarea class="pnLock" data-lock="${p}" rows="3" placeholder="Ce qu'il faut garder (facultatif) : ex. cheveux roux bouclés, veste de cuir">${esc(c.locked)}</textarea>${ex('help', 'Copier le prompt du « à garder »')}</div></div>
         ${ks.map((k, i) => `<h3>Feuille ${p === 'x' ? i + 1 : 3}${p === 'x' ? ' · ' : ' · '}<select data-kind="${p}:${i}">${KINDS.map(([id, l]) => `<option value="${id}"${id === k ? ' selected' : ''}>${l}</option>`).join('')}</select></h3>
           <div class="pnRow">${pslot(`sheet:${p}:${i}`, 'Coller la feuille', null)}<div class="pnCol">${ex(k, 'Copier le prompt')}<p class="pnSt" data-st="${p}:${i}">${saved[`d_${p}${i}`] ? '✓ Dans le jeu' : ''}</p></div></div>`).join('')}
@@ -135,7 +140,8 @@ window.DECK = (() => {
     if (!name) { st.textContent = 'Donne-lui un nom d\u2019abord.'; return; }
     queue = queue.then(async () => {   // one at a time: the importer holds one sheet
       try {
-        st.textContent = 'Découpe…'; await IMPORT.cut(file, kindsOf(p)[i], name, (t) => { st.textContent = t; });
+        st.textContent = 'Découpe…'; const cells = await IMPORT.cut(file, kindsOf(p)[i], name, (t) => { st.textContent = t; });
+        if (+i === 0 && cells[0]) { saved[p + 'c'] = await small(cells[0].src); save(); const sl = pn.querySelector(`[data-slot="img:${p}"]`); if (sl) { sl.style.backgroundImage = `url(${saved[p + 'c']})`; sl.classList.add('has'); sl.firstChild.textContent = ''; } }
         st.textContent = 'Ajout au jeu…'; const msg = await IMPORT.add(); saved[`d_${p}${i}`] = 1; save(); st.textContent = '✓ ' + msg;
       } catch (e) { st.textContent = 'Pas ajoutée : ' + (e.message || e); }
     });

@@ -484,6 +484,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pnCol { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .8em; align-items: flex-start; }
 .pnSlot { flex: none; width: 16em; height: 16em; border-radius: 1.4em; display: grid; place-items: center; text-align: center; background: rgba(255,255,255,.05) center / cover no-repeat; box-shadow: inset 0 0 0 .14em #48484a; color: #aeaeb2; cursor: pointer; outline: 0; }
 .pnSlot span { padding: 0 .8em; font-size: 1.8em; font-weight: 600; }
+.pnSlot.auto { cursor: default; }
 .pnSlot:hover, .pnSlot:focus { box-shadow: inset 0 0 0 .2em #ffd60a; }
 .pnName, .pnLock { width: 100%; box-sizing: border-box; font: inherit; font-size: 2em; padding: .5em .7em; border: 0; border-radius: .8em; background: #1c1c1e; color: #f5f5f7; }
 .pnLock { font-size: 1.7em; resize: vertical; }
@@ -936,7 +937,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .spark { margin: 1em 0 4em; }
 .sp-head { position: relative; padding: 2.4em 2em 2.2em; border-radius: 2em; overflow: hidden; background: radial-gradient(120% 140% at 0% 0%, #ff9f0a55, transparent 55%), radial-gradient(120% 140% at 100% 100%, #ff375f55, transparent 55%), #141018; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.08); }
 .sp-head span { display: block; font-size: 1.7em; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: #ffd60a; }
-.sp-head b { display: block; font-family: var(--display); font-weight: 400; font-size: 9em; line-height: 1; margin: .05em 0 .1em; background: linear-gradient(90deg, #ffd60a, #ff9f0a 35%, #ff375f 70%, #bf5af2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sp-head b { display: block; font-family: var(--display); font-weight: 400; font-size: 9em; line-height: 1; margin: .05em 0 .1em; background: linear-gradient(90deg, #ffd60a, #ff9f0a 35%, #ff375f 75%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .sp-head em { display: block; font-style: normal; font-size: 2.3em; font-weight: 700; color: #e5e5ea; }
 .sp-stage { position: relative; margin-top: 1.6em; padding: 2em 1.6em 1.6em; border-radius: 1.8em; background: linear-gradient(160deg, color-mix(in srgb, var(--g) 18%, #111), #0b0b0d 70%); box-shadow: inset 0 0 0 .12em color-mix(in srgb, var(--g) 45%, transparent), 0 1.2em 3em -1.6em color-mix(in srgb, var(--g) 70%, transparent); }
 .sp-tag { display: flex; align-items: center; gap: .7em; font-size: 2.2em; font-weight: 800; color: #fff; margin-bottom: .8em; }
@@ -945,8 +946,8 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .sp-card b, .sp-steps b { display: block; font-size: 2.3em; font-weight: 700; line-height: 1.3; color: #f5f5f7; }
 .sp-card small, .sp-steps small { display: block; font-size: 1.9em; color: #aeaeb2; margin-top: .35em; line-height: 1.3; }
 .sp-card small::before { content: '— '; color: var(--g); }
-.sp-arrow { width: .4em; height: 4em; margin: 0 auto; background: linear-gradient(#ff9f0a, #bf5af2); border-radius: .2em; position: relative; box-shadow: 0 0 1.4em #ff9f0a88; }
-.sp-arrow::after { content: ''; position: absolute; left: 50%; bottom: -1em; transform: translateX(-50%); border: .9em solid transparent; border-top: 1.1em solid #bf5af2; border-bottom: 0; }
+.sp-arrow { width: .4em; height: 4em; margin: 0 auto; background: linear-gradient(#ff9f0a, #ff375f); border-radius: .2em; position: relative; box-shadow: 0 0 1.4em #ff9f0a88; }
+.sp-arrow::after { content: ''; position: absolute; left: 50%; bottom: -1em; transform: translateX(-50%); border: .9em solid transparent; border-top: 1.1em solid #ff375f; border-bottom: 0; }
 .sp-steps { list-style: none; margin: 0; padding: 0; counter-reset: sp; display: flex; flex-direction: column; gap: 1em; }
 .sp-steps li { counter-increment: sp; position: relative; padding: 1.1em 1.3em 1.1em 5em; border-radius: 1.1em; background: rgba(255,255,255,.06); }
 .sp-steps li::before { content: counter(sp); position: absolute; left: 1em; top: 1em; width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center; font-size: 1.7em; font-weight: 800; color: #000; background: var(--g); box-shadow: 0 0 1em var(--g); }
@@ -1548,10 +1549,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
           <div class="sp-card"><b>Parler à 2 personnes, les prendre en photo</b><small>[X], rencontré sur place, et [Y], mon complice : personne ne doit savoir qu'il y en a deux</small><small>Leur consentement pour montrer leurs photos</small><small>Leur demander un peu leur personnage</small></div>
           <div class="sp-card"><b>Tester s'ils arrivent à entrer dans le jeu avec le code QR</b></div></div>
         <div class="sp-arrow"></div>
-        <div class="sp-stage" style="--g:#bf5af2"><div class="sp-tag"><i>2</i>De mon côté</div>
-          <div class="sp-card"><b>Générer les pose sheets nécessaires</b><small>Un perso pour chacun, d'après sa photo</small></div></div>
-        <div class="sp-arrow"></div>
-        <div class="sp-stage" style="--g:#ff375f"><div class="sp-tag"><i>3</i>Sur scène · le pitch</div>
+        <div class="sp-stage" style="--g:#ff375f"><div class="sp-tag"><i>2</i>Sur scène · le pitch</div>
           <ol class="sp-steps">
             <li><b>« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… »</b><small>Une seule. [Y] n'existe pas encore pour la salle</small></li>
             <li><b>[X], présenté en une phrase</b><small>« [X] est en cybersécurité et adore… »</small><span class="sp-chip">Slide · sa photo</span></li>
@@ -1772,7 +1770,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261031550000"></script>
-<script src="deck.js?v=20261032300000"></script>
+<script src="deck.js?v=20261032400000"></script>
 <script src="bank.js?v=20261031700000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
