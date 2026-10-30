@@ -1666,8 +1666,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031430000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
-<script src="importer.js?v=20261031430000"></script>
-<script src="bank.js?v=20261031440000"></script>
+<script src="importer.js?v=20261031480000"></script>
+<script src="bank.js?v=20261031450000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1765,8 +1765,9 @@ function placeActor(a) {
 // on the ledge under his two fingers (the pose bar_put): it stays there, in front of him, until the scene changes ----
 // where a hand holds each object (fractions of its picture), and whether it turns around in a hand of someone facing right
 // (the mug's handle is on its right: turned, the handle is in her hand and the mug in front of her)
-const PROP_GRIP = { chope: [0.86, 0.45, true], lettre: [0.12, 0.8], bourse: [0.45, 0.12], enveloppe: [0.15, 0.7], parchemin: [0.08, 0.45],
+const PROP_GRIP = { chope: [0.86, 0.45, true], biere: [0.5, 0.6], gobelet: [0.5, 0.6], potion: [0.5, 0.6], vin: [0.5, 0.7], lettre: [0.12, 0.8], bourse: [0.45, 0.12], enveloppe: [0.15, 0.7], parchemin: [0.08, 0.45],
   carte: [0.12, 0.8], plan: [0.12, 0.8], wanted: [0.12, 0.8], piece: [0.5, 0.5] };
+const PAPER = ['lettre', 'carte', 'plan', 'wanted', 'parchemin', 'enveloppe'];   // read, held flat: they fill the red sheet
 const propM = (name) => { const r = ((window.BANK && BANK.props) || []).find((p) => p[0] === name); return r ? parseFloat(r[1]) / 100 : 0.15; };
 const gripOf = (a, pose) => { const sp = SPRITES[spriteOf(a.id)]; return sp.grip && sp.grip[poseOf(a.id, pose)]; };
 function gripAt(a, b, g) {   // a grip in his pose's pixels -> decor px (and mirrored when he is turned around)
@@ -1794,6 +1795,21 @@ function drawHeld(a, b) {
     a.layerEl.hidden = false; return;
   }
   if (a.layerEl) a.layerEl.hidden = true;
+  // the red placeholder of the pose (Prises): the object under the pose, where the red was, along its axis. Something to
+  // drink keeps its real size (the red cup is 9 cm wide), something to read fills the red sheet
+  const S = a.hold && (SPRITES[spriteOf(a.id)].slots || {})[poseOf(a.id, a.shown)];
+  if (S) {
+    if (a.heldEl) a.heldEl.hidden = true;
+    if (!a.slotEl) { a.slotEl = new Image(); a.slotEl.alt = ''; a.slotEl.style.cssText = 'position:absolute;pointer-events:none;z-index:-1;transform-origin:50% 50%'; a.el.appendChild(a.slotEl); }
+    const src = `props/${a.hold}.webp`; if (a.slotEl.getAttribute('src') !== src) a.slotEl.src = src;
+    const [pw, ph] = SPRITES[spriteOf(a.id)].poses[poseOf(a.id, a.shown)], kx = b.w / pw, ky = b.h / ph, f = flipped(a);
+    const flat = PAPER.includes(a.hold), w = (flat ? S.w : S.w * propM(a.hold) / 0.09) * kx, h = flat ? S.h * ky : 'auto';
+    const cx = (f ? pw - S.c[0] : S.c[0]) * kx, cy = S.c[1] * ky, ang = f ? -S.a : S.a;
+    Object.assign(a.slotEl.style, { width: w + 'px', height: h === 'auto' ? 'auto' : h + 'px', left: cx + 'px', top: cy + 'px',
+      transform: `translate(-50%,-50%) rotate(${ang}rad)${f ? ' scaleX(-1)' : ''}` });
+    a.slotEl.hidden = false; return;
+  }
+  if (a.slotEl) a.slotEl.hidden = true;
   const g = a.hold && gripOf(a, a.shown);
   if (!g) { if (a.heldEl) a.heldEl.hidden = true; return; }
   if (!a.heldEl || a.heldEl.dataset.src !== a.hold) {

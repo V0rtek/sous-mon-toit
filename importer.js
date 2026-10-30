@@ -15,7 +15,7 @@
     debout: { cut: 'full', poses: ['listen', 'smile', 'surprised', 'angry', 'hurt', 'back_walk'] },
     accoude: { cut: 'counter', poses: ['bar_to_listen', 'bar_to_smile', 'bar_to_tense', 'bar_ahead', 'bar_back', 'bar_put'] },
     assis: { cut: 'table', poses: ['sit_listen', 'sit_lean', 'sit_back', 'sit_head', 'sit_fist', 'sit_rise'] },
-    prises: { cut: 'counter', poses: ['hold_mouth', 'hold_raise', 'hold_front', 'hold_give', 'bar_slump', 'bar_laugh'] },
+    prises: { cut: 'counter', poses: ['hold_mouth', 'hold_raise', 'hold_front', 'hold_give', 'hold_ledge', 'bar_laugh'] },
     base: { cut: 'full', poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'] },
     back: { cut: 'full', poses: ['back_far', 'back_down', 'back_look', 'back_door', 'back_fists', 'back_walk'] },
     barFront: { cut: 'counter', poses: ['bar_talk', 'bar_drink', 'bar_stare', 'bar_smile', 'bar_laugh', 'bar_slump'] },
@@ -88,6 +88,26 @@
         img.data[o] = d[i * 4]; img.data[o + 1] = d[i * 4 + 1]; img.data[o + 2] = d[i * 4 + 2]; img.data[o + 3] = Math.round(a * 255);
         solid[y * w + x] = a > 0.5 ? 1 : 0;
       }
+      // the red placeholder (Prises): where the object goes. Its place, its long axis and its size are kept (the slot),
+      // then it is cleared: the game slides the object in under the pose, the fingers that were in front stay in front
+      let slot = null;
+      { const red = []; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const o = (y * w + x) * 4, r = img.data[o], g = img.data[o + 1], b = img.data[o + 2];
+          if (img.data[o + 3] > 100 && r > 215 && g < 40 && b < 40) red.push(x, y); }   // pure red (#FF0000): the darkest red hair is (200, 51, 29)
+        const n = red.length / 2;
+        if (n > w * h * 0.002) {
+          let mx = 0, my = 0; for (let i = 0; i < red.length; i += 2) { mx += red[i]; my += red[i + 1]; } mx /= n; my /= n;
+          let sxx = 0, syy = 0, sxy = 0; for (let i = 0; i < red.length; i += 2) { const dx = red[i] - mx, dy = red[i + 1] - my; sxx += dx * dx; syy += dy * dy; sxy += dx * dy; }
+          let t = 0.5 * Math.atan2(2 * sxy, sxx - syy), ux = Math.cos(t), uy = Math.sin(t); if (uy > 0 || (uy === 0 && ux < 0)) { ux = -ux; uy = -uy; }   // the long axis, pointing up
+          let a0 = 1e9, a1 = -1e9, b0 = 1e9, b1 = -1e9;
+          for (let i = 0; i < red.length; i += 2) { const dx = red[i] - mx, dy = red[i + 1] - my, pa = dx * ux + dy * uy, pb = -dx * uy + dy * ux; a0 = Math.min(a0, pa); a1 = Math.max(a1, pa); b0 = Math.min(b0, pb); b1 = Math.max(b1, pb); }
+          const ca = (a0 + a1) / 2, cb = (b0 + b1) / 2;
+          slot = { c: [Math.round(mx + ca * ux - cb * uy), Math.round(my + ca * uy + cb * ux)], a: +Math.atan2(ux, -uy).toFixed(4), h: Math.round(a1 - a0), w: Math.round(b1 - b0) };
+          // cleared, with the reddish rim right around it (within 2 px of the red, not the hair further away)
+          const near = new Uint8Array(w * h); for (let i = 0; i < red.length; i += 2) for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const x = red[i] + dx, y = red[i + 1] + dy; if (x >= 0 && y >= 0 && x < w && y < h) near[y * w + x] = 1; }
+          for (let i = 0; i < w * h; i++) if (near[i]) { const o = i * 4, r = img.data[o], g = img.data[o + 1], b = img.data[o + 2];
+            if (r - g > 60 && r - b > 60 && Math.abs(g - b) < 40) img.data[o + 3] = 0; }
+        } }
       const p = document.createElement('canvas'); p.width = w; p.height = h; p.getContext('2d').putImageData(img, 0, 0);
       // measures: the lowest row of its left 60% (a forearm on the counter, not a mug hanging lower), the rightmost point
       // of its head (the top 35%: the face, for the kiss), the middle of its bottom row (its waist)
@@ -105,7 +125,7 @@
         grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? Math.min(arm, hand || arm) + 1 : gy]; }
       // the ledge = the higher of the two bottoms: the body's on the left (a mug hanging lower on the right doesn't count),
       // the forearms' on the right (a belt or a skirt drawn under them on the left doesn't count)
-      out.push({ pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip, rect: [(x0 + bx0) / W, (y0 + by0) / H, w / W, h / H] });
+      out.push({ slot, pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip, rect: [(x0 + bx0) / W, (y0 + by0) / H, w / W, h / H] });
     }
     return out;
   }
@@ -121,7 +141,7 @@
     }
     const g = GUIDE[K.cut === 'table' ? 'counter' : K.cut], unit = Math.round(g.unit * median(cells.map((c) => (K.cut === 'belt' ? c.h : Math.min(c.h, c.arm)))) / g.h);
     for (const c of cells) {
-      c.scale = 1; sp.poses[c.pose] = [c.w, c.h]; (sp.rects = sp.rects || {})[c.pose] = c.rect;
+      c.scale = 1; sp.poses[c.pose] = [c.w, c.h]; (sp.rects = sp.rects || {})[c.pose] = c.rect; if (c.slot) (sp.slots = sp.slots || {})[c.pose] = c.slot;
       if (c.grip) (sp.grip = sp.grip || {})[c.pose] = c.grip;
       // at a counter the ledge is 1.05 m (0.6 of his height); at a table, 0.75 m (0.43)
       if (K.cut === 'counter' || K.cut === 'table') sp.half.poses[c.pose] = [Math.round(GUIDE.counter.ax * unit / g.unit), Math.min(c.h, c.arm), K.cut === 'table' ? 0.43 : 0.6, unit];
@@ -146,6 +166,7 @@
     }
     if (data.grip) sp.grip = { ...(sp.grip || {}), ...data.grip };
     if (data.rects) sp.rects = { ...(sp.rects || {}), ...data.rects };
+    if (data.slots) sp.slots = { ...(sp.slots || {}), ...data.slots };
     // an object layer drawn by hand on the sheet: per object, per pose, its picture (the pose's size, over it)
     // layers[obj][pose] = { src, box: [left, top, width, height] as fractions of the pose's picture }
     for (const [obj, boxes] of Object.entries(data.layers || {})) { sp.layers = sp.layers || {}; sp.layers[obj] = sp.layers[obj] || {};
@@ -176,7 +197,7 @@
     const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
     const old = (await read(`chars/${id}/sprite.json`)) || { name, ext: 'png', poses: {}, half: { unit: 0, belt: 0.6, poses: {}, full: {} } };
     const list = (await read('chars/imports.json')) || [];
-    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
+    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
