@@ -172,10 +172,13 @@ window.BANK = {
   const GREEN = 'Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no shadow, no glow. The character wears nothing green.';
   // id: [title, why, the guide pictures in ref/ (after image 1 = the character), BANK.prompts index or a prompt of its own]
   const SHEETS = {
-    photo: ['Le perso, d’après sa photo', 'La base de tout : une image en pied dans le style du jeu. C’est l’image 1 de toutes les autres feuilles.', ['urban.webp'], () =>
+    photo: ['Son image', 'Sa photo + l’image de style : le perso en pied, dans le style du jeu. C’est l’image 1 de toutes ses feuilles.', ['style.webp'], (L) =>
       `Create a full-body character illustration of the person in image 1 (a photo), in the exact art style of image 2. Image 2 is ONLY a style reference: copy its line, shading and colors, never its character.
 
-Keep the person recognizable: face shape, skin tone, eye color, hair (color, length, texture), facial hair, build. Outfit: what they wear in the photo, simplified to a few clear pieces, nothing green.
+Keep the person recognizable: face shape, skin tone, eye color, hair (color, length, texture), facial hair, build. Outfit: what they wear in the photo, simplified to a few clear pieces, nothing green.${L ? `
+
+What to keep exactly:
+${L}` : ''}
 
 Art style: identical to image 2: ${STYLE}
 
@@ -246,7 +249,7 @@ Do not exaggerate the poses. Subtle and natural, like the reference. Mouth close
   const LEAN_CUT = 'Framing, the same in all 6 cells: he leans on a counter or a ledge that is NOT drawn. It would hide everything below the top of his forearms, so cut the body with a straight horizontal line right under his forearms (the ledge\'s top edge), and that cut sits exactly on the bottom edge of the cell, at the same height in every cell. Nothing below the forearms. The head is the same size as in image 2 and at the same height in every cell. Clear margin of green above the head and on both sides (a hand never touches an edge). No text, no labels.';
   const LEAN_ANGLE = 'BODY ANGLE, the same in all 6 cells — the most important rule (like image 2): he faces the RIGHT side of the image, a SIDE VIEW turned only very slightly toward the camera (about 20 degrees), upper body leaning forward, both forearms resting on the invisible ledge in front of him. THE BODY IS IDENTICAL IN ALL 6 CELLS: only the head, the face and the hands change. "Toward the camera side" = his head turns a little toward the camera, to someone leaning next to him on that side: we see more of his face (never a full front view).';
   const KIT_SHEETS = {
-    debout: ['Debout (base)', 'Partout : écoute, sourire, surpris, fâché, blessé, et de dos quand il part.', ['urban.webp'], CELLS('full body, standing', 'Framing, the same in all 6 cells: full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.', 'Angle, the same in cells 1 to 5: three-quarter view, turned slightly toward the right, like image 1. Camera at chest height. Cell 6 is the only exception (see it).', [
+    debout: ['Debout (base)', 'Partout : écoute, sourire, surpris, fâché, blessé, et de dos quand il part.', ['style.webp'], CELLS('full body, standing', 'Framing, the same in all 6 cells: full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.', 'Angle, the same in cells 1 to 5: three-quarter view, turned slightly toward the right, like image 1. Camera at chest height. Cell 6 is the only exception (see it).', [
       '1. Listening: standing still, neutral and attentive, arms relaxed.',
       '2. Warm smile: relaxed shoulders, a genuine warm smile, head slightly tilted.',
       '3. Surprised, exclaiming: eyebrows up, eyes wide, mouth open, shoulders up, one hand rising.',
@@ -295,9 +298,9 @@ Example:
 
   // a sheet of Justin's -> the same sheet for someone else
   function make(id, c) {
-    const [, , guides, src] = SHEETS[id], L = (c.locked || '[colle ici son bloc LOCKED]').trim();
+    const [, , guides, src] = SHEETS[id], L = (c.locked || '').trim();
     let t;
-    if (typeof src === 'function') { t = src(L); if (id === 'photo') return t; }
+    if (typeof src === 'function') { t = src(L); if (id === 'photo') return t; t = t.replace(/LOCKED — must not change in any way, even slightly:\n\n+/, ''); }
     else {
     t = BANK.prompts[src][3];
     const imgs = guides.length > 1
@@ -305,7 +308,7 @@ Example:
       : `Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing, the cut and the poses; copy nothing of his look (face, hair, body, clothes). Copy the character of image 1 exactly.`;
     const first = t.indexOf('. ') + 1;
     t = t.slice(0, first) + ' ' + imgs + t.slice(t.indexOf('\n\n'));
-    t = t.replace(/LOCKED — must not change[\s\S]*?(?=\n\n)/, 'LOCKED — must not change in any way, even slightly:\n' + L)
+    t = t.replace(/LOCKED — must not change[\s\S]*?(?=\n\n)\n\n/, L ? 'LOCKED — must not change in any way, even slightly:\n' + L + '\n\n' : '')
       .replace(/\(exactly like his bar pose, cell 4 of image 2\)/, '(exactly like the guide, image 2)')
       .replace(/,? ?(and )?(the )?(thin )?gold glasses arm/g, '').replace(/\(cheek, ear, glasses arm\)/, '(cheek, ear)')
       .replace(/the back of the tank top/g, 'the back of the top').replace(/the tank top/g, 'the top');
@@ -334,10 +337,10 @@ Example:
     const one = mine ? pic(mine, `Image 1 · ${nm}`) : '<div class="ncPic mine"><span>Image 1 · ton perso (étape 2)</span></div>';
     return step(1, 'Qui', !!nm, `<input data-nc="name" placeholder="Son nom" value="${esc(nm)}"><div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`)
       + step(2, 'Son image', !!mine || !!done.photo, mine ? '<p>Déjà dans le jeu.</p>'
-        : `<p>Joins sa photo + l’image de style, colle le prompt.</p><div class="ncPics"><div class="ncPic mine"><span>Image 1 · sa photo</span></div>${pic('urban.webp', 'Image 2 · le style')}</div>`
+        : `<p>Joins sa photo + l’image de style, colle le prompt.</p><div class="ncPics"><div class="ncPic mine"><span>Image 1 · sa photo</span></div>${pic('style.webp', 'Image 2 · le style')}</div>`
+          + `<textarea data-nc="locked" rows="3" placeholder="Ce qu’il faut garder (facultatif) : ex. cheveux roux bouclés, cicatrice à la joue, veste de cuir">${esc(c.locked || '')}</textarea>`
           + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="photo">Copier le prompt</button><button type="button" class="ncDone${done.photo ? ' on' : ''}" data-ncdone="photo">${done.photo ? 'Fait ✓' : 'Fait'}</button></div>`)
-      + step(3, 'Son bloc LOCKED', !!(c.locked || '').trim(), `<p>Ce qui ne change jamais. Copie le prompt, colle-le avec son image, colle la réponse ici.</p><button type="button" class="bkCopy" data-nccopy="help">Copier le prompt</button><textarea data-nc="locked" rows="5" placeholder="- Hair: …&#10;- Face: …&#10;- Outfit: …">${esc(c.locked || '')}</textarea>`)
-      + step(4, `Ses feuilles · ${sheets.filter((id) => done[id]).length}/${sheets.length}`, sheets.every((id) => done[id]),
+      + step(3, `Ses feuilles · ${sheets.filter((id) => done[id]).length}/${sheets.length}`, sheets.every((id) => done[id]),
         `<p>Debout et Accoudé : tout le monde. Ensuite, selon l’histoire.</p>`
         + sheets.map((id) => { const [t, why, guides] = SHEETS[id], open = c.open === id;
           return `<div class="ncSheet${open ? ' open' : ''}${done[id] ? ' done' : ''}"><button type="button" class="ncHead" data-ncopen="${id}"><i>${done[id] ? '✓' : ''}</i>${esc(t)}<em>${open ? '−' : '+'}</em></button>`
