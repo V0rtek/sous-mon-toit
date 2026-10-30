@@ -257,6 +257,19 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .bkRef { font: inherit; border: 0; background: #2c2c2e; border-radius: 1em; padding: .4em; color: #c7c7cc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; }
 .bkRef img { height: 12em; border-radius: .6em; }
 .bkRef span { font-size: 1.2em; }
+.ncForm { display: flex; flex-direction: column; gap: .8em; margin-bottom: 1.4em; }
+.ncForm input, .ncForm textarea { font: inherit; font-size: 1.6em; padding: .6em .8em; border-radius: .8em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; user-select: text; resize: vertical; }
+.ncForm small { font-size: 1.35em; color: #a1a1a6; }
+.ncChips { display: flex; gap: .6em; flex-wrap: wrap; }
+.ncChips button { font: inherit; font-size: 1.5em; padding: .4em 1em; border-radius: 1em; border: 0; background: #2c2c2e; color: #f5f5f7; cursor: pointer; }
+.ncChips button.on { background: #f5f5f7; color: #000; font-weight: 600; }
+.ncPics { display: flex; gap: .8em; overflow-x: auto; margin: .6em 0; }
+.ncPic { flex: none; width: 16em; background: #2c2c2e; border-radius: 1em; padding: .6em; display: flex; flex-direction: column; gap: .4em; }
+.ncPic img { width: 100%; height: 11em; object-fit: contain; background: #111; border-radius: .6em; cursor: pointer; }
+.ncPic span { font-size: 1.25em; color: #c7c7cc; }
+.ncPic div { display: flex; gap: .4em; }
+.ncPic.mine { justify-content: center; align-items: center; min-height: 14em; border: .12em dashed #636366; background: none; text-align: center; }
+.ncBtn { font: inherit; flex: 1; font-size: 1.2em; font-weight: 600; padding: .45em .3em; border: 0; border-radius: .8em; background: #f5f5f7; color: #000; text-align: center; text-decoration: none; cursor: pointer; }
 .bkCopy { font: inherit; font-size: 1.5em; font-weight: 600; margin-top: .4em; padding: .5em 1.2em; border: 0; border-radius: 1em; background: #f5f5f7; color: #000; cursor: pointer; }
 .bkSound { font: inherit; width: 100%; display: grid; grid-template-columns: 3em 1fr; align-items: center; column-gap: 1em; background: #1c1c1e; border: 0; border-radius: 1.4em; padding: 1em 1.2em; margin-bottom: .8em; color: #f5f5f7; text-align: left; cursor: pointer; }
 .bkSound i { grid-row: span 2; font-style: normal; font-size: 2em; width: 1.5em; height: 1.5em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; }
@@ -1132,7 +1145,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="bank" class="card menu" hidden>
-    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="objects">Objets</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="sounds">Sons</button></div>
+    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="objects">Objets</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="newchar">Nouveau perso</button><button type="button" data-t="sounds">Sons</button></div>
     <div id="bankBody"></div>
     <div id="bankBig" hidden></div>
   </div>
@@ -1612,7 +1625,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031180000"></script>
-<script src="bank.js?v=20261031140000"></script>
+<script src="bank.js?v=20261031200000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),

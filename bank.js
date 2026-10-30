@@ -94,6 +94,7 @@ window.BANK = {
       return '<p class="bkNote">Les feuilles de poses qui ont marché. Ouvrir l’image à joindre (la toucher, puis l’enregistrer), copier le prompt, coller dans ChatGPT avec l’image.</p>'
         + BANK.prompts.map(([t, refs, check], i) => `<div class="bkShot"><b>${esc(t)}</b><p>${esc(check)}</p><div class="bkRefs">${pics(refs)}</div><button type="button" class="bkCopy" data-copy="${i}">Copier le prompt</button></div>`).join('');
     },
+    newchar() { return BANK.newChar(); },
     sounds() {
       return BANK.sounds.map(([n, kind, what]) => `<button type="button" class="bkSound" data-snd="${n}"><i>▶</i><b>${esc(n)}</b><span>${kind} · ${esc(what)}</span></button>`).join('')
         + '<h3 class="bkH">À ajouter</h3><p class="bkNote">' + BANK.soundsNext.map(esc).join(' · ') + '</p>';
@@ -117,6 +118,15 @@ window.BANK = {
     $('#bankTabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { e.stopPropagation(); tab = b.dataset.t; draw(); } };
     $('#bankBody').onclick = (e) => {
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
+      const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
+      if (nc || ci) {   // Nouveau perso: a prompt, or a picture as png (the promise keeps it inside the tap, for Safari)
+        e.stopPropagation(); const b = nc || ci, was = b.textContent, done = (ok) => { b.textContent = ok ? 'Copié ✓' : 'Copie impossible : Enregistrer'; setTimeout(() => { b.textContent = was; }, 1800); };
+        if (nc) { const t = BANK.newCharPrompt(nc.dataset.nccopy); navigator.clipboard.writeText(t).then(() => done(true), () => { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); done(true); }); return; }
+        const png = fetch(ci.dataset.cimg).then((r) => r.blob()).then((bl) => createImageBitmap(bl)).then((im2) => { const cv = document.createElement('canvas'); cv.width = im2.width; cv.height = im2.height; cv.getContext('2d').drawImage(im2, 0, 0); return new Promise((ok) => cv.toBlob(ok, 'image/png')); });
+        try { navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => done(true), () => done(false)); } catch { done(false); }
+        return;
+      }
+      if (she || pl) { e.stopPropagation(); if (she) BANK.newCharSet('she', !!she.dataset.ncshe); else BANK.newCharSet('place', pl.dataset.ncplace); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (cp) {
         e.stopPropagation();
         const done = () => { cp.textContent = 'Copié ✓'; setTimeout(() => { cp.textContent = 'Copier le prompt'; }, 1600); };
@@ -133,6 +143,124 @@ window.BANK = {
       }
     };
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
+    $('#bankBody').oninput = (e) => { const k = e.target.dataset.nc; if (k) BANK.newCharSet(k, e.target.value); };   // kept as typed, no redraw (the keyboard stays)
   });
   window.BANK_CLOSE = () => { stop(); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
+})();
+
+// ---- Nouveau perso (31/10): every pose sheet a new character needs for a place, its prompt written for him or her ----
+// The sheets that worked for Justin (BANK.prompts) become templates: his LOCKED block becomes the new one's, his sheet
+// becomes a guide (image 2: the angle, the cut, the poses, never his look), he/his -> she/her. Plus 2 sheets of their own:
+// the character from a photo, and the 6 base poses (listen, surprised, thinking, explaining, angry, holding)
+(() => {
+  const STYLE = 'clean bold black outlines, flat cel shading with 2 tones, muted natural colors, same line thickness, same level of detail. Not more realistic, not more anime, not softer.';
+  const GREEN = 'Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no shadow, no glow. The character wears nothing green.';
+  // id: [title, why, the guide pictures in ref/ (after image 1 = the character), BANK.prompts index or a prompt of its own]
+  const SHEETS = {
+    photo: ['Le perso, d’après sa photo', 'La base de tout : une image en pied dans le style du jeu. C’est l’image 1 de toutes les autres feuilles.', ['urban.webp'], () =>
+      `Create a full-body character illustration of the person in image 1 (a photo), in the exact art style of image 2. Image 2 is ONLY a style reference: copy its line, shading and colors, never its character.
+
+Keep the person recognizable: face shape, skin tone, eye color, hair (color, length, texture), facial hair, build. Outfit: what they wear in the photo, simplified to a few clear pieces, nothing green.
+
+Art style: identical to image 2: ${STYLE}
+
+Format: portrait image, 2:3. One character, full body from head to feet, centered, with a clear margin all around. Standing, relaxed and neutral, turned slightly toward the right (three-quarter view), arms relaxed, a calm natural expression. Camera at chest height.
+
+${GREEN.replace(' in every cell', '')} No text, no props.`],
+    base: ['6 poses de base, en pied', 'Écoute, surpris, réfléchit, explique, fâché, retenu : les 6 poses de tous les persos, celles que l’histoire utilise partout.', [], (L) =>
+      `Create a character pose sheet of THIS EXACT character, full body. Image 1 is the reference: it is the character AND the art style. Copy both exactly.
+
+LOCKED — must not change in any way, even slightly:
+${L}
+
+Format: portrait image, 2:3. An invisible grid of 6 equal cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.
+
+${GREEN}
+
+In every cell: the same character, full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.
+
+Angle, the same in all 6 cells: three-quarter view, turned slightly toward the right, like image 1. Camera at chest height.
+
+Row 1, left to right:
+1. Listening: standing still, neutral and attentive, arms relaxed.
+2. Surprised: eyebrows raised, eyes wide, lips parted, shoulders slightly up.
+3. Thinking: one hand at the chin, eyes looking aside, weight on one leg.
+
+Row 2, left to right:
+4. Explaining: talking, one hand raised at chest height in a natural gesture.
+5. Angry: brows low, jaw tight, fists at the sides, leaning forward a little.
+6. Holding back: arms crossed, closed, guarded, a restrained look.
+
+Do not exaggerate the poses. Subtle and natural, like the reference.`],
+    back: ['De dos, en pied', 'Partir, regarder au loin, se retourner : les conséquences d’un choix (« elle part seule »).', ['urban_back.webp'], 0],
+    side: ['Profil, coupé à la ceinture', 'Face à face de profil, marcher : les confrontations debout.', ['urban_side.webp'], 1],
+    angled: ['Tourné de 20° (marche, accoudé, assis, adossé)', 'La marche en 3, accoudé à un comptoir, assis au feu, adossé : les places des décors.', ['urban_angled.webp'], 2],
+    close: ['Gros plans', 'Parle, petit sourire, regard de côté, blessé, colère retenue, de dos pour le par-dessus l’épaule.', ['urban_closeup.webp'], 3],
+    barFront: ['Au comptoir · droit devant', 'Boire, fixer sa chope, rire pompette : l’activité de la taverne.', ['justin_comptoir_devant.webp', 'chope.webp'], 4],
+    barOther: ['Au comptoir · vers l’autre', 'Le même corps, la tête vers son voisin : flirter, trinquer, se fâcher.', ['justin_comptoir_autre.webp', 'chope.webp'], 5],
+    kiss: ['Le baiser · profil pur', 'Profil pur : le partenaire est la même pose retournée, leurs visages se rencontrent.', ['justin_baiser.webp'], 6],
+  };
+  const PLACES = [['taverne', 'Taverne', ['photo', 'base', 'close', 'angled', 'barFront', 'barOther', 'kiss', 'back']],
+    ['maison', 'Maison, salon', ['photo', 'base', 'close', 'side', 'kiss', 'back']],
+    ['tout', 'Tout', ['photo', 'base', 'close', 'side', 'angled', 'barFront', 'barOther', 'kiss', 'back']]];
+  // the prompt that writes the LOCKED block from the character's picture (what each sheet keeps identical)
+  const LOCK_HELP = `Look at the character in this image. Write the LOCKED block that describes them for a pose-sheet prompt, in exactly this shape and nothing else (one line each, concrete, what never changes):
+- Hair: color, length, texture, how it falls (front and back).
+- Face: eye color, skin tone, facial hair or makeup, any distinctive feature (ears, freckles, scar).
+- Body: build, proportions.
+- Outfit: each piece with its color and cut (top, bottom, shoes), then: Nothing added, nothing removed: no jewelry, no tattoo, no logo, no props.
+- Art style: identical to image 1: ${STYLE}
+Example:
+- Hair: dark brown, thick, messy and wavy on top, falling a bit on the forehead, short on the sides and the nape.
+- Glasses: thin gold metal rectangular frames.
+- Face: green eyes, thin mustache, small chin beard, light tanned skin.
+- Body: lean athletic, defined shoulders and arms.
+- Outfit: plain white ribbed tank top, black baggy cargo pants with a side cargo pocket on each thigh, white-and-grey chunky sneakers. Nothing added, nothing removed: no jewelry, no tattoo, no logo, no props.
+- Art style: identical to image 1: ${STYLE}`;
+
+  // a sheet of Justin's -> the same sheet for someone else
+  function make(id, c) {
+    const [, , guides, src] = SHEETS[id], L = (c.locked || '[colle ici son bloc LOCKED]').trim();
+    if (typeof src === 'function') return src(L);
+    let t = BANK.prompts[src][3];
+    const imgs = guides.length > 1
+      ? `Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing, the cut and the poses; copy nothing of his look (face, hair, body, clothes). Image 3 is the mug. Copy the character of image 1 exactly.`
+      : `Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing, the cut and the poses; copy nothing of his look (face, hair, body, clothes). Copy the character of image 1 exactly.`;
+    const first = t.indexOf('. ') + 1;
+    t = t.slice(0, first) + ' ' + imgs + t.slice(t.indexOf('\n\n'));
+    t = t.replace(/LOCKED — must not change[\s\S]*?(?=\n\n)/, 'LOCKED — must not change in any way, even slightly:\n' + L)
+      .replace(/\(exactly like his bar pose, cell 4 of image 2\)/, '(exactly like the guide, image 2)')
+      .replace(/,? ?(and )?(the )?(thin )?gold glasses arm/g, '').replace(/\(cheek, ear, glasses arm\)/, '(cheek, ear)')
+      .replace(/the back of the tank top/g, 'the back of the top').replace(/the tank top/g, 'the top');
+    if (c.she) {   // the guide stays "his" (another character, a man): only the character's own he/his turn
+      const keep = 'copy nothing of his look';
+      t = t.replace(keep, '\u0000').replace(/\bhimself\b/g, 'herself').replace(/\bhim\b/g, 'her').replace(/\bhis\b/g, 'her').replace(/\bhe\b/g, 'she')
+        .replace(/\bHis\b/g, 'Her').replace(/\bHe\b/g, 'She').replace('\u0000', keep);
+    }
+    return t;
+  }
+  const HAVE = ['brooke', 'cam', 'candy', 'james', 'julian', 'justin', 'ruby', 'suit'];   // ref/perso_<name>.webp
+  const KEY = 'smt-newchar';
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+  const keep = (c) => { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+  // a picture to attach: big, with Copier (into the clipboard, as png) and Enregistrer (a download)
+  const pic = (f, label) => `<div class="ncPic"><img src="ref/${f}" alt="" data-img="ref/${f}"><span>${esc(label)}</span><div><button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image</button><a class="ncBtn" href="ref/${f}" download="${f}">Enregistrer</a></div></div>`;
+  BANK.newChar = () => {
+    const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0];
+    const mine = HAVE.includes(String(c.name || '').trim().toLowerCase()) ? `perso_${String(c.name).trim().toLowerCase()}.webp` : null;   // a character we already have: his picture is image 1
+    return `<p class="bkNote">Un nouveau perso : son nom, il ou elle, son bloc LOCKED, le lieu. Chaque feuille : les images à joindre (l’image 1 est toujours ton perso), puis son prompt, prêt pour lui ou elle.</p>`
+      + `<div class="ncForm"><input data-nc="name" placeholder="Son nom (ex. Nora)" value="${esc(c.name || '')}">`
+      + `<div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`
+      + `<small>Son bloc LOCKED (ce qui ne change jamais : cheveux, visage, corps, vêtements, style)</small><textarea data-nc="locked" rows="6" placeholder="- Hair: …&#10;- Face: …&#10;- Body: …&#10;- Outfit: …&#10;- Art style: …">${esc(c.locked || '')}</textarea>`
+      + `<button type="button" class="bkCopy" data-nccopy="help">Copier le prompt qui écrit son LOCKED</button><p class="bkNote">À coller dans ChatGPT avec l’image de ton perso (feuille 1) : il répond le bloc, colle-le ci-dessus.</p>`
+      + `<small>Le lieu</small><div class="ncChips">${PLACES.map(([id, l]) => `<button type="button" data-ncplace="${id}" class="${id === place[0] ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
+      + place[2].map((id, i) => { const [t, why, guides] = SHEETS[id];
+        return `<div class="bkShot"><b>${i + 1}. ${esc(t)}${c.name ? ' · ' + esc(c.name) : ''}</b><p>${esc(why)}</p><div class="ncPics">`
+          + (id !== 'photo' && mine ? pic(mine, `Image 1 : ${c.name}`) : `<div class="ncPic mine"><span>${id === 'photo' ? 'Image 1 : sa photo' : 'Image 1 : ton perso (feuille 1)'}</span></div>`)
+          + guides.map((f, k) => pic(f, `Image ${k + 2} : ${id === 'photo' ? 'le style' : f === 'chope.webp' ? 'la chope' : 'le guide (Justin)'}`)).join('')
+          + `</div><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button></div>`; }).join('');
+  };
+  BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
+  BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
 })();
