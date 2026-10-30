@@ -7,6 +7,7 @@ window.DECK = (() => {
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* full or private window */ } };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slot = (k, label) => `<label class="dkPic" data-k="${k}"${saved[k] ? ` style="background-image:url(${saved[k]})"` : ''}><span>${saved[k] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
+  const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
   const typed = (k, def) => `<p class="dkTyped" contenteditable="true" spellcheck="false" data-t="${k}">${esc(saved['t_' + k] ?? def)}</p>`;
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
@@ -27,20 +28,95 @@ window.DECK = (() => {
   function draw() {
     const s = S[i];
     root.style.setProperty('--c', s.c);
-    root.querySelector('.dkSlide').innerHTML = s.h();
+    root.querySelector('.dkSlide').innerHTML = T(s.h());
     root.querySelector('.dkN').textContent = `${i + 1} / ${S.length}`;
     root.querySelector('.dkBar i').style.width = `${(i + 1) / S.length * 100}%`;
   }
   const go = (d) => { i = Math.max(0, Math.min(S.length - 1, i + d)); draw(); };
-  function pick(file, k) {   // the photo shrunk to 900 px so it stays small enough to keep
+  const shrink = (file) => new Promise((ok, no) => {   // the photo shrunk to 900 px so it stays small enough to keep
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
       const r = Math.min(1, 900 / Math.max(img.width, img.height)), c = document.createElement('canvas');
       c.width = img.width * r; c.height = img.height * r; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(url); saved[k] = c.toDataURL('image/jpeg', .85); save(); draw();
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', .85));
     };
+    img.onerror = () => no(new Error('Image illisible.'));
     img.src = url;
+  });
+  const pick = (file, k) => shrink(file).then((u) => { saved[k] = u; save(); draw(); });
+
+  // ---- the control panel (before going on stage): for [X] and [Y], paste the photo, the name, copy the prompt of each sheet, paste each sheet.
+  // The sheets go through the same importer as Nouveau perso (cut, add to the game); the prompts are Nouveau perso's, per person ----
+  const KINDS = [['debout', 'Debout'], ['accoude', 'Accoudé'], ['assis', 'Assis'], ['prises', 'Prises']];
+  const PEOPLE = [['x', '[X] · rencontré sur place', ['debout', 'accoude']], ['y', '[Y] · le complice', ['accoude']]];
+  const kindsOf = (p) => saved['k_' + p] || PEOPLE.find((q) => q[0] === p)[2];
+  const person = (p) => ({ name: saved['n_' + p] || '', she: !!saved['s_' + p], locked: saved['l_' + p] || '' });
+  const copy = (text, btn) => {
+    const ok = () => { const t = btn.textContent; btn.textContent = 'Copié ✓'; setTimeout(() => { btn.textContent = t; }, 1500); };
+    navigator.clipboard.writeText(text).then(ok, () => { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); });
+  };
+  const copyPic = (src, btn) => {   // a picture into the clipboard as png (the promise stays inside the tap, for Safari)
+    const png = fetch(src).then((r) => r.blob()).then((b) => createImageBitmap(b)).then((m) => new Promise((ok) => {
+      const c = document.createElement('canvas'); c.width = m.width; c.height = m.height; c.getContext('2d').drawImage(m, 0, 0); c.toBlob(ok, 'image/png'); }));
+    navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => { const t = btn.textContent; btn.textContent = 'Copié ✓'; setTimeout(() => { btn.textContent = t; }, 1500); }, () => { btn.textContent = 'Enregistre-la plutôt'; });
+  };
+  const pslot = (key, label, src) => `<label class="pnSlot${src ? ' has' : ''}" tabindex="0" data-slot="${key}"${src ? ` style="background-image:url(${src})"` : ''}><span>${src ? '' : esc(label)}</span><input type="file" accept="image/*" data-file="${key}" hidden></label>`;
+  let queue = Promise.resolve(), cur = null, pn = null;
+  function drawPanel() {
+    pn.innerHTML = '<p class="pnLead">Avant de monter sur scène. Survole une case et colle (Ctrl+V), ou touche-la pour choisir un fichier.</p><div class="pnCols">' + PEOPLE.map(([p, title]) => {
+      const c = person(p), ks = kindsOf(p), ex = (id, label) => `<button type="button" class="pnBtn" data-pcopy="${p}:${id}">${label}</button>`;
+      return `<section class="pnP" data-p="${p}"><h2>${esc(title)}</h2>
+        <div class="pnRow">${pslot('photo:' + p, 'Photo', saved[p])}<div class="pnCol">
+          <input class="pnName" data-name="${p}" maxlength="16" autocomplete="off" placeholder="Son nom" value="${esc(c.name)}">
+          <div class="pnChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-she="${p}:${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>
+          ${saved[p] ? `<button type="button" class="pnBtn" data-pimg="${p}">Copier la photo</button><a class="pnBtn" href="${saved[p]}" download="${esc(c.name || p)}.jpg">Enregistrer</a>` : ''}
+        </div></div>
+        <h3>Son image</h3><p>Photo + <a href="ref/style.webp" target="_blank" rel="noopener">l'image de style</a> dans ChatGPT, puis colle ce qu'il te donne.</p>
+        <div class="pnRow">${pslot('img:' + p, 'Image du perso', saved[p + 'c'])}<div class="pnCol">${ex('photo', 'Copier le prompt')}
+          <textarea class="pnLock" data-lock="${p}" rows="3" placeholder="Ce qu'il faut garder (facultatif) : ex. cheveux roux bouclés, veste de cuir">${esc(c.locked)}</textarea>${ex('help', 'Copier le prompt du « à garder »')}</div></div>
+        ${ks.map((k, i) => `<h3>Feuille ${p === 'x' ? i + 1 : 3}${p === 'x' ? ' · ' : ' · '}<select data-kind="${p}:${i}">${KINDS.map(([id, l]) => `<option value="${id}"${id === k ? ' selected' : ''}>${l}</option>`).join('')}</select></h3>
+          <div class="pnRow">${pslot(`sheet:${p}:${i}`, 'Coller la feuille', null)}<div class="pnCol">${ex(k, 'Copier le prompt')}<p class="pnSt" data-st="${p}:${i}">${saved[`d_${p}${i}`] ? '✓ Dans le jeu' : ''}</p></div></div>`).join('')}
+      </section>`; }).join('') + '</div>';
   }
+  function panelHandle(key, file) {
+    const [kind, p, i] = key.split(':');
+    if (kind === 'photo') return shrink(file).then((u) => { saved[p] = u; save(); drawPanel(); });
+    if (kind === 'img') return shrink(file).then((u) => { saved[p + 'c'] = u; save(); drawPanel(); });
+    const st = pn.querySelector(`[data-st="${p}:${i}"]`), name = saved['n_' + p];
+    if (!name) { st.textContent = 'Donne-lui un nom d\u2019abord.'; return; }
+    queue = queue.then(async () => {   // one at a time: the importer holds one sheet
+      try {
+        st.textContent = 'Découpe…'; await IMPORT.cut(file, kindsOf(p)[i], name, (t) => { st.textContent = t; });
+        st.textContent = 'Ajout au jeu…'; const msg = await IMPORT.add(); saved[`d_${p}${i}`] = 1; save(); st.textContent = '✓ ' + msg;
+      } catch (e) { st.textContent = 'Pas ajoutée : ' + (e.message || e); }
+    });
+  }
+  const panel = {
+    mount(el) {
+      pn = el; drawPanel();
+      el.onclick = (e) => {
+        const b = e.target.closest('button'); if (!b) return;
+        if (b.dataset.pcopy) { const [p, id] = b.dataset.pcopy.split(':'); copy(BANK.newCharPromptFor(id, person(p)), b); }
+        else if (b.dataset.pimg) copyPic(saved[b.dataset.pimg], b);
+        else if (b.dataset.she) { const [p, v] = b.dataset.she.split(':'); saved['s_' + p] = !!v; save(); drawPanel(); }
+      };
+      el.onchange = (e) => {
+        const f = e.target.dataset.file, k = e.target.dataset.kind;
+        if (f && e.target.files[0]) panelHandle(f, e.target.files[0]);
+        if (k) { const [p, i] = k.split(':'), ks = [...kindsOf(p)]; ks[i] = e.target.value; saved['k_' + p] = ks; delete saved[`d_${p}${i}`]; save(); drawPanel(); }
+      };
+      el.oninput = (e) => {
+        const n = e.target.dataset.name, l = e.target.dataset.lock;
+        if (n) saved['n_' + n] = e.target.value.trim(); if (l) saved['l_' + l] = e.target.value; save();
+      };
+      el.onpointerover = (e) => { cur = e.target.closest('.pnSlot'); };
+      el.onfocusin = (e) => { cur = e.target.closest('.pnSlot') || cur; };
+    },
+    paste(e) {   // Ctrl+V on the panel: the picture goes to the case under the pointer (or the last one touched)
+      const f = [...(e.clipboardData?.files || [])].find((x) => x.type.startsWith('image/'));
+      if (!f || !cur || !cur.isConnected) return false; panelHandle(cur.dataset.slot, f); return true;
+    },
+  };
   return {
     mount(el) {
       root = el; i = 0;
@@ -54,6 +130,7 @@ window.DECK = (() => {
       el.oninput = (e) => { const t = e.target.closest('.dkTyped'); if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
       draw();
     },
+    panel,
     key(e) { if (['ArrowRight', 'PageDown', ' '].includes(e.key)) go(1); else if (['ArrowLeft', 'PageUp'].includes(e.key)) go(-1); else return false; return true; },
   };
 })();

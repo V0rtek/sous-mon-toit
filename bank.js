@@ -395,6 +395,7 @@ Example:
     redraw();
   };
   BANK.newCharGrip = (pose, fx, fy) => { const r = IMPORT.setGrip(pose, fx, fy), m = r && shown && shown.imgs && shown.imgs.find((x) => x.pose === pose); if (m) { m.grip = r; shown.moved = true; } return !!m; };
+  BANK.newCharPromptFor = (id, c) => (id === 'help' ? LOCK_HELP : make(id, c));   // the Spark panel: one per person
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
   BANK.newCharIsOpen = () => !!load().shown;
