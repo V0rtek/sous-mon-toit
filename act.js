@@ -193,7 +193,7 @@ window.ACT = (() => {
       else if (!a[w].because) out.push(`Pourquoi ${cap(a[w].id)} veut ça ? (Vouloir + raison)`);
     }
     if (a.justin_wants && !/\b(parce|car|because|since|pour)\b/i.test(a.justin_wants)) out.push('Pourquoi Justin veut ça ? (Un rêve à lui)');
-    if (a.justin_wants && /\b(ce soir|cette nuit|tonight)\b/i.test(a.justin_wants)) out.push('Ce que Justin veut tient en un soir : un rêve de longue date (Un rêve à lui)');
+    if (a.justin_wants && /\b(ce soir|cette nuit|soirée|tonight|evening)\b/i.test(a.justin_wants)) out.push('Ce que Justin veut tient en un soir : un rêve de longue date (Un rêve à lui)');
     if (!a.lost_if_no) out.push('Ce qui est perdu si Justin dit non ? (Danger présent)');
     if (!a.past) out.push('Le passé ? (Le passé en une phrase)');
     else if ((String(a.past).trim().match(/[.!?](\s|$)/g) || []).length > 1) out.push('Le passé tient en plus d’une phrase (Le passé en une phrase)');
@@ -256,7 +256,7 @@ window.ACT = (() => {
       + '<div class="aBtns"><button type="button" class="go" data-s="copyAct">Copier le prompt de l’acte</button></div>'
       + `<small>La réponse</small>${box('act', 'Colle ici le JSON de l’acte')}`
       + '<div class="aBtns"><button type="button" data-s="pasteAct">Coller l’acte</button><button type="button" data-s="visual">Voir l’acte</button></div>'
-      + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b>${warn.length ? ` · <em>${warn.length} à vérifier</em>` : ' · ✓'}</p><p class="pMsg" data-m="act"></p></section>`
+      + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b>${warn.length ? ` · <em>${warn.length} à vérifier</em>` : ' · ✓'}</p>${warn.length ? `<div class="aWarn">${warn.map((w) => `<span>${esc(w)}</span>`).join('')}</div><p class="pD">Le plan et l’histoire suivent l’acte : un acte qui rate ça, ils le ratent aussi. Corrige-le (Voir l’acte) ou génère-en un nouveau.</p>` : ''}<p class="pMsg" data-m="act"></p></section>`
       + `<section class="aStep"><h3><i>2</i>Le plan de l’épisode</h3><p class="pD">Le prompt du Plan de scène, avec l’acte : ce qui s’est passé avant et ce que cet épisode doit contenir.</p>`
       + `<div class="aEps">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-ep="${n}" class="${n === ep ? 'on' : ''}">${n}${A.plans && A.plans[n] ? ' ✓' : ''}</button>`).join('')}</div>`
       + `<div class="aBtns"><button type="button" class="go" data-s="copyPlan">Copier le prompt du plan · épisode ${ep}</button></div>`
@@ -458,6 +458,19 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
     }
   }
   // Générer's buttons
+  // the rectangles of the plan's episode box the story skipped or moved (each step says its rectangle, "b")
+  let forced = null;
+  function missing(j) {
+    const P = window.PLAN && PLAN.get(), box = P && (P.boxes || []).find((b) => b.id === 'ep');
+    if (!box || !Array.isArray(j.steps)) return [];
+    const seen = [], add = (s) => { if (s && s.b && !seen.includes(s.b)) seen.push(s.b); };
+    j.steps.forEach((s) => { add(s); (s.choice || []).forEach((o) => { add(o); (o.then || []).forEach(add); }); });
+    if (!seen.length) return ['aucune réplique ne dit son rectangle ("b")'];
+    const ids = box.beats.map((b) => b.id), out = ids.filter((id) => !seen.includes(id)).map((id) => { const b = box.beats.find((x) => x.id === id); return `il manque ${id}${b.tech ? ' (' + b.tech + ')' : ''}`; });
+    const order = seen.filter((id) => ids.includes(id));
+    if (order.some((id, i) => i && ids.indexOf(id) < ids.indexOf(order[i - 1]))) out.push('rectangles dans le désordre');
+    return out;
+  }
   function step(s, btn) {
     switch (s) {
       case 'other': { let p; do p = PAIRS[Math.floor(Math.random() * PAIRS.length)]; while (p === pair); pair = p; render(); return; }
@@ -478,6 +491,8 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
       case 'copyStory': return copy(window.PLAN.prompt2(), btn);
       case 'play': { let j;
         try { j = LOOSE_JSON(draft.story); } catch { return say('story', 'Ce n’est pas une histoire (JSON).'); }
+        const miss = missing(j);
+        if (miss.length && forced !== draft.story) { forced = draft.story; return say('story', `L’histoire n’a pas suivi le plan : ${miss.join(' · ')}. Touche encore Jouer pour jouer quand même.`); }
         try { keep(`histoire-ep${ep}`, { ep, plan: PLAN.get().title, story: j }); window.PLAN_PLAY(j, PLAN.get().title); draft.story = ''; } catch (err) { say('story', err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'); }
         return; }
       case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && !/^•+$/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
