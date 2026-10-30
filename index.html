@@ -312,6 +312,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .obsBtns { display: flex; gap: 1em; margin-top: .8em; }
 .obsBtns button { font: inherit; font-size: 2.3em; font-weight: 600; padding: .5em 1em; border-radius: 2em; border: 0; background: #1d1d1f; color: #fff; cursor: pointer; }
 .obsBtns button + button { background: #e8e8ed; color: #1d1d1f; }
+.fbClaude { font: inherit; font-size: 2em; font-weight: 600; width: 100%; margin-top: .8em; padding: .6em 1em; border-radius: 2em; border: 0; background: #d97757; color: #fff; cursor: pointer; }
 #labNote span { font-size: 3.6em; font-weight: 600; }
 /* an incoming call: the caller's name, then decline (red) and answer (green) */
 #ringCard { position: absolute; inset: 0; z-index: 25; background: rgba(12,12,16,.86); display: flex; flex-direction: column; align-items: center; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; color: #f5f5f7; cursor: default; }
@@ -1427,6 +1428,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div id="fbQs"></div>
     <textarea id="fbText" rows="2" maxlength="300" placeholder="Autre chose? (optionnel)" aria-label="Autre chose"></textarea>
     <div class="obsBtns"><button type="button" id="fbSend">Envoyer</button><button type="button" id="fbClose">Fermer</button></div>
+    <button type="button" id="fbClaude" class="fbClaude" hidden>Envoyer et copier pour Claude (tout)</button>
   </div></div>
   <button id="storyNote" type="button" aria-label="Notes" hidden><span>?</span></button>
   <div id="inviteCard" hidden><div class="box"><p id="invFrom"></p><h3 id="invTitle"></h3><button type="button" class="go" id="invGo">Rejoindre</button><button type="button" id="invLater">Plus tard</button></div></div>
@@ -1603,8 +1605,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261031080000"></script>
-<script src="act.js?v=20261031080000"></script>
+<script src="plan.js?v=20261031090000"></script>
+<script src="act.js?v=20261031090000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031010000"></script>
@@ -3207,7 +3209,9 @@ const feat = (name) => bump((st) => { st.f = st.f || {}; st.f[name] = (st.f[name
 const tally = (f) => bump((st) => { st.s = st.s || {}; const id = sid(state.story), r = (st.s[id] = st.s[id] || {}); if (storyName(state.story) !== state.story) r.n = storyName(state.story); f(r); });
 const FB_QS = [{ k: 'compris', q: "J'ai compris ?" }, { k: 'suite', q: "J'ai envie de voir la suite ?" }];   // by key: older answers (by number) stay out
 let fbAns = {};
+let fbDone = false;   // a review counts once, whichever button sent it
 function openFb() {
+  fbDone = false;
   fbAns = {}; $('#fbText').value = ''; $('#fbQs').innerHTML = '';
   FB_QS.forEach(({ k, q }) => {
     const row = document.createElement('div'); row.className = 'q';
@@ -3221,13 +3225,22 @@ function openFb() {
     why.placeholder = 'Pourquoi ?'; why.setAttribute('aria-label', 'Pourquoi');
     $('#fbQs').append(row, why);
   });
+  $('#fbClaude').hidden = state.story !== 'gen' || !window.ACT;   // a generated story: the act, the plan, the story and this review
+  $('#fbClaude').textContent = 'Envoyer et copier pour Claude (tout)';
   $('#fbCard').hidden = false;
 }
 $('#fbBtn').onclick = (e) => { e.stopPropagation(); openFb(); };
 $('#fbClose').onclick = (e) => { e.stopPropagation(); $('#fbCard').hidden = true; };
 $('#fbCard').onclick = (e) => { e.stopPropagation(); };
-$('#fbSend').onclick = (e) => {
-  e.stopPropagation(); const id = state.story;
+$('#fbSend').onclick = (e) => { e.stopPropagation(); sendFb(); };
+// the review saved first, then everything copied in one piece (the act, its plans, the plan open, this story and its review)
+$('#fbClaude').onclick = (e) => {
+  e.stopPropagation(); sendFb(true); const b = $('#fbClaude'), text = JSON.stringify(ACT.bundle());
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { b.textContent = 'Copié : colle-le dans le chat'; $('#fbBtn').textContent = 'Copié pour Claude'; }, () => { b.textContent = 'Copie impossible'; });
+};
+function sendFb(keepOpen) {
+  if (fbDone) return; fbDone = true;
+  const id = state.story;
   const whys = Object.fromEntries([...$('#fbQs').querySelectorAll('.why')].map((w) => [w.dataset.k, w.value.trim()]).filter(([, w]) => w));
   // the note: each answer with its why, then the rest
   const text = [...FB_QS.filter((x) => x.k in fbAns).map((x) => `${x.q} ${fbAns[x.k] ? '👍' : '👎'}${whys[x.k] ? ' — ' + whys[x.k] : ''}`), $('#fbText').value.trim()].filter(Boolean).join('\n');
@@ -3244,9 +3257,9 @@ $('#fbSend').onclick = (e) => {
     const all = getGens(); if (all[0]) { all[0].fb = { ans: fbAns, whys, text }; localStorage.setItem('smt-gens', JSON.stringify(all)); }
   } catch { /* private window */ }
   if (id === 'gen' && window.ACT_KEEP) ACT_KEEP('avis', { ans: fbAns, whys, text, story: (getGens()[0] || {}).idea });   // kept for Claude (act.js)
-  $('#fbCard').hidden = true;
+  if (!keepOpen) $('#fbCard').hidden = true;
   $('#fbBtn').textContent = 'Merci';
-};
+}
 const storyName = (id) => ({ t1: 'UNWRITTEN', play: 'Le café', bar: 'Last call', gen: 'Ton histoire' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
 // ---- Stats and Valider l'idée: every device's tally (usage.js), added up live ----
 function sumUp(devs) {

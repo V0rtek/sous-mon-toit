@@ -472,5 +472,5 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
   }
   // a feedback given after a generated story (index.html): kept with the act's episode
   window.ACT_KEEP = (name, data) => keep(`${name}-ep${ep}`, { ep, plan: window.PLAN ? PLAN.get().title : '', ...data });
-  return { mount, closeSheet, redraw: () => render(), get: () => A, actText, promptAct: (idea) => promptAct(idea, pair) };
+  return { mount, closeSheet, redraw: () => render(), get: () => A, bundle, actText, promptAct: (idea) => promptAct(idea, pair) };
 })();
