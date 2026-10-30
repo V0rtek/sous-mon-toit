@@ -29,7 +29,10 @@ window.FACE = {
     // fists = holding back anger, walk = walking away
     back_far: 'r', back_down: 'r', back_look: 'r', back_door: 'r', back_fists: 'r', back_walk: 'f',
     // in profile, cut at the belt (30/10, chars.js: half): only in a close shot on him. walk_a / walk_b = the walk loop ({walk})
-    side_walk_a: 'r', side_walk_b: 'r', side_listen: 'r', side_talk: 'r', side_lean: 'r', side_tense: 'r' },
+    side_walk_a: 'r', side_walk_b: 'r', side_listen: 'r', side_talk: 'r', side_lean: 'r', side_tense: 'r',
+    // angled a little toward the camera (30/10): the walk in 3 (walk_a, walk_mid, walk_b), leaning on a bar (cut at the
+    // counter), sitting low (a campfire), leaning back on a wall
+    walk_a: 'r', walk_mid: 'r', walk_b: 'r', bar: 'r', sit: 'r', wall: 'r' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   ruby: ELF, melissa: ELF, isa_nuit: ELF, isa_or: ELF, isa_noir: ELF, candy: LION, amare: LION,
 };
@@ -307,7 +310,7 @@ window.STORY = [
 // menu gallery: every pose of each character, the picture it started from (src) and the sheet it was cut from (ref).
 // The recolors (recolor: their original) stay out of the gallery
 window.GALLERY = [
-  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action', 'urban_back', 'urban_side'] },
+  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action', 'urban_back', 'urban_side', 'urban_angled'] },
   { sprite: 'ruby', name: 'Ruby', src: 'perso_ruby', ref: ['elf'] },
   { sprite: 'candy', name: 'Candy', src: 'perso_candy', ref: ['feline'] },
   { sprite: 'james', name: 'James', src: 'perso_james', ref: ['tv'] },

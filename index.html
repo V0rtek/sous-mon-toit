@@ -1456,8 +1456,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
-<script src="chars.js?v=20261030120000"></script>
-<script src="story.js?v=20261030120000"></script>
+<script src="chars.js?v=20261030150000"></script>
+<script src="story.js?v=20261030150000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
@@ -1539,16 +1539,18 @@ function fit() {
 
 // ---- people, in decor pixels ----
 // sized from the pose on screen (a.shown): a new pose takes its place once its picture is ready (setPose)
-// a pose cut at the belt (SPRITES[sprite].half: unit = its px per full height, belt = where his pants start, from the
-// feet, cut = the sheet's cut line in px below that, poses = the x of his waist) sits on the full body's pants line,
-// his waist on his x: sharper, from its own sheet, and only for a close shot on him (frameOf stops the frame at the cut)
+// a pose cut at the belt (SPRITES[sprite].half: unit = its sheet's px per full height, belt = where his pants start,
+// from the feet, in full heights; poses = [x of his waist, the row where his pants start, its own belt, its own unit])
+// sits on the full body's pants line, his waist on his x: sharper, from its own sheet, and only for a close shot on him
+// (frameOf stops the frame at the cut). Its own belt: sitting (low), or leaning on a bar (row = its bottom, the
+// forearms, belt = the counter's height)
 const flipped = (a) => { const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.shown)]; return !!(a.face && nat !== 'f' && a.face !== nat); };
 function box(a) {
   const sp = SPRITES[spriteOf(a.id)], name = poseOf(a.id, a.shown), k = a.h * (castOf(a.id).scale || 1);
   const hf = sp.half && sp.half.poses[name];
   if (hf) {
-    const [w, h] = sp.poses[name], u = k / sp.half.unit, cut = a.feet - sp.half.belt * k + sp.half.cut * u;
-    return { w: w * u, h: h * u, left: a.x - (flipped(a) ? w - hf : hf) * u, top: cut - h * u, half: true };
+    const [w, h] = sp.poses[name], [ax, row, belt, unit] = hf, u = k / (unit || sp.half.unit);
+    return { w: w * u, h: h * u, left: a.x - (flipped(a) ? w - ax : ax) * u, top: a.feet - (belt ?? sp.half.belt) * k - row * u, half: true };
   }
   const p = sp.poses[name], ih = p[1] / sp.refH * k, w = p[0] / p[1] * ih;
   return { w, h: ih, left: a.x - w / 2, top: a.feet - ih };
@@ -1593,13 +1595,13 @@ function setPose(id, pose) {
   img.decode().then(swap, swap);
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
-// {walk: id | [ids], to, ms}: they walk there in profile, cut at the belt (side_walk_a, side_listen, side_walk_b,
-// side_listen, a small bob), the close shot following them; then side_listen. to = x in decor px, someone, a spot, or
-// [x, feet, height]: a spot or a [x, feet, height] also moves the feet and the size (stairs: up and away from the camera).
-// The steps follow the ground covered (a stride = 0.36 of his height), so they slow down with him; without ms, he walks
-// at 0.6 of his height a second. glide: true = no steps, side_listen the whole way, the bob and a slight sway of the
-// shoulders. Together: the first one goes to "to", the others side by side with him, out of step. A sprite without the
-// walk just slides. The frame stops at their belt, so the same walk works on stairs or on any floor
+// {walk: id | [ids], to, ms}: they walk there in profile, cut at the belt (walk_a, walk_mid, walk_b, walk_mid, or the
+// older side_walk_a / side_listen / side_walk_b, a small bob), the close shot following them; then the passing pose.
+// to = x in decor px, someone, a spot, or [x, feet, height]: a spot or a [x, feet, height] also moves the feet and the
+// size (stairs: up and away from the camera). Straight into the walk at a steady pace (no easing); the steps follow the
+// ground covered (a stride = 0.36 of his height); without ms, 0.6 of his height a second. glide: true = no steps, the
+// passing pose the whole way, the bob and a slight sway of the shoulders. Together: the first one goes to "to", the
+// others side by side with him, out of step. A sprite without the walk just slides. The frame stops at their belt
 async function walk(ids, to, ms, r, glide) {
   const who = [].concat(ids).map((id) => actors[id]).filter(Boolean); if (!who.length) return;
   const lead = who[0], x0 = lead.x;
@@ -1609,8 +1611,9 @@ async function walk(ids, to, ms, r, glide) {
   // little ahead so each face shows; they get there in the first steps
   const dir = x1 >= x0 ? 1 : -1;
   const go = who.map((a, k) => {
-    const has = SPRITES[spriteOf(a.id)].poses, cycle = has.side_listen && (glide || (has.side_walk_a && has.side_walk_b));
-    const imgs = cycle ? (glide ? ['side_listen', 'side_listen', 'side_listen'] : ['side_walk_a', 'side_walk_b', 'side_listen']).map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(a.id, p); return [p, i]; }) : [];
+    const has = SPRITES[spriteOf(a.id)].poses, set = has.walk_mid ? ['walk_a', 'walk_b', 'walk_mid'] : ['side_walk_a', 'side_walk_b', 'side_listen'];
+    const cycle = has[set[2]] && (glide || (has[set[0]] && has[set[1]]));
+    const imgs = cycle ? (glide ? [set[2], set[2], set[2]] : set).map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(a.id, p); return [p, i]; }) : [];
     const off = k ? { x: dir * 0.1 * k, feet: -0.035 * k, h: 0.96 ** k } : { x: 0, feet: 0, h: 1 };   // in his heights
     const was = { x: (a.x - x0) / lead.h, feet: (a.feet - lead.feet) / lead.h, h: a.h / lead.h };
     return { a, was, off, cycle, imgs, phase: k * 0.5, px: a.x, pf: a.feet };   // out of step with the one before
@@ -1620,7 +1623,7 @@ async function walk(ids, to, ms, r, glide) {
   const f0 = lead.feet, h0 = lead.h, dist = Math.hypot(x1 - x0, f1 - f0);
   const ids_ = who.map((a) => a.id), t0 = performance.now(), dur = FAST ? 0 : ms || dist / (0.6 * (h0 + h1) / 2) * 1000;
   for (;;) {
-    const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);   // eases in and out
+    const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t;   // steady, from the first frame
     const side = Math.min(1, t * 3), sd = 1 - (1 - side) ** 2;
     const lx = x0 + (x1 - x0) * e, lf = f0 + (f1 - f0) * e, lh = h0 + (h1 - h0) * e;
     go.forEach((g) => {
@@ -1669,6 +1672,10 @@ function setScene(id, cast) {
   rects(sc.back, backEl);
   for (const [who, pose] of Object.entries(cast)) enter(who, pose);
   rects(sc.front, frontEl);
+  if (sc.fg) {   // a foreground picture over the people, the decor's size (a counter, a log): transparent where they show
+    const fg = new Image(); fg.alt = ''; fg.src = sc.fg;
+    Object.assign(fg.style, { position: 'absolute', left: 0, top: 0, width: bw + 'px', height: bh + 'px' }); frontEl.appendChild(fg);
+  }
   frontEl.style.zIndex = 5000;
   textsEl.innerHTML = ''; farEl.innerHTML = '';
 }
