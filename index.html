@@ -1204,7 +1204,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </section>
   </div>
   <div id="pitch" class="card menu" hidden>
-    <div class="qs"><button type="button" id="qAiv">Why not AI videos?</button></div>
+    <div class="qs"><button type="button" id="qAiv">Why not AI videos?</button><button type="button" id="qGarfield">Garfield</button><button type="button" id="qRivals">Les compétiteurs</button></div>
   </div>
   <div id="aiv" class="card menu" hidden>
     <svg id="aivTree" viewBox="0 0 560 460" aria-hidden="true"></svg>
@@ -3473,6 +3473,24 @@ function bossPlay() {
 }
 $('#mkBoss').closest('.mk').onclick = (e) => { e.stopPropagation(); bossPlay(); };
 $('#pitchBtn').onclick = (e) => { e.stopPropagation(); show('#pitch'); };
+// Pitch: the arguments to say on stage, with their numbers (sources in the commit, 31/10)
+const PITCH = {
+  qGarfield: { title: 'Garfield', items: [
+    'Garfield, c’est environ 17 000 histoires de 3 cases, une par jour depuis le 19 juin 1978',
+    '- 12 868 strips en septembre 2013 (décompte de fans), plus de 11 000 originaux sur papier mis aux enchères par Jim Davis',
+    'Toujours le même chat, avec une poignée de poses',
+    'Et ça rapporte : entre 750 M$ et 1 G$ de produits dérivés par année (Licensing International)',
+    '- Le strip le plus syndiqué au monde : environ 2 600 journaux (Guinness)',
+    'Ce qui accroche, ce n’est pas l’image. C’est le personnage et l’histoire.',
+  ] },
+  qRivals: { title: 'Les compétiteurs', items: [
+    'Les compétiteurs s’attaquent à la beauté visuelle',
+    'Je m’attaque à l’histoire et à la personnalisation',
+    '- L’histoire : chaque choix change la suite, chaque épisode finit sur une question',
+    '- La personnalisation : toi et tes amis êtes les personnages, ce soir',
+  ] },
+};
+for (const id of Object.keys(PITCH)) $('#' + id).onclick = (e) => { e.stopPropagation(); openNote(PITCH[id]); };
 $('#sysBtn').onclick = (e) => { e.stopPropagation(); $('#system').scrollTop = 0; show('#system'); };
 $('#cosmoBtn').onclick = (e) => { e.stopPropagation(); show('#cosmo'); };
 $('#cgOP').onclick = (e) => { e.stopPropagation(); $('#cosmoOP').scrollTop = 0; show('#cosmoOP'); };
