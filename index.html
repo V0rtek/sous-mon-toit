@@ -1589,8 +1589,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
-<script src="chars.js?v=20261030220000"></script>
-<script src="story.js?v=20261030210000"></script>
+<script src="chars.js?v=20261030233000"></script>
+<script src="story.js?v=20261030233000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
@@ -1605,7 +1605,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261030230000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="bank.js?v=20261030210000"></script>
+<script src="tests.js?v=20261030233000"></script>
+<script src="bank.js?v=20261030233000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1616,7 +1617,7 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // camera height per framing, in standing heights of the framed people (it grows if they do not fit side by side),
 // and the space left above the highest head (share of the frame)
 const FRAME = { one: [0.86, .08], close: [0.55, .06], two: [0.9, .1], three: [1.0, .12], xclose: [0.17, .02] };   // xclose = the face alone
-const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3, xclose: 0 };   // decor blur on screen, x stage height / 800; a shot's own blur: {blur}
+const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3, xclose: 0, ots: 2 };   // decor blur on screen, x stage height / 800; a shot's own blur: {blur}
 
 let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST = false, run = 0;
 let sc = null, actors = {}, camNow = null;
@@ -1739,6 +1740,7 @@ function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) {
 // passing pose the whole way, the bob and a slight sway of the shoulders. Together: the first one goes to "to", the
 // others side by side with him, out of step. A sprite without the walk just slides. The frame stops at their belt
 async function walk(ids, to, ms, r, glide) {
+  unOts();
   const who = [].concat(ids).map((id) => actors[id]).filter(Boolean); if (!who.length) return;
   const lead = who[0], x0 = lead.x;
   const end = Array.isArray(to) ? to : typeof to === 'number' ? [to] : actors[to] ? [actors[to].x] : sc.spots[to] || [x0];
@@ -1784,6 +1786,36 @@ async function walk(ids, to, ms, r, glide) {
     placeActor(a);
   }
   applyCam({ size: 'close', who: ids_, tight: true }, 0);
+}
+
+// {ots: [near, far]}: over the shoulder. The far one stays where he is, turned to the near one, in a bust (his own cu_
+// pose, else cu_talk); the frame is 2,8 faces wide and stops at his cut, his face on the open side. The near one is
+// brought between him and the camera: from behind (cu_back), a bit bigger, his head low on the other side, at the
+// frame's edge, barely soft. The next shot puts the near one back where he was
+function ots(nearId, farId) {
+  unOts();
+  const A = actors[nearId], B = actors[farId]; if (!A || !B) return;
+  const has = (id, p) => SPRITES[spriteOf(id)].poses[p], L = A.x <= B.x;
+  A.ots = { x: A.x, feet: A.feet, h: A.h, face: A.face, pose: A.pose, back: has(nearId, 'cu_back') ? 'cu_back' : 'back_far' };
+  if (!String(B.pose).startsWith('cu_') && has(farId, 'cu_talk')) setPose(farId, 'cu_talk');
+  B.face = L ? 'l' : 'r'; B.shown = B.pose; placeActor(B);
+  const bb = box(B), camW = 2.8 * 0.42 * bb.w, camH = camW * 16 / 9, bottom = bb.top + bb.h, top = bottom - camH;
+  const face = B.x + (L ? -0.08 : 0.08) * bb.w, left = face - (L ? 0.7 : 0.3) * camW;
+  const back = has(nearId, 'cu_back') ? 'cu_back' : 'back_far';
+  if (A.pose !== back) { A.pose = back; A.shown = back; const i = new Image(); i.alt = ''; i.src = poseSrc(nearId, back); A.el.replaceChild(i, A.el.firstChild); }
+  A.h = B.h * 1.25; A.face = L ? 'r' : 'l';
+  A.feet = 0; placeActor(A); A.feet = top + 0.5 * camH - box(A).top;
+  A.x = L ? left - 0.02 * camW : left + 1.02 * camW; placeActor(A);
+  A.el.style.filter = 'blur(0.6px)';
+  applyCam({ size: 'ots', who: [farId], frame: { camH, top, left } }, 0);
+}
+function unOts() {
+  for (const a of Object.values(actors)) if (a.ots) {
+    Object.assign(a, { x: a.ots.x, feet: a.ots.feet, h: a.ots.h, face: a.ots.face }); a.el.style.filter = '';
+    const { pose, back } = a.ots; delete a.ots;
+    if (a.pose === back) { a.pose = null; setPose(a.id, pose); }   // still from behind: his pose back (a pose given since stays)
+    placeActor(a);
+  }
 }
 
 // a decor = a photo and/or rectangles behind the people (back) and in front of them (front), in decor px:
@@ -2081,7 +2113,7 @@ function buzz() {
     o.connect(g).connect(out()); o.start(t); o.stop(t + 0.14);
   }
 }
-function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; applyCam({ ...c, frame: null }, ms); }
+function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; unOts(); applyCam({ ...c, frame: null }, ms); }
 
 // ---- text ----
 let typingFull = '';   // the whole line, shown at once when someone taps while it types
@@ -2770,6 +2802,7 @@ async function next() {
     else if (s.exit) exit(s.exit);
     else if (s.face) setFace(s.face);
     else if (s.walk) { await walk(s.walk, s.to, s.ms, r, s.glide); if (r !== run) return; }
+    else if (s.ots) { bubble.hidden = true; ots(s.ots[0], s.ots[1]); }
     else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
     else if (s.reveal) await reveal(s.reveal, s.ms);
     else if (s.fade) await fade(s.fade, s.ms);

@@ -10,6 +10,7 @@ window.CAST = {
   james: { name: 'James', color: '#6e2b2b', sprite: 'james' },
   amare: { name: 'Amare', color: '#5a2d8c', sprite: 'amare', scale: 0.93 },
   isa: { name: 'Isa', color: '#c2366b', sprite: 'isa', scale: 0.96 },
+  kai: { name: 'Kai', color: '#a3203c', sprite: 'kai' },   // Justin recolored, for the tests
 };
 
 // Isa's three looks (personalise step)
@@ -37,6 +38,8 @@ window.FACE = {
     // and from behind for over-the-shoulder shots
     cu_talk: 'r', cu_smile: 'r', cu_glance: 'r', cu_hurt: 'r', cu_anger: 'r', cu_back: 'r' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
+  // Kai (30/10) = Justin recolored for the tests (black hair, dark red tank top): all his poses
+  get kai() { return this.justin; },
   ruby: ELF, melissa: ELF, isa_nuit: ELF, isa_or: ELF, isa_noir: ELF, candy: LION, amare: LION,
 };
 
@@ -86,6 +89,15 @@ window.SCENES = {
   rempart: {
     image: 'bg/rempart.webp', size: [1295, 1214],
     spots: { justin: [566, 1521, 994], melissa: [673, 1337, 753], candy: [761, 1184, 554], ruby: [833, 1060, 391] },
+    face: { justin: 'r', melissa: 'r', candy: 'r', ruby: 'r' },
+    front: [],
+  },
+  // the gallery over the city (30/10): a long marble table into the depth, they lean on it side by side from its far
+  // side, facing right (pose bar). The top is 1,2 m wide: at depth, height = 1,75 × its width on screen / 1,2; forearms
+  // on its left edge, each one's back on it
+  galerie: {
+    image: 'bg/galerie.webp', size: [1672, 940],
+    spots: { justin: [718, 1146, 923], melissa: [869, 998, 726], candy: [981, 888, 579], ruby: [1067, 802, 459] },
     face: { justin: 'r', melissa: 'r', candy: 'r', ruby: 'r' },
     front: [],
   },
