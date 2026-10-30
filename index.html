@@ -1538,16 +1538,24 @@ function fit() {
 
 // ---- people, in decor pixels ----
 // sized from the pose on screen (a.shown): a new pose takes its place once its picture is ready (setPose)
+// a pose cut at the belt (SPRITES[sprite].half: unit = its px per full height, belt = where his pants start, from the
+// feet, cut = the sheet's cut line in px below that, poses = the x of his waist) sits on the full body's pants line,
+// his waist on his x: sharper, from its own sheet, and only for a close shot on him (frameOf stops the frame at the cut)
+const flipped = (a) => { const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.shown)]; return !!(a.face && nat !== 'f' && a.face !== nat); };
 function box(a) {
-  const sp = SPRITES[spriteOf(a.id)], p = sp.poses[poseOf(a.id, a.shown)];
-  const ih = p[1] / sp.refH * a.h * (castOf(a.id).scale || 1);
-  return { w: p[0] / p[1] * ih, h: ih };
+  const sp = SPRITES[spriteOf(a.id)], name = poseOf(a.id, a.shown), k = a.h * (castOf(a.id).scale || 1);
+  const hf = sp.half && sp.half.poses[name];
+  if (hf) {
+    const [w, h] = sp.poses[name], u = k / sp.half.unit, cut = a.feet - sp.half.belt * k + sp.half.cut * u;
+    return { w: w * u, h: h * u, left: a.x - (flipped(a) ? w - hf : hf) * u, top: cut - h * u, half: true };
+  }
+  const p = sp.poses[name], ih = p[1] / sp.refH * k, w = p[0] / p[1] * ih;
+  return { w, h: ih, left: a.x - w / 2, top: a.feet - ih };
 }
 function placeActor(a) {
   const b = box(a);
-  Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: a.x - b.w / 2 + 'px', top: a.feet - b.h + 'px', zIndex: Math.round(a.feet) });
-  const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.shown)];
-  a.el.firstChild.style.transform = a.face && nat !== 'f' && a.face !== nat ? 'scaleX(-1)' : '';
+  Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: b.left + 'px', top: b.top + (a.bob || 0) + 'px', zIndex: Math.round(a.feet) });
+  a.el.firstChild.style.transform = flipped(a) ? 'scaleX(-1)' : '';
 }
 function enter(id, pose) {
   const [x, feet, h] = sc.spots[id];
@@ -1572,6 +1580,33 @@ function setPose(id, pose) {
   img.decode().then(swap, swap);
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
+// {walk: id, to: x in decor px | someone | a spot, ms}: he walks there in profile, cut at the belt (side_walk_a / _b,
+// a step every 300 ms, a small bob), the close shot following him; then side_listen. A sprite without them just slides.
+// The frame stops at his belt, so the same walk works on stairs or on any floor
+async function walk(id, to, ms, r) {
+  const a = actors[id]; if (!a) return;
+  const x0 = a.x, x1 = typeof to === 'number' ? to : actors[to] ? actors[to].x : (sc.spots[to] || [x0])[0];
+  const has = SPRITES[spriteOf(id)].poses, cycle = has.side_walk_a && has.side_walk_b && has.side_listen;
+  const imgs = cycle ? ['side_walk_a', 'side_walk_b', 'side_listen'].map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(id, p); return [p, i]; }) : [];
+  await Promise.all(imgs.map(([, i]) => i.decode().catch(() => {})));
+  if (x1 !== x0) a.face = x1 > x0 ? 'r' : 'l';
+  const t0 = performance.now(), dur = FAST ? 0 : ms;
+  for (;;) {
+    const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1;
+    a.x = x0 + (x1 - x0) * (t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t));   // eases in and out
+    if (cycle) {
+      const [p, i] = imgs[Math.floor((now - t0) / 300) % 2];
+      if (a.shown !== p) { a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
+      a.bob = -Math.abs(Math.sin((now - t0) / 300 * Math.PI)) * a.h * 0.006;
+    }
+    placeActor(a); applyCam({ size: 'close', who: [id], tight: true }, 0);
+    if (t >= 1 || r !== run) break;
+    await new Promise((res) => requestAnimationFrame(res));
+  }
+  a.bob = 0;
+  if (cycle) { const [p, i] = imgs[2]; a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
+  placeActor(a); applyCam({ size: 'close', who: [id], tight: true }, 0);
+}
 
 // a decor = a photo and/or rectangles behind the people (back) and in front of them (front), in decor px:
 // {x, y, w, h, color, r: radius (px or css), line: css border, glow: css shadow, blur}
@@ -1610,14 +1645,21 @@ function frameOf(c) {
     const all = Object.values(actors);
     cx = c.at ?? (all.length ? (Math.min(...all.map((a) => a.x)) + Math.max(...all.map((a) => a.x))) / 2 : bw / 2);
     // a frame wider than the decor shows less of its height: centred on the people (heads to feet), not on the sky
-    if (camH * ASP() > bw && all.length) { camH = bw / ASP(); top = (Math.min(...all.map((a) => a.feet - box(a).h)) + Math.max(...all.map((a) => a.feet))) / 2 - camH / 2; }
+    if (camH * ASP() > bw && all.length) { camH = bw / ASP(); top = (Math.min(...all.map((a) => box(a).top)) + Math.max(...all.map((a) => a.feet))) / 2 - camH / 2; }
   } else {
     const [k, margin] = FRAME[c.size];
     const boxes = who.map((a) => ({ a, b: box(a) }));
-    const left = Math.min(...boxes.map(({ a, b }) => a.x - b.w / 2)), right = Math.max(...boxes.map(({ a, b }) => a.x + b.w / 2));
-    const tall = Math.max(...who.map((a) => a.h)), head = Math.min(...boxes.map(({ a, b }) => a.feet - b.h));
+    const left = Math.min(...boxes.map(({ b }) => b.left)), right = Math.max(...boxes.map(({ b }) => b.left + b.w));
+    const tall = Math.max(...who.map((a) => a.h)), head = Math.min(...boxes.map(({ b }) => b.top));
     camH = Math.min(bh, Math.max(k * tall, (right - left) * 1.08 / ASP()));
     cx = (left + right) / 2; top = head - margin * camH;
+    // someone cut at the belt: the frame stops at the cut, whatever the shot (taller = more room above the head)
+    const cut = boxes.filter(({ b }) => b.half).map(({ b }) => b.top + b.h);
+    // c.tight (a walk): the frame keeps his height and follows his waist, a swinging arm may leave it
+    if (cut.length) {
+      camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), c.tight ? 0 : (right - left) * 1.08 / ASP())); top = Math.min(...cut) - camH;
+      if (c.tight) cx = who.reduce((t, a) => t + a.x, 0) / who.length;
+    }
   }
   if (c.lift !== undefined) top = c.lift;
   camH = Math.min(camH, bw / ASP());   // never wider than the decor
@@ -2449,7 +2491,7 @@ function farLine(s) {
   a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk');
   farEl.innerHTML = ''; clearTimeout(farT);
   const f = camNow && camNow.frame; if (!f || FAST) return;
-  const k = H / f.camH, x = (a.x - f.left) * k, y = (a.feet - box(a).h - f.top) * k;
+  const k = H / f.camH, x = (a.x - f.left) * k, y = (box(a).top - f.top) * k;
   if (x < 0 || x > W || y < 0) return;
   const d = document.createElement('div'); d.className = 'far'; d.innerHTML = '<i></i><i></i><i></i>';
   Object.assign(d.style, { left: x + 'px', top: y + 'px' });
@@ -2536,6 +2578,7 @@ async function next() {
     else if (s.enter) for (const [id, pose] of Object.entries(s.enter)) enter(id, pose);
     else if (s.exit) exit(s.exit);
     else if (s.face) setFace(s.face);
+    else if (s.walk) { await walk(s.walk, s.to, s.ms || 2500, r); if (r !== run) return; }
     else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
     else if (s.reveal) await reveal(s.reveal, s.ms);
     else if (s.fade) await fade(s.fade, s.ms);

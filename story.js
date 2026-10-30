@@ -27,7 +27,9 @@ window.FACE = {
     phone_call: 'r', texting: 'f', phone_shock: 'f', punch: 'r', hit: 'f', ko: 'f',
     // from behind (30/10): far = into the distance, down, look = back over his shoulder, door = reaching for a door,
     // fists = holding back anger, walk = walking away
-    back_far: 'r', back_down: 'r', back_look: 'r', back_door: 'r', back_fists: 'r', back_walk: 'f' },
+    back_far: 'r', back_down: 'r', back_look: 'r', back_door: 'r', back_fists: 'r', back_walk: 'f',
+    // in profile, cut at the belt (30/10, chars.js: half): only in a close shot on him. walk_a / walk_b = the walk loop ({walk})
+    side_walk_a: 'r', side_walk_b: 'r', side_listen: 'r', side_talk: 'r', side_lean: 'r', side_tense: 'r' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   ruby: ELF, melissa: ELF, isa_nuit: ELF, isa_or: ELF, isa_noir: ELF, candy: LION, amare: LION,
 };
@@ -305,7 +307,7 @@ window.STORY = [
 // menu gallery: every pose of each character, the picture it started from (src) and the sheet it was cut from (ref).
 // The recolors (recolor: their original) stay out of the gallery
 window.GALLERY = [
-  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action', 'urban_back'] },
+  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action', 'urban_back', 'urban_side'] },
   { sprite: 'ruby', name: 'Ruby', src: 'perso_ruby', ref: ['elf'] },
   { sprite: 'candy', name: 'Candy', src: 'perso_candy', ref: ['feline'] },
   { sprite: 'james', name: 'James', src: 'perso_james', ref: ['tv'] },
