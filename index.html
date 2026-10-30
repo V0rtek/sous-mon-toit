@@ -224,6 +224,40 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .todo li + li { margin-top: .35em; }
 .todo li.sub { list-style: none; margin-left: .6em; margin-top: .1em; font-size: 2.2em; color: #6e6e73; }
 /* mini-games: the home's tiles, its own "?" (the ideas) in the corner */
+/* the bank (bank.js): tabs on top, the list scrolls under them; a tap on a picture shows it big */
+#bank { justify-content: flex-start; padding: 12em 0 0; }
+#bankTabs { display: flex; gap: .8em; padding: 0 5% 1.6em; }
+#bankTabs button { font: inherit; font-size: 1.8em; font-weight: 600; flex: 1; padding: .55em 0; border: 0; border-radius: 1em; background: #1c1c1e; color: #a1a1a6; cursor: pointer; }
+#bankTabs button.on { background: #f5f5f7; color: #000; }
+#bankBody { flex: 1; overflow-y: auto; padding: 0 5% 6em; }
+#bank h3 { font-size: 2.1em; margin: 1.2em 0 .5em; }
+#bank h3 small { font-size: .7em; color: #86868b; font-weight: 500; }
+.bkNote { font-size: 1.6em; color: #a1a1a6; line-height: 1.4; margin: 0 0 1em; }
+.bkRow { display: flex; gap: 1em; overflow-x: auto; padding-bottom: .6em; }
+.bkPose { font: inherit; flex: none; width: 13em; background: #1c1c1e; border: 0; border-radius: 1.4em; padding: 1em .6em .8em; display: flex; flex-direction: column; align-items: center; gap: .5em; color: #f5f5f7; cursor: pointer; }
+.bkPose img { height: 18em; max-width: 100%; object-fit: contain; }
+.bkPose.cut img { object-position: bottom; }
+.bkPose span { font-size: 1.35em; text-align: center; word-break: break-all; }
+.bkPose i { display: block; font-style: normal; color: #ff9f0a; font-size: .85em; }
+.bkGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; }
+.bkDecor { font: inherit; background: #1c1c1e; border: 0; border-radius: 1.4em; padding: 0 0 1em; overflow: hidden; color: #f5f5f7; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: .3em; }
+.bkDecor .pic { position: relative; display: block; aspect-ratio: 16 / 9; background: #000; }
+.bkDecor .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bkDecor b { font-size: 1.6em; padding: .3em .7em 0; }
+.bkDecor small { font-size: 1.25em; color: #a1a1a6; padding: 0 .9em; }
+.bkShot { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; }
+.bkShot b { font-size: 1.8em; }
+.bkShot > span { float: right; font-size: 1.3em; color: #30d158; font-weight: 600; }
+.bkShot.next > span { color: #ff9f0a; }
+.bkShot p { font-size: 1.5em; color: #c7c7cc; margin: .4em 0; }
+.bkShot code { font-size: 1.3em; color: #86868b; }
+.bkSound { font: inherit; width: 100%; display: grid; grid-template-columns: 3em 1fr; align-items: center; column-gap: 1em; background: #1c1c1e; border: 0; border-radius: 1.4em; padding: 1em 1.2em; margin-bottom: .8em; color: #f5f5f7; text-align: left; cursor: pointer; }
+.bkSound i { grid-row: span 2; font-style: normal; font-size: 2em; width: 1.5em; height: 1.5em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; }
+.bkSound.on i { background: #ff9f0a; color: #000; }
+.bkSound b { font-size: 1.7em; }
+.bkSound span { font-size: 1.35em; color: #a1a1a6; }
+#bankBig { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,.92); display: grid; place-items: center; cursor: pointer; }
+#bankBig img { grid-area: 1 / 1; max-width: 96%; max-height: 90%; object-fit: contain; }
 #labScreen { justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; }
 #labScreen .tiles { margin: auto 0; }
 #labNote { position: absolute; top: 2.2%; right: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #f5f5f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -1002,7 +1036,13 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="lab"><span class="art" style="--g:#b3261e"><img src="chars/justin/punch.webp" alt=""></span><b>Mini-jeux</b></button>
       <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
       <button type="button" id="t3d"><span class="art" style="--g:#6b3fa0"><img src="chars/amare/listen.webp" alt=""></span><b>3D</b></button>
+      <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
     </div>
+  </div>
+  <div id="bank" class="card menu" hidden>
+    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="sounds">Sons</button></div>
+    <div id="bankBody"></div>
+    <div id="bankBig" hidden></div>
   </div>
   <div id="marketing" class="card menu" hidden>
     <section class="mk" style="--g:#b3261e">
@@ -1471,6 +1511,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="plan.js?v=20261030100000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
+<script src="bank.js?v=20261030160000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -2685,12 +2726,13 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#tvPick', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan'];
-const UP = { '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
+const SCREENS = ['#who', '#hub', '#tvPick', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#bank'];
+const UP = { '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
   if (TV && id === '#hub') id = '#tvPick';
+  if (id !== '#bank' && window.BANK_CLOSE) BANK_CLOSE();   // leaving the bank stops its sound
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it
@@ -3284,6 +3326,7 @@ $('#genGo').onclick = async (e) => {
 $('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setItem('smt-home', '1'); } catch { /* private window */ } };
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); feat('3D'); show('#about3d'); };
+$('#bankBtn').onclick = (e) => { e.stopPropagation(); feat('Banque'); BANK_OPEN(); show('#bank'); };
 $('#watch3d').onclick = (e) => {
   e.stopPropagation();
   $('#yt').src = `https://www.youtube-nocookie.com/embed/${VIDEO_3D}?autoplay=1&playsinline=1&rel=0`;
