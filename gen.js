@@ -133,7 +133,9 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       last = s.who;
       // his inner voice only when he talks to himself ("to": justin, or no one); to someone, he says it out loud
       if (s.who === 'justin' && !inChoice && (!s.to || s.to === 'justin')) return [...out, { think: 'justin', text: clip(s.text, 160) }];
-      return [...out, say(s.who, posesOf(s.who).includes(s.pose) ? s.pose : 'listen', clip(s.text, 160), to)];
+      // at the counter: what they take in hand before the line ("hold"), what they lay on the counter ("put")
+      const obj = s.hold !== undefined ? [{ hold: { [s.who]: s.hold || null } }] : [], put = s.put ? [{ put: { [s.who]: s.put } }] : [];
+      return [...out, ...obj, ...put, say(s.who, posesOf(s.who).includes(s.pose) ? s.pose : (j.rest || 'listen'), clip(s.text, 160), to)];
     };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 }, most = j.seed || j.episode ? 3 : 2;   // an episode (ep1.js has a seed, the scene plan's prompt 2 says episode): 3 choices
     for (const s of j.steps) {
@@ -145,7 +147,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
           if (!full || !o || !Array.isArray(o.then)) return null;
           const t = shorten(full);
           last = null;
-          then.push(cam('one', 'justin'), say('justin', 'explaining', clip(o.say, 160) || full, pre ? { to: pre } : undefined)); last = 'justin';
+          then.push(cam('one', 'justin'), say('justin', j.rest || 'explaining', clip(o.say, 160) || full, pre ? { to: pre } : undefined)); last = 'justin';
           inChoice = true; for (const l of o.then) then.push(...line(l, [...cast, 'justin'])); inChoice = false;
           return then.length > 2 ? { t, intent: clip(o.tone, 20), then } : null;
         }).filter(Boolean);
@@ -159,7 +161,7 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
     const speaks = new Set(), walk = (list) => (list || []).forEach((s) => { if (s && s.who) speaks.add(s.who); if (s && Array.isArray(s.choice)) s.choice.forEach((o) => walk(o && o.then)); });
     walk(j.steps);
     return [
-      scene(sc, Object.fromEntries([...cast.filter((id) => speaks.has(id)), 'justin'].map((id) => [id, 'listen']))),
+      scene(sc, Object.fromEntries([...cast.filter((id) => speaks.has(id)), 'justin'].map((id) => [id, j.rest || 'listen']))),
       cam('wide'), est ? { establish: est, ms: 3400 } : { fade: 'in', ms: 700 },
       ...steps,
       ...(est ? [{ establish: est, ms: 2800, out: true }] : []), { fade: 'out', ms: 800 },

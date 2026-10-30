@@ -432,7 +432,8 @@ window.PLAN = (() => {
 
   // ---- the prompts (for a basic model; English, the story comes out in the idea's language). Both list the goals and
   // techniques above, so a change here changes them ----
-  const DECORS = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const DECORS_ALL = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const DECORS = { toString: () => (window.COUNTER && COUNTER.on ? COUNTER.decor() : DECORS_ALL) };   // « Au comptoir » (Ton histoire): only the counter and who can lean there
   const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}${t.ex ? ' Examples (shapes, never copy them): ' + t.ex.map((x) => `"${x}"`).join(' / ') : ''}`).join('\n')).join('\n');
   const prompt1 = (idea, fresh, act) => `You plan episode ${act ? act.n + ' of 5' : 1} of an interactive story for a phone game, BEFORE any dialogue is written.${act ? ' The whole act is already planned (THE ACT, at the end): this episode does its part of it, exactly, and nothing of the later episodes.' : ''} The player plays the main character (his id is "justin"). Write every text in the language of the idea.
 Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:
@@ -526,7 +527,7 @@ THE FIRST AND THE LAST LINE:
 THE MAIN CHARACTER'S DESIRE: in the rectangle that shows it, justin says it himself, out loud, to someone, with its reason ("One day I'll play a real stage. Not this bar."), and someone reacts. Never in his head, never "tonight".
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: before tapping, the player knows what each option means: an option makes sense on its own, and a lie or a secret is only an option if the player knows the truth. "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
-POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
+${window.COUNTER && COUNTER.on ? COUNTER.posesText() : 'POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those.'} Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
 
 THE JSON (exactly this shape):
 {"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",

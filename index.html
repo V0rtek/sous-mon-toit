@@ -259,6 +259,8 @@ body.uitop #ui { top: 3%; }
 .bkRef { font: inherit; border: 0; background: #2c2c2e; border-radius: 1em; padding: .4em; color: #c7c7cc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; }
 .bkRef img { height: 12em; border-radius: .6em; }
 .bkRef span { font-size: 1.2em; }
+.genCounter { display: flex; align-items: center; gap: .6em; font-size: 2em; color: #e5e5ea; margin: .4em 0; }
+.genCounter input { width: 1.3em; height: 1.3em; }
 .ncTop { background: #1c1c1e; border-radius: 1.4em; margin-bottom: 1.4em; }
 .ncTop.open { background: none; }
 .ncToggle { font: inherit; width: 100%; display: flex; align-items: center; gap: .8em; padding: 1.1em 1.4em; border: 0; border-radius: 1.4em; background: #1c1c1e; color: #f5f5f7; text-align: left; cursor: pointer; }
@@ -1500,6 +1502,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <input id="genKey" type="password" autocomplete="off" placeholder="Ta clé API Anthropic (reste sur cet appareil)" aria-label="Clé API Anthropic">
       <button class="pill" id="genGo" type="button">Écrire l'histoire</button>
       <button class="pill" id="genAct" type="button">Tout par Haiku : acte, plan, épisode 1</button>
+      <label class="genCounter"><input type="checkbox" id="genCounter"> Au comptoir, avec les poses que chaque perso a maintenant</label>
       <p class="lead" id="genMsg"></p>
       <button class="ghost" id="genHistBtn" type="button">Dernières histoires</button>
     </div>
@@ -1653,15 +1656,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261031240000"></script>
 <script src="games.js?v=20261028143259"></script>
-<script src="gen.js?v=20261030090000"></script>
+<script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261028143259"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261031130000"></script>
-<script src="act.js?v=20261031130000"></script>
+<script src="plan.js?v=20261031490000"></script>
+<script src="act.js?v=20261031490000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031430000"></script>
@@ -3575,7 +3578,35 @@ $('#actBtn').onclick = (e) => { e.stopPropagation(); show('#acte'); ACT.mount($(
 const actBack = () => { show('#acte'); ACT.mount($('#acteBody')); };
 window.ACT_TO_PLAN = () => { ACT.closeSheet(); UP['#plan'] = '#acte'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // the story written from a plan (its prompt 2): plays like a generated story and joins the last ones (Ton histoire)
+// « Au comptoir » (Ton histoire, Tout par Haiku): the whole story at the counter, with the characters who can lean there
+// NOW (their sheets as they are: a new sheet imported = new poses offered), each told the poses they really have
+const POSE_MEANS = { bar: 'leaning, neutral (a plain "bar" turns the head to whom they talk to)', bar_to_listen: 'listening, looking at the one next to them', bar_to_smile: 'a half smile at them',
+  bar_to_tense: 'tense with them', bar_ahead: 'straight ahead, hurt or lost in thought, no eye contact', bar_back: 'looking the other way (back of the head)', bar_put: 'putting something on the counter for them (with "put")',
+  bar_talk: 'talking, straight ahead', bar_drink: 'drinking from their mug', bar_stare: 'staring into their mug', bar_smile: 'a small smile to themselves', bar_laugh: 'laughing out loud', bar_slump: 'drunk, slumped',
+  bar_to_talk: 'talking to them, eye contact', bar_to_flirt: 'flirting with them', bar_to_anger: 'angry at them', bar_toast: 'a toast with their mug', bar_slide: 'sliding their mug to them',
+  hold_mouth: 'drinking what they hold (with "hold")', hold_raise: 'raising what they hold, a toast (with "hold")', hold_front: 'reading what they hold (with "hold")', hold_give: 'handing what they hold (with "hold")', hold_ledge: 'a hand around a drink on the counter (with "hold")' };
+const NOT_CAST = ['justin', 'kai', 'leo', 'twin', 'lily2', 'redtest'];   // the player, and the test doubles
+window.COUNTER = {
+  on: false,
+  poses: (id) => Object.keys((SPRITES[(CAST[id] || {}).sprite || id] || {}).poses || {}).filter((p) => POSE_MEANS[p]),
+  cast() { return Object.keys(CAST).filter((id) => !NOT_CAST.includes(id) && COUNTER.poses(id).length >= 3); },
+  decor() { return `"comptoir" = ${COUNTER.cast().map((id) => `${id} (${CAST[id].name})`).join(', ')} (leaning side by side at the counter of a port tavern, at night; justin leans there too)`; },
+  posesText() {
+    const line = (id) => `- ${id}: ${COUNTER.poses(id).map((p) => `${p} (${POSE_MEANS[p]})`).join(', ')}`;
+    return `AT THE COUNTER: the whole scene happens leaning at the counter. Each line's "pose" is one of THAT character's poses below, nothing else; choose the one that plays the line (a drink to dodge a question, a toast, a coin slid over, a look away).
+${[...COUNTER.cast(), 'justin'].map(line).join('\n')}
+OBJECTS: on a line, "hold": "<object>" puts it in their hand first (the hold_ poses), "hold": null takes it away; "put": "<object>" lays it on the counter under their fingers (the pose bar_put). Drinks: biere, vin, potion, gobelet. Papers: lettre, carte, wanted, parchemin, enveloppe. Small: piece, bourse. Only when it serves the line.`;
+  },
+};
 window.PLAN_PLAY = (json, title) => {
+  if (json.scene === 'comptoir' || COUNTER.on) {   // the counter: justin in front, the others further along it
+    const B = SCENES.taverne_bar, slots = ['melissa', 'candy', 'ruby'], ids = [...new Set((PLAN.get().chars || []).map((c) => c.id).filter((id) => COUNTER.cast().includes(id)))].slice(0, 3);
+    SCENES.plan = { ...B, spots: { justin: B.spots.justin }, face: { justin: 'r' } };
+    ids.forEach((id, i) => { SCENES.plan.spots[id] = B.spots[slots[i]]; SCENES.plan.face[id] = 'r'; });
+    json = { ...json, scene: 'plan', cast: ids, rest: 'bar', poses: Object.fromEntries([...ids, 'justin'].map((id) => [id, ['bar', ...COUNTER.poses(id)]])) };
+    const st = GEN.build(json); st.cast = { justin: CAST.justin, ...Object.fromEntries(ids.map((id) => [id, CAST[id]])) };
+    saveGen('Plan · ' + (title || json.title || ''), json); playGen(st); return;
+  }
   const plan = PLAN.get(), decor = SCENES[json.scene] ? json.scene : plan.scene, base = SCENES[decor];
   const mine = plan.chars.filter((c) => c.poses && c.sprite && SPRITES[c.sprite]), slots = base ? Object.keys(base.spots).filter((k) => k !== 'justin') : [];
   let cast = null;
@@ -3681,8 +3712,9 @@ for (const b of document.querySelectorAll('.genCopy')) b.onclick = async (e) => 
 // what Haiku cost, counted with the other generated stories
 window.GEN_USED = (u) => bump((x) => { const g = (x.gen = x.gen || { n: 0, in: 0, out: 0 }); g.n++; g.in += u.in; g.out += u.out; });
 // the 3 layers by Haiku (act.js): the act (from the idea, or none), the plan of episode 1, its story, then it plays
+$('#genCounter').onchange = (e) => { COUNTER.on = e.target.checked; };
 $('#genAct').onclick = async (e) => {
-  e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
+  e.stopPropagation(); COUNTER.on = $('#genCounter').checked; const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
   if (!key) { $('#genKey').focus(); return; }
   try { localStorage.setItem('smt-key', key); localStorage.setItem('smt-idea', idea); } catch { /* private window */ }
   $('#genAct').disabled = $('#genGo').disabled = true;

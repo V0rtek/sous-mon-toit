@@ -85,7 +85,8 @@ window.ACT = (() => {
     ['his best friend', 'his ex', 'son meilleur ami', 'son ex'], ['his business partner', 'his girlfriend', 'son associé', 'sa blonde'],
     ['his sister', 'his father', 'sa sœur', 'son père'], ['an old friend who just came back', 'his girlfriend', 'un vieil ami qui revient', 'sa blonde'],
     ['a friend of his father who sleeps on the couch', 'his father', 'une amie de son père qui dort au salon', 'son père'], ['his mother', 'his best friend', 'sa mère', 'son meilleur ami']];
-  const DECORS = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby, melissa, candy and isa are women, james and amare are men; ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const DECORS_ALL = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby, melissa, candy and isa are women, james and amare are men; ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
+  const DECORS = { toString: () => (window.COUNTER && COUNTER.on ? COUNTER.decor() : DECORS_ALL) };   // « Au comptoir » (Ton histoire): only the counter and who can lean there
 
   // the example, written by hand: what a filled act looks like (the reference the prompt has to reach)
   const EX = () => ({ v: 2, title: 'Sous mon toit', scene: 'salon', question: 'Dois-tu dire la vérité à ton père si elle va le briser ?',
