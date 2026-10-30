@@ -1567,7 +1567,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
-<script src="chars.js?v=20261030210000"></script>
+<script src="chars.js?v=20261030220000"></script>
 <script src="story.js?v=20261030210000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
@@ -1593,8 +1593,8 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // camera height per framing, in standing heights of the framed people (it grows if they do not fit side by side),
 // and the space left above the highest head (share of the frame)
-const FRAME = { one: [0.86, .08], close: [0.55, .06], two: [0.9, .1], three: [1.0, .12] };
-const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3 };   // decor blur on screen, x stage height / 800
+const FRAME = { one: [0.86, .08], close: [0.55, .06], two: [0.9, .1], three: [1.0, .12], xclose: [0.17, .02] };   // xclose = the face alone
+const BLUR = { wide: 0, three: .6, two: 1.2, one: 2, close: 3, xclose: 0 };   // decor blur on screen, x stage height / 800; a shot's own blur: {blur}
 
 let W = 0, H = 0, q = [], waiting = null, typing = null, firstLine = true, FAST = false, run = 0;
 let sc = null, actors = {}, camNow = null;
@@ -1811,10 +1811,11 @@ function frameOf(c) {
     const boxes = who.map((a) => ({ a, b: box(a) }));
     const left = Math.min(...boxes.map(({ b }) => b.left)), right = Math.max(...boxes.map(({ b }) => b.left + b.w));
     const tall = Math.max(...who.map((a) => a.h)), head = Math.min(...boxes.map(({ b }) => b.top));
-    camH = Math.min(bh, Math.max(k * tall, (right - left) * 1.08 / ASP()));
+    camH = Math.min(bh, c.size === 'xclose' ? k * tall : Math.max(k * tall, (right - left) * 1.08 / ASP()));   // the face alone: never widened
     cx = (left + right) / 2; top = head - margin * camH;
     // someone cut at the belt: the frame stops at the cut, whatever the shot (taller = more room above the head)
-    const cut = boxes.filter(({ b }) => b.half).map(({ b }) => b.top + b.h);
+    const cut = c.size === 'xclose' ? [] : boxes.filter(({ b }) => b.half).map(({ b }) => b.top + b.h);   // the face alone is well above any cut
+    if (c.size === 'xclose') cx = who.reduce((t, a) => t + a.x + (a.face === 'l' ? -0.06 : 0.06) * box(a).w, 0) / who.length;   // on the face, ahead of the neck
     // c.tight (a walk): the frame keeps his height and follows his waist, a swinging arm may leave it
     if (cut.length) {
       // busts (cut at mid-chest): the frame keeps the face, the shoulders may leave it
@@ -1839,7 +1840,7 @@ function applyCam(c, ms) {
   const f = c.frame || frameOf(c), s = H / f.camH;
   world.style.transition = ms ? `transform ${ms}ms cubic-bezier(.45,0,.25,1)` : 'none';
   world.style.transform = `translate(${-f.left * s}px,${-f.top * s}px) scale(${s})`;
-  const blur = (BLUR[c.size] || 0) * H / 800 / s;
+  const blur = (c.blur ?? BLUR[c.size] ?? 0) * H / 800 / s;
   bgImg.style.filter = backEl.style.filter = blur ? `blur(${blur}px)` : 'none';
   camNow.frame = f;
   drawTexts(ms);
