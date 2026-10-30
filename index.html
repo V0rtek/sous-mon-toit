@@ -1603,8 +1603,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261031070000"></script>
-<script src="act.js?v=20261031070000"></script>
+<script src="plan.js?v=20261031080000"></script>
+<script src="act.js?v=20261031080000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031010000"></script>
@@ -3441,7 +3441,9 @@ $('#mine').onclick = (e) => { e.stopPropagation(); feat('Écrire une histoire');
 const getGens = () => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } };
 function playGen(steps) { STORIES.gen = steps; steps.credits = ''; begin('gen'); }
 function saveGen(idea, json, used) {
-  try { localStorage.setItem('smt-gens', JSON.stringify([{ at: Date.now(), idea, json, used }, ...getGens()].slice(0, 20))); } catch { /* private window */ }
+  // a full phone (the plans and acts take room): keep fewer old stories rather than lose the new one
+  const all = [{ at: Date.now(), idea, json, used }, ...getGens()];
+  for (const n of [20, 5, 1]) try { localStorage.setItem('smt-gens', JSON.stringify(all.slice(0, n))); return; } catch { /* too big: fewer */ }
 }
 function renderHist() {
   const all = getGens(), list = $('#histList'); list.innerHTML = ''; $('#histEmpty').hidden = all.length > 0;

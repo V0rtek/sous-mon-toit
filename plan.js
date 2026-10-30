@@ -466,7 +466,7 @@ ${act && act.n > 1 ? '- The first rectangle picks up where the last episode ende
 - No rectangle where one character explains alone: a fact comes out because someone asks, accuses, dodges or disagrees.
 - When something hurts the main character (the past, a reproach), the next rectangle or choice is his reaction: he is never silent about it.
 - The turn brings something new: a precise next moment (who, when, where, what will be settled: "See you at the championship tonight. We're gonna have a little talk."), a surprise or a question. Never a choice just made, asked again, never vague ("There will be consequences").
-- What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture or object the screen does not show (counting the lights, flipping a coin, a crate): what matters is said in a line, plainly, the first time.
+- What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture, event or object the screen does not show (counting the lights, flipping a coin, a crate, "justin nearly spills a drink", "someone arrives"): a rectangle is what people SAY; what matters is said in a line, plainly, the first time.
 
 THE JSON:
 {"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
@@ -496,7 +496,7 @@ CLARITY (the player knows nothing you know):
 A. One new thing per line, one sentence per bubble: a line with two sentences becomes two lines of the same speaker. Short: 4 to 12 words, 70 characters at most.
 F. Never ask again what was asked, never say again what was said: each line moves things forward. Except a question dodged in a "Question esquivée" rectangle, which comes back where the plan's "Question qui revient" is.
 B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 lines. Someone absent: a name AND what identifies them.
-C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
+C. Every line answers the line before it (answers, dodges, jokes, pushes back), and only what the player has read: never a line about something nobody said or showed ("Only because I keep saying yes to your detours." -> which detours?). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 H. Never more than 2 lines in a row from the same character: what comes out, comes out in an exchange (a question, a reproach, a disagreement), never in a speech.

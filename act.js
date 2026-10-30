@@ -72,6 +72,10 @@ window.ACT = (() => {
     ex: ['« Ne promets rien que tu ne peux tenir. » (le choix, reposé) / « Il y aura des conséquences. » (vague)', '« On se voit au championnat ce soir. On va avoir une petite discussion. » / Leo : « Samedi, après le match. Tu le dis à papa, ou c’est moi. »'],
     en: 'The last line announces a precise next moment the player wants to see: who, when, where, and what will be settled there. Or a surprise, or a new question. Never the question of the choice just made, asked again; never vague.',
     enEx: ['"Don\'t promise what you can\'t keep." (the choice, asked again) / "There will be consequences." (vague)', '"See you at the championship tonight. We\'re gonna have a little talk." / Leo: "Saturday, after the game. You tell Dad, or I will."'] };
+  AT.spark = { n: 'Une étincelle', how: 'Au moins une des deux est attirée par Justin (les deux, et c’est une rivalité). Ça se voit dans les répliques dès l’épisode 1 : une taquinerie qui dure un peu trop, un compliment qu’on regrette, une jalousie entre elles. Jamais dit (« je t’aime ») avant que l’histoire l’ait gagné. Le joueur se demande : « est-ce qu’elle… ? »',
+    ex: ['Nora est amoureuse de Justin. (dit, rien à voir) / Nora : « Je t’aime. » (trop tôt, plus rien à attendre)', 'Nora : « T’as coupé tes cheveux. … Refais plus jamais ça, j’ai failli dire une niaiserie. » / Sam, à Nora : « Il est pris, ce soir. » Nora : « Ah oui ? »'],
+    en: 'At least one of the two is drawn to justin (both, and it is a rivalry). It shows in the lines from episode 1: teasing that lasts a beat too long, a compliment someone regrets, jealousy between them. Never said ("I love you") before the story has earned it. The player wonders: "does she...?"',
+    enEx: ['Nora is in love with justin. (told, nothing to see) / Nora: "I love you." (too soon, nothing left to wait for)', 'Nora: "You cut your hair. ...Never do that again, I almost said something stupid." / Sam, to Nora: "He\'s taken tonight." Nora: "Is he?"'] };
   const atLine = (id) => `- ${AT[id].n}: ${AT[id].en} Flat: "${AT[id].enEx[0]}" -> works: "${AT[id].enEx[1]}"`;
 
   // the two people, drawn for the act's prompt ("Autre" draws again): who they are to justin, never a job
@@ -111,9 +115,9 @@ window.ACT = (() => {
   // the arc: per episode, its goal, what's at stake (it grows), its act techniques, and what it must contain:
   // [key, label here, label in the prompt, the act's value, thread]. Episode 1 carries three things and one plant
   const ARC = [
-    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'first', 'want', 'here', 'because', 'danger', 'loop', 'plant', 'hook'],
+    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'first', 'spark', 'want', 'here', 'because', 'danger', 'loop', 'plant', 'hook'],
       items: (A) => [['first', 'La 1re réplique', 'The FIRST line (La 1re réplique): understood alone, knowing nothing; a conflict, a surprise or a confession between two people on screen', ''],
-        ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel")`, ''],
+        ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel"); at least one of them is drawn to him, and it shows (Une étincelle)`, ''],
         ['want', 'Justin veut', `What justin has wanted for a long time, and why (Un rêve à lui): he says it himself, out loud, BEFORE ${nm(A, 'a')} asks; the request then lands on it`, A.justin_wants],
         ['ask', `${nm(A, 'a')} demande`, `${nm(A, 'a')} asks justin, out loud, and we see what is lost if he says no`, [E(A, 1).ask, A.lost_if_no].filter(Boolean).join(' · ')],
         ['hurt', `Ça blesse ${nm(A, 'b')}`, `Why giving it hurts ${nm(A, 'b')}, shown`, E(A, 1).hurts],
@@ -347,7 +351,7 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
 7. "secret": "who" (the id of the character it belongs to: the one whose odd behaviour it explains) and "what" (Un secret qui explique un geste). Once out, the player sees that person differently. It explains both setups.
 8. "setups": exactly 2 (Un plant qui se voit). "plant" = the line that plants it (setup 1 in episode 1, setup 2 in episode 2), "pay" = what it means once the secret is out.
 9. "episodes": exactly 5 objects, in order, with these fields:
-   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, best two people on screen telling a different past; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
+   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open: ONE simple contradiction the player gets in one exchange, one says it happened, the other says it did not ("You never came." / "I came every night."), never two versions of who did what; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
    2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook" (La fin qui promet).
    3: "reveal" (how the secret comes out, in the scene), "flip" (what the player believed, and what is true), "hook".
    4: "clock" (why it must be decided now), "a_asks", "b_asks" (Le même moment, deux demandes).
@@ -360,6 +364,8 @@ RULES:
 - Nothing contradicts itself: the past, the secret and the episodes tell one story.
 - Before episode 3, the secret is never said: only planted and hinted. But its question is open from episode 1 ("mystery").
 - Both sides of episode 4 must feel right: the player has to hesitate.
+- Romance keeps players: at least one of the two is drawn to justin (Une étincelle), from episode 1.
+- Simple enough to get on a phone: the past, the secret and the mystery each fit in one plain sentence a player understands the first time. Flat: "Ruby says she convinced him to stay, while Melissa claims she changed his mind." (who did what?) -> works: "Ruby says Melissa gave up on the trip. Melissa says she never did."
 
 THE JSON:
 {"title": "...", "scene": "...", "question": "...", "a": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "b": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "justin_wants": "...",
