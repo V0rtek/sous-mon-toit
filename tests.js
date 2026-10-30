@@ -36,6 +36,8 @@
     t_baiser: { ...T, spots: { justin: [820, 925, 430], twin: [920, 925, 430] }, face: { justin: 'r', twin: 'l' } },
     // two at the counter talking to each other: Sam nearer the camera, Justin behind him (the one at the back shows his face)
     t_deux: { ...B, spots: { twin: B.spots.justin, justin: B.spots.melissa }, face: { twin: 'r', justin: 'r' } },
+    // Justin and the pirate at the counter: Justin nearer the camera, the pirate behind him
+    t_pirate: { ...B, spots: { justin: B.spots.justin, pirate: B.spots.melissa }, face: { justin: 'r', pirate: 'r' } },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
@@ -171,6 +173,21 @@
     { cam: 'two', who: ['twin', 'justin'] }, { say: 'twin', pose: 'bar', to: 'justin', text: 'Ok. Oui. Elle est belle.' },
     { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_drink', text: '…' },
     { say: 'justin', pose: 'bar', to: 'twin', text: 'Elle m’a demandé ton nom.' },
+    { fade: 'out', ms: 600 },
+    // the pirate (made with Nouveau perso): his poses, and the two of them turning their heads to talk
+    { scene: 't_pirate', cast: { justin: 'bar', pirate: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Le pirate' }, { wait: 1200 },
+    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar', to: 'justin', text: 'T’es nouveau, toi.' },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar', to: 'pirate', text: 'Ça paraît tant que ça ?' },
+    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_laugh', text: 'Tu tiens ta chope comme une épée.' },
+    { say: 'pirate', pose: 'bar_drink', text: '…' },
+    { say: 'pirate', pose: 'bar_to_flirt', to: 'justin', text: 'La rousse, au fond. Elle te regarde.' },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar', to: 'pirate', text: 'Elle regarde tout le monde.' },
+    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_to_anger', to: 'justin', text: 'Pas moi. Jamais moi.' },
+    { say: 'pirate', pose: 'bar_stare', text: 'Plus depuis le port.' },
+    { say: 'pirate', pose: 'bar_back', text: 'La voilà.' },
+    { say: 'pirate', pose: 'bar_slide', to: 'justin', text: 'Tiens. T’en auras besoin.' },
+    { cam: 'wide', at: 900 }, { say: 'pirate', pose: 'bar_toast', to: 'justin', text: 'Aux nouveaux.' },
+    { say: 'pirate', pose: 'bar_slump', text: 'Réveille-moi si elle revient.' },
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
   // tbaiser (31/10): Justin and Sam (Justin again, turned around) face to face in pure profile: each pose of the kiss

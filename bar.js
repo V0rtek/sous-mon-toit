@@ -28,6 +28,8 @@ FACE.justin_bar = { drunk_listen: 'r', drunk_talk: 'r', drunk_happy: 'r', drunk_
   drunk_serious: 'r', explaining: 'r', angry: 'r', phone_shock: 'r', sit_fire: 'r' };
 // the house's poses (sheets to come, 23/10) play meanwhile as the closest pose each one has
 window.POSE_ALIAS = {
+  // the pirate only has his counter poses: leaning with a plain 'bar', or listening, he is his small smile
+  pirate: { bar: 'bar_smile', listen: 'bar_smile', explaining: 'bar_talk', thinking: 'bar_stare', surprised: 'bar_to_talk', angry: 'bar_to_anger', holding: 'bar_stare' },
   brooke: {
     listen: 'drunk_listen', explaining: 'drunk_talk', holding: 'drunk_sad', angry: 'drunk_talk', surprised: 'thinking',
     drunk_flirt: 'drunk_point', phone_shock: 'texting',
