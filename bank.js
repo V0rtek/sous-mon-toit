@@ -60,6 +60,7 @@ window.BANK = {
 (() => {
   const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   let tab = 'chars', playing = null;
+  const src = (id, p) => (typeof MADE !== 'undefined' && MADE[id] && MADE[id][p]) || `chars/${id}/${p}.webp`;   // an imported pose is a png
   const nameOf = (id) => ((window.GALLERY || []).find((g) => g.sprite === id) || {}).name || (window.CAST && CAST[id] && CAST[id].name) || id;
   const tabs = {
     chars() {
@@ -70,7 +71,7 @@ window.BANK = {
         + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
         return `<section class="bkChar"><h3>${esc(nameOf(id))} <small>${poses.length} poses</small></h3><div class="bkRow">${poses.map((p) =>
-          `<button type="button" class="bkPose${half[p] ? ' cut' : ''}" data-img="chars/${id}/${p}.webp"><img loading="lazy" src="chars/${id}/${p}.webp" alt=""><span>${esc(p)}${half[p] ? '<i>coupée</i>' : ''}</span></button>`).join('')}</div></section>`;
+          `<button type="button" class="bkPose${half[p] ? ' cut' : ''}" data-img="${src(id, p)}"><img loading="lazy" src="${src(id, p)}" alt=""><span>${esc(p)}${half[p] ? '<i>coupée</i>' : ''}</span></button>`).join('')}</div></section>`;
       }).join('');
     },
     decors() {
@@ -149,7 +150,10 @@ window.BANK = {
     };
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
     const redraw = () => { const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; };
-    $('#bankBody').onchange = (e) => { const k = e.target.dataset.ncfile; if (k && e.target.files[0]) BANK.newCharFile(k, e.target.files[0], redraw); };
+    $('#bankBody').onchange = (e) => { const d = e.target.dataset, f = e.target.files && e.target.files[0];
+      if (d.ncfile && f) BANK.newCharFile(d.ncfile, f, redraw);
+      else if (d.nclayer && f) BANK.newCharLayer(d.nclayer, f, redraw);
+      else if (d.ncobj) BANK.newCharLayerObj(e.target.value); };
     $('#bankBody').addEventListener('click', (e) => {
       const a = e.target.closest('[data-ncadd]'), g = e.target.closest('[data-ncgrip]');
       if (a) { e.stopPropagation(); BANK.newCharAdd(a.dataset.ncadd, redraw); }
@@ -273,9 +277,9 @@ Do not exaggerate the poses. Subtle and natural, like the reference. Mouth close
       '4. Head in his hands: elbows on the table, face in both hands, shoulders slumped.',
       '5. Fist on the table: one fist slammed on the table top, jaw clenched, leaning forward, angry.',
       '6. Getting up: rising from the chair, both hands pushing on the table, body half up, looking at the person across.'])],
-    prises: ['Prises (mains vides)', 'Boire, trinquer, lire, tendre : les mains sont vides, le jeu y met la chope, la lettre, la clé.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side, his hands EMPTY in holding positions', LEAN_CUT + ' HIS HANDS ARE EMPTY IN EVERY CELL: NO mug, NO cup, NO glass, NO paper, NO object at all. The game adds the object later: draw the hand shaped as if it holds it. Image 2 shows a mug in some cells: ignore it, his hands stay empty.', LEAN_ANGLE, [
-      '1. Bringing something to his lips: his near hand raised to his mouth, fingers curled as if holding a mug by its handle (empty), head tilted back slightly, eyes half closed.',
-      '2. Raising something toward the person next to him: head turned toward the camera side, smiling, his near hand raised at shoulder height toward them, fingers curled as if holding a mug (empty).',
+    prises: ['Prises (mains vides)', 'Boire, trinquer, lire, tendre : les mains sont vides. Boire et trinquer avec la main du fond : l’objet se met devant elle, sans rien découper. Puis « Ajouter une couche d’objet » : l’objet dessiné là où il va.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side, his hands EMPTY in holding positions', LEAN_CUT + ' HIS HANDS ARE EMPTY IN EVERY CELL: NO mug, NO cup, NO glass, NO paper, NO object at all. The game adds the object later: draw the hand shaped as if it holds it. Image 2 shows a mug in some cells: ignore it, his hands stay empty.', LEAN_ANGLE, [
+      '1. Bringing something to his lips with his FAR hand (the one on the other side of his body, away from the camera): that hand raised to his mouth, fingers curled as if holding a mug (empty), head tilted back slightly, eyes half closed. The near forearm stays on the ledge.',
+      '2. Raising something toward the person next to him with his FAR hand: head turned toward the camera side, smiling, the far hand raised at shoulder height in front of his chest, fingers curled as if holding a mug (empty). The near forearm stays on the ledge.',
       '3. Holding something in front of him with both hands: both hands together above the ledge in front of his chest, as if holding a letter open (empty), looking down at it.',
       '4. Handing something to the person next to him: head turned toward the camera side, his near arm extended toward them, hand half open as if offering a small thing (empty).',
       '5. Slumped, drunk or exhausted: his cheek resting in his near hand (elbow on the ledge), heavy eyelids, a lazy half-smile.',
@@ -356,7 +360,18 @@ Example:
   const importBox = (id) => { const s = shown && shown.kind === id ? shown : null;
     return `<div class="ncImport"><label class="ncBtn ncPick">${s && s.imgs ? 'Refaire avec une autre image' : 'Importer la feuille générée'}<input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
       + (s && s.imgs ? `${s.imgs.some((m) => m.grip) ? '<p>Le point jaune = où le jeu met l’objet. Touche la main pour le déplacer.</p>' : ''}<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>${s.moved ? `<button type="button" class="bkCopy" data-ncadd="${id}">Enregistrer la prise</button>` : ''}` : '')
-      + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '') + '</div>'; };
+      + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '')
+      // an object drawn by hand where it goes, on a layer the size of the sheet (the rest transparent)
+      + `<div class="ncLayer"><p>Un objet placé à la main : une couche de la taille de la feuille, l’objet seul là où il va, le reste transparent.</p><div class="ncRow"><select data-ncobj="${id}">${BANK.props.map(([n]) => `<option${n === layerObj ? ' selected' : ''}>${n}</option>`).join('')}</select><label class="ncBtn ncPick">Ajouter une couche d’objet<input type="file" accept="image/*" data-nclayer="${id}" hidden></label></div>`
+      + (L && L.kind === id ? `${L.imgs ? `<div class="ncCuts">${L.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>` : ''}<p class="ncMsg">${esc(L.msg)}</p>` : '') + '</div></div>'; };
+  let layerObj = 'chope', L = null;   // the object chosen for a layer, and the last layer cut
+  BANK.newCharLayerObj = (o) => { layerObj = o; };
+  BANK.newCharLayer = async (kind, file, redraw) => {
+    L = { kind, msg: 'Découpe de la couche…' }; redraw();
+    try { const r = await IMPORT.layer(file, kind, load().name, layerObj); L = { kind, imgs: r.poses.map((p) => ({ pose: p.pose, src: p.src })), msg: r.msg }; }
+    catch (err) { L = { kind, msg: `Pas ajoutée : ${err.message}` }; }
+    redraw();
+  };
   // imported = cut, then added to the game and ticked at once (a hand moved afterwards: « Enregistrer la prise »)
   BANK.newCharFile = async (kind, file, redraw) => {
     if (!String(load().name || '').trim()) { shown = { kind, msg: 'Donne-lui un nom d’abord (étape 1).' }; redraw(); return; }

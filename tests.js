@@ -43,6 +43,7 @@
     // Lily (31/10, imported from Nouveau perso): standing face to face with Justin, at the counter behind him, at the table
     t_lily_debout: { ...T, spots: { justin: [760, 925, 430], lily: [1010, 925, 430] }, face: { justin: 'r', lily: 'l' } },
     t_lily_bar: { ...B, spots: { justin: B.spots.justin, lily: B.spots.melissa }, face: { justin: 'r', lily: 'r' } },
+    t_lily_devant: { ...B, spots: { lily: B.spots.melissa, justin: B.spots.candy }, face: { lily: 'r', justin: 'r' } },   // nobody in front of her, room on her right for what she holds
     t_lily_table: { image: 'ref/guides/table.webp', fg: 'ref/guides/table_fg.webp', size: [2400, 1350], front: [], spots: { lily: [1005, 1250, 620], lily2: [1395, 1250, 620] }, face: { lily: 'r', lily2: 'l' } },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
@@ -235,14 +236,23 @@
     { fade: 'out', ms: 500 },
     // her Prises (empty hands): the game puts the mug, then the letter, where her hand is (until her sheet is imported,
     // her closest pose plays and nothing is held)
-    { scene: 't_lily_bar', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'close', who: ['lily'] }, { fade: 'in', ms: 600 }, { caption: 'Lily · prises' }, { wait: 900 },
+    { scene: 't_lily_devant', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'close', who: ['lily'] }, { fade: 'in', ms: 600 }, { caption: 'Lily · prises' }, { wait: 900 },
     { hold: { lily: 'chope' } }, { say: 'lily', pose: 'hold_mouth', text: '…' },
     { say: 'lily', pose: 'hold_raise', to: 'justin', text: 'À Marco. Qu’il dorme bien ce soir.' },
     { hold: { lily: 'lettre' } }, { say: 'lily', pose: 'hold_front', text: '« Minuit, la cave. » C’est son écriture.' },
     { say: 'lily', pose: 'hold_give', to: 'justin', text: 'Garde-la. Si je reviens pas.' },
     { hold: { lily: null } }, { say: 'lily', pose: 'bar_slump', text: 'J’ai trop bu pour un plan pareil.' },
     { say: 'lily', pose: 'bar_laugh', text: 'Ou pas assez !' },
-    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+    { fade: 'out', ms: 500 },
+    // the same hands, other objects: the purse, the envelope, the map, the scroll, the poster, a coin
+    { scene: 't_lily_devant', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'close', who: ['lily'] }, { fade: 'in', ms: 600 }, { caption: 'Lily · objets' }, { wait: 900 },
+    { hold: { lily: 'bourse' } }, { say: 'lily', pose: 'hold_give', to: 'justin', text: 'Sa bourse. Je l’ai prise en passant.' },
+    { hold: { lily: 'enveloppe' } }, { say: 'lily', pose: 'hold_front', text: 'Scellée. Le sceau du port.' },
+    { hold: { lily: 'carte' } }, { say: 'lily', pose: 'hold_raise', to: 'justin', text: 'Et ça, c’est où il cache le reste.' },
+    { hold: { lily: 'parchemin' } }, { say: 'lily', pose: 'hold_front', text: 'Un contrat. Avec ton nom dessus.' },
+    { hold: { lily: 'wanted' } }, { say: 'lily', pose: 'hold_give', to: 'justin', text: 'Et ça, c’est toi. Recherché.' },
+    { hold: { lily: 'piece' } }, { say: 'lily', pose: 'hold_raise', to: 'justin', text: 'Pile, tu restes. Face, tu cours.' },
+    { hold: { lily: null } }, { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
   window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser, tlily };
   window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }, { id: 'tlily', name: 'Test · Lily' }];

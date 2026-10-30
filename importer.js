@@ -105,7 +105,7 @@
         grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? Math.min(arm, hand || arm) + 1 : gy]; }
       // the ledge = the higher of the two bottoms: the body's on the left (a mug hanging lower on the right doesn't count),
       // the forearms' on the right (a belt or a skirt drawn under them on the left doesn't count)
-      out.push({ pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip });
+      out.push({ pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip, rect: [(x0 + bx0) / W, (y0 + by0) / H, w / W, h / H] });
     }
     return out;
   }
@@ -116,12 +116,12 @@
     const K = KINDS[kind], sp = { poses: {}, half: { unit: 1483, belt: 0.6, poses: {}, full: {} } };
     if (K.cut === 'full') {   // head to feet: all the poses of the sheet at one scale, the tallest = 700
       const s = GUIDE.full.h / Math.max(...cells.map((c) => c.h));
-      for (const c of cells) { c.scale = s; sp.poses[c.pose] = [Math.round(c.w * s), Math.round(c.h * s)]; }
+      for (const c of cells) { c.scale = s; sp.poses[c.pose] = [Math.round(c.w * s), Math.round(c.h * s)]; (sp.rects = sp.rects || {})[c.pose] = c.rect; }
       sp.refH = GUIDE.full.h; return sp;
     }
     const g = GUIDE[K.cut === 'table' ? 'counter' : K.cut], unit = Math.round(g.unit * median(cells.map((c) => (K.cut === 'belt' ? c.h : Math.min(c.h, c.arm)))) / g.h);
     for (const c of cells) {
-      c.scale = 1; sp.poses[c.pose] = [c.w, c.h];
+      c.scale = 1; sp.poses[c.pose] = [c.w, c.h]; (sp.rects = sp.rects || {})[c.pose] = c.rect;
       if (c.grip) (sp.grip = sp.grip || {})[c.pose] = c.grip;
       // at a counter the ledge is 1.05 m (0.6 of his height); at a table, 0.75 m (0.43)
       if (K.cut === 'counter' || K.cut === 'table') sp.half.poses[c.pose] = [Math.round(GUIDE.counter.ax * unit / g.unit), Math.min(c.h, c.arm), K.cut === 'table' ? 0.43 : 0.6, unit];
@@ -145,6 +145,11 @@
       Object.assign(sp.half.poses, data.half.poses); Object.assign(sp.half.full, data.half.full || {});
     }
     if (data.grip) sp.grip = { ...(sp.grip || {}), ...data.grip };
+    if (data.rects) sp.rects = { ...(sp.rects || {}), ...data.rects };
+    // an object layer drawn by hand on the sheet: per object, per pose, its picture (the pose's size, over it)
+    // layers[obj][pose] = { src, box: [left, top, width, height] as fractions of the pose's picture }
+    for (const [obj, boxes] of Object.entries(data.layers || {})) { sp.layers = sp.layers || {}; sp.layers[obj] = sp.layers[obj] || {};
+      for (const [p, box] of Object.entries(boxes)) sp.layers[obj][p] = { src: (urls && urls[`${p}@${obj}`]) || `chars/${id}/${p}@${obj}.png`, box }; }
     FACE[id] = FACE[id] || {}; for (const p of Object.keys(data.poses)) FACE[id][p] = 'r';
     MADE[id] = MADE[id] || {}; for (const p of Object.keys(data.poses)) MADE[id][p] = (urls && urls[p]) || `chars/${id}/${p}.${data.ext || 'png'}`;
     if (!CAST[id]) CAST[id] = { name: data.name || id, color: data.color || '#6e3b8c', sprite: id };
@@ -171,7 +176,7 @@
     const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
     const old = (await read(`chars/${id}/sprite.json`)) || { name, ext: 'png', poses: {}, half: { unit: 0, belt: 0.6, poses: {}, full: {} } };
     const list = (await read('chars/imports.json')) || [];
-    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
+    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
@@ -181,6 +186,10 @@
     }
     files.push({ path: `chars/${id}/sprite.json`, content: JSON.stringify(data, null, 1), encoding: 'utf-8' });
     if (!list.includes(id)) files.push({ path: 'chars/imports.json', content: JSON.stringify([...list, id]), encoding: 'utf-8' });
+    await commit(token, files, `${name || id} : feuille ${kind} importée depuis Nouveau perso`);
+    return data;
+  }
+  async function commit(token, files, message) {
     const ref = await gh(token, 'git/ref/heads/main'), base = await gh(token, `git/commits/${ref.object.sha}`);
     const tree = [];
     for (const f of files) {
@@ -188,9 +197,8 @@
       tree.push({ path: f.path, mode: '100644', type: 'blob', sha: bl.sha });
     }
     const t = await gh(token, 'git/trees', { method: 'POST', body: JSON.stringify({ base_tree: base.tree.sha, tree }) });
-    const cm = await gh(token, 'git/commits', { method: 'POST', body: JSON.stringify({ message: `${name || id} : feuille ${kind} importée depuis Nouveau perso`, tree: t.sha, parents: [ref.object.sha] }) });
+    const cm = await gh(token, 'git/commits', { method: 'POST', body: JSON.stringify({ message, tree: t.sha, parents: [ref.object.sha] }) });
     await gh(token, 'git/refs/heads/main', { method: 'PATCH', body: JSON.stringify({ sha: cm.sha }) });
-    return data;
   }
 
   // ---- for Nouveau perso: cut and show, then push ----
@@ -208,6 +216,7 @@
       last = { id: slug(name), name: String(name || '').trim(), kind, cells, sp };
       return cells.map((c) => ({ pose: c.pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
     },
+    lastRects: () => last && last.sp.rects,
     // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)
     setGrip(pose, fx, fy) {
       const c = last && last.cells.find((x) => x.pose === pose); if (!c || !c.grip) return null;
@@ -224,6 +233,34 @@
       return `Ajouté au jeu : ${last.name}. Partout dans une minute environ.`;
     },
     apply,
+    // a layer the size of the sheet, the object alone where it goes (the rest transparent): cut with each pose's rect
+    async layer(file, kind, name, obj) {
+      const id = slug(name), sp = SPRITES[id], poses = KINDS[kind].poses.filter((p) => sp && sp.rects && sp.rects[p]);
+      if (!poses.length) throw new Error('Réimporte d’abord cette feuille : le jeu doit savoir où il a coupé chaque pose.');
+      const bmp = await createImageBitmap(file), out = [];
+      for (const p of poses) {
+        // its whole cell (an object may reach past the figure), at the pose's scale; box = where the cell sits on the pose
+        const n = KINDS[kind].poses.indexOf(p), cx0 = (n % 3) / 3, cy0 = ((n / 3) | 0) / 2, [fx, fy, fw, fh] = sp.rects[p], [pw] = sp.poses[p];
+        const k = pw / (fw * bmp.width), c = document.createElement('canvas'); c.width = Math.round(bmp.width / 3 * k); c.height = Math.round(bmp.height / 2 * k);
+        const cx = c.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, cx0 * bmp.width, cy0 * bmp.height, bmp.width / 3, bmp.height / 2, 0, 0, c.width, c.height);
+        const a = cx.getImageData(0, 0, c.width, c.height).data; let any = false; for (let i = 3; i < a.length; i += 4) if (a[i] > 40) { any = true; break; }
+        if (any) out.push({ pose: p, src: c.toDataURL('image/png'), canvas: c, box: [(cx0 - fx) / fw, (cy0 - fy) / fh, (1 / 3) / fw, (1 / 2) / fh].map((v) => +v.toFixed(4)) });
+        await breathe();
+      }
+      if (!out.length) throw new Error('La couche est vide, ou pas à la taille de la feuille.');
+      const boxes = Object.fromEntries(out.map((o) => [o.pose, o.box]));
+      apply(id, { poses: {}, layers: { [obj]: boxes } }, Object.fromEntries(out.map((o) => [`${o.pose}@${obj}`, o.src])));
+      const token = ls('smt-gh-token');
+      if (!token) return { poses: out, msg: 'Jouable sur ce téléphone seulement (pas de jeton GitHub).' };
+      const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
+      const old = await read(`chars/${id}/sprite.json`); if (!old) throw new Error('Ce perso n’est pas encore dans le repo.');
+      const data = { ...old, layers: { ...(old.layers || {}), [obj]: { ...((old.layers || {})[obj] || {}), ...boxes } } };
+      const files = [];
+      for (const o of out) files.push({ path: `chars/${id}/${o.pose}@${obj}.png`, content: await blobB64(await new Promise((ok) => o.canvas.toBlob(ok, 'image/png'))), encoding: 'base64' });
+      files.push({ path: `chars/${id}/sprite.json`, content: JSON.stringify(data, null, 1), encoding: 'utf-8' });
+      await commit(token, files, `${old.name || id} : couche ${obj} (${out.length} poses) depuis Nouveau perso`);
+      return { poses: out, msg: `Couche « ${obj} » ajoutée : ${out.map((o) => o.pose).join(', ')}.` };
+    },
   };
 
   // every page: the imported characters, from the repo (IMPORTS_READY: a test that plays one waits for them)
