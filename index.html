@@ -1684,9 +1684,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031430000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
-<script src="importer.js?v=20261031520000"></script>
+<script src="importer.js?v=20261031550000"></script>
 <script src="bank.js?v=20261031500000"></script>
-<script src="place.js?v=20261031510000"></script>
+<script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1796,8 +1796,22 @@ function gripAt(a, b, g) {   // a grip in his pose's pixels -> decor px (and mir
   return { x: b.left + (flipped(a) ? pw - g[0] : g[0]) / pw * b.w, y: b.top + g[1] / ph * b.h };
 }
 // where the held object reaches, left and right, in decor px (null: nothing held)
+// placed by hand for this object on this pose; else for another object of its kind (a drink, a paper) on this pose
+function placeOf(a) {
+  const pl = SPRITES[spriteOf(a.id)].place || {}, pose = poseOf(a.id, a.shown), own = (pl[a.hold] || {})[pose];
+  if (own) return own;
+  const kind = DRINKS.includes(a.hold) ? DRINKS : PAPER.includes(a.hold) ? PAPER : [];
+  for (const o of kind) if (pl[o] && pl[o][pose]) return { ...pl[o][pose], from: o };
+  // her Accoudé poses are one body (only the head turns): a drink placed on the counter in one of them stays there in the others
+  const LEAN = ['bar_to_listen', 'bar_to_smile', 'bar_to_tense', 'bar_ahead', 'bar_back', 'bar_put'];
+  if (LEAN.includes(pose)) for (const o of [a.hold, ...kind]) for (const q of LEAN) if (pl[o] && pl[o][q]) return { ...pl[o][q], from: o === a.hold ? undefined : o };
+  return null;
+}
+// a picture's height / width (props/), once it has been seen
+const ASPECT = {};
+const aspectOf = (name) => { if (!ASPECT[name]) { const i = new Image(); i.onload = () => { ASPECT[name] = i.naturalHeight / i.naturalWidth; }; i.src = `props/${name}.webp`; } return ASPECT[name]; };
 function heldSpan(a, b) {
-  const P = a.hold && ((SPRITES[spriteOf(a.id)].place || {})[a.hold] || {})[poseOf(a.id, a.shown)];
+  const P = a.hold && placeOf(a);
   if (P) { const c = b.left + (flipped(a) ? 1 - P.x : P.x) * b.w, h = P.w * b.w * 0.8; return [c - h, c + h]; }
   const L = a.hold && ((SPRITES[spriteOf(a.id)].layers || {})[a.hold] || {})[poseOf(a.id, a.shown)];
   if (L) { const [l, , w] = L.box, f = flipped(a), x0 = b.left + (f ? 1 - l - w : l) * b.w; return [x0, x0 + w * b.w]; }
@@ -1819,11 +1833,20 @@ function drawHeld(a, b) {
   }
   if (a.layerEl) a.layerEl.hidden = true;
   // placed by hand (Mini-jeux › Placer un objet): its centre, its width and its angle on this pose
-  const P = a.hold && ((SPRITES[spriteOf(a.id)].place || {})[a.hold] || {})[poseOf(a.id, a.shown)];
+  const P = a.hold && placeOf(a);
   if (P) {
     if (!a.heldEl || a.heldEl.dataset.src !== a.hold) { if (a.heldEl) a.heldEl.remove(); a.heldEl = new Image(); a.heldEl.alt = ''; a.heldEl.dataset.src = a.hold; a.heldEl.src = `props/${a.hold}.webp`; a.el.appendChild(a.heldEl); }
     const f = flipped(a);
-    a.heldEl.style.cssText = `position:absolute;pointer-events:none;left:${(f ? 1 - P.x : P.x) * b.w}px;top:${P.y * b.h}px;width:${P.w * b.w}px;height:auto;max-width:none;max-height:none;transform:translate(-50%,-50%) rotate(${f ? -P.r : P.r}deg)${f ? ' scaleX(-1)' : ''}`;
+    // borrowed from another object of its kind: its own real size, its top (a rim, a neck) where the other one's top was
+    let { x, y, w } = P;
+    if (P.from) {
+      const k = propM(a.hold) / propM(P.from), w2 = w * k, ra = (P.r || 0) * Math.PI / 180, A0 = aspectOf(P.from), A1 = aspectOf(a.hold);
+      if (A0 && A1) { const h0 = w * b.w * A0, h1 = w2 * b.w * A1, d = (h1 - h0) / 2;   // move along its axis by the difference of half heights
+        x += d * Math.sin(ra) / b.w; y += -d * Math.cos(ra) * -1 / b.h; }
+      else a.heldEl.onload = () => placeActor(a);
+      w = w2;
+    }
+    a.heldEl.style.cssText = `position:absolute;pointer-events:none;left:${(f ? 1 - x : x) * b.w}px;top:${y * b.h}px;width:${w * b.w}px;height:auto;max-width:none;max-height:none;transform:translate(-50%,-50%) rotate(${f ? -P.r : P.r}deg)${f ? ' scaleX(-1)' : ''}`;
     a.heldEl.hidden = false; if (a.slotEl) a.slotEl.hidden = true; return;
   }
   // the red placeholder of the pose (Prises): the object under the pose, where the red was, along its axis. Something to
@@ -3625,11 +3648,20 @@ window.COUNTER = {
   poses: (id) => Object.keys((SPRITES[(CAST[id] || {}).sprite || id] || {}).poses || {}).filter((p) => POSE_MEANS[p]),
   cast() { return Object.keys(CAST).filter((id) => !NOT_CAST.includes(id) && COUNTER.poses(id).length >= 3); },
   decor() { return `"comptoir" = ${COUNTER.cast().map((id) => `${id} (${CAST[id].name})`).join(', ')} (leaning side by side at the counter of a port tavern, at night; justin leans there too)`; },
+  // where each one's drinks show, from the placements made by hand: in hand (a hold_ pose) or on the counter next to them
+  objectsText() {
+    const lines = [...COUNTER.cast(), 'justin'].map((id) => { const pl = (SPRITES[(CAST[id] || {}).sprite || id] || {}).place || {}, hand = new Set(), side = new Set();
+      for (const poses of Object.values(pl)) for (const q of Object.keys(poses)) (/^hold_/.test(q) ? hand : side).add(q);
+      if (!hand.size && !side.size) return '';
+      return `- ${id}: a drink (biere, vin, potion, gobelet)${hand.size ? ` in hand with ${[...hand].join(', ')}` : ''}${side.size ? `${hand.size ? ';' : ''} on the counter next to them while leaning (${[...side].join(', ')} and their other bar_ poses)` : ''}`; }).filter(Boolean);
+    return lines.length ? `Drinks that really show (give them with "hold" and keep them through the scene: a drink on the counter in front of someone says a lot):\n${lines.join('\n')}` : '';
+  },
   posesText() {
     const line = (id) => `- ${id}: ${COUNTER.poses(id).map((p) => `${p} (${POSE_MEANS[p]})`).join(', ')}`;
     return `AT THE COUNTER: the whole scene happens leaning at the counter. Each line's "pose" is one of THAT character's poses below, nothing else; choose the one that plays the line (a drink to dodge a question, a toast, a coin slid over, a look away).
 ${[...COUNTER.cast(), 'justin'].map(line).join('\n')}
-OBJECTS: on a line, "hold": "<object>" puts it in their hand first (the hold_ poses), "hold": null takes it away; "put": "<object>" lays it on the counter under their fingers (the pose bar_put). Drinks: biere, vin, potion, gobelet. Papers: lettre, carte, wanted, parchemin, enveloppe. Small: piece, bourse. Only when it serves the line.`;
+OBJECTS: on a line, "hold": "<object>" gives it to them (it stays until "hold": null), "put": "<object>" lays it on the counter under their fingers (the pose bar_put). Drinks: biere, vin, potion, gobelet. Papers: lettre, carte, wanted, parchemin, enveloppe. Small: piece, bourse. Only when it serves the line.
+${COUNTER.objectsText()}`;
   },
 };
 window.PLAN_PLAY = (json, title) => {

@@ -166,6 +166,8 @@
     }
     if (data.grip) sp.grip = { ...(sp.grip || {}), ...data.grip };
     if (data.rects) sp.rects = { ...(sp.rects || {}), ...data.rects };
+    // placed by hand (Mini-jeux › Placer un objet, sent to Claude): per object, per pose, {x, y, w, r}
+    for (const [o, poses] of Object.entries(data.place || {})) { sp.place = sp.place || {}; sp.place[o] = { ...(sp.place[o] || {}), ...poses }; }
     if (data.slots) sp.slots = { ...(sp.slots || {}), ...data.slots };
     // an object layer drawn by hand on the sheet: per object, per pose, its picture (the pose's size, over it)
     // layers[obj][pose] = { src, box: [left, top, width, height] as fractions of the pose's picture }

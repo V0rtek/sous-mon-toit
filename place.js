@@ -57,7 +57,8 @@
     const k = e.target.dataset.pl; if (!k) return;
     if (k === 'w' || k === 'r') { st[k] = +e.target.value; place(); return; }
     st[k] = e.target.value; if (k === 'id') st.pose = null;
-    if (k !== 'w' && k !== 'r') { draw(); if (st.pose) { recall(); draw(); } }
+    if (k === 'obj') { draw(); return; }   // another object: the same place, size and angle (only its picture changes)
+    draw(); if (st.pose) { recall(); draw(); }
   }
   // dragging: the object follows the finger, in fractions of the pose's picture
   let drag = false;
