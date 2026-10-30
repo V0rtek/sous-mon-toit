@@ -35,6 +35,7 @@ window.DECK = (() => {
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Pause.</h1><p>Son cell : le choix qu'il a devant lui.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Un nouveau perso entre : [Y].</h1><p>Pour la salle, un perso comme les autres.</p>` },
     { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure.</p>` },
+    { c: '#ff375f', full: true, h: () => `<img class="dkFull" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">` },
     { c: '#30d158', h: () => `<h1>L'histoire te suit.</h1><p>Même au bol : elle continue sur ton cell.</p>` },
     { c: '#30d158', wall: true, h: () => `<div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div>` },
   ];
@@ -53,6 +54,7 @@ window.DECK = (() => {
     "Je clique sur la télé : pause. L'écran s'assombrit, je clique sur son perso : on voit l'écran de son cell, le choix qu'il a devant lui.",
     "Un nouveau perso entre dans l'histoire : [Y]. Pour la salle, c'est un perso comme les autres. Il parle, il fait un choix : personne ne se doute qu'un humain le joue.",
     "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure.",
+    "Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé.",
     "Un joueur peut même aller sur le bol et continuer à suivre l'histoire sur son cell. L'histoire ne l'attend pas dans la salle : elle le suit.",
     "Tous ces persos viennent d'une photo. Chacun joue ses poses.",
   ];
@@ -61,7 +63,7 @@ window.DECK = (() => {
   function draw() {
     const s = S[i]; clearInterval(spot);
     root.style.setProperty('--c', s.c);
-    root.querySelector('.dkSlide').innerHTML = T(s.h());
+    const sl = root.querySelector('.dkSlide'); sl.classList.toggle('full', !!s.full); sl.innerHTML = T(s.h());
     if (s.wall) {   // every perso plays its poses, each at its own offset, round and round
       WALL.forEach(([, poses]) => poses.forEach((u) => { new Image().src = u; }));
       const imgs = [...root.querySelectorAll('.dkAnim')]; let t = 0;
