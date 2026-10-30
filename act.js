@@ -19,6 +19,10 @@ window.ACT = (() => {
   // ---- the act's techniques: what makes a field work. n, how, ex = [flat, works] (here, in French); en, enEx = the
   // same for the prompts. The flat examples come from the act "The Empty Place" (30/10), which didn't work ----
   const AT = {
+    visible: { n: 'Ce que l’écran montre', how: 'Le joueur ne voit que le décor, les persos, leurs poses et les répliques. Rien d’autre n’existe : pas de geste qu’on ne voit pas (compter les lumières, jouer avec une pièce), pas d’objet qui n’est pas dans le décor (une caisse). Si une chose compte, une réplique dit clairement ce que c’est, dès la première fois.',
+      ex: ['Il compte les lumières du plafond. / Il fait tourner une pièce. / Où est la caisse ?', '« Trois ans que t’es pas venue ici. » (ce qui compte est dit, rien à voir de plus)'],
+      en: 'The player only sees the decor, the characters, their poses and the lines. Nothing else exists: no gesture the screen does not show (counting the lights, flipping a coin), no object that is not in the decor (a crate). If something matters, a line says plainly what it is, the first time it comes up.',
+      enEx: ['He counts the lights on the ceiling. / He flips a coin. / Where is the crate?', '"Three years since you set foot in here." (what matters is said, nothing else to see)'] },
     because: { n: 'Vouloir + raison', how: 'Chaque perso veut une chose qu’il demande à voix haute, et finit la phrase « parce qu’il croit que… ». Sans raison, c’est le scénario qui veut, pas lui.',
       ex: ['Candy veut empêcher Melissa d’emmener sa sœur.', 'Candy veut que Justin dise non à Melissa, parce qu’elle croit que Melissa l’abandonnera lui aussi, comme elle est partie il y a trois ans.'],
       en: 'Each one wants something they ask justin for out loud, and finishes the sentence "because they believe that...". A want without a reason is the script wanting, not them.',
@@ -28,25 +32,25 @@ window.ACT = (() => {
       en: 'What is at stake is between the people on screen, tonight. No institution, no key character we never see. Someone absent can only be a reason to act, never the one who acts.',
       enEx: ['The sister (never seen), the city council, the eastern gate.', 'Melissa asks justin to leave with her tomorrow morning. Candy is sitting right there.'] },
     danger: { n: 'Danger présent', how: 'Ce qui peut être perdu se voit dans la scène : quelqu’un qui part, un lien qui casse devant témoins, une vérité qui va sortir. On le voit, pas besoin de l’expliquer.',
-      ex: ['Faire sortir la sœur de la ville (fuir quoi ?).', 'Si Justin dit non, Melissa part seule demain et ne reviendra pas : ses bagages sont déjà au pied de l’escalier.'],
+      ex: ['Faire sortir la sœur de la ville (fuir quoi ?).', 'Melissa : « Je pars demain matin. Avec toi ou sans toi. Et je reviendrai pas. »'],
       en: 'What can be lost is visible in the scene: someone leaving, a bond breaking in front of others, a truth about to come out. We see it, nobody has to explain it.',
-      enEx: ['Get the sister out of the city (escape what?).', 'If justin says no, Melissa leaves alone tomorrow and never comes back: her bags are already at the foot of the stairs.'] },
+      enEx: ['Get the sister out of the city (escape what?).', 'Melissa: "I leave tomorrow morning. With you or without you. And I\'m not coming back."'] },
     past: { n: 'Le passé en une phrase', how: 'Le passé tient en une phrase, encore vraie aujourd’hui. Pas de chaîne d’événements anciens : un passé de deux phrases ne rentre pas dans un épisode de 24 répliques.',
       ex: ['Il y a trois ans, Melissa a fait fuir sa sœur avec l’aide de Candy, qui l’a laissée porter le blâme, et la sœur l’a découvert…', 'Il y a trois ans, Melissa est partie sans dire au revoir à Justin.'],
       en: 'The past fits in ONE sentence, still true today. No chain of old events: a past that needs two sentences does not fit in a 24-line episode.',
       enEx: ['Three years ago Melissa helped her sister escape with Candy\'s help, Candy let her take the blame, and the sister found out...', 'Three years ago, Melissa left without saying goodbye to justin.'] },
     secret: { n: 'Un secret qui explique un geste', how: 'Le secret appartient à celui qu’il explique. Avant la révélation, ce perso fait déjà une chose étrange qu’on voit ; après, ce geste a un sens.',
-      ex: ['Le secret « de Melissa » raconte ce que Candy a fait.', 'Candy a lu la lettre d’adieu que Melissa avait laissée pour Justin, et l’a gardée. Avant, elle change de sujet chaque fois qu’on parle du départ.'],
+      ex: ['Le secret « de Melissa » raconte ce que Candy a fait.', 'Candy a gardé la lettre d’adieu que Melissa avait laissée pour Justin. Avant, chaque fois qu’on parle du départ, elle change de sujet.'],
       en: 'The secret belongs to the person it explains. Before it comes out, that person already does something odd that we see; after, that gesture makes sense.',
       enEx: ['"Melissa\'s" secret tells what Candy did.', 'Candy read the goodbye letter Melissa left for justin, and kept it. Before, she changes the subject every time someone mentions the day Melissa left.'] },
     plant: { n: 'Un plant qui se voit', how: 'Le plant est dans une réplique : un mot, un geste nommé, un objet tenu. Il passe pour autre chose (une blague, une habitude), puis le secret lui donne son sens. Rien à remarquer en silence : le jeu n’a que des répliques.',
-      ex: ['Candy pose trois tasses pour deux.', '« T’as gardé ma tasse ? » « Je garde tout, moi. » (Candy, en rangeant une boîte qu’elle ne laisse pas ouvrir.)'],
+      ex: ['Candy pose trois tasses pour deux.', 'Candy : « Moi, je garde tout. Même ce qu’on m’a jamais donné. » (dit en riant, comme une blague)'],
       en: 'A plant is in a line: a word, a gesture someone names, an object someone holds. It passes for something else (a joke, a habit); the secret later gives it its meaning. Nothing to notice in silence: the game only has lines.',
-      enEx: ['Candy sets three cups for two.', '"You kept my cup?" "I keep everything." (Candy, putting away a box she won\'t let anyone open.)'] },
+      enEx: ['Candy sets three cups for two.', 'Candy: "I keep everything. Even what nobody ever gave me." (said laughing, like a joke)'] },
     easy: { n: 'Effort minimal, échec qui empire', how: 'Justin tente ce que n’importe qui ferait d’abord : un petit mensonge, gagner du temps. Ça casse devant la personne qu’il voulait protéger, et ça la blesse plus que la vérité.',
-      ex: ['Il promet à l’une la porte, à l’autre l’audience.', 'Il dit à Candy qu’il n’ira pas voir Melissa. Candy le voit sortir de chez Melissa.'],
+      ex: ['Il promet à l’une la porte, à l’autre l’audience.', 'Il dit à Candy qu’il n’a pas revu Melissa. Melissa arrive : « Merci pour hier soir. »'],
       en: 'justin tries what anyone would try first: a small lie, buying time. It breaks in front of the person he wanted to protect, and hurts them more than the truth would have.',
-      enEx: ['He promises one the gate and the other the hearing.', 'He tells Candy he won\'t see Melissa. Candy sees him walk out of Melissa\'s room.'] },
+      enEx: ['He promises one the gate and the other the hearing.', 'He tells Candy he hasn\'t seen Melissa. Melissa walks in: "Thanks for last night."'] },
     same: { n: 'Le même moment, deux demandes', how: 'A et B demandent la même chose précise au même moment : il ne peut physiquement pas faire les deux. Chaque côté a une raison qu’on comprend.',
       ex: ['Porte de l’est à 6 h contre audience à 6 h (deux absents de plus).', 'Demain 7 h : Melissa part, elle l’attend à la porte. Candy : « Si tu pars avec elle, ne reviens pas. »'],
       en: 'A and B ask for the same precise moment: he physically cannot do both. Each side has a reason we understand.',
@@ -91,31 +95,33 @@ window.ACT = (() => {
   // the arc: per episode, its goal, what's at stake (it grows), its act techniques, and what it must contain:
   // [key, label here, label in the prompt, the act's value, thread]. Episode 1 carries three things and one plant
   const ARC = [
-    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['here', 'because', 'danger', 'plant'],
-      items: (A) => [['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel")`, ''],
+    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'here', 'because', 'danger', 'plant'],
+      items: (A) => [['first', 'La 1re réplique', 'The FIRST line: one sentence that makes the player want to know what happens, about something visible or said (never a gesture or an object the screen does not show)', ''],
+        ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel")`, ''],
+        ['want', 'Justin veut', 'What justin wants for himself, said or thought, so the player wants it too', A.justin_wants],
         ['ask', `${nm(A, 'a')} demande`, `${nm(A, 'a')} asks justin, out loud, and we see what is lost if he says no`, [E(A, 1).ask, A.lost_if_no].filter(Boolean).join(' · ')],
         ['hurt', `Ça blesse ${nm(A, 'b')}`, `Why giving it hurts ${nm(A, 'b')}, shown`, E(A, 1).hurts],
         ['s1', 'Planté', 'Plant it in a line, passing for something else', S(A, 0).plant, 's1'],
         ['end', 'Fin', 'The episode ends on (its turn)', E(A, 1).hook]] },
-    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['easy', 'plant', 'secret'],
+    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['visible', 'easy', 'plant', 'secret'],
       items: (A) => [['r1', 'Rappel', 'Bring it back, without explaining it', S(A, 0).plant, 's1'],
         ['easy', 'L’effort minimal', 'What justin tries first to keep both (the easy way)', E(A, 2).easy],
         ['s2', 'Planté', 'Plant it in a line, passing for something else', S(A, 1).plant, 's2'],
         ['worse', 'Ça empire', `It backfires and makes it worse with ${nm(A, 'b')}`, E(A, 2).backfires],
         ['sec', `Le secret ${de(holder(A))}, soulevé`, `${holder(A)} does the odd thing the secret will explain; the question is raised, never answered`, '', 'sec'],
         ['end', 'Fin', 'The episode ends on (its turn)', E(A, 2).hook]] },
-    { goal: 'Le secret sort. On revoit tout', en: 'the secret comes out and the player sees everything differently', stake: (A) => `Ce qu’il croyait ${de(holder(A))}`, at: ['secret'],
+    { goal: 'Le secret sort. On revoit tout', en: 'the secret comes out and the player sees everything differently', stake: (A) => `Ce qu’il croyait ${de(holder(A))}`, at: ['visible', 'secret'],
       items: (A) => [['out', 'Le secret sort', 'The secret comes out ("Reveal info")', E(A, 3).reveal, 'sec'],
         ['p1', 'Payé', 'Pay it off: what was planted now makes sense', S(A, 0).pay, 's1'],
         ['p2', 'Payé', 'Pay it off: what was planted now makes sense', S(A, 1).pay, 's2'],
         ['flip', 'Ce qu’on croyait', 'What the player believed, turned around', E(A, 3).flip],
         ['end', 'Fin', 'The episode ends on (its turn)', E(A, 3).hook]] },
-    { goal: 'Un ou l’autre. Pas les deux', en: 'he must choose between the two, he cannot keep both', stake: (A) => `${nm(A, 'a')} ou ${nm(A, 'b')}`, at: ['same', 'here'],
+    { goal: 'Un ou l’autre. Pas les deux', en: 'he must choose between the two, he cannot keep both', stake: (A) => `${nm(A, 'a')} ou ${nm(A, 'b')}`, at: ['visible', 'same', 'here'],
       items: (A) => [['clock', 'L’horloge', 'The clock: why it must be decided now', E(A, 4).clock],
         ['aa', `${nm(A, 'a')} demande`, `${nm(A, 'a')} asks`, E(A, 4).a_asks],
         ['ba', `${nm(A, 'b')} demande`, `${nm(A, 'b')} asks`, E(A, 4).b_asks],
         ['pick', 'Le choix', `The LAST choice of the episode: ${nm(A, 'a')} or ${nm(A, 'b')}, exactly these two options, each one painful to lose`, '']] },
-    { goal: 'Ce que ça a coûté', en: 'what his choice cost', stake: () => 'Ce que ça coûte', at: ['here'],
+    { goal: 'Ce que ça a coûté', en: 'what his choice cost', stake: () => 'Ce que ça coûte', at: ['visible', 'here'],
       items: (A) => { const p = A.picks && A.picks[4], e = E(A, 5);
         const cost = p === 'a' ? e.if_a : p === 'b' ? e.if_b : `Si ${nm(A, 'a')} : ${e.if_a || '…'} · Si ${nm(A, 'b')} : ${e.if_b || '…'}`;
         return [['cost', 'Ce que ça coûte', 'What his choice costs, shown', cost],
@@ -136,6 +142,28 @@ window.ACT = (() => {
   const save = () => { store.list[store.cur] = A; try { localStorage.setItem(KEY, JSON.stringify(store)); } catch { /* private window */ } };
   const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { /* private window */ } return null; };
   let mode = ls('smt-act-mode') === 'visual' ? 'visual' : 'flow';
+
+  // ---- kept for Claude: every act, plan, story and feedback generated here goes to the repo (essais/auto/<act>/), so
+  // a session can read them; needs a GitHub token of this phone (fine-grained, this repo only, Contents: read and
+  // write). No token: nothing is sent, "Copier pour Claude" still copies the whole of it ----
+  const REPO = 'V0rtek/sous-mon-toit', AUTO = 'essais/auto';
+  const slug = (t) => String(t || 'sans-titre').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'acte';
+  const stamp = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`; };
+  const b64 = (str) => { const b = new TextEncoder().encode(str); let s = ''; for (const c of b) s += String.fromCharCode(c); return btoa(s); };
+  async function keep(name, data) {
+    const token = ls('smt-gh-token'); if (!token) return false;
+    const path = `${AUTO}/${slug(A.title)}/${stamp()}-${name}.json`;
+    try {
+      const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${encodeURI(path)}`, { method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+        body: JSON.stringify({ message: `Essai gardé : ${A.title} · ${name}`, content: b64(JSON.stringify(data, null, 1)), branch: 'main' }) });
+      if (!r.ok) throw new Error(r.status);
+      note(`Gardé pour Claude : ${name}`); return true;
+    } catch (err) { note(`Pas gardé (${err.message}) : vérifie le jeton dans Générer › Garder pour Claude`); return false; }
+  }
+  // everything of the act open, in one piece: the act, its plans (titles), the plan open, the last story and its feedback
+  const bundle = () => { const g = (() => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } })()[0];
+    return { act: A, ep, plan: window.PLAN ? PLAN.get() : null, story: g ? { idea: g.idea, json: g.json, fb: g.fb } : null }; };
 
   // ---- the validator: what doesn't hold in the act, each with the technique that fixes it (it still opens) ----
   const BANNED = /\b(dettes?|debts?|argent|money|caisses?|crates?|caves?|cellars?|proprio|landlord|licences?|licenses?|contrebande|smuggl\w*)\b/i;
@@ -221,7 +249,10 @@ window.ACT = (() => {
       + `<small>La réponse</small>${box('story', 'Colle ici le JSON de l’histoire')}`
       + '<div class="aBtns"><button type="button" class="go" data-s="play">Jouer l’histoire</button></div><p class="pMsg" data-m="story"></p>'
       + `<small>Une fois jouée</small>${ep === 4 ? `<div class="aPick">${pickBtns()}</div>` : `<input class="aNote" data-note="${ep}" value="${esc(A.picks[ep] || '')}" placeholder="Ce que Justin a choisi">`}`
-      + (ep < 5 ? `<div class="aBtns"><button type="button" data-s="next">Épisode ${ep + 1} →</button></div>` : '') + '</section>';
+      + (ep < 5 ? `<div class="aBtns"><button type="button" data-s="next">Épisode ${ep + 1} →</button></div>` : '') + '</section>'
+      + `<section class="aStep"><h3><i>✓</i>Garder pour Claude</h3><p class="pD">${ls('smt-gh-token') ? 'Activé : chaque acte, plan, histoire et avis va dans le repo (essais/auto), où Claude peut les lire.' : 'Pas activé. Une fois : sur github.com, Settings › Developer settings › Fine-grained tokens › Generate : seulement le repo sous-mon-toit, Contents : Read and write. Colle le jeton ici (il reste sur ce téléphone).'}</p>`
+      + `<input class="aNote" type="password" data-token="1" placeholder="Jeton GitHub (github_pat_…)" value="${ls('smt-gh-token') ? '••••••••' : ''}">`
+      + '<div class="aBtns"><button type="button" data-s="saveToken">Enregistrer le jeton</button><button type="button" data-s="bundle">Copier pour Claude</button></div></section>';
   }
 
   function render() {
@@ -320,7 +351,7 @@ ${Object.keys(AT).map(atLine).join('\n')}
 FILL IN (each one sentence, concrete: something you could film or say out loud, never a feeling alone):
 1. "scene": the decor. "title": 2-4 words.
 2. "a" and "b": "id" (the character's id), "is" (who they are to justin), "wants" (what they ask justin for, out loud: "wants him to leave with her tomorrow morning", never "wants to be happy"), "because" (what they believe that makes them want it). Techniques: Vouloir + raison, Ici et maintenant.
-3. "justin_wants": what justin wants for himself, at the start.
+3. "justin_wants": what justin wants FOR HIMSELF, tonight (a person, a place, a chance), something A's request puts at risk: the player must want it with him.
 4. "past": the one thing from the past that matters, in ONE sentence (Le passé en une phrase).
 5. "lost_if_no": what is lost, right there, if justin says no to A (Danger présent).
 6. "question": the question the act argues about, as a question ("Do you keep a promise to someone who lies to you?").
@@ -334,6 +365,7 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
    5: "if_a" (if he chose A: what it costs, shown), "if_b" (if he chose B), "open" (what stays open for the next act).
 
 RULES:
+- Ce que l'écran montre: the player only sees the decor, the characters and their lines. No gesture or object the screen cannot show.
 - Everything happens between the characters on screen. No institution, no hearing, no council, no gate, no key character who never appears.
 - The stakes are between people, never money: no debt, no money owed, no crate, no cellar, no landlord, no licence, no smuggling.
 - Nothing contradicts itself: the past, the secret and the episodes tell one story.
@@ -415,19 +447,22 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
         try { j = LOOSE_JSON(draft.act); } catch { return say('act', 'Ce n’est pas un acte (JSON).'); }
         if (!j.a || !j.b || !Array.isArray(j.episodes)) return say('act', 'Il manque A, B ou les épisodes.');
         store.list.push(fix({ ...j, done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
+        keep('acte', { act: A, check: check(A) });
         draft.act = ''; ep = 1; render(); const w = check(A); say('act', w.length ? `Ouvert, ${w.length} à vérifier (Voir l’acte).` : 'Ouvert.'); return; }
       case 'visual': mode = 'visual'; ls('smt-act-mode', mode); render(); el.querySelector('.aView').scrollTop = 0; return;
       case 'copyPlan': return copy(planPrompt(ep), btn);
       case 'pastePlan': { let j;
         try { j = LOOSE_JSON(draft.plan); if (!Array.isArray(j.boxes)) throw 0; } catch { return say('plan', 'Ce n’est pas un plan (JSON).'); }
         if (!j.title) j.title = `${A.title} · épisode ${ep}`;
-        const p = window.PLAN.add(j); A.plans[ep] = p.title; save(); draft.plan = ''; render(); say('plan', 'Plan ouvert dans Plan de scène.'); return; }
+        const p = window.PLAN.add(j); A.plans[ep] = p.title; save(); keep(`plan-ep${ep}`, { ep, plan: j }); draft.plan = ''; render(); say('plan', 'Plan ouvert dans Plan de scène.'); return; }
       case 'seePlan': return window.ACT_TO_PLAN && window.ACT_TO_PLAN();
       case 'copyStory': return copy(window.PLAN.prompt2(), btn);
       case 'play': { let j;
         try { j = LOOSE_JSON(draft.story); } catch { return say('story', 'Ce n’est pas une histoire (JSON).'); }
-        try { window.PLAN_PLAY(j, PLAN.get().title); draft.story = ''; } catch (err) { say('story', err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'); }
+        try { keep(`histoire-ep${ep}`, { ep, plan: PLAN.get().title, story: j }); window.PLAN_PLAY(j, PLAN.get().title); draft.story = ''; } catch (err) { say('story', err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'); }
         return; }
+      case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && !/^•+$/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
+      case 'bundle': return copy(JSON.stringify(bundle()), btn);
       case 'next': ep = Math.min(5, ep + 1); render(); el.querySelector('.aView').scrollTop = 0; return;
     }
   }
@@ -440,5 +475,7 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
     };
     closeSheet(); render();
   }
+  // a feedback given after a generated story (index.html): kept with the act's episode
+  window.ACT_KEEP = (name, data) => keep(`${name}-ep${ep}`, { ep, plan: window.PLAN ? PLAN.get().title : '', ...data });
   return { mount, closeSheet, redraw: () => render(), get: () => A, actText, check, promptAct: (idea) => promptAct(idea, pair) };
 })();

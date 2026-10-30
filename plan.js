@@ -459,6 +459,7 @@ ${act && act.n > 1 ? '- The first rectangle picks up where the last episode ende
 - At least one desire is shown ("desire" goal).
 - Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
+- What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture or object the screen does not show (counting the lights, flipping a coin, a crate): what matters is said in a line, plainly, the first time.
 
 THE JSON:
 {"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
@@ -490,6 +491,7 @@ B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 li
 C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
+G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate). If something matters, a line says what it is, plainly, the first time.
 
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: before tapping, the player knows what each option means: an option makes sense on its own, and a lie or a secret is only an option if the player knows the truth. "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
