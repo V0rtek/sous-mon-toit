@@ -3,7 +3,7 @@
 // takes a picture from the phone and keeps it on this device; the line under [X] is typed in place.
 window.DECK = (() => {
   const KEY = 'smt-deck', load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
-  let saved = load(), i = 0, root;
+  let saved = load(), i = -1, root;
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* full or private window */ } };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slot = (k, label) => `<label class="dkPic" data-k="${k}"${saved[k] ? ` style="background-image:url(${saved[k]})"` : ''}><span>${saved[k] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
@@ -68,7 +68,9 @@ window.DECK = (() => {
   let noteOpen = false;
   let spot = 0;
   function draw() {
-    const s = S[i]; clearInterval(spot);
+    clearInterval(spot); root.classList.toggle('prep', i < 0);
+    if (i < 0) { root.style.setProperty('--c', '#ff9f0a'); root.querySelector('.dkN').textContent = `0 / ${S.length}`; return; }
+    const s = S[i];
     root.style.setProperty('--c', s.c);
     const sl = root.querySelector('.dkSlide'); sl.classList.toggle('full', !!s.full); sl.innerHTML = T(s.h());
     if (s.wall) {   // every perso plays its poses, each at its own offset, round and round
@@ -81,7 +83,7 @@ window.DECK = (() => {
     root.querySelector('.dkN').textContent = `${i + 1} / ${S.length}`;
     root.querySelector('.dkBar i').style.width = `${(i + 1) / S.length * 100}%`;
   }
-  const go = (d) => { i = Math.max(0, Math.min(S.length - 1, i + d)); draw(); };
+  const go = (d) => { i = Math.max(-1, Math.min(S.length - 1, i + d)); draw(); };
   const shrink = (file) => new Promise((ok, no) => {   // the photo shrunk to 900 px so it stays small enough to keep
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
@@ -148,7 +150,7 @@ window.DECK = (() => {
   }
   const panel = {
     mount(el) {
-      pn = el; drawPanel();
+      pn = el; cur = null; drawPanel();
       el.onclick = (e) => {
         const b = e.target.closest('button'); if (!b) return;
         if (b.dataset.pcopy) { const [p, id] = b.dataset.pcopy.split(':'); copy(BANK.newCharPromptFor(id, person(p)), b); }
@@ -169,14 +171,16 @@ window.DECK = (() => {
     },
     paste(e) {   // Ctrl+V on the panel: the picture goes to the case under the pointer (or the last one touched)
       const f = [...(e.clipboardData?.files || [])].find((x) => x.type.startsWith('image/'));
-      if (!f || !cur || !cur.isConnected) return false; panelHandle(cur.dataset.slot, f); return true;
+      if (!f || !cur || !cur.isConnected || i >= 0) return false; panelHandle(cur.dataset.slot, f); return true;
     },
   };
   return {
     mount(el) {
-      root = el; i = 0;
-      el.innerHTML = '<div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
+      root = el; i = -1;
+      el.innerHTML = '<div class="dkPrep"><button type="button" class="dkStart">Commencer ▶</button><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
+        if (e.target.closest('.dkStart')) { go(1); return; }
+        if (i < 0) return;   // slide 0 scrolls and has its own buttons
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const p = e.target.closest('.dkPic');
         if (p || e.target.closest('.dkTyped, .dkNote')) return;
@@ -184,11 +188,14 @@ window.DECK = (() => {
       };
       el.onchange = (e) => { const p = e.target.closest('.dkPic'); if (p && e.target.files[0]) pick(e.target.files[0], p.dataset.k); };
       el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
+      el.querySelector('.dkPlan').appendChild(document.getElementById('sparkPlan').content.cloneNode(true));
+      panel.mount(el.querySelector('.pnHost'));
       draw();
     },
     panel,
     key(e) {
-      if (e.target.closest && e.target.closest('[contenteditable]')) return false;   // typing in a note or a line
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return false;   // typing in a note, a line or a field
+      if (i < 0 && e.key === ' ') return true;   // slide 0 is a page to scroll
       if (['ArrowRight', 'PageDown', ' '].includes(e.key)) go(1); else if (['ArrowLeft', 'PageUp'].includes(e.key)) go(-1); else return false; return true; },
   };
 })();
