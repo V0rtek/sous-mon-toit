@@ -57,6 +57,11 @@
         if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < W * (H - 1)) st.push(i + W); }
       for (let i = W; i < W * (H - 1); i++) if (alpha[i] && (!alpha[i - 1] || !alpha[i + 1] || !alpha[i - W] || !alpha[i + W])) alpha[i] = 0.6;   // a soft edge
     }
+    // green left near an edge (the image model's own green screen, removed badly): pulled back to grey. Only within 8 px
+    // of the background, so green eyes stay green
+    let edge = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) edge[i] = alpha[i] < 0.5 ? 1 : 0;
+    for (let k = 0; k < 8; k++) { const n2 = edge.slice(); for (let i = W; i < W * (H - 1); i++) if (!edge[i] && (edge[i - 1] || edge[i + 1] || edge[i - W] || edge[i + W])) n2[i] = 1; edge = n2; }
+    for (let i = 0; i < W * H; i++) if (edge[i]) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; if (g > Math.max(r, b) + 12) d[i * 4 + 1] = Math.max(r, b); }
     const out = [];
     for (let n = 0; n < 6; n++) {
       const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2;
@@ -79,9 +84,10 @@
       const p = document.createElement('canvas'); p.width = w; p.height = h; p.getContext('2d').putImageData(img, 0, 0);
       // measures: the lowest row of its left 60% (a forearm on the counter, not a mug hanging lower), the rightmost point
       // of its head (the top 35%: the face, for the kiss), the middle of its bottom row (its waist)
-      let arm = 0, face = 0, b0 = w, b1 = 0;
+      let arm = 0, hand = 0, face = 0, b0 = w, b1 = 0;
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (solid[y * w + x]) {
         if (x < w * 0.6 && y > arm) arm = y;
+        if (x >= w * 0.6 && y > hand) hand = y;
         if (y < h * 0.35 && x > face) face = x;
         if (y === h - 1) { if (x < b0) b0 = x; if (x > b1) b1 = x; }
       }
@@ -89,8 +95,10 @@
       const band = { hold_mouth: [0, 0.45], hold_raise: [0, 0.7], hold_front: [0.3, 0.95], hold_give: [0.15, 0.95], bar_put: [0.8, 1] }[K.poses[n]];
       let grip = null;
       if (band) { let gx = -1, gy = 0; for (let y = Math.floor(h * band[0]); y < Math.ceil(h * band[1]); y++) for (let x = w - 1; x > gx; x--) if (solid[y * w + x]) { gx = x; gy = y; break; }
-        grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? h : gy]; }
-      out.push({ pose: K.poses[n], canvas: p, w, h, arm: arm + 1, face, mid: (b0 + b1) / 2, grip });
+        grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? Math.min(arm, hand || arm) + 1 : gy]; }
+      // the ledge = the higher of the two bottoms: the body's on the left (a mug hanging lower on the right doesn't count),
+      // the forearms' on the right (a belt or a skirt drawn under them on the left doesn't count)
+      out.push({ pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip });
     }
     return out;
   }
@@ -104,7 +112,7 @@
       for (const c of cells) { c.scale = s; sp.poses[c.pose] = [Math.round(c.w * s), Math.round(c.h * s)]; }
       sp.refH = GUIDE.full.h; return sp;
     }
-    const g = GUIDE[K.cut === 'table' ? 'counter' : K.cut], unit = Math.round(g.unit * median(cells.map((c) => c.h)) / g.h);
+    const g = GUIDE[K.cut === 'table' ? 'counter' : K.cut], unit = Math.round(g.unit * median(cells.map((c) => (K.cut === 'belt' ? c.h : Math.min(c.h, c.arm)))) / g.h);
     for (const c of cells) {
       c.scale = 1; sp.poses[c.pose] = [c.w, c.h];
       if (c.grip) (sp.grip = sp.grip || {})[c.pose] = c.grip;
