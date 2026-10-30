@@ -3137,12 +3137,12 @@ for (const g of GAME_LIST) {
   b.onclick = (e) => { e.stopPropagation(); openWait(g.id); };
   $('#labTiles').appendChild(b);
 }
-// the staging tests (tests.js): one tile each, played solo; the end comes back here
+// the staging tests (tests.js): one tile each, played solo; the end comes back here. First, the newest on top
 for (const t of window.TEST_LIST || []) {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'test';
   const sp = document.createElement('span'); sp.textContent = t.name; b.appendChild(sp);
   b.onclick = (e) => { e.stopPropagation(); location.href = `index.html?play=${t.id}&back=index.html`; };
-  $('#labTiles').appendChild(b);
+  $('#labTiles').prepend(b);   // each new one goes on top
 }
 $('#lab').onclick = (e) => { e.stopPropagation(); feat('Mini-jeux'); show('#labScreen'); };
 $('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
