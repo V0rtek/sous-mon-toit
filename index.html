@@ -1516,7 +1516,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="plan.js?v=20261030100000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="bank.js?v=20261030180000"></script>
+<script src="bank.js?v=20261030190000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -2737,7 +2737,7 @@ const UP = { '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d':
 let screen = '#who';
 function show(id) {
   if (TV && id === '#hub') id = '#tvPick';
-  if (id !== '#bank' && window.BANK_CLOSE) BANK_CLOSE();   // leaving the bank stops its sound
+  if (id !== '#bank' && window.BANK_CLOSE) BANK_CLOSE();   // leaving the bank stops its sound (and takes back its history step)
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
   for (const s of SCREENS) $(s).hidden = s !== id;
   if (id !== '#video3d' && $('#yt').src.includes('youtube')) $('#yt').src = 'about:blank';   // leaving the video stops it

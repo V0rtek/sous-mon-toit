@@ -87,7 +87,14 @@ window.BANK = {
     $('#bankBody').innerHTML = tabs[tab](); $('#bankBody').scrollTop = 0;
   }
   function stop() { if (playing) { playing.a.pause(); playing.b.classList.remove('on'); playing.b.firstChild.textContent = '▶'; playing = null; } }
-  window.BANK_OPEN = () => { draw(); };
+  // the phone's back (gesture or button) works in the bank: it closes a big picture, else goes back to Plus, like ‹.
+  // Opening the bank pushes a step in the history; leaving it by ‹ takes that step back
+  window.BANK_OPEN = () => { draw(); if (!(history.state && history.state.bank)) history.pushState({ bank: 1 }, ''); };
+  addEventListener('popstate', () => {
+    if (screen !== '#bank') return;
+    if (!$('#bankBig').hidden) { $('#bankBig').hidden = true; history.pushState({ bank: 1 }, ''); return; }
+    show('#more');
+  });
   document.addEventListener('DOMContentLoaded', () => {
     $('#bankTabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { e.stopPropagation(); tab = b.dataset.t; draw(); } };
     $('#bankBody').onclick = (e) => {
@@ -109,5 +116,5 @@ window.BANK = {
     };
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
   });
-  window.BANK_CLOSE = stop;
+  window.BANK_CLOSE = () => { stop(); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
 })();
