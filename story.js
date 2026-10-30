@@ -77,6 +77,15 @@ window.SCENES = {
     face: { justin: 'r', melissa: 'r', candy: 'r', ruby: 'r' },
     front: [],
   },
+  // the rampart over the city (30/10): they lean on the parapet side by side, in depth, facing right (the castle), from
+  // the wall-walk behind it (pose bar). The parapet's top is 60 cm wide: at depth, height = 1,75 × its width on screen
+  // / 0,6; forearms on its far edge (99,997)→(1045,750), each one's back on that edge so the top is under all of him
+  rempart: {
+    image: 'bg/rempart.webp', size: [1295, 1214],
+    spots: { justin: [566, 1521, 994], melissa: [673, 1337, 753], candy: [761, 1184, 554], ruby: [833, 1060, 391] },
+    face: { justin: 'r', melissa: 'r', candy: 'r', ruby: 'r' },
+    front: [],
+  },
   maison: {
     image: 'bg/maison.jpg', size: [1920, 1440],
     spots: { ruby: [420, 1425, 760], justin: [720, 1425, 770], james: [1075, 885, 400] },

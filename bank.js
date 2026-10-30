@@ -20,6 +20,7 @@ window.BANK = {
     ['rue', true, 'Rue · marche', 'Façades à 11 m, lampadaires en avant-plan'], ['escalier', true, 'Escalier', '17,5 × 28 cm, rampe à 90 cm'],
     ['bar', true, 'Bar', 'Comptoir 1,05 m qui file vers le fond, clients côte à côte en profondeur'],
     ['feu', true, 'Feu de camp', 'Bûche de 45 cm, une de 55 cm contre leurs genoux'], ['ruelle', false, 'Ruelle', 'Adossés au mur de gauche, en profondeur'],
+    ['rempart', false, 'Rempart', 'Accoudés au parapet (60 cm de large), côte à côte en profondeur, vers le château'],
     ['taverne_bar', false, 'Taverne · comptoir', 'Les 4 places sur le décor : horizon y 510, dessus du comptoir 25 cm sous la caméra'],
   ],
   // the pose-sheet prompts that worked (30/10), to copy: title, the pictures to attach, what to check, the prompt.
