@@ -172,7 +172,8 @@
     for (const [obj, boxes] of Object.entries(data.layers || {})) { sp.layers = sp.layers || {}; sp.layers[obj] = sp.layers[obj] || {};
       for (const [p, box] of Object.entries(boxes)) sp.layers[obj][p] = { src: (urls && urls[`${p}@${obj}`]) || `chars/${id}/${p}@${obj}.png`, box }; }
     FACE[id] = FACE[id] || {}; for (const p of Object.keys(data.poses)) FACE[id][p] = 'r';
-    MADE[id] = MADE[id] || {}; for (const p of Object.keys(data.poses)) MADE[id][p] = (urls && urls[p]) || `chars/${id}/${p}.${data.ext || 'png'}`;
+    // its pictures carry its version (a new import = a new address: no picture stays stuck in a cache)
+    MADE[id] = MADE[id] || {}; for (const p of Object.keys(data.poses)) MADE[id][p] = (urls && urls[p]) || `chars/${id}/${p}.${data.ext || 'png'}${data.v ? `?v=${data.v}` : ''}`;
     if (!CAST[id]) CAST[id] = { name: data.name || id, color: data.color || '#6e3b8c', sprite: id };
     // only leaning poses so far: a plain 'bar' or a listen is his first leaning pose
     // the poses the stories ask for, played by the closest the kit has (the kit has no « explaining »: the face carries it)
@@ -197,7 +198,7 @@
     const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
     const old = (await read(`chars/${id}/sprite.json`)) || { name, ext: 'png', poses: {}, half: { unit: 0, belt: 0.6, poses: {}, full: {} } };
     const list = (await read('chars/imports.json')) || [];
-    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
+    const data = { ...old, v: Date.now(), name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
@@ -275,7 +276,7 @@
       if (!token) return { poses: out, msg: 'Jouable sur ce téléphone seulement (pas de jeton GitHub).' };
       const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
       const old = await read(`chars/${id}/sprite.json`); if (!old) throw new Error('Ce perso n’est pas encore dans le repo.');
-      const data = { ...old, layers: { ...(old.layers || {}), [obj]: { ...((old.layers || {})[obj] || {}), ...boxes } } };
+      const data = { ...old, v: Date.now(), layers: { ...(old.layers || {}), [obj]: { ...((old.layers || {})[obj] || {}), ...boxes } } };
       const files = [];
       for (const o of out) files.push({ path: `chars/${id}/${o.pose}@${obj}.png`, content: await blobB64(await new Promise((ok) => o.canvas.toBlob(ok, 'image/png'))), encoding: 'base64' });
       files.push({ path: `chars/${id}/sprite.json`, content: JSON.stringify(data, null, 1), encoding: 'utf-8' });

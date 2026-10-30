@@ -1190,6 +1190,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
       <button type="button" id="t3d"><span class="art" style="--g:#6b3fa0"><img src="chars/amare/listen.webp" alt=""></span><b>3D</b></button>
       <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
+      <button type="button" id="freshBtn"><span class="art" style="--g:#30a46c"><img src="chars/justin/surprised.webp" alt=""></span><b>Mettre à jour</b></button>
       <button type="button" id="roadBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/justin/thinking.webp" alt=""></span><b>Roadmap</b></button>
     </div>
   </div>
@@ -1679,7 +1680,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031430000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
-<script src="importer.js?v=20261031500000"></script>
+<script src="importer.js?v=20261031520000"></script>
 <script src="bank.js?v=20261031500000"></script>
 <script src="place.js?v=20261031510000"></script>
 <script>
@@ -3765,6 +3766,10 @@ $('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setI
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); feat('3D'); show('#about3d'); };
 $('#bankBtn').onclick = (e) => { e.stopPropagation(); feat('Banque'); BANK_OPEN(); show('#bank'); };
+// Mettre à jour: GitHub publishes a push in about a minute, then keeps each file 10 min in its cache (and the phone too).
+// A new address for the page skips both caches (its scripts carry their own version); the imported characters' pictures
+// carry the version of their sprite.json (importer.js)
+$('#freshBtn').onclick = (e) => { e.stopPropagation(); location.replace(`${location.pathname}?fresh=${Date.now()}`); };
 $('#roadBtn').onclick = (e) => { e.stopPropagation(); feat('Roadmap'); openNote(window.ROADMAP); };
 $('#watch3d').onclick = (e) => {
   e.stopPropagation();
