@@ -10,6 +10,12 @@
   // guide's order, so the names come from the type. counter = leaning on an edge, cut under the forearms; belt = cut
   // below the belt, placed by the face (the kiss); full = head to feet
   const KINDS = {
+    // the kit (31/10): Debout and Accoudé for everyone, then Assis and Prises. In Prises the hands are empty: each pose
+    // keeps where its hand is (grip), the game puts the object there
+    debout: { cut: 'full', poses: ['listen', 'smile', 'surprised', 'angry', 'hurt', 'back_walk'] },
+    accoude: { cut: 'counter', poses: ['bar_to_listen', 'bar_to_smile', 'bar_to_tense', 'bar_ahead', 'bar_back', 'bar_put'] },
+    assis: { cut: 'table', poses: ['sit_listen', 'sit_lean', 'sit_back', 'sit_head', 'sit_fist', 'sit_rise'] },
+    prises: { cut: 'counter', poses: ['hold_mouth', 'hold_raise', 'hold_front', 'hold_give', 'bar_slump', 'bar_laugh'] },
     base: { cut: 'full', poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'] },
     back: { cut: 'full', poses: ['back_far', 'back_down', 'back_look', 'back_door', 'back_fists', 'back_walk'] },
     barFront: { cut: 'counter', poses: ['bar_talk', 'bar_drink', 'bar_stare', 'bar_smile', 'bar_laugh', 'bar_slump'] },
@@ -62,7 +68,12 @@
         if (y < h * 0.35 && x > face) face = x;
         if (y === h - 1) { if (x < b0) b0 = x; if (x > b1) b1 = x; }
       }
-      out.push({ pose: K.poses[n], canvas: p, w, h, arm: arm + 1, face, mid: (b0 + b1) / 2 });
+      // the hand: the figure's rightmost point in the band where that pose holds it (his hands reach to the right)
+      const band = { hold_mouth: [0, 0.45], hold_raise: [0, 0.7], hold_front: [0.3, 0.95], hold_give: [0.15, 0.95], bar_put: [0.8, 1] }[K.poses[n]];
+      let grip = null;
+      if (band) { let gx = -1, gy = 0; for (let y = Math.floor(h * band[0]); y < Math.ceil(h * band[1]); y++) for (let x = w - 1; x > gx; x--) if (solid[y * w + x]) { gx = x; gy = y; break; }
+        grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? h : gy]; }
+      out.push({ pose: K.poses[n], canvas: p, w, h, arm: arm + 1, face, mid: (b0 + b1) / 2, grip });
     }
     return out;
   }
@@ -76,10 +87,12 @@
       for (const c of cells) { c.scale = s; sp.poses[c.pose] = [Math.round(c.w * s), Math.round(c.h * s)]; }
       sp.refH = GUIDE.full.h; return sp;
     }
-    const g = GUIDE[K.cut], unit = Math.round(g.unit * median(cells.map((c) => c.h)) / g.h);
+    const g = GUIDE[K.cut === 'table' ? 'counter' : K.cut], unit = Math.round(g.unit * median(cells.map((c) => c.h)) / g.h);
     for (const c of cells) {
       c.scale = 1; sp.poses[c.pose] = [c.w, c.h];
-      if (K.cut === 'counter') sp.half.poses[c.pose] = [Math.round(GUIDE.counter.ax * unit / g.unit), Math.min(c.h, c.arm), 0.6, unit];
+      if (c.grip) (sp.grip = sp.grip || {})[c.pose] = c.grip;
+      // at a counter the ledge is 1.05 m (0.6 of his height); at a table, 0.75 m (0.43)
+      if (K.cut === 'counter' || K.cut === 'table') sp.half.poses[c.pose] = [Math.round(GUIDE.counter.ax * unit / g.unit), Math.min(c.h, c.arm), K.cut === 'table' ? 0.43 : 0.6, unit];
       else {   // the kiss: placed by the face (his lips a fixed way ahead of his spot), pulled back = placed by the waist
         const ax = c.pose === 'kiss_rejected' ? Math.round(c.mid) : Math.round(c.face - g.face * unit / g.unit);
         sp.half.poses[c.pose] = [ax, c.h, g.belt, unit]; sp.half.full[c.pose] = c.pose === 'kiss_rejected' ? 'surprised' : 'listen';
@@ -97,12 +110,17 @@
       sp.half = sp.half || { unit: data.half.unit, belt: data.half.belt, poses: {}, full: {} };
       Object.assign(sp.half.poses, data.half.poses); Object.assign(sp.half.full, data.half.full || {});
     }
+    if (data.grip) sp.grip = { ...(sp.grip || {}), ...data.grip };
     FACE[id] = FACE[id] || {}; for (const p of Object.keys(data.poses)) FACE[id][p] = 'r';
     MADE[id] = MADE[id] || {}; for (const p of Object.keys(data.poses)) MADE[id][p] = (urls && urls[p]) || `chars/${id}/${p}.${data.ext || 'png'}`;
     if (!CAST[id]) CAST[id] = { name: data.name || id, color: data.color || '#6e3b8c', sprite: id };
     // only leaning poses so far: a plain 'bar' or a listen is his first leaning pose
-    const has = sp.poses, lean = ['bar_to_talk', 'bar_smile', 'bar_talk'].find((p) => has[p]);
-    if (lean && !has.listen) { window.POSE_ALIAS = window.POSE_ALIAS || {}; POSE_ALIAS[id] = { bar: lean, listen: lean, ...(POSE_ALIAS[id] || {}) }; }
+    // the poses the stories ask for, played by the closest the kit has (the kit has no « explaining »: the face carries it)
+    const has = sp.poses, lean = ['bar_to_listen', 'bar_to_talk', 'bar_smile', 'bar_talk'].find((p) => has[p]);
+    window.POSE_ALIAS = window.POSE_ALIAS || {};
+    const al = POSE_ALIAS[id] = POSE_ALIAS[id] || {};
+    if (lean) { al.bar = al.bar || lean; if (!has.listen) al.listen = al.listen || lean; }
+    if (has.listen) Object.assign(al, { explaining: 'listen', holding: 'listen', thinking: has.hurt ? 'hurt' : 'listen', ...al });
   }
 
   // ---- the GitHub side: one commit for the 6 pictures, the character's sprite.json and the list of imports ----
@@ -119,7 +137,7 @@
     const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
     const old = (await read(`chars/${id}/sprite.json`)) || { name, ext: 'png', poses: {}, half: { unit: 0, belt: 0.6, poses: {}, full: {} } };
     const list = (await read('chars/imports.json')) || [];
-    const data = { ...old, name: name || old.name, ext: 'png', sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
+    const data = { ...old, name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
@@ -153,7 +171,12 @@
         const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o;
       }
       last = { id: slug(name), name: String(name || '').trim(), kind, cells, sp };
-      return cells.map((c) => ({ pose: c.pose, src: c.out.toDataURL('image/png') }));
+      return cells.map((c) => ({ pose: c.pose, src: c.out.toDataURL('image/png'), grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
+    },
+    // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)
+    setGrip(pose, fx, fy) {
+      const c = last && last.cells.find((x) => x.pose === pose); if (!c || !c.grip) return null;
+      c.grip = [Math.round(fx * c.w), Math.round(fy * c.h)]; last.sp.grip[pose] = c.grip; return [fx, fy];
     },
     // in this page right away (a test can use him), then in the repo for every device
     async add() {

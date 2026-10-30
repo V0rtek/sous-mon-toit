@@ -2,14 +2,11 @@
 // removes it in the commit that does it). "- " = a step under the line above
 window.ROADMAP = { title: 'Roadmap', items: [
   '1. Les objets qui marchent',
-  '- Objet posé : « pose un objet » met la pièce, la lettre, la clé sous ses doigts',
-  '- Objet en main (Prises) : un point de prise par pose, tiré du guide, ajustable d’un toucher à l’import',
-  '- Assis : une table et des chaises en avant-plan, des places assises',
+  '- Assis : l’image du décor d’une table (le guide est prêt : ref/guides/table.webp, la table cache tout sous son dessus)',
+  '- Tester objets et Assis avec la 1re femme (ci-dessous)',
   '2. Les feuilles',
-  '- Prompts de la base : Debout, Accoudé',
-  '- Puis Assis et Prises, dans Nouveau perso',
-  '- Justin les fait en premier : ses feuilles deviennent les guides',
-  '- Chaque nouvelle feuille s’importe dans Nouveau perso (son type dans importer.js)',
+  '- Générer la 1re femme avec le kit (Debout, Accoudé, Assis, Prises), l’importer',
+  '- Justin refait les siennes au nouveau format (Debout, Accoudé)',
   '3. Les poses des persos féminins',
   '- Une 1re femme dans le style de Justin : ses feuilles deviennent le guide « Elle »',
   '4. Les poses et les places dans la génération IA',

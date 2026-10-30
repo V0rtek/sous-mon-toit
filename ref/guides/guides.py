@@ -132,6 +132,17 @@ for dd in range(3, 30, 2):
 ALLEY_PEOPLE = [(-1.3, 'r', 4.0 + 0.8 * i) for i in range(4)]
 guides(d, 'RUELLE · adossés', ['Adossés côte à côte = en profondeur, dos au mur de gauche', 'Tous tournés vers le mur de droite, à 1,9 m ; 80 cm entre eux', 'Rien ne cache leurs jambes : en plan large, pose en pied', 'Joints du mur tous les 2 m, grille au sol = 1 m'], people=ALLEY_PEOPLE)
 scenes['g_alley'] = save('ruelle', bg, None)
-for n, pp in (('bar', BAR_PEOPLE), ('feu', FIRE_PEOPLE), ('ruelle', ALLEY_PEOPLE)):
+# 6 · the table (31/10, Assis): a table 75 cm high runs along the picture in front of them; they sit behind it, turned
+# toward each other (the one on the left faces right, the other left). Its top and its near side are the foreground:
+# they hide everything below the table top, the sitting poses are cut there
+TX0, TX1, TD0, TD1 = -1.4, 1.4, 3.2, 3.9
+bg, d = base((70, 58, 50), (58, 50, 46)); grid(d)
+d.polygon([P(-12, 0, 12), P(12, 0, 12), P(12, 4, 12), P(-12, 4, 12)], fill=(66, 52, 44, 255))
+fg = Image.new('RGBA', (W, H)); f = ImageDraw.Draw(fg)
+box(f, TX0, TX1, 0, 0.75, TD0, TD1, (120, 84, 56, 255), edge=(40, 24, 14, 255))
+TABLE_PEOPLE = [(-0.55, 'r', 4.0), (0.55, 'l', 4.0)]
+guides(d, 'TABLE · assis', ['Une table de 75 cm, devant eux, sur toute la largeur', 'Assis derrière, tournés l’un vers l’autre : celui de gauche vers la droite, l’autre vers la gauche', 'Le dessus et le devant de la table = l’avant-plan : ils cachent tout sous le dessus', 'Les poses assises sont coupées au dessus de la table (43 % de leur hauteur)'], people=TABLE_PEOPLE)
+scenes['g_table'] = save('table', bg, fg)
+for n, pp in (('bar', BAR_PEOPLE), ('feu', FIRE_PEOPLE), ('ruelle', ALLEY_PEOPLE), ('table', TABLE_PEOPLE)):
   print(n, [[round(P(x, 0, dd)[0]), round(P(x, 0, dd)[1]), round(HCH * D0 / dd)] for x, _, dd in pp])
 print(json.dumps({'HZ': HZ, 'F': F}))

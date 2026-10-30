@@ -267,7 +267,10 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .ncPick { display: block; flex: none; padding: .6em; font-size: 1.4em; }
 .ncCuts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5em; }
 .ncCuts figure { margin: 0; background: repeating-conic-gradient(#3a3a3c 0 25%, #2c2c2e 0 50%) 0 0 / 1.6em 1.6em; border-radius: .6em; padding: .3em; }
-.ncCuts img { width: 100%; height: 9em; object-fit: contain; display: block; }
+.ncCuts figure { text-align: center; }
+.ncCuts img { max-width: 100%; max-height: 9em; width: auto; height: auto; display: block; }
+.ncGrip { position: relative; display: inline-block; vertical-align: top; }
+.ncGrip i { position: absolute; width: .9em; height: .9em; margin: -.45em 0 0 -.45em; border-radius: 50%; background: #ffd60a; box-shadow: 0 0 0 .15em #000; pointer-events: none; }
 .ncCuts figcaption { font-size: 1.1em; color: #c7c7cc; text-align: center; }
 .ncMsg { font-size: 1.4em; color: #ffd60a; margin: 0; }
 .ncStep { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; display: flex; flex-direction: column; gap: .8em; }
@@ -1655,9 +1658,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261031130000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="tests.js?v=20261031240000"></script>
-<script src="roadmap.js?v=20261031260000"></script>
-<script src="bank.js?v=20261031260000"></script>
+<script src="tests.js?v=20261031270000"></script>
+<script src="roadmap.js?v=20261031270000"></script>
+<script src="bank.js?v=20261031270000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1747,6 +1750,39 @@ function placeActor(a) {
   const b = box(a);
   Object.assign(a.el.style, { width: b.w + 'px', height: b.h + 'px', left: b.left + 'px', top: b.top + (a.bob || 0) + 'px', zIndex: Math.round(a.feet) });
   a.el.firstChild.style.transform = flipped(a) ? 'scaleX(-1)' : '';
+  drawHeld(a, b);
+}
+// ---- objects (31/10, Roadmap 1): props/<name>.webp at their real size (BANK.props, in cm). A pose of the kit's Prises
+// has empty hands and keeps where its hand is (SPRITES[x].grip[pose] = [x, y] in its pixels): {hold: {who: 'chope'}}
+// puts the object there in every pose that has a grip ({hold: {who: null}} takes it away). {put: {who: 'piece'}} lays it
+// on the ledge under his two fingers (the pose bar_put): it stays there, in front of him, until the scene changes ----
+const propM = (name) => { const r = ((window.BANK && BANK.props) || []).find((p) => p[0] === name); return r ? parseFloat(r[1]) / 100 : 0.15; };
+const gripOf = (a, pose) => { const sp = SPRITES[spriteOf(a.id)]; return sp.grip && sp.grip[poseOf(a.id, pose)]; };
+function gripAt(a, b, g) {   // a grip in his pose's pixels -> decor px (and mirrored when he is turned around)
+  const [pw, ph] = SPRITES[spriteOf(a.id)].poses[poseOf(a.id, a.shown)];
+  return { x: b.left + (flipped(a) ? pw - g[0] : g[0]) / pw * b.w, y: b.top + g[1] / ph * b.h };
+}
+function drawHeld(a, b) {
+  const g = a.hold && gripOf(a, a.shown);
+  if (!g) { if (a.heldEl) a.heldEl.hidden = true; return; }
+  if (!a.heldEl || a.heldEl.dataset.src !== a.hold) {
+    if (a.heldEl) a.heldEl.remove();
+    a.heldEl = new Image(); a.heldEl.alt = ''; a.heldEl.dataset.src = a.hold; a.heldEl.src = `props/${a.hold}.webp`;
+    a.heldEl.style.cssText = 'position:absolute;transform:translate(-50%,-50%);pointer-events:none';
+    a.el.appendChild(a.heldEl);
+  }
+  const p = gripAt(a, b, g), w = propM(a.hold) / 1.75 * a.h * (castOf(a.id).scale || 1);
+  Object.assign(a.heldEl.style, { left: p.x - b.left + 'px', top: p.y - b.top + 'px', width: w + 'px' }); a.heldEl.hidden = false;
+  a.heldEl.style.transform = `translate(-50%,-50%)${flipped(a) ? ' scaleX(-1)' : ''}`;
+}
+function putDown(a, name) {
+  const g = gripOf(a, a.shown) || gripOf(a, 'bar_put'); if (!g) return;
+  const p = gripAt(a, box(a), g), w = propM(name) / 1.75 * a.h * (castOf(a.id).scale || 1), i = new Image();
+  i.alt = ''; i.src = `props/${name}.webp`; i.className = 'prop';
+  // its bottom on the ledge, just past his fingertips (toward whom he slides it)
+  i.onload = () => { i.style.top = p.y - w * i.naturalHeight / i.naturalWidth + 'px'; };
+  Object.assign(i.style, { position: 'absolute', left: p.x + (flipped(a) ? -w : 0) + 'px', top: p.y + 'px', width: w + 'px', zIndex: Math.round(a.feet) + 1 });
+  castEl.appendChild(i);
 }
 function enter(id, pose) {
   const [x, feet, h] = sc.spots[id];
@@ -2229,12 +2265,14 @@ function gaze(s) {
 // he talks to turns to him: toward someone nearer the camera = bar_to_talk (the face), toward someone further = bar_back
 // (the back of the head). Only those leaning (a bar pose) and whose sheet has both; any other pose is played as written
 const leaning = (a) => a && String(a.pose).startsWith('bar');
-const canTurn = (a) => { const p = (SPRITES[spriteOf(a.id)] || {}).poses || {}; return p.bar_to_talk && p.bar_back; };
-const headTo = (a, b) => (b.feet > a.feet ? 'bar_to_talk' : 'bar_back');
+// toward the camera side: the kit's « listening to him » (mouth closed, it carries a line just as well), else « talking to him »
+const turnPoses = (a) => (SPRITES[spriteOf(a.id)] || {}).poses || {};
+const canTurn = (a) => { const p = turnPoses(a); return (p.bar_to_listen || p.bar_to_talk) && p.bar_back; };
+const headTo = (a, b) => (b.feet > a.feet ? (turnPoses(a).bar_to_listen ? 'bar_to_listen' : 'bar_to_talk') : 'bar_back');
 function counterTalk(s) {
   const sp = actors[s.say], to = actors[s.to || lastSpeaker];
   if (!leaning(sp) || !leaning(to) || to === sp || !canTurn(sp)) return s.pose;
-  if (canTurn(to) && ['bar', 'bar_to_talk', 'bar_back'].includes(to.pose)) setPose(to.id, headTo(to, sp));
+  if (canTurn(to) && ['bar', 'bar_to_talk', 'bar_to_listen', 'bar_back'].includes(to.pose)) setPose(to.id, headTo(to, sp));
   return !s.pose || s.pose === 'bar' ? headTo(sp, to) : s.pose;
 }
 function line(s) {
@@ -2902,6 +2940,8 @@ async function next() {
     else if (s.walk) { await walk(s.walk, s.to, s.ms, r, s.glide, s.catchup); if (r !== run) return; }
     else if (s.ots) { bubble.hidden = true; ots(s.ots[0], s.ots[1]); }
     else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
+    else if (s.hold) for (const [id, o] of Object.entries(s.hold)) { if (actors[id]) { actors[id].hold = o; placeActor(actors[id]); } }
+    else if (s.put) for (const [id, o] of Object.entries(s.put)) { if (actors[id]) putDown(actors[id], o); }
     else if (s.reveal) await reveal(s.reveal, s.ms);
     else if (s.fade) await fade(s.fade, s.ms);
     else if (s.establish) { await establish(s.establish, s.ms, s.out); if (r !== run) return; }
@@ -4203,6 +4243,6 @@ if (!PREVIEW) {
   for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = charUrl(id, pose);
 }
 </script>
-<script src="importer.js?v=20261031260000"></script>
+<script src="importer.js?v=20261031270000"></script>
 </body>
 </html>

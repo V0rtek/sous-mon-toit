@@ -149,7 +149,15 @@ window.BANK = {
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
     const redraw = () => { const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; };
     $('#bankBody').onchange = (e) => { const k = e.target.dataset.ncfile; if (k && e.target.files[0]) BANK.newCharFile(k, e.target.files[0], redraw); };
-    $('#bankBody').addEventListener('click', (e) => { const a = e.target.closest('[data-ncadd]'); if (a) { e.stopPropagation(); BANK.newCharAdd(a.dataset.ncadd, redraw); } }, true);
+    $('#bankBody').addEventListener('click', (e) => {
+      const a = e.target.closest('[data-ncadd]'), g = e.target.closest('[data-ncgrip]');
+      if (a) { e.stopPropagation(); BANK.newCharAdd(a.dataset.ncadd, redraw); }
+      else if (g) {   // where the hand is: the tap, as a fraction of the picture (its img box, object-fit contain)
+        e.stopPropagation(); const im = g.querySelector('img'), r = im.getBoundingClientRect(), k = Math.min(r.width / im.naturalWidth, r.height / im.naturalHeight);
+        const w = im.naturalWidth * k, h = im.naturalHeight * k, fx = (e.clientX - r.left - (r.width - w) / 2) / w, fy = (e.clientY - r.top - (r.height - h) / 2) / h;
+        if (fx >= 0 && fx <= 1 && fy >= 0 && fy <= 1 && BANK.newCharGrip(g.dataset.ncgrip, fx, fy)) redraw();
+      }
+    }, true);
     $('#bankBody').oninput = (e) => { const k = e.target.dataset.nc; if (k) BANK.newCharSet(k, e.target.value); };   // kept as typed, no redraw (the keyboard stays)
   });
   window.BANK_CLOSE = () => { stop(); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
@@ -207,9 +215,69 @@ Do not exaggerate the poses. Subtle and natural, like the reference.`],
     barOther: ['Au comptoir · vers l’autre', 'Le même corps, la tête vers son voisin : flirter, trinquer, se fâcher.', ['justin_comptoir_autre.webp', 'chope.webp'], 5],
     kiss: ['Le baiser · profil pur', 'Profil pur : le partenaire est la même pose retournée, leurs visages se rencontrent.', ['justin_baiser.webp'], 6],
   };
-  const PLACES = [['taverne', 'Taverne', ['photo', 'base', 'close', 'angled', 'barFront', 'barOther', 'kiss', 'back']],
-    ['maison', 'Maison, salon', ['photo', 'base', 'close', 'side', 'kiss', 'back']],
-    ['tout', 'Tout', ['photo', 'base', 'close', 'side', 'angled', 'barFront', 'barOther', 'kiss', 'back']]];
+
+  // ---- the kit (31/10): every character has Debout and Accoudé; then Assis, Prises and the others as the story needs.
+  // Each cell does one thing nobody else does. The mouth is open only to exclaim: the bubble says who speaks, the face
+  // says what they feel ----
+  const CELLS = (title, framing, angle, rows) => (L) => `Create a character pose sheet of THIS EXACT character, ${title}. Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing and the size of the head; copy nothing of his look (face, hair, body, clothes). Copy the character of image 1 exactly.
+
+LOCKED — must not change in any way, even slightly:
+${L}
+
+Format: LANDSCAPE image, 3:2. An invisible grid of 6 equal SQUARE cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.
+
+${GREEN} No furniture, no counter, no table, no chair drawn: only the character.
+
+${framing}
+
+${angle}
+
+Row 1, left to right:
+${rows[0]}
+${rows[1]}
+${rows[2]}
+
+Row 2, left to right:
+${rows[3]}
+${rows[4]}
+${rows[5]}
+
+Do not exaggerate the poses. Subtle and natural, like the reference. Mouth closed unless a cell says otherwise.`;
+  const LEAN_CUT = 'Framing, the same in all 6 cells: he leans on a counter or a ledge that is NOT drawn. It would hide everything below the top of his forearms, so cut the body with a straight horizontal line right under his forearms (the ledge\'s top edge), and that cut sits exactly on the bottom edge of the cell, at the same height in every cell. Nothing below the forearms. The head is the same size as in image 2 and at the same height in every cell. Clear margin of green above the head and on both sides (a hand never touches an edge). No text, no labels.';
+  const LEAN_ANGLE = 'BODY ANGLE, the same in all 6 cells — the most important rule (like image 2): he faces the RIGHT side of the image, a SIDE VIEW turned only very slightly toward the camera (about 20 degrees), upper body leaning forward, both forearms resting on the invisible ledge in front of him. THE BODY IS IDENTICAL IN ALL 6 CELLS: only the head, the face and the hands change. "Toward the camera side" = his head turns a little toward the camera, to someone leaning next to him on that side: we see more of his face (never a full front view).';
+  const KIT_SHEETS = {
+    debout: ['Debout (base)', 'Partout : écoute, sourire, surpris, fâché, blessé, et de dos quand il part.', ['urban.webp'], CELLS('full body, standing', 'Framing, the same in all 6 cells: full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.', 'Angle, the same in cells 1 to 5: three-quarter view, turned slightly toward the right, like image 1. Camera at chest height. Cell 6 is the only exception (see it).', [
+      '1. Listening: standing still, neutral and attentive, arms relaxed.',
+      '2. Warm smile: relaxed shoulders, a genuine warm smile, head slightly tilted.',
+      '3. Surprised, exclaiming: eyebrows up, eyes wide, mouth open, shoulders up, one hand rising.',
+      '4. Angry: brows low, jaw tight, fists at his sides, leaning forward a little.',
+      '5. Hurt: head lowered, eyes down, shoulders dropped, arms close to the body.',
+      '6. Walking away, from behind: three-quarter back view, he turns his back to the camera and walks away toward the right, mid-step, arms swinging naturally.'])],
+    accoude: ['Accoudé (base)', 'Tout ce qui a un rebord : comptoir, table haute, clôture, pont, mur, table du conseil. Seuls la tête et les mains changent.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side', LEAN_CUT, LEAN_ANGLE, [
+      '1. Listening to the person next to him: head turned toward the camera side, eye contact, mouth closed, calm and attentive.',
+      '2. A half smile at them: head turned toward the camera side, a crooked half-smile, warm playful eyes.',
+      '3. Tense with them: head turned toward the camera side, jaw clenched, brows low, a hard stare, forearms tense.',
+      '4. Straight ahead, hurt or lost in thought: the head faces the same way as the body (to the right), no eye contact, eyes lowered, mouth pressed shut.',
+      '5. The back of his head: the head turns the other way, AWAY from the camera, toward someone on his far side: we see the back of his head and hair, his ear, only the outline of his cheek.',
+      '6. Putting something down for them: head turned toward the camera side, his near hand forward on the ledge, index and middle fingers pressed flat on its top as if sliding a small flat thing (a coin, a note) toward the camera side. NO object drawn: the fingertips rest exactly on the cut line.'])],
+    assis: ['Assis (à une table)', 'Une table de resto, le conseil assis, un banc, le feu : la personne en face est assise de l’autre côté.', ['justin_comptoir_autre.webp'], CELLS('sitting at a table, seen almost from the side', 'Framing, the same in all 6 cells: he sits on a chair at a table that is NOT drawn. The table would hide everything below its top, so cut the body with a straight horizontal line at the height of the table top, under his forearms when they rest on it, and that cut sits exactly on the bottom edge of the cell, at the same height in every cell. The head is the same size as in image 2. Clear margin of green above the head and on both sides. No text, no labels.', 'ANGLE, the same in all 6 cells: he faces the RIGHT side of the image, a SIDE VIEW turned only very slightly toward the camera (about 20 degrees). The person he talks to sits across the table, to the right: looking to the right IS looking at them. Camera at chest height.', [
+      '1. Listening across the table: forearms on the table, looking at the person across, calm, mouth closed.',
+      '2. Leaning in to confide: leaning forward over the table, closer, head slightly lowered, a low intimate look.',
+      '3. Leaning back, distrustful: upper body back against the chair, away from the table, arms crossed, chin down.',
+      '4. Head in his hands: elbows on the table, face in both hands, shoulders slumped.',
+      '5. Fist on the table: one fist slammed on the table top, jaw clenched, leaning forward, angry.',
+      '6. Getting up: rising from the chair, both hands pushing on the table, body half up, looking at the person across.'])],
+    prises: ['Prises (mains vides)', 'Boire, trinquer, lire, tendre : les mains sont vides, le jeu y met la chope, la lettre, la clé.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side, his hands EMPTY in holding positions', LEAN_CUT + ' HIS HANDS ARE EMPTY IN EVERY CELL: NO mug, NO cup, NO glass, NO paper, NO object at all. The game adds the object later: draw the hand shaped as if it holds it.', LEAN_ANGLE, [
+      '1. Bringing something to his lips: his near hand raised to his mouth, fingers curled as if holding a mug by its handle (empty), head tilted back slightly, eyes half closed.',
+      '2. Raising something toward the person next to him: head turned toward the camera side, smiling, his near hand raised at shoulder height toward them, fingers curled as if holding a mug (empty).',
+      '3. Holding something in front of him with both hands: both hands together above the ledge in front of his chest, as if holding a letter open (empty), looking down at it.',
+      '4. Handing something to the person next to him: head turned toward the camera side, his near arm extended toward them, hand half open as if offering a small thing (empty).',
+      '5. Slumped, drunk or exhausted: his cheek resting in his near hand (elbow on the ledge), heavy eyelids, a lazy half-smile.',
+      '6. Laughing out loud: head tilted back, a big open-mouthed laugh, eyes squinting, one hand flat on the ledge.'])],
+  };
+  Object.assign(SHEETS, KIT_SHEETS);
+  // the order: the base for everyone, then what the story needs (the older sheets stay for the characters that have them)
+  const PLACES = [['kit', 'Base, puis selon l’histoire', ['photo', 'debout', 'accoude', 'assis', 'prises', 'kiss', 'close']]];
   // the prompt that writes the LOCKED block from the character's picture (what each sheet keeps identical)
   const LOCK_HELP = `Look at the character in this image. Write the LOCKED block that describes them for a pose-sheet prompt, in exactly this shape and nothing else (one line each, concrete, what never changes):
 - Hair: color, length, texture, how it falls (front and back).
@@ -228,8 +296,10 @@ Example:
   // a sheet of Justin's -> the same sheet for someone else
   function make(id, c) {
     const [, , guides, src] = SHEETS[id], L = (c.locked || '[colle ici son bloc LOCKED]').trim();
-    if (typeof src === 'function') return src(L);
-    let t = BANK.prompts[src][3];
+    let t;
+    if (typeof src === 'function') { t = src(L); if (id === 'photo') return t; }
+    else {
+    t = BANK.prompts[src][3];
     const imgs = guides.length > 1
       ? `Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing, the cut and the poses; copy nothing of his look (face, hair, body, clothes). Image 3 is the mug. Copy the character of image 1 exactly.`
       : `Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing, the cut and the poses; copy nothing of his look (face, hair, body, clothes). Copy the character of image 1 exactly.`;
@@ -239,6 +309,7 @@ Example:
       .replace(/\(exactly like his bar pose, cell 4 of image 2\)/, '(exactly like the guide, image 2)')
       .replace(/,? ?(and )?(the )?(thin )?gold glasses arm/g, '').replace(/\(cheek, ear, glasses arm\)/, '(cheek, ear)')
       .replace(/the back of the tank top/g, 'the back of the top').replace(/the tank top/g, 'the top');
+    }
     if (c.she) {   // the guide stays "his" (another character, a man): only the character's own he/his turn
       const keep = 'copy nothing of his look';
       t = t.replace(keep, '\u0000').replace(/\bhimself\b/g, 'herself').replace(/\bhim\b/g, 'her').replace(/\bhis\b/g, 'her').replace(/\bhe\b/g, 'she')
@@ -267,7 +338,7 @@ Example:
           + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="photo">Copier le prompt</button><button type="button" class="ncDone${done.photo ? ' on' : ''}" data-ncdone="photo">${done.photo ? 'Fait ✓' : 'Fait'}</button></div>`)
       + step(3, 'Son bloc LOCKED', !!(c.locked || '').trim(), `<p>Ce qui ne change jamais. Copie le prompt, colle-le avec son image, colle la réponse ici.</p><button type="button" class="bkCopy" data-nccopy="help">Copier le prompt</button><textarea data-nc="locked" rows="5" placeholder="- Hair: …&#10;- Face: …&#10;- Outfit: …">${esc(c.locked || '')}</textarea>`)
       + step(4, `Ses feuilles · ${sheets.filter((id) => done[id]).length}/${sheets.length}`, sheets.every((id) => done[id]),
-        `<div class="ncChips">${PLACES.map(([id, l]) => `<button type="button" data-ncplace="${id}" class="${id === place[0] ? 'on' : ''}">${l}</button>`).join('')}</div>`
+        `<p>Debout et Accoudé : tout le monde. Ensuite, selon l’histoire.</p>`
         + sheets.map((id) => { const [t, why, guides] = SHEETS[id], open = c.open === id;
           return `<div class="ncSheet${open ? ' open' : ''}${done[id] ? ' done' : ''}"><button type="button" class="ncHead" data-ncopen="${id}"><i>${done[id] ? '✓' : ''}</i>${esc(t)}<em>${open ? '−' : '+'}</em></button>`
             + (open ? `<div class="ncBody"><p>${esc(why)}</p><div class="ncPics">${one}${guides.map((f, k) => pic(f, `Image ${k + 2} · ${f === 'chope.webp' ? 'la chope' : 'le guide'}`)).join('')}</div>`
@@ -278,7 +349,7 @@ Example:
   let shown = null;   // { kind, imgs, msg }
   const importBox = (id) => { const s = shown && shown.kind === id ? shown : null;
     return `<div class="ncImport"><label class="ncBtn ncPick">${s && s.imgs ? 'Refaire avec une autre image' : 'Importer la feuille générée'}<input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
-      + (s && s.imgs ? `<div class="ncCuts">${s.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div><button type="button" class="bkCopy" data-ncadd="${id}">Ajouter au jeu</button>` : '')
+      + (s && s.imgs ? `${s.imgs.some((m) => m.grip) ? '<p>Le point jaune = où le jeu met l’objet. Touche la main pour le déplacer.</p>' : ''}<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div><button type="button" class="bkCopy" data-ncadd="${id}">Ajouter au jeu</button>` : '')
       + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '') + '</div>'; };
   BANK.newCharFile = async (kind, file, redraw) => {
     shown = { kind, msg: 'Découpe…' }; redraw();
@@ -292,6 +363,7 @@ Example:
     catch (err) { shown = { ...shown, msg: `Pas ajouté : ${err.message}` }; }
     redraw();
   };
+  BANK.newCharGrip = (pose, fx, fy) => { const r = IMPORT.setGrip(pose, fx, fy), m = r && shown && shown.imgs && shown.imgs.find((x) => x.pose === pose); if (m) m.grip = r; return !!m; };
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
   BANK.newCharIsOpen = () => !!load().shown;
