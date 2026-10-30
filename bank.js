@@ -119,6 +119,8 @@ window.BANK = {
     $('#bankBody').onclick = (e) => {
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
       const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
+      const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]');
+      if (op || tk) { e.stopPropagation(); if (op) BANK.newCharOpen(op.dataset.ncopen); else BANK.newCharTick(tk.dataset.ncdone); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (nc || ci) {   // Nouveau perso: a prompt, or a picture as png (the promise keeps it inside the tap, for Safari)
         e.stopPropagation(); const b = nc || ci, was = b.textContent, done = (ok) => { b.textContent = ok ? 'Copié ✓' : 'Copie impossible : Enregistrer'; setTimeout(() => { b.textContent = was; }, 1800); };
         if (nc) { const t = BANK.newCharPrompt(nc.dataset.nccopy); navigator.clipboard.writeText(t).then(() => done(true), () => { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); done(true); }); return; }
@@ -246,21 +248,28 @@ Example:
   const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
   // a picture to attach: big, with Copier (into the clipboard, as png) and Enregistrer (a download)
   const pic = (f, label) => `<div class="ncPic"><img src="ref/${f}" alt="" data-img="ref/${f}"><span>${esc(label)}</span><div><button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image</button><a class="ncBtn" href="ref/${f}" download="${f}">Enregistrer</a></div></div>`;
+  // the screen: 4 steps, one card each, short. 4 = the sheets of the place, one line each: a tap opens it (its pictures,
+  // its prompt), « Fait » ticks it; one open at a time
   BANK.newChar = () => {
-    const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0];
-    const mine = HAVE.includes(String(c.name || '').trim().toLowerCase()) ? `perso_${String(c.name).trim().toLowerCase()}.webp` : null;   // a character we already have: his picture is image 1
-    return `<p class="bkNote">Un nouveau perso : son nom, il ou elle, son bloc LOCKED, le lieu. Chaque feuille : les images à joindre (l’image 1 est toujours ton perso), puis son prompt, prêt pour lui ou elle.</p>`
-      + `<div class="ncForm"><input data-nc="name" placeholder="Son nom (ex. Nora)" value="${esc(c.name || '')}">`
-      + `<div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`
-      + `<small>Son bloc LOCKED (ce qui ne change jamais : cheveux, visage, corps, vêtements, style)</small><textarea data-nc="locked" rows="6" placeholder="- Hair: …&#10;- Face: …&#10;- Body: …&#10;- Outfit: …&#10;- Art style: …">${esc(c.locked || '')}</textarea>`
-      + `<button type="button" class="bkCopy" data-nccopy="help">Copier le prompt qui écrit son LOCKED</button><p class="bkNote">À coller dans ChatGPT avec l’image de ton perso (feuille 1) : il répond le bloc, colle-le ci-dessus.</p>`
-      + `<small>Le lieu</small><div class="ncChips">${PLACES.map(([id, l]) => `<button type="button" data-ncplace="${id}" class="${id === place[0] ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
-      + place[2].map((id, i) => { const [t, why, guides] = SHEETS[id];
-        return `<div class="bkShot"><b>${i + 1}. ${esc(t)}${c.name ? ' · ' + esc(c.name) : ''}</b><p>${esc(why)}</p><div class="ncPics">`
-          + (id !== 'photo' && mine ? pic(mine, `Image 1 : ${c.name}`) : `<div class="ncPic mine"><span>${id === 'photo' ? 'Image 1 : sa photo' : 'Image 1 : ton perso (feuille 1)'}</span></div>`)
-          + guides.map((f, k) => pic(f, `Image ${k + 2} : ${id === 'photo' ? 'le style' : f === 'chope.webp' ? 'la chope' : 'le guide (Justin)'}`)).join('')
-          + `</div><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button></div>`; }).join('');
+    const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0], done = c.done || {};
+    const nm = String(c.name || '').trim(), mine = HAVE.includes(nm.toLowerCase()) ? `perso_${nm.toLowerCase()}.webp` : null;
+    const step = (n, title, ok, body) => `<div class="ncStep${ok ? ' ok' : ''}"><b><i>${ok ? '✓' : n}</i>${title}</b>${body}</div>`;
+    const sheets = place[2].filter((id) => id !== 'photo');
+    const one = mine ? pic(mine, `Image 1 · ${nm}`) : '<div class="ncPic mine"><span>Image 1 · ton perso (étape 2)</span></div>';
+    return step(1, 'Qui', !!nm, `<input data-nc="name" placeholder="Son nom" value="${esc(nm)}"><div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`)
+      + step(2, 'Son image', !!mine || !!done.photo, mine ? '<p>Déjà dans le jeu.</p>'
+        : `<p>Joins sa photo + l’image de style, colle le prompt.</p><div class="ncPics"><div class="ncPic mine"><span>Image 1 · sa photo</span></div>${pic('urban.webp', 'Image 2 · le style')}</div>`
+          + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="photo">Copier le prompt</button><button type="button" class="ncDone${done.photo ? ' on' : ''}" data-ncdone="photo">${done.photo ? 'Fait ✓' : 'Fait'}</button></div>`)
+      + step(3, 'Son bloc LOCKED', !!(c.locked || '').trim(), `<p>Ce qui ne change jamais. Copie le prompt, colle-le avec son image, colle la réponse ici.</p><button type="button" class="bkCopy" data-nccopy="help">Copier le prompt</button><textarea data-nc="locked" rows="5" placeholder="- Hair: …&#10;- Face: …&#10;- Outfit: …">${esc(c.locked || '')}</textarea>`)
+      + step(4, `Ses feuilles · ${sheets.filter((id) => done[id]).length}/${sheets.length}`, sheets.every((id) => done[id]),
+        `<div class="ncChips">${PLACES.map(([id, l]) => `<button type="button" data-ncplace="${id}" class="${id === place[0] ? 'on' : ''}">${l}</button>`).join('')}</div>`
+        + sheets.map((id) => { const [t, why, guides] = SHEETS[id], open = c.open === id;
+          return `<div class="ncSheet${open ? ' open' : ''}${done[id] ? ' done' : ''}"><button type="button" class="ncHead" data-ncopen="${id}"><i>${done[id] ? '✓' : ''}</i>${esc(t)}<em>${open ? '−' : '+'}</em></button>`
+            + (open ? `<div class="ncBody"><p>${esc(why)}</p><div class="ncPics">${one}${guides.map((f, k) => pic(f, `Image ${k + 2} · ${f === 'chope.webp' ? 'la chope' : 'le guide'}`)).join('')}</div>`
+              + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button><button type="button" class="ncDone${done[id] ? ' on' : ''}" data-ncdone="${id}">${done[id] ? 'Fait ✓' : 'Fait'}</button></div></div>` : '') + '</div>'; }).join(''));
   };
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
+  BANK.newCharTick = (id) => { const c = load(); c.done = c.done || {}; c.done[id] = !c.done[id]; keep(c); };
+  BANK.newCharOpen = (id) => { const c = load(); c.open = c.open === id ? null : id; keep(c); };
 })();

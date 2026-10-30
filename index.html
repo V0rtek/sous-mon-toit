@@ -257,6 +257,23 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .bkRef { font: inherit; border: 0; background: #2c2c2e; border-radius: 1em; padding: .4em; color: #c7c7cc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; }
 .bkRef img { height: 12em; border-radius: .6em; }
 .bkRef span { font-size: 1.2em; }
+.ncStep { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; display: flex; flex-direction: column; gap: .8em; }
+.ncStep > b { font-size: 1.9em; display: flex; align-items: center; gap: .5em; }
+.ncStep > b i { font-style: normal; width: 1.5em; height: 1.5em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; font-size: .75em; }
+.ncStep.ok > b i { background: #30d158; color: #000; }
+.ncStep p { font-size: 1.5em; color: #a1a1a6; margin: 0; line-height: 1.35; }
+.ncStep input, .ncStep textarea { font: inherit; font-size: 1.6em; padding: .6em .8em; border-radius: .8em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; user-select: text; resize: vertical; }
+.ncRow { display: flex; gap: .6em; align-items: center; }
+.ncRow .bkCopy { margin: 0; }
+.ncDone { font: inherit; font-size: 1.5em; font-weight: 600; padding: .5em 1.2em; border: .1em solid #48484a; border-radius: 1em; background: none; color: #f5f5f7; cursor: pointer; }
+.ncDone.on { background: #30d158; border-color: #30d158; color: #000; }
+.ncSheet { background: #2c2c2e; border-radius: 1em; }
+.ncHead { font: inherit; font-size: 1.6em; width: 100%; display: flex; align-items: center; gap: .6em; padding: .7em .8em; border: 0; background: none; color: #f5f5f7; text-align: left; cursor: pointer; }
+.ncHead i { font-style: normal; width: 1.3em; height: 1.3em; border-radius: 50%; border: .1em solid #636366; display: grid; place-items: center; font-size: .8em; flex: none; }
+.ncSheet.done .ncHead i { background: #30d158; border-color: #30d158; color: #000; }
+.ncHead em { font-style: normal; margin-left: auto; color: #8e8e93; }
+.ncBody { padding: 0 1em 1em; display: flex; flex-direction: column; gap: .6em; }
+.ncSheet .ncPic { background: #1c1c1e; }
 .ncForm { display: flex; flex-direction: column; gap: .8em; margin-bottom: 1.4em; }
 .ncForm input, .ncForm textarea { font: inherit; font-size: 1.6em; padding: .6em .8em; border-radius: .8em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; user-select: text; resize: vertical; }
 .ncForm small { font-size: 1.35em; color: #a1a1a6; }
@@ -1624,8 +1641,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261031130000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="tests.js?v=20261031180000"></script>
-<script src="bank.js?v=20261031200000"></script>
+<script src="tests.js?v=20261031210000"></script>
+<script src="bank.js?v=20261031220000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -2192,10 +2209,25 @@ function gaze(s) {
   if (to && to !== sp && to.x !== sp.x) { sp.face = to.x < sp.x ? 'l' : 'r'; placeActor(sp); }
   lastSpeaker = s.say;
 }
+// at the counter, everyone faces along it, side by side in depth: talking to each other is the head that turns. Whoever
+// speaks with a plain 'bar' (or no pose) turns his head to whom he talks to (s.to, else whoever spoke last), and the one
+// he talks to turns to him: toward someone nearer the camera = bar_to_talk (the face), toward someone further = bar_back
+// (the back of the head). Only those leaning (a bar pose) and whose sheet has both; any other pose is played as written
+const leaning = (a) => a && String(a.pose).startsWith('bar');
+const canTurn = (a) => { const p = (SPRITES[spriteOf(a.id)] || {}).poses || {}; return p.bar_to_talk && p.bar_back; };
+const headTo = (a, b) => (b.feet > a.feet ? 'bar_to_talk' : 'bar_back');
+function counterTalk(s) {
+  const sp = actors[s.say], to = actors[s.to || lastSpeaker];
+  if (!leaning(sp) || !leaning(to) || to === sp || !canTurn(sp)) return s.pose;
+  if (canTurn(to) && ['bar', 'bar_to_talk', 'bar_back'].includes(to.pose)) setPose(to.id, headTo(to, sp));
+  return !s.pose || s.pose === 'bar' ? headTo(sp, to) : s.pose;
+}
 function line(s) {
   const who = s.say || s.think || null, kind = s.narr ? 'narr' : s.think ? 'think' : s.whisper ? 'whisper' : 'say';
+  const pose = s.say ? counterTalk(s) : s.pose;
   if (s.say && story().gaze) gaze(s);
-  if (s.say && s.pose) setPose(s.say, s.pose);
+  if (s.say && pose) setPose(s.say, pose);
+  if (s.say) lastSpeaker = s.say;
   const side = callSide(), voice = !!(side && s.say && s.say !== side && seatsOf().includes(s.say));   // through the phone
   bubble.className = voice ? 'say phone' : kind;
   tagEl.hidden = !who;

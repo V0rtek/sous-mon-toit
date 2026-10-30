@@ -34,6 +34,8 @@
     // the kiss: face to face in pure profile; a kiss pose puts his lips 143 sheet px ahead of his spot (chars.js), so
     // 2 × 143 × 430 / 1230 = 100 apart, their faces meet
     t_baiser: { ...T, spots: { justin: [820, 925, 430], twin: [920, 925, 430] }, face: { justin: 'r', twin: 'l' } },
+    // two at the counter talking to each other: Sam nearer the camera, Justin behind him (the one at the back shows his face)
+    t_deux: { ...B, spots: { twin: B.spots.justin, justin: B.spots.melissa }, face: { twin: 'r', justin: 'r' } },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
@@ -159,6 +161,16 @@
     say('justin', 'bar_back', 'Elle revient.'),
     say('justin', 'bar_slide', 'Tiens. T’en as plus besoin que moi.'),
     { cam: 'wide', at: 900 }, say('justin', 'bar_toast', 'À celle qui sourit à tout le monde.'),
+    { fade: 'out', ms: 600 },
+    // they talk to each other: a plain 'bar' turns the head (index.html, counterTalk): Justin, at the back, turns his face
+    // to Sam; Sam, in front, turns the back of his head to Justin
+    { scene: 't_deux', cast: { twin: 'bar', justin: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Ils se parlent' }, { wait: 1200 },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar', to: 'twin', text: 'Sam. Tu l’as vue, toi aussi ?' },
+    { cam: 'close', who: ['twin'] }, { say: 'twin', pose: 'bar', to: 'justin', text: 'Vue qui ?' },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_to_flirt', to: 'twin', text: 'Fais pas l’innocent.' },
+    { cam: 'two', who: ['twin', 'justin'] }, { say: 'twin', pose: 'bar', to: 'justin', text: 'Ok. Oui. Elle est belle.' },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_drink', text: '…' },
+    { say: 'justin', pose: 'bar', to: 'twin', text: 'Elle m’a demandé ton nom.' },
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
   // tbaiser (31/10): Justin and Sam (Justin again, turned around) face to face in pure profile: each pose of the kiss
