@@ -60,6 +60,18 @@ window.ACT = (() => {
     ex: ['Melissa : « Il y a trois ans, je suis partie sans adieu. » (dit, expliqué, fermé : plus rien à savoir)', 'Justin : « T’es partie sans un mot. » Melissa : « Sans un mot ? Je t’ai écrit. » Candy : « Qui veut un verre ? »'],
     en: 'The episode opens a question the player wants answered, and does not close it. The strongest: two people on screen do not tell the same past. Nobody explains, someone changes the subject: the player is left with the question. A choice is not a hook (what justin answers, the player decides himself); a past told and closed is not one either.',
     enEx: ['Melissa: "Three years ago, I left without saying goodbye." (said, explained, closed: nothing left to know)', 'justin: "You left without a word." Melissa: "Without a word? I wrote to you." Candy: "Who wants a drink?"'] };
+  AT.first = { n: 'La 1re réplique', how: 'Elle se comprend seule, sans rien savoir : un conflit, une surprise ou un aveu entre deux persos à l’écran, ici, maintenant. Le joueur se demande « pourquoi ? » ou « et alors ? ». Jamais une ambiance, une salutation, ni une chose qu’on ne voit pas.',
+    ex: ['« La septième lumière porte chance ! » (de quoi elle parle ?) / « Belle soirée, hein ? »', 'Candy : « Si elle s’assoit à cette table, moi je me lève. » / « Trois ans. Et tu reviens le soir où j’allais enfin bien. »'],
+    en: 'It is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen, here, now. The player asks "why?" or "and then?". Never a mood, a greeting, or something the screen does not show.',
+    enEx: ['"The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?"', 'Candy: "If she sits at this table, I\'m leaving it." / "Three years. And you come back the night I was finally okay."'] };
+  AT.want = { n: 'Un rêve à lui', how: 'Justin veut une chose pour lui, depuis longtemps, avec sa raison : un rêve personnel qu’on comprend (partir, être libre, être reconnu, aimer quelqu’un). Pas « ce soir », pas pour quelqu’un d’autre. Il le dit lui-même, à voix haute, à quelqu’un à l’écran, avant la demande de A ; quelqu’un réagit (une blague, un doute). Puis la demande de A tombe dessus : dire oui l’en rapproche et blesse B, dire non l’en éloigne. Le choix lui coûte à lui, pas seulement aux autres.',
+    ex: ['Justin veut passer une soirée tranquille avec elles. (ce soir, rien à poursuivre) / Justin veut être heureux.', 'Justin : « Un jour je pars d’ici. Je veux voir la mer avant mes trente ans. » Candy : « Tu dis ça chaque année. » (il rêve d’être libre ; Candy le retient sans le savoir ; Melissa lui offre de partir)'],
+    en: 'justin wants something for himself, for a long time, with its reason: a personal dream anyone understands (to leave, to be free, to be recognized, to love someone). Not "tonight", not for someone else. He says it himself, out loud, to someone on screen, BEFORE A asks; someone reacts (a joke, a doubt). Then A\'s request lands on it: yes brings him closer and hurts B, no takes it away. The choice costs HIM, not only the others.',
+    enEx: ['justin wants a quiet evening with them. (tonight, nothing to chase) / justin wants to be happy.', 'justin: "One day I\'m leaving this city. I want to see the sea before I\'m thirty." Candy: "You say that every year." (he dreams of being free; Candy holds him back without knowing it; Melissa offers him the way out)'] };
+  AT.hook = { n: 'La fin qui promet', how: 'La dernière réplique annonce une suite précise qu’on veut voir : qui, quand, où, et ce qui va s’y jouer. Ou une surprise, ou une nouvelle question. Jamais la question du choix qu’on vient de faire, reposée ; jamais vague.',
+    ex: ['« Ne promets rien que tu ne peux tenir. » (le choix, reposé) / « Il y aura des conséquences. » (vague)', '« On se voit au championnat ce soir. On va avoir une petite discussion. » / Candy : « Demain, 7 h, à cette table. Toi et moi, on va se parler. »'],
+    en: 'The last line announces a precise next moment the player wants to see: who, when, where, and what will be settled there. Or a surprise, or a new question. Never the question of the choice just made, asked again; never vague.',
+    enEx: ['"Don\'t promise what you can\'t keep." (the choice, asked again) / "There will be consequences." (vague)', '"See you at the championship tonight. We\'re gonna have a little talk." / Candy: "Tomorrow, 7 a.m., this table. You and me, we talk."'] };
   const atLine = (id) => `- ${AT[id].n}: ${AT[id].en} Flat: "${AT[id].enEx[0]}" -> works: "${AT[id].enEx[1]}"`;
 
   // the two people, drawn for the act's prompt ("Autre" draws again): who they are to justin, never a job
@@ -75,7 +87,7 @@ window.ACT = (() => {
   const EX = () => ({ v: 2, title: 'Sous mon toit', scene: 'salon', question: 'Dois-tu dire la vérité à ton père si elle va le briser ?',
     a: { id: 'isa', is: 'L’amie de son père, qui dort au salon depuis hier', wants: 'Que Justin ne dise pas à James qu’elle sort toutes les nuits', because: 'Elle croit que James la mettrait dehors s’il savait où elle va' },
     b: { id: 'james', is: 'Son père', wants: 'Que Justin veille sur Isa et lui dise tout', because: 'Il croit qu’Isa est fragile et qu’il est le seul à pouvoir la protéger' },
-    justin_wants: 'Que son père soit enfin heureux avec Amare',
+    justin_wants: 'Partir étudier à Montréal en septembre, parce qu’il veut enfin une vie à lui, mais il n’ose pas laisser James seul',
     past: 'Il y a dix ans, la mère de Justin est partie quand James a fait son coming out.',
     lost_if_no: 'Si Justin refuse, Isa fait déjà son sac : elle part ce soir, et James perd la seule amie qui est restée.',
     secret: { who: 'isa', what: 'C’est la mère de Justin qui envoie Isa : chaque nuit, elle sort pour lui donner des nouvelles de Justin' },
@@ -99,23 +111,23 @@ window.ACT = (() => {
   // the arc: per episode, its goal, what's at stake (it grows), its act techniques, and what it must contain:
   // [key, label here, label in the prompt, the act's value, thread]. Episode 1 carries three things and one plant
   const ARC = [
-    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'here', 'because', 'danger', 'loop', 'plant'],
-      items: (A) => [['first', 'La 1re réplique', 'The FIRST line: one sentence that makes the player want to know what happens, about something visible or said (never a gesture or an object the screen does not show)', ''],
+    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'first', 'want', 'here', 'because', 'danger', 'loop', 'plant', 'hook'],
+      items: (A) => [['first', 'La 1re réplique', 'The FIRST line (La 1re réplique): understood alone, knowing nothing; a conflict, a surprise or a confession between two people on screen', ''],
         ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel")`, ''],
-        ['want', 'Justin veut', 'What justin wants for himself, said or thought, so the player wants it too', A.justin_wants],
+        ['want', 'Justin veut', `What justin has wanted for a long time, and why (Un rêve à lui): he says it himself, out loud, BEFORE ${nm(A, 'a')} asks; the request then lands on it`, A.justin_wants],
         ['ask', `${nm(A, 'a')} demande`, `${nm(A, 'a')} asks justin, out loud, and we see what is lost if he says no`, [E(A, 1).ask, A.lost_if_no].filter(Boolean).join(' · ')],
         ['hurt', `Ça blesse ${nm(A, 'b')}`, `Why giving it hurts ${nm(A, 'b')}, shown`, E(A, 1).hurts],
         ['loop', 'La question ouverte', 'The question this episode opens and does NOT answer (it is answered by the secret, in episode 3): justin reacts to it, nobody explains', E(A, 1).mystery, 'sec'],
         ['s1', 'Planté', 'Plant it in a line, passing for something else', S(A, 0).plant, 's1'],
-        ['end', 'Fin', 'The episode ends on (its turn): something new, never the question justin just answered in a choice', E(A, 1).hook]] },
-    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['visible', 'loop', 'easy', 'plant', 'secret'],
+        ['end', 'Fin', 'The episode ends on (its turn, La fin qui promet)', E(A, 1).hook]] },
+    { goal: 'Il essaie de garder les deux. Ça empire', en: 'he tries to keep both, and it gets worse', stake: (A) => `La confiance ${de(nm(A, 'b'))}`, at: ['visible', 'loop', 'easy', 'plant', 'secret', 'hook'],
       items: (A) => [['r1', 'Rappel', 'Bring it back, without explaining it', S(A, 0).plant, 's1'],
         ['easy', 'L’effort minimal', 'What justin tries first to keep both (the easy way)', E(A, 2).easy],
         ['s2', 'Planté', 'Plant it in a line, passing for something else', S(A, 1).plant, 's2'],
         ['worse', 'Ça empire', `It backfires and makes it worse with ${nm(A, 'b')}`, E(A, 2).backfires],
         ['sec', `Le secret ${de(holder(A))}, soulevé`, `${holder(A)} does the odd thing the secret will explain; the question is raised, never answered`, '', 'sec'],
         ['end', 'Fin', 'The episode ends on (its turn)', E(A, 2).hook]] },
-    { goal: 'Le secret sort. On revoit tout', en: 'the secret comes out and the player sees everything differently', stake: (A) => `Ce qu’il croyait ${de(holder(A))}`, at: ['visible', 'secret'],
+    { goal: 'Le secret sort. On revoit tout', en: 'the secret comes out and the player sees everything differently', stake: (A) => `Ce qu’il croyait ${de(holder(A))}`, at: ['visible', 'secret', 'hook'],
       items: (A) => [['out', 'Le secret sort', 'The secret comes out ("Reveal info")', E(A, 3).reveal, 'sec'],
         ['p1', 'Payé', 'Pay it off: what was planted now makes sense', S(A, 0).pay, 's1'],
         ['p2', 'Payé', 'Pay it off: what was planted now makes sense', S(A, 1).pay, 's2'],
@@ -180,6 +192,8 @@ window.ACT = (() => {
       if (!a[w] || !a[w].id || !a[w].wants) out.push(`Il manque ${w.toUpperCase()} ou ce qu’il veut`);
       else if (!a[w].because) out.push(`Pourquoi ${cap(a[w].id)} veut ça ? (Vouloir + raison)`);
     }
+    if (a.justin_wants && !/\b(parce|car|because|since|pour)\b/i.test(a.justin_wants)) out.push('Pourquoi Justin veut ça ? (Un rêve à lui)');
+    if (a.justin_wants && /\b(ce soir|cette nuit|tonight)\b/i.test(a.justin_wants)) out.push('Ce que Justin veut tient en un soir : un rêve de longue date (Un rêve à lui)');
     if (!a.lost_if_no) out.push('Ce qui est perdu si Justin dit non ? (Danger présent)');
     if (!a.past) out.push('Le passé ? (Le passé en une phrase)');
     else if ((String(a.past).trim().match(/[.!?](\s|$)/g) || []).length > 1) out.push('Le passé tient en plus d’une phrase (Le passé en une phrase)');
@@ -342,7 +356,7 @@ Reply with ONE JSON object and nothing else (its shape is at the end).
 
 THE ARC (always this one: you fill it, you never change it)
 justin is caught between two people he cares about, A and B. A asks him for something; giving it to A hurts B.
-- Episode 1: we like A and B; A asks, and we see what is lost if justin says no; we see why saying yes would hurt B. A question about the past is opened and left open (the secret is its answer). One small thing is planted.
+- Episode 1: the first line hooks on its own; we like A and B; justin says his dream; A asks, and we see what is lost if justin says no; we see why saying yes would hurt B. A question about the past is opened and left open (the secret is its answer). One small thing is planted.
 - Episode 2: justin tries the easy way to keep both. It backfires: things get worse with B. A second small thing is planted; the one who has the secret does something odd.
 - Episode 3: the secret comes out. The two planted things suddenly make sense. What the player believed is turned around.
 - Episode 4: A and B each ask him for the same moment. He must choose: A or B.
@@ -356,15 +370,15 @@ ${Object.keys(AT).map(atLine).join('\n')}
 FILL IN (each one sentence, concrete: something you could film or say out loud, never a feeling alone):
 1. "scene": the decor. "title": 2-4 words.
 2. "a" and "b": "id" (the character's id), "is" (who they are to justin), "wants" (what they ask justin for, out loud: "wants him to leave with her tomorrow morning", never "wants to be happy"), "because" (what they believe that makes them want it). Techniques: Vouloir + raison, Ici et maintenant.
-3. "justin_wants": what justin wants FOR HIMSELF, tonight (a person, a place, a chance), something A's request puts at risk: the player must want it with him.
+3. "justin_wants": what justin has wanted FOR HIMSELF for a long time, and why, in one sentence (Un rêve à lui): personal and relatable ("to leave the city, because he dreams of being free and has never dared leave his sister alone"). Never tonight, never for someone else. A's request brings him closer to it, B's keeps him from it (or the other way): the choice costs him too.
 4. "past": the one thing from the past that matters, in ONE sentence (Le passé en une phrase).
 5. "lost_if_no": what is lost, right there, if justin says no to A (Danger présent).
 6. "question": the question the act argues about, as a question ("Do you keep a promise to someone who lies to you?").
 7. "secret": "who" (the id of the character it belongs to: the one whose odd behaviour it explains) and "what" (Un secret qui explique un geste). Once out, the player sees that person differently. It explains both setups.
 8. "setups": exactly 2 (Un plant qui se voit). "plant" = the line that plants it (setup 1 in episode 1, setup 2 in episode 2), "pay" = what it means once the secret is out.
 9. "episodes": exactly 5 objects, in order, with these fields:
-   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, best two people on screen telling a different past; the secret is its answer), "hook" (the last moment of the episode: a surprise or a new question, never a summary, never the request asked again).
-   2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook".
+   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, best two people on screen telling a different past; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
+   2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook" (La fin qui promet).
    3: "reveal" (how the secret comes out, in the scene), "flip" (what the player believed, and what is true), "hook".
    4: "clock" (why it must be decided now), "a_asks", "b_asks" (Le même moment, deux demandes).
    5: "if_a" (if he chose A: what it costs, shown), "if_b" (if he chose B), "open" (what stays open for the next act).

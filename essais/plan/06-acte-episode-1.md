@@ -37,3 +37,12 @@ Prompts de l'Acte à eae69d2 (techniques d'acte, Générer). Le JSON de l'acte, 
   apporte du neuf, jamais un choix reposé.
 - Histoire : jamais plus de 2 répliques d'affilée du même perso ; Justin répond à ce qui le blesse ; la dernière réplique
   apporte du neuf.
+
+## 3e passe (30/10) : le désir de Justin, la 1re et la dernière réplique
+- Le désir de Justin manquait à toute la chaîne : l'acte demandait « ce que Justin veut, au départ » (puis « ce soir »,
+  pire) ; le plan cochait « un désir montré » avec la demande de Melissa ; l'histoire : « Je voulais juste une soirée ».
+- L'histoire ne voyait jamais les techniques d'acte (seulement le plan) : la 1re et la dernière réplique n'avaient pas d'exemple.
+- Corrigé : techniques d'acte « La 1re réplique », « Un rêve à lui », « La fin qui promet » (plat → ce qui marche) ;
+  justin_wants = un rêve de longue date avec sa raison, que la demande de A touche (validateur : sans raison, ou « ce soir ») ;
+  plan : technique de désir « Un rêve et sa raison », le désir doit être celui de Justin ; histoire : une section
+  « la 1re et la dernière réplique » avec exemples, et Justin dit son rêve lui-même, à voix haute.

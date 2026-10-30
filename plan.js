@@ -27,6 +27,7 @@ window.PLAN = (() => {
         { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement, sans le dire.', ex: ['She pushes her plate toward him without a word.', '« You didn’t eat. » / « I’m fine. » / « Eat. »'] }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
     { id: 'desire', name: 'Show desire / goal', c: '#ff375f', d: 'Montrer clairement ce qu’un perso veut.',
       tech: [{ n: 'Direct confession', d: 'Le perso dit tout haut, à quelqu’un en face de lui, ce qu’il veut ou ressent, sans sous-entendu (jamais dans sa tête).', ex: ['« I don’t think I could survive someone taking Cam away from me. »', '« I want out. Tonight. »'] },
+        { n: 'Un rêve et sa raison', d: 'Le héros dit à quelqu’un, à voix haute, ce qu’il veut pour lui depuis longtemps, et pourquoi ; l’autre réagit (une blague, un doute). On le comprend et on le veut avec lui. Avant la demande qui va tomber dessus.', ex: ['« One day I’m leaving this city. I want to see the sea before I’m thirty. » / « You say that every year. »', '« I want my name on that wall. Just once. » / « Then stop pouring drinks for the guys already on it. »'] },
         { n: 'Phrase pas finie', d: 'Il commence à dire à quelqu’un ce qu’il veut, ne finit pas, et se sauve.', ex: ['« Cam. You’re just… Yeah. Just… » then « I gotta pee. »'] }], icon: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>' },
     { id: 'stakes', name: 'Raise stakes', c: '#ffd60a', d: 'Montrer ce qui peut être perdu : à mettre juste avant un choix, lié à lui.',
       tech: [{ n: 'Mention consequences', d: 'Quelqu’un dit à un autre ce qui arrivera si ça tourne mal.', ex: ['« If the guard finds one bottle, we lose the license. »', '« Rent’s due Monday. I’m not covering you again. »'] },
@@ -456,13 +457,13 @@ ${act && act.n > 1 ? '- The first rectangle picks up where the last episode ende
 - Every rectangle brings something new (a fact, a feeling, a stake). Never two rectangles on the same question, except a "Question esquivée" and its "Question qui revient" (linked).
 - Before tapping, the player knows what each option means. An option may bring something new if it makes sense on its own; an option that is a lie or hides a secret needs the player to know the truth (shown before).
 - The main character knows nothing the player does not: whatever he knows that matters is shown before it is used.
-- At least one desire is shown ("desire" goal).
+- The main character's own desire is shown: a "desire" rectangle where he says what he has wanted for a long time, and why (THE ACT's "justin wants"), before the first stakes. Another character's request is not his desire. The stakes then say what that request does to his desire.
 - Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
 - At least one rectangle of "ep" hints an info of "later": the player ends the episode with a question nobody answered.
 - No rectangle where one character explains alone: a fact comes out because someone asks, accuses, dodges or disagrees.
 - When something hurts the main character (the past, a reproach), the next rectangle or choice is his reaction: he is never silent about it.
-- The turn brings something new (a fact, a surprise, a question): never a choice just made, asked again.
+- The turn brings something new: a precise next moment (who, when, where, what will be settled: "See you at the championship tonight. We're gonna have a little talk."), a surprise or a question. Never a choice just made, asked again, never vague ("There will be consequences").
 - What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture or object the screen does not show (counting the lights, flipping a coin, a crate): what matters is said in a line, plainly, the first time.
 
 THE JSON:
@@ -497,9 +498,12 @@ D. No line that only carries information, greets or explains a feeling: show it 
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 H. Never more than 2 lines in a row from the same character: what comes out, comes out in an exchange (a question, a reproach, a disagreement), never in a speech.
 I. When a line hurts the main character (the past, a reproach), he answers it: a line or a choice, never silence.
-J. The last line brings something new: a fact, a surprise, a question nobody answers. Never the question of the choice the player just made, asked again.
 G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate). If something matters, a line says what it is, plainly, the first time.
 
+THE FIRST AND THE LAST LINE:
+- The first line is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen. The player asks "why?". Flat: "The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?" -> works: Candy: "If she sits at this table, I'm leaving it." / "Three years. And you come back the night I was finally okay."
+- The last line announces a precise next moment the player wants to see (who, when, where, what will be settled), or a surprise, or a new question. Flat: "Don't promise what you can't keep." (the choice just made, asked again) / "There will be consequences." (vague) -> works: "See you at the championship tonight. We're gonna have a little talk." / "Tomorrow, 7 a.m., this table. You and me, we talk."
+THE MAIN CHARACTER'S DESIRE: in the rectangle that shows it, justin says it himself, out loud, to someone, with its reason ("One day I'm leaving this city. I want to see the sea before I'm thirty."), and someone reacts. Never in his head, never "tonight".
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: before tapping, the player knows what each option means: an option makes sense on its own, and a lie or a secret is only an option if the player knows the truth. "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
 POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
