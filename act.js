@@ -233,7 +233,7 @@ window.ACT = (() => {
       + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b></p><p class="pMsg" data-m="act"></p></section>`
       + `<section class="aStep"><h3><i>2</i>Le plan de l’épisode</h3><p class="pD">Le prompt du Plan de scène, avec l’acte : ce qui s’est passé avant et ce que cet épisode doit contenir.</p>`
       + `<div class="aEps">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-ep="${n}" class="${n === ep ? 'on' : ''}">${n}${A.plans && A.plans[n] ? ' ✓' : ''}</button>`).join('')}</div>`
-      + `<div class="aBtns"><button type="button" class="go" data-s="copyPlan">Copier le prompt du plan · épisode ${ep}</button></div>`
+      + `<div class="aBtns"><button type="button" class="go" data-s="copyPlan">Copier le prompt du plan · épisode ${ep}</button><button type="button" data-s="haiku">Haiku : plan + histoire · épisode ${ep}</button></div>`
       + `<small>La réponse</small>${box('plan', 'Colle ici le JSON du plan')}`
       + '<div class="aBtns"><button type="button" data-s="pastePlan">Coller le plan</button><button type="button" data-s="seePlan">Voir le plan</button></div>'
       + `<p class="aNow">${planOk ? `Plan ouvert : <b>${esc(P.title)}</b> ✓` : `Pas encore de plan pour l’épisode ${ep}`}</p><p class="pMsg" data-m="plan"></p></section>`
@@ -446,6 +446,10 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
         draft.act = ''; ep = 1; render(); say('act', 'Ouvert.'); return; }
       case 'visual': mode = 'visual'; ls('smt-act-mode', mode); render(); el.querySelector('.aView').scrollTop = 0; return;
       case 'copyPlan': return copy(planPrompt(ep), btn);
+      case 'haiku': { const key = ls('smt-key'); if (!key) return say('plan', 'Il faut ta clé API : entre-la une fois dans Ton histoire.');
+        btn.disabled = true;
+        auto(key, { n: ep, newAct: false }, (t) => say('plan', t)).then((u) => window.GEN_USED && GEN_USED(u), (err) => { say('plan', err.message || 'Ça n’a pas marché.'); btn.disabled = false; });
+        return; }
       case 'pastePlan': { let j;
         try { j = LOOSE_JSON(draft.plan); if (!Array.isArray(j.boxes)) throw 0; } catch { return say('plan', 'Ce n’est pas un plan (JSON).'); }
         if (!j.title) j.title = `${A.title} · épisode ${ep}`;
@@ -461,6 +465,43 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
       case 'next': ep = Math.min(5, ep + 1); render(); el.querySelector('.aView').scrollTop = 0; return;
     }
   }
+  // ---- Haiku does the 3 layers itself, with Justin's key (GEN.ask: claude-haiku-4-5, nothing bigger): the act (if
+  // asked), the plan of episode n, its story; each kept like a pasted one. A reply that is not JSON gets one retry ----
+  async function viaHaiku(key, prompt, max, ok, used) {
+    const messages = [{ role: 'user', content: prompt }];
+    for (let i = 0; ; i++) {
+      let got = null;
+      try {
+        got = await GEN.ask(key, messages, 'You reply with ONE JSON object and nothing else.', max);
+        used.in += got.usage.input_tokens || 0; used.out += got.usage.output_tokens || 0;
+        const j = LOOSE_JSON(got.text); if (!ok(j)) throw new Error('Some fields are missing.'); return j;
+      } catch (e) {
+        if (i || /401|Clé|Erreur/.test(e.message)) throw e;
+        messages.push({ role: 'assistant', content: (got && got.text) || '{}' }, { role: 'user', content: `That does not work (${e.message}). Reply again with the full JSON only, exactly the shape asked.` });
+      }
+    }
+  }
+  // tell(text) = the progress shown on the screen. Returns what Haiku cost (tokens), after the story starts playing
+  async function auto(key, { idea = '', n = 1, newAct = true } = {}, tell = () => {}) {
+    const used = { in: 0, out: 0 }, of = newAct ? 3 : 2;
+    if (newAct) {
+      tell(`1/${of} · L’acte (5 épisodes)…`);
+      const j = await viaHaiku(key, promptAct(idea, pair), 8000, (x) => x.a && x.b && Array.isArray(x.episodes), used);
+      store.list.push(fix({ ...j, done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
+      keep('acte', { act: A, by: 'haiku' });
+    }
+    ep = n;
+    tell(`${of - 1}/${of} · Le plan de l’épisode ${n}…`);
+    const plan = await viaHaiku(key, planPrompt(n), 12000, (x) => Array.isArray(x.boxes), used);
+    if (!plan.title) plan.title = `${A.title} · épisode ${n}`;
+    const p = window.PLAN.add(plan); A.plans[n] = p.title; save(); keep(`plan-ep${n}`, { ep: n, plan, by: 'haiku' });
+    tell(`${of}/${of} · L’histoire de l’épisode ${n}…`);
+    const story = await viaHaiku(key, window.PLAN.prompt2(), 8000, (x) => Array.isArray(x.steps), used);
+    keep(`histoire-ep${n}`, { ep: n, plan: p.title, story, by: 'haiku' });
+    tell('');
+    window.PLAN_PLAY(story, p.title);
+    return used;
+  }
   function mount(root) {
     el = root; root.onclick = onClick;
     root.oninput = (e) => {
@@ -472,5 +513,5 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
   }
   // a feedback given after a generated story (index.html): kept with the act's episode
   window.ACT_KEEP = (name, data) => keep(`${name}-ep${ep}`, { ep, plan: window.PLAN ? PLAN.get().title : '', ...data });
-  return { mount, closeSheet, redraw: () => render(), get: () => A, bundle, actText, promptAct: (idea) => promptAct(idea, pair) };
+  return { mount, closeSheet, redraw: () => render(), get: () => A, bundle, auto, actText, promptAct: (idea) => promptAct(idea, pair) };
 })();

@@ -1441,10 +1441,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="genScreen" class="card menu" hidden>
     <div class="step">
       <h2>Ton histoire</h2>
-      <p class="lead">Décris l'idée en une ou deux phrases. Haiku écrit une histoire courte avec des choix.</p>
+      <p class="lead">Décris l'idée en une ou deux phrases. Haiku écrit une histoire courte avec des choix. Ou tout par Haiku : l'acte de 5 épisodes, le plan, puis l'épisode 1 (l'idée est facultative, 1 à 3 min).</p>
       <textarea id="genIdea" rows="5" maxlength="600" placeholder="Ex. : Ruby découvre que James a menti sur où il était hier soir." aria-label="Ton idée"></textarea>
       <input id="genKey" type="password" autocomplete="off" placeholder="Ta clé API Anthropic (reste sur cet appareil)" aria-label="Clé API Anthropic">
       <button class="pill" id="genGo" type="button">Écrire l'histoire</button>
+      <button class="pill" id="genAct" type="button">Tout par Haiku : acte, plan, épisode 1</button>
       <p class="lead" id="genMsg"></p>
       <button class="ghost" id="genHistBtn" type="button">Dernières histoires</button>
     </div>
@@ -1605,8 +1606,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261031090000"></script>
-<script src="act.js?v=20261031090000"></script>
+<script src="plan.js?v=20261031100000"></script>
+<script src="act.js?v=20261031100000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031010000"></script>
@@ -3506,6 +3507,18 @@ for (const b of document.querySelectorAll('.genCopy')) b.onclick = async (e) => 
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand('copy'); sel.removeAllRanges();
   }
   b.classList.add('done'); setTimeout(() => b.classList.remove('done'), 1400);
+};
+// what Haiku cost, counted with the other generated stories
+window.GEN_USED = (u) => bump((x) => { const g = (x.gen = x.gen || { n: 0, in: 0, out: 0 }); g.n++; g.in += u.in; g.out += u.out; });
+// the 3 layers by Haiku (act.js): the act (from the idea, or none), the plan of episode 1, its story, then it plays
+$('#genAct').onclick = async (e) => {
+  e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
+  if (!key) { $('#genKey').focus(); return; }
+  try { localStorage.setItem('smt-key', key); localStorage.setItem('smt-idea', idea); } catch { /* private window */ }
+  $('#genAct').disabled = $('#genGo').disabled = true;
+  try { const u = await ACT.auto(key, { idea, n: 1, newAct: true }, (t) => ($('#genMsg').textContent = t)); GEN_USED(u); $('#genMsg').textContent = `Fait : ${(GEN.cost(u)).toFixed(2)} $. La suite : Acte › Générer › épisode 2.`; }
+  catch (err) { $('#genMsg').textContent = err.message || "Ça n'a pas marché."; }
+  $('#genAct').disabled = $('#genGo').disabled = false;
 };
 $('#genGo').onclick = async (e) => {
   e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
