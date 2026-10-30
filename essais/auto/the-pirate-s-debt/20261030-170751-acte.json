@@ -1,0 +1,84 @@
+{
+ "act": {
+  "done": {},
+  "picks": {},
+  "plans": {},
+  "setups": [
+   {
+    "plant": "Le Pirate: \"I kept your seat at this counter for three years. Even when you didn't show up.\"",
+    "pay": "Le Pirate kept justin's place because he was always waiting for him to choose the partnership over anything else; he never believed james would come back."
+   },
+   {
+    "plant": "Lily: \"Some people leave because they have to, not because they want to.\"",
+    "pay": "lily was defending james's departure, knowing she sent him away to keep his friendship with justin alive."
+   }
+  ],
+  "title": "The Pirate's Debt",
+  "scene": "a port tavern at night. the counter runs along one wall. behind it, shelves of bottles catch the lamplight. three stools face the counter. the door opens onto the dark harbor.",
+  "question": "Do you honor a promise made to someone who kept the truth from you?",
+  "a": {
+   "id": "le_pirate",
+   "is": "his business partner",
+   "wants": "wants justin to testify against James at the harbor court tomorrow morning, because he believes the stolen cargo was James's doing and the law must know it"
+  },
+  "b": {
+   "id": "lily",
+   "is": "his girlfriend",
+   "wants": "wants justin to say nothing at the court, because she believes james is innocent and testifying will destroy him"
+  },
+  "justin_wants": "to own a ship one day and sail it himself, because he has always worked for others and dreams of commanding something that is his alone.",
+  "past": "Three years ago, justin and james ran a small cargo business together until james disappeared one night without explaining why.",
+  "lost_if_no": "Le Pirate walks out of the tavern and the partnership ends; justin loses the only route he has to owning a ship.",
+  "secret": {
+   "who": "lily",
+   "what": "lily helped james leave three years ago because she was already in love with justin and james was leaving to protect that love from becoming a betrayal of their partnership."
+  },
+  "episodes": [
+   {
+    "ask": "Le Pirate asks justin to testify tomorrow that he saw james loading stolen goods onto the ship the night before he vanished.",
+    "hurts": "If justin says yes, he confirms james was a thief; lily, sitting at the bar, will lose the man she protected by sending him away.",
+    "mystery": "Justin asks where james went. Le Pirate says he ran because he was guilty. Lily says nothing. The question: did james run because he was guilty, or for another reason?",
+    "choice": {
+     "a": "Promise Le Pirate you will testify.",
+     "if_a": "Le Pirate nods and buys justin a drink; lily's face goes still; the partnership path opens, but lily looks wounded and distant across the counter.",
+     "b": "Tell Le Pirate you need time to remember what you saw.",
+     "if_b": "Le Pirate leans back, disappointed but patient; lily relaxes slightly; you stay between them both, but Le Pirate's trust feels thinner."
+    },
+    "hook": "Le Pirate: \"The hearing is tomorrow at sunrise. Come early. We'll walk to the courthouse together.\""
+   },
+   {
+    "easy": "Justin tells Le Pirate he will testify, then tells lily he cannot possibly do it—he says he was too drunk that night to remember anything clearly.",
+    "backfires": "Le Pirate arrives at the tavern before dawn to walk to the courthouse. He overhears lily telling justin she loves him for this choice. Le Pirate leaves without a word, and by the time justin follows him outside, the ship's crew is already untying the lines. Le Pirate is leaving the harbor.",
+    "choice": {
+     "a": "Run after Le Pirate and tell him the truth: you lied to lily, you will testify.",
+     "if_a": "Le Pirate stops. He takes justin's arm and walks him to the courthouse. But lily sees them from the tavern door, understanding justin chose the ship over her. She turns and walks into the harbor mist. The partnership survives; she does not.",
+     "b": "Let Le Pirate sail. Stay with lily at the tavern.",
+     "if_b": "Lily holds justin's hand, relieved. But when the sun rises, a magistrate arrives at the tavern door looking for witnesses. Le Pirate sent word: the court will subpoena justin now. Lily's face changes—she realizes you lied and Le Pirate knows it. The choice no longer saves anyone."
+    },
+    "hook": "The magistrate: \"Tell us where to find james, or the court will assume you're protecting him too.\""
+   },
+   {
+    "reveal": "Lily finally speaks. She says she sent james away three years ago because james was going to confess to Le Pirate that he was in love with justin, and it would have destroyed the partnership. She made james leave to save both the business and justin's future. Le Pirate, standing at the counter, says nothing. Then he says: \"I knew. I always knew james loved him. That's why I kept the seat empty—I was waiting for justin to choose.\"",
+    "flip": "The player believed james ran because he stole cargo. The truth is: james ran to protect justin's partnership, and lily sent him to protect that same partnership. Le Pirate kept the seat because he was waiting for justin to prove the partnership mattered more than loyalty to lily.",
+    "choice": {
+     "a": "Tell Le Pirate and lily that you will testify james is innocent—you will tell the court the truth.",
+     "if_a": "Le Pirate's face hardens. He says justin chose lily over him. He pays for his drink and walks to the door. Lily cries and holds justin, saying she is sorry for the cost. But the partnership is over, and Le Pirate leaves the tavern without looking back.",
+     "b": "Tell them both you will stay silent at the court—you will let the law assume james is guilty.",
+     "if_b": "Lily kisses justin at the counter. Le Pirate nods slowly and sits back down on his stool. But lily's hands are shaking—she knows james is still running, and she sent him into a life of hiding because of this choice."
+    },
+    "hook": "The next morning, justin stands before the magistrate, and the first question is: \"Did you see james load stolen goods onto the ship?\""
+   },
+   {
+    "clock": "The magistrate is waiting for justin's answer. If he does not speak now, the court will decide without his testimony. James will be declared a thief and hunted across every port. Le Pirate and Lily are both watching from the courthouse bench—this moment will settle who justin is to each of them.",
+    "a_asks": "Le Pirate, before justin takes the stand: \"Tell them what you saw. For us. For the partnership.\"",
+    "b_asks": "Lily, squeezing justin's hand as he walks to the stand: \"Tell them you don't remember. For james. For us.\""
+   },
+   {
+    "if_a": "Justin testifies that he never saw james load stolen cargo. He tells the court james ran for personal reasons, not criminal ones. The magistrate dismisses the case. Le Pirate stands and leaves the courtroom without thanking him—the partnership was never about the truth, only about loyalty, and justin chose the truth instead. Lily holds justin outside, grateful and shocked. But three weeks later, Le Pirate sells his share of the business to a stranger and disappears. Justin owns nothing. Lily and he are together, but the dream of commanding his own ship is gone. Le Pirate's seat at the tavern is empty now, and no one sits there.",
+    "if_b": "Justin testifies that he was too drunk to remember clearly. The magistrate finds james guilty in absentia. Lily kisses justin at the courthouse steps, relieved. But Le Pirate walks past them both and returns to his ship. He writes a letter to justin saying the partnership is dissolved—he cannot trust someone who lies under oath, and he will not build a ship with a man who chose a woman over his word. Justin is left with nothing: no partnership, no ship, and Lily's gratitude built on a lie that will haunt him every time she looks at him.",
+    "open": "In both paths, justin has no ship and no clear answer to whether his choice was right. A letter arrives at the tavern: it is from james, written years later, asking if the court case is finally over. The question remains—did justin save james by lying, or did he sentence him to a life of hiding by telling the truth? And what did he truly sacrifice: the ship, the partnership, lily, or something in himself he cannot name?"
+   }
+  ]
+ },
+ "by": "haiku"
+}
