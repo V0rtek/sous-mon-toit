@@ -259,6 +259,15 @@ body.uitop #ui { top: 3%; }
 .bkRef { font: inherit; border: 0; background: #2c2c2e; border-radius: 1em; padding: .4em; color: #c7c7cc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; }
 .bkRef img { height: 12em; border-radius: .6em; }
 .bkRef span { font-size: 1.2em; }
+.plRow { display: flex; gap: .6em; flex-wrap: wrap; margin: .6em 0; }
+.plRow select { font: inherit; font-size: 1.6em; padding: .4em .6em; border-radius: .8em; border: 0; background: #2c2c2e; color: #f5f5f7; max-width: 100%; }
+.plStage { position: relative; display: inline-block; touch-action: none; background: repeating-conic-gradient(#3a3a3c 0 25%, #2c2c2e 0 50%) 0 0 / 2em 2em; border-radius: 1em; overflow: visible; }
+.plStage .plPose { display: block; max-width: 100%; max-height: 52vh; width: auto; height: auto; }
+.plStage .plObj { position: absolute; pointer-events: none; }
+.plSl { display: flex; align-items: center; gap: .8em; font-size: 1.6em; color: #e5e5ea; margin: .5em 0; }
+.plSl input { flex: 1; }
+.plHint, .plMsg { font-size: 1.4em; color: #a1a1a6; margin: .3em 0; }
+.plMsg { color: #ffd60a; }
 .genCounter { display: flex; align-items: center; gap: .6em; font-size: 2em; color: #e5e5ea; margin: .4em 0; }
 .genCounter input { width: 1.3em; height: 1.3em; }
 .ncTop { background: #1c1c1e; border-radius: 1.4em; margin-bottom: 1.4em; }
@@ -1478,6 +1487,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>UNWRITTEN</h2>
     <div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell (ou ouvre ce lien), puis choisis l'histoire</p><code id="tvLink"></code></div><div id="tvNames"></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
+  <div id="placeScreen" class="card menu" hidden><div class="step"><h2>Placer un objet</h2><div id="placeBody"></div></div></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="fbCard" hidden><div class="fb">
     <b>Ton avis</b>
@@ -1671,6 +1681,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261031500000"></script>
 <script src="bank.js?v=20261031500000"></script>
+<script src="place.js?v=20261031510000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1781,6 +1792,8 @@ function gripAt(a, b, g) {   // a grip in his pose's pixels -> decor px (and mir
 }
 // where the held object reaches, left and right, in decor px (null: nothing held)
 function heldSpan(a, b) {
+  const P = a.hold && ((SPRITES[spriteOf(a.id)].place || {})[a.hold] || {})[poseOf(a.id, a.shown)];
+  if (P) { const c = b.left + (flipped(a) ? 1 - P.x : P.x) * b.w, h = P.w * b.w * 0.8; return [c - h, c + h]; }
   const L = a.hold && ((SPRITES[spriteOf(a.id)].layers || {})[a.hold] || {})[poseOf(a.id, a.shown)];
   if (L) { const [l, , w] = L.box, f = flipped(a), x0 = b.left + (f ? 1 - l - w : l) * b.w; return [x0, x0 + w * b.w]; }
   const g = a.hold && gripOf(a, a.shown); if (!g) return null;
@@ -1800,6 +1813,14 @@ function drawHeld(a, b) {
     a.layerEl.hidden = false; return;
   }
   if (a.layerEl) a.layerEl.hidden = true;
+  // placed by hand (Mini-jeux › Placer un objet): its centre, its width and its angle on this pose
+  const P = a.hold && ((SPRITES[spriteOf(a.id)].place || {})[a.hold] || {})[poseOf(a.id, a.shown)];
+  if (P) {
+    if (!a.heldEl || a.heldEl.dataset.src !== a.hold) { if (a.heldEl) a.heldEl.remove(); a.heldEl = new Image(); a.heldEl.alt = ''; a.heldEl.dataset.src = a.hold; a.heldEl.src = `props/${a.hold}.webp`; a.el.appendChild(a.heldEl); }
+    const f = flipped(a);
+    a.heldEl.style.cssText = `position:absolute;pointer-events:none;left:${(f ? 1 - P.x : P.x) * b.w}px;top:${P.y * b.h}px;width:${P.w * b.w}px;height:auto;max-width:none;max-height:none;transform:translate(-50%,-50%) rotate(${f ? -P.r : P.r}deg)${f ? ' scaleX(-1)' : ''}`;
+    a.heldEl.hidden = false; if (a.slotEl) a.slotEl.hidden = true; return;
+  }
   // the red placeholder of the pose (Prises): the object under the pose, where the red was, along its axis. Something to
   // drink keeps its real size (the red cup is 9 cm wide), something to read fills the red sheet
   const S = a.hold && (SPRITES[spriteOf(a.id)].slots || {})[poseOf(a.id, a.shown)];
@@ -3053,8 +3074,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#who', '#hub', '#tvPick', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
-const UP = { '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
+const UP = { '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos', '#acte': '#infos' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
@@ -3303,6 +3324,9 @@ for (const t of window.TEST_LIST || []) {
   b.onclick = (e) => { e.stopPropagation(); history.replaceState(null, '', location.pathname + '?lab=1'); location.href = `index.html?play=${t.id}&back=${encodeURIComponent('index.html?lab=1')}`; };
   $('#labTiles').prepend(b);   // each new one goes on top
 }
+// Placer un objet (place.js): the first tile (after the tests: each of them goes on top)
+{ const b = document.createElement('button'); b.type = 'button'; b.className = 'test'; const sp = document.createElement('span'); sp.textContent = 'Placer un objet'; b.appendChild(sp);
+  b.onclick = (e) => { e.stopPropagation(); show('#placeScreen'); PLACE_OPEN(); }; $('#labTiles').prepend(b); }
 $('#lab').onclick = (e) => { e.stopPropagation(); feat('Mini-jeux'); show('#labScreen'); };
 $('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
 // a TV's story is picked on a player's phone, in the lobby: every 2-player story, then the mini-games
