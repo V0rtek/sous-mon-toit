@@ -24,7 +24,7 @@ window.DECK = (() => {
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2>[X]</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
-    { c: '#ff9f0a', h: () => `<h1>Avant ce soir, je ne le connaissais pas.</h1><p>Et c'est important.</p>` },
+    { c: '#ff9f0a', h: () => `<h1>Et c'est important parce qu'elle s'est offerte comme cobaye.</h1><p>Mais avant de vous parler de ça…</p>` },
     { c: '#bf5af2', h: () => `<small>J'y reviens plus tard</small><h1>17 000 histoires de 3 cases.</h1><p>Garfield : une par jour depuis le 19 juin 1978.</p>` },
     { c: '#bf5af2', h: () => `<h1>Toujours le même chat.</h1><p>Une poignée de poses. Et pourtant : entre 750 M$ et 1 G$ de produits dérivés par année.</p><small>Licensing International</small>` },
     { c: '#bf5af2', h: () => `<h1>Ce qui accroche, ce n'est pas l'image.</h1><p>C'est le personnage et l'histoire.</p>` },
@@ -38,6 +38,25 @@ window.DECK = (() => {
     { c: '#30d158', h: () => `<h1>L'histoire te suit.</h1><p>Même au bol : elle continue sur ton cell.</p>` },
     { c: '#30d158', wall: true, h: () => `<div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div>` },
   ];
+  // what I say on each slide (mine to edit, kept on this device); behind the corner button
+  const NOTES = [
+    "« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… » Une seule : [Y] n'existe pas encore pour la salle.",
+    "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
+    "« Et c'est important parce qu'elle s'est offerte comme cobaye. Mais avant de vous parler de ça… »",
+    "« J'y reviens plus tard. » Le speech : bâtir l'attente, le contexte, expliquer le problème. Garfield, c'est environ 17 000 histoires de 3 cases, une par jour depuis le 19 juin 1978.",
+    "Toujours le même chat, avec une poignée de poses. Et ça rapporte : entre 750 M$ et 1 G$ de produits dérivés par année (Licensing International). Le strip le plus syndiqué au monde : environ 2 600 journaux (Guinness).",
+    "Ce qui accroche, ce n'est pas l'image. C'est le personnage et l'histoire.",
+    "Les compétiteurs s'attaquent à la beauté visuelle. Je m'attaque à l'histoire (chaque choix change la suite, chaque épisode finit sur une question) et à la personnalisation (toi et tes amis êtes les personnages, ce soir).",
+    "Son selfie, une flèche vers son perso.",
+    "Le catalogue d'histoires : je clique sur une histoire de pirates immersive. Démo · télé.",
+    "Après les premières répliques, je révèle que [X] décide de l'histoire. Pendant la démo, pas avant : le public croit regarder une histoire, puis découvre qu'un joueur a le contrôle.",
+    "Je clique sur la télé : pause. L'écran s'assombrit, je clique sur son perso : on voit l'écran de son cell, le choix qu'il a devant lui.",
+    "Un nouveau perso entre dans l'histoire : [Y]. Pour la salle, c'est un perso comme les autres. Il parle, il fait un choix : personne ne se doute qu'un humain le joue.",
+    "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure.",
+    "Un joueur peut même aller sur le bol et continuer à suivre l'histoire sur son cell. L'histoire ne l'attend pas dans la salle : elle le suit.",
+    "Tous ces persos viennent d'une photo. Chacun joue ses poses.",
+  ];
+  let noteOpen = false;
   let spot = 0;
   function draw() {
     const s = S[i]; clearInterval(spot);
@@ -49,6 +68,7 @@ window.DECK = (() => {
       const tick = () => { if (!root.offsetParent) return clearInterval(spot); imgs.forEach((im, n) => { im.src = WALL[n][1][(t + n) % WALL[n][1].length]; }); t++; };
       spot = setInterval(tick, 650);
     }
+    const nt = root.querySelector('.dkNote'); nt.textContent = saved['note_' + i] ?? T(NOTES[i] || ''); nt.hidden = !noteOpen;
     root.querySelector('.dkN').textContent = `${i + 1} / ${S.length}`;
     root.querySelector('.dkBar i').style.width = `${(i + 1) / S.length * 100}%`;
   }
@@ -140,17 +160,20 @@ window.DECK = (() => {
   return {
     mount(el) {
       root = el; i = 0;
-      el.innerHTML = '<div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span>';
+      el.innerHTML = '<div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
+        if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const p = e.target.closest('.dkPic');
-        if (p || e.target.closest('.dkTyped')) return;
+        if (p || e.target.closest('.dkTyped, .dkNote')) return;
         const r = el.getBoundingClientRect(); go(e.clientX - r.left < r.width / 3 ? -1 : 1);
       };
       el.onchange = (e) => { const p = e.target.closest('.dkPic'); if (p && e.target.files[0]) pick(e.target.files[0], p.dataset.k); };
-      el.oninput = (e) => { const t = e.target.closest('.dkTyped'); if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
+      el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
       draw();
     },
     panel,
-    key(e) { if (['ArrowRight', 'PageDown', ' '].includes(e.key)) go(1); else if (['ArrowLeft', 'PageUp'].includes(e.key)) go(-1); else return false; return true; },
+    key(e) {
+      if (e.target.closest && e.target.closest('[contenteditable]')) return false;   // typing in a note or a line
+      if (['ArrowRight', 'PageDown', ' '].includes(e.key)) go(1); else if (['ArrowLeft', 'PageUp'].includes(e.key)) go(-1); else return false; return true; },
   };
 })();
