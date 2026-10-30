@@ -9,7 +9,9 @@
 // backslash (\[), which JSON refuses: those backslashes go (JSON's own escapes stay), then curly quotes as a last try
 window.LOOSE_JSON = (v) => {
   const t = String(v || ''), j = t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1);
-  for (const f of [(x) => x, (x) => x.replace(/\\(?!["\\/bfnrtu])/g, ''), (x) => x.replace(/\\(?!["\\/bfnrtu])/g, '').replace(/[“”]/g, '"')]) {
+  // a chat copied as Markdown escapes [ ] with a \ and doubles the \ of a quote inside a string (\\" for \")
+  const md = (x) => x.replace(/\\\\"/g, '\\"').replace(/\\(?!["\\/bfnrtu])/g, '');
+  for (const f of [(x) => x, md, (x) => md(x).replace(/[“”]/g, '"')]) {
     try { return JSON.parse(f(j)); } catch { /* the next try */ }
   }
   throw new Error('JSON');

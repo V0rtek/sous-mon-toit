@@ -332,7 +332,7 @@ justin is caught between two people he cares about, A and B. A asks him for some
 - Episode 4: A and B each ask him for the same moment. He must choose: A or B.
 - Episode 5: what his choice cost (one version per choice), and what stays open.
 
-THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit.
+THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit, gender included: a father or a brother is a man (james, amare), a mother or a sister is a woman. If no decor has both, keep the closest relation that fits (his father becomes his mother) and write it in "is". Use the character's real gender everywhere (he/she).
 
 THE ACT'S TECHNIQUES (each field below says which one does it; follow them):
 ${Object.keys(AT).map(atLine).join('\n')}
