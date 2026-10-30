@@ -273,7 +273,7 @@ Do not exaggerate the poses. Subtle and natural, like the reference. Mouth close
       '4. Head in his hands: elbows on the table, face in both hands, shoulders slumped.',
       '5. Fist on the table: one fist slammed on the table top, jaw clenched, leaning forward, angry.',
       '6. Getting up: rising from the chair, both hands pushing on the table, body half up, looking at the person across.'])],
-    prises: ['Prises (mains vides)', 'Boire, trinquer, lire, tendre : les mains sont vides, le jeu y met la chope, la lettre, la clé.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side, his hands EMPTY in holding positions', LEAN_CUT + ' HIS HANDS ARE EMPTY IN EVERY CELL: NO mug, NO cup, NO glass, NO paper, NO object at all. The game adds the object later: draw the hand shaped as if it holds it.', LEAN_ANGLE, [
+    prises: ['Prises (mains vides)', 'Boire, trinquer, lire, tendre : les mains sont vides, le jeu y met la chope, la lettre, la clé.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side, his hands EMPTY in holding positions', LEAN_CUT + ' HIS HANDS ARE EMPTY IN EVERY CELL: NO mug, NO cup, NO glass, NO paper, NO object at all. The game adds the object later: draw the hand shaped as if it holds it. Image 2 shows a mug in some cells: ignore it, his hands stay empty.', LEAN_ANGLE, [
       '1. Bringing something to his lips: his near hand raised to his mouth, fingers curled as if holding a mug by its handle (empty), head tilted back slightly, eyes half closed.',
       '2. Raising something toward the person next to him: head turned toward the camera side, smiling, his near hand raised at shoulder height toward them, fingers curled as if holding a mug (empty).',
       '3. Holding something in front of him with both hands: both hands together above the ledge in front of his chest, as if holding a letter open (empty), looking down at it.',
@@ -319,7 +319,7 @@ Example:
     if (c.she) {   // the guide stays "his" (another character, a man): only the character's own he/his turn
       const keep = 'copy nothing of his look', keep2 = 'never draw him';
       t = t.replace(keep, '\u0000').replace(keep2, '\u0001').replace(/\bhimself\b/g, 'herself').replace(/\bhim\b/g, 'her').replace(/\bhis\b/g, 'her').replace(/\bhe\b/g, 'she')
-        .replace(/\bHis\b/g, 'Her').replace(/\bHe\b/g, 'She').replace('\u0000', keep).replace('\u0001', keep2).replace('it is the character to draw', 'it is the character to draw (a woman)');
+        .replace(/\bHis\b/g, 'Her').replace(/\bHe\b/g, 'She').replace(/\bHIS\b/g, 'HER').replace(/\bHE\b/g, 'SHE').replace('\u0000', keep).replace('\u0001', keep2).replace('it is the character to draw', 'it is the character to draw (a woman)');
     }
     return t;
   }
