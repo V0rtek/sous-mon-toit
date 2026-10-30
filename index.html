@@ -506,6 +506,12 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .dkArrow { flex: none; width: 14em; height: .9em; border-radius: .5em; position: relative; background: var(--c); box-shadow: 0 0 3em var(--c); }
 .dkArrow::after { content: ''; position: absolute; right: -1em; top: 50%; transform: translateY(-50%); border: 2.2em solid transparent; border-left: 3em solid var(--c); border-right: 0; }
 .dkTyped { outline: 0; }
+#deck .dkWall { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2em 3em; align-content: center; height: 100%; }
+.dkWall > div { display: flex; align-items: center; justify-content: center; gap: 1.2em; height: 22em; padding: 1em; border-radius: 1.6em; background: rgba(255,255,255,.04); opacity: .45; transition: opacity .3s, transform .3s, box-shadow .3s; }
+.dkWall > div.on { opacity: 1; transform: scale(1.08); box-shadow: inset 0 0 0 .18em var(--c), 0 0 3em -.5em var(--c); }
+.dkWall img { height: 100%; width: 38%; object-fit: contain; border-radius: 1em; }
+.dkWall .dkArrow { width: 4em; height: .5em; }
+.dkWall .dkArrow::after { right: -.6em; border-width: 1.2em; border-left-width: 1.6em; }
 #deck .dkBar { position: absolute; left: 0; right: 0; bottom: 0; height: .8em; background: rgba(255,255,255,.08); }
 .dkBar i { display: block; height: 100%; background: var(--c); transition: width .25s; }
 #deck .dkN { position: absolute; right: 3%; bottom: 2em; font-size: 2em; color: #86868b; }
