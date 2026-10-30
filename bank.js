@@ -147,6 +147,9 @@ window.BANK = {
       }
     };
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
+    const redraw = () => { const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; };
+    $('#bankBody').onchange = (e) => { const k = e.target.dataset.ncfile; if (k && e.target.files[0]) BANK.newCharFile(k, e.target.files[0], redraw); };
+    $('#bankBody').addEventListener('click', (e) => { const a = e.target.closest('[data-ncadd]'); if (a) { e.stopPropagation(); BANK.newCharAdd(a.dataset.ncadd, redraw); } }, true);
     $('#bankBody').oninput = (e) => { const k = e.target.dataset.nc; if (k) BANK.newCharSet(k, e.target.value); };   // kept as typed, no redraw (the keyboard stays)
   });
   window.BANK_CLOSE = () => { stop(); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
@@ -268,7 +271,26 @@ Example:
         + sheets.map((id) => { const [t, why, guides] = SHEETS[id], open = c.open === id;
           return `<div class="ncSheet${open ? ' open' : ''}${done[id] ? ' done' : ''}"><button type="button" class="ncHead" data-ncopen="${id}"><i>${done[id] ? '✓' : ''}</i>${esc(t)}<em>${open ? '−' : '+'}</em></button>`
             + (open ? `<div class="ncBody"><p>${esc(why)}</p><div class="ncPics">${one}${guides.map((f, k) => pic(f, `Image ${k + 2} · ${f === 'chope.webp' ? 'la chope' : 'le guide'}`)).join('')}</div>`
-              + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button><button type="button" class="ncDone${done[id] ? ' on' : ''}" data-ncdone="${id}">${done[id] ? 'Fait ✓' : 'Fait'}</button></div></div>` : '') + '</div>'; }).join(''));
+              + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button><button type="button" class="ncDone${done[id] ? ' on' : ''}" data-ncdone="${id}">${done[id] ? 'Fait ✓' : 'Fait'}</button></div>`
+              + (window.IMPORT && IMPORT.KINDS[id] ? importBox(id) : '') + '</div>' : '') + '</div>'; }).join(''));
+  };
+  // the generated sheet -> into the game (importer.js): pick it, see the 6 poses cut, « Ajouter au jeu »
+  let shown = null;   // { kind, imgs, msg }
+  const importBox = (id) => { const s = shown && shown.kind === id ? shown : null;
+    return `<div class="ncImport"><label class="ncBtn ncPick">${s && s.imgs ? 'Refaire avec une autre image' : 'Importer la feuille générée'}<input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
+      + (s && s.imgs ? `<div class="ncCuts">${s.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div><button type="button" class="bkCopy" data-ncadd="${id}">Ajouter au jeu</button>` : '')
+      + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '') + '</div>'; };
+  BANK.newCharFile = async (kind, file, redraw) => {
+    shown = { kind, msg: 'Découpe…' }; redraw();
+    try { shown = { kind, imgs: await IMPORT.cut(file, kind, load().name), msg: load().name ? '' : 'Donne-lui un nom (étape 1) avant d’ajouter.' }; }
+    catch (err) { shown = { kind, msg: err.message || 'Je n’arrive pas à la découper.' }; }
+    redraw();
+  };
+  BANK.newCharAdd = async (kind, redraw) => {
+    shown = { ...shown, msg: 'Envoi…' }; redraw();
+    try { shown = { ...shown, msg: await IMPORT.add() }; const c = load(); c.done = c.done || {}; c.done[kind] = true; keep(c); }
+    catch (err) { shown = { ...shown, msg: `Pas ajouté : ${err.message}` }; }
+    redraw();
   };
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
