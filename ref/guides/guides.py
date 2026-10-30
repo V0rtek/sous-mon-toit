@@ -30,13 +30,16 @@ def guides(d, title, notes, people=()):
   d.line([0, HZ, W, HZ], fill=(255, 220, 80, 230), width=4)
   d.text((20, HZ - 40), 'HORIZON = hauteur de poitrine (caméra) · les fuyantes vont au point rouge', font=fnt(28), fill=(255, 220, 80))
   d.ellipse([CX - 12, HZ - 12, CX + 12, HZ + 12], fill=RED)
-  for (x, face) in people:                    # where they stand: 1.75 m, chest, belt, and their 20° look
-    d.rectangle([x - 4, Y0 - HCH, x + 4, Y0], fill=(255, 255, 255, 90))
+  for pp in people:                           # where they stand: 1.75 m, chest, belt, and their 20° look
+    x, face, dd = (pp[0], pp[1], D0) if len(pp) == 2 else pp   # (px on the 4 m plane, face) or (world x m, face, depth m)
+    wx = X(x, D0) if len(pp) == 2 else x; sx, fy = P(wx, 0, dd); hh = HCH * D0 / dd; k = D0 / dd
+    d.rectangle([sx - 4 * k, fy - hh, sx + 4 * k, fy], fill=(255, 255, 255, 90))
     for frac, lab in ((1, '1,75 m'), (0.72, 'poitrine'), (0.6, 'ceinture')):
-      y = Y0 - HCH * frac; d.line([x - 40, y, x + 40, y], fill=(255, 255, 255, 160), width=3); d.text((x + 46, y - 14), lab, font=fnt(22), fill=(255, 255, 255, 200))
-    wx = X(x, D0); sgn = 1 if face == 'r' else -1
-    tip = P(wx + sgn * 1.2 * math.cos(math.radians(20)), 1.26, D0 - 1.2 * math.sin(math.radians(20)))
-    d.line([P(wx, 1.26, D0), tip], fill=BLUE + (230,), width=5); d.text((tip[0] - 20, tip[1] - 34), '20°', font=fnt(24), fill=BLUE)
+      y = fy - hh * frac; d.line([sx - 40 * k, y, sx + 40 * k, y], fill=(255, 255, 255, 160), width=3)
+      if len(pp) == 2 or dd == people[0][2]: d.text((sx + 46 * k, y - 14), lab, font=fnt(22), fill=(255, 255, 255, 200))
+    sgn = 1 if face == 'r' else -1
+    tip = P(wx + sgn * 1.2 * math.cos(math.radians(20)), 1.26, dd - 1.2 * math.sin(math.radians(20)))
+    d.line([P(wx, 1.26, dd), tip], fill=BLUE + (230,), width=max(2, int(5 * k))); d.text((tip[0] - 20, tip[1] - 34), '20°', font=fnt(int(24 * k)), fill=BLUE)
   d.rectangle([20, 20, 1180, 40 + 40 * (len(notes) + 1)], fill=(0, 0, 0, 150))
   d.text((40, 30), title, font=fnt(34), fill=(255, 255, 255))
   for i, n in enumerate(notes): d.text((40, 80 + 40 * i), n, font=fnt(26), fill=(230, 230, 230))
@@ -79,19 +82,27 @@ f.line([P(sx - 0.3, 0.9, D0 - 0.6), P(sx + 2.8, 1.75 + 0.9, D0 - 0.6), P(sx + 4,
 guides(d, 'ESCALIER', ['Marches : 17,5 cm de haut × 28 cm de profond, 10 marches = 1,75 m', 'Escalier parallèle à l’image, au plan des persos (4 m), 1,2 m de large', 'Rampe à 90 cm au-dessus du nez des marches (avant-plan)', 'Palier en haut : 1,75 m'], people=[(700, 'r')])
 scenes['g_stairs'] = save('escalier', bg, fg)
 
-# 3 · the bar: counter 1,05 m high (= their belt), its front 40 cm in front of them, back bar 2 m behind
+# 3 · the bar: the counter runs into the depth on the left, the patrons in a row behind it, side by side (each 80 cm
+# further), facing right (toward the camera's side): the counter is between the camera and their bellies. Its top in the
+# back (their forearms rest on it, the poses are cut there), its side and near end in front of them
+BAR = (-1.05, -0.5, 2.0, 22)                 # x left, x right, from depth, to depth (m); top at 1.05 m
 bg, d = base(); grid(d)
-d.polygon([P(-12, 0, 6), P(12, 0, 6), P(12, 4, 6), P(-12, 4, 6)], fill=(60, 44, 38, 255))
-for y in (1.1, 1.6, 2.1):
-  d.rectangle(rr(P(-6, y + 0.05, 6), P(6, y, 6)), fill=(110, 80, 50))
+d.polygon([P(-12, 0, 12), P(12, 0, 12), P(12, 4, 12), P(-12, 4, 12)], fill=(60, 44, 38, 255))
+for y in (1.1, 1.6, 2.1):                     # the back bar, far end
+  d.rectangle(rr(P(-6, y + 0.05, 12), P(6, y, 12)), fill=(110, 80, 50))
   for x in [i * 0.35 - 6 for i in range(35)]:
-    d.rectangle(rr(P(x, y + 0.32, 6), P(x + 0.09, y + 0.05, 6)), fill=((70 + int(x * 40)) % 200 + 40, 90, 60))
-d.polygon([P(-12, 1.05, D0 - 0.4), P(12, 1.05, D0 - 0.4), P(12, 1.05, D0 + 0.15), P(-12, 1.05, D0 + 0.15)], fill=(150, 104, 66, 255), outline=(0, 0, 0, 200))
+    d.rectangle(rr(P(x, y + 0.32, 12), P(x + 0.09, y + 0.05, 12)), fill=((70 + int(x * 40)) % 200 + 40, 90, 60))
+x0, x1, d0, d1 = BAR
+d.polygon([P(x0, 1.05, d0), P(x1, 1.05, d0), P(x1, 1.05, d1), P(x0, 1.05, d1)], fill=(150, 104, 66, 255), outline=(0, 0, 0, 200))
+for dd in range(3, 22, 2): d.line([P(x0, 1.05, dd), P(x1, 1.05, dd)], fill=(0, 0, 0, 50), width=2)
 fg = Image.new('RGBA', (W, H)); f = ImageDraw.Draw(fg)
-f.polygon([P(-12, 0, D0 - 0.4), P(12, 0, D0 - 0.4), P(12, 1.05, D0 - 0.4), P(-12, 1.05, D0 - 0.4)], fill=(96, 62, 40, 255))
-f.line([P(-12, 1.0, D0 - 0.4), P(12, 1.0, D0 - 0.4)], fill=(60, 36, 22, 255), width=8)
-guides(d, 'BAR', ['Comptoir : 1,05 m de haut (= leur ceinture), dessus 55 cm de profond', 'Face du comptoir 40 cm devant eux : c’est l’avant-plan, il cache leur bas', 'Étagères du fond à 6 m, à 1,1 / 1,6 / 2,1 m', 'Deux persos accoudés à 75 cm, face à face : la même pose, retournée'], people=[(1000, 'r'), (1260, 'l')])
+f.polygon([P(x1, 0, d0), P(x1, 0, d1), P(x1, 1.05, d1), P(x1, 1.05, d0)], fill=(96, 62, 40, 255), outline=(40, 24, 14, 255))   # its side
+f.polygon([P(x0, 0, d0), P(x1, 0, d0), P(x1, 1.05, d0), P(x0, 1.05, d0)], fill=(80, 50, 32, 255), outline=(40, 24, 14, 255))   # its near end
+f.line([P(x1, 1.0, d0), P(x1, 1.0, d1)], fill=(60, 36, 22, 255), width=6)
+BAR_PEOPLE = [(-1.2, 'r', 4.0 + 0.8 * i) for i in range(4)]
+guides(d, 'BAR', ['Comptoir 1,05 m de haut (= leur ceinture), 55 cm de large, il file vers le fond', 'Les clients côte à côte = en profondeur, tous tournés vers la droite, 80 cm entre eux', 'Le dessus est derrière eux (leurs avant-bras posés dessus, la pose est coupée là)', 'Le côté et le bout du comptoir sont l’avant-plan : ils cachent leur ventre'], people=BAR_PEOPLE)
 scenes['g_bar'] = save('bar', bg, fg)
+print('bar people', [(round(P(x, 0, dd)[0]), round(P(x, 0, dd)[1]), round(HCH * D0 / dd)) for x, _, dd in BAR_PEOPLE])
 
 # 4 · the campfire: logs 45 cm high, a log 30 cm in front of each (foreground), the fire between them
 bg, d = base((54, 62, 44), (22, 26, 40)); grid(d)
