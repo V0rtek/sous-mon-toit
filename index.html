@@ -1658,8 +1658,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261031130000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="tests.js?v=20261031270000"></script>
+<script src="tests.js?v=20261031360000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
+<script src="importer.js?v=20261031350000"></script>
 <script src="bank.js?v=20261031340000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -4213,7 +4214,7 @@ if (PREVIEW) {
     } else if (el) el.click();
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
-} else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
+} else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; Promise.race([window.IMPORTS_READY, sleep(4000)]).finally(() => begin(PLAY_ONLY)); }   // the imported characters first
 else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
 else if (ROLE === 'host') {
   goLive();
@@ -4243,6 +4244,5 @@ if (!PREVIEW) {
   for (const [id, sp] of Object.entries(SPRITES)) for (const pose of Object.keys(sp.poses)) new Image().src = charUrl(id, pose);
 }
 </script>
-<script src="importer.js?v=20261031340000"></script>
 </body>
 </html>

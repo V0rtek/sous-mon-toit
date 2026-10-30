@@ -224,7 +224,9 @@
     apply,
   };
 
-  // every page: the imported characters, from the repo
-  fetch(`chars/imports.json?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : [])).then((ids) => Promise.all((ids || []).map((id) =>
-    fetch(`chars/${id}/sprite.json?t=${Date.now()}`, { cache: 'no-store' }).then((r) => r.json()).then((data) => apply(id, data)).catch(() => {})))).catch(() => { /* none yet */ });
+  // every page: the imported characters, from the repo (IMPORTS_READY: a test that plays one waits for them)
+  // (loaded before the main script: apply waits for the page, whose MADE and figureOf it uses)
+  const page = new Promise((ok) => (document.readyState === 'loading' ? addEventListener('DOMContentLoaded', ok) : ok()));
+  window.IMPORTS_READY = fetch(`chars/imports.json?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : [])).then((ids) => Promise.all((ids || []).map((id) =>
+    fetch(`chars/${id}/sprite.json?t=${Date.now()}`, { cache: 'no-store' }).then((r) => r.json()))).then(async (all) => { await page; all.forEach((data, k) => apply(ids[k], data)); })).catch(() => { /* none yet */ });
 })();

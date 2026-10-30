@@ -40,6 +40,10 @@
     t_pirate: { ...B, spots: { justin: B.spots.justin, pirate: B.spots.melissa }, face: { justin: 'r', pirate: 'r' } },
     // seated at a table, facing each other (the guide ref/guides/table, until the real decor): the table hides below its top
     t_table: { image: 'ref/guides/table.webp', fg: 'ref/guides/table_fg.webp', size: [2400, 1350], front: [], spots: { a: [1005, 1250, 620], b: [1395, 1250, 620] }, face: { a: 'r', b: 'l' } },
+    // Lily (31/10, imported from Nouveau perso): standing face to face with Justin, at the counter behind him, at the table
+    t_lily_debout: { ...T, spots: { justin: [760, 925, 430], lily: [1010, 925, 430] }, face: { justin: 'r', lily: 'l' } },
+    t_lily_bar: { ...B, spots: { justin: B.spots.justin, lily: B.spots.melissa }, face: { justin: 'r', lily: 'r' } },
+    t_lily_table: { image: 'ref/guides/table.webp', fg: 'ref/guides/table_fg.webp', size: [2400, 1350], front: [], spots: { lily: [1005, 1250, 620], lily2: [1395, 1250, 620] }, face: { lily: 'r', lily2: 'l' } },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
@@ -204,6 +208,32 @@
     { poses: { twin: 'kiss_near', justin: 'kiss_near' } }, { wait: 600 }, { poses: { justin: 'kiss_rejected' } }, say('justin', 'kiss_rejected', 'Attends. Quoi ?'),
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser };
-  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }];
+  // tlily (31/10): the 1st character made entirely in the game (Nouveau perso: her picture, Debout, Accoudé, Assis
+  // imported from the phone, no Claude). Each of her poses, with Justin; at the table across from herself (Justin has no
+  // sitting poses yet)
+  CAST.lily2 = CAST.lily2 || { name: 'Lily (reflet)', color: '#555', sprite: 'lily' };
+  const tlily = [
+    { scene: 't_lily_debout', cast: { justin: 'listen', lily: 'listen' } }, { cam: 'two', who: ['justin', 'lily'] }, { fade: 'in', ms: 600 }, { caption: 'Lily · debout' }, { wait: 1200 },
+    say('lily', 'smile', 'Toi, t’es pas d’ici.'), say('justin', 'explaining', 'Ça se voit tant que ça ?'),
+    say('lily', 'surprised', 'T’as payé ta bière ? Personne paie, ici !'),
+    say('lily', 'angry', 'Le vieux Marco va te plumer.'), say('lily', 'hurt', 'Il m’a plumée, moi.'),
+    { cam: 'one', who: ['lily'] }, say('lily', 'back_walk', 'Suis-moi. Vite.'),
+    { fade: 'out', ms: 500 },
+    { scene: 't_lily_bar', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Lily · au comptoir' }, { wait: 1000 },
+    { cam: 'close', who: ['lily'] }, { say: 'lily', pose: 'bar', to: 'justin', text: 'Tu me dois une pièce.' },
+    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar', to: 'lily', text: 'Pour quoi ?' },
+    { cam: 'close', who: ['lily'] }, { say: 'lily', pose: 'bar_to_smile', to: 'justin', text: 'Pour t’avoir sauvé de Marco.' },
+    { say: 'lily', pose: 'bar_to_tense', to: 'justin', text: 'C’est pas une blague.' },
+    { say: 'lily', pose: 'bar_ahead', text: 'Il en a eu d’autres avant toi.' },
+    { say: 'lily', pose: 'bar_back', text: 'Il nous regarde.' },
+    { put: { lily: 'piece' } }, { say: 'lily', pose: 'bar_put', to: 'justin', text: 'Tiens. Fais semblant de payer.' },
+    { fade: 'out', ms: 500 },
+    { scene: 't_lily_table', cast: { lily: 'sit_listen', lily2: 'sit_listen' } }, { cam: 'wide', at: 1200 }, { fade: 'in', ms: 600 }, { caption: 'Lily · assise' }, { wait: 1200 },
+    { cam: 'close', who: ['lily'] }, say('lily', 'sit_listen', 'Assieds-toi.'), say('lily', 'sit_lean', 'Marco garde l’argent sous le comptoir.'),
+    say('lily', 'sit_back', 'Pourquoi je te ferais confiance ?'), say('lily', 'sit_head', 'J’en peux plus de cette ville.'),
+    say('lily', 'sit_fist', 'Ce soir, on le reprend.'), say('lily', 'sit_rise', 'Minuit. Sois là.'),
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser, tlily };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }, { id: 'tlily', name: 'Test · Lily' }];
 })();
