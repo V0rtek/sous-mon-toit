@@ -149,6 +149,11 @@ window.ACT = (() => {
           ['q', 'La question, tranchée', 'The question of the act, answered by what happened (never said as a moral)', A.question],
           ['end', 'Reste ouvert', 'The episode ends on what stays open (its turn)', e.open]]; } },
   ];
+  // the episode's main choice (its last one): two outcomes, each a bundle of big consequences
+  const MAIN = (A, n) => { const c = E(A, n).choice; return ['main', 'Le choix principal', 'The MAIN choice, the last of the episode: two outcomes the player reads before tapping, each with big consequences, shown at once in its branch',
+    c && c.a ? `1. ${c.a} → ${c.if_a || '…'} / 2. ${c.b || '…'} → ${c.if_b || '…'}` : '']; };
+  ARC.slice(0, 3).forEach((arc, i) => { const items = arc.items; arc.items = (A) => { const all = items(A), end = all.findIndex(([k]) => k === 'end');
+    all.splice(end < 0 ? all.length : end, 0, MAIN(A, i + 1)); return all; }; });
   const THREAD = { s1: '#ff9f0a', s2: '#ff9f0a', sec: '#bf5af2' };
 
   // the acts kept on this phone (smt-acts: every act, the one open); a pasted act is a new one
@@ -298,6 +303,7 @@ window.ACT = (() => {
   ];
   function openEp(n) {
     const f = EP_FIELDS[n - 1].map(([l, k]) => [l.replace(/\bA\b/, nm(A, 'a')).replace(/\bB\b/, nm(A, 'b')), `episodes.${n - 1}.${k}`]);
+    if (n < 4) f.push(['Choix principal · 1', `episodes.${n - 1}.choice.a`], ['Si 1', `episodes.${n - 1}.choice.if_a`], ['Choix principal · 2', `episodes.${n - 1}.choice.b`], ['Si 2', `episodes.${n - 1}.choice.if_b`]);
     if (n === 1) f.push(['Si Justin dit non', 'lost_if_no'], ['Planté 1', 'setups.0.plant']);
     if (n === 2) f.push(['Planté 2', 'setups.1.plant']);
     if (n === 3) f.push(['Payé 1', 'setups.0.pay'], ['Payé 2', 'setups.1.pay']);
@@ -354,6 +360,7 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
    1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, about something justin did NOT see (it happened while he was not there, or between the two others: he cannot know the answer, so the player wants it); ONE simple contradiction the player gets in one exchange, one says it happened, the other says it did not ("You never came." / "I came every night."), never two versions of who did what; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
    2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook" (La fin qui promet).
    3: "reveal" (how the secret comes out, in the scene), "flip" (what the player believed, and what is true), "hook".
+   Episodes 1, 2 and 3 also have "choice": the episode's MAIN choice, its last one: {"a", "if_a", "b", "if_b"}. Two outcomes the player reads before tapping, each a bundle of big consequences: a bond that ends or begins, a romance that starts or dies, a place he leaves or stays in. The bigger, the better. Flat: "a": "Ask for more time", "b": "Read the contract" (a procedure, nothing changes). Works: "a": "Break up with Ruby. Kiss Melissa. Leave the city.", "if_a": "Ruby is alone tonight, with whoever threatens her; Melissa and he are together; his room is empty by morning." / "b": "Turn Melissa down. Stay with Ruby.", "if_b": "Melissa walks out alone, hurt; Ruby lets him closer than ever; the city keeps him." The next episode works from either outcome.
    4: "clock" (why it must be decided now), "a_asks", "b_asks" (Le même moment, deux demandes).
    5: "if_a" (if he chose A: what it costs, shown), "if_b" (if he chose B), "open" (what stays open for the next act).
 
@@ -371,7 +378,7 @@ RULES:
 THE JSON:
 {"title": "...", "scene": "...", "question": "...", "a": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "b": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "justin_wants": "...",
  "past": "...", "lost_if_no": "...", "secret": {"who": "<a character id>", "what": "..."}, "setups": [{"plant": "...", "pay": "..."}, {"plant": "...", "pay": "..."}],
- "episodes": [{"ask": "...", "hurts": "...", "mystery": "...", "hook": "..."}, {"easy": "...", "backfires": "...", "hook": "..."}, {"reveal": "...", "flip": "...", "hook": "..."}, {"clock": "...", "a_asks": "...", "b_asks": "..."}, {"if_a": "...", "if_b": "...", "open": "..."}]}
+ "episodes": [{"ask": "...", "hurts": "...", "mystery": "...", "choice": {"a": "...", "if_a": "...", "b": "...", "if_b": "..."}, "hook": "..."}, {"easy": "...", "backfires": "...", "choice": {...}, "hook": "..."}, {"reveal": "...", "flip": "...", "choice": {...}, "hook": "..."}, {"clock": "...", "a_asks": "...", "b_asks": "..."}, {"if_a": "...", "if_b": "...", "open": "..."}]}
 
 CHECK BEFORE YOU REPLY (rewrite what fails):
 1. Is what is at stake a person or a bond, here, tonight? Never money, a sale, a company, papers.
@@ -380,6 +387,7 @@ CHECK BEFORE YOU REPLY (rewrite what fails):
 4. Is at least one of the two drawn to justin?
 5. Do the past, the secret and the mystery each fit in one plain sentence?
 6. Is nothing taken from the examples (their people, events, objects)?
+7. Does each main choice (episodes 1-3) change a bond, a romance or where he lives, in both outcomes?
 
 The idea: ${idea || '(none: invent it from the two people)'}`;
   const copy = (text, btn) => { const was = btn.textContent;

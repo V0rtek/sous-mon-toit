@@ -444,7 +444,7 @@ ${fresh ? `2. "characters": 2 or 3 NEW characters made for this story (the main 
    A rectangle: "goals" (1 or 2 goal ids below), "tech" (one technique of those goals, its exact name), "lines" (how many lines of dialogue it will take, 1 to 5), "what", "reveals" (ids of the infos it reveals), "hints" (ids of the infos whose question it raises without answering).
    "what" = how the technique is done in this scene, concretely, in one sentence, NO dialogue, no quotes. Start from the technique: "Shared memory: Ruby and the main character remember the night they opened the tavern, each with a different version." If what happens does not do its technique, change one of them: a goal on a rectangle means its technique really happens there.
    A choice: "kind": "choice", "goals": [], "tech": "", "what" (the question the MAIN CHARACTER faces), "opts" (2 or 3 of HIS attitudes, not lines: "Defy him", "Lie to protect her"), "lines" (2 or 3). Every choice is the main character's: never another character's decision.
-   2 or 3 choices in the episode. Right before each one, a "stakes" rectangle, linked to it.
+   2 or 3 choices in the episode. Right before each one, a "stakes" rectangle, linked to it.${act ? ' The LAST choice is the MAIN choice THE ACT gives: its 2 "opts" are its 2 outcomes, written so the player knows what each one does ("Break up with Ruby. Kiss Melissa. Leave."), never attitudes. The others are smaller (an attitude).' : ''}
 7. "links": {"from", "to", "label"}: a setup to what it sets off: each stakes rectangle to its choice; a callback (something planted early that comes back later, in the episode or in "later").
 
 GOALS AND THEIR TECHNIQUES (use only these):
@@ -498,6 +498,14 @@ HOW TO TRANSLATE THE PLAN:
 
 TECHNIQUES:
 ${techList()}
+
+HOW PEOPLE TALK (it has to feel human, like a real night out):
+- They are doing something while they talk, something the decor allows and a line says (at the tavern: a round, a toast, the bar, the last drink: "Another one?" / "Drink. It helps you lie."). It gives them something to say when the truth is too much.
+- They answer with a word, a question, a joke, half a sentence. They tease. They dodge. They interrupt. A silence ({"hush": true}) says more than a line.
+- Example of the flow (another story, take the shape only): "Six years… and I don't even know where you're from." / "You never asked." / "I'm asking." / "Sudbury. Tell anyone and you're dead."
+- Never a line that sounds written: no speeches, no explaining feelings, no summaries of the plot.
+
+THE MAIN CHOICE (the last one of the episode): each button says its outcome plainly ("Leave with Melissa", "Stay. Kiss Ruby."); its "then" shows the consequence happening at once (someone walks out, a kiss, a door slams); the two branches end in different places. "next" starts with what each one changed ("If he left with Melissa: ...").
 
 CLARITY (the player knows nothing you know):
 A. One new thing per line, one sentence per bubble: a line with two sentences becomes two lines of the same speaker. Short: 4 to 12 words, 70 characters at most.
