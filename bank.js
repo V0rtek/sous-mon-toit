@@ -32,7 +32,7 @@ window.BANK = {
   props: [['biere', '11 cm', 'boire, trinquer (la chope sans anse)'], ['gobelet', '10 cm', 'boire, l’eau, le vin du pauvre'], ['potion', '9 cm', 'une fiole, un remède, un poison'], ['vin', '8 cm', 'une bouteille, trinquer'],
     ['chope', '17 cm', 'à boire, trinquer'], ['piece', '7 cm', 'payer, parier'], ['bourse', '16 cm', 'payer, soudoyer, voler'], ['lettre', '25 cm', 'un message, un aveu'],
     ['enveloppe', '22 cm', 'scellée, un secret'], ['parchemin', '36 cm', 'un ordre, un contrat'], ['carte', '32 cm', 'un trésor, un chemin'], ['plan', '32 cm', 'le château, un vol'],
-    ['wanted', '30 cm', 'quelqu’un est recherché']],
+    ['wanted', '30 cm', 'quelqu’un est recherché'], ['avis', '28 cm', 'un avis de recherche froissé, tenu ou lu']],
   // the photos of real people leaning, in ref/poses: file, what it shows
   poseRefs: [['balcon_penchee', 'Penchée sur un balcon, la main à la joue'], ['balcon_profil', 'De profil, avant-bras sur la rambarde'], ['rambarde_face', 'De face, les mains croisées sur la pierre'],
     ['bureau_penchee', 'Penchée sur un bureau, le téléphone en main'], ['table_couchee', 'Couchée sur une table, les mains jointes']],

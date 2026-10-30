@@ -1682,10 +1682,10 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261031490000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="tests.js?v=20261031560000"></script>
+<script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261031550000"></script>
-<script src="bank.js?v=20261031570000"></script>
+<script src="bank.js?v=20261031580000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -1786,9 +1786,9 @@ function placeActor(a) {
 // (the mug's handle is on its right: turned, the handle is in her hand and the mug in front of her)
 // a drink held by the far hand sits IN FRONT of it: its middle on the hand (the grip is the hand's front, its knuckles)
 const PROP_GRIP = { chope: [0.86, 0.45, true], biere: [0.62, 0.55], gobelet: [0.62, 0.5], potion: [0.62, 0.6], vin: [0.6, 0.62], lettre: [0.12, 0.8], bourse: [0.45, 0.12], enveloppe: [0.15, 0.7], parchemin: [0.08, 0.45],
-  carte: [0.12, 0.8], plan: [0.12, 0.8], wanted: [0.12, 0.8], piece: [0.5, 0.5] };
+  carte: [0.12, 0.8], plan: [0.12, 0.8], wanted: [0.12, 0.8], avis: [0.2, 0.7], piece: [0.5, 0.5] };
 const DRINKS = ['biere', 'vin', 'potion', 'gobelet', 'chope'];
-const PAPER = ['lettre', 'carte', 'plan', 'wanted', 'parchemin', 'enveloppe'];   // read, held flat: they fill the red sheet
+const PAPER = ['lettre', 'carte', 'plan', 'wanted', 'avis', 'parchemin', 'enveloppe'];   // read, held flat: they fill the red sheet
 const propM = (name) => { const r = ((window.BANK && BANK.props) || []).find((p) => p[0] === name); return r ? parseFloat(r[1]) / 100 : 0.15; };
 const gripOf = (a, pose) => { const sp = SPRITES[spriteOf(a.id)]; return sp.grip && sp.grip[poseOf(a.id, pose)]; };
 function gripAt(a, b, g) {   // a grip in his pose's pixels -> decor px (and mirrored when he is turned around)

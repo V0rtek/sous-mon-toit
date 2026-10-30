@@ -262,7 +262,7 @@
       { say: 'lily', pose: 'hold_raise', to: 'justin', text: `${o} · elle trinque` },
       { say: 'lily', pose: 'bar_to_smile', to: 'justin', text: `${o} · posée à côté d’elle` },
       { say: 'lily', pose: 'bar_ahead', text: `${o} · toujours là` }]),
-    ...['lettre', 'carte', 'wanted', 'enveloppe'].flatMap((o) => [
+    ...['lettre', 'carte', 'wanted', 'avis', 'enveloppe'].flatMap((o) => [
       { hold: { lily: o } }, { say: 'lily', pose: 'hold_front', text: `${o} · elle lit` },
       { say: 'lily', pose: 'hold_give', to: 'justin', text: `${o} · elle tend` }]),
     { hold: { lily: null } }, { put: { lily: 'piece' } }, { say: 'lily', pose: 'bar_put', to: 'justin', text: 'piece · posée sous ses doigts' },
