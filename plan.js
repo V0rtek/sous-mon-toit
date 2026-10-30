@@ -29,7 +29,9 @@ window.PLAN = (() => {
       tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.', ex: ['Early: « Something will come up. » Later the money comes from the wrong man: « …Something came up. »'] },
         { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.', ex: ['Early, his friend: « Rent’s due Monday. » Later, the enemy: « Rent’s due Monday, Brooke. »'] },
         { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.', ex: ['Early: « What do you drink? » « Red. » Later: « Don’t drink the red wine. »'] },
-        { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.', ex: ['Early: « You’re just… » Later: « What was he gonna say? »'] }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
+        { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.', ex: ['Early: « You’re just… » Later: « What was he gonna say? »'] },
+        { n: 'Question esquivée', d: 'Quelqu’un pose une question, l’autre l’esquive (une blague, un changement de sujet, « plus tard ») : la réponse est retenue, la curiosité reste. Le rectangle soulève l’info sans la révéler, et il est lié à la Question qui revient.', ex: ['« Where were you last night? » / « Out. Pass the salt. »', '« Who gave you that ring? » / « You want another drink? »'] },
+        { n: 'Question qui revient', d: 'La question esquivée revient, cette fois sans porte de sortie, juste avant un choix (lié à lui) : le joueur doit y répondre.', ex: ['« I’ll ask one more time. Where were you? »', '« No jokes this time. Who gave you the ring? »'] }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
   // a goal: d = what it's for; its techniques: { n: name, d: what it is, s: [the techniques under it] } (a category opens
   // on what's under it)
@@ -442,8 +444,9 @@ RULES:
 - An info comes out after its parent (in rectangle order), one at a time, only through a "Reveal info" technique.
 - Each technique's description (above) says how it is done: follow it (who says it to whom, aloud or not).
 - Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
-- Every rectangle brings something new (a fact, a feeling, a stake). Never two rectangles on the same question: once a thing is asked or said, it moves forward or it is dropped.
-- A choice acts on something the player has already seen: an option about a lie needs a secret the player knows, an option about a person needs that person on screen.
+- Every rectangle brings something new (a fact, a feeling, a stake). Never two rectangles on the same question, except a "Question esquivée" and its "Question qui revient" (linked).
+- Before tapping, the player knows what each option means. An option may bring something new if it makes sense on its own; an option that is a lie or hides a secret needs the player to know the truth (shown before).
+- The main character knows nothing the player does not: whatever he knows that matters is shown before it is used.
 - At least one desire is shown ("desire" goal).
 - Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
@@ -473,14 +476,14 @@ ${techList()}
 
 CLARITY (the player knows nothing you know):
 A. One new thing per line, one sentence per bubble: a line with two sentences becomes two lines of the same speaker. Short: 4 to 12 words, 70 characters at most.
-F. Never ask again what was asked, never say again what was said: each line moves things forward.
+F. Never ask again what was asked, never say again what was said: each line moves things forward. Except a question dodged in a "Question esquivée" rectangle, which comes back where the plan's "Question qui revient" is.
 B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 lines. Someone absent: a name AND what identifies them.
 C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
-CHOICES: an option only refers to what the player has seen and heard (no lie that was never set up, no thing never named). "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
+CHOICES: before tapping, the player knows what each option means: an option makes sense on its own, and a lie or a secret is only an option if the player knows the truth. "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
 POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
 
 THE JSON (exactly this shape):
