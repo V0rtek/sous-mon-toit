@@ -420,12 +420,12 @@ window.PLAN = (() => {
   // techniques above, so a change here changes them ----
   const DECORS = '"taverne" = melissa, candy, ruby (the terrace of a tavern above a fantasy city) · "maison" = ruby, james (inside a house) · "salon" = isa, amare, james (a living room). ruby and melissa are elves, candy is a feline woman, amare is a lion-man';
   const techList = () => GOALS.map((g) => `- ${g.name} ("${g.id}"): ${g.d}\n` + flatT(g.tech).map((t) => `    · ${t.n}: ${t.d}${t.ex ? ' Examples (shapes, never copy them): ' + t.ex.map((x) => `"${x}"`).join(' / ') : ''}`).join('\n')).join('\n');
-  const prompt1 = (idea, fresh) => `You plan episode 1 of an interactive story for a phone game, BEFORE any dialogue is written. The player plays the main character (his id is "justin"). Write every text in the language of the idea.
+  const prompt1 = (idea, fresh, act) => `You plan episode ${act ? act.n + ' of 5' : 1} of an interactive story for a phone game, BEFORE any dialogue is written.${act ? ' The whole act is already planned (THE ACT, at the end): this episode does its part of it, exactly, and nothing of the later episodes.' : ''} The player plays the main character (his id is "justin"). Write every text in the language of the idea.
 Reply with ONE JSON object and nothing else (its shape is at the end). Fill it in this order:
 
 1. "scene": the decor that fits the idea: ${DECORS}.${fresh ? ' (Only the place: the characters are new, below.)' : ''}
 ${fresh ? `2. "characters": 2 or 3 NEW characters made for this story (the main character is the player: not in this list). For each: "id" (one lowercase word), "name", "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them, "look" = what they look like, one sentence (age, build, hair, clothes, one detail that says who they are; nothing green), "poses" = exactly 6 pose names, the first one "listen" (neutral, listening), the 5 others the ones this character needs in this episode (snake_case: "laughing", "arms_crossed", "pointing"). "sprite": "". Nothing else.` : `2. "characters": 2 or 3 people of that decor (the main character is the player: not in this list). id and sprite = their name in the decor list; "name" = the same, capitalized. For each: "traits" = 1 or 2 short, concrete traits that make us like them ("broke and proud of it"), "infos" = the ids of the infos about them. Nothing else.`}
-3. "turn": decided first: the event at the end of the episode that turns everything, in one sentence.
+3. "turn": ${act ? 'given by THE ACT (how this episode ends): write it in one sentence.' : 'decided first: the event at the end of the episode that turns everything, in one sentence.'}
 4. "needs": what the turn needs in place: 2 to 4 things the player must already know or have seen, or the turn makes no sense. Each one becomes an info (step 5) or a rectangle that plants it (step 6); "by" = its id.
 5. "infos": what the player must learn, as chains: an info with "parent" can only come out after its parent ("someone has a job for you" -> "the job is at the docks" -> "one rule: no red wine"). 5 to 9 infos. Each info is revealed by exactly one rectangle: in box "ep" (this episode) or in box "later" (a later episode). For an info revealed in "later", a rectangle of "ep" raises its question without answering it ("hints": its id): that is the curiosity the episode ends on.
 6. "boxes": exactly two. Box "ep" (col 0) = the episode, 6 to 10 rectangles in order. Box "later" (col 1, title "Plus tard") = 1 to 3 events or choices of later episodes that this one sets up.
@@ -440,7 +440,7 @@ ${techList()}
 
 RULES:
 - Box "ep": 24 lines at most in total.
-- The first rectangle is engagingness ("char" or "rel") on the present moment ("Share personal internal conflict", or "Show contrast" on what is happening right there). No info of the plot before it: the player likes the people before learning facts.
+${act && act.n > 1 ? '- The first rectangle picks up where the last episode ended (THE ACT says how), with engagingness ("char" or "rel") on that present moment.' : `- The first rectangle is engagingness ("char" or "rel") on the present moment ("Share personal internal conflict", or "Show contrast" on what is happening right there). No info of the plot before it: the player likes the people before learning facts.`}
 - An info comes out after its parent (in rectangle order), one at a time, only through a "Reveal info" technique.
 - Each technique's description (above) says how it is done: follow it (who says it to whom, aloud or not).
 - Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
@@ -459,7 +459,7 @@ THE JSON:
            {"id": "later", "title": "Plus tard", "col": 1, "beats": [{"id": "f1", "goals": ["stakes"], "tech": "", "lines": 1, "what": "...", "reveals": ["i5"]}]}],
  "links": [{"from": "r4", "to": "r5", "label": "..."}]}
 
-The idea: ${idea}`;
+${act ? act.text : 'The idea: ' + idea}`;
   const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ x, y, ...c }) => c) };
     return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
