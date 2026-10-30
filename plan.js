@@ -479,7 +479,7 @@ ${act ? act.text : 'The idea: ' + idea}`;
     return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
 HOW TO TRANSLATE THE PLAN:
-- Follow the rectangles of the first box ("ep") in order, every one of them: never skip one, never merge two. Every step says its rectangle: "b" = its id (a choice step, its option and their "then" lines too). The game checks it: a skipped rectangle is refused.
+- Follow the rectangles of the first box ("ep") in order, every one of them: never skip one, never merge two.
 - What a rectangle hints stays unexplained: no line answers it or contradicts it ("I wrote to you" cannot be followed by "I know my silence was cruel"). Each one becomes exactly its "lines" lines, written with its technique (below), for its goals. "what" says what happens: never copy it as a line.
 - A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
 - An info comes out exactly in the rectangle of "ep" that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice). An info revealed in "later" is never said in this episode: where a rectangle "hints" it, only its question is raised (something seen or said that makes the player wonder), never its answer.
@@ -511,10 +511,10 @@ POSES: listen, surprised, thinking, explaining, angry, holding (holding = restra
 
 THE JSON (exactly this shape):
 {"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",
- "steps": [ {"b": "r1", "who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"b": "r6", "choice": [ {"b": "r6", "t": "...", "say": "...", "tone": "...", "then": [ {"b": "r6", "who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
+ "steps": [ {"who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"choice": [ {"t": "...", "say": "...", "tone": "...", "then": [ {"who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
  "next": ["If ..., ...", "..."]}
 
-CHECK BEFORE YOU REPLY: every rectangle of "ep" is there, in order, each step with its "b"; every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
+CHECK BEFORE YOU REPLY: every rectangle of "ep" is there, in order (none skipped: the one that raises a question is the one the player came for); every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
 
 THE PLAN:
 ${JSON.stringify(plan)}`; };

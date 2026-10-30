@@ -182,34 +182,6 @@ window.ACT = (() => {
   const bundle = () => { const g = (() => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } })()[0];
     return { act: A, ep, plan: window.PLAN ? PLAN.get() : null, story: g ? { idea: g.idea, json: g.json, fb: g.fb } : null }; };
 
-  // ---- the validator: what doesn't hold in the act, each with the technique that fixes it (it still opens) ----
-  const BANNED = /\b(dettes?|debts?|argent|money|caisses?|crates?|caves?|cellars?|proprio|landlord|licences?|licenses?|contrebande|smuggl\w*)\b/i;
-  const INSTITUTION = /\b(conseil|council|audiences?|hearings?|tribunal|court|police|mairie|gouvernement|government|guilde|guild)\b/i;
-  function check(a) {
-    const out = [];
-    for (const k of ['title', 'scene', 'question', 'justin_wants']) if (!a[k]) out.push(`Il manque : ${k}`);
-    for (const w of ['a', 'b']) {
-      if (!a[w] || !a[w].id || !a[w].wants) out.push(`Il manque ${w.toUpperCase()} ou ce qu’il veut`);
-      else if (!a[w].because) out.push(`Pourquoi ${cap(a[w].id)} veut ça ? (Vouloir + raison)`);
-    }
-    if (a.justin_wants && !/\b(parce|car|because|since|pour)\b/i.test(a.justin_wants)) out.push('Pourquoi Justin veut ça ? (Un rêve à lui)');
-    if (a.justin_wants && /\b(ce soir|cette nuit|soirée|tonight|evening)\b/i.test(a.justin_wants)) out.push('Ce que Justin veut tient en un soir : un rêve de longue date (Un rêve à lui)');
-    if (!a.lost_if_no) out.push('Ce qui est perdu si Justin dit non ? (Danger présent)');
-    if (!a.past) out.push('Le passé ? (Le passé en une phrase)');
-    else if ((String(a.past).trim().match(/[.!?](\s|$)/g) || []).length > 1) out.push('Le passé tient en plus d’une phrase (Le passé en une phrase)');
-    const w = a.secret && a.secret.who;
-    if (!a.secret || !a.secret.what) out.push('Il manque le secret');
-    else if (a.a && a.b && ![a.a.id, a.b.id, 'a', 'b'].includes(w)) out.push('Le secret n’appartient ni à A ni à B (Un secret qui explique un geste)');
-    if (!Array.isArray(a.setups) || a.setups.length < 2 || a.setups.some((s) => !s || !s.plant || !s.pay)) out.push('Il faut 2 plants, chacun avec ce qu’il paie');
-    ['ask hurts mystery hook', 'easy backfires hook', 'reveal flip hook', 'clock a_asks b_asks', 'if_a if_b open'].forEach((f, i) => {
-      const gone = f.split(' ').filter((k) => !(a.episodes && a.episodes[i] && a.episodes[i][k])); if (gone.length) out.push(`Épisode ${i + 1} : il manque ${gone.join(', ')}`); });
-    const bad = JSON.stringify(a.episodes || []).concat(JSON.stringify(a.secret || {}), a.past || '').match(BANNED);
-    if (bad) out.push(`« ${bad[0]} » : l’enjeu doit rester entre les gens`);
-    const away = JSON.stringify(a).match(INSTITUTION);
-    if (away) out.push(`« ${away[0]} » : une institution, hors de la scène (Ici et maintenant)`);
-    return out;
-  }
-
   // ---- Visuel: the act on top (the two people, why, the past, the danger, the secret), then the 5 episodes ----
   function column(st, n) {
     const arc = ARC[n - 1], items = arc.items(A), done = items.filter(([k]) => A.done[n + k]).length;
@@ -227,10 +199,8 @@ window.ACT = (() => {
   const pickBtns = () => ['a', 'b'].map((w) => `<button type="button" data-pick="${w}" class="${A.picks[4] === w ? 'on' : ''}">Il a choisi ${esc(nm(A, w))}</button>`).join('');
   function visual() {
     const who = (w) => `<div class="aWho">${face(A[w].id)}<div><b>${esc(nm(A, w))}</b><span>${esc(A[w].is)}</span><em>Veut : ${esc(A[w].wants)}</em>${A[w].because ? `<i>parce que ${esc(A[w].because)}</i>` : ''}</div></div>`;
-    const warn = check(A);
     return '<div class="aTop" data-a="edit">'
       + `<small>L’arc · toujours le même pour l’instant</small><p class="aArc">Justin est pris entre deux personnes. ${esc(nm(A, 'a'))} lui demande quelque chose qui blesse ${esc(nm(A, 'b'))}. Il essaie de garder les deux, ça empire ; un secret change tout ; il doit choisir.</p>`
-      + (warn.length ? `<div class="aWarn"><b>À vérifier</b>${warn.map((x) => `<span>${esc(x)}</span>`).join('')}</div>` : '')
       + `<small>La question</small><p class="aQ">${esc(A.question)}</p>`
       + `<div class="aPeople">${who('a')}${who('b')}</div>`
       + `<div class="aWant"><b>Justin veut</b> ${esc(A.justin_wants)}</div>`
@@ -248,7 +218,7 @@ window.ACT = (() => {
   const draft = { idea: ls('smt-act-idea') || '', act: '', plan: '', story: '' };
   let ep = 1;
   function flow() {
-    const P = window.PLAN && PLAN.get(), planOk = A.plans && A.plans[ep] && P && P.title === A.plans[ep], warn = check(A);
+    const P = window.PLAN && PLAN.get(), planOk = A.plans && A.plans[ep] && P && P.title === A.plans[ep];
     const box = (f, ph) => `<textarea data-f="${f}" rows="3" placeholder="${ph}">${esc(draft[f])}</textarea>`;
     return `<section class="aStep"><h3><i>1</i>L’acte</h3><p class="pD">L’arc et les techniques d’acte sont dans le prompt : l’IA remplit les 5 épisodes.</p>`
       + `<small>Ton idée (facultatif)</small>${box('idea', 'Une ou deux phrases, ou rien')}`
@@ -256,7 +226,7 @@ window.ACT = (() => {
       + '<div class="aBtns"><button type="button" class="go" data-s="copyAct">Copier le prompt de l’acte</button></div>'
       + `<small>La réponse</small>${box('act', 'Colle ici le JSON de l’acte')}`
       + '<div class="aBtns"><button type="button" data-s="pasteAct">Coller l’acte</button><button type="button" data-s="visual">Voir l’acte</button></div>'
-      + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b>${warn.length ? ` · <em>${warn.length} à vérifier</em>` : ' · ✓'}</p>${warn.length ? `<div class="aWarn">${warn.map((w) => `<span>${esc(w)}</span>`).join('')}</div><p class="pD">Le plan et l’histoire suivent l’acte : un acte qui rate ça, ils le ratent aussi. Corrige-le (Voir l’acte) ou génère-en un nouveau.</p>` : ''}<p class="pMsg" data-m="act"></p></section>`
+      + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b></p><p class="pMsg" data-m="act"></p></section>`
       + `<section class="aStep"><h3><i>2</i>Le plan de l’épisode</h3><p class="pD">Le prompt du Plan de scène, avec l’acte : ce qui s’est passé avant et ce que cet épisode doit contenir.</p>`
       + `<div class="aEps">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-ep="${n}" class="${n === ep ? 'on' : ''}">${n}${A.plans && A.plans[n] ? ' ✓' : ''}</button>`).join('')}</div>`
       + `<div class="aBtns"><button type="button" class="go" data-s="copyPlan">Copier le prompt du plan · épisode ${ep}</button></div>`
@@ -458,19 +428,6 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
     }
   }
   // Générer's buttons
-  // the rectangles of the plan's episode box the story skipped or moved (each step says its rectangle, "b")
-  let forced = null;
-  function missing(j) {
-    const P = window.PLAN && PLAN.get(), box = P && (P.boxes || []).find((b) => b.id === 'ep');
-    if (!box || !Array.isArray(j.steps)) return [];
-    const seen = [], add = (s) => { if (s && s.b && !seen.includes(s.b)) seen.push(s.b); };
-    j.steps.forEach((s) => { add(s); (s.choice || []).forEach((o) => { add(o); (o.then || []).forEach(add); }); });
-    if (!seen.length) return ['aucune réplique ne dit son rectangle ("b")'];
-    const ids = box.beats.map((b) => b.id), out = ids.filter((id) => !seen.includes(id)).map((id) => { const b = box.beats.find((x) => x.id === id); return `il manque ${id}${b.tech ? ' (' + b.tech + ')' : ''}`; });
-    const order = seen.filter((id) => ids.includes(id));
-    if (order.some((id, i) => i && ids.indexOf(id) < ids.indexOf(order[i - 1]))) out.push('rectangles dans le désordre');
-    return out;
-  }
   function step(s, btn) {
     switch (s) {
       case 'other': { let p; do p = PAIRS[Math.floor(Math.random() * PAIRS.length)]; while (p === pair); pair = p; render(); return; }
@@ -479,8 +436,8 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
         try { j = LOOSE_JSON(draft.act); } catch { return say('act', 'Ce n’est pas un acte (JSON).'); }
         if (!j.a || !j.b || !Array.isArray(j.episodes)) return say('act', 'Il manque A, B ou les épisodes.');
         store.list.push(fix({ ...j, done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
-        keep('acte', { act: A, check: check(A) });
-        draft.act = ''; ep = 1; render(); const w = check(A); say('act', w.length ? `Ouvert, ${w.length} à vérifier (Voir l’acte).` : 'Ouvert.'); return; }
+        keep('acte', { act: A });
+        draft.act = ''; ep = 1; render(); say('act', 'Ouvert.'); return; }
       case 'visual': mode = 'visual'; ls('smt-act-mode', mode); render(); el.querySelector('.aView').scrollTop = 0; return;
       case 'copyPlan': return copy(planPrompt(ep), btn);
       case 'pastePlan': { let j;
@@ -491,8 +448,6 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
       case 'copyStory': return copy(window.PLAN.prompt2(), btn);
       case 'play': { let j;
         try { j = LOOSE_JSON(draft.story); } catch { return say('story', 'Ce n’est pas une histoire (JSON).'); }
-        const miss = missing(j);
-        if (miss.length && forced !== draft.story) { forced = draft.story; return say('story', `L’histoire n’a pas suivi le plan : ${miss.join(' · ')}. Touche encore Jouer pour jouer quand même.`); }
         try { keep(`histoire-ep${ep}`, { ep, plan: PLAN.get().title, story: j }); window.PLAN_PLAY(j, PLAN.get().title); draft.story = ''; } catch (err) { say('story', err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'); }
         return; }
       case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && !/^•+$/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
@@ -511,5 +466,5 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
   }
   // a feedback given after a generated story (index.html): kept with the act's episode
   window.ACT_KEEP = (name, data) => keep(`${name}-ep${ep}`, { ep, plan: window.PLAN ? PLAN.get().title : '', ...data });
-  return { mount, closeSheet, redraw: () => render(), get: () => A, actText, check, promptAct: (idea) => promptAct(idea, pair) };
+  return { mount, closeSheet, redraw: () => render(), get: () => A, actText, promptAct: (idea) => promptAct(idea, pair) };
 })();
