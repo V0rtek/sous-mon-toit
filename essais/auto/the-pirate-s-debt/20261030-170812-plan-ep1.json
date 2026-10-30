@@ -1,0 +1,277 @@
+{
+ "ep": 1,
+ "plan": {
+  "title": "The Seat at the Counter",
+  "scene": "a port tavern at night. the counter runs along one wall. behind it, shelves of bottles catch the lamplight. three stools face the counter. the door opens onto the dark harbor.",
+  "turn": "Le_pirate tells justin the hearing is tomorrow at sunrise and asks him to come early to walk to the courthouse together.",
+  "needs": [
+   {
+    "text": "James disappeared three years ago without explanation.",
+    "by": "i1"
+   },
+   {
+    "text": "Le_pirate believes James stole cargo and ran away that night.",
+    "by": "i2"
+   },
+   {
+    "text": "Justin has always dreamed of owning a ship and commanding it himself.",
+    "by": "i3"
+   },
+   {
+    "text": "Le_pirate is Justin's only path to owning that ship.",
+    "by": "i4"
+   }
+  ],
+  "infos": [
+   {
+    "id": "i1",
+    "text": "James disappeared three years ago without explanation."
+   },
+   {
+    "id": "i2",
+    "text": "Le_pirate believes James stole cargo and ran away that night.",
+    "parent": "i1"
+   },
+   {
+    "id": "i3",
+    "text": "Justin has always dreamed of owning a ship and commanding it himself, not working for others."
+   },
+   {
+    "id": "i4",
+    "text": "Le_pirate is Justin's only path to owning that ship.",
+    "parent": "i3"
+   },
+   {
+    "id": "i5",
+    "text": "If Justin testifies that James stole the cargo, James will be destroyed.",
+    "parent": "i2"
+   },
+   {
+    "id": "i6",
+    "text": "Lily cares deeply whether James is declared guilty or innocent.",
+    "parent": "i5"
+   },
+   {
+    "id": "i7",
+    "text": "Did James run because he was guilty, or for another reason?",
+    "parent": "i1"
+   }
+  ],
+  "boxes": [
+   {
+    "id": "ep",
+    "title": "Épisode 1",
+    "col": 0,
+    "beats": [
+     {
+      "id": "r1",
+      "goals": [
+       "char"
+      ],
+      "tech": "Show contrast",
+      "lines": 2,
+      "what": "Le_pirate leans forward on his stool, energized by the sight of Justin entering; Lily, sitting three stools away, stiffens slightly and looks down at her drink.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r2",
+      "goals": [
+       "rel"
+      ],
+      "tech": "Shared memory",
+      "lines": 3,
+      "what": "Le_pirate and Justin recall aloud the night they first met at this counter, each remembering a different detail that makes them laugh; Lily, still present, says nothing but watches Justin laugh.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r3",
+      "goals": [
+       "char"
+      ],
+      "tech": "Share personal internal conflict",
+      "lines": 2,
+      "what": "Justin says aloud to Le_pirate that he wants to own a ship one day and sail it himself, not pour drinks for someone else forever, but admits he does not know how that will ever happen.",
+      "reveals": [
+       "i3"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r4",
+      "goals": [
+       "desire"
+      ],
+      "tech": "Un rêve et sa raison",
+      "lines": 2,
+      "what": "Le_pirate responds that Justin has always said that, then tells Justin he knows how to make it happen; that is why he kept Justin's seat at the counter for three years, even when Justin did not show up.",
+      "reveals": [
+       "i4"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r5",
+      "goals": [
+       "info"
+      ],
+      "tech": "Demande qui révèle",
+      "lines": 2,
+      "what": "Le_pirate asks Justin aloud where James went that night three years ago; Justin says he does not know; Le_pirate says James ran because he was guilty of stealing the cargo.",
+      "reveals": [
+       "i1",
+       "i2"
+      ],
+      "hints": [
+       "i7"
+      ]
+     },
+     {
+      "id": "r6",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Mention consequences",
+      "lines": 2,
+      "what": "Le_pirate tells Justin that tomorrow at the harbor court hearing, he needs Justin to testify that he saw James loading stolen goods onto the ship the night before James vanished.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r7",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Show character positioning",
+      "lines": 2,
+      "what": "Lily stands from her stool and tells Justin that if he testifies, he will be confirming that James was a thief; she says she is against it, then leaves the bar area.",
+      "reveals": [
+       "i5",
+       "i6"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r8",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Menace : si tu X, je Y",
+      "lines": 2,
+      "what": "Le_pirate tells Justin that if he testifies, the partnership becomes real and the path to owning a ship opens; if he does not, Le_pirate will have to walk away from him.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r9",
+      "kind": "choice",
+      "goals": [],
+      "tech": "",
+      "lines": 2,
+      "what": "Justin must choose now: promise Le_pirate he will testify tomorrow, or ask for time to think.",
+      "opts": [
+       "Promise Le_pirate you will testify tomorrow. The partnership opens, the ship becomes possible. But Lily will see you as the man who destroyed James.",
+       "Tell Le_pirate you need time to remember what you saw that night. You stay between them both, but Le_pirate's trust thins and the ship moves further away."
+      ]
+     }
+    ]
+   },
+   {
+    "id": "later",
+    "title": "Plus tard",
+    "col": 1,
+    "beats": [
+     {
+      "id": "f1",
+      "goals": [
+       "info"
+      ],
+      "tech": "Tell a story",
+      "lines": 2,
+      "what": "Justin tells Le_pirate he will testify, then tells Lily he cannot possibly do it because he was too drunk that night to remember anything clearly.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "f2",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Mention consequences",
+      "lines": 2,
+      "what": "Le_pirate arrives at the tavern before dawn to walk to the courthouse; he overhears Lily telling Justin she loves him for choosing not to testify.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "f3",
+      "goals": [
+       "info"
+      ],
+      "tech": "Show character positioning",
+      "lines": 1,
+      "what": "Le_pirate leaves without a word; by the time Justin follows him outside, the ship's crew is already untying the lines and Le_pirate is leaving the harbor.",
+      "reveals": [],
+      "hints": []
+     }
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "r6",
+    "to": "r9",
+    "label": "Le_pirate's request sets the trap"
+   },
+   {
+    "from": "r7",
+    "to": "r9",
+    "label": "Lily's opposition stakes the choice"
+   },
+   {
+    "from": "r8",
+    "to": "r9",
+    "label": "The cost of each option is clear"
+   },
+   {
+    "from": "r4",
+    "to": "r6",
+    "label": "Justin's dream meets Le_pirate's demand"
+   },
+   {
+    "from": "r5",
+    "to": "f1",
+    "label": "The unanswered question about James returns in episode 2"
+   }
+  ],
+  "chars": [
+   {
+    "id": "le_pirate",
+    "name": "Le_pirate",
+    "sprite": "le_pirate",
+    "traits": [
+     "loyal to his own",
+     "expects loyalty back"
+    ],
+    "infos": [
+     "i2",
+     "i4"
+    ]
+   },
+   {
+    "id": "lily",
+    "name": "Lily",
+    "sprite": "lily",
+    "traits": [
+     "protective of those she loves",
+     "keeps her reasons to herself"
+    ],
+    "infos": [
+     "i1"
+    ]
+   }
+  ]
+ },
+ "by": "haiku"
+}
