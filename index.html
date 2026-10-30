@@ -1580,32 +1580,43 @@ function setPose(id, pose) {
   img.decode().then(swap, swap);
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
-// {walk: id, to: x in decor px | someone | a spot, ms}: he walks there in profile, cut at the belt (side_walk_a / _b,
-// a step every 300 ms, a small bob), the close shot following him; then side_listen. A sprite without them just slides.
-// The frame stops at his belt, so the same walk works on stairs or on any floor
-async function walk(id, to, ms, r) {
-  const a = actors[id]; if (!a) return;
-  const x0 = a.x, x1 = typeof to === 'number' ? to : actors[to] ? actors[to].x : (sc.spots[to] || [x0])[0];
-  const has = SPRITES[spriteOf(id)].poses, cycle = has.side_walk_a && has.side_walk_b && has.side_listen;
-  const imgs = cycle ? ['side_walk_a', 'side_walk_b', 'side_listen'].map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(id, p); return [p, i]; }) : [];
-  await Promise.all(imgs.map(([, i]) => i.decode().catch(() => {})));
-  if (x1 !== x0) a.face = x1 > x0 ? 'r' : 'l';
-  const t0 = performance.now(), dur = FAST ? 0 : ms;
+// {walk: id | [ids], to: x in decor px | someone | a spot, ms}: they walk there in profile, cut at the belt (side_walk_a
+// / _b, a step every 300 ms, a small bob), the close shot following them; then side_listen. Together: the first one goes
+// to "to", the others keep their distance to him, out of step. A sprite without the walk just slides.
+// The frame stops at their belt, so the same walk works on stairs or on any floor
+async function walk(ids, to, ms, r) {
+  const who = [].concat(ids).map((id) => actors[id]).filter(Boolean); if (!who.length) return;
+  const lead = who[0], x0 = lead.x, x1 = typeof to === 'number' ? to : actors[to] ? actors[to].x : (sc.spots[to] || [x0])[0];
+  const go = who.map((a) => {
+    const has = SPRITES[spriteOf(a.id)].poses, cycle = has.side_walk_a && has.side_walk_b && has.side_listen;
+    const imgs = cycle ? ['side_walk_a', 'side_walk_b', 'side_listen'].map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(a.id, p); return [p, i]; }) : [];
+    return { a, from: a.x, cycle, imgs };
+  });
+  await Promise.all(go.flatMap((g) => g.imgs.map(([, i]) => i.decode().catch(() => {}))));
+  if (x1 !== x0) for (const { a } of go) a.face = x1 > x0 ? 'r' : 'l';
+  const ids_ = who.map((a) => a.id), t0 = performance.now(), dur = FAST ? 0 : ms;
   for (;;) {
-    const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1;
-    a.x = x0 + (x1 - x0) * (t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t));   // eases in and out
-    if (cycle) {
-      const [p, i] = imgs[Math.floor((now - t0) / 300) % 2];
-      if (a.shown !== p) { a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
-      a.bob = -Math.abs(Math.sin((now - t0) / 300 * Math.PI)) * a.h * 0.006;
-    }
-    placeActor(a); applyCam({ size: 'close', who: [id], tight: true }, 0);
+    const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);   // eases in and out
+    go.forEach(({ a, from, cycle, imgs }, k) => {
+      a.x = from + (x1 - x0) * e;
+      if (cycle) {
+        const step = (now - t0) / 300 + k * 0.5;   // out of step with the one before
+        const [p, i] = imgs[Math.floor(step) % 2];
+        if (a.shown !== p) { a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
+        a.bob = -Math.abs(Math.sin(step * Math.PI)) * a.h * 0.006;
+      }
+      placeActor(a);
+    });
+    applyCam({ size: 'close', who: ids_, tight: true }, 0);
     if (t >= 1 || r !== run) break;
     await new Promise((res) => requestAnimationFrame(res));
   }
-  a.bob = 0;
-  if (cycle) { const [p, i] = imgs[2]; a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
-  placeActor(a); applyCam({ size: 'close', who: [id], tight: true }, 0);
+  for (const { a, cycle, imgs } of go) {
+    a.bob = 0;
+    if (cycle) { const [p, i] = imgs[2]; a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
+    placeActor(a);
+  }
+  applyCam({ size: 'close', who: ids_, tight: true }, 0);
 }
 
 // a decor = a photo and/or rectangles behind the people (back) and in front of them (front), in decor px:
@@ -1658,7 +1669,11 @@ function frameOf(c) {
     // c.tight (a walk): the frame keeps his height and follows his waist, a swinging arm may leave it
     if (cut.length) {
       camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), c.tight ? 0 : (right - left) * 1.08 / ASP())); top = Math.min(...cut) - camH;
-      if (c.tight) cx = who.reduce((t, a) => t + a.x, 0) / who.length;
+      if (c.tight) {   // several: wide enough for their waists, with room for a head on each side
+        const xs = who.map((a) => a.x), span = Math.max(...xs) - Math.min(...xs);
+        if (span) { camH = Math.min(bh, Math.max(camH, (span + 0.4 * tall) / ASP())); top = Math.min(...cut) - camH; }
+        cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+      }
     }
   }
   if (c.lift !== undefined) top = c.lift;
