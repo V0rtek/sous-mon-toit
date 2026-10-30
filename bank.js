@@ -222,14 +222,16 @@ Do not exaggerate the poses. Subtle and natural, like the reference.`],
   // ---- the kit (31/10): every character has Debout and Accoudé; then Assis, Prises and the others as the story needs.
   // Each cell does one thing nobody else does. The mouth is open only to exclaim: the bubble says who speaks, the face
   // says what they feel ----
-  const CELLS = (title, framing, angle, rows) => (L) => `Create a character pose sheet of THIS EXACT character, ${title}. Image 1 is the reference: it is the character AND the art style. Image 2 is a pose sheet of ANOTHER character: use it ONLY as a guide for the angle, the framing and the size of the head; copy nothing of his look (face, hair, body, clothes). Copy the character of image 1 exactly.
+  // guide = with Justin's sheet as image 2 (the angle, the cut); without, only the character's own picture (a full-body
+  // sheet: image 2 made it draw Justin). tall = portrait 2:3, tall cells: a full body stays big, so sharp
+  const CELLS = (title, framing, angle, rows, { guide = true, tall = false } = {}) => (L) => `Create a character pose sheet of THIS EXACT character, ${title}, on a pure green (#00FF00) background. Image 1 is the reference: it is the character to draw AND the art style.${guide ? ' Image 2 is a pose sheet of ANOTHER character (a man): use it ONLY as a guide for the angle, the framing and the size of the head; never draw him, copy nothing of his look (face, hair, body, clothes).' : ''} Every cell shows the character of image 1, exactly.
 
 LOCKED — must not change in any way, even slightly:
 ${L}
 
-Format: LANDSCAPE image, 3:2. An invisible grid of 6 equal SQUARE cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.
+${tall ? 'Format: PORTRAIT image, 2:3, at the highest resolution. An invisible grid of 6 equal tall cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.' : 'Format: LANDSCAPE image, 3:2, at the highest resolution. An invisible grid of 6 equal SQUARE cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.'}
 
-${GREEN} No furniture, no counter, no table, no chair drawn: only the character.
+${GREEN} Not white, not grey: green. No furniture, no counter, no table, no chair drawn: only the character.
 
 ${framing}
 
@@ -249,13 +251,13 @@ Do not exaggerate the poses. Subtle and natural, like the reference. Mouth close
   const LEAN_CUT = 'Framing, the same in all 6 cells: he leans on a counter or a ledge that is NOT drawn. It would hide everything below the top of his forearms, so cut the body with a straight horizontal line right under his forearms (the ledge\'s top edge), and that cut sits exactly on the bottom edge of the cell, at the same height in every cell. Nothing below the forearms. The head is the same size as in image 2 and at the same height in every cell. Clear margin of green above the head and on both sides (a hand never touches an edge). No text, no labels.';
   const LEAN_ANGLE = 'BODY ANGLE, the same in all 6 cells — the most important rule (like image 2): he faces the RIGHT side of the image, a SIDE VIEW turned only very slightly toward the camera (about 20 degrees), upper body leaning forward, both forearms resting on the invisible ledge in front of him. THE BODY IS IDENTICAL IN ALL 6 CELLS: only the head, the face and the hands change. "Toward the camera side" = his head turns a little toward the camera, to someone leaning next to him on that side: we see more of his face (never a full front view).';
   const KIT_SHEETS = {
-    debout: ['Debout (base)', 'Partout : écoute, sourire, surpris, fâché, blessé, et de dos quand il part.', ['style.webp'], CELLS('full body, standing', 'Framing, the same in all 6 cells: full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.', 'Angle, the same in cells 1 to 5: three-quarter view, turned slightly toward the right, like image 1. Camera at chest height. Cell 6 is the only exception (see it).', [
+    debout: ['Debout (base)', 'Partout : écoute, sourire, surpris, fâché, blessé, et de dos quand il part. Une seule image à joindre : ton perso.', [], CELLS('full body, standing', 'Framing, the same in all 6 cells: full body from head to feet, centered, same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell). No text, no labels, no props.', 'Angle, the same in cells 1 to 5: three-quarter view, turned slightly toward the right (we see his face well, the far shoulder a little behind), like image 1. Camera at chest height. Cell 6 is the only exception (see it).', [
       '1. Listening: standing still, neutral and attentive, arms relaxed.',
       '2. Warm smile: relaxed shoulders, a genuine warm smile, head slightly tilted.',
       '3. Surprised, exclaiming: eyebrows up, eyes wide, mouth open, shoulders up, one hand rising.',
       '4. Angry: brows low, jaw tight, fists at his sides, leaning forward a little.',
       '5. Hurt: head lowered, eyes down, shoulders dropped, arms close to the body.',
-      '6. Walking away, from behind: three-quarter back view, he turns his back to the camera and walks away toward the right, mid-step, arms swinging naturally.'])],
+      '6. Walking away, from behind: three-quarter back view, he turns his back to the camera and walks away toward the right, mid-step, arms swinging naturally.'], { guide: false, tall: true })],
     accoude: ['Accoudé (base)', 'Tout ce qui a un rebord : comptoir, table haute, clôture, pont, mur, table du conseil. Seuls la tête et les mains changent.', ['justin_comptoir_autre.webp'], CELLS('leaning on a ledge, seen almost from the side', LEAN_CUT, LEAN_ANGLE, [
       '1. Listening to the person next to him: head turned toward the camera side, eye contact, mouth closed, calm and attentive.',
       '2. A half smile at them: head turned toward the camera side, a crooked half-smile, warm playful eyes.',
@@ -314,9 +316,9 @@ Example:
       .replace(/the back of the tank top/g, 'the back of the top').replace(/the tank top/g, 'the top');
     }
     if (c.she) {   // the guide stays "his" (another character, a man): only the character's own he/his turn
-      const keep = 'copy nothing of his look';
-      t = t.replace(keep, '\u0000').replace(/\bhimself\b/g, 'herself').replace(/\bhim\b/g, 'her').replace(/\bhis\b/g, 'her').replace(/\bhe\b/g, 'she')
-        .replace(/\bHis\b/g, 'Her').replace(/\bHe\b/g, 'She').replace('\u0000', keep);
+      const keep = 'copy nothing of his look', keep2 = 'never draw him';
+      t = t.replace(keep, '\u0000').replace(keep2, '\u0001').replace(/\bhimself\b/g, 'herself').replace(/\bhim\b/g, 'her').replace(/\bhis\b/g, 'her').replace(/\bhe\b/g, 'she')
+        .replace(/\bHis\b/g, 'Her').replace(/\bHe\b/g, 'She').replace('\u0000', keep).replace('\u0001', keep2).replace('it is the character to draw', 'it is the character to draw (a woman)');
     }
     return t;
   }

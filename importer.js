@@ -35,10 +35,25 @@
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0, W, H);
     const px = cx.getImageData(0, 0, W, H), d = px.data, alpha = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) {   // green screen: how green against red and blue; the spill on the edges pulled back
-      const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], t = g - Math.max(r, b);
-      alpha[i] = g < 120 ? 1 : Math.min(1, Math.max(0, 1 - (t - 25) / 60));
-      if (alpha[i] < 0.98 && g > Math.max(r, b)) d[i * 4 + 1] = Math.max(r, b);
+    // the backdrop: the median of the 4 corners. Green: keyed by how green each pixel is. Anything else (a white or grey
+    // sheet the image model made anyway): the backdrop is what looks like it AND touches the edge, flooded inward, so a
+    // white top on a white sheet stays (it doesn't touch the edge)
+    const corner = (c) => { const v = []; for (const [ox, oy] of [[0, 0], [W - 6, 0], [0, H - 6], [W - 6, H - 6]]) for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) v.push(d[((oy + y) * W + ox + x) * 4 + c]); return median(v); };
+    const bg = [corner(0), corner(1), corner(2)];
+    if (bg[1] - Math.max(bg[0], bg[2]) > 60) {
+      for (let i = 0; i < W * H; i++) {   // green screen: how green against red and blue; the spill on the edges pulled back
+        const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], t = g - Math.max(r, b);
+        alpha[i] = g < 120 ? 1 : Math.min(1, Math.max(0, 1 - (t - 25) / 60));
+        if (alpha[i] < 0.98 && g > Math.max(r, b)) d[i * 4 + 1] = Math.max(r, b);
+      }
+    } else {
+      const near = (i) => Math.max(Math.abs(d[i * 4] - bg[0]), Math.abs(d[i * 4 + 1] - bg[1]), Math.abs(d[i * 4 + 2] - bg[2])) < 26;
+      alpha.fill(1); const st = [];
+      for (let x = 0; x < W; x++) st.push(x, (H - 1) * W + x);
+      for (let y = 0; y < H; y++) st.push(y * W, y * W + W - 1);
+      while (st.length) { const i = st.pop(); if (alpha[i] === 0 || !near(i)) continue; alpha[i] = 0; const x = i % W;
+        if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < W * (H - 1)) st.push(i + W); }
+      for (let i = W; i < W * (H - 1); i++) if (alpha[i] && (!alpha[i - 1] || !alpha[i + 1] || !alpha[i - W] || !alpha[i + W])) alpha[i] = 0.6;   // a soft edge
     }
     const out = [];
     for (let n = 0; n < 6; n++) {
