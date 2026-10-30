@@ -1567,8 +1567,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
-<script src="chars.js?v=20261030150000"></script>
-<script src="story.js?v=20261030200000"></script>
+<script src="chars.js?v=20261030210000"></script>
+<script src="story.js?v=20261030210000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
@@ -1583,7 +1583,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261030200000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="bank.js?v=20261030200000"></script>
+<script src="bank.js?v=20261030210000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1655,15 +1655,16 @@ function fit() {
 // a pose cut at the belt (SPRITES[sprite].half: unit = its sheet's px per full height, belt = where his pants start,
 // from the feet, in full heights; poses = [x of his waist, the row where his pants start, its own belt, its own unit])
 // sits on the full body's pants line, his waist on his x: sharper, from its own sheet, and only for a close shot on him
-// (frameOf stops the frame at the cut). Its own belt: sitting (low), or leaning on a bar (row = its bottom, the
-// forearms, belt = the counter's height)
+// (frameOf stops the frame at the cut). Its own belt: sitting (low), leaning on a bar (row = its bottom, the forearms,
+// belt = the counter's height), or a bust cut at mid-chest (row = its bottom, belt = where that cut falls: bust)
 const flipped = (a) => { const nat = FACE[spriteOf(a.id)][poseOf(a.id, a.shown)]; return !!(a.face && nat !== 'f' && a.face !== nat); };
 function box(a) {
   const sp = SPRITES[spriteOf(a.id)], name = poseOf(a.id, a.shown), k = a.h * (castOf(a.id).scale || 1);
   const hf = sp.half && sp.half.poses[name];
   if (hf) {
     const [w, h] = sp.poses[name], [ax, row, belt, unit] = hf, u = k / (unit || sp.half.unit);
-    return { w: w * u, h: h * u, left: a.x - (flipped(a) ? w - ax : ax) * u, top: a.feet - (belt ?? sp.half.belt) * k - row * u, half: true };
+    const b = belt ?? sp.half.belt;
+    return { w: w * u, h: h * u, left: a.x - (flipped(a) ? w - ax : ax) * u, top: a.feet - b * k - row * u, half: true, bust: b > 0.7 };
   }
   const p = sp.poses[name], ih = p[1] / sp.refH * k, w = p[0] / p[1] * ih;
   return { w, h: ih, left: a.x - w / 2, top: a.feet - ih };
@@ -1816,8 +1817,10 @@ function frameOf(c) {
     const cut = boxes.filter(({ b }) => b.half).map(({ b }) => b.top + b.h);
     // c.tight (a walk): the frame keeps his height and follows his waist, a swinging arm may leave it
     if (cut.length) {
-      camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), c.tight ? 0 : (right - left) * 1.08 / ASP()));
-      if (c.tight) {   // several: wide enough for their waists, with room for a head on each side
+      // busts (cut at mid-chest): the frame keeps the face, the shoulders may leave it
+      const narrow = c.tight || boxes.every(({ b }) => b.bust);
+      camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), narrow ? 0 : (right - left) * 1.08 / ASP()));
+      if (narrow) {   // several: wide enough for their waists, with room for a head on each side
         const xs = who.map((a) => a.x), span = Math.max(...xs) - Math.min(...xs);
         if (span) camH = Math.max(camH, (span + 0.2 * tall) / ASP());
         cx = (Math.min(...xs) + Math.max(...xs)) / 2;
