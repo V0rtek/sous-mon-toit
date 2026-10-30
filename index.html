@@ -1165,6 +1165,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
       <button type="button" id="t3d"><span class="art" style="--g:#6b3fa0"><img src="chars/amare/listen.webp" alt=""></span><b>3D</b></button>
       <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
+      <button type="button" id="roadBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/justin/thinking.webp" alt=""></span><b>Roadmap</b></button>
     </div>
   </div>
   <div id="bank" class="card menu" hidden>
@@ -1648,6 +1649,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031240000"></script>
+<script src="roadmap.js?v=20261031250000"></script>
 <script src="bank.js?v=20261031230000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -3587,6 +3589,7 @@ $('#fullDemo').onclick = (e) => { e.stopPropagation(); try { sessionStorage.setI
 const VIDEO_3D = 'AgJVAPk2yl0';   // youtu.be/AgJVAPk2yl0, the Unity version
 $('#t3d').onclick = (e) => { e.stopPropagation(); feat('3D'); show('#about3d'); };
 $('#bankBtn').onclick = (e) => { e.stopPropagation(); feat('Banque'); BANK_OPEN(); show('#bank'); };
+$('#roadBtn').onclick = (e) => { e.stopPropagation(); feat('Roadmap'); openNote(window.ROADMAP); };
 $('#watch3d').onclick = (e) => {
   e.stopPropagation();
   $('#yt').src = `https://www.youtube-nocookie.com/embed/${VIDEO_3D}?autoplay=1&playsinline=1&rel=0`;

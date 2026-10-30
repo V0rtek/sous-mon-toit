@@ -1,0 +1,27 @@
+// Plus › Roadmap (31/10): what's left to do for the Spark pitch, in order. A line goes away when it's done (Claude
+// removes it in the commit that does it). "- " = a step under the line above
+window.ROADMAP = { title: 'Roadmap', items: [
+  '1. Importer une feuille, sans Claude',
+  '- Nouveau perso : « Importer » sur chaque feuille, tu déposes l’image générée',
+  '- Le navigateur découpe les 6 cases et enlève le vert',
+  '- Il trouve tout seul la coupe (comptoir, ceinture), la taille, le visage',
+  '- Il nomme les poses d’après le type de feuille (les cases suivent toujours le même ordre)',
+  '- Aperçu des 6 poses, « Refaire » si une case est ratée',
+  '- Il pousse le perso dans le repo (ton jeton GitHub) : la télé et les autres téléphones le voient',
+  '2. Les objets qui marchent',
+  '- Objet posé : « pose un objet » met la pièce, la lettre, la clé sous ses doigts',
+  '- Objet en main (Prises) : un point de prise par pose, tiré du guide, ajustable d’un toucher à l’import',
+  '- Assis : une table et des chaises en avant-plan, des places assises',
+  '3. Les feuilles',
+  '- Prompts de la base : Debout, Accoudé',
+  '- Puis Assis et Prises, dans Nouveau perso',
+  '- Justin les fait en premier : ses feuilles deviennent les guides',
+  '4. Les poses des persos féminins',
+  '- Une 1re femme dans le style de Justin : ses feuilles deviennent le guide « Elle »',
+  '5. Les poses et les places dans la génération IA',
+  '- Le prompt reçoit le menu du décor (places, actions) et les poses que chaque perso a vraiment',
+  '- Les répliques générées disent la pose et la place, le moteur les joue',
+  '6. Plus tard',
+  '- Gros plans, Profil · Proche, Profil · Confrontation (la frappe : gifle si attitude féminine, poing sinon)',
+  '- Le mouvement : marche, course, s’arrête, se retourne',
+] };
