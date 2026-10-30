@@ -24,7 +24,10 @@ const ELF = { listen: 'r', surprised: 'r', thinking: 'r', explaining: 'r', angry
 const LION = { listen: 'r', surprised: 'r', thinking: 'r', explaining: 'r', angry: 'r', holding: 'r' };
 window.FACE = {
   justin: { listen: 'l', surprised: 'r', thinking: 'r', explaining: 'r', angry: 'r', holding: 'f',
-    phone_call: 'r', texting: 'f', phone_shock: 'f', punch: 'r', hit: 'f', ko: 'f' },
+    phone_call: 'r', texting: 'f', phone_shock: 'f', punch: 'r', hit: 'f', ko: 'f',
+    // from behind (30/10): far = into the distance, down, look = back over his shoulder, door = reaching for a door,
+    // fists = holding back anger, walk = walking away
+    back_far: 'r', back_down: 'r', back_look: 'r', back_door: 'r', back_fists: 'r', back_walk: 'f' },
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   ruby: ELF, melissa: ELF, isa_nuit: ELF, isa_or: ELF, isa_noir: ELF, candy: LION, amare: LION,
 };
@@ -302,7 +305,7 @@ window.STORY = [
 // menu gallery: every pose of each character, the picture it started from (src) and the sheet it was cut from (ref).
 // The recolors (recolor: their original) stay out of the gallery
 window.GALLERY = [
-  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action'] },
+  { sprite: 'justin', name: 'Justin', src: 'perso_justin', ref: ['urban', 'urban_action', 'urban_back'] },
   { sprite: 'ruby', name: 'Ruby', src: 'perso_ruby', ref: ['elf'] },
   { sprite: 'candy', name: 'Candy', src: 'perso_candy', ref: ['feline'] },
   { sprite: 'james', name: 'James', src: 'perso_james', ref: ['tv'] },
