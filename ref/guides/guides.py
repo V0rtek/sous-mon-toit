@@ -102,29 +102,36 @@ f.line([P(x1, 1.0, d0), P(x1, 1.0, d1)], fill=(60, 36, 22, 255), width=6)
 BAR_PEOPLE = [(-1.2, 'r', 4.0 + 0.8 * i) for i in range(4)]
 guides(d, 'BAR', ['Comptoir 1,05 m de haut (= leur ceinture), 55 cm de large, il file vers le fond', 'Les clients côte à côte = en profondeur, tous tournés vers la droite, 80 cm entre eux', 'Le dessus est derrière eux (leurs avant-bras posés dessus, la pose est coupée là)', 'Le côté et le bout du comptoir sont l’avant-plan : ils cachent leur ventre'], people=BAR_PEOPLE)
 scenes['g_bar'] = save('bar', bg, fg)
-print('bar people', [(round(P(x, 0, dd)[0]), round(P(x, 0, dd)[1]), round(HCH * D0 / dd)) for x, _, dd in BAR_PEOPLE])
 
-# 4 · the campfire: logs 45 cm high, a log 30 cm in front of each (foreground), the fire between them
+# 4 · the campfire: a long log runs into the depth on the left, they sit on it side by side (each 80 cm further), all
+# facing right, the fire on the right. A second, bigger log against their knees (55 cm) is the foreground: it hides
+# their legs, the poses are cut below the knees
 bg, d = base((54, 62, 44), (22, 26, 40)); grid(d)
 for x in range(-12, 13, 2):
   t = P(x, 0, 14); d.polygon([t, (t[0] - 60, HZ + 2), (t[0] + 60, HZ + 2)], fill=(18, 34, 26))   # far trees
 d.polygon([P(-12, 0, 14), P(12, 0, 14), P(12, 4, 14), P(-12, 4, 14)], fill=(20, 30, 26, 255))
-fx = X(1200, D0)
+box(d, -1.6, -1.2, 0, 0.45, 2.5, 9, (92, 60, 36, 255))   # the log they sit on
+FIRE = (0.0, 5.2)
 for k, col in ((0.6, (255, 120, 30)), (0.42, (255, 180, 60)), (0.25, (255, 235, 150))):
-  d.polygon([P(fx - k * 0.5, 0, D0), P(fx, k * 1.4, D0), P(fx + k * 0.5, 0, D0)], fill=col + (255,))
-d.ellipse(rr(P(fx - 0.5, 0.05, D0 - 0.2), P(fx + 0.5, -0.05, D0 + 0.2)), outline=(90, 90, 90), width=6)
+  d.polygon([P(FIRE[0] - k * 0.5, 0, FIRE[1]), P(FIRE[0], k * 1.4, FIRE[1]), P(FIRE[0] + k * 0.5, 0, FIRE[1])], fill=col + (255,))
+d.ellipse(rr(P(FIRE[0] - 0.6, 0, FIRE[1] - 0.6), P(FIRE[0] + 0.6, 0, FIRE[1] + 0.6)), outline=(90, 90, 90), width=6)
 fg = Image.new('RGBA', (W, H)); f = ImageDraw.Draw(fg)
-for x in (X(900, D0), X(1500, D0)):
-  f.rounded_rectangle(rr(P(x - 0.6, 0.5, D0 - 0.3), P(x + 0.6, 0, D0 - 0.3)), radius=30, fill=(92, 60, 36, 255), outline=(40, 24, 14, 255), width=6)
-guides(d, 'FEU DE CAMP', ['Assis sur des bûches de 45 cm : leur ceinture à 52 cm du sol', 'Une bûche de 50 cm, 30 cm devant chacun (avant-plan) : elle cache le bas', 'Le feu entre eux, au même plan, 1,2 m de large', 'Face à face : la même pose, retournée'], people=[(900, 'r'), (1500, 'l')])
+box(f, -1.05, -0.75, 0, 0.55, 2.5, 9, (110, 72, 44, 255), edge=(40, 24, 14, 255))   # the log against their knees
+FIRE_PEOPLE = [(-1.38, 'r', 4.0 + 0.8 * i) for i in range(4)]
+guides(d, 'FEU DE CAMP', ['Assis côte à côte = en profondeur, sur une bûche de 45 cm qui file vers le fond', 'Tous tournés vers la droite, 80 cm entre eux ; le feu à droite, à 5 m', 'Une bûche de 55 cm contre leurs genoux = l’avant-plan : elle cache leurs jambes', 'Leur ceinture à 52 cm du sol'], people=FIRE_PEOPLE)
 scenes['g_fire'] = save('feu', bg, fg)
 
-# 5 · the alley: two walls 1,9 m apart, receding to the vanishing point; each leans back on one, facing the other
+# 5 · the alley: they lean back on the left wall side by side (each 80 cm further), all facing the right wall, 1,9 m
+# across. Nothing hides their legs: in a wide shot they stand in their full-body pose
 bg, d = base(); grid(d, x0=-1, x1=1)
-xl, xr = X(1010, D0) - 0.18, X(1390, D0) + 0.18
-for (x, c) in ((xl, (92, 80, 74)), (xr, (84, 74, 70))):
-  d.polygon([P(x, 0, 2.2), P(x, 0, 30), P(x, 6, 30), P(x, 6, 2.2)], fill=c + (255,), outline=(0, 0, 0, 200))
-  for dd in range(3, 30, 2): d.line([P(x, 0, dd), P(x, 6, dd)], fill=(0, 0, 0, 60), width=2)
-guides(d, 'RUELLE · adossés', ['Deux murs à 1,9 m l’un de l’autre, ils filent vers le point rouge', 'Chacun dos à un mur, face à l’autre : la même pose, retournée', 'Joints du mur tous les 2 m', 'Grille au sol = 1 m'], people=[(1010, 'r'), (1390, 'l')])
+XL, XR = -1.48, 0.42
+d.polygon([P(XL, 0, 2.2), P(XL, 0, 30), P(XL, 6, 30), P(XL, 6, 2.2)], fill=(92, 80, 74, 255), outline=(0, 0, 0, 200))
+d.polygon([P(XR, 0, 2.2), P(XR, 0, 30), P(XR, 6, 30), P(XR, 6, 2.2)], fill=(84, 74, 70, 255), outline=(0, 0, 0, 200))
+for dd in range(3, 30, 2):
+  for x in (XL, XR): d.line([P(x, 0, dd), P(x, 6, dd)], fill=(0, 0, 0, 60), width=2)
+ALLEY_PEOPLE = [(-1.3, 'r', 4.0 + 0.8 * i) for i in range(4)]
+guides(d, 'RUELLE · adossés', ['Adossés côte à côte = en profondeur, dos au mur de gauche', 'Tous tournés vers le mur de droite, à 1,9 m ; 80 cm entre eux', 'Rien ne cache leurs jambes : en plan large, pose en pied', 'Joints du mur tous les 2 m, grille au sol = 1 m'], people=ALLEY_PEOPLE)
 scenes['g_alley'] = save('ruelle', bg, None)
+for n, pp in (('bar', BAR_PEOPLE), ('feu', FIRE_PEOPLE), ('ruelle', ALLEY_PEOPLE)):
+  print(n, [[round(P(x, 0, dd)[0]), round(P(x, 0, dd)[1]), round(HCH * D0 / dd)] for x, _, dd in pp])
 print(json.dumps({'HZ': HZ, 'F': F}))
