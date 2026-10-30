@@ -173,7 +173,7 @@ window.BANK = {
   // id: [title, why, the guide pictures in ref/ (after image 1 = the character), BANK.prompts index or a prompt of its own]
   const SHEETS = {
     photo: ['Son image', 'Sa photo + l’image de style : le perso en pied, dans le style du jeu. C’est l’image 1 de toutes ses feuilles.', ['style.webp'], (L) =>
-      `Create a full-body character illustration of the person in image 1 (a photo), in the exact art style of image 2. Image 2 is ONLY a style reference: copy its line, shading and colors, never its character.
+      `Create a full-body character illustration of the person in image 1 (a photo), in the exact art style of image 2. Image 2 is ONLY a style reference (a full body and a close-up of the face): copy its line, shading and colors, the way it draws a face, never its character.
 
 Keep the person recognizable: face shape, skin tone, eye color, hair (color, length, texture), facial hair, build. Outfit: what they wear in the photo, simplified to a few clear pieces, nothing green.${L ? `
 
