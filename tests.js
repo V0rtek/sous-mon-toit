@@ -232,6 +232,16 @@
     { cam: 'close', who: ['lily'] }, say('lily', 'sit_listen', 'Assieds-toi.'), say('lily', 'sit_lean', 'Marco garde l’argent sous le comptoir.'),
     say('lily', 'sit_back', 'Pourquoi je te ferais confiance ?'), say('lily', 'sit_head', 'J’en peux plus de cette ville.'),
     say('lily', 'sit_fist', 'Ce soir, on le reprend.'), say('lily', 'sit_rise', 'Minuit. Sois là.'),
+    { fade: 'out', ms: 500 },
+    // her Prises (empty hands): the game puts the mug, then the letter, where her hand is (until her sheet is imported,
+    // her closest pose plays and nothing is held)
+    { scene: 't_lily_bar', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'close', who: ['lily'] }, { fade: 'in', ms: 600 }, { caption: 'Lily · prises' }, { wait: 900 },
+    { hold: { lily: 'chope' } }, { say: 'lily', pose: 'hold_mouth', text: '…' },
+    { say: 'lily', pose: 'hold_raise', to: 'justin', text: 'À Marco. Qu’il dorme bien ce soir.' },
+    { hold: { lily: 'lettre' } }, { say: 'lily', pose: 'hold_front', text: '« Minuit, la cave. » C’est son écriture.' },
+    { say: 'lily', pose: 'hold_give', to: 'justin', text: 'Garde-la. Si je reviens pas.' },
+    { hold: { lily: null } }, { say: 'lily', pose: 'bar_slump', text: 'J’ai trop bu pour un plan pareil.' },
+    { say: 'lily', pose: 'bar_laugh', text: 'Ou pas assez !' },
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
   window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser, tlily };

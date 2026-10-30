@@ -60,13 +60,14 @@ window.BANK = {
 (() => {
   const $ = (s) => document.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   let tab = 'chars', playing = null;
-  const nameOf = (id) => ((window.GALLERY || []).find((g) => g.sprite === id) || {}).name || id;
+  const nameOf = (id) => ((window.GALLERY || []).find((g) => g.sprite === id) || {}).name || (window.CAST && CAST[id] && CAST[id].name) || id;
   const tabs = {
     chars() {
       // Nouveau perso on top (a tap opens its 4 steps), then every character we have
       const open = BANK.newCharIsOpen();
       return `<div class="ncTop${open ? ' open' : ''}"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b><em>${open ? '−' : 'les feuilles de poses, pas à pas'}</em></button>${open ? `<div class="ncIn">${BANK.newChar()}</div>` : ''}</div>`
-        + Object.entries(window.SPRITES || {}).map(([id, sp]) => {
+        // the newest imported first, then the others
+        + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
         return `<section class="bkChar"><h3>${esc(nameOf(id))} <small>${poses.length} poses</small></h3><div class="bkRow">${poses.map((p) =>
           `<button type="button" class="bkPose${half[p] ? ' cut' : ''}" data-img="chars/${id}/${p}.webp"><img loading="lazy" src="chars/${id}/${p}.webp" alt=""><span>${esc(p)}${half[p] ? '<i>coupée</i>' : ''}</span></button>`).join('')}</div></section>`;

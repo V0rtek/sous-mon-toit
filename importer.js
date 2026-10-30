@@ -134,7 +134,9 @@
   }
 
   // what an imported character is in the engine: its poses' sizes and cuts, which way they face, where their files are
+  window.IMPORTED = window.IMPORTED || [];   // the imported characters, in the order they came (the Banque shows the newest first)
   function apply(id, data, urls) {
+    IMPORTED = [...IMPORTED.filter((x) => x !== id), id];
     const sp = SPRITES[id] = SPRITES[id] || { refH: data.refH || 700, poses: {} };
     if (data.refH) sp.refH = data.refH;
     Object.assign(sp.poses, data.poses);
