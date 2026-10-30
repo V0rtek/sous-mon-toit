@@ -85,7 +85,10 @@ window.ACT = (() => {
 
   // the acts kept on this phone (smt-acts: every act, the one open); a pasted act is a new one
   const KEY = 'smt-acts';
-  const fix = (a) => (a && a.a && a.b && Array.isArray(a.episodes) ? { done: {}, picks: {}, setups: [], ...a, v: 1 } : EX());
+  const low = (x) => (typeof x === 'string' ? x.trim().toLowerCase() : x);
+  const fix = (a) => { if (!(a && a.a && a.b && Array.isArray(a.episodes))) return EX();
+    a = { done: {}, picks: {}, setups: [], ...a, v: 1 }; a.scene = low(a.scene); a.a.id = low(a.a.id); a.b.id = low(a.b.id);   // "Taverne" -> "taverne"
+    if (a.secret) a.secret.who = low(a.secret.who); return a; };
   const store = (() => { try { const k = JSON.parse(localStorage.getItem(KEY)); if (k && Array.isArray(k.list) && k.list.length) return { cur: Math.min(k.cur || 0, k.list.length - 1), list: k.list.map(fix) }; } catch { /* none yet */ }
     return { cur: 0, list: [EX()] }; })();
   let A = store.list[store.cur], el = null;
@@ -191,7 +194,7 @@ window.ACT = (() => {
   // ---- the act's prompt: an idea (optional) + the two people drawn -> the act, as JSON. A basic model fills the arc,
   // it never builds one: every field is one concrete sentence ----
   let pair = PAIRS[Math.floor(Math.random() * PAIRS.length)];
-  const promptAct = (idea, [ra, rb]) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in the language of the idea (no idea: French).
+  const promptAct = (idea, [ra, rb]) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in French, unless the idea is written in another language (then in that language).
 Reply with ONE JSON object and nothing else (its shape is at the end).
 
 THE ARC (always this one: you fill it, you never change it)
@@ -255,7 +258,7 @@ The idea: ${idea || '(none: invent it from the two people)'}`;
         case 'other': { let p; do p = PAIRS[Math.floor(Math.random() * PAIRS.length)]; while (p === pair); pair = p; openPrompt(); return; }
         case 'copy': copy(promptAct(s.querySelector('[data-f="idea"]').value.trim(), pair), a); return;
         case 'paste': { const v = s.querySelector('[data-f="act"]').value; let j;
-          try { j = JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1)); } catch { msg.textContent = 'Ce n’est pas un acte (JSON).'; return; }
+          try { j = LOOSE_JSON(v); } catch { msg.textContent = 'Ce n’est pas un acte (JSON).'; return; }
           if (!j.a || !j.b || !Array.isArray(j.episodes)) { msg.textContent = 'Il manque A, B ou les épisodes.'; return; }
           const m = missing(j); store.list.push(fix({ ...j, done: {}, picks: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save(); closeSheet(); render();
           note(m.length ? `Ouvert. Il manque : ${m.join(', ')}` : 'Ouvert.'); return; }
@@ -285,8 +288,8 @@ The idea: ${idea || '(none: invent it from the two people)'}`;
     const next = n < 5 ? ARC[n].items(A).filter(([k, , , v]) => v && ['easy', 'worse', 'out', 'flip', 'clock', 'aa', 'ba', 'cost'].includes(k)).map(([, , en, v]) => `${en}: ${v}`).join(' / ') : '';
     return `THE ACT (5 episodes, always the same arc: justin is caught between two people he cares about; giving one what they ask hurts the other; a secret changes what he believed; in episode 4 he must choose)
 Scene: "${A.scene}". The question the act argues (never said as a moral): ${A.question}
-- ${nm(A, 'a')} (id "${A.a.id}"): ${A.a.is}. Wants: ${A.a.wants}
-- ${nm(A, 'b')} (id "${A.b.id}"): ${A.b.is}. Wants: ${A.b.wants}
+- ${nm(A, 'a')} (id "${A.a.id}"): ${dot(A.a.is)} Wants: ${A.a.wants}
+- ${nm(A, 'b')} (id "${A.b.id}"): ${dot(A.b.is)} Wants: ${A.b.wants}
 - justin wants: ${A.justin_wants}
 - The secret of ${holder(A)}: ${dot(A.secret && A.secret.what)} ${sec}
 ${n > 1 ? `BEFORE THIS EPISODE (the player saw it):\n${before(n)}\n` : ''}THIS EPISODE: episode ${n} of 5, step "${st.name}" (${st.line}): ${arc.en}. Only ${nm(A, 'a')}, ${nm(A, 'b')} and justin in "characters" (another character of the decor only if the episode needs them).

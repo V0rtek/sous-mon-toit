@@ -5,6 +5,15 @@
 // at once), its technique, what happens, the infos it reveals; a choice also has its options (attitudes, not lines).
 // Orange = a link: a setup to what it sets off (a "raise stakes" to its choice, a callback, a choice or an event later).
 // On top, the turn and the infos to expose: each one says where it comes out, or that it hasn't yet. Kept on this phone ----
+// a JSON answer pasted from a chat: from its first { to its last }; a chat that copies as Markdown escapes [ ] _ * with a
+// backslash (\[), which JSON refuses: those backslashes go (JSON's own escapes stay), then curly quotes as a last try
+window.LOOSE_JSON = (v) => {
+  const t = String(v || ''), j = t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1);
+  for (const f of [(x) => x, (x) => x.replace(/\\(?!["\\/bfnrtu])/g, ''), (x) => x.replace(/\\(?!["\\/bfnrtu])/g, '').replace(/[“”]/g, '"')]) {
+    try { return JSON.parse(f(j)); } catch { /* the next try */ }
+  }
+  throw new Error('JSON');
+};
 window.PLAN = (() => {
   const GOALS = [
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
@@ -374,7 +383,7 @@ window.PLAN = (() => {
         case 'example': openPlan(LC()); break;
         case 'copy': copy(JSON.stringify(P), a); return;
         case 'paste': { const v = s.querySelector('textarea').value;
-          try { const j = JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1)); if (!Array.isArray(j.boxes)) throw 0; openPlan(fix(j)); }
+          try { const j = LOOSE_JSON(v); if (!Array.isArray(j.boxes)) throw 0; openPlan(fix(j)); }
           catch { s.querySelector('.pMsg').textContent = 'Ce n’est pas un plan.'; return; } break; }
       }
       s.oninput = onInput; closeSheet(); render();
@@ -408,7 +417,7 @@ window.PLAN = (() => {
         case 'p2': copy(prompt2(), a); return;
         case 'plans': s.oninput = onInput; openPlans(); return;
         case 'play': { const v = s.querySelector('[data-f="story"]').value;
-          try { const j = JSON.parse(v.slice(v.indexOf('{'), v.lastIndexOf('}') + 1)); window.PLAN_PLAY(j, P.title); closeSheet(); }
+          try { const j = LOOSE_JSON(v); window.PLAN_PLAY(j, P.title); closeSheet(); }
           catch (err) { msg.textContent = err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'; } return; }
       }
       s.oninput = onInput; closeSheet(); render();
