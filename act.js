@@ -20,58 +20,58 @@ window.ACT = (() => {
   // same for the prompts. The flat examples come from the act "The Empty Place" (30/10), which didn't work ----
   const AT = {
     visible: { n: 'Ce que l’écran montre', how: 'Le joueur ne voit que le décor, les persos, leurs poses et les répliques. Rien d’autre n’existe : pas de geste qu’on ne voit pas (compter les lumières, jouer avec une pièce), pas d’objet qui n’est pas dans le décor (une caisse). Si une chose compte, une réplique dit clairement ce que c’est, dès la première fois.',
-      ex: ['Il compte les lumières du plafond. / Il fait tourner une pièce. / Où est la caisse ?', '« Trois ans que t’es pas venue ici. » (ce qui compte est dit, rien à voir de plus)'],
+      ex: ['Il compte les lumières du plafond. / Il fait tourner une pièce. / Où est la caisse ?', '« T’as vendu le bateau de papa sans me demander. » (ce qui compte est dit, rien à voir de plus)'],
       en: 'The player only sees the decor, the characters, their poses and the lines. Nothing else exists: no gesture the screen does not show (counting the lights, flipping a coin), no object that is not in the decor (a crate). If something matters, a line says plainly what it is, the first time it comes up.',
-      enEx: ['He counts the lights on the ceiling. / He flips a coin. / Where is the crate?', '"Three years since you set foot in here." (what matters is said, nothing else to see)'] },
+      enEx: ['He counts the lights on the ceiling. / He flips a coin. / Where is the crate?', '"You sold Dad\'s boat without asking me." (what matters is said, nothing else to see)'] },
     because: { n: 'Vouloir + raison', how: 'Chaque perso veut une chose qu’il demande à voix haute, et finit la phrase « parce qu’il croit que… ». Sans raison, c’est le scénario qui veut, pas lui.',
-      ex: ['Candy veut empêcher Melissa d’emmener sa sœur.', 'Candy veut que Justin dise non à Melissa, parce qu’elle croit que Melissa l’abandonnera lui aussi, comme elle est partie il y a trois ans.'],
+      ex: ['Nora veut empêcher Leo de partir.', 'Nora veut que Justin rate l’audition, parce qu’elle croit que le groupe meurt le jour où il devient connu.'],
       en: 'Each one wants something they ask justin for out loud, and finishes the sentence "because they believe that...". A want without a reason is the script wanting, not them.',
-      enEx: ['Candy wants to stop Melissa taking her sister.', 'Candy wants justin to say no to Melissa, because she believes Melissa will leave him too, like she left three years ago.'] },
+      enEx: ['Nora wants to stop Leo leaving.', 'Nora wants justin to skip the audition, because she believes the band dies the day he gets famous.'] },
     here: { n: 'Ici et maintenant', how: 'L’enjeu se joue entre les gens à l’écran, ce soir. Pas d’institution, pas de personnage clé qu’on ne voit jamais. Un absent n’est qu’une raison d’agir, jamais celui qui agit.',
-      ex: ['La sœur (jamais vue), le conseil de la ville, la porte de l’est.', 'Melissa demande à Justin de partir avec elle demain matin. Candy est assise à côté.'],
+      ex: ['La sœur (jamais vue), le conseil de la ville, la porte de l’est.', 'Leo demande à Justin de le couvrir ce soir. Son patron est à la table d’à côté.'],
       en: 'What is at stake is between the people on screen, tonight. No institution, no key character we never see. Someone absent can only be a reason to act, never the one who acts.',
-      enEx: ['The sister (never seen), the city council, the eastern gate.', 'Melissa asks justin to leave with her tomorrow morning. Candy is sitting right there.'] },
+      enEx: ['The sister (never seen), the city council, the eastern gate.', 'Leo asks justin to cover for him tonight. His boss is at the next table.'] },
     danger: { n: 'Danger présent', how: 'Ce qui peut être perdu se voit dans la scène : quelqu’un qui part, un lien qui casse devant témoins, une vérité qui va sortir. On le voit, pas besoin de l’expliquer.',
-      ex: ['Faire sortir la sœur de la ville (fuir quoi ?).', 'Melissa : « Je pars demain matin. Avec toi ou sans toi. Et je reviendrai pas. »'],
+      ex: ['Faire sortir la sœur de la ville (fuir quoi ?).', 'Sam : « Signe le bail avec moi ce soir, ou je donne la chambre à Théo. »'],
       en: 'What can be lost is visible in the scene: someone leaving, a bond breaking in front of others, a truth about to come out. We see it, nobody has to explain it.',
-      enEx: ['Get the sister out of the city (escape what?).', 'Melissa: "I leave tomorrow morning. With you or without you. And I\'m not coming back."'] },
+      enEx: ['Get the sister out of the city (escape what?).', 'Sam: "Sign the lease with me tonight, or the room goes to Theo."'] },
     past: { n: 'Le passé en une phrase', how: 'Le passé tient en une phrase, encore vraie aujourd’hui. Pas de chaîne d’événements anciens : un passé de deux phrases ne rentre pas dans un épisode de 24 répliques.',
-      ex: ['Il y a trois ans, Melissa a fait fuir sa sœur avec l’aide de Candy, qui l’a laissée porter le blâme, et la sœur l’a découvert…', 'Il y a trois ans, Melissa est partie sans dire au revoir à Justin.'],
+      ex: ['L’été dernier, Leo a aidé son cousin à fuir avec l’aide de Nora, qui l’a laissé porter le blâme, et le cousin l’a découvert…', 'L’hiver dernier, Justin a pris le blâme pour l’accident de son frère.'],
       en: 'The past fits in ONE sentence, still true today. No chain of old events: a past that needs two sentences does not fit in a 24-line episode.',
-      enEx: ['Three years ago Melissa helped her sister escape with Candy\'s help, Candy let her take the blame, and the sister found out...', 'Three years ago, Melissa left without saying goodbye to justin.'] },
+      enEx: ['Last summer Leo helped his cousin run away with Nora\'s help, Nora let him take the blame, and the cousin found out...', 'Last winter, justin took the blame for his brother\'s crash.'] },
     secret: { n: 'Un secret qui explique un geste', how: 'Le secret appartient à celui qu’il explique. Avant la révélation, ce perso fait déjà une chose étrange qu’on voit ; après, ce geste a un sens.',
-      ex: ['Le secret « de Melissa » raconte ce que Candy a fait.', 'Candy a gardé la lettre d’adieu que Melissa avait laissée pour Justin. Avant, chaque fois qu’on parle du départ, elle change de sujet.'],
+      ex: ['Le secret « de Leo » raconte ce que Nora a fait.', 'Nora a envoyé le courriel qui a fait renvoyer Justin. Avant, c’est elle qui lui répète d’oublier cette job.'],
       en: 'The secret belongs to the person it explains. Before it comes out, that person already does something odd that we see; after, that gesture makes sense.',
-      enEx: ['"Melissa\'s" secret tells what Candy did.', 'Candy read the goodbye letter Melissa left for justin, and kept it. Before, she changes the subject every time someone mentions the day Melissa left.'] },
+      enEx: ['"Leo\'s" secret tells what Nora did.', 'Nora sent the email that got justin fired. Before, she is the one who keeps telling him to forget that job.'] },
     plant: { n: 'Un plant qui se voit', how: 'Le plant est dans une réplique : un mot, un geste nommé, un objet tenu. Il passe pour autre chose (une blague, une habitude), puis le secret lui donne son sens. Rien à remarquer en silence : le jeu n’a que des répliques.',
-      ex: ['Candy pose trois tasses pour deux.', 'Candy : « Moi, je garde tout. Même ce qu’on m’a jamais donné. » (dit en riant, comme une blague)'],
+      ex: ['Nora pose trois tasses pour deux.', 'Nora : « Les mots de passe, c’est ma spécialité. Demande à n’importe qui. » (dit en riant, comme une blague)'],
       en: 'A plant is in a line: a word, a gesture someone names, an object someone holds. It passes for something else (a joke, a habit); the secret later gives it its meaning. Nothing to notice in silence: the game only has lines.',
-      enEx: ['Candy sets three cups for two.', 'Candy: "I keep everything. Even what nobody ever gave me." (said laughing, like a joke)'] },
+      enEx: ['Nora sets three cups for two.', 'Nora: "Passwords are my thing. Ask anyone." (said laughing, like a joke)'] },
     easy: { n: 'Effort minimal, échec qui empire', how: 'Justin tente ce que n’importe qui ferait d’abord : un petit mensonge, gagner du temps. Ça casse devant la personne qu’il voulait protéger, et ça la blesse plus que la vérité.',
-      ex: ['Il promet à l’une la porte, à l’autre l’audience.', 'Il dit à Candy qu’il n’a pas revu Melissa. Melissa arrive : « Merci pour hier soir. »'],
+      ex: ['Il promet à l’une la porte, à l’autre l’audience.', 'Il dit à Nora qu’il a refusé l’audition. Le metteur en scène l’appelle : « À lundi, Justin. »'],
       en: 'justin tries what anyone would try first: a small lie, buying time. It breaks in front of the person he wanted to protect, and hurts them more than the truth would have.',
-      enEx: ['He promises one the gate and the other the hearing.', 'He tells Candy he hasn\'t seen Melissa. Melissa walks in: "Thanks for last night."'] },
+      enEx: ['He promises one the gate and the other the hearing.', 'He tells Nora he turned the audition down. The director calls: "See you Monday, justin."'] },
     same: { n: 'Le même moment, deux demandes', how: 'A et B demandent la même chose précise au même moment : il ne peut physiquement pas faire les deux. Chaque côté a une raison qu’on comprend.',
-      ex: ['Porte de l’est à 6 h contre audience à 6 h (deux absents de plus).', 'Demain 7 h : Melissa part, elle l’attend à la porte. Candy : « Si tu pars avec elle, ne reviens pas. »'],
+      ex: ['Porte de l’est à 6 h contre audience à 6 h (deux absents de plus).', 'Samedi midi : il est le témoin au mariage de Leo. Sam prend l’avion à la même heure : « Viens, ou rappelle-moi plus. »'],
       en: 'A and B ask for the same precise moment: he physically cannot do both. Each side has a reason we understand.',
-      enEx: ['The eastern gate at six against the hearing at six (two more absent things).', 'Tomorrow at 7: Melissa leaves and waits for him at the door. Candy: "If you leave with her, don\'t come back."'] },
+      enEx: ['The eastern gate at six against the hearing at six (two more absent things).', 'Saturday noon: he is the best man at Leo\'s wedding. Sam flies out the same hour: "Come, or stop calling me."'] },
   };
   AT.loop = { n: 'Une question ouverte', how: 'L’épisode ouvre une question que le joueur veut voir répondue, et ne la ferme pas. La plus forte : deux persos à l’écran ne racontent pas le même passé. Personne n’explique, quelqu’un change de sujet : le joueur reste avec la question. Un choix n’est pas une accroche (ce que Justin répond, le joueur le décide lui-même) ; un passé raconté puis fermé non plus.',
-    ex: ['Melissa : « Il y a trois ans, je suis partie sans adieu. » (dit, expliqué, fermé : plus rien à savoir)', 'Justin : « T’es partie sans un mot. » Melissa : « Sans un mot ? Je t’ai écrit. » Candy : « Qui veut un verre ? »'],
+    ex: ['Leo : « Je suis pas venu à l’hôpital, j’avais peur. » (dit, expliqué, fermé : plus rien à savoir)', 'Justin : « T’es jamais venu à l’hôpital. » Leo : « J’y étais chaque soir. On m’a dit que tu voulais voir personne. » Nora : « Qui veut un verre ? »'],
     en: 'The episode opens a question the player wants answered, and does not close it. The strongest: two people on screen do not tell the same past. Nobody explains, someone changes the subject: the player is left with the question. A choice is not a hook (what justin answers, the player decides himself); a past told and closed is not one either.',
-    enEx: ['Melissa: "Three years ago, I left without saying goodbye." (said, explained, closed: nothing left to know)', 'justin: "You left without a word." Melissa: "Without a word? I wrote to you." Candy: "Who wants a drink?"'] };
+    enEx: ['Leo: "I didn\'t come to the hospital, I was scared." (said, explained, closed: nothing left to know)', 'justin: "You never came to the hospital." Leo: "I was there every night. They said you didn\'t want visitors." Nora: "Who wants a drink?"'] };
   AT.first = { n: 'La 1re réplique', how: 'Elle se comprend seule, sans rien savoir : un conflit, une surprise ou un aveu entre deux persos à l’écran, ici, maintenant. Le joueur se demande « pourquoi ? » ou « et alors ? ». Jamais une ambiance, une salutation, ni une chose qu’on ne voit pas.',
-    ex: ['« La septième lumière porte chance ! » (de quoi elle parle ?) / « Belle soirée, hein ? »', 'Candy : « Si elle s’assoit à cette table, moi je me lève. » / « Trois ans. Et tu reviens le soir où j’allais enfin bien. »'],
+    ex: ['« La septième lumière porte chance ! » (de quoi elle parle ?) / « Belle soirée, hein ? »', 'Nora : « S’il s’assoit à cette table, moi je me lève. » / « Tu m’as gardé ma place. Même après ce que j’ai fait ? »'],
     en: 'It is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen, here, now. The player asks "why?" or "and then?". Never a mood, a greeting, or something the screen does not show.',
-    enEx: ['"The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?"', 'Candy: "If she sits at this table, I\'m leaving it." / "Three years. And you come back the night I was finally okay."'] };
+    enEx: ['"The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?"', 'Nora: "If he sits at this table, I\'m leaving it." / "You kept my seat. Even after what I did?"'] };
   AT.want = { n: 'Un rêve à lui', how: 'Justin veut une chose pour lui, depuis longtemps, avec sa raison : un rêve personnel qu’on comprend (partir, être libre, être reconnu, aimer quelqu’un). Pas « ce soir », pas pour quelqu’un d’autre. Il le dit lui-même, à voix haute, à quelqu’un à l’écran, avant la demande de A ; quelqu’un réagit (une blague, un doute). Puis la demande de A tombe dessus : dire oui l’en rapproche et blesse B, dire non l’en éloigne. Le choix lui coûte à lui, pas seulement aux autres.',
-    ex: ['Justin veut passer une soirée tranquille avec elles. (ce soir, rien à poursuivre) / Justin veut être heureux.', 'Justin : « Un jour je pars d’ici. Je veux voir la mer avant mes trente ans. » Candy : « Tu dis ça chaque année. » (il rêve d’être libre ; Candy le retient sans le savoir ; Melissa lui offre de partir)'],
+    ex: ['Justin veut passer une soirée tranquille avec elles. (ce soir, rien à poursuivre) / Justin veut être heureux.', 'Justin : « Un jour je joue sur une vraie scène. Pas dans ce bar. » Leo : « Tu dis ça chaque année. » (il rêve d’être entendu ; Leo a besoin de lui au bar ; Sam lui offre la scène)'],
     en: 'justin wants something for himself, for a long time, with its reason: a personal dream anyone understands (to leave, to be free, to be recognized, to love someone). Not "tonight", not for someone else. He says it himself, out loud, to someone on screen, BEFORE A asks; someone reacts (a joke, a doubt). Then A\'s request lands on it: yes brings him closer and hurts B, no takes it away. The choice costs HIM, not only the others.',
-    enEx: ['justin wants a quiet evening with them. (tonight, nothing to chase) / justin wants to be happy.', 'justin: "One day I\'m leaving this city. I want to see the sea before I\'m thirty." Candy: "You say that every year." (he dreams of being free; Candy holds him back without knowing it; Melissa offers him the way out)'] };
+    enEx: ['justin wants a quiet evening with them. (tonight, nothing to chase) / justin wants to be happy.', 'justin: "One day I\'ll play a real stage. Not this bar." Leo: "You say that every year." (he dreams of being heard; Leo needs him at the bar; Sam offers him the stage)'] };
   AT.hook = { n: 'La fin qui promet', how: 'La dernière réplique annonce une suite précise qu’on veut voir : qui, quand, où, et ce qui va s’y jouer. Ou une surprise, ou une nouvelle question. Jamais la question du choix qu’on vient de faire, reposée ; jamais vague.',
-    ex: ['« Ne promets rien que tu ne peux tenir. » (le choix, reposé) / « Il y aura des conséquences. » (vague)', '« On se voit au championnat ce soir. On va avoir une petite discussion. » / Candy : « Demain, 7 h, à cette table. Toi et moi, on va se parler. »'],
+    ex: ['« Ne promets rien que tu ne peux tenir. » (le choix, reposé) / « Il y aura des conséquences. » (vague)', '« On se voit au championnat ce soir. On va avoir une petite discussion. » / Leo : « Samedi, après le match. Tu le dis à papa, ou c’est moi. »'],
     en: 'The last line announces a precise next moment the player wants to see: who, when, where, and what will be settled there. Or a surprise, or a new question. Never the question of the choice just made, asked again; never vague.',
-    enEx: ['"Don\'t promise what you can\'t keep." (the choice, asked again) / "There will be consequences." (vague)', '"See you at the championship tonight. We\'re gonna have a little talk." / Candy: "Tomorrow, 7 a.m., this table. You and me, we talk."'] };
+    enEx: ['"Don\'t promise what you can\'t keep." (the choice, asked again) / "There will be consequences." (vague)', '"See you at the championship tonight. We\'re gonna have a little talk." / Leo: "Saturday, after the game. You tell Dad, or I will."'] };
   const atLine = (id) => `- ${AT[id].n}: ${AT[id].en} Flat: "${AT[id].enEx[0]}" -> works: "${AT[id].enEx[1]}"`;
 
   // the two people, drawn for the act's prompt ("Autre" draws again): who they are to justin, never a job
@@ -334,7 +334,7 @@ justin is caught between two people he cares about, A and B. A asks him for some
 
 THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit, gender included: a father or a brother is a man (james, amare), a mother or a sister is a woman. If no decor has both, keep the closest relation that fits (his father becomes his mother) and write it in "is". Use the character's real gender everywhere (he/she).
 
-THE ACT'S TECHNIQUES (each field below says which one does it; follow them):
+THE ACT'S TECHNIQUES (each field below says which one does it; follow them). Their examples come from OTHER stories: take the shape, never their people, events, objects or durations (no hospital, no lease, no audition, no "three years ago", no letter, no one leaving at sunrise). Invent from the idea and the two people:
 ${Object.keys(AT).map(atLine).join('\n')}
 
 FILL IN (each one sentence, concrete: something you could film or say out loud, never a feeling alone):
