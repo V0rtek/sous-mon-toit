@@ -1456,8 +1456,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </div>
 
 <div id="tvSides"><div class="tv-side l"></div><div class="tv-side r"></div></div>
-<script src="chars.js?v=20261028143259"></script>
-<script src="story.js?v=20261030060000"></script>
+<script src="chars.js?v=20261030120000"></script>
+<script src="story.js?v=20261030120000"></script>
 <script src="play.js?v=20261028143259"></script>
 <script src="bar.js?v=20261028143259"></script>
 <script src="games.js?v=20261028143259"></script>
@@ -1568,51 +1568,70 @@ function enter(id, pose) {
 function exit(id) { if (actors[id]) { actors[id].el.remove(); delete actors[id]; } }
 // the new pose's picture is decoded off screen, then replaces the old one and resizes the box in the same frame
 // (swapping the src of the picture on screen showed him empty for a frame, or the old pose stretched to the new size)
+// a pose cut at the belt shows only in a shot on him that isn't wide; anywhere else he stands in its full-body
+// stand-in (SPRITES[sprite].half.full), and gets it back when the camera comes back on him (applyCam)
+function shownFor(a, c) {
+  const full = ((SPRITES[spriteOf(a.id)].half || {}).full || {})[poseOf(a.id, a.pose)];
+  return full && !(c && c.size !== 'wide' && (c.who || []).includes(a.id)) ? full : a.pose;
+}
+function show(a, pose) {
+  if (a.shown === pose) return;
+  const img = new Image(); img.alt = ''; img.src = poseSrc(a.id, pose);
+  const swap = () => { if (a.shown === pose && actors[a.id] === a) { a.el.replaceChild(img, a.el.firstChild); placeActor(a); } };
+  a.shown = pose; img.decode().then(swap, swap);
+}
 function setPose(id, pose) {
   const a = actors[id]; if (!a || a.pose === pose) return;
   a.pose = pose;
-  const img = new Image(); img.alt = ''; img.src = poseSrc(id, pose);
+  const want = shownFor(a, camNow), img = new Image(); img.alt = ''; img.src = poseSrc(id, want);
   const swap = () => {
     if (a.pose !== pose || actors[id] !== a) return;   // a newer pose came first, or he left the scene
     const phone = PHONE_POSES.includes(a.shown) !== PHONE_POSES.includes(pose);
-    a.el.replaceChild(img, a.el.firstChild); a.shown = pose; placeActor(a);
+    a.el.replaceChild(img, a.el.firstChild); a.shown = want; placeActor(a);
     if (phone) drawTexts();   // he took his phone out, or put it away: his texts come or go
   };
   img.decode().then(swap, swap);
 }
 function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) { actors[id].face = d; placeActor(actors[id]); } }
-// {walk: id | [ids], to: x in decor px | someone | a spot, ms}: they walk there in profile, cut at the belt (side_walk_a
-// / _b, a step every 300 ms with side_listen between them, a small bob), the close shot following them; then side_listen.
-// glide: true = no steps, side_listen the whole way, the bob and a slight sway of the shoulders. Together: the first one
-// goes to "to", the others keep their distance to him, out of step. A sprite without the walk just slides.
-// The frame stops at their belt, so the same walk works on stairs or on any floor
+// {walk: id | [ids], to, ms}: they walk there in profile, cut at the belt (side_walk_a, side_listen, side_walk_b,
+// side_listen, a small bob), the close shot following them; then side_listen. to = x in decor px, someone, a spot, or
+// [x, feet, height]: a spot or a [x, feet, height] also moves the feet and the size (stairs: up and away from the camera).
+// The steps follow the ground covered (a stride = 0.36 of his height), so they slow down with him; without ms, he walks
+// at 0.6 of his height a second. glide: true = no steps, side_listen the whole way, the bob and a slight sway of the
+// shoulders. Together: the first one goes to "to", the others side by side with him, out of step. A sprite without the
+// walk just slides. The frame stops at their belt, so the same walk works on stairs or on any floor
 async function walk(ids, to, ms, r, glide) {
   const who = [].concat(ids).map((id) => actors[id]).filter(Boolean); if (!who.length) return;
-  const lead = who[0], x0 = lead.x, x1 = typeof to === 'number' ? to : actors[to] ? actors[to].x : (sc.spots[to] || [x0])[0];
+  const lead = who[0], x0 = lead.x;
+  const end = Array.isArray(to) ? to : typeof to === 'number' ? [to] : actors[to] ? [actors[to].x] : sc.spots[to] || [x0];
+  const x1 = end[0], f1 = end[1] ?? lead.feet, h1 = end[2] ?? lead.h;
   // together = side by side: the others a step further from the camera (a bit higher, a bit smaller, behind him), a
   // little ahead so each face shows; they get there in the first steps
   const dir = x1 >= x0 ? 1 : -1;
   const go = who.map((a, k) => {
     const has = SPRITES[spriteOf(a.id)].poses, cycle = has.side_listen && (glide || (has.side_walk_a && has.side_walk_b));
     const imgs = cycle ? (glide ? ['side_listen', 'side_listen', 'side_listen'] : ['side_walk_a', 'side_walk_b', 'side_listen']).map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(a.id, p); return [p, i]; }) : [];
-    const to = k ? { x: dir * 0.1 * lead.h * k, feet: lead.feet - 0.035 * lead.h * k, h: lead.h * 0.96 ** k } : { x: 0, feet: a.feet, h: a.h };
-    return { a, from: { x: a.x - x0, feet: a.feet, h: a.h }, to, cycle, imgs };
+    const off = k ? { x: dir * 0.1 * k, feet: -0.035 * k, h: 0.96 ** k } : { x: 0, feet: 0, h: 1 };   // in his heights
+    const was = { x: (a.x - x0) / lead.h, feet: (a.feet - lead.feet) / lead.h, h: a.h / lead.h };
+    return { a, was, off, cycle, imgs, phase: k * 0.5, px: a.x, pf: a.feet };   // out of step with the one before
   });
   await Promise.all(go.flatMap((g) => g.imgs.map(([, i]) => i.decode().catch(() => {}))));
   if (x1 !== x0) for (const { a } of go) a.face = x1 > x0 ? 'r' : 'l';
-  const ids_ = who.map((a) => a.id), t0 = performance.now(), dur = FAST ? 0 : ms;
+  const f0 = lead.feet, h0 = lead.h, dist = Math.hypot(x1 - x0, f1 - f0);
+  const ids_ = who.map((a) => a.id), t0 = performance.now(), dur = FAST ? 0 : ms || dist / (0.6 * (h0 + h1) / 2) * 1000;
   for (;;) {
     const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);   // eases in and out
     const side = Math.min(1, t * 3), sd = 1 - (1 - side) ** 2;
-    go.forEach(({ a, from, to, cycle, imgs }, k) => {
-      a.x = x0 + (x1 - x0) * e + from.x + (to.x - from.x) * sd;
-      a.feet = from.feet + (to.feet - from.feet) * sd; a.h = from.h + (to.h - from.h) * sd;
+    const lx = x0 + (x1 - x0) * e, lf = f0 + (f1 - f0) * e, lh = h0 + (h1 - h0) * e;
+    go.forEach((g) => {
+      const { a, was, off, cycle, imgs } = g, mix = (k) => was[k] + (off[k] - was[k]) * sd;
+      a.x = lx + mix('x') * lh; a.feet = lf + mix('feet') * lh; a.h = mix('h') * lh;
+      g.phase += Math.hypot(a.x - g.px, a.feet - g.pf) / (0.36 * a.h); g.px = a.x; g.pf = a.feet;   // a step per stride covered
       if (cycle) {
-        const step = (now - t0) / 300 + k * 0.5;   // out of step with the one before
-        const [p, i] = imgs[[0, 2, 1, 2][Math.floor(step * 2) % 4]];   // a step, side_listen as the passing frame, the other step...
+        const [p, i] = imgs[[0, 2, 1, 2][Math.floor(g.phase * 2) % 4]];   // a step, side_listen as the passing frame, the other step...
         if (a.shown !== p) { a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
-        a.bob = (1 + Math.cos(step * 2 * Math.PI)) / 2 * a.h * 0.0025;   // down on each step, up when passing: the bottom stays under the cut
-        if (glide) a.el.style.rotate = Math.sin(step * Math.PI) * 0.6 * (a.face === 'l' ? -1 : 1) + 'deg';   // the shoulders sway from the waist
+        a.bob = (1 + Math.cos(g.phase * 2 * Math.PI)) / 2 * a.h * 0.0025;   // down on each step, up when passing: the bottom stays under the cut
+        if (glide) a.el.style.rotate = Math.sin(g.phase * Math.PI) * 0.6 * (a.face === 'l' ? -1 : 1) + 'deg';   // the shoulders sway from the waist
       }
       placeActor(a);
     });
@@ -1693,6 +1712,7 @@ function frameOf(c) {
 }
 function applyCam(c, ms) {
   camNow = c;
+  if (!c.frame) for (const a of Object.values(actors)) show(a, shownFor(a, c));   // cut at the belt only in a shot on him
   const f = c.frame || frameOf(c), s = H / f.camH;
   world.style.transition = ms ? `transform ${ms}ms cubic-bezier(.45,0,.25,1)` : 'none';
   world.style.transform = `translate(${-f.left * s}px,${-f.top * s}px) scale(${s})`;
@@ -2603,7 +2623,7 @@ async function next() {
     else if (s.enter) for (const [id, pose] of Object.entries(s.enter)) enter(id, pose);
     else if (s.exit) exit(s.exit);
     else if (s.face) setFace(s.face);
-    else if (s.walk) { await walk(s.walk, s.to, s.ms || 2500, r, s.glide); if (r !== run) return; }
+    else if (s.walk) { await walk(s.walk, s.to, s.ms, r, s.glide); if (r !== run) return; }
     else if (s.poses) for (const [id, p] of Object.entries(s.poses)) setPose(id, p);
     else if (s.reveal) await reveal(s.reveal, s.ms);
     else if (s.fade) await fade(s.fade, s.ms);
