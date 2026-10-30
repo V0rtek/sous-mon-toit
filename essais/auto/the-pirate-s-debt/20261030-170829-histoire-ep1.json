@@ -1,0 +1,226 @@
+{
+ "ep": 1,
+ "plan": "The Seat at the Counter",
+ "story": {
+  "episode": 1,
+  "title": "The Seat at the Counter",
+  "scene": "a port tavern at night. the counter runs along one wall. behind it, shelves of bottles catch the lamplight. three stools face the counter. the door opens onto the dark harbor.",
+  "steps": [
+   {
+    "who": "le_pirate",
+    "pose": "bar_to_talk",
+    "to": "justin",
+    "text": "You kept my seat. Even after what I did?"
+   },
+   {
+    "who": "justin",
+    "pose": "bar",
+    "to": "le_pirate",
+    "text": "Three years I've been gone. You saved it?"
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_laugh",
+    "to": "justin",
+    "text": "Night we met, you spilled wine on that guy's vest."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_smile",
+    "to": "le_pirate",
+    "text": "And you threw him out. Told him to find another tavern."
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "Been saving your seat ever since. Where else would you sit?"
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "justin",
+    "pose": "bar_talk",
+    "to": "le_pirate",
+    "text": "One day I'm opening my own place. Not pouring for someone else."
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_to_talk",
+    "to": "justin",
+    "text": "I know how to make that happen."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_stare",
+    "to": "le_pirate",
+    "text": "You've said that before."
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "This time I mean it. You own a ship someday. Command it yourself."
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "justin",
+    "pose": "bar_to_talk",
+    "to": "le_pirate",
+    "text": "Where did James go that night?"
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "He ran. Because he stole the cargo."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_stare",
+    "to": "le_pirate",
+    "text": "I don't know that. I was drunk."
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_to_talk",
+    "to": "justin",
+    "text": "Tomorrow, harbor court. Sunrise. I need you to testify."
+   },
+   {
+    "who": "justin",
+    "pose": "bar",
+    "to": "le_pirate",
+    "text": "Testify to what?"
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "That you saw James loading stolen goods that night before he vanished."
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "lily",
+    "pose": "bar_to_anger",
+    "to": "justin",
+    "text": "If you testify, you're saying James was a thief."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_to_talk",
+    "to": "lily",
+    "text": "What do you want me to do?"
+   },
+   {
+    "who": "lily",
+    "pose": "bar_back",
+    "to": "le_pirate",
+    "text": "I'm against this. I won't watch it."
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_to_talk",
+    "to": "justin",
+    "text": "If you testify, the partnership starts. The ship is yours to chase."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_stare",
+    "to": "le_pirate",
+    "text": "And if I don't?"
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "I walk away from you. No ship. No partnership. Nothing."
+   },
+   {
+    "choice": [
+     {
+      "t": "Promise. Testify tomorrow.",
+      "say": "I'll do it. I'll testify.",
+      "tone": "resigned",
+      "then": [
+       {
+        "who": "le_pirate",
+        "pose": "bar_toast",
+        "to": "justin",
+        "text": "See you at sunrise. We walk to court together."
+       },
+       {
+        "who": "justin",
+        "pose": "bar_drink",
+        "to": "le_pirate",
+        "text": "Sunrise. I'll be ready."
+       },
+       {
+        "who": "lily",
+        "pose": "bar_back",
+        "to": "justin",
+        "text": "Not looking back."
+       }
+      ]
+     },
+     {
+      "t": "Ask for time. Need to remember.",
+      "say": "I need time. That night was fuzzy. I don't remember clearly.",
+      "tone": "careful",
+      "then": [
+       {
+        "who": "le_pirate",
+        "pose": "bar_stare",
+        "to": "justin",
+        "text": "You'll remember by sunrise."
+       },
+       {
+        "who": "justin",
+        "pose": "bar",
+        "to": "le_pirate",
+        "text": "I want to get this right."
+       },
+       {
+        "who": "le_pirate",
+        "pose": "bar_back",
+        "to": "justin",
+        "text": "Sunrise. Don't be late."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_to_talk",
+    "to": "justin",
+    "text": "Saturday, after the hearing. We'll talk about everything. The ship. The plan."
+   },
+   {
+    "who": "justin",
+    "pose": "bar_to_talk",
+    "to": "le_pirate",
+    "text": "After we're done at court."
+   },
+   {
+    "who": "le_pirate",
+    "pose": "bar_talk",
+    "to": "justin",
+    "text": "Or never. Depends what you do up there."
+   }
+  ],
+  "next": [
+   "If he promised to testify: Le_pirate walks to the courthouse at sunrise; Lily pulls Justin aside in the dark and says she loves him for staying honest—but he just lied to her face.",
+   "If he asked for time: Le_pirate arrives before dawn, overhears Justin telling Lily he can't testify because he was too drunk to remember anything; Le_pirate leaves the tavern without a word, and by the time Justin follows him outside, the ship is already untying its lines."
+  ]
+ },
+ "by": "haiku"
+}
