@@ -1669,8 +1669,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031430000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
-<script src="importer.js?v=20261031480000"></script>
-<script src="bank.js?v=20261031450000"></script>
+<script src="importer.js?v=20261031500000"></script>
+<script src="bank.js?v=20261031500000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1768,8 +1768,10 @@ function placeActor(a) {
 // on the ledge under his two fingers (the pose bar_put): it stays there, in front of him, until the scene changes ----
 // where a hand holds each object (fractions of its picture), and whether it turns around in a hand of someone facing right
 // (the mug's handle is on its right: turned, the handle is in her hand and the mug in front of her)
-const PROP_GRIP = { chope: [0.86, 0.45, true], biere: [0.5, 0.6], gobelet: [0.5, 0.6], potion: [0.5, 0.6], vin: [0.5, 0.7], lettre: [0.12, 0.8], bourse: [0.45, 0.12], enveloppe: [0.15, 0.7], parchemin: [0.08, 0.45],
+// a drink held by the far hand sits IN FRONT of it: its middle on the hand (the grip is the hand's front, its knuckles)
+const PROP_GRIP = { chope: [0.86, 0.45, true], biere: [0.62, 0.55], gobelet: [0.62, 0.5], potion: [0.62, 0.6], vin: [0.6, 0.62], lettre: [0.12, 0.8], bourse: [0.45, 0.12], enveloppe: [0.15, 0.7], parchemin: [0.08, 0.45],
   carte: [0.12, 0.8], plan: [0.12, 0.8], wanted: [0.12, 0.8], piece: [0.5, 0.5] };
+const DRINKS = ['biere', 'vin', 'potion', 'gobelet', 'chope'];
 const PAPER = ['lettre', 'carte', 'plan', 'wanted', 'parchemin', 'enveloppe'];   // read, held flat: they fill the red sheet
 const propM = (name) => { const r = ((window.BANK && BANK.props) || []).find((p) => p[0] === name); return r ? parseFloat(r[1]) / 100 : 0.15; };
 const gripOf = (a, pose) => { const sp = SPRITES[spriteOf(a.id)]; return sp.grip && sp.grip[poseOf(a.id, pose)]; };
@@ -1822,9 +1824,12 @@ function drawHeld(a, b) {
     a.el.appendChild(a.heldEl);
   }
   const p = gripAt(a, b, g), w = propM(a.hold) / 1.75 * a.h * (castOf(a.id).scale || 1);
-  const [ax, ay, turn] = PROP_GRIP[a.hold] || [0.5, 0.5], m = !!turn !== flipped(a);   // turned: its grip point is mirrored too
-  Object.assign(a.heldEl.style, { left: p.x - b.left + 'px', top: p.y - b.top + 'px', width: w + 'px' }); a.heldEl.hidden = false;
-  a.heldEl.style.transform = `translate(${-(m ? 1 - ax : ax) * 100}%,${-ay * 100}%)${m ? ' scaleX(-1)' : ''}`;
+  let [ax, ay, turn] = PROP_GRIP[a.hold] || [0.5, 0.5], tilt = 0; const m = !!turn !== flipped(a);   // turned: its grip point is mirrored too
+  // drinking: the drink goes from the hand to the lips (toward her face, tilted toward her mouth)
+  if (DRINKS.includes(a.hold) && poseOf(a.id, a.shown) === 'hold_mouth') { ax = 0.72; ay = 0.78; tilt = -28; }   // the hand under it, its rim up at her lips
+  Object.assign(a.heldEl.style, { left: p.x - b.left + 'px', top: p.y - b.top + 'px', width: w + 'px', height: 'auto', maxWidth: 'none', maxHeight: 'none' }); a.heldEl.hidden = false;   // its own shape, not the pose's box
+  a.heldEl.style.transformOrigin = `${(m ? 1 - ax : ax) * 100}% ${ay * 100}%`;
+  a.heldEl.style.transform = `translate(${-(m ? 1 - ax : ax) * 100}%,${-ay * 100}%)${tilt ? ` rotate(${flipped(a) ? -tilt : tilt}deg)` : ''}${m ? ' scaleX(-1)' : ''}`;
 }
 function putDown(a, name) {
   const g = gripOf(a, a.shown) || gripOf(a, 'bar_put'); if (!g) return;

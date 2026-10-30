@@ -15,7 +15,7 @@
     debout: { cut: 'full', poses: ['listen', 'smile', 'surprised', 'angry', 'hurt', 'back_walk'] },
     accoude: { cut: 'counter', poses: ['bar_to_listen', 'bar_to_smile', 'bar_to_tense', 'bar_ahead', 'bar_back', 'bar_put'] },
     assis: { cut: 'table', poses: ['sit_listen', 'sit_lean', 'sit_back', 'sit_head', 'sit_fist', 'sit_rise'] },
-    prises: { cut: 'counter', poses: ['hold_mouth', 'hold_raise', 'hold_front', 'hold_give', 'hold_ledge', 'bar_laugh'] },
+    prises: { cut: 'counter', poses: ['hold_mouth', 'hold_raise', 'hold_front', 'hold_give', 'bar_slump', 'bar_laugh'] },
     base: { cut: 'full', poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'] },
     back: { cut: 'full', poses: ['back_far', 'back_down', 'back_look', 'back_door', 'back_fists', 'back_walk'] },
     barFront: { cut: 'counter', poses: ['bar_talk', 'bar_drink', 'bar_stare', 'bar_smile', 'bar_laugh', 'bar_slump'] },
