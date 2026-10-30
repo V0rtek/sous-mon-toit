@@ -1,4 +1,4 @@
-// Stories that test the staging, played with index.html?play=<id>. tpose (30/10): every new pose and shot with dialogue,
+// Stories that test the staging, played with index.html?play=<id> (Mini-jeux has a tile for each). tpose (30/10): every new pose and shot with dialogue,
 // Justin and Kai (Justin recolored). The situations: leaning side by side (rempart, galerie, the bar), a silent look in
 // a very close-up (the lie), over-the-shoulder and its reverse, walking together, face to face in profile, one walks
 // off and the other watches him go (from behind, then a look back), someone arrives and leans next to you
@@ -11,6 +11,12 @@
     t_face: { ...T, spots: { justin: [760, 925, 430], kai: [1010, 925, 430] }, face: { justin: 'r', kai: 'l' } },
     t_bar: { ...B, spots: { justin: B.spots.justin, kai: [120, 1212, 945] }, face: { justin: 'r', kai: 'r' } },
     t_galerie: { ...G, spots: { kai: G.spots.justin, justin: G.spots.melissa }, face: { kai: 'r', justin: 'r' } },
+    t_rue: { ...T, spots: { kai: [1000, 925, 430], justin: [1500, 925, 430] }, face: { kai: 'l', justin: 'l' } },
+    t_loin: { ...B, spots: { justin: B.spots.justin, leo: B.spots.ruby, kai: [120, 1212, 945] }, face: { justin: 'r', leo: 'r', kai: 'r' } },
+    t_galerie2: { ...G, spots: { justin: G.spots.justin, kai: G.spots.ruby }, face: { justin: 'r', kai: 'r' } },
+    t_feu: { image: 'ref/guides/feu.webp', fg: 'ref/guides/feu_fg.webp', size: [2400, 1350], front: [], spots: { justin: [711, 1250, 620], kai: [793, 1176, 517] }, face: { justin: 'r', kai: 'r' } },
+    t_rempart2: { ...R, spots: { justin: R.spots.melissa, kai: [-200, 1521, 994] }, face: { justin: 'r', kai: 'r' } },
+    t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
     { scene: 't_rempart', cast: { kai: 'bar', justin: 'bar' } }, { cam: 'wide', at: 700 }, { fade: 'in', ms: 900 }, { caption: 'Le rempart' }, { wait: 1400 },
@@ -43,5 +49,63 @@
     { cam: 'wide', at: 900 }, { hush: 1500 }, { fade: 'out', ms: 900 },
     { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose };
+  // trattrape: one walks ahead, the other hurries to catch up (catchup), then side by side; they stop and talk over the
+  // shoulder; they set off together (a cut, side by side at once); one stops, the other goes on alone
+  const trattrape = [
+    { scene: 't_rue', cast: { kai: 'walk_mid', justin: 'walk_mid' } }, { cam: 'wide', at: 1250 }, { fade: 'in', ms: 600 }, { caption: 'Rattraper' }, { wait: 1000 },
+    say('justin', 'walk_mid', 'Kai ! Attends !'),
+    { walk: ['kai', 'justin'], to: 500, catchup: true },
+    { ots: ['justin', 'kai'] }, say('kai', 'cu_talk', 'T’es lent.'),
+    { ots: ['kai', 'justin'] }, say('justin', 'cu_smile', 'T’as pas attendu, surtout.'),
+    { ots: ['justin', 'kai'] }, say('kai', 'cu_glance', 'On nous suit. Marche.'),
+    { walk: ['kai', 'justin'], to: 1300 },
+    say('justin', 'walk_mid', 'Kai ?'),
+    { walk: 'kai', to: 1750 }, { exit: 'kai' },
+    { poses: { justin: 'cu_hurt' } }, { wait: 150 }, { cam: 'xclose', who: ['justin'] }, { hush: 1500 },
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  // ttrois: three at the bar, side by side in depth; a close-up on each who speaks (the one at the back too), over the
+  // shoulder between two of them while the third listens, a look in a very close-up, then one gets up and leaves
+  const ttrois = [
+    { scene: 't_trois', cast: { kai: 'bar', leo: 'bar', justin: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'À trois au comptoir' }, { wait: 1200 },
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Bon. Qui paie la tournée ?'),
+    { cam: 'close', who: ['kai'] }, say('kai', 'bar', 'Pas moi. Justin a de l’argent, maintenant.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar', 'Qui t’a dit ça ?'),
+    { ots: ['justin', 'leo'] }, say('leo', 'cu_talk', 'Tout le monde le sait, Justin.'),
+    { ots: ['leo', 'justin'] }, say('justin', 'cu_anger', 'Tout le monde parle trop.'),
+    { poses: { kai: 'cu_glance' } }, { wait: 150 }, { cam: 'xclose', who: ['kai'] }, { hush: 1500 },
+    { cam: 'close', who: ['kai'] }, say('kai', 'cu_talk', 'Moi, je dis rien.'),
+    { poses: { leo: 'walk_mid' } },   // he stands up: straight into the walk, the close shot follows him
+    { walk: 'leo', to: [150, 1212, 945] }, { exit: 'leo' },
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar', 'Bon. Il reste toi.'),
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  // tplaces: small placements. Someone far down the counter (close-ups on him far away), someone walking along the counter
+  // into the depth to lean further on, the two ends of the long table talking over the shoulder, sitting side by side at
+  // a fire, someone arriving from off-screen to lean next to you
+  const tplaces = [
+    { scene: 't_loin', cast: { leo: 'bar', justin: 'bar', kai: 'walk_mid' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Au bout du comptoir' }, { wait: 1200 },
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Hé ! Le nouveau, là-bas !'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar', 'Moi ?'),
+    { poses: { leo: 'cu_smile' } }, { wait: 150 }, { cam: 'xclose', who: ['leo'] }, { hush: 1300 },
+    { ots: ['justin', 'leo'] }, say('leo', 'cu_talk', 'Viens t’asseoir avec moi.'),
+    { cam: 'wide', at: 900 }, { wait: 500 },
+    { walk: 'kai', to: [1000, 960, 630] }, { poses: { kai: 'bar' } }, { cam: 'wide', at: 900 }, { wait: 900 },
+    { cam: 'close', who: ['kai'] }, say('kai', 'bar', 'Il parle à tout le monde, lui.'),
+    { fade: 'out', ms: 500 },
+    { scene: 't_galerie2', cast: { justin: 'bar', kai: 'bar' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 600 }, { caption: 'Les deux bouts de la table' }, { wait: 1200 },
+    { ots: ['justin', 'kai'] }, say('kai', 'cu_anger', 'Tu restes à ta place.'),
+    { ots: ['kai', 'justin'] }, say('justin', 'cu_talk', 'Ma place est ici.'),
+    { fade: 'out', ms: 500 },
+    { scene: 't_feu', cast: { kai: 'sit', justin: 'sit' } }, { cam: 'wide', at: 850 }, { fade: 'in', ms: 600 }, { caption: 'Autour du feu' }, { wait: 1200 },
+    { cam: 'close', who: ['justin'] }, say('justin', 'sit', 'Tu dors pas ?'),
+    { cam: 'close', who: ['kai'] }, say('kai', 'sit', 'Pas avec Marco dans le coin.'),
+    { fade: 'out', ms: 500 },
+    { scene: 't_rempart2', cast: { justin: 'bar', kai: 'walk_mid' } }, { cam: 'wide', at: 700 }, { fade: 'in', ms: 600 }, { caption: 'Il arrive' }, { wait: 800 },
+    { walk: 'kai', to: [566, 1521, 994] }, { poses: { kai: 'bar' } }, { cam: 'wide', at: 700 }, { wait: 800 },
+    { cam: 'close', who: ['kai'] }, say('kai', 'bar', 'Je savais que tu serais ici.'),
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }];
 })();

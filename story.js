@@ -11,6 +11,7 @@ window.CAST = {
   amare: { name: 'Amare', color: '#5a2d8c', sprite: 'amare', scale: 0.93 },
   isa: { name: 'Isa', color: '#c2366b', sprite: 'isa', scale: 0.96 },
   kai: { name: 'Kai', color: '#a3203c', sprite: 'kai' },   // Justin recolored, for the tests
+  leo: { name: 'Léo', color: '#2c5fb3', sprite: 'leo' },
 };
 
 // Isa's three looks (personalise step)
@@ -40,6 +41,7 @@ window.FACE = {
   james: { listen: 'l', surprised: 'l', thinking: 'l', explaining: 'f', angry: 'f', holding: 'l' },
   // Kai (30/10) = Justin recolored for the tests (black hair, dark red tank top): all his poses
   get kai() { return this.justin; },
+  get leo() { return this.justin; },   // Léo, the same (chestnut hair, navy tank top)
   ruby: ELF, melissa: ELF, isa_nuit: ELF, isa_or: ELF, isa_noir: ELF, candy: LION, amare: LION,
 };
 
