@@ -10,7 +10,7 @@ window.PLAN = (() => {
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
     { id: 'char', name: 'Create char engagingness', c: '#0a84ff', d: 'Faire aimer un perso : on veut passer du temps avec lui.',
       tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', ex: ['She counts her coins twice. He tips with money he doesn’t have.', '« Man… I think we’re getting too old for this. » / « Man… I think it’s the best night of my life. »'], s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
-        { n: 'Moment présent', d: 'Pour ouvrir : un perso réagit à ce qui se passe là, maintenant (ce qu’il boit, voit, ressent), sans passé ni nom absent. On le comprend sans rien savoir, et ça dit qui il est.', ex: ['« Man… I think we’re getting too old for this shit. »', '« This is the worst coffee in the city. Order me another. »', '« Don’t look now. He’s wearing the same shirt as you. »'] },
+        { n: 'Share personal internal conflict', d: 'Un perso dit tout haut ce qui se bat en lui, maintenant : il veut une chose et son contraire. Pas de passé, pas de nom absent : on le comprend sans rien savoir, et on s’y attache. Bon pour ouvrir.', ex: ['« Man… I think we’re getting too old for this shit. »', '« I should go home. Order me another. »', '« I love this place. I hate who I am in it. »'] },
         { n: 'Tell a story', d: 'Un moment du passé, à voix haute : une ligne (un perso), ou un échange à deux sur un passé commun. Dit qui ils sont (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', '« Hey, you remember what you lost at the McGill bet club? » / « Fuck, man. I still miss those pants. »', '« Remember who paid the first round here? » / « You did. With my wallet. »'] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
     { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', d: 'Faire aimer le lien entre deux persos, pas seulement chacun.',
       tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.', ex: ['He plans every step, she improvises, and she still finishes his sentences.'] },
@@ -438,7 +438,7 @@ ${techList()}
 
 RULES:
 - Box "ep": 24 lines at most in total.
-- The first rectangle is engagingness ("char" or "rel") on the present moment ("Moment présent", or "Show contrast" on what is happening right there). No info of the plot before it: the player likes the people before learning facts.
+- The first rectangle is engagingness ("char" or "rel") on the present moment ("Share personal internal conflict", or "Show contrast" on what is happening right there). No info of the plot before it: the player likes the people before learning facts.
 - An info comes out after its parent (in rectangle order), one at a time, only through a "Reveal info" technique.
 - Each technique's description (above) says how it is done: follow it (who says it to whom, aloud or not).
 - Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
