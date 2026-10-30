@@ -257,6 +257,12 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .bkRef { font: inherit; border: 0; background: #2c2c2e; border-radius: 1em; padding: .4em; color: #c7c7cc; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: .3em; }
 .bkRef img { height: 12em; border-radius: .6em; }
 .bkRef span { font-size: 1.2em; }
+.ncTop { background: #1c1c1e; border-radius: 1.4em; margin-bottom: 1.4em; }
+.ncTop.open { background: none; }
+.ncToggle { font: inherit; width: 100%; display: flex; align-items: center; gap: .8em; padding: 1.1em 1.4em; border: 0; border-radius: 1.4em; background: #1c1c1e; color: #f5f5f7; text-align: left; cursor: pointer; }
+.ncToggle b { font-size: 1.9em; }
+.ncToggle em { font-style: normal; margin-left: auto; font-size: 1.4em; color: #8e8e93; }
+.ncTop.open .ncToggle { margin-bottom: 1em; }
 .ncStep { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; display: flex; flex-direction: column; gap: .8em; }
 .ncStep > b { font-size: 1.9em; display: flex; align-items: center; gap: .5em; }
 .ncStep > b i { font-style: normal; width: 1.5em; height: 1.5em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; font-size: .75em; }
@@ -1162,7 +1168,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="bank" class="card menu" hidden>
-    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="objects">Objets</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="newchar">Nouveau perso</button><button type="button" data-t="sounds">Sons</button></div>
+    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="objects">Objets</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="sounds">Sons</button></div>
     <div id="bankBody"></div>
     <div id="bankBig" hidden></div>
   </div>
@@ -1642,7 +1648,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031210000"></script>
-<script src="bank.js?v=20261031220000"></script>
+<script src="bank.js?v=20261031230000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -3186,7 +3192,8 @@ for (const g of GAME_LIST) {
 for (const t of window.TEST_LIST || []) {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'test';
   const sp = document.createElement('span'); sp.textContent = t.name; b.appendChild(sp);
-  b.onclick = (e) => { e.stopPropagation(); location.href = `index.html?play=${t.id}&back=index.html`; };
+  // this page becomes « Mini-jeux » in the history: the phone's back during the test, and its end, come back here
+  b.onclick = (e) => { e.stopPropagation(); history.replaceState(null, '', location.pathname + '?lab=1'); location.href = `index.html?play=${t.id}&back=${encodeURIComponent('index.html?lab=1')}`; };
   $('#labTiles').prepend(b);   // each new one goes on top
 }
 $('#lab').onclick = (e) => { e.stopPropagation(); feat('Mini-jeux'); show('#labScreen'); };
@@ -4158,7 +4165,12 @@ if (PREVIEW) {
   });
 } else if (PLAY_ONLY) { document.body.classList.add('playonly'); state.name = 'Toi'; begin(PLAY_ONLY); }
 else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
-else if (ROLE === 'host') { goLive(); if (home && $('#whoName').value) $('#whoForm .pill').click(); }
+else if (ROLE === 'host') {
+  goLive();
+  const lab = new URLSearchParams(location.search).has('lab');   // back from a test: straight to Mini-jeux
+  if ((home || lab) && $('#whoName').value) $('#whoForm .pill').click();
+  if (lab) { history.replaceState(null, '', location.pathname); if ($('#whoName').value) show('#labScreen'); }
+}
 else if (MIRROR) { document.body.classList.add('mirror'); myName = '·'; hushed = true; show('#lobby'); goLive(); }
 else if ($('#whoName').value) $('#whoForm .pill').click();   // the name it had (a phone that comes back to the room goes straight in)
 {

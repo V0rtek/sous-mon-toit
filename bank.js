@@ -63,7 +63,10 @@ window.BANK = {
   const nameOf = (id) => ((window.GALLERY || []).find((g) => g.sprite === id) || {}).name || id;
   const tabs = {
     chars() {
-      return Object.entries(window.SPRITES || {}).map(([id, sp]) => {
+      // Nouveau perso on top (a tap opens its 4 steps), then every character we have
+      const open = BANK.newCharIsOpen();
+      return `<div class="ncTop${open ? ' open' : ''}"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b><em>${open ? '−' : 'les feuilles de poses, pas à pas'}</em></button>${open ? `<div class="ncIn">${BANK.newChar()}</div>` : ''}</div>`
+        + Object.entries(window.SPRITES || {}).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
         return `<section class="bkChar"><h3>${esc(nameOf(id))} <small>${poses.length} poses</small></h3><div class="bkRow">${poses.map((p) =>
           `<button type="button" class="bkPose${half[p] ? ' cut' : ''}" data-img="chars/${id}/${p}.webp"><img loading="lazy" src="chars/${id}/${p}.webp" alt=""><span>${esc(p)}${half[p] ? '<i>coupée</i>' : ''}</span></button>`).join('')}</div></section>`;
@@ -94,7 +97,6 @@ window.BANK = {
       return '<p class="bkNote">Les feuilles de poses qui ont marché. Ouvrir l’image à joindre (la toucher, puis l’enregistrer), copier le prompt, coller dans ChatGPT avec l’image.</p>'
         + BANK.prompts.map(([t, refs, check], i) => `<div class="bkShot"><b>${esc(t)}</b><p>${esc(check)}</p><div class="bkRefs">${pics(refs)}</div><button type="button" class="bkCopy" data-copy="${i}">Copier le prompt</button></div>`).join('');
     },
-    newchar() { return BANK.newChar(); },
     sounds() {
       return BANK.sounds.map(([n, kind, what]) => `<button type="button" class="bkSound" data-snd="${n}"><i>▶</i><b>${esc(n)}</b><span>${kind} · ${esc(what)}</span></button>`).join('')
         + '<h3 class="bkH">À ajouter</h3><p class="bkNote">' + BANK.soundsNext.map(esc).join(' · ') + '</p>';
@@ -119,8 +121,8 @@ window.BANK = {
     $('#bankBody').onclick = (e) => {
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
       const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
-      const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]');
-      if (op || tk) { e.stopPropagation(); if (op) BANK.newCharOpen(op.dataset.ncopen); else BANK.newCharTick(tk.dataset.ncdone); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
+      const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]'), tg = e.target.closest('[data-nctoggle]');
+      if (op || tk || tg) { e.stopPropagation(); if (tg) BANK.newCharSet('shown', !BANK.newCharIsOpen()); else if (op) BANK.newCharOpen(op.dataset.ncopen); else BANK.newCharTick(tk.dataset.ncdone); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (nc || ci) {   // Nouveau perso: a prompt, or a picture as png (the promise keeps it inside the tap, for Safari)
         e.stopPropagation(); const b = nc || ci, was = b.textContent, done = (ok) => { b.textContent = ok ? 'Copié ✓' : 'Copie impossible : Enregistrer'; setTimeout(() => { b.textContent = was; }, 1800); };
         if (nc) { const t = BANK.newCharPrompt(nc.dataset.nccopy); navigator.clipboard.writeText(t).then(() => done(true), () => { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); done(true); }); return; }
@@ -270,6 +272,7 @@ Example:
   };
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };
+  BANK.newCharIsOpen = () => !!load().shown;
   BANK.newCharTick = (id) => { const c = load(); c.done = c.done || {}; c.done[id] = !c.done[id]; keep(c); };
   BANK.newCharOpen = (id) => { const c = load(); c.open = c.open === id ? null : id; keep(c); };
 })();
