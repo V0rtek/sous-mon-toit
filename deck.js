@@ -6,7 +6,7 @@ window.DECK = (() => {
   let saved = load(), i = -1, root;
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* full or private window */ } };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const slot = (k, label) => `<label class="dkPic" data-k="${k}"${saved[k] ? ` style="background-image:url(${saved[k]})"` : ''}><span>${saved[k] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
+  const slot = (k, label, src = k) => `<label class="dkPic" data-k="${k}"${saved[src] ? ` style="background-image:url(${saved[src]})"` : ''}><span>${saved[src] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
   const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
   const typed = (k, def) => `<p class="dkTyped" contenteditable="true" spellcheck="false" data-t="${k}">${esc(saved['t_' + k] ?? def)}</p>`;
   // every character we have the base image for: image → perso, the perso cycling through its poses to show it moves
@@ -32,11 +32,7 @@ window.DECK = (() => {
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2>[X]</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
     { c: '#ff9f0a', h: () => `<h1>Et c'est important parce qu'elle s'est offerte comme cobaye.</h1><p>Mais avant de vous parler de ça…</p>` },
-    { c: '#bf5af2', h: () => `<small>J'y reviens plus tard</small><h1>17 000 histoires de 3 cases.</h1><p>Garfield : une par jour depuis le 19 juin 1978.</p>` },
-    { c: '#bf5af2', h: () => `<h1>Toujours le même chat.</h1><p>Une poignée de poses. Et pourtant : entre 750 M$ et 1 G$ de produits dérivés par année.</p><small>Licensing International</small>` },
-    { c: '#bf5af2', h: () => `<h1>Ce qui accroche, ce n'est pas l'image.</h1><p>C'est le personnage et l'histoire.</p>` },
-    { c: '#bf5af2', h: () => `<div class="dkTwo"><div><small>Les compétiteurs</small><h2>La beauté visuelle</h2></div><div><small>Moi</small><h2>L'histoire et la personnalisation</h2></div></div><p>Chaque choix change la suite. Toi et tes amis êtes les personnages, ce soir.</p>` },
-    { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso')}</div>` },
+    { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
     { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>[X] décide de l'histoire.</h1><p>Le public croit regarder une histoire. Puis il découvre qu'un joueur a le contrôle.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Pause.</h1><p>Son cell : le choix qu'il a devant lui.</p>` },
@@ -51,10 +47,6 @@ window.DECK = (() => {
     "« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… » Une seule : [Y] n'existe pas encore pour la salle.",
     "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
     "« Et c'est important parce qu'elle s'est offerte comme cobaye. Mais avant de vous parler de ça… »",
-    "« J'y reviens plus tard. » Le speech : bâtir l'attente, le contexte, expliquer le problème. Garfield, c'est environ 17 000 histoires de 3 cases, une par jour depuis le 19 juin 1978.",
-    "Toujours le même chat, avec une poignée de poses. Et ça rapporte : entre 750 M$ et 1 G$ de produits dérivés par année (Licensing International). Le strip le plus syndiqué au monde : environ 2 600 journaux (Guinness).",
-    "Ce qui accroche, ce n'est pas l'image. C'est le personnage et l'histoire.",
-    "Les compétiteurs s'attaquent à la beauté visuelle. Je m'attaque à l'histoire (chaque choix change la suite, chaque épisode finit sur une question) et à la personnalisation (toi et tes amis êtes les personnages, ce soir).",
     "Son selfie, une flèche vers son perso.",
     "Le catalogue d'histoires : je clique sur une histoire de pirates immersive. Démo · télé.",
     "Après les premières répliques, je révèle que [X] décide de l'histoire. Pendant la démo, pas avant : le public croit regarder une histoire, puis découvre qu'un joueur a le contrôle.",
@@ -66,7 +58,7 @@ window.DECK = (() => {
     "Tous ces persos viennent d'une photo. Chacun joue ses poses.",
   ];
   let noteOpen = false;
-  let spot = 0;
+  let spot = 0, sub = 0;   // sub: the step inside a slide (the perso's 2nd pose on the slide where we first see it)
   function draw() {
     clearInterval(spot); root.classList.toggle('prep', i < 0);
     if (i < 0) { root.style.setProperty('--c', '#ff9f0a'); root.querySelector('.dkN').textContent = `0 / ${S.length}`; return; }
@@ -83,7 +75,12 @@ window.DECK = (() => {
     root.querySelector('.dkN').textContent = `${i + 1} / ${S.length}`;
     root.querySelector('.dkBar i').style.width = `${(i + 1) / S.length * 100}%`;
   }
-  const go = (d) => { i = Math.max(-1, Math.min(S.length - 1, i + d)); draw(); };
+  const stepsOf = (k) => (k >= 0 && S[k].steps ? S[k].steps() : 1);
+  const go = (d) => {
+    if (i >= 0 && d > 0 && sub < stepsOf(i) - 1) { sub++; return draw(); }   // next = the next step of this slide
+    if (i >= 0 && d < 0 && sub > 0) { sub--; return draw(); }
+    i = Math.max(-1, Math.min(S.length - 1, i + d)); sub = d < 0 ? stepsOf(i) - 1 : 0; draw();
+  };
   const shrink = (file) => new Promise((ok, no) => {   // the photo shrunk to 900 px so it stays small enough to keep
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
@@ -143,7 +140,7 @@ window.DECK = (() => {
     queue = queue.then(async () => {   // one at a time: the importer holds one sheet
       try {
         st.textContent = 'Découpe…'; const cells = await IMPORT.cut(file, kindsOf(p)[i], name, (t) => { st.textContent = t; });
-        if (+i === 0 && cells[0]) { saved[p + 'c'] = await small(cells[0].src); save(); const sl = pn.querySelector(`[data-slot="img:${p}"]`); if (sl) { sl.style.backgroundImage = `url(${saved[p + 'c']})`; sl.classList.add('has'); sl.firstChild.textContent = ''; } }
+        if (+i === 0 && cells[0]) { saved[p + 'c'] = await small(cells[0].src); if (cells[1]) saved[p + 'c2'] = await small(cells[1].src); save(); const sl = pn.querySelector(`[data-slot="img:${p}"]`); if (sl) { sl.style.backgroundImage = `url(${saved[p + 'c']})`; sl.classList.add('has'); sl.firstChild.textContent = ''; } }
         st.textContent = 'Ajout au jeu…'; const msg = await IMPORT.add(); saved[`d_${p}${i}`] = 1; save(); st.textContent = '✓ ' + msg;
       } catch (e) { st.textContent = 'Pas ajoutée : ' + (e.message || e); }
     });
@@ -176,7 +173,7 @@ window.DECK = (() => {
   };
   return {
     mount(el) {
-      root = el; i = -1;
+      root = el; i = -1; sub = 0;
       el.innerHTML = '<div class="dkPrep"><button type="button" class="dkStart">Commencer ▶</button><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
         if (e.target.closest('.dkStart')) { go(1); return; }
