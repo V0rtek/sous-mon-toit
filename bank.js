@@ -33,6 +33,9 @@ window.BANK = {
     ['chope', '17 cm', 'à boire, trinquer'], ['piece', '7 cm', 'payer, parier'], ['bourse', '16 cm', 'payer, soudoyer, voler'], ['lettre', '25 cm', 'un message, un aveu'],
     ['enveloppe', '22 cm', 'scellée, un secret'], ['parchemin', '36 cm', 'un ordre, un contrat'], ['carte', '32 cm', 'un trésor, un chemin'], ['plan', '32 cm', 'le château, un vol'],
     ['wanted', '30 cm', 'quelqu’un est recherché']],
+  // the photos of real people leaning, in ref/poses: file, what it shows
+  poseRefs: [['balcon_penchee', 'Penchée sur un balcon, la main à la joue'], ['balcon_profil', 'De profil, avant-bras sur la rambarde'], ['rambarde_face', 'De face, les mains croisées sur la pierre'],
+    ['bureau_penchee', 'Penchée sur un bureau, le téléphone en main'], ['table_couchee', 'Couchée sur une table, les mains jointes']],
   // the shots: done = the engine has it, its step; or still to come
   shots: [
     ['Plan large', true, '{cam: \'wide\', at: x}', 'Tout le décor sur la hauteur, centré sur les persos'],
@@ -97,7 +100,10 @@ window.BANK = {
     prompts() {
       // the pictures to attach show under each prompt (ref/…): a tap opens one big, to save it
       const pics = (refs) => (refs.match(/[\w]+\.webp/g) || []).map((f) => `<button type="button" class="bkRef" data-img="ref/${f}"><img loading="lazy" src="ref/${f}" alt=""><span>${f}</span></button>`).join('');
-      return '<p class="bkNote">Les feuilles de poses qui ont marché. Ouvrir l’image à joindre (la toucher, puis l’enregistrer), copier le prompt, coller dans ChatGPT avec l’image.</p>'
+      // photos of real people leaning (31/10): how a body really rests on a ledge, to show the image model or check a sheet
+      const refs = '<h3 class="bkH">Poses de référence · accoudé</h3><p class="bkNote">De vraies personnes appuyées sur un rebord : à joindre au prompt d’une feuille Accoudé ou Prises, ou pour vérifier qu’une pose est crédible.</p><div class="bkGrid">'
+        + BANK.poseRefs.map(([n, what]) => `<button type="button" class="bkDecor" data-img="ref/poses/${n}.webp"><span class="pic"><img loading="lazy" src="ref/poses/${n}.webp" alt=""></span><b>${esc(what)}</b></button>`).join('') + '</div>';
+      return refs + '<p class="bkNote">Les feuilles de poses qui ont marché. Ouvrir l’image à joindre (la toucher, puis l’enregistrer), copier le prompt, coller dans ChatGPT avec l’image.</p>'
         + BANK.prompts.map(([t, refs, check], i) => `<div class="bkShot"><b>${esc(t)}</b><p>${esc(check)}</p><div class="bkRefs">${pics(refs)}</div><button type="button" class="bkCopy" data-copy="${i}">Copier le prompt</button></div>`).join('');
     },
     sounds() {
