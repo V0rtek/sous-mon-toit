@@ -622,6 +622,28 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .aPair { display: flex; align-items: center; justify-content: space-between; gap: 1em; font-size: 1em; }
 .aPair span { font-size: 1.8em; color: #f5f5f7; }
 .aEx s { color: #86868b; text-decoration-color: #ff453a; }
+/* Acte · Générer: the 3 layers one under the other, each a card (copy its prompt, paste the answer, look at it) */
+.aFlow { display: flex; flex-direction: column; gap: 1.6em; padding: 2em 5% 6em; max-width: 70em; }
+.aStep { display: flex; flex-direction: column; gap: .7em; padding: 1.6em 1.8em 1.8em; border-radius: 1.6em; background: #141416; }
+.aStep h3 { margin: 0; display: flex; align-items: center; gap: .6em; font-size: 2.3em; }
+.aStep h3 i { flex: none; width: 1.5em; height: 1.5em; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .8em; background: #0a84ff; color: #fff; }
+.aStep small { font-size: 1.45em; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: #86868b; margin-top: .5em; }
+.aStep textarea { font: inherit; font-size: 1.7em; padding: .6em .8em; border-radius: .7em; border: 0; background: #2c2c2e; color: #f5f5f7; outline: none; resize: vertical; user-select: text; }
+.aBtns { display: flex; gap: .6em; }
+.aBtns button, .aEps button { flex: 1; font: inherit; font-size: 1.7em; padding: .6em; border-radius: 1em; border: 0; background: #2c2c2e; color: #f5f5f7; cursor: pointer; }
+.aBtns button.go { background: #0a84ff; color: #fff; font-weight: 600; }
+.aEps { display: flex; gap: .5em; }
+.aEps button.on { background: #f5f5f7; color: #000; font-weight: 700; }
+.aNow { margin: .2em 0 0; font-size: 1.6em; color: #aeaeb2; }
+.aNow em { font-style: normal; color: #ff9f0a; }
+.aMode button.on { background: #f5f5f7; color: #000; font-weight: 600; }
+.aWarn { display: flex; flex-direction: column; gap: .3em; padding: .8em 1em; border-radius: .9em; background: rgba(255,159,10,.12); }
+.aWarn b { font-size: 1.5em; color: #ff9f0a; }
+.aWarn span { font-size: 1.6em; color: #ffd60a; line-height: 1.3; }
+.aWho i { font-size: 1.5em; color: #8e8e93; }
+.aLost b { color: #ff453a !important; }
+.aTechs button.act { background: #2c2c2e; border-color: #f5f5f7; color: #f5f5f7; }
+
 
 .pSh { display: flex; flex-direction: column; gap: .7em; padding: 2em 5% 3em; }
 .pShTop { display: flex; justify-content: space-between; align-items: center; }
@@ -1579,8 +1601,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261028143259"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261030200000"></script>
-<script src="act.js?v=20261030200000"></script>
+<script src="plan.js?v=20261030230000"></script>
+<script src="act.js?v=20261030230000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="bank.js?v=20261030210000"></script>
@@ -3287,10 +3309,12 @@ $('#techStages').innerHTML = TECH_STAGES.map((st) => `<section class="tStage"><h
 $('#techBtn').onclick = (e) => { e.stopPropagation(); $('#tech').scrollTop = 0; show('#tech'); };
 $('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techPath = [b.dataset.t]; techOpen(); };
 // ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
-$('#planBtn').onclick = (e) => { e.stopPropagation(); show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
+$('#planBtn').onclick = (e) => { e.stopPropagation(); UP['#plan'] = '#infos'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // ---- Infos · Acte (act.js): one act of 5 episodes, each one's prompt 1 copied from its column ----
 $('#actBtn').onclick = (e) => { e.stopPropagation(); show('#acte'); ACT.mount($('#acteBody')); };
-window.ACT_TO_PLAN = () => { ACT.closeSheet(); show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
+// ‹ from a plan opened by the act goes back to the act (it opens again where it was)
+const actBack = () => { show('#acte'); ACT.mount($('#acteBody')); };
+window.ACT_TO_PLAN = () => { ACT.closeSheet(); UP['#plan'] = '#acte'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // the story written from a plan (its prompt 2): plays like a generated story and joins the last ones (Ton histoire)
 window.PLAN_PLAY = (json, title) => {
   const plan = PLAN.get(), decor = SCENES[json.scene] ? json.scene : plan.scene, base = SCENES[decor];
@@ -3419,7 +3443,7 @@ $('#back').onclick = (e) => {
   if (screen === '#techCard' && techPath.length > 1) { techPath.pop(); techOpen(); return; }   // a card: back one step of the path
   if (screen === '#plan') PLAN.closeSheet();
   if (screen === '#acte') ACT.closeSheet();
-  const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up) show(up); };
+  const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up === '#acte') actBack(); else if (up) show(up); };
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
 // only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
 const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).includes('"episode"');

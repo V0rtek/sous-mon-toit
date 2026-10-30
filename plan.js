@@ -682,5 +682,7 @@ ${JSON.stringify(plan)}`; };
     const s = sheet(); s.oninput = onInput; closeSheet();
     render();
   }
-  return { GOALS, LC, mount, closeSheet, redraw: () => render(), get: () => P, prompt1, prompt2 };
+  // a generated plan, pasted elsewhere (Acte › Générer): a new plan, the one open
+  const add = (j) => { if (!j || !Array.isArray(j.boxes)) throw new Error('plan'); openPlan(fix(j)); return P; };
+  return { GOALS, LC, mount, closeSheet, redraw: () => render(), get: () => P, prompt1, prompt2, add };
 })();
