@@ -1587,23 +1587,29 @@ function setFace(f) { for (const [id, d] of Object.entries(f)) if (actors[id]) {
 async function walk(ids, to, ms, r) {
   const who = [].concat(ids).map((id) => actors[id]).filter(Boolean); if (!who.length) return;
   const lead = who[0], x0 = lead.x, x1 = typeof to === 'number' ? to : actors[to] ? actors[to].x : (sc.spots[to] || [x0])[0];
-  const go = who.map((a) => {
+  // together = side by side: the others a step further from the camera (a bit higher, a bit smaller, behind him), a
+  // little ahead so each face shows; they get there in the first steps
+  const dir = x1 >= x0 ? 1 : -1;
+  const go = who.map((a, k) => {
     const has = SPRITES[spriteOf(a.id)].poses, cycle = has.side_walk_a && has.side_walk_b && has.side_listen;
     const imgs = cycle ? ['side_walk_a', 'side_walk_b', 'side_listen'].map((p) => { const i = new Image(); i.alt = ''; i.src = poseSrc(a.id, p); return [p, i]; }) : [];
-    return { a, from: a.x, cycle, imgs };
+    const to = k ? { x: dir * 0.1 * lead.h * k, feet: lead.feet - 0.035 * lead.h * k, h: lead.h * 0.96 ** k } : { x: 0, feet: a.feet, h: a.h };
+    return { a, from: { x: a.x - x0, feet: a.feet, h: a.h }, to, cycle, imgs };
   });
   await Promise.all(go.flatMap((g) => g.imgs.map(([, i]) => i.decode().catch(() => {}))));
   if (x1 !== x0) for (const { a } of go) a.face = x1 > x0 ? 'r' : 'l';
   const ids_ = who.map((a) => a.id), t0 = performance.now(), dur = FAST ? 0 : ms;
   for (;;) {
     const now = performance.now(), t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);   // eases in and out
-    go.forEach(({ a, from, cycle, imgs }, k) => {
-      a.x = from + (x1 - x0) * e;
+    const side = Math.min(1, t * 3), sd = 1 - (1 - side) ** 2;
+    go.forEach(({ a, from, to, cycle, imgs }, k) => {
+      a.x = x0 + (x1 - x0) * e + from.x + (to.x - from.x) * sd;
+      a.feet = from.feet + (to.feet - from.feet) * sd; a.h = from.h + (to.h - from.h) * sd;
       if (cycle) {
         const step = (now - t0) / 300 + k * 0.5;   // out of step with the one before
         const [p, i] = imgs[Math.floor(step) % 2];
         if (a.shown !== p) { a.el.replaceChild(i, a.el.firstChild); a.shown = a.pose = p; }
-        a.bob = -Math.abs(Math.sin(step * Math.PI)) * a.h * 0.006;
+        a.bob = Math.abs(Math.cos(step * Math.PI)) * a.h * 0.006;   // down on each step: the bottom stays under the cut
       }
       placeActor(a);
     });
@@ -1668,12 +1674,13 @@ function frameOf(c) {
     const cut = boxes.filter(({ b }) => b.half).map(({ b }) => b.top + b.h);
     // c.tight (a walk): the frame keeps his height and follows his waist, a swinging arm may leave it
     if (cut.length) {
-      camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), c.tight ? 0 : (right - left) * 1.08 / ASP())); top = Math.min(...cut) - camH;
+      camH = Math.min(bh, Math.max((Math.min(...cut) - head) / (1 - margin), c.tight ? 0 : (right - left) * 1.08 / ASP()));
       if (c.tight) {   // several: wide enough for their waists, with room for a head on each side
         const xs = who.map((a) => a.x), span = Math.max(...xs) - Math.min(...xs);
-        if (span) { camH = Math.min(bh, Math.max(camH, (span + 0.4 * tall) / ASP())); top = Math.min(...cut) - camH; }
+        if (span) camH = Math.max(camH, (span + 0.2 * tall) / ASP());
         cx = (Math.min(...xs) + Math.max(...xs)) / 2;
       }
+      camH = Math.min(camH, Math.min(...cut)); top = Math.min(...cut) - camH;   // never past the top of the decor: no gap under the cut
     }
   }
   if (c.lift !== undefined) top = c.lift;
