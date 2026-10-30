@@ -301,7 +301,7 @@ window.ACT = (() => {
   // ---- the act's prompt: an idea (optional) + the two people drawn -> the act, as JSON. A basic model fills the arc,
   // it never builds one: every field is one concrete sentence, done with its technique ----
   let pair = PAIRS[Math.floor(Math.random() * PAIRS.length)];
-  const promptAct = (idea, [ra, rb]) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in French, unless the idea is written in another language (then in that language).
+  const promptAct = (idea, [ra, rb]) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in English, unless the idea is written in another language (then in that language).
 Reply with ONE JSON object and nothing else (its shape is at the end).
 
 THE ARC (always this one: you fill it, you never change it)
