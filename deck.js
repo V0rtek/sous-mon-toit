@@ -21,6 +21,15 @@ window.DECK = (() => {
     ['ref/perso_suit.webp', 'chars/suit', 'listen adjust offer angry'],
     ['ref/perso_corsaire.webp', 'ref/corsaire', 'listen smile surprised angry hurt back_walk'],
   ].map(([img, dir, poses]) => [img, poses.split(' ').map((p) => `${dir}/${p}.webp`)]);
+  // slide 9: the catalogue the story is picked from (a tap in the demo); a hover shows what makes you curious
+  const CAT = [
+    ['Le serment du pirate', 'bg/taverne.webp', ['chars/pirate/bar_smile.webp'], 'props/wanted.webp', '« Je gardais ta place depuis trois ans. »', 1],
+    ['Quest of power', 'bg/rempart.webp', ['chars/ninja/stand.webp', 'chars/exile/stand.webp'], 'ref/boss_breath.webp', 'La ville brûle. Et personne ne bouge.'],
+    ['Les deux béliers', 'bg/terrasse.jpg', ['chars/belier_blanc/stand.webp', 'chars/belier_noir/stand.webp'], 'chars/ombre/stand.webp', 'Il y a quelqu\u2019un dans l\u2019ombre.'],
+    ['Un été de trop', 'bg/chalet.jpg', ['chars/plage/hip.webp', 'chars/alex/beach.webp'], 'chars/mila/beach.webp', 'Que personne ne sache pour l\u2019été.'],
+    ['Last call', 'covers/lastcall.jpg', [], 'covers/lastcall_ep3.jpg', 'La soirée dérape.'],
+    ['Négociation', 'bg/galerie.webp', ['chars/suit/listen.webp', 'chars/isa_or/listen.webp'], 'props/enveloppe.webp', 'Une enveloppe. Sans nom.'],
+  ];
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2>[X]</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
@@ -30,7 +39,7 @@ window.DECK = (() => {
     { c: '#bf5af2', h: () => `<h1>Ce qui accroche, ce n'est pas l'image.</h1><p>C'est le personnage et l'histoire.</p>` },
     { c: '#bf5af2', h: () => `<div class="dkTwo"><div><small>Les compétiteurs</small><h2>La beauté visuelle</h2></div><div><small>Moi</small><h2>L'histoire et la personnalisation</h2></div></div><p>Chaque choix change la suite. Toi et tes amis êtes les personnages, ce soir.</p>` },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso')}</div>` },
-    { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Une histoire de pirates, immersive.</h1><p>Le catalogue d'histoires. Je clique.</p>` },
+    { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, hv, tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="background-image:url(${bg})">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv" style="background-image:url(${hv})"><span>${esc(tz)}</span></div></div>`).join('')}</div>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>[X] décide de l'histoire.</h1><p>Le public croit regarder une histoire. Puis il découvre qu'un joueur a le contrôle.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Pause.</h1><p>Son cell : le choix qu'il a devant lui.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Un nouveau perso entre : [Y].</h1><p>Pour la salle, un perso comme les autres.</p>` },
