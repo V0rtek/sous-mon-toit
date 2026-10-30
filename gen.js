@@ -149,14 +149,17 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
           inChoice = true; for (const l of o.then) then.push(...line(l, [...cast, 'justin'])); inChoice = false;
           return then.length > 2 ? { t, intent: clip(o.tone, 20), then } : null;
         }).filter(Boolean);
-        if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 2) }); choices.n++; last = null; }
+        if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 3) }); choices.n++; last = null; }
       } else { const l = line(s, [...cast, 'justin']); steps.push(...l); if (!choices.n) saysN.n += l.some((x) => x.say || x.think) ? 1 : 0; }
     }
     if (saysN.n < 3) throw new Error('Taps 1-4 come before the first choice: justin (inner voice), the threat, justin (the stakes), the ultimatum.');
     if (!choices.n) throw new Error('There must be 2 "choice" steps (tap 5 and tap 10), each with 2 options and a "then" list.');
     const est = window.SCENES && SCENES[sc] && SCENES[sc].establish;   // a decor seen from afar: it opens the scene and closes it
+    // only who speaks is in the scene: nobody stands there without a word
+    const speaks = new Set(), walk = (list) => (list || []).forEach((s) => { if (s && s.who) speaks.add(s.who); if (s && Array.isArray(s.choice)) s.choice.forEach((o) => walk(o && o.then)); });
+    walk(j.steps);
     return [
-      scene(sc, Object.fromEntries([...cast, 'justin'].map((id) => [id, 'listen']))),
+      scene(sc, Object.fromEntries([...cast.filter((id) => speaks.has(id)), 'justin'].map((id) => [id, 'listen']))),
       cam('wide'), est ? { establish: est, ms: 3400 } : { fade: 'in', ms: 700 },
       ...steps,
       ...(est ? [{ establish: est, ms: 2800, out: true }] : []), { fade: 'out', ms: 800 },

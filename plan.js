@@ -442,6 +442,8 @@ RULES:
 - An info comes out after its parent (in rectangle order), one at a time, only through a "Reveal info" technique.
 - Each technique's description (above) says how it is done: follow it (who says it to whom, aloud or not).
 - Enough engagingness: every character gets a "char" or "rel" rectangle before the first stakes.
+- Every rectangle brings something new (a fact, a feeling, a stake). Never two rectangles on the same question: once a thing is asked or said, it moves forward or it is dropped.
+- A choice acts on something the player has already seen: an option about a lie needs a secret the player knows, an option about a person needs that person on screen.
 - At least one desire is shown ("desire" goal).
 - Every item of "needs" is revealed or planted before the turn.
 - No dialogue anywhere: what happens, not what is said.
@@ -470,14 +472,15 @@ TECHNIQUES:
 ${techList()}
 
 CLARITY (the player knows nothing you know):
-A. One new thing per line. Lines are short: 4 to 12 words, 70 characters at most.
+A. One new thing per line, one sentence per bubble: a line with two sentences becomes two lines of the same speaker. Short: 4 to 12 words, 70 characters at most.
+F. Never ask again what was asked, never say again what was said: each line moves things forward.
 B. No "he", "she", "they", "it" unless the player saw who it is in the last 3 lines. Someone absent: a name AND what identifies them.
 C. Every line answers the line before it (answers, dodges, jokes, pushes back). No trailer lines ("You have no idea what you're dealing with.").
 D. No line that only carries information, greets or explains a feeling: show it in how they talk.
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
-CHOICES: "t" = the button, a short line in his voice, 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
+CHOICES: an option only refers to what the player has seen and heard (no lie that was never set up, no thing never named). "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
 POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those. Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
 
 THE JSON (exactly this shape):
