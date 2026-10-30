@@ -1701,7 +1701,7 @@ function enter(id, pose) {
   const [x, feet, h] = sc.spots[id];
   const a = actors[id] = { id, pose, base: pose, shown: pose, x, feet, h, face: sc.face[id], el: document.createElement('div') };
   a.el.className = 'actor'; a.el.style.position = 'absolute';
-  a.el.appendChild(poseImg(a, pose));
+  a.shown = shownFor(a, null); a.el.appendChild(poseImg(a, a.shown));   // a pose cut at the belt waits for a shot on him
   castEl.appendChild(a.el); placeActor(a);
   for (const p of Object.keys(SPRITES[spriteOf(id)].poses)) poseImg(a, p);   // all his poses, decoded ahead
 }
@@ -1731,9 +1731,15 @@ function swapPose(a, pose, done) {
   const i = poseImg(a, pose), put = () => { if (a.el.firstChild !== i) a.el.replaceChild(i, a.el.firstChild); done(); };
   if (i.ok) put(); else i.ready.then(() => { if (actors[a.id] === a) put(); });
 }
+// a pose cut at the belt (or a bust) arriving in a shot on him, or leaving it: the frame follows in the same frame, so
+// the cut never shows (a head floating where his body was)
+function reframe(a, was) {
+  const cut = (p) => !!((SPRITES[spriteOf(a.id)].half || {}).poses || {})[p];
+  if (camNow && camNow.size !== 'ots' && camNow.size !== 'wide' && (camNow.who || []).includes(a.id) && (cut(was) || cut(a.shown))) applyCam({ ...camNow, frame: null }, 0);
+}
 function showPose(a, pose) {   // the picture and its size change together (a picture not ready yet: the old one stays till then)
   if (a.shown === pose && a.want === undefined) return;
-  a.want = pose; swapPose(a, pose, () => { if (a.want === pose) { a.shown = pose; delete a.want; placeActor(a); } });
+  a.want = pose; swapPose(a, pose, () => { if (a.want === pose) { const was = a.shown; a.shown = pose; delete a.want; placeActor(a); reframe(a, was); } });
 }
 function setPose(id, pose) {
   const a = actors[id]; if (!a || a.pose === pose) return;
@@ -1743,7 +1749,8 @@ function setPose(id, pose) {
     if (a.pose !== pose) return;   // a newer pose came first
     delete a.want;
     const phone = PHONE_POSES.includes(a.shown) !== PHONE_POSES.includes(pose);
-    a.shown = want; placeActor(a);
+    const was = a.shown;
+    a.shown = want; placeActor(a); reframe(a, was);
     if (phone) drawTexts();   // he took his phone out, or put it away: his texts come or go
   });
 }
@@ -1816,7 +1823,7 @@ function ots(nearId, farId) {
   A.ots = { x: A.x, feet: A.feet, h: A.h, face: A.face, pose: A.pose, back: has(nearId, 'cu_back') ? 'cu_back' : 'back_far' };
   if (!String(B.pose).startsWith('cu_') && has(farId, 'cu_talk')) setPose(farId, 'cu_talk');
   B.face = L ? 'l' : 'r'; showPose(B, B.pose); placeActor(B);
-  const bb = box(B), camW = 2.8 * 0.42 * bb.w, camH = camW * 16 / 9, bottom = bb.top + bb.h, top = bottom - camH;
+  const bb = box(B), camW = 2.8 * 0.42 * bb.w, camH = camW * 16 / 9, bottom = bb.top + bb.h * 0.97, top = bottom - camH;   // a little over his cut: another bust of his may be a bit shorter
   const face = B.x + (L ? -0.08 : 0.08) * bb.w, left = face - (L ? 0.7 : 0.3) * camW;
   const back = has(nearId, 'cu_back') ? 'cu_back' : 'back_far';
   if (A.pose !== back) { A.pose = back; A.shown = back; swapPose(A, back, () => placeActor(A)); }
@@ -1907,12 +1914,6 @@ function frameOf(c) {
 }
 function applyCam(c, ms) {
   camNow = c;
-  // a close shot on someone further back: whoever stands nearer and covers him is left out (the camera moved round)
-  const tg = ['one', 'close', 'xclose'].includes(c.size) ? (c.who || []).map((id) => actors[id]).filter(Boolean) : [];
-  for (const a of Object.values(actors)) {
-    const cover = tg.length && !tg.includes(a) && tg.some((t) => a.feet > t.feet + 2 && Math.abs(a.x - t.x) < 0.6 * (a.h + t.h) / 2);
-    a.el.style.visibility = cover ? 'hidden' : '';
-  }
   if (!c.frame) for (const a of Object.values(actors)) showPose(a, shownFor(a, c));   // cut at the belt only in a shot on him
   const f = c.frame || frameOf(c), s = H / f.camH;
   world.style.transition = ms ? `transform ${ms}ms cubic-bezier(.45,0,.25,1)` : 'none';
