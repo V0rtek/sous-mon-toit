@@ -4032,7 +4032,9 @@ async function skipTo(n, id, stop = null, keep = false) {
   FAST = false;
 }
 
-addEventListener('resize', () => { fit(); if (screen === '#plan') PLAN.redraw(); if (screen === '#acte') ACT.redraw(); });
+// the phone's keyboard opening is a resize too: redrawing then would rebuild the box being typed in and close the keyboard
+addEventListener('resize', () => { fit(); if (document.activeElement && document.activeElement.matches('input, textarea')) return;
+  if (screen === '#plan') PLAN.redraw(); if (screen === '#acte') ACT.redraw(); });
 if (ROLE === 'watch') document.body.classList.add('watch');
 let auto = false, home = false;
 try {
