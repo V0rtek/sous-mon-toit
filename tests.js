@@ -254,6 +254,19 @@
     { hold: { lily: 'piece' } }, { say: 'lily', pose: 'hold_raise', to: 'justin', text: 'Pile, tu restes. Face, tu cours.' },
     { hold: { lily: null } }, { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser, tlily };
-  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }, { id: 'tlily', name: 'Test · Lily' }];
+  // tobj (31/10, « Objets »): every drink with Lily, at the counter, nobody in front of her: drunk, raised, left on the
+  // counter beside her while she talks (her leaning poses), then the papers read and handed. Placements: Placer un objet
+  const tobj = [{ scene: 't_lily_devant', cast: { justin: 'bar', lily: 'bar' } }, { cam: 'close', who: ['lily'] }, { fade: 'in', ms: 600 }, { caption: 'Objets' }, { wait: 900 },
+    ...['biere', 'vin', 'potion', 'gobelet'].flatMap((o) => [
+      { hold: { lily: o } }, { say: 'lily', pose: 'hold_mouth', text: `${o} · elle boit` },
+      { say: 'lily', pose: 'hold_raise', to: 'justin', text: `${o} · elle trinque` },
+      { say: 'lily', pose: 'bar_to_smile', to: 'justin', text: `${o} · posée à côté d’elle` },
+      { say: 'lily', pose: 'bar_ahead', text: `${o} · toujours là` }]),
+    ...['lettre', 'carte', 'wanted', 'enveloppe'].flatMap((o) => [
+      { hold: { lily: o } }, { say: 'lily', pose: 'hold_front', text: `${o} · elle lit` },
+      { say: 'lily', pose: 'hold_give', to: 'justin', text: `${o} · elle tend` }]),
+    { hold: { lily: null } }, { put: { lily: 'piece' } }, { say: 'lily', pose: 'bar_put', to: 'justin', text: 'piece · posée sous ses doigts' },
+    { fade: 'out', ms: 800 }, { end: 'Fin du test' }];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets, tcomptoir, tbaiser, tlily, tobj };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }, { id: 'tcomptoir', name: 'Test · comptoir' }, { id: 'tbaiser', name: 'Test · baiser' }, { id: 'tlily', name: 'Test · Lily' }, { id: 'tobj', name: 'Objets' }];
 })();
