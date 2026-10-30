@@ -227,7 +227,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 /* the bank (bank.js): tabs on top, the list scrolls under them; a tap on a picture shows it big */
 #bank { justify-content: flex-start; padding: 12em 0 0; }
 #bankTabs { display: flex; gap: .8em; padding: 0 5% 1.6em; }
-#bankTabs button { font: inherit; font-size: 1.55em; font-weight: 600; flex: 1; padding: .55em 0; border: 0; border-radius: 1em; background: #1c1c1e; color: #a1a1a6; cursor: pointer; }
+#bankTabs button { font: inherit; font-size: 1.3em; font-weight: 600; flex: 1; padding: .55em 0; border: 0; border-radius: 1em; background: #1c1c1e; color: #a1a1a6; cursor: pointer; }
 #bankTabs button.on { background: #f5f5f7; color: #000; }
 #bankBody { flex: 1; overflow-y: auto; padding: 0 5% 6em; }
 #bank h3 { font-size: 2.1em; margin: 1.2em 0 .5em; }
@@ -243,6 +243,8 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 .bkDecor { font: inherit; background: #1c1c1e; border: 0; border-radius: 1.4em; padding: 0 0 1em; overflow: hidden; color: #f5f5f7; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: .3em; }
 .bkDecor .pic { position: relative; display: block; aspect-ratio: 16 / 9; background: #000; }
 .bkDecor .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bkDecor .pic.obj { background: #2a211b; }
+.bkDecor .pic.obj img { object-fit: contain; padding: 8%; box-sizing: border-box; }
 .bkDecor b { font-size: 1.6em; padding: .3em .7em 0; }
 .bkDecor small { font-size: 1.25em; color: #a1a1a6; padding: 0 .9em; }
 .bkShot { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; }
@@ -1129,7 +1131,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="bank" class="card menu" hidden>
-    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="sounds">Sons</button></div>
+    <div id="bankTabs"><button type="button" data-t="chars">Persos</button><button type="button" data-t="decors">Décors</button><button type="button" data-t="objects">Objets</button><button type="button" data-t="shots">Plans</button><button type="button" data-t="prompts">Prompts</button><button type="button" data-t="sounds">Sons</button></div>
     <div id="bankBody"></div>
     <div id="bankBig" hidden></div>
   </div>
@@ -1606,7 +1608,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031010000"></script>
-<script src="bank.js?v=20261031010000"></script>
+<script src="bank.js?v=20261031020000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
