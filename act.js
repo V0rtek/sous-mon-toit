@@ -351,7 +351,7 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
 7. "secret": "who" (the id of the character it belongs to: the one whose odd behaviour it explains) and "what" (Un secret qui explique un geste). Once out, the player sees that person differently. It explains both setups.
 8. "setups": exactly 2 (Un plant qui se voit). "plant" = the line that plants it (setup 1 in episode 1, setup 2 in episode 2), "pay" = what it means once the secret is out.
 9. "episodes": exactly 5 objects, in order, with these fields:
-   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open: ONE simple contradiction the player gets in one exchange, one says it happened, the other says it did not ("You never came." / "I came every night."), never two versions of who did what; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
+   1: "ask" (what A asks justin), "hurts" (why saying yes hurts B), "mystery" (Une question ouverte: the question about the past this episode opens and leaves open, about something justin did NOT see (it happened while he was not there, or between the two others: he cannot know the answer, so the player wants it); ONE simple contradiction the player gets in one exchange, one says it happened, the other says it did not ("You never came." / "I came every night."), never two versions of who did what; the secret is its answer), "hook" (La fin qui promet: the last line announces a precise next moment, who, when, where, what will be settled; or a surprise; never a summary, never the request asked again).
    2: "easy" (Effort minimal, échec qui empire: what justin tries first to keep both), "backfires" (how it breaks in front of B), "hook" (La fin qui promet).
    3: "reveal" (how the secret comes out, in the scene), "flip" (what the player believed, and what is true), "hook".
    4: "clock" (why it must be decided now), "a_asks", "b_asks" (Le même moment, deux demandes).
@@ -360,7 +360,8 @@ FILL IN (each one sentence, concrete: something you could film or say out loud, 
 RULES:
 - Ce que l'écran montre: the player only sees the decor, the characters and their lines. No gesture or object the screen cannot show.
 - Everything happens between the characters on screen. No institution, no hearing, no council, no gate, no key character who never appears.
-- The stakes are between people, never money: no debt, no money owed, no crate, no cellar, no landlord, no licence, no smuggling.
+- The world is the decor's world (a fantasy city, a house): no phone, no company, no buyer, no lawyer, no contract, no papers to sign.
+- The stakes are between people, never money or a business: no sale, no offer, no debt, no money owed, no crate, no cellar, no landlord, no licence, no smuggling. Flat: "Melissa wants him to sell the saloon to the mining company by midnight." (what does the player lose? money?) -> works: "Melissa wants him to leave with her tonight." (he loses Ruby, and the player sees her).
 - Nothing contradicts itself: the past, the secret and the episodes tell one story.
 - Before episode 3, the secret is never said: only planted and hinted. But its question is open from episode 1 ("mystery").
 - Both sides of episode 4 must feel right: the player has to hesitate.
@@ -371,6 +372,14 @@ THE JSON:
 {"title": "...", "scene": "...", "question": "...", "a": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "b": {"id": "...", "is": "...", "wants": "...", "because": "..."}, "justin_wants": "...",
  "past": "...", "lost_if_no": "...", "secret": {"who": "<a character id>", "what": "..."}, "setups": [{"plant": "...", "pay": "..."}, {"plant": "...", "pay": "..."}],
  "episodes": [{"ask": "...", "hurts": "...", "mystery": "...", "hook": "..."}, {"easy": "...", "backfires": "...", "hook": "..."}, {"reveal": "...", "flip": "...", "hook": "..."}, {"clock": "...", "a_asks": "...", "b_asks": "..."}, {"if_a": "...", "if_b": "...", "open": "..."}]}
+
+CHECK BEFORE YOU REPLY (rewrite what fails):
+1. Is what is at stake a person or a bond, here, tonight? Never money, a sale, a company, papers.
+2. Is the mystery about something justin did not see? (Never about what justin himself said or did: he would know.)
+3. Is justin's dream his own, long-standing, with its reason, and does A's request touch it?
+4. Is at least one of the two drawn to justin?
+5. Do the past, the secret and the mystery each fit in one plain sentence?
+6. Is nothing taken from the examples (their people, events, objects)?
 
 The idea: ${idea || '(none: invent it from the two people)'}`;
   const copy = (text, btn) => { const was = btn.textContent;

@@ -468,6 +468,13 @@ ${act && act.n > 1 ? '- The first rectangle picks up where the last episode ende
 - The turn brings something new: a precise next moment (who, when, where, what will be settled: "See you at the championship tonight. We're gonna have a little talk."), a surprise or a question. Never a choice just made, asked again, never vague ("There will be consequences").
 - What the screen shows: the player only sees the decor, the characters, their poses and the lines. No gesture, event or object the screen does not show (counting the lights, flipping a coin, a crate, "justin nearly spills a drink", "someone arrives"): a rectangle is what people SAY; what matters is said in a line, plainly, the first time.
 
+CHECK BEFORE YOU REPLY (rewrite what fails):
+1. Box "ep" has 2 or 3 choices, each right after its stakes rectangle; each choice is about the people (who he sides with, what he admits, who he hurts), never a procedure ("ask for more time" / "read the contract").
+2. Every "what" is what people say: no gesture, arrival, counting or object the screen does not show.
+3. The main character says his own dream in a "desire" rectangle, before the first stakes.
+4. One rectangle raises the open question and nobody answers it.
+5. No info the main character would know is a mystery to him.
+
 THE JSON:
 {"title": "2-4 words", "scene": "...", "turn": "...", "needs": [{"text": "...", "by": "i2"}, {"text": "...", "by": "r3"}],
  "characters": [${fresh ? '{"id": "mara", "name": "Mara", "sprite": "", "traits": ["..."], "infos": ["i1"], "look": "...", "poses": ["listen", "...", "...", "...", "...", "..."]}' : '{"id": "ruby", "name": "Ruby", "sprite": "ruby", "traits": ["..."], "infos": ["i1"]}'}],
@@ -516,7 +523,7 @@ THE JSON (exactly this shape):
  "steps": [ {"who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"choice": [ {"t": "...", "say": "...", "tone": "...", "then": [ {"who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
  "next": ["If ..., ...", "..."]}
 
-CHECK BEFORE YOU REPLY: every rectangle of "ep" is there, in order (none skipped: the one that raises a question is the one the player came for); every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
+CHECK BEFORE YOU REPLY: the branches of a choice differ: no line appears in two options' "then" (the lines both branches share come after the choice, once); no character has more than 2 lines in a row; every rectangle of "ep" is there, in order (none skipped: the one that raises a question is the one the player came for); every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
 
 THE PLAN:
 ${JSON.stringify(plan)}`; };
