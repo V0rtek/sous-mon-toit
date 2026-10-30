@@ -1605,8 +1605,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="act.js?v=20261031040000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
-<script src="tests.js?v=20261031000000"></script>
-<script src="bank.js?v=20261030233000"></script>
+<script src="tests.js?v=20261031010000"></script>
+<script src="bank.js?v=20261031010000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
@@ -1863,6 +1863,14 @@ function setScene(id, cast) {
   Object.assign(world.style, { width: bw + 'px', height: bh + 'px' });
   rects(sc.back, backEl);
   for (const [who, pose] of Object.entries(cast)) enter(who, pose);
+  // objects lying in the decor (props/): {src, x, y = where its bottom touches, w, all in decor px}; in front of whoever
+  // stands further back than it (z = its y, like the people's feet)
+  for (const p of sc.props || []) {
+    const i = new Image(); i.alt = ''; i.src = `props/${p.src}.webp`; i.className = 'prop';
+    i.onload = () => { const h = p.w * i.naturalHeight / i.naturalWidth; Object.assign(i.style, { top: p.y - h + 'px' }); };
+    Object.assign(i.style, { position: 'absolute', left: p.x - p.w / 2 + 'px', top: p.y + 'px', width: p.w + 'px', zIndex: Math.round(p.z ?? p.y) });
+    castEl.appendChild(i);
+  }
   rects(sc.front, frontEl);
   if (sc.fg) {   // a foreground picture over the people, the decor's size (a counter, a log): transparent where they show
     const fg = new Image(); fg.alt = ''; fg.src = sc.fg;

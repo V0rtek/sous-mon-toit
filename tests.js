@@ -16,6 +16,21 @@
     t_galerie2: { ...G, spots: { justin: G.spots.justin, kai: G.spots.ruby }, face: { justin: 'r', kai: 'r' } },
     t_feu: { image: 'ref/guides/feu.webp', fg: 'ref/guides/feu_fg.webp', size: [2400, 1350], front: [], spots: { justin: [711, 1250, 620], kai: [793, 1176, 517] }, face: { justin: 'r', kai: 'r' } },
     t_rempart2: { ...R, spots: { justin: R.spots.melissa, kai: [-200, 1521, 994] }, face: { justin: 'r', kai: 'r' } },
+    // the counter with objects in front of each one: on its top, past their hands, sized from their depth (1,75 m = their
+    // height). Widths in metres: a mug 17 cm, a coin 7, a purse 16, a letter 25, an envelope 22, a poster 30, a map 32
+    t_objets: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy, twin: B.spots.ruby },
+      face: { justin: 'r', leo: 'r', kai: 'r', twin: 'r' },
+      // [who, object, width m, how far in front of his forearms (in his heights, toward the camera), along the counter (0 =
+      // at his hands, 1 = at the top's right edge; below 0, to the left, in tenths of his height)]. The top's right edge: (980, 712) → (1290, 545), measured
+      // in front of Justin, the counter's near end (its front edge at y 705) has room: a purse, his mug, a letter, a coin;
+      // the others get one each, past their hands
+      props: [['justin', 'bourse', 0.16, 0.03, -2.4], ['justin', 'lettre', 0.24, 0.033, -1.2], ['justin', 'chope', 0.17, 0.02, 0.35], ['justin', 'piece', 0.07, 0.03, 0.8],
+        ['leo', 'enveloppe', 0.22, 0.02, 0.9], ['kai', 'wanted', 0.3, 0.02, 0.9], ['twin', 'carte', 0.32, 0.02, 0.9]]
+        .map(([who, src, m, dy, along]) => {
+          const [x, feet, h] = B.spots[{ justin: 'justin', leo: 'melissa', kai: 'candy', twin: 'ruby' }[who]], y = feet - 0.6 * h + dy * h, w = m / 1.75 * h;
+          const hands = x + 0.12 * h, right = 980 + (712 - y) / 167 * 310 - 0.55 * w;   // the object stays on the top
+          return { src, x: along < 0 ? hands + along * 0.1 * h : hands + (right - hands) * along, y, w, z: feet + 1 };   // < 0: in front of his arms, in tenths of his height
+        }) },
     t_trois: { ...B, spots: { justin: B.spots.justin, leo: B.spots.melissa, kai: B.spots.candy }, face: { justin: 'r', leo: 'r', kai: 'r' } },
   });
   const tpose = [
@@ -106,6 +121,16 @@
     { cam: 'close', who: ['kai'] }, say('kai', 'bar', 'Je savais que tu serais ici.'),
     { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
-  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces };
-  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }];
+  // tobjets: objects lying on the counter in front of each one (no hands yet): wide, then a close-up on each
+  CAST.twin = CAST.twin || { name: 'Sam', color: '#555', sprite: 'justin' };
+  const tobjets = [
+    { scene: 't_objets', cast: { twin: 'bar', kai: 'bar', leo: 'bar', justin: 'bar' } }, { cam: 'wide', at: 950 }, { fade: 'in', ms: 600 }, { caption: 'Objets sur le comptoir' }, { wait: 1800 },
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar', 'Ma bourse, ma bière, ma pièce. Et une lettre.'),
+    { cam: 'close', who: ['leo'] }, say('leo', 'bar', 'Une enveloppe. Scellée.'),
+    { cam: 'close', who: ['kai'] }, say('kai', 'bar', 'Cinq cents pièces pour lui.'),
+    { cam: 'close', who: ['twin'] }, say('twin', 'bar', 'Et la carte qui mène au trésor.'),
+    { cam: 'wide', at: 950 }, { hush: 1500 }, { fade: 'out', ms: 800 }, { end: 'Fin du test' },
+  ];
+  window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), tpose, trattrape, ttrois, tplaces, tobjets };
+  window.TEST_LIST = [{ id: 'tpose', name: 'Test · tout' }, { id: 'trattrape', name: 'Test · rattraper' }, { id: 'ttrois', name: 'Test · à trois' }, { id: 'tplaces', name: 'Test · placements' }, { id: 'tobjets', name: 'Test · objets' }];
 })();
