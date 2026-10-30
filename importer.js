@@ -35,12 +35,14 @@
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0, W, H);
     const px = cx.getImageData(0, 0, W, H), d = px.data, alpha = new Float32Array(W * H);
-    // the backdrop: the median of the 4 corners. Green: keyed by how green each pixel is. Anything else (a white or grey
+    // the backdrop: the median of the 4 corners. Transparent: kept as it is. Green: keyed by how green each pixel is. Anything else (a white or grey
     // sheet the image model made anyway): the backdrop is what looks like it AND touches the edge, flooded inward, so a
     // white top on a white sheet stays (it doesn't touch the edge)
     const corner = (c) => { const v = []; for (const [ox, oy] of [[0, 0], [W - 6, 0], [0, H - 6], [W - 6, H - 6]]) for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) v.push(d[((oy + y) * W + ox + x) * 4 + c]); return median(v); };
     const bg = [corner(0), corner(1), corner(2)];
-    if (bg[1] - Math.max(bg[0], bg[2]) > 60) {
+    if (corner(3) < 40) {   // already transparent (ChatGPT can give a transparent background): its own alpha
+      for (let i = 0; i < W * H; i++) alpha[i] = d[i * 4 + 3] / 255;
+    } else if (bg[1] - Math.max(bg[0], bg[2]) > 60) {
       for (let i = 0; i < W * H; i++) {   // green screen: how green against red and blue; the spill on the edges pulled back
         const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], t = g - Math.max(r, b);
         alpha[i] = g < 120 ? 1 : Math.min(1, Math.max(0, 1 - (t - 25) / 60));
