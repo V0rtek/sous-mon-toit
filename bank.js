@@ -35,7 +35,9 @@ window.BANK = {
     ['wanted', '30 cm', 'quelqu’un est recherché'], ['avis', '28 cm', 'un avis de recherche froissé, tenu ou lu']],
   // the photos of real people leaning, in ref/poses: file, what it shows
   poseRefs: [['balcon_penchee', 'Penchée sur un balcon, la main à la joue'], ['balcon_profil', 'De profil, avant-bras sur la rambarde'], ['rambarde_face', 'De face, les mains croisées sur la pierre'],
-    ['bureau_penchee', 'Penchée sur un bureau, le téléphone en main'], ['table_couchee', 'Couchée sur une table, les mains jointes']],
+    ['bureau_penchee', 'Penchée sur un bureau, le téléphone en main'], ['table_couchee', 'Couchée sur une table, les mains jointes'],
+    ['rousse_chope', 'Accoudée, une chope noire en main (l’objet est vide, à placer)'], ['main_perles', 'Une main qui tient un objet : le rouge marque où il va'],
+    ['rousse_cigarette', 'Accoudée : la cigarette à la bouche, puis tenue avec sa fumée']],
   // the shots: done = the engine has it, its step; or still to come
   shots: [
     ['Plan large', true, '{cam: \'wide\', at: x}', 'Tout le décor sur la hauteur, centré sur les persos'],

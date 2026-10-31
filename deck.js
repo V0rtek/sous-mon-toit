@@ -22,18 +22,20 @@ window.DECK = (() => {
     ['ref/perso_corsaire.webp', 'ref/corsaire', 'listen smile surprised angry hurt back_walk'],
   ].map(([img, dir, poses]) => [img, poses.split(' ').map((p) => `${dir}/${p}.webp`)]);
   // slide 9: the catalogue the story is picked from (a tap in the demo); a hover shows what makes you curious
+  // Last call's toilets, redrawn to fill a card: the tiles, two urinals and their divider, Brooke and the suit, the bubble of the game
+  const WC = '<i class="wcU a"></i><i class="wcU b"></i><i class="wcU c"></i><i class="wcDiv"></i><img class="wcB" src="chars/brooke/pee_look.webp" alt=""><img class="wcS" src="chars/suit/pee.webp" alt=""><div class="wcBubble"><b>BROOKE</b><p>Nice suit.</p></div>';
   const CAT = [   // title, decor, characters on the card, what shows on hover (a background, what stands on it, its kind), its line, picked
     ['Le serment du pirate', 'bg/taverne.webp', ['chars/pirate/bar_smile.webp'], ['props/wanted.webp', []], '« Je gardais ta place depuis trois ans. »', 1],
-    ['Quest of power', 'ref/boss_breath.webp', [], ['', ['chars/ombre/stand.webp'], 'shadow'], 'Il y avait quelqu\u2019un dans l\u2019ombre.'],
+    ['Quest of power', 'ref/boss_breath.webp', [], ['', ['chars/ombre/stand.webp'], 'zoom'], 'Il y avait quelqu\u2019un dans l\u2019ombre.'],
     ['Un été de trop', 'bg/chalet.jpg', ['chars/plage/hip.webp', 'chars/alex/beach.webp'], ['', ['chars/mila/beach.webp'], 'shadow'], 'Que personne ne sache pour l\u2019été.'],
-    ['Last call', '', ['chars/brooke/texting.webp'], ['ref/lastcall_wc.webp', [], 'wc'], '« Nice suit. »'],
+    ['Last call', '', ['chars/brooke/texting.webp'], ['', [], 'wc'], ''],
   ];
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
-    { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2>[X]</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
+    { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2 class="dkTyped" contenteditable="true" spellcheck="false" data-name="x">${nm('x')}</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
     { c: '#ff9f0a', h: () => `<h1>Et c'est important parce qu'elle s'est offerte comme cobaye.</h1><p>Mais avant de vous parler de ça…</p>` },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
-    { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
+    { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hk === 'wc' ? WC : ''}${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>[X] décide de l'histoire.</h1><p>Le public croit regarder une histoire. Puis il découvre qu'un joueur a le contrôle.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Pause.</h1><p>Son cell : le choix qu'il a devant lui.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>Un nouveau perso entre : [Y].</h1><p>Pour la salle, un perso comme les autres.</p>` },
@@ -41,6 +43,8 @@ window.DECK = (() => {
     { c: '#ff375f', full: true, h: () => `<img class="dkFull" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">` },
     { c: '#30d158', h: () => `<h1>L'histoire te suit.</h1><p>Même au bol : elle continue sur ton cell.</p>` },
     { c: '#30d158', wall: true, h: () => `<div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div>` },
+    { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div>` },
+    { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Un cofounder</li><li>Du feedback</li><li>Du financement</li><li>Du mentorat</li></ul>` },
   ];
   // what I say on each slide (mine to edit, kept on this device); behind the corner button
   const NOTES = [
@@ -56,6 +60,8 @@ window.DECK = (() => {
     "Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé.",
     "Un joueur peut même aller sur le bol et continuer à suivre l'histoire sur son cell. L'histoire ne l'attend pas dans la salle : elle le suit.",
     "Tous ces persos viennent d'une photo. Chacun joue ses poses.",
+    "",
+    "Je me cherche un cofounder, du feedback, du financement, du mentorat.",
   ];
   let noteOpen = false;
   let spot = 0, sub = 0;   // sub: the step inside a slide (the perso's 2nd pose on the slide where we first see it)
@@ -98,75 +104,46 @@ window.DECK = (() => {
   });
   const pick = (file, k) => shrink(file).then((u) => { saved[k] = u; save(); draw(); });
 
-  // ---- the control panel (before going on stage): for [X] and [Y], paste the photo, the name, copy the prompt of each sheet, paste each sheet.
-  // The sheets go through the same importer as Nouveau perso (cut, add to the game); the prompts are Nouveau perso's, per person ----
-  const KINDS = [['debout', 'Debout'], ['accoude', 'Accoudé'], ['assis', 'Assis'], ['prises', 'Prises']];
-  const PEOPLE = [['x', '[X] · rencontré sur place', ['debout', 'accoude']], ['y', '[Y] · le complice', ['accoude']]];
-  const kindsOf = (p) => saved['k_' + p] || PEOPLE.find((q) => q[0] === p)[2];
-  const person = (p) => ({ name: saved['n_' + p] || '', she: !!saved['s_' + p], locked: saved['l_' + p] || '' });
+  // ---- slide 0 (before going on stage): the plan, 5 files to drop (the 2 photos, the 3 sheets) and the 3 prompts to copy. Nothing else.
+  // The sheets go through the same importer as Nouveau perso (cut, add to the game); the prompts are Nouveau perso's ----
+  const SHEETS = [['x', 0, 'debout'], ['x', 1, 'accoude'], ['y', 0, 'accoude']];   // [X] has 2 sheets, [Y] 1
+  const person = (p) => ({ name: saved['n_' + p] || '', she: saved['s_' + p] ?? (p === 'x'), locked: saved['l_' + p] || '' });
   const copy = (text, btn) => {
     const ok = () => { const t = btn.textContent; btn.textContent = 'Copié ✓'; setTimeout(() => { btn.textContent = t; }, 1500); };
     navigator.clipboard.writeText(text).then(ok, () => { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); });
   };
-  const copyPic = (src, btn) => {   // a picture into the clipboard as png (the promise stays inside the tap, for Safari)
-    const png = fetch(src).then((r) => r.blob()).then((b) => createImageBitmap(b)).then((m) => new Promise((ok) => {
-      const c = document.createElement('canvas'); c.width = m.width; c.height = m.height; c.getContext('2d').drawImage(m, 0, 0); c.toBlob(ok, 'image/png'); }));
-    navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]).then(() => { const t = btn.textContent; btn.textContent = 'Copié ✓'; setTimeout(() => { btn.textContent = t; }, 1500); }, () => { btn.textContent = 'Enregistre-la plutôt'; });
-  };
-  const pslot = (key, label, src) => `<label class="pnSlot${src ? ' has' : ''}${key.startsWith('img:') ? ' auto' : ''}" tabindex="0" data-slot="${key}"${src ? ` style="background-image:url(${src})"` : ''}><span>${src ? '' : esc(label)}</span>${key.startsWith('img:') ? '' : `<input type="file" accept="image/*" data-file="${key}" hidden>`}</label>`;
+  const FILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+  const icon = (key, n, label, src, st) => `<label class="pnIcon${src ? ' has' : ''}" tabindex="0" data-slot="${key}"><i${src ? ` style="background-image:url(${src})"` : ''}>${src ? '' : FILE}<b>${n}</b></i><span>${esc(label)}</span><em data-st="${key}">${esc(st || '')}</em><input type="file" accept="image/*" data-file="${key}" hidden></label>`;
   let queue = Promise.resolve(), cur = null, pn = null;
   function drawPanel() {
-    pn.innerHTML = '<p class="pnLead">Avant de monter sur scène. Survole une case et colle (Ctrl+V), ou touche-la pour choisir un fichier.</p><div class="pnCols">' + PEOPLE.map(([p, title]) => {
-      const c = person(p), ks = kindsOf(p), ex = (id, label) => `<button type="button" class="pnBtn" data-pcopy="${p}:${id}">${label}</button>`;
-      return `<section class="pnP" data-p="${p}"><h2>${esc(title)}</h2>
-        <div class="pnRow">${pslot('photo:' + p, 'Photo', saved[p])}<div class="pnCol">
-          <input class="pnName" data-name="${p}" maxlength="16" autocomplete="off" placeholder="Son nom" value="${esc(c.name)}">
-          <div class="pnChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-she="${p}:${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>
-          ${saved[p] ? `<button type="button" class="pnBtn" data-pimg="${p}">Copier la photo</button><a class="pnBtn" href="${saved[p]}" download="${esc(c.name || p)}.jpg">Enregistrer</a>` : ''}
-        </div></div>
-        <h3>Son image</h3><p>Pour la feuille 1 : photo + <a href="ref/style.webp" target="_blank" rel="noopener">l'image de style</a> dans ChatGPT : son image est l'image 1 de ses feuilles. Sa photo sur scène sera la 1re pose de la feuille 1 (automatique).</p>
-        <div class="pnRow">${pslot('img:' + p, '1re pose de la feuille 1', saved[p + 'c'])}<div class="pnCol">${ex('photo', 'Copier le prompt')}
-          <textarea class="pnLock" data-lock="${p}" rows="3" placeholder="Ce qu'il faut garder (facultatif) : ex. cheveux roux bouclés, veste de cuir">${esc(c.locked)}</textarea>${ex('help', 'Copier le prompt du « à garder »')}</div></div>
-        ${ks.map((k, i) => `<h3>Feuille ${p === 'x' ? i + 1 : 3}${p === 'x' ? ' · ' : ' · '}<select data-kind="${p}:${i}">${KINDS.map(([id, l]) => `<option value="${id}"${id === k ? ' selected' : ''}>${l}</option>`).join('')}</select></h3>
-          <div class="pnRow">${pslot(`sheet:${p}:${i}`, 'Coller la feuille', null)}<div class="pnCol">${ex(k, 'Copier le prompt')}<p class="pnSt" data-st="${p}:${i}">${saved[`d_${p}${i}`] ? '✓ Dans le jeu' : ''}</p></div></div>`).join('')}
-      </section>`; }).join('') + '</div>';
+    pn.innerHTML = '<div class="pnBar"><div class="pnIcons">'
+      + icon('photo:x', 1, 'Photo X', saved.x) + icon('photo:y', 2, 'Photo Y', saved.y)
+      + SHEETS.map(([p, i], k) => icon(`sheet:${p}:${i}`, k + 3, `Feuille ${k + 1}`, null, saved[`d_${p}${i}`] ? '✓ dans le jeu' : '')).join('')
+      + '</div><div class="pnPrompts">' + SHEETS.map(([p, i, kind], k) => `<button type="button" class="pnBtn" data-pcopy="${p}:${kind}">Prompt feuille ${k + 1}</button>`).join('') + '</div></div>';
   }
   function panelHandle(key, file) {
     const [kind, p, i] = key.split(':');
     if (kind === 'photo') return shrink(file).then((u) => { saved[p] = u; save(); drawPanel(); });
-    if (kind === 'img') return shrink(file).then((u) => { saved[p + 'c'] = u; save(); drawPanel(); });
-    const st = pn.querySelector(`[data-st="${p}:${i}"]`), name = saved['n_' + p];
-    if (!name) { st.textContent = 'Donne-lui un nom d\u2019abord.'; return; }
+    const st = pn.querySelector(`[data-st="${key}"]`), name = saved['n_' + p] || `Spark ${p.toUpperCase()}`;
+    const say = (t) => { st.textContent = t; };
+    say('En attente…');
     queue = queue.then(async () => {   // one at a time: the importer holds one sheet
       try {
-        st.textContent = 'Découpe…'; const cells = await IMPORT.cut(file, kindsOf(p)[i], name, (t) => { st.textContent = t; });
-        if (+i === 0 && cells[0]) { saved[p + 'c'] = await small(cells[0].src); if (cells[1]) saved[p + 'c2'] = await small(cells[1].src); save(); const sl = pn.querySelector(`[data-slot="img:${p}"]`); if (sl) { sl.style.backgroundImage = `url(${saved[p + 'c']})`; sl.classList.add('has'); sl.firstChild.textContent = ''; } }
-        st.textContent = 'Ajout au jeu…'; const msg = await IMPORT.add(); saved[`d_${p}${i}`] = 1; save(); st.textContent = '✓ ' + msg;
-      } catch (e) { st.textContent = 'Pas ajoutée : ' + (e.message || e); }
+        say('Découpe…'); const cells = await IMPORT.cut(file, SHEETS.find(([q, j]) => q === p && j === +i)[2], name, say);
+        if (+i === 0 && cells[0]) { saved[p + 'c'] = await small(cells[0].src); if (cells[1]) saved[p + 'c2'] = await small(cells[1].src); save(); }
+        say('Ajout au jeu…'); const msg = await IMPORT.add(); saved[`d_${p}${i}`] = 1; save(); say(msg.startsWith('Jouable') ? '✓ sur cet appareil' : '✓ dans le jeu');
+      } catch (e) { say('Pas ajoutée : ' + (e.message || e)); }
     });
   }
   const panel = {
     mount(el) {
       pn = el; cur = null; drawPanel();
-      el.onclick = (e) => {
-        const b = e.target.closest('button'); if (!b) return;
-        if (b.dataset.pcopy) { const [p, id] = b.dataset.pcopy.split(':'); copy(BANK.newCharPromptFor(id, person(p)), b); }
-        else if (b.dataset.pimg) copyPic(saved[b.dataset.pimg], b);
-        else if (b.dataset.she) { const [p, v] = b.dataset.she.split(':'); saved['s_' + p] = !!v; save(); drawPanel(); }
-      };
-      el.onchange = (e) => {
-        const f = e.target.dataset.file, k = e.target.dataset.kind;
-        if (f && e.target.files[0]) panelHandle(f, e.target.files[0]);
-        if (k) { const [p, i] = k.split(':'), ks = [...kindsOf(p)]; ks[i] = e.target.value; saved['k_' + p] = ks; delete saved[`d_${p}${i}`]; save(); drawPanel(); }
-      };
-      el.oninput = (e) => {
-        const n = e.target.dataset.name, l = e.target.dataset.lock;
-        if (n) saved['n_' + n] = e.target.value.trim(); if (l) saved['l_' + l] = e.target.value; save();
-      };
-      el.onpointerover = (e) => { cur = e.target.closest('.pnSlot'); };
-      el.onfocusin = (e) => { cur = e.target.closest('.pnSlot') || cur; };
+      el.onclick = (e) => { const b = e.target.closest('button[data-pcopy]'); if (b) { const [p, kind] = b.dataset.pcopy.split(':'); copy(BANK.newCharPromptFor(kind, person(p)), b); } };
+      el.onchange = (e) => { const f = e.target.dataset.file; if (f && e.target.files[0]) panelHandle(f, e.target.files[0]); };
+      el.onpointerover = (e) => { cur = e.target.closest('.pnIcon'); };
+      el.onfocusin = (e) => { cur = e.target.closest('.pnIcon') || cur; };
     },
-    paste(e) {   // Ctrl+V on the panel: the picture goes to the case under the pointer (or the last one touched)
+    paste(e) {   // Ctrl+V on slide 0: the picture goes to the file under the pointer (or the last one touched)
       const f = [...(e.clipboardData?.files || [])].find((x) => x.type.startsWith('image/'));
       if (!f || !cur || !cur.isConnected || i >= 0) return false; panelHandle(cur.dataset.slot, f); return true;
     },
@@ -174,17 +151,16 @@ window.DECK = (() => {
   return {
     mount(el) {
       root = el; i = -1; sub = 0;
-      el.innerHTML = '<div class="dkPrep"><button type="button" class="dkStart">Commencer ▶</button><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
+      el.innerHTML = '<div class="dkPrep"><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
-        if (e.target.closest('.dkStart')) { go(1); return; }
-        if (i < 0) return;   // slide 0 scrolls and has its own buttons
+        if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const p = e.target.closest('.dkPic');
         if (p || e.target.closest('.dkTyped, .dkNote')) return;
         const r = el.getBoundingClientRect(); go(e.clientX - r.left < r.width / 3 ? -1 : 1);
       };
       el.onchange = (e) => { const p = e.target.closest('.dkPic'); if (p && e.target.files[0]) pick(e.target.files[0], p.dataset.k); };
-      el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
+      el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t && t.dataset.name) { saved['n_' + t.dataset.name] = t.textContent.trim(); save(); return; } if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
       el.querySelector('.dkPlan').appendChild(document.getElementById('sparkPlan').content.cloneNode(true));
       panel.mount(el.querySelector('.pnHost'));
       draw();

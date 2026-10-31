@@ -45,6 +45,7 @@
       for (let i = 0; i < W * H; i++) alpha[i] = d[i * 4 + 3] / 255;
     } else if (bg[1] - Math.max(bg[0], bg[2]) > 60) {
       for (let i = 0; i < W * H; i++) {   // green screen: how green against red and blue; the spill on the edges pulled back
+        if ((i & 0x3ffff) === 0) await breathe();   // the page stays alive (a phone takes seconds on a sheet)
         const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], t = g - Math.max(r, b);
         alpha[i] = g < 120 ? 1 : Math.min(1, Math.max(0, 1 - (t - 25) / 60));
         if (alpha[i] < 0.98 && g > Math.max(r, b)) d[i * 4 + 1] = Math.max(r, b);
@@ -54,7 +55,8 @@
       alpha.fill(1); const st = [];
       for (let x = 0; x < W; x++) st.push(x, (H - 1) * W + x);
       for (let y = 0; y < H; y++) st.push(y * W, y * W + W - 1);
-      while (st.length) { const i = st.pop(); if (alpha[i] === 0 || !near(i)) continue; alpha[i] = 0; const x = i % W;
+      let steps = 0;
+      while (st.length) { if ((++steps & 0x3ffff) === 0) await breathe(); const i = st.pop(); if (alpha[i] === 0 || !near(i)) continue; alpha[i] = 0; const x = i % W;
         if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < W * (H - 1)) st.push(i + W); }
       for (let i = W; i < W * (H - 1); i++) if (alpha[i] && (!alpha[i - 1] || !alpha[i + 1] || !alpha[i - W] || !alpha[i + W])) alpha[i] = 0.6;   // a soft edge
     }
@@ -63,7 +65,7 @@
     await breathe();
     const dist = new Uint8Array(W * H).fill(255), q = new Int32Array(W * H); let qh = 0, qt = 0;
     for (let i = 0; i < W * H; i++) if (alpha[i] < 0.5) { dist[i] = 0; q[qt++] = i; }
-    while (qh < qt) { const i = q[qh++], dd = dist[i] + 1; if (dd > 8) continue; const x = i % W;
+    while (qh < qt) { if ((qh & 0x3ffff) === 0) await breathe(); const i = q[qh++], dd = dist[i] + 1; if (dd > 8) continue; const x = i % W;
       for (const n of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) if (n >= 0 && n < W * H && dist[n] > dd) { dist[n] = dd; q[qt++] = n; } }
     const edge = dist;
     for (let i = 0; i < W * H; i++) if (edge[i] <= 8) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; if (g > Math.max(r, b) + 12) d[i * 4 + 1] = Math.max(r, b); }
@@ -233,10 +235,10 @@
     async cut(file, kind, name, tell) {
       const cells = await cut(file, kind, tell), sp = measure(kind, cells);
       for (const c of cells) {   // the picture at its final size (a full-body sheet is scaled to 700 tall)
-        const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
+        await breathe(); const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
         const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o;
       }
-      for (const c of cells) c.src = c.out.toDataURL('image/png');
+      for (const c of cells) { await breathe(); c.src = c.out.toDataURL('image/png'); }
       last = { id: slug(name), name: String(name || '').trim(), kind, cells, sp };
       return cells.map((c) => ({ pose: c.pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
     },

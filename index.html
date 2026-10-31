@@ -530,14 +530,41 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .dkHv img:nth-of-type(2) { right: 18%; }
 .dkHv img:only-of-type { left: 50%; transform: translateX(-50%); }
 .dkHv.shadow { background: radial-gradient(80% 90% at 50% 40%, #3a1218, #0b0608); }
-.dkHv.wc { background: #cfd8d6 center / contain no-repeat; background-image: url(ref/lastcall_wc.webp); background-color: #1c1c1e; }
+/* Last call's toilets: tiles, urinals, divider, the two of them, the game's bubble */
+.dkHv.wc { background: linear-gradient(#39423f, #39423f) bottom / 100% 26% no-repeat, repeating-linear-gradient(0deg, transparent 0 calc(9% - .2em), #bcc7c1 calc(9% - .2em) 9%), repeating-linear-gradient(90deg, transparent 0 calc(11% - .2em), #bcc7c1 calc(11% - .2em) 11%), #d6ded9; }
+.dkHv.wc::before { display: none; }
+.dkHv.wc i { position: absolute; background: #f7f8f5; border-radius: 3em 3em 1em 1em; box-shadow: inset 0 0 0 .3em #e1e5e1; }
+.dkHv.wc .wcU { width: 17%; height: 24%; top: 36%; }
+.dkHv.wc .wcU.a { left: 14%; } .dkHv.wc .wcU.b { left: 55%; } .dkHv.wc .wcU.c { left: 96%; }
+.dkHv.wc .wcDiv { left: 49%; width: 1.4%; top: 22%; height: 52%; background: #7f8a87; box-shadow: none; border-radius: .6em; }
+.dkHv.wc img { height: 66%; bottom: 20%; transform: none; }
+.dkHv.wc .wcB { left: 20%; right: auto; } .dkHv.wc .wcS { left: 56%; right: auto; }
+.dkHv.wc .wcBubble { position: absolute; left: 12%; right: 12%; top: 50%; padding: .5em .9em .6em; background: #fffefb; color: #1c1c1e; border-radius: 1em; box-shadow: 0 0 0 .14em #a9b9d0; }
+.dkHv.wc .wcBubble b { position: absolute; left: 34%; top: -.9em; right: auto; bottom: auto; padding: .15em 1em; border-radius: 1em; background: #2a4f8f; color: #fff; font-size: 1.5em; font-style: italic; font-weight: 800; letter-spacing: .08em; }
+.dkHv.wc .wcBubble p { margin: 0; max-width: none; font-size: 2.4em; font-weight: 600; color: #1c1c1e; }
+.dkHv.wc span { display: none; }
+.dkHv.zoom { background: radial-gradient(80% 90% at 50% 40%, #3a1218, #0b0608); }
+.dkHv.zoom img { top: -14%; bottom: auto; height: 250%; left: 50%; transform: translateX(-50%); }
 .dkHv span { z-index: 1; }
 .dkHv::before { z-index: 1; }
 .dkCard:hover .dkHv { opacity: 1; }
 /* slide 0: Préparer, then the plan, one page that scrolls; → goes on to slide 1 */
 .dkPrep { display: none; }
-#deck .dkPrep { position: absolute; inset: 0; overflow-y: auto; padding: 11em 5% 8em; }
+#deck .dkPrep { position: absolute; inset: 0; overflow-y: auto; padding: 11em 5% 8em; cursor: pointer; }
 #deck.prep .dkPrep { display: block; }
+/* slide 0: 5 files to drop, 3 prompts to copy */
+.pnBar { display: flex; flex-wrap: wrap; gap: 2em 5em; align-items: flex-end; margin-bottom: 1em; }
+.pnIcons { display: flex; gap: 2.4em; }
+.pnIcon { display: flex; flex-direction: column; align-items: center; gap: .5em; width: 12em; cursor: pointer; outline: 0; text-align: center; }
+.pnIcon i { position: relative; width: 9em; height: 9em; border-radius: 1.6em; display: grid; place-items: center; background: #1c1c1e center / cover no-repeat; box-shadow: inset 0 0 0 .14em #48484a; color: #aeaeb2; font-style: normal; }
+.pnIcon i svg { width: 4.6em; height: 4.6em; }
+.pnIcon i b { position: absolute; top: -.7em; left: -.7em; width: 2.2em; height: 2.2em; border-radius: 50%; display: grid; place-items: center; background: #ffd60a; color: #000; font-size: 1.6em; }
+.pnIcon:hover i, .pnIcon:focus i { box-shadow: inset 0 0 0 .2em #ffd60a; }
+.pnIcon span { font-size: 2em; font-weight: 600; color: #f5f5f7; }
+.pnIcon em { font-style: normal; font-size: 1.5em; color: #30d158; min-height: 1.2em; }
+.pnPrompts { display: flex; gap: 1.2em; flex-wrap: wrap; padding-bottom: 2.4em; }
+.dkZero { font-family: var(--display); font-size: 70em; line-height: .9; text-align: center; color: var(--c); }
+.dkAsk { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .4em; font-family: var(--display); font-size: 11em; line-height: 1.05; }
 #deck.prep .dkSlide, #deck.prep .dkBar, #deck.prep .dkNote, #deck.prep .dkNoteBtn { display: none; }
 .dkPrep .dkStart { font: inherit; font-size: 2.4em; font-weight: 700; padding: .5em 1.1em; border: 0; border-radius: 2em; color: #000; background: linear-gradient(90deg, #ffd60a, #ff9f0a); cursor: pointer; }
 .dkPrep .spark { margin: 4em 0 0; }
@@ -1766,9 +1793,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
-<script src="importer.js?v=20261031550000"></script>
-<script src="deck.js?v=20261032800000"></script>
-<script src="bank.js?v=20261031700000"></script>
+<script src="importer.js?v=20261033100000"></script>
+<script src="deck.js?v=20261033100000"></script>
+<script src="bank.js?v=20261032900000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
