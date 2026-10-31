@@ -6,7 +6,7 @@ window.DECK = (() => {
   let saved = load(), i = -1, root;
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* full or private window */ } };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const slot = (k, label, src = k) => `<label class="dkPic" data-k="${k}"${saved[src] ? ` style="background-image:url(${saved[src]})"` : ''}><span>${saved[src] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
+  const slot = (k, label, src = k) => `<label class="dkPic${k.endsWith('c') ? ' ct' : ''}" data-k="${k}"${saved[src] ? ` style="background-image:url(${saved[src]})"` : ''}><span>${saved[src] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
   const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
   const typed = (k, def) => `<p class="dkTyped" contenteditable="true" spellcheck="false" data-t="${k}">${esc(saved['t_' + k] ?? def)}</p>`;
   // every character we have the base image for: image → perso, the perso cycling through its poses to show it moves
@@ -33,7 +33,6 @@ window.DECK = (() => {
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<div><h2 class="dkTyped" contenteditable="true" spellcheck="false" data-name="x">${nm('x')}</h2>${typed('x', '[X] est en cybersécurité et adore…')}</div></div>` },
-    { c: '#ff9f0a', h: () => `<h1>Et c'est important parce qu'elle s'est offerte comme cobaye.</h1><p>Mais avant de vous parler de ça…</p>` },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
     { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hk === 'wc' ? WC : ''}${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
     { c: '#ff375f', h: () => `<small>Démo · télé</small><h1>[X] décide de l'histoire.</h1><p>Le public croit regarder une histoire. Puis il découvre qu'un joueur a le contrôle.</p>` },
@@ -50,7 +49,6 @@ window.DECK = (() => {
   const NOTES = [
     "« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… » Une seule : [Y] n'existe pas encore pour la salle.",
     "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
-    "« Et c'est important parce qu'elle s'est offerte comme cobaye. Mais avant de vous parler de ça… »",
     "Son selfie, une flèche vers son perso.",
     "Le catalogue d'histoires : je clique sur une histoire de pirates immersive. Démo · télé.",
     "Après les premières répliques, je révèle que [X] décide de l'histoire. Pendant la démo, pas avant : le public croit regarder une histoire, puis découvre qu'un joueur a le contrôle.",
