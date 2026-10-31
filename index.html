@@ -534,8 +534,10 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .dkHv img:only-of-type { left: 50%; transform: translateX(-50%); }
 .dkHv.shadow { background: radial-gradient(80% 90% at 50% 40%, #3a1218, #0b0608); }
 /* Last call's toilets: tiles, urinals, divider, the two of them, the game's bubble */
-.dkHv.wc { background: linear-gradient(#39423f, #39423f) bottom / 100% 26% no-repeat, repeating-linear-gradient(0deg, transparent 0 calc(9% - .2em), #bcc7c1 calc(9% - .2em) 9%), repeating-linear-gradient(90deg, transparent 0 calc(11% - .2em), #bcc7c1 calc(11% - .2em) 11%), #d6ded9; }
+.dkHv.wc { inset: auto 0 0; height: 42%; background: linear-gradient(#39423f, #39423f) bottom / 100% 26% no-repeat, repeating-linear-gradient(0deg, transparent 0 calc(9% - .2em), #bcc7c1 calc(9% - .2em) 9%), repeating-linear-gradient(90deg, transparent 0 calc(11% - .2em), #bcc7c1 calc(11% - .2em) 11%), #d6ded9; }
 .dkHv.wc::before { display: none; }
+.dkCard:has(.dkHv.wc) b { transition: bottom .25s; }
+.dkCard:has(.dkHv.wc):hover b { bottom: 42%; }   /* the title lifts; the toilets are its subtitle underneath */
 .dkHv.wc i { position: absolute; background: #f7f8f5; border-radius: 3em 3em 1em 1em; box-shadow: inset 0 0 0 .3em #e1e5e1; }
 .dkHv.wc .wcU { width: 17%; height: 24%; top: 36%; }
 .dkHv.wc .wcU.a { left: 14%; } .dkHv.wc .wcU.b { left: 55%; } .dkHv.wc .wcU.c { left: 96%; }
@@ -1801,7 +1803,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261033100000"></script>
-<script src="deck.js?v=20261033500000"></script>
+<script src="deck.js?v=20261034100000"></script>
 <script src="bank.js?v=20261032900000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>

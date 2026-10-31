@@ -28,7 +28,7 @@ window.DECK = (() => {
     ['Le serment du pirate', 'bg/taverne.webp', ['chars/pirate/bar_smile.webp'], ['props/wanted.webp', []], '« Je gardais ta place depuis trois ans. »', 1],
     ['Quest of power', 'ref/boss_breath.webp', [], ['', ['chars/ombre/stand.webp'], 'zoom'], 'Il y avait quelqu\u2019un dans l\u2019ombre.'],
     ['Un été de trop', 'bg/chalet.jpg', ['chars/plage/hip.webp', 'chars/alex/beach.webp'], ['', ['chars/mila/beach.webp'], 'shadow'], 'Que personne ne sache pour l\u2019été.'],
-    ['Last call', '', ['chars/brooke/texting.webp'], ['', [], 'wc'], ''],
+    ['Last call', 'covers/lastcall_deck.jpg', ['chars/brooke/texting.webp'], ['', [], 'wc'], ''],
   ];
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
