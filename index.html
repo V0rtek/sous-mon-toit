@@ -515,6 +515,12 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #deck .dkNote[hidden] { display: none; }
 #deck .dkSlide.full { padding: 0; }
 .dkFull { width: 100%; height: 100%; object-fit: contain; background: #000; }
+/* the 2x2: three pictures and the wall of persos, each a quarter */
+#deck .dkQuad { position: absolute; inset: 8em 9% 4em; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1.2em; }
+#deck .dkQuad > img { width: 100%; height: 100%; min-height: 0; object-fit: cover; border-radius: 1.2em; }
+#deck .dkQuad .dkWall { height: 100%; min-height: 0; grid-template-rows: repeat(3, 1fr); gap: .6em; }
+#deck .dkQuad .dkWall > div { height: auto; min-height: 0; padding: .4em; gap: .4em; }
+#deck .dkQuad .dkWall img { width: 36%; }
 #deck .dkSlide:has(.dkCat) { gap: 1.2em; padding: 9em 21% 4em; justify-content: flex-start; }
 .dkSlide:has(.dkCat) h2 { font-size: 4.2em; }
 .dkCat { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 1.6em; }
@@ -1803,7 +1809,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261033100000"></script>
-<script src="deck.js?v=20261034100000"></script>
+<script src="deck.js?v=20261034200000"></script>
 <script src="bank.js?v=20261032900000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
