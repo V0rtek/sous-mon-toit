@@ -32,6 +32,7 @@ window.DECK = (() => {
   ];
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
+    { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Il me faut un volontaire pour que je prenne en photo. »</h1><p>Un étranger monte sur scène. Personne ne le connaît encore.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}</div>` },
     { c: '#ff9f0a', h: () => '' },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
@@ -41,7 +42,7 @@ window.DECK = (() => {
     { c: '#ff375f', h: () => `<small>Démo · télé · 3</small><h1>Lily a le pouvoir sur l'histoire.</h1><p>Plot twist. Le choix lui est donné, tout simplement. Pause pour expliquer.</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé · 4</small><h1>Les enjeux montent.</h1><p>Mini-climax : la salle a hâte de voir les conséquences. Un nouveau perso entre : [Y].</p>` },
     { c: '#ff375f', h: () => `<small>Démo · télé · 5</small><h1>Plot twist : c'est du multijoueur.</h1><p>Un choix qui compte, fait par quelqu'un d'autre dans la salle.</p>` },
-    { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure.</p>` },
+    { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.</p>` },
     { c: '#ff375f', full: true, h: () => `<img class="dkFull" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">` },
     { c: '#30d158', wall: true, h: () => `<div class="dkQuad"><img src="ref/suit_tele.webp" alt="Deux amis devant la télé, l’histoire de pirates à l’écran"><img src="ref/suit_cells.webp" alt="Chacun sur son cell, l’un aux toilettes, l’autre sur le divan"><img src="ref/suit_cell.webp" alt="Elle suit l’histoire sur son cell"><div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div></div>` },
     { c: '#ff375f', h: () => `<h1>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</h1><p>Étrangement, non.</p>` },
@@ -51,6 +52,7 @@ window.DECK = (() => {
   // what I say on each slide (mine to edit, kept on this device); behind the corner button
   const NOTES = [
     "« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… » Une seule : [Y] n'existe pas encore pour la salle.",
+    "« Il me faut un volontaire pour que je prenne en photo. » Un étranger monte sur scène : c'est lui, [Y], qui pose pour la photo.",
     "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
     "Slide vide.",
     "Son selfie, une flèche vers son perso.",
@@ -60,7 +62,7 @@ window.DECK = (() => {
     "3. Plot twist : Lily a du pouvoir sur l'histoire, un pouvoir cool que les gens aimeraient avoir. Je montre simplement comment le choix est donné. Pause pour expliquer un peu.",
     "4. Les enjeux montent : les gens ont hâte de voir les conséquences du choix (mini-climax). Et un nouveau perso arrive : [Y], annoncé plus tôt (« J'y reviens plus tard »).",
     "5. Plot twist : c'est en fait du multijoueur, et le choix qui compte a été fait par une autre personne dans la salle.",
-    "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure.",
+    "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.",
     "Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé.",
     "Devant la télé, ensemble. Chacun sur son cell, même aux toilettes : l'histoire le suit. Elle continue sur son cell. Tous ces persos viennent d'une photo, chacun joue ses poses.",
     "« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine. » Étrangement, non : je montre le concept de monde, d'histoires et mon système d'histoire.",
