@@ -1,0 +1,86 @@
+{
+ "act": {
+  "done": {},
+  "picks": {},
+  "plans": {},
+  "setups": [
+   {
+    "plant": "Melissa: \"Some people get offered things they don't deserve. The question is whether their friends let them throw it away.\" She looks only at Ruby.",
+    "pay": "Melissa's fear of Ruby taking Justin away explains why she sabotaged Ruby, and why she now wants Justin's success at the gala: proof that staying was the right choice, and that Ruby was holding him back."
+   },
+   {
+    "plant": "Ruby, laughing nervously: \"Melissa keeps saying she wants what's best for you. But she's never once asked me if I'm okay with any of this.\"",
+    "pay": "Ruby's comment about Melissa not asking reveals Ruby suspects Melissa has always decided Justin's future without Ruby's voice mattering, which connects to Melissa's history of making choices for him."
+   }
+  ],
+  "title": "The Tavern Debt",
+  "scene": "taverne",
+  "question": "Can you keep your dream without losing the people who believed in you first?",
+  "a": {
+   "id": "melissa",
+   "is": "his business partner",
+   "wants": "wants him to perform at the merchant's gala tomorrow night instead of at their tavern",
+   "because": "she believes that one night on a real stage will make him famous and their tavern will become the place where the famous musician plays"
+  },
+  "b": {
+   "id": "ruby",
+   "is": "his girlfriend",
+   "wants": "wants him to stay and perform at the tavern as promised, no exceptions",
+   "because": "she believes the gala is a trap by people who will use him and abandon him once they are done"
+  },
+  "justin_wants": "to play a real stage in front of people who matter, because he has spent five years playing the same tavern and dreams of being heard beyond these walls",
+  "past": "Two years ago, ruby left the city for a week to audition elsewhere, and neither melissa nor justin told her that melissa had already booked him for a tour she cancelled at the last moment.",
+  "lost_if_no": "Melissa walks out of the tavern tonight and does not come back; the partnership ends before it begins.",
+  "secret": {
+   "who": "melissa",
+   "what": "Melissa sabotaged Ruby's audition two years ago by telling the casting director that Ruby was unreliable, because she was afraid Ruby would take Justin away from the city and their tavern dream together."
+  },
+  "episodes": [
+   {
+    "ask": "Melissa asks Justin to perform at the merchant's gala tomorrow night instead of at the tavern, because she believes it is the only real stage he will ever get.",
+    "hurts": "Ruby hears him say yes to Melissa: she loses her faith that Justin will choose her and their tavern over ambition.",
+    "mystery": "Ruby says: \"You never even told me Melissa tried to send you on tour two years ago.\" Melissa says: \"I told him to keep it from you. It fell through anyway.\" But Ruby heard about it from someone else and knew he hid it. What did Justin tell Ruby at the time, and why?",
+    "choice": {
+     "a": "Tell Melissa yes: perform at the gala. Kiss her. Choose the stage.",
+     "if_a": "Ruby watches from the bar as Melissa hugs Justin; Ruby sets down her drink and leaves without a word. Melissa and Justin are alone together, planning. The tavern is quiet.",
+     "b": "Tell Melissa no: stay at the tavern. Tell Ruby you will never leave her like that again.",
+     "if_b": "Melissa's face hardens; she sits at a table alone and drinks. Ruby squeezes your hand, but her eyes stay on Melissa, worried. The three of you are in the same room and no longer equals."
+    },
+    "hook": "Melissa: \"Tomorrow night, you walk on that stage or you stop calling yourself a musician. Choose now.\""
+   },
+   {
+    "easy": "Justin tells Melissa he will perform at the gala, then tells Ruby he convinced Melissa to let him stay at the tavern—that Melissa agreed to a compromise.",
+    "backfires": "The gala organizer arrives at the tavern to confirm Justin's attendance and find him working. Ruby is there and hears everything. She stands up and says: \"You lied to me. Again.\" She leaves.",
+    "choice": {
+     "a": "Chase Ruby into the street. Admit Melissa made you choose and you wanted both.",
+     "if_a": "Ruby stops and listens, but she does not turn around. She says: \"Then you chose wrong,\" and walks into the darkness. Melissa watches from the tavern window.",
+     "b": "Stay at the tavern. Tell Melissa: \"This is done. We perform together tomorrow or not at all.\"",
+     "if_b": "Melissa laughs—a sound without joy. She says: \"You don't get to make that call anymore,\" and goes to the cellar. Ruby's chair is still warm. You are alone at the bar."
+    },
+    "hook": "A carriage arrives at the tavern door an hour later. A merchant steps out, looks at Melissa, and says: \"We leave at dawn. Is your boy ready, or do I find someone else?\""
+   },
+   {
+    "reveal": "Melissa, drunk in the cellar, tells Justin the truth: \"I kept you here because I couldn't lose you. Not after I already lost her. I told that director Ruby was unreliable. I made sure she would fail. And it worked. She stayed gone, and you never even knew.\" Justin realizes the past makes sense now: Ruby never came home because she believed she was a failure.",
+    "flip": "The player believed Melissa was ambitious for Justin's future; the truth is Melissa was terrified of her own loneliness and sabotaged Ruby to keep Justin close. Ruby's doubt of Melissa was not jealousy—it was knowing, somewhere deep, that Melissa had already taken something from her.",
+    "choice": {
+     "a": "Forgive Melissa now. Tell her you understand why she did it and that you will perform at the gala—for both of you.",
+     "if_a": "Melissa cries and holds you. Upstairs, Ruby returns to the tavern at midnight, hoping to see you. She sees you and Melissa together, laughing in the dim light. She leaves again, this time for good.",
+     "b": "Tell Melissa she has to confess to Ruby tomorrow, or you will. Tell her you are done choosing between them based on lies.",
+     "if_b": "Melissa agrees, terrified. You go upstairs, and Ruby is sitting at the bar, waiting. She knows something has changed. You are not sure if she will forgive either of you."
+    },
+    "hook": "Ruby says: \"Tomorrow at sunrise. Both of you at the bridge. We talk, or I leave the city and you never see me again.\""
+   },
+   {
+    "clock": "The gala is tomorrow night at eight. The conversation at the bridge is tomorrow at dawn. He cannot be at both.",
+    "a_asks": "Melissa says: \"Come to the gala. Let me introduce you. This is the moment we built the tavern for.\"",
+    "b_asks": "Ruby says: \"Come to the bridge. Hear me. Then decide what you want, not what they took from you.\""
+   },
+   {
+    "if_a": "Justin performs at the gala and becomes known in the city. Merchants and nobles praise him. He never goes to the bridge. Ruby sends word three days later that she has left the city. Melissa owns the tavern alone now, and she and Justin run it together in silence—successful and hollow. A letter arrives six months later, postmarked from a city north of here. Ruby's handwriting: \"I hope the stage was worth it.\" Nothing else.",
+    "if_b": "Justin goes to the bridge at dawn. Ruby tells him that she sabotaged her own audition two years ago because she was afraid of leaving him, and that Melissa exploited that fear. She says: \"I'm still afraid. But I'm more afraid of a life where you had to choose between me and yourself.\" They leave the tavern together that morning. Melissa stands alone on the terrace, watching them go. A year later, Justin plays small stages in other cities. He is not famous, but he is free. He writes to Melissa sometimes. She never replies.",
+    "open": "In either path, the question remains: Can love survive the truth, or only the lie it was built on? The next act will show what happens when they meet again."
+   }
+  ]
+ },
+ "by": "haiku"
+}
