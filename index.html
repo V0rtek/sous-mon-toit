@@ -84,16 +84,16 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 
 #ui { position: absolute; left: 7%; right: 7%; top: 53%; display: flex; flex-direction: column; gap: 1.4em; }
 /* a staging test (Mini-jeux): the lines at the top, the poses below them in full view */
-body.uitop #ui { top: 3%; }
-#bubble { position: relative; background: var(--paper); border: .3em solid var(--rim); border-radius: 2em; padding: 2.4em 2.2em 1.9em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); }
+body.uitop #ui { top: auto; bottom: 3%; }
+#bubble { position: relative; background: var(--paper); border: .3em solid var(--rim); border-radius: 1.4em; padding: 1.6em 1.4em 1.1em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); }
 #bubble.narr { background: rgba(22,18,30,.9); border-color: rgba(255,255,255,.14); color: #f4eefc; padding-top: 1.8em; }
 #bubble.narr #text { font-style: italic; font-weight: 600; text-align: center; }
 #bubble.think { border-style: dashed; background: #f6f2ff; }
 #bubble.think #text, #bubble.whisper #text { font-style: italic; }
-#bubble.whisper #text { font-size: 2.1em; }
+#bubble.whisper #text { font-size: 1.3em; }
 #tag { position: absolute; left: 1.6em; top: -1.55em; padding: .32em 1.1em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: 2em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
 #tag small { font-size: .62em; font-weight: 700; letter-spacing: .02em; text-transform: none; opacity: .85; margin-left: .4em; }
-#text { font-size: 2.35em; line-height: 1.32; font-weight: 600; min-height: 1.32em; }
+#text { font-size: 1.45em; line-height: 1.32; font-weight: 600; min-height: 1.32em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
