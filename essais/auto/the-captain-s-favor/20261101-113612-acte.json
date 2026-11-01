@@ -1,0 +1,86 @@
+{
+ "act": {
+  "done": {},
+  "picks": {},
+  "plans": {},
+  "setups": [
+   {
+    "plant": "Le_pirate: \"Your brother was the bravest man I knew. If he were here, he would tell you: the sea doesn't take. People choose it.\"",
+    "pay": "Once the secret is out, this line becomes a confession: Le_pirate is not talking about Lily's brother choosing the sea—he is talking about himself choosing to let go."
+   },
+   {
+    "plant": "Lily, holding a bottle, does not set it down: \"You always say the salvage will be the last one. You've said that every time.\"",
+    "pay": "She is not talking about promises Le_pirate made to her; she is talking about a promise he made to Lily's brother—a promise Le_pirate broke by cutting the rope."
+   }
+  ],
+  "title": "The Captain's Favor",
+  "scene": "the compass, a tavern by the docks at night; the counter runs along one side, bottles behind it catching lamplight; a few tables scatter the floor; the sea sounds outside, waves against wood.",
+  "question": "Can you keep a promise to someone if keeping it means breaking faith with the one you love?",
+  "a": {
+   "id": "le_pirate",
+   "is": "his business partner; they own the tavern together",
+   "wants": "wants justin to sail with him tomorrow at dawn to claim a salvage claim two days north, because he believes justin is the only one he trusts to navigate it and they will be rich enough to own the whole harbor.",
+   "because": "he believes justin is the only one he trusts to navigate it and they will be rich enough to own the whole harbor"
+  },
+  "b": {
+   "id": "lily",
+   "is": "his girlfriend; she works behind the counter most nights",
+   "wants": "wants justin to promise he will never sail with Le_pirate again, because she believes the sea takes everyone who trusts it and she has already lost one person that way.",
+   "because": "she believes the sea takes everyone who trusts it and she has already lost one person that way"
+  },
+  "justin_wants": "to sail his own ship one day, to be captain of something that is his, not a partner's shadow, because he has spent five years behind this counter watching other men leave and come back changed, and he wants to know what the sea promises.",
+  "past": "Five years ago, Lily's brother drowned on a salvage run; Le_pirate was on that boat and came back; Lily never asked him what happened.",
+  "lost_if_no": "Le_pirate walks out of the tavern with the claim in his pocket and does not come back; the partnership is over; justin stays behind the counter forever.",
+  "secret": {
+   "who": "le_pirate",
+   "what": "Le_pirate did not try to save Lily's brother that night; he cut the rope when the boat went down, because Lily's brother wanted to take command and Le_pirate could not bear to lose control of the sea."
+  },
+  "episodes": [
+   {
+    "ask": "Le_pirate asks justin to sail north with him at dawn to claim a salvage wreck two days out; he says they will split it three ways with no one else knowing.",
+    "hurts": "Lily hears this and her face closes; she sets down the bottle hard; she does not look at justin for the rest of the night.",
+    "mystery": "Lily says to justin: \"Your brother promised me he would not sail again.\" Justin says: \"My brother never sailed.\" Lily: \"Exactly.\" She turns away before he can ask what she means.",
+    "choice": {
+     "a": "Tell Le_pirate yes; say goodbye to Lily tonight before the dawn.",
+     "if_a": "Lily walks out of the tavern into the dark without a word; Le_pirate claps justin on the shoulder and says \"You'll see the horizon.\" Justin stands alone behind the counter as the sun comes up outside.",
+     "b": "Tell Le_pirate no; stay with Lily; promise never to sail.",
+     "if_b": "Le_pirate's face hardens; he sets down his drink and walks to the door; he pauses and says \"Your brother would have sailed.\" He leaves without waiting for an answer. Lily does not move or speak."
+    },
+    "hook": "Le_pirate comes back before dawn with a letter folded in his hand; he sets it on the counter and says: \"Read this when you're alone. Then decide if you still want to stay.\""
+   },
+   {
+    "easy": "Justin tells Le_pirate he will sail, but only for one week, not two days—a lie that buys time; he tells Lily the same: one week away, then back for good.",
+    "backfires": "Le_pirate's ship is already loaded; Justin meets him at the dock and Le_pirate says \"We leave now.\" At the same moment, Lily appears at the tavern door across the dock; she sees them together with the rope in hand; she sits down on the step and does not look away until they cast off.",
+    "choice": {
+     "a": "Jump into the boat; sail; leave Lily watching on the dock.",
+     "if_a": "The boat pulls away; Lily does not move; Justin watches her get smaller until the sea takes her from view; Le_pirate does not speak; the boat cuts through dark water.",
+     "b": "Drop the rope; tell Le_pirate you are not sailing; run back to Lily.",
+     "if_b": "Lily stands up and walks back into the tavern without waiting for him; Le_pirate's face goes stone; he says \"So that is what you choose.\" He sails alone. Justin reaches the tavern door, but Lily has locked it from inside."
+    },
+    "hook": "At midnight, Lily unlocks the tavern door; she slides the captain's log across the counter—the one from the boat that sank five years ago, the one Le_pirate kept hidden; she says: \"Read it. Then tell me what you would have done.\""
+   },
+   {
+    "reveal": "Justin reads the log by candlelight at the counter; every page is there—the night the boat sank, the order to cut the rope, Lily's brother's name written and crossed out, Le_pirate's hand shaking as he wrote the words. Lily sits across from him and watches his face change. When he looks up, she says: \"He told my brother he would save him. He lied.\"",
+    "flip": "The player believed Le_pirate was an honest man who sailed by trust; the truth is Le_pirate is a man who kills to keep power. The player believed Lily was protecting justin out of fear; the truth is Lily was protecting him from becoming Le_pirate—from learning that the man he idolizes is a murderer.",
+    "choice": {
+     "a": "Tell Le_pirate the truth is known; break with him completely; stay with Lily and burn the log.",
+     "if_a": "Justin walks to the dock at dawn and waits for Le_pirate's boat to return; when it does, he tells him what Lily found; Le_pirate's face does not change; he says \"Good. Now you know what the sea costs.\" He walks past justin and into the tavern; he does not come out. Lily and Justin stand together at the counter, and Le_pirate is in the back room, listening.",
+     "b": "Say nothing; keep the secret; tell Lily you believe Le_pirate's version; try to forgive him and move forward.",
+     "if_b": "Lily sets the log on fire in the tavern hearth; she watches it burn and says: \"You chose him.\" She takes off the apron she has worn for five years and sets it on the counter; by morning, she is gone. Justin is alone in the tavern with Le_pirate, who never speaks of the sea again."
+    },
+    "hook": "Three days later, Le_pirate appears at the tavern with a new salvage map and a rope coiled at his feet; he looks at justin and says: \"We can sail north together, or you can sail south with someone else. But you will sail. The question is: with who?\""
+   },
+   {
+    "clock": "Le_pirate's ship leaves on the evening tide; Lily (if she stayed) is closing the tavern tonight and will not come back tomorrow; the choice must be made before sunset or both will be gone.",
+    "a_asks": "Le_pirate asks justin to come to the dock at sunset and board the ship; \"You've waited long enough,\" he says.",
+    "b_asks": "Lily asks justin to meet her at the tavern door at sunset and leave the harbor with her, overland, away from the sea; \"I know I'm asking you to choose nothing,\" she says, \"but I'm asking you to choose me.\""
+   },
+   {
+    "if_a": "Justin sails with Le_pirate into the dark; the ship cuts through black water; Le_pirate teaches him to read the stars; months pass; they find wrecks and bring back gold; justin becomes captain of his own ship, the one he dreamed of; he is free and he is rich and he is alone. One night, Le_pirate says: \"Your girl sent word to every port. She asked captains to tell you she forgave you if you ever came back.\" Justin looks at the stars and does not sail home.",
+    "if_b": "Justin meets Lily at the tavern door; they walk overland; Le_pirate's ship sails without him; the tavern is locked behind them; years pass; Justin works the land instead of the sea; he has a quiet life and Lily beside him; but sometimes he wakes at night and listens for waves; and sometimes Lily watches him and knows he is listening.",
+    "open": "Does Le_pirate ever sail into a port where Lily waits? Does Justin ever sail back to the harbor and find the tavern still standing? Does Lily's brother's death ever become a story the sea forgets, or does it follow both of them forever?"
+   }
+  ]
+ },
+ "by": "haiku"
+}
