@@ -37,7 +37,7 @@
     // two at the counter talking to each other: Sam nearer the camera, Justin behind him (the one at the back shows his face)
     t_deux: { ...B, spots: { twin: B.spots.justin, justin: B.spots.melissa }, face: { twin: 'r', justin: 'r' } },
     // Justin and the pirate at the counter: the pirate nearer the camera (bar_back = he looks at Justin), Justin behind him (bar_to_* = he talks to the pirate)
-    t_pirate: { ...B, spots: { pirate: B.spots.justin, justin: B.spots.melissa }, face: { justin: 'r', pirate: 'r' } },
+    t_pirate: { ...B, spots: { pirate: [830, 1319, 1089], justin: [950, 1130, 835] }, face: { justin: 'r', pirate: 'r' } },
     // seated at a table, facing each other (the guide ref/guides/table, until the real decor): the table hides below its top
     t_table: { image: 'ref/guides/table.webp', fg: 'ref/guides/table_fg.webp', size: [2400, 1350], front: [], spots: { a: [1005, 1250, 620], b: [1395, 1250, 620] }, face: { a: 'r', b: 'l' } },
     // Lily (31/10, imported from Nouveau perso): standing face to face with Justin, at the counter behind him, at the table
