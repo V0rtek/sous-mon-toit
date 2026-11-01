@@ -5,6 +5,13 @@ window.DECK = (() => {
   const KEY = 'smt-deck', load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
   let saved = load(), i = -1, root;
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch { /* full or private window */ } };
+  // 01/11: 6 slides added (the problem ×3, the investment, why me, the questions); the notes typed before follow their slide
+  if (!saved.v) {
+    const moved = (o) => (o < 4 ? o : o < 16 ? o + 3 : o === 16 ? 20 : o + 5), old = {};
+    for (const k of Object.keys(saved)) if (/^note_\d+$/.test(k)) { old[k] = saved[k]; delete saved[k]; }
+    for (const [k, v] of Object.entries(old)) saved['note_' + moved(+k.slice(5))] = v;
+    saved.v = 2; save();
+  }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slot = (k, label, src = k) => `<label class="dkPic${k.endsWith('c') ? ' ct' : ''}" data-k="${k}"${saved[src] ? ` style="background-image:url(${saved[src]})"` : ''}><span>${saved[src] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
   const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
@@ -30,11 +37,63 @@ window.DECK = (() => {
     ['Un été de trop', 'bg/chalet.jpg', ['chars/plage/hip.webp', 'chars/alex/beach.webp'], ['', ['chars/mila/beach.webp'], 'shadow'], 'Que personne ne sache pour l\u2019été.'],
     ['Last call', 'covers/lastcall_deck.jpg', ['chars/brooke/texting.webp'], ['', [], 'wc'], ''],
   ];
+  // the last slide (and stage 3 of the plan): the questions they'll ask after, and what I answer (from the YC application, 01/11)
+  const QA = [
+    ['C’est pas juste Showrunner?', [
+      'Eux misent sur les graphismes. Moi sur l’histoire et la personnalisation.',
+      'Showrunner pense que les gens veulent scripter leurs épisodes. Ils veulent des émotions tout de suite, avec leurs amis, sans effort.',
+      'Ce qui accroche un public : le conflit, le but du perso, le suspense, les twists. Les graphismes arrivent loin derrière. Joker 2 et Justice League : des graphismes fous, des flops.',
+      'Vidéo IA : environ 30 $ la minute en 1080p. Mes feuilles de poses : environ 0,66 $ la minute.']],
+    ['Pourquoi pas de la vidéo IA?', [
+      'Un jeu de choix, c’est un arbre : chaque branche est une vidéo que quelqu’un paie.',
+      '5 épisodes, 15 choix = 65 535 vidéos.',
+      'En vidéo IA (Veo 3.1 Lite) : 196 605 $. Chez nous : 655 $ (environ 1 ¢ de texte par branche, joué sur le cell).']],
+    ['Comment tu fais de l’argent?', [
+      'Les 4 premiers épisodes sont gratuits : on paie quand on est accroché.',
+      'Ensuite, l’hôte paie : 8 à 14 $ par mois, ou 4,99 $ la saison.',
+      'Plus d’un perso par compte = abonné.',
+      'Des packs de mondes en partenariat avec des séries : « Tu es un Jedi dans Star Wars ».',
+      'Si ça devient comme Episode (Pocket Gems) : plus de 1 M$ par mois.']],
+    ['Pourquoi maintenant?', [
+      'Le contenu IA devient infini : ce qui reste rare, c’est une histoire faite pour ton groupe, vécue ensemble.',
+      'Le jeu vidéo et le cinéma fusionnent : c’est un nouveau marché (Maria Valenzuela, ex-SVP Sony Pictures).',
+      'L’IA rend la personnalisation presque gratuite : un selfie devient un perso qui joue ses poses.']],
+    ['Pourquoi toi?', [
+      'Le problème demande 3 compétences en même temps, et j’ai les trois.',
+      'Les jeux : 50+ depuis 14 ans, dont un open world avec une communauté et un cofounder.',
+      'Le procédural : un générateur de villages. Des arbres de choix qui tiennent debout.',
+      'Le récit : j’écris des histoires depuis 11 ans, j’étudie la théorie du récit depuis 14 ans, 100+ histoires. J’entraîne l’IA dessus.']],
+    ['Où t’en es?', [
+      'Pivot #12. 2 ans à temps partiel, les 3-4 derniers mois à temps plein, 15 h par jour.',
+      'La version web rapide marche (ce que vous venez de voir). Je commence les tests avec de vrais joueurs.',
+      'Je fais tout moi-même : le code, les histoires, le pitch.']],
+    ['L’IA peut pas écrire de bonnes histoires.', [
+      'Seule, non. Avec une structure en dessous, oui.',
+      'Chaque épisode suit 5 étapes : investissement, escalade, révélation, crise, payoff. Plus une banque de techniques et du procédural.',
+      'J’itère pour que chaque épisode maximise le hook et l’envie de voir la suite.']],
+    ['Les images sont simples, non?', [
+      'Garfield : environ 17 000 histoires de 3 cases depuis 1978. Toujours le même chat, une poignée de poses.',
+      'Et ça rapporte entre 750 M$ et 1 G$ de produits dérivés par année.',
+      'Ce qui accroche, ce n’est pas l’image : c’est le personnage et l’histoire.']],
+    ['Ça coûte combien, un perso?', [
+      '0 $. 4 images gratuites par jour sur ChatGPT × 6 poses = 24 poses et expressions.',
+      'Les décors sont faits d’avance, adaptés aux poses. Une pose sert dans toutes les scènes.']],
+    ['C’est pour qui?', [
+      'Des groupes d’amis, des couples, la famille : la soirée ciné, mais vous êtes dedans et vous décidez.',
+      'Même à distance : chacun sur son cell, l’histoire le suit.',
+      'Ça marche aussi en solo, et qui veut juste regarder peut couper les choix.']],
+    ['Tu travailles seul?', [
+      'Oui, je fais tout. Je me cherche un cofounder, mais j’avance sans attendre.']],
+  ];
+  let qa = 0;
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Il me faut un volontaire pour que je prenne en photo. »</h1><p>Un étranger monte sur scène. Personne ne le connaît encore.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}</div>` },
     { c: '#ff9f0a', h: () => '' },
+    { c: '#ffd60a', h: () => `<small>Le problème</small><h1>L'IA rend le contenu infini.</h1><p>Quand tout est abondant, plus rien n'a de valeur.</p>` },
+    { c: '#ffd60a', h: () => `<small>Le problème</small><h1>On ne regarde plus les mêmes histoires.</h1><p>La dernière saison de Game of Thrones : tout le monde en parlait. Chez nous, ça criait à table.</p>` },
+    { c: '#ffd60a', h: () => `<h1>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. »</h1><p>Maria Valenzuela · ex-SVP, Sony Pictures</p>` },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
     { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hk === 'wc' ? WC : ''}${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
     { c: '#ff375f', h: () => `<small>Démo · télé · 1</small><h1>L'histoire commence.</h1><p>Les impressionner, les accrocher dès le début.</p>` },
@@ -47,16 +106,22 @@ window.DECK = (() => {
     { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.</p>` },
     { c: '#ff375f', full: true, h: () => `<img class="dkFull" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">` },
     { c: '#30d158', wall: true, h: () => `<div class="dkQuad"><img src="ref/suit_tele.webp" alt="Deux amis devant la télé, l’histoire de pirates à l’écran"><img src="ref/suit_cells.webp" alt="Chacun sur son cell, l’un aux toilettes, l’autre sur le divan"><img src="ref/suit_cell.webp" alt="Elle suit l’histoire sur son cell"><div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div></div>` },
+    { c: '#30d158', h: () => `<small>Pourquoi ça accroche</small><ol class="dkInv"><li><b>Tu es</b> le personnage.</li><li><b>Tu décides</b> à sa place.</li><li><b>Tu le vis</b> avec tes amis.</li></ol><p>Netflix ne fait aucun des trois.</p>` },
     { c: '#ff375f', h: () => `<h1>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</h1><p>Étrangement, non.</p>` },
-    { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div>` },
+    { c: '#0a84ff', h: () => `<small>Pourquoi moi</small><div class="dkSkills"><div><b>Jeux</b><span>50+ depuis 14 ans</span></div><div><b>Procédural</b><span>Des arbres de choix qui tiennent</span></div><div><b>Récit</b><span>100+ histoires</span></div></div><p>Il faut les trois en même temps.</p>` },
+    { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div><p class="dkZeroP">Un nouveau perso : 24 poses, avec 4 images gratuites sur ChatGPT.</p>` },
     { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Un cofounder</li><li>Du feedback</li><li>Du financement</li><li>Du mentorat</li></ul>` },
+    { c: '#0a84ff', h: () => `<small>Questions</small><div class="dkQA"><div class="dkQs">${QA.map(([q], n) => `<button type="button" data-qa="${n}"${n === qa ? ' class="on"' : ''}>${esc(q)}</button>`).join('')}</div><div class="dkAns"><h2>${esc(QA[qa][0])}</h2><ul>${QA[qa][1].map((l) => `<li>${esc(l)}</li>`).join('')}</ul></div></div>` },
   ];
   // what I say on each slide (mine to edit, kept on this device); behind the corner button
   const NOTES = [
     "« Avant de commencer, j'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir… » Une seule : [Y] n'existe pas encore pour la salle.",
     "« Il me faut un volontaire pour que je prenne en photo. » Un étranger monte sur scène : c'est lui, [Y], qui pose pour la photo.",
     "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
-    "Slide vide.",
+    "Slide vide. « Or avant ce soir — et c'est important — je ne le connaissais pas. J'y reviens plus tard. »",
+    "Lent. L'IA va générer des films et des histoires sans fin, faits pour les goûts de chacun. Quand le contenu devient infini, chaque histoire perd sa rareté, sa valeur.",
+    "Chacun son flux, donc de moins en moins d'histoires en commun. Les soirées ciné, une réplique que tout le monde connaît, « T'as vu le dernier épisode? » : c'est comme ça qu'on se lie. La dernière saison de GoT, ça criait à table chez nous. Ces moments-là vont devenir rares.",
+    "Conférence sur le futur du cinéma avec l'IA : Maria Valenzuela (ex-SVP Sony Pictures) prédit l'explosion du contenu IA et la fusion du cinéma et du jeu vidéo. Et : les gens veulent qu'on crée pour eux, selon leurs goûts. La solution : une histoire faite pour ton groupe, avec vous dedans, où chacun change la suite. « Je vous montre. »",
     "Son selfie, une flèche vers son perso.",
     "Le catalogue d'histoires : je clique sur une histoire de pirates immersive. Démo · télé.",
     "1. J'introduis l'histoire, je les impressionne et je les accroche dès le début.",
@@ -69,9 +134,12 @@ window.DECK = (() => {
     "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.",
     "Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé.",
     "Devant la télé, ensemble. Chacun sur son cell, même aux toilettes : l'histoire le suit. Elle continue sur son cell. Tous ces persos viennent d'une photo, chacun joue ses poses.",
+    "Après la démo. Le sommet de l'investissement dans un perso : 1. ÊTRE le perso (c'est ta face). 2. Prendre ses décisions : c'est MOI qui l'ai fait, pas le perso. 3. Le vivre avec les gens avec qui tu veux partager des émotions. Netflix ne fait aucun des trois.",
     "« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine. » Étrangement, non : je montre le concept de monde, d'histoires et mon système d'histoire.",
-    "",
+    "Il faut 3 choses en même temps : faire des jeux (l'interactif, le visuel), le procédural (des arbres de choix qui tiennent), la théorie du récit (des épisodes qui accrochent). Je fais les trois depuis 14 ans : 50+ jeux, un générateur de villages, 100+ histoires.",
+    "Ce que coûte un nouveau perso : 0 $. 4 images gratuites par jour sur ChatGPT × 6 poses = 24 poses et expressions. Les décors sont faits d'avance pour les poses. La vidéo IA : environ 30 $ la minute.",
     "Je me cherche un cofounder, du feedback, du financement, du mentorat.",
+    "Les questions : je tape celle qu'on me pose, la réponse s'affiche. Les mêmes sont dans le plan (slide 0, étape 3).",
   ];
   let noteOpen = false;
   let spot = 0, sub = 0;   // sub: the step inside a slide (the perso's 2nd pose on the slide where we first see it)
@@ -165,6 +233,9 @@ window.DECK = (() => {
       el.onclick = (e) => {
         if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
+        const q = e.target.closest('[data-qa]');
+        if (q) { qa = +q.dataset.qa; draw(); return; }
+        if (e.target.closest('.dkAns')) return;
         const p = e.target.closest('.dkPic');
         if (p || e.target.closest('.dkTyped, .dkNote')) return;
         const r = el.getBoundingClientRect(); go(e.clientX - r.left < r.width / 3 ? -1 : 1);
@@ -172,6 +243,8 @@ window.DECK = (() => {
       el.onchange = (e) => { const p = e.target.closest('.dkPic'); if (p && e.target.files[0]) pick(e.target.files[0], p.dataset.k); };
       el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t && t.dataset.name) { saved['n_' + t.dataset.name] = t.textContent.trim(); save(); return; } if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
       el.querySelector('.dkPlan').appendChild(document.getElementById('sparkPlan').content.cloneNode(true));
+      el.querySelector('.dkPlan .spark').insertAdjacentHTML('beforeend', '<div class="sp-arrow"></div><div class="sp-stage" style="--g:#0a84ff"><div class="sp-tag"><i>3</i>Les questions · mes réponses</div>'
+        + QA.map(([q, a]) => `<div class="sp-card"><b>${esc(q)}</b>${a.map((l) => `<small>${esc(l)}</small>`).join('')}</div>`).join('') + '</div>');
       panel.mount(el.querySelector('.pnHost'));
       draw();
     },
