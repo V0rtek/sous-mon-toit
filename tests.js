@@ -37,7 +37,7 @@
     // two at the counter talking to each other: Sam nearer the camera, Justin behind him (the one at the back shows his face)
     t_deux: { ...B, spots: { twin: B.spots.justin, justin: B.spots.melissa }, face: { twin: 'r', justin: 'r' } },
     // Justin and the pirate at the counter: Justin nearer the camera, the pirate behind him
-    t_pirate: { ...B, spots: { justin: B.spots.justin, pirate: B.spots.melissa }, face: { justin: 'r', pirate: 'r' } },
+    t_pirate: { ...B, spots: { justin: [836, 1310, 1076], pirate: [884, 1234, 975] }, face: { justin: 'r', pirate: 'r' } },
     // seated at a table, facing each other (the guide ref/guides/table, until the real decor): the table hides below its top
     t_table: { image: 'ref/guides/table.webp', fg: 'ref/guides/table_fg.webp', size: [2400, 1350], front: [], spots: { a: [1005, 1250, 620], b: [1395, 1250, 620] }, face: { a: 'r', b: 'l' } },
     // Lily (31/10, imported from Nouveau perso): standing face to face with Justin, at the counter behind him, at the table
@@ -272,41 +272,39 @@
   // 12 poses and Justin's 12 are all used. The story: the pirate lost his ship at dice to Marco, he needs a stranger
   const tpirate = [
     { scene: 't_pirate', cast: { justin: 'bar_stare', pirate: 'bar_drink' } }, { cam: 'wide', at: 900 }, { fade: 'in', ms: 700 }, { caption: 'Le pirate · la dette' }, { wait: 1400 },
-    // he drinks, then talks to the room; Justin talks to his mug
+    // whoever looks at the other has his head turned (bar_to_*, even silent); straight ahead (bar_*) = not talking to anyone
     { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_drink', '…'),
-    say('pirate', 'bar_talk', 'Ça fait une heure que tu parles à ta chope.'),
+    say('pirate', 'bar_to_talk', 'Ça fait une heure que tu parles à ta chope.'),
     { cam: 'close', who: ['justin'] }, say('justin', 'bar_stare', 'Elle écoute mieux que les autres.'),
-    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_smile', 'Et elle t’a répondu quoi ?'),
-    // Justin turns his head to him
-    { poses: { pirate: 'bar_smile' } }, { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_to_talk', to: 'pirate', text: 'Que je suis arrivé trop tard.' },
-    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_laugh', 'Tout le monde arrive trop tard, ici.'),
+    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_to_flirt', 'Et elle t’a répondu quoi ?'),
+    { poses: { justin: 'bar_to_talk' } }, { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_talk', 'Que je suis arrivé trop tard.'),
+    { poses: { justin: 'bar_to_flirt' } }, { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_laugh', 'Tout le monde arrive trop tard, ici.'),
     { poses: { justin: 'bar_to_talk' } }, say('pirate', 'bar_stare', 'Moi, j’ai eu un bateau, une fois.'),
-    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_to_flirt', to: 'pirate', text: 'Un bateau. Dis-moi que c’est une belle histoire.' },
-    // he turns to Justin, angry, the debt
-    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_to_anger', to: 'justin', text: 'Le Corbeau. Perdu aux dés. Contre Marco.' },
-    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_to_talk', to: 'pirate', text: 'Il a triché.' },
-    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_to_talk', to: 'justin', text: 'Ses dés sont lourds d’un côté. Je l’ai vu trop tard.' },
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_flirt', 'Un bateau. Dis-moi que c’est une belle histoire.'),
+    { poses: { justin: 'bar_to_talk' } }, { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_to_anger', 'Le Corbeau. Perdu aux dés. Contre Marco.'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_talk', 'Il a triché.'),
+    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_to_talk', 'Ses dés sont lourds d’un côté. Je l’ai vu trop tard.'),
     // both look back over their far shoulder: Marco, at the other end
     { cam: 'wide', at: 900 }, { poses: { pirate: 'bar_back', justin: 'bar_back' } }, { wait: 1300 },
     say('justin', 'bar_back', 'Le gros, au bout. Il nous regarde.'),
     say('pirate', 'bar_back', 'Il regarde toujours. Il compte.'),
-    // back to the mugs, the mug slides over
-    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_stare', 'Chaque pièce que tu dépenses ici est à moi.'),
-    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_slide', to: 'justin', text: 'Bois. Il me faut un menteur qui reste calme.' },
-    { cam: 'close', who: ['justin'] }, say('justin', 'bar_drink', '…'),
-    { poses: { justin: 'bar_to_talk' } }, { say: 'justin', pose: 'bar_to_talk', to: 'pirate', text: 'Pourquoi moi ?' },
-    { cam: 'close', who: ['pirate'] }, { say: 'pirate', pose: 'bar_to_flirt', to: 'justin', text: 'Parce que lui, il te connaît pas. Sa clé est dans sa botte. Un sourire, un verre…' },
-    { cam: 'close', who: ['justin'] }, { say: 'justin', pose: 'bar_to_anger', to: 'pirate', text: 'Je suis pas un voleur.' },
+    // back to the mugs; Justin keeps his head turned to him while he talks and slides his mug
+    { poses: { justin: 'bar_to_talk' } }, { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_stare', 'Chaque pièce que tu dépenses ici est à moi.'),
+    say('pirate', 'bar_slide', 'Bois. Il me faut un menteur qui reste calme.'),
+    { poses: { pirate: 'bar_to_flirt' } }, { cam: 'close', who: ['justin'] }, say('justin', 'bar_drink', '…'),
+    { poses: { justin: 'bar_to_talk' } }, say('justin', 'bar_to_talk', 'Pourquoi moi ?'),
+    { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_to_flirt', 'Parce que lui, il te connaît pas. Sa clé est dans sa botte. Un sourire, un verre…'),
+    { cam: 'close', who: ['justin'] }, say('justin', 'bar_to_anger', 'Je suis pas un voleur.'),
     { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_laugh', 'Moi non plus ! Le Corbeau est à moi.'),
-    // Justin hesitates, straight ahead, then the laugh
-    { cam: 'close', who: ['justin'] }, say('justin', 'bar_stare', '…'),
+    // Justin hesitates, looking at nobody, then the laugh
+    { poses: { pirate: 'bar_to_talk' } }, { cam: 'close', who: ['justin'] }, say('justin', 'bar_stare', '…'),
     { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_smile', 'Tu hésites. Bon signe.'),
     { cam: 'close', who: ['justin'] }, say('justin', 'bar_laugh', 'Je suis saoul, pas stupide.'),
     { cam: 'close', who: ['pirate'] }, say('pirate', 'bar_laugh', 'Alors on est deux sur trois.'),
-    // the toast, then he sinks
+    // the toast, then both sink
     { cam: 'wide', at: 900 }, { poses: { justin: 'bar_toast' } }, say('pirate', 'bar_toast', 'À la mauvaise idée.'),
     say('justin', 'bar_toast', 'À la mauvaise idée.'),
-    { poses: { justin: 'bar_smile' } }, say('pirate', 'bar_slump', 'Minuit, sur le quai. Réveille-moi si t’as peur.'),
+    { poses: { justin: 'bar_to_talk' } }, say('pirate', 'bar_slump', 'Minuit, sur le quai. Réveille-moi si t’as peur.'),
     { cam: 'close', who: ['justin'] }, say('justin', 'bar_slump', 'J’aurai pas peur. Je serai trop saoul.'),
     { cam: 'wide', at: 900 }, { hush: 1500 }, { fade: 'out', ms: 800 }, { end: 'Fin du test' },
   ];
