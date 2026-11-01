@@ -1,0 +1,264 @@
+{
+ "ep": 1,
+ "plan": {
+  "title": "The Compass: Departure",
+  "scene": "the compass, a tavern by the docks at night; the counter runs along one side, bottles behind it catching lamplight; a few tables scatter the floor; the sea sounds outside, waves against wood.",
+  "turn": "Le_pirate comes back before dawn with a letter folded in his hand; he sets it on the counter in front of justin and says: 'Read this when you're alone. Then decide if you still want to stay.'",
+  "needs": [
+   {
+    "text": "justin dreams of sailing his own ship one day, not being a partner's shadow",
+    "by": "r3"
+   },
+   {
+    "text": "Le_pirate and Lily are both important to justin and draw him in different directions",
+    "by": "r2"
+   },
+   {
+    "text": "Lily has lost someone to the sea before and fears it will take justin too",
+    "by": "r6"
+   }
+  ],
+  "infos": [
+   {
+    "id": "i1",
+    "text": "Le_pirate and justin own the tavern together"
+   },
+   {
+    "id": "i2",
+    "text": "Le_pirate has found a salvage wreck two days north and wants justin to navigate it with him at dawn",
+    "parent": "i1"
+   },
+   {
+    "id": "i3",
+    "text": "Lily works the counter most nights and is close to justin"
+   },
+   {
+    "id": "i4",
+    "text": "If justin sails with Le_pirate, Le_pirate will walk out with the claim and never come back; the partnership ends; justin stays behind the counter forever",
+    "parent": "i2"
+   },
+   {
+    "id": "i5",
+    "text": "Lily's brother drowned on a salvage run five years ago; Le_pirate was on that boat and came back",
+    "parent": "i3"
+   },
+   {
+    "id": "i6",
+    "text": "Lily made her brother promise never to sail again before he died, and he broke that promise",
+    "parent": "i5"
+   }
+  ],
+  "boxes": [
+   {
+    "id": "ep",
+    "title": "Épisode 1",
+    "col": 0,
+    "beats": [
+     {
+      "id": "r1",
+      "goals": [
+       "char"
+      ],
+      "tech": "Show contrast",
+      "lines": 2,
+      "what": "Le_pirate leans at the counter holding a drink, eyes on the horizon line where the lamp catches the window; Lily pours for him without looking up, her hand steady; justin arrives behind the bar and Le_pirate turns to him with his whole face alive while Lily's shoulders tighten.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r2",
+      "goals": [
+       "rel"
+      ],
+      "tech": "Shared memory",
+      "lines": 2,
+      "what": "Le_pirate tells justin he remembers the night they bought the tavern together, how scared they both were; Lily, still pouring, says 'You weren't scared. You laughed all night.' Le_pirate: 'That was fear, too.'",
+      "reveals": [
+       "i1"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r3",
+      "goals": [
+       "desire"
+      ],
+      "tech": "Un rêve et sa raison",
+      "lines": 3,
+      "what": "justin says to both of them, out loud: 'One day I want to captain my own ship. Not be a shadow in someone else's command. Five years I've watched men leave this bar and come back different. I want to know what they know.' Lily's hand stops moving. Le_pirate smiles.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r4",
+      "goals": [
+       "info"
+      ],
+      "tech": "Demande qui révèle",
+      "lines": 2,
+      "what": "Le_pirate sets a folded chart on the counter between his drink and justin's hands. 'I found a wreck two days north. Salvage claim, all ours. We leave at dawn.' Lily does not move. Justin asks 'Just us?' Le_pirate: 'Just us. We split it. No one else.'",
+      "reveals": [
+       "i2"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r5",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Mention consequences",
+      "lines": 2,
+      "what": "Le_pirate says to justin: 'If you say no, I sail anyway. With the claim. The partnership ends. You keep the counter.' He does not look at Lily. Lily sets down her bottle and turns away.",
+      "reveals": [
+       "i4"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r6",
+      "goals": [
+       "char"
+      ],
+      "tech": "Share personal internal conflict",
+      "lines": 2,
+      "what": "Lily says to justin, low: 'You swore you would stay. You did swear that.' Justin: 'I never swore anything.' Lily: 'Exactly.' She turns her back and does not speak again for the rest of the night.",
+      "reveals": [
+       "i5",
+       "i6"
+      ],
+      "hints": [
+       "i5"
+      ]
+     },
+     {
+      "id": "r7",
+      "goals": [
+       "callback"
+      ],
+      "tech": "Objet planté",
+      "lines": 1,
+      "what": "Le_pirate says to justin: 'Your brother was the bravest man I knew. If he were here, he would tell you: the sea doesn't take. People choose it.'",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r8",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Menace: si tu X, je Y",
+      "lines": 2,
+      "what": "Le_pirate, hand on justin's shoulder: 'You sail with me, you sail alone. Lily won't wait for you to come back.' Lily does not turn around. Le_pirate: 'You stay here, you never leave this counter. Not with me.'",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r9",
+      "kind": "choice",
+      "goals": [],
+      "tech": "",
+      "lines": 2,
+      "what": "justin stands between them. Le_pirate's hand is still on his shoulder. Lily's back is turned. The sun is not yet up. What does justin do?",
+      "opts": [
+       "Sail with Le_pirate at dawn. Tell Lily goodbye now, while it is dark.",
+       "Stay at the counter. Tell Le_pirate no, and watch him walk out that door."
+      ]
+     }
+    ]
+   },
+   {
+    "id": "later",
+    "title": "Plus tard",
+    "col": 1,
+    "beats": [
+     {
+      "id": "f1",
+      "goals": [
+       "info"
+      ],
+      "tech": "Demande qui révèle",
+      "lines": 1,
+      "what": "Le_pirate comes back before dawn with a letter folded in his hand and sets it on the counter: 'Read this when you're alone. Then decide if you still want to stay.'",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "f2",
+      "goals": [
+       "desire"
+      ],
+      "tech": "Direct confession",
+      "lines": 1,
+      "what": "Lily, at the dock in the dark, watches justin and Le_pirate load rope onto the ship without moving from the tavern step.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "f3",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Show character positioning",
+      "lines": 1,
+      "what": "Le_pirate, on the ship, says to justin: 'We leave now.' At the same moment, Lily appears at the tavern door; she sees justin with rope in hand; she sits and does not look away until they cast off.",
+      "reveals": [],
+      "hints": []
+     }
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "r5",
+    "to": "r9",
+    "label": "stakes before choice"
+   },
+   {
+    "from": "r8",
+    "to": "r9",
+    "label": "stakes before choice"
+   },
+   {
+    "from": "r7",
+    "to": "f1",
+    "label": "brother's words lead to hidden letter"
+   },
+   {
+    "from": "r6",
+    "to": "f2",
+    "label": "Lily's unfinished question opens to her silent vigil"
+   }
+  ],
+  "chars": [
+   {
+    "id": "le_pirate",
+    "name": "Le_pirate",
+    "sprite": "le_pirate",
+    "traits": [
+     "burns with certainty about what the sea will give",
+     "sees justin as the only person he trusts"
+    ],
+    "infos": [
+     "i1",
+     "i2",
+     "i4"
+    ]
+   },
+   {
+    "id": "lily",
+    "name": "Lily",
+    "sprite": "lily",
+    "traits": [
+     "watches justin like he might disappear",
+     "holds herself still when afraid"
+    ],
+    "infos": [
+     "i3",
+     "i5"
+    ]
+   }
+  ]
+ },
+ "by": "haiku"
+}
