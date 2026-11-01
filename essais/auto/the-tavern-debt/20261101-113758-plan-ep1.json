@@ -1,0 +1,316 @@
+{
+ "ep": 1,
+ "plan": {
+  "title": "The Gala Offer",
+  "scene": "taverne",
+  "turn": "Melissa tells Justin he must choose between the gala tomorrow night and their tavern partnership, and demands his answer now.",
+  "needs": [
+   {
+    "text": "Justin has dreamed of playing a real stage for years",
+    "by": "i1"
+   },
+   {
+    "text": "Melissa and Justin built the tavern together and it is their shared dream",
+    "by": "i2"
+   },
+   {
+    "text": "Ruby knows Melissa once tried to send Justin on tour two years ago without telling her",
+    "by": "i3"
+   }
+  ],
+  "infos": [
+   {
+    "id": "i1",
+    "text": "Justin has wanted to perform on a real stage in front of important people for five years, because he dreams of being heard beyond the tavern walls"
+   },
+   {
+    "id": "i2",
+    "text": "Melissa and Justin built the tavern together and share the dream of making it the place where famous musicians play",
+    "parent": "i1"
+   },
+   {
+    "id": "i3",
+    "text": "Two years ago, Melissa tried to book Justin for a tour she later cancelled, and neither Melissa nor Justin told Ruby about it"
+   },
+   {
+    "id": "i4",
+    "text": "The merchant's gala tomorrow night is a real stage with people who matter attending",
+    "parent": "i2"
+   },
+   {
+    "id": "i5",
+    "text": "Melissa believes the gala is Justin's only chance at a real stage and is worth sacrificing the tavern show",
+    "parent": "i4"
+   },
+   {
+    "id": "i6",
+    "text": "Ruby believes that choosing the gala means choosing ambition over the people who believed in him first",
+    "parent": "i3"
+   }
+  ],
+  "boxes": [
+   {
+    "id": "ep",
+    "title": "Épisode 1",
+    "col": 0,
+    "beats": [
+     {
+      "id": "r1",
+      "goals": [
+       "char"
+      ],
+      "tech": "Show contrast",
+      "lines": 3,
+      "what": "Melissa raises a glass to toast the tavern's first anniversary; Ruby counts the empty bottles on the bar and mutters about inventory; Melissa: 'To a thousand more nights.' Ruby: 'If we survive the month.'",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r2",
+      "goals": [
+       "rel"
+      ],
+      "tech": "Share personal internal conflict",
+      "lines": 2,
+      "what": "Justin admits to both of them: 'I love playing here. I hate that I'm still playing here.' He looks between them, waiting for a reaction.",
+      "reveals": [
+       "i1"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r3",
+      "goals": [
+       "rel"
+      ],
+      "tech": "Show contrast",
+      "lines": 2,
+      "what": "Melissa leans forward and squeezes Justin's shoulder. Ruby watches from the bar, her jaw tightening; Melissa: 'You're going to play bigger stages.' Ruby turns away to stack glasses louder than necessary.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r4",
+      "goals": [
+       "char"
+      ],
+      "tech": "Tell a story",
+      "lines": 2,
+      "what": "Melissa tells Justin: 'Remember when we couldn't afford the lights? You said 'Someday people will come here to hear you, not just drink cheap wine.' I remember. I built this place for that day.'",
+      "reveals": [
+       "i2"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r5",
+      "goals": [
+       "info"
+      ],
+      "tech": "Demande qui révèle",
+      "lines": 2,
+      "what": "Ruby approaches Justin and asks: 'You never even told me Melissa tried to send you on tour two years ago.' Melissa cuts in: 'I told him to keep it from you. It fell through anyway.' Ruby's eyes don't leave Melissa.",
+      "reveals": [
+       "i3"
+      ],
+      "hints": [
+       "i7"
+      ]
+     },
+     {
+      "id": "r6",
+      "goals": [
+       "char"
+      ],
+      "tech": "Phrase pas finie",
+      "lines": 1,
+      "what": "Justin starts to speak to Ruby: 'It was complicated, I wanted to—' but Melissa touches his arm and he stops.",
+      "reveals": [],
+      "hints": [
+       "i7"
+      ]
+     },
+     {
+      "id": "r7",
+      "goals": [
+       "info"
+      ],
+      "tech": "Tell a story",
+      "lines": 2,
+      "what": "Melissa says to both of them, looking only at Ruby: 'Some people get offered things they don't deserve. The question is whether their friends let them throw it away.' She steps closer to Justin.",
+      "reveals": [
+       "i4",
+       "i5"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r8",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Aveu vulnérable",
+      "lines": 2,
+      "what": "Ruby's voice drops as she speaks to Justin: 'If you walk out that door with her tomorrow night, I'm not sure I can stay. I'm not sure I can watch you become someone I don't recognize.'",
+      "reveals": [
+       "i6"
+      ],
+      "hints": []
+     },
+     {
+      "id": "r9",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Menace : si tu X, je Y",
+      "lines": 1,
+      "what": "Melissa faces Justin: 'Tomorrow night, you walk on that stage or you stop calling yourself a musician. If you say no to me, I'm out of this tavern and out of your life.'",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r10",
+      "kind": "choice",
+      "goals": [],
+      "tech": "",
+      "lines": 2,
+      "what": "Justin looks between Melissa and Ruby. One hand is on the bar; the other is reaching toward Melissa. He must tell them both what he is choosing, and live with what comes next.",
+      "opts": [
+       "Tell Melissa yes. Perform at the gala. Leave the tavern tomorrow night.",
+       "Tell Melissa no. Stay at the tavern. Promise Ruby you will never lie to her again."
+      ]
+     },
+     {
+      "id": "r10a",
+      "kind": "choice",
+      "goals": [],
+      "tech": "",
+      "lines": 0,
+      "what": "Branch 1: Tell Melissa yes.",
+      "opts": []
+     },
+     {
+      "id": "r11",
+      "goals": [
+       "desire"
+      ],
+      "tech": "Direct confession",
+      "lines": 2,
+      "what": "Justin turns to Melissa and says: 'I want this. I want the stage. I want people to hear me beyond these walls.' Melissa hugs him. Ruby watches from the bar, sets down her drink, and walks toward the door without a word.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r12",
+      "goals": [
+       "char"
+      ],
+      "tech": "Show contrast",
+      "lines": 1,
+      "what": "Melissa and Justin stand together in the tavern; Melissa pulls out a notebook and starts planning the gala set. The lights stay on. The room is quiet.",
+      "reveals": [],
+      "hints": []
+     },
+     {
+      "id": "r10b",
+      "kind": "choice",
+      "goals": [],
+      "tech": "",
+      "lines": 0,
+      "what": "Branch 2: Tell Melissa no.",
+      "opts": []
+     },
+     {
+      "id": "r13",
+      "goals": [
+       "char"
+      ],
+      "tech": "Direct confession",
+      "lines": 2,
+      "what": "Justin turns to Melissa: 'I can't. Not like this. Not at the cost of everything we built.' Melissa's face hardens. She walks to a corner table and sits alone, ordering a drink. Ruby's hand finds Justin's, but her eyes stay on Melissa, afraid.",
+      "reveals": [],
+      "hints": []
+     }
+    ]
+   },
+   {
+    "id": "later",
+    "title": "Plus tard",
+    "col": 1,
+    "beats": [
+     {
+      "id": "f1",
+      "goals": [
+       "info"
+      ],
+      "tech": "Tell a story",
+      "lines": 1,
+      "what": "Justin tells Melissa he has convinced her to let him do both: play the gala and stay loyal to the tavern. Melissa's eyes narrow.",
+      "reveals": [
+       "i8"
+      ]
+     },
+     {
+      "id": "f2",
+      "goals": [
+       "stakes"
+      ],
+      "tech": "Mention consequences",
+      "lines": 1,
+      "what": "The gala organizer arrives at the tavern to confirm Justin's attendance and find him working behind the bar. Ruby hears everything. She stands and says: 'You lied to me. Again.' The door closes behind her.",
+      "reveals": [],
+      "hints": []
+     }
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "r8",
+    "to": "r10",
+    "label": "stakes before main choice"
+   },
+   {
+    "from": "r9",
+    "to": "r10",
+    "label": "stakes before main choice"
+   },
+   {
+    "from": "r5",
+    "to": "r6",
+    "label": "question raised, then avoided"
+   }
+  ],
+  "chars": [
+   {
+    "id": "melissa",
+    "name": "Melissa",
+    "sprite": "melissa",
+    "traits": [
+     "ambitious, sees no middle ground",
+     "protective of what she built with Justin"
+    ],
+    "infos": [
+     "i2",
+     "i4",
+     "i5"
+    ]
+   },
+   {
+    "id": "ruby",
+    "name": "Ruby",
+    "sprite": "ruby",
+    "traits": [
+     "loyal to Justin, fears losing him",
+     "remembers what was hidden from her"
+    ],
+    "infos": [
+     "i3",
+     "i5",
+     "i6"
+    ]
+   }
+  ]
+ },
+ "by": "haiku"
+}
