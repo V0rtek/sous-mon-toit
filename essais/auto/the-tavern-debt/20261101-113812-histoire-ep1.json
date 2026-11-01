@@ -1,0 +1,242 @@
+{
+ "ep": 1,
+ "plan": "The Gala Offer",
+ "story": {
+  "episode": 1,
+  "title": "The Gala Offer",
+  "scene": "taverne",
+  "steps": [
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "justin",
+    "text": "To a thousand more nights."
+   },
+   {
+    "who": "ruby",
+    "pose": "holding",
+    "to": "justin",
+    "text": "If we survive the month."
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "justin",
+    "pose": "thinking",
+    "to": "melissa",
+    "text": "I love playing here."
+   },
+   {
+    "who": "justin",
+    "pose": "thinking",
+    "to": "ruby",
+    "text": "I hate that I'm still here."
+   },
+   {
+    "who": "melissa",
+    "pose": "listening",
+    "to": "justin",
+    "text": "You're going to play bigger stages."
+   },
+   {
+    "who": "ruby",
+    "pose": "angry",
+    "to": "justin",
+    "text": ""
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "justin",
+    "text": "Remember when we couldn't afford lights?"
+   },
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "justin",
+    "text": "You said people would come to hear you."
+   },
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "justin",
+    "text": "I built this place for that day."
+   },
+   {
+    "who": "ruby",
+    "pose": "angry",
+    "to": "justin",
+    "text": "You never told me about the tour."
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "ruby",
+    "text": "I told him to keep it quiet."
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "ruby",
+    "text": "It fell through anyway."
+   },
+   {
+    "who": "justin",
+    "pose": "thinking",
+    "to": "ruby",
+    "text": "It was complicated, I wanted to—"
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "justin",
+    "text": ""
+   },
+   {
+    "hush": true
+   },
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "ruby",
+    "text": "Some people get offered real chances."
+   },
+   {
+    "who": "melissa",
+    "pose": "explaining",
+    "to": "ruby",
+    "text": "The question is: do their friends let them walk away?"
+   },
+   {
+    "who": "ruby",
+    "pose": "angry",
+    "to": "justin",
+    "text": "If you walk out tomorrow night, I can't stay."
+   },
+   {
+    "who": "ruby",
+    "pose": "angry",
+    "to": "justin",
+    "text": "I won't watch you become someone else."
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "justin",
+    "text": "Tomorrow night: you walk on that stage."
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "justin",
+    "text": "Or you stop calling yourself a musician."
+   },
+   {
+    "who": "melissa",
+    "pose": "holding",
+    "to": "justin",
+    "text": "Say no, and I'm done. With all of this."
+   },
+   {
+    "choice": [
+     {
+      "t": "Tell Melissa yes.",
+      "say": "I want this. I want the stage.",
+      "tone": "resolute",
+      "then": [
+       {
+        "who": "justin",
+        "pose": "explaining",
+        "to": "melissa",
+        "text": "I want people to hear me beyond these walls."
+       },
+       {
+        "who": "melissa",
+        "pose": "listening",
+        "to": "justin",
+        "text": ""
+       },
+       {
+        "hush": true
+       },
+       {
+        "who": "ruby",
+        "pose": "angry",
+        "to": "justin",
+        "text": ""
+       },
+       {
+        "hush": true
+       },
+       {
+        "who": "melissa",
+        "pose": "listening",
+        "to": "justin",
+        "text": "We start planning your set tonight."
+       },
+       {
+        "who": "ruby",
+        "pose": "angry",
+        "to": "justin",
+        "text": "See you around, I guess."
+       }
+      ]
+     },
+     {
+      "t": "Tell Melissa no.",
+      "say": "Not like this. Not at this cost.",
+      "tone": "steady",
+      "then": [
+       {
+        "who": "justin",
+        "pose": "explaining",
+        "to": "melissa",
+        "text": "I can't throw away what we built."
+       },
+       {
+        "who": "melissa",
+        "pose": "angry",
+        "to": "justin",
+        "text": ""
+       },
+       {
+        "hush": true
+       },
+       {
+        "who": "ruby",
+        "pose": "surprised",
+        "to": "justin",
+        "text": ""
+       },
+       {
+        "hush": true
+       },
+       {
+        "who": "melissa",
+        "pose": "holding",
+        "to": "justin",
+        "text": "You just chose the wrong dream."
+       },
+       {
+        "who": "ruby",
+        "pose": "listening",
+        "to": "justin",
+        "text": "Thank you."
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "next": [
+   "If he said yes to Melissa: Justin arrives at the gala tomorrow night. Ruby sends him a message he doesn't expect.",
+   "If he said no to Melissa: Justin tries to convince Melissa there's another way. She's already planning her exit.",
+   "Either way: someone is about to reveal what they've been hiding, and it changes everything."
+  ]
+ },
+ "by": "haiku"
+}
