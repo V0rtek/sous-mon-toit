@@ -12,6 +12,13 @@ window.DECK = (() => {
     for (const [k, v] of Object.entries(old)) saved['note_' + moved(+k.slice(5))] = v;
     saved.v = 2; save();
   }
+  // 02/11: the « top 10 » slide goes in before 0 $ (slide 23): the notes from there on move one further
+  if (saved.v === 2) {
+    const old = {};
+    for (const k of Object.keys(saved)) if (/^note_\d+$/.test(k) && +k.slice(5) >= 22) { old[k] = saved[k]; delete saved[k]; }
+    for (const [k, v] of Object.entries(old)) saved['note_' + (+k.slice(5) + 1)] = v;
+    saved.v = 3; save();
+  }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slot = (k, label, src = k) => `<label class="dkPic${k.endsWith('c') ? ' ct' : ''}" data-k="${k}"${saved[src] ? ` style="background-image:url(${saved[src]})"` : ''}><span>${saved[src] ? '' : esc(label)}</span><input type="file" accept="image/*" hidden></label>`;
   const nm = (k) => esc(saved['n_' + k] || `[${k.toUpperCase()}]`), T = (h) => h.replace(/\[X\]/g, nm('x')).replace(/\[Y\]/g, nm('y'));
@@ -124,6 +131,7 @@ window.DECK = (() => {
     { c: '#30d158', h: () => `<small>Trois choses normalement séparées</small><div class="dkSkills"><div><b>Personnalisation</b><span>L’histoire, c’est toi et tes amis.</span></div><div><b>Agentivité</b><span>Tu changes ce qui arrive.</span></div><div><b>Lien social</b><span>Vous la vivez ensemble, même à distance.</span></div></div><p>Netflix ne fait aucun des trois.</p>` },
     { c: '#ff375f', h: () => `<h1>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</h1><p>Étrangement, non.</p>` },
     { c: '#0a84ff', h: () => `<small>Pourquoi moi</small><div class="dkSkills"><div><b>Jeux</b><span>50+ depuis 14 ans</span></div><div><b>Procédural</b><span>Des arbres de choix qui tiennent</span></div><div><b>Récit</b><span>100+ histoires</span></div></div><p>Il faut les trois en même temps.</p>` },
+    { c: '#ff375f', h: () => `<small>Ce qui accroche un public · top 10</small><ol class="dkTop"><li>Le conflit</li><li>Le but du perso</li><li>Le suspense</li><li>Les twists</li><li class="gap">…</li><li class="last" value="10">Les beaux graphismes</li></ol><p>Joker 2 et Justice League : des graphismes fous, des flops. Une bonne histoire bat tout.</p>` },
     { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div><p class="dkZeroP">Un nouveau perso : 24 poses, avec 4 images gratuites sur ChatGPT.</p>` },
     { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Des groupes de 2-3 pour tester<span>10 minutes, je me déplace. Si vous dites oui : accès gratuit au produit et à toutes les histoires.</span></li><li>Un cofounder</li></ul>` },
     { c: '#0a84ff', h: () => `<small>Questions</small><div class="dkQA"><div class="dkQs">${QA.map(([q], n) => `<button type="button" data-qa="${n}"${n === qa ? ' class="on"' : ''}>${esc(q)}</button>`).join('')}</div><div class="dkAns">${qa < 0 ? '' : `<h2>${esc(QA[qa][0])}</h2><ul>${QA[qa][1].map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}</div></div>` },
@@ -152,6 +160,7 @@ window.DECK = (() => {
     "Après la démo. Le produit combine trois choses normalement séparées : la personnalisation (l'histoire, c'est toi et tes amis : tu ES le perso), l'agentivité (tu changes ce qui arrive : c'est MOI qui l'ai fait, pas le perso), le lien social (vous la vivez ensemble, même à distance). Netflix ne fait aucun des trois.",
     "« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine. » Étrangement, non : je montre le concept de monde, d'histoires et mon système d'histoire.",
     "Il faut 3 choses en même temps : faire des jeux (l'interactif, le visuel), le procédural (des arbres de choix qui tiennent), la théorie du récit (des épisodes qui accrochent). Je fais les trois depuis 14 ans : 50+ jeux, un générateur de villages, 100+ histoires.",
+    "Demandez à n'importe quelle IA les 10 façons prouvées de faire une série qui accroche son public. Les bons graphismes arrivent 10e. Derrière le conflit, le but du perso, le suspense et les twists. Joker 2 et Justice League ont floppé, même avec des graphismes de fou. Une bonne histoire bat tout.",
     "Ce que coûte un nouveau perso : 0 $. 4 images gratuites par jour sur ChatGPT × 6 poses = 24 poses et expressions. Les décors sont faits d'avance pour les poses. La vidéo IA : environ 30 $ la minute.",
     "Je suis en phase de validation. Je cherche des groupes de 2-3 personnes prêts à prendre 10 minutes pour essayer le produit : je fais le déplacement. Si vous êtes curieux d'essayer les autres histoires, venez me voir : si vous dites oui, je vous donne accès au produit et aux histoires gratuitement. Et je cherche un cofounder.",
     "Les questions : je tape celle qu'on me pose, la réponse s'affiche. Les mêmes sont dans le plan (slide 0, étape 3).",
