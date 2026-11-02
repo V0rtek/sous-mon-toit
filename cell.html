@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le cell de Brooke · variantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;0,900;1,700&family=Yeseva+One&display=swap">
+<style>
+/* Une histoire à la télé : le cell du joueur devient le cell de son perso quand il reçoit un texto ou un appel. Les
+   mots sont sur TON cell, seulement sur le tien (la télé montre « Brooke lit un texto »). Plusieurs hypothèses, sur les
+   vrais moments des jeux télé (games.js). Chaque carte rejoue en boucle; « Sur ton cell » l'ouvre en plein écran, avec
+   la vibration (Android), et là il faut toucher pour lire. */
+:root { --bg: #0b0a0f; --fg: #f5f5f7; --dim: #8e8e93; --line: #2c2c2e; --ui: 'Nunito', 'Segoe UI', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; --ios: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; background: rgba(11,10,15,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size: 14px; }
+.seg { display: flex; flex-wrap: wrap; background: #1c1c1e; border-radius: 20px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 800; color: var(--dim); background: none; border: 0; border-radius: 99px; padding: 7px 14px; cursor: pointer; }
+.seg button.on { background: #f5f5f7; color: #000; }
+.again { font: inherit; font-size: 14px; font-weight: 900; border: 0; border-radius: 99px; padding: 9px 16px; background: #ffd60a; color: #000; cursor: pointer; }
+.intro { max-width: 980px; padding: 18px 20px 0; color: #d1d1d6; font-size: 15px; line-height: 1.5; }
+.intro b { color: #fff; }
+.tvline { margin-top: 8px; color: var(--dim); font-size: 14px; }
+.tvline i { color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px 22px; padding: 22px 20px 60px; }
+.card { display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.card h2 i { font-style: normal; font-size: 12px; font-weight: 900; color: #000; background: #f5f5f7; border-radius: 6px; padding: 2px 6px; }
+.card p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--dim); min-height: 4.4em; }
+.card .solo { font-size: 13px; font-weight: 800; color: #0a84ff; text-decoration: none; align-self: flex-start; }
+.fav { margin-left: auto; font: inherit; font-size: 18px; background: none; border: 0; color: #48484a; cursor: pointer; padding: 0 2px; }
+.fav.on { color: #ff375f; }
+.card.faved .ph { box-shadow: 0 0 0 3px #ff375f; }
+
+/* ===== the phone: a real one's shape; 1em = 1% of its height ===== */
+.ph { position: relative; width: 100%; aspect-ratio: 9 / 19.5; border-radius: 26px; overflow: hidden; background: #000; container-type: size; cursor: zoom-in; box-shadow: 0 0 0 1px var(--line); }
+.st { position: absolute; inset: 0; font-size: 1cqh; font-family: var(--ios); color: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
+.st * { box-sizing: border-box; }
+.lay { position: absolute; inset: 0; }
+/* the game's own black screen (minView): a pause, faint */
+.mv { position: absolute; inset: 0; display: grid; place-items: center; background: #000; }
+.mv svg { width: 16em; height: 16em; opacity: .22; }
+/* status bar */
+.sb { position: absolute; left: 0; right: 0; top: 0; height: 6em; display: flex; align-items: center; justify-content: space-between; padding: 1em 2.8em 0 3.4em; z-index: 6; font-weight: 600; font-size: 1em; }
+.sb b { font-size: 1.9em; font-weight: 600; letter-spacing: -.01em; }
+.sb .ic { display: flex; align-items: center; gap: .6em; }
+.sb svg { height: 1.6em; width: auto; fill: #fff; }
+.bat { position: relative; display: flex; align-items: center; gap: .3em; }
+.bat .shell { width: 3em; height: 1.5em; border-radius: .45em; border: .15em solid rgba(255,255,255,.45); padding: .15em; }
+.bat .lvl { height: 100%; border-radius: .2em; background: #fff; }
+.bat.low .lvl { background: #ff3b30; }
+.bat em { font-style: normal; font-size: 1.3em; font-weight: 700; }
+.bat.low em { color: #ff3b30; }
+.sb.hide { display: none; }
+/* faces */
+.fc { position: relative; flex: none; display: block; overflow: hidden; border-radius: 50%; background: linear-gradient(#a5a5aa, #6e6e73); }
+.fc img { position: absolute; width: 100%; opacity: 0; }
+.fc.ini { display: grid; place-items: center; color: #fff; font-weight: 600; }
+.fc.ini span { font-size: 45cqh; }
+.fc.nobody svg { position: absolute; left: 15%; top: 18%; width: 70%; fill: rgba(255,255,255,.85); }
+.app { flex: none; display: grid; place-items: center; border-radius: 22%; background: linear-gradient(#5ff777, #0ac936); }
+.app svg { width: 62%; fill: #fff; }
+
+/* ----- lock screen ----- */
+.wall { position: absolute; inset: 0; background: radial-gradient(120% 70% at 30% 10%, #3b2c6b 0%, #191233 45%, #07060d 100%); }
+.wall.img { background-size: cover; background-position: center; }
+.wall.img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.05) 40%, rgba(0,0,0,.55)); }
+.wall .self { position: absolute; bottom: -42%; height: 108%; filter: drop-shadow(0 1em 2em rgba(0,0,0,.6)); }
+.wall.blur { filter: blur(1.4em) brightness(.55); transform: scale(1.1); }
+.lk { position: absolute; left: 0; right: 0; top: 9%; text-align: center; z-index: 2; }
+.lk .d { font-size: 2.1em; font-weight: 600; opacity: .9; }
+.lk .t { font-size: 10.5em; font-weight: 700; letter-spacing: -.02em; line-height: 1; margin-top: .02em; }
+.lkb { position: absolute; left: 7%; right: 7%; bottom: 3.6%; display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+.lkb i { width: 5.4em; height: 5.4em; border-radius: 50%; background: rgba(40,40,45,.55); backdrop-filter: blur(10px); display: grid; place-items: center; }
+.lkb i svg { width: 2.4em; fill: #fff; }
+.home { position: absolute; left: 50%; bottom: 1%; width: 34%; height: .55em; border-radius: 1em; background: #fff; transform: translateX(-50%); z-index: 8; }
+/* the screen wakes: black first, then the lock screen comes up */
+.wake { position: absolute; inset: 0; background: #000; z-index: 9; pointer-events: none; transition: opacity .5s ease; }
+.on .wake { opacity: 0; }
+/* notifications */
+.nts { position: absolute; left: 3%; right: 3%; bottom: 15%; display: flex; flex-direction: column; gap: .8em; z-index: 3; }
+.nt { display: none; align-items: center; gap: 1.3em; padding: 1.4em 1.5em; border-radius: 2.6em; background: rgba(42,40,48,.62); backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6); box-shadow: 0 .3em 1em rgba(0,0,0,.25); }
+.nt .fw { position: relative; flex: none; }
+.nt .fc { width: 5.4em; height: 5.4em; }
+.nt .fw .app { position: absolute; right: -.4em; bottom: -.4em; width: 2.3em; height: 2.3em; box-shadow: 0 0 0 .2em rgba(42,40,48,1); }
+.nt div { flex: 1; min-width: 0; }
+.nt b { display: flex; justify-content: space-between; font-size: 1.85em; font-weight: 600; }
+.nt b small { font-weight: 400; opacity: .6; font-size: .85em; }
+.nt div > span { display: block; font-size: 1.85em; line-height: 1.3; }
+/* a message shows when its step has come (m1, m2, m3 stay on) */
+.st.m1 .k1, .st.m2 .k2, .st.m3 .k3 { display: flex; animation: ntIn .45s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes ntIn { from { opacity: 0; transform: translateY(1.5em) scale(.94); } }
+/* lock screen: the newest on top, the older ones stack under it */
+.nts.stk { flex-direction: column-reverse; }
+/* the choices, over the lock screen: a sheet from the bottom */
+.chs { position: absolute; left: 3%; right: 3%; bottom: 3%; display: flex; flex-direction: column; gap: 1em; z-index: 7; visibility: hidden; }
+.st.ch .chs { visibility: visible; }
+.chs button { font: inherit; font-family: var(--ui); font-size: 2.5em; font-weight: 800; color: #000; background: #fff; border: 0; border-radius: .8em; padding: .8em .9em; cursor: pointer; text-align: center; box-shadow: 0 .3em 1em rgba(0,0,0,.45); }
+.st.ch .chs button { animation: chIn .4s ease-out backwards; }
+.st.ch .chs button:nth-child(2) { animation-delay: .08s; }
+@keyframes chIn { from { opacity: 0; transform: translateY(1.2em); } }
+.chs button.pk { outline: .25em solid #ffd60a; outline-offset: .15em; }
+.chs button.no { opacity: .3; }
+.st.ch .nts { bottom: 30%; transition: bottom .4s; }
+.st.ch .dimmer { opacity: 1; }
+.dimmer { position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgba(0,0,0,.65)); opacity: 0; transition: opacity .4s; z-index: 2; pointer-events: none; }
+.lkb, .home { transition: opacity .3s; }
+.st.ch .lkb { opacity: 0; }
+
+/* ----- banner (the game's black screen, the phone's own banner drops in) ----- */
+.bnr { position: absolute; left: 2.5%; right: 2.5%; top: 1.4%; z-index: 7; display: flex; flex-direction: column; gap: .7em; }
+.bnr .nt { background: rgba(38,38,42,.95); }
+.st.m1 .bnr .k1, .st.m2 .bnr .k2, .st.m3 .bnr .k3 { animation: drop .5s cubic-bezier(.2,.9,.3,1.15) both; }
+@keyframes drop { from { transform: translateY(-140%); } }
+.v-B .chs { top: 22%; bottom: 3%; }
+.v-B.st.m2 .chs { top: 31%; }
+.v-B .chs button { flex: 1; border-radius: .7em; font-size: 3.2em; background: #2c2c2e; color: #fff; box-shadow: none; }
+.v-B.st.ch .mv svg { display: none; }
+
+/* ----- the thread (Messages, open) ----- */
+.th { position: absolute; inset: 0; background: #000; display: flex; flex-direction: column; z-index: 4; }
+.th-h { flex: none; padding: 6.4em 2em 1.2em; display: flex; flex-direction: column; align-items: center; gap: .5em; background: rgba(28,28,30,.92); border-bottom: .1em solid #2c2c2e; position: relative; }
+.th-h .fc { width: 5.6em; height: 5.6em; }
+.th-h b { font-size: 1.5em; font-weight: 500; display: flex; align-items: center; gap: .2em; }
+.th-h b::after { content: '›'; opacity: .5; font-size: 1.2em; }
+.th-h .bk { position: absolute; left: .45em; top: 1.75em; color: #0a84ff; font-size: 3.6em; line-height: 1; font-weight: 300; }
+.th-h .bk em { position: absolute; left: .55em; top: .18em; font-style: normal; font-size: .42em; font-weight: 600; background: #0a84ff; color: #fff; border-radius: 1em; padding: .05em .45em; }
+.th-b { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: .5em; padding: 1em 2.4em 1.6em; overflow: hidden; }
+.th-b .ts { align-self: center; font-size: 1.35em; color: #8e8e93; margin-bottom: .6em; }
+.th-b .ts b { font-weight: 600; }
+.bb { display: none; max-width: 76%; font-size: 2.05em; line-height: 1.28; padding: .45em .75em; border-radius: 1em; background: #262629; align-self: flex-start; overflow-wrap: anywhere; }
+.bb.out { background: #0a84ff; align-self: flex-end; }
+.bb.old { display: block; }
+.st.m1 .bb.k1, .st.m2 .bb.k2, .st.m3 .bb.k3 { display: block; animation: bbIn .35s ease-out both; }
+@keyframes bbIn { from { opacity: 0; transform: translateY(.6em) scale(.95); } }
+.dots { display: none; align-self: flex-start; gap: .4em; padding: .9em 1em; border-radius: 1.4em; background: #262629; }
+.st.ty .dots { display: flex; }
+.dots i { width: .95em; height: .95em; border-radius: 50%; background: #8e8e93; animation: dot 1.2s infinite; }
+.dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes dot { 30% { opacity: .35; transform: translateY(-.25em); } }
+.rd { display: none; align-self: flex-end; font-size: 1.3em; color: #8e8e93; margin-top: -.2em; }
+.st.rd1 .rd { display: block; }
+/* compose bar, and the keyboard when it opens */
+.cp { flex: none; display: flex; align-items: center; gap: 1em; padding: .8em 1.6em 1.2em; background: #000; }
+.cp i { width: 3.6em; height: 3.6em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; font-style: normal; font-size: 1em; color: #aeaeb2; }
+.cp i span { font-size: 2.4em; line-height: 1; }
+.cp .fld { flex: 1; min-height: 3.6em; border-radius: 1.8em; border: .12em solid #3a3a3c; display: flex; align-items: center; padding: 0 1.2em; font-size: 1.9em; color: #636366; }
+.cp .fld.typ { color: #fff; }
+.cp .fld.typ::after { content: ''; width: .08em; height: 1.1em; background: #0a84ff; margin-left: .05em; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.kb { flex: none; height: 0; overflow: hidden; background: #1f1f22; transition: height .35s ease; display: flex; flex-direction: column; gap: .8em; padding: 0 .6em; }
+.st.kbd .kb { height: 30%; padding: 1em .6em 4em; }
+.kb .sug { display: flex; gap: .4em; }
+.kb .sug span { flex: 1; text-align: center; font-size: 1.8em; color: #d1d1d6; padding: .3em 0; border-right: .06em solid #3a3a3c; }
+.kb .sug span:last-child { border: 0; }
+.kb .row { display: flex; gap: .55em; justify-content: center; }
+.kb .row i { flex: 0 0 8.4%; height: 5em; border-radius: .6em; background: #6b6b70; }
+/* choices in the thread: reply chips over the keyboard (variant C, D) */
+.th .rp { flex: none; display: none; flex-direction: column; gap: .9em; padding: 1em 2em 1.4em; background: #000; border-top: .1em solid #1c1c1e; }
+.st.ch .th .rp { display: flex; }
+.th .rp > b { font-family: var(--ui); font-size: 1.5em; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: #8e8e93; text-align: center; }
+.th .rp button { font: inherit; font-family: var(--ui); font-size: 2.4em; font-weight: 800; color: #000; border: 0; background: #fff; border-radius: .8em; padding: .75em .9em; cursor: pointer; animation: chIn .35s ease-out backwards; }
+.th .rp button.pk { outline: .2em solid #ffd60a; outline-offset: .12em; }
+.th .rp button.no { opacity: .3; }
+.st.ch .cp { display: none; }
+
+/* ----- D: slide to read: the notification waits for a swipe ----- */
+.v-D .th { transform: translateY(100%); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.v-D.st.open .th { transform: none; }
+.hint { position: absolute; left: 0; right: 0; bottom: 9%; text-align: center; z-index: 5; font-size: 1.9em; font-weight: 600; color: rgba(255,255,255,.8); display: none; }
+.st.wait .hint { display: block; animation: pulse 1.6s ease-in-out infinite; }
+.hint u { position: absolute; left: 50%; bottom: 7em; width: 3.4em; height: 3.4em; margin-left: -1.7em; border-radius: 50%; background: rgba(255,255,255,.7); text-decoration: none; animation: swipe 1.6s ease-in-out infinite; }
+@keyframes swipe { 0% { transform: translateY(2em); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14em); opacity: 0; } }
+@keyframes pulse { 50% { opacity: .5; } }
+.st.wait .nt { box-shadow: 0 0 0 .25em rgba(255,255,255,.5), 0 .3em 1em rgba(0,0,0,.25); }
+.st.wait { cursor: pointer; }
+
+/* ----- F: giant: the words, huge, on black ----- */
+.gi { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 8%; gap: 2.4em; z-index: 3; transition: padding .4s; }
+.gi .who { display: flex; align-items: center; gap: 1.2em; opacity: 0; transition: opacity .5s; }
+.st.m1 .gi .who { opacity: 1; }
+.gi .who .fc { width: 7em; height: 7em; }
+.gi .who b { font-family: var(--ui); font-size: 2.6em; font-weight: 800; color: #8e8e93; }
+.gi .msg { display: none; font-family: var(--ui); font-size: 6.2em; font-weight: 800; line-height: 1.12; letter-spacing: -.01em; }
+.gi .msg.old { font-size: 3.6em; color: #636366; }
+.st.m2 .gi .msg.k1 { font-size: 3.6em; color: #636366; transition: font-size .4s, color .4s; }
+.st.m3 .gi .msg.k2 { font-size: 3.6em; color: #636366; transition: font-size .4s, color .4s; }
+.st.m1 .gi .msg.k1, .st.m2 .gi .msg.k2, .st.m3 .gi .msg.k3 { display: block; animation: giIn .7s ease-out both; }
+@keyframes giIn { from { opacity: 0; transform: translateY(.3em); filter: blur(.1em); } }
+.v-F.st.ch .gi { justify-content: flex-start; padding-top: 12%; }
+.v-F.st.ch .gi .msg { font-size: 4.2em; }
+.v-F .chs button { font-size: 2.8em; border-radius: .7em; padding: 1.1em .9em; }
+
+/* ----- G: the choice is a gesture on his phone ----- */
+.gs { position: absolute; left: 4%; right: 4%; bottom: 4%; display: flex; gap: 1.4em; z-index: 7; visibility: hidden; }
+.st.ch .gs { visibility: visible; }
+.gs button { flex: 1; font: inherit; font-family: var(--ios); display: flex; flex-direction: column; align-items: center; gap: 1em; background: none; border: 0; color: #fff; cursor: pointer; padding: 0; animation: chIn .4s ease-out backwards; }
+.gs button i { width: 9em; height: 9em; border-radius: 50%; display: grid; place-items: center; background: rgba(60,60,67,.75); backdrop-filter: blur(10px); }
+.gs button i svg { width: 4em; height: 4em; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gs button span { font-size: 1.9em; font-weight: 600; text-align: center; line-height: 1.2; }
+.gs button small { display: block; font-size: .8em; opacity: .55; font-weight: 400; margin-top: .2em; }
+.gs button.pk i { background: #fff; }
+.gs button.pk i svg { stroke: #000; }
+.v-G.st.ch .nts { bottom: 26%; }
+/* G, locked: the screen goes black (he put it away) */
+.st.lockd .blk { opacity: 1; }
+.blk { position: absolute; inset: 0; background: #000; z-index: 20; opacity: 0; transition: opacity .5s .2s; pointer-events: none; }
+/* G, shown: the phone turns away from you (toward them) */
+.st { transition: transform .9s ease-in, opacity .9s ease-in; }
+.st.shown { transform: perspective(60em) rotateY(-75deg) scale(.85); opacity: .12; }
+
+/* ----- a call ----- */
+.call { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; opacity: 0; transition: opacity .4s; }
+.st.ring .call { opacity: 1; }
+.call .bgf { position: absolute; inset: 0; overflow: hidden; }
+.call .bgf img { position: absolute; left: 50%; top: -6%; height: 260%; transform: translateX(-50%); filter: blur(2.6em) brightness(.45) saturate(1.3); }
+.call .bgf::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.2), rgba(0,0,0,.6)); }
+.call > .cn, .call > .cs, .call > .fc { position: relative; }
+.call .cn { margin-top: 18%; font-size: 4.4em; font-weight: 500; }
+.call .cs { font-size: 2em; opacity: .7; margin-top: .3em; }
+.call .fc { width: 16em; height: 16em; margin-top: 6em; }
+.st.ring .call .fc { animation: callPulse 1.6s ease-out infinite; }
+@keyframes callPulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.35); } 100% { box-shadow: 0 0 0 3em rgba(255,255,255,0); } }
+.call .cb { position: absolute; left: 12%; right: 12%; bottom: 10%; display: flex; justify-content: space-between; }
+.call .cb button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: 1em; background: none; border: 0; color: #fff; cursor: pointer; padding: 0; }
+.call .cb i { width: 8.6em; height: 8.6em; border-radius: 50%; display: grid; place-items: center; }
+.call .cb i svg { width: 4em; height: 4em; fill: #fff; }
+.call .cb .dc i { background: #ff3b30; } .call .cb .dc i svg { transform: rotate(135deg); }
+.call .cb .ac i { background: #34c759; }
+.st.ring .call .cb .ac i { animation: wob 1s ease-in-out infinite; }
+@keyframes wob { 0%, 60%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(-12deg); } 20%, 40% { transform: rotate(12deg); } }
+.call .cb span { font-size: 1.8em; }
+.call .cb button.pk i { box-shadow: 0 0 0 .4em #fff; }
+/* the locked kind: slide to answer */
+.sld { position: absolute; left: 9%; right: 9%; bottom: 13%; height: 8.6em; border-radius: 4.3em; background: rgba(255,255,255,.18); backdrop-filter: blur(10px); display: flex; align-items: center; padding: .7em; }
+.sld i { width: 7.2em; height: 7.2em; border-radius: 50%; background: #34c759; display: grid; place-items: center; animation: nudge 2s ease-in-out infinite; cursor: pointer; }
+.sld i svg { width: 3.6em; fill: #fff; }
+.sld span { flex: 1; text-align: center; font-size: 2.2em; color: rgba(255,255,255,.75); background: linear-gradient(90deg, rgba(255,255,255,.35) 30%, #fff 50%, rgba(255,255,255,.35) 70%) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 2.4s linear infinite; }
+@keyframes shine { to { background-position: -200% 0; } }
+@keyframes nudge { 0%, 70%, 100% { transform: none; } 80% { transform: translateX(1.4em); } }
+.sld.ok i { transform: translateX(calc(100cqw * .82 - 8.6em)); animation: none; transition: transform .4s; }
+.c2 { position: absolute; left: 12%; right: 12%; bottom: 25%; display: flex; justify-content: space-between; }
+.c2 span { display: flex; flex-direction: column; align-items: center; gap: .6em; font-size: 1.6em; }
+.c2 span i { width: 3.6em; height: 3.6em; border-radius: 50%; background: rgba(255,255,255,.2); }
+.dcl { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; font: inherit; font-size: 1.9em; color: rgba(255,255,255,.65); background: none; border: 0; cursor: pointer; }
+/* the banner kind of call: compact, on top */
+.cbn { position: absolute; left: 2.5%; right: 2.5%; top: 1.4%; z-index: 7; display: flex; align-items: center; gap: 1.2em; padding: 1.2em 1.4em; border-radius: 3em; background: rgba(38,38,42,.96); transform: translateY(-140%); transition: transform .5s cubic-bezier(.2,.9,.3,1.15); }
+.st.ring .cbn { transform: none; }
+.cbn .fc { width: 5.4em; height: 5.4em; }
+.cbn div { flex: 1; }
+.cbn b { display: block; font-size: 2em; font-weight: 600; }
+.cbn small { font-size: 1.6em; opacity: .6; }
+.cbn button { width: 5.2em; height: 5.2em; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; }
+.cbn button svg { width: 2.6em; fill: #fff; }
+.cbn .dc { background: #ff3b30; } .cbn .dc svg { transform: rotate(135deg); }
+.cbn .ac { background: #34c759; }
+.cbn button.pk { box-shadow: 0 0 0 .3em #fff; }
+/* the giant kind of call: two halves */
+.gc { position: absolute; inset: 0; display: flex; flex-direction: column; z-index: 4; opacity: 0; transition: opacity .4s; }
+.st.ring .gc { opacity: 1; }
+.gc .top { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1.2em; padding: 14% 0 5%; }
+.gc .top .fc { width: 13em; height: 13em; }
+.st.ring .gc .top .fc { animation: callPulse 1.6s ease-out infinite; }
+.gc .top b { font-family: var(--ui); font-size: 6em; font-weight: 900; }
+.gc .top small { font-family: var(--ui); font-size: 2.2em; font-weight: 800; color: #34c759; letter-spacing: .1em; text-transform: uppercase; animation: pulse 1.2s infinite; }
+.gc button { flex: 1; font: inherit; font-family: var(--ui); font-size: 4em; font-weight: 900; border: 0; margin: 0 4% 3%; border-radius: .5em; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; gap: .4em; }
+.gc button svg { width: 1em; fill: #fff; }
+.gc .ac { background: #248a3d; } .gc .dc { background: #3a1d1d; color: #ff6961; } .gc .dc svg { fill: #ff6961; transform: rotate(135deg); }
+.gc button.pk { outline: .12em solid #fff; outline-offset: .06em; }
+
+/* ===== solo: on your own phone, full screen ===== */
+body.solo { overflow: hidden; background: #000; }
+body.solo header, body.solo .intro, body.solo .grid { display: none; }
+#soloBox { display: none; }
+body.solo #soloBox { display: block; position: fixed; inset: 0; }
+body.solo #soloBox .ph { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; cursor: default; }
+#tapGo { position: fixed; inset: 0; z-index: 50; background: #000; color: #fff; display: grid; place-items: center; text-align: center; font-family: var(--ui); cursor: pointer; padding: 0 12%; }
+#tapGo b { display: block; font-family: var(--display); font-weight: 400; font-size: 34px; margin-bottom: 14px; }
+#tapGo span { font-size: 16px; color: #aeaeb2; line-height: 1.5; }
+#tapGo[hidden] { display: none; }
+#soloBar { position: fixed; left: 0; right: 0; top: 0; z-index: 40; display: none; justify-content: center; gap: 10px; padding: calc(12px + env(safe-area-inset-top)) 10px 28px; background: linear-gradient(rgba(0,0,0,.92) 55%, transparent); animation: chIn .4s ease-out; }
+body.solo.done #soloBar { display: flex; }
+#soloBar a, #soloBar button { font: inherit; font-family: var(--ui); font-size: 15px; font-weight: 900; border: 0; border-radius: 99px; padding: 10px 16px; background: #f5f5f7; color: #000; text-decoration: none; cursor: pointer; }
+#soloBar a { background: #2c2c2e; color: #fff; }
+/* big view */
+#big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.88); display: grid; place-items: center; cursor: zoom-out; }
+#big[hidden] { display: none; }
+#big .ph { width: auto; height: 92vh; cursor: default; }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr 1fr; gap: 20px 12px; padding: 16px; } .card p { font-size: 12px; } header { padding: 12px 16px; } .intro { padding: 14px 16px 0; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Le cell de Brooke · variantes</h1>
+  <div class="seg" id="mom"></div>
+  <button type="button" class="again" id="again">Rejouer</button>
+  <a href="index.html">‹ Accueil</a>
+</header>
+<div class="intro">Une histoire à la télé : quand ton perso reçoit un texto ou un appel, <b>ton cell devient son cell</b>. Les mots sont seulement sur le tien; la télé montre juste qu’il lit. Touche une carte pour la voir en grand (là, il faut toucher pour lire, répondre, choisir). <b>Sur ton cell</b> : plein écran, avec la vibration (Android). ♥ tes préférées.
+  <div class="tvline" id="tvline"></div></div>
+<div class="grid" id="grid"></div>
+<div id="big" hidden></div>
+<div id="soloBox"></div>
+<div id="tapGo" hidden><div><b id="tapWho">Le cell de Brooke</b><span>Mets la télé dans ta tête. Pose ton cell écran vers le bas, ou garde-le dans ta main.<br><br>Touche pour commencer.</span></div></div>
+<div id="soloBar"><button type="button" id="soloAgain">Rejouer</button><a id="soloNext" href="#">Variante suivante</a><a href="cell.html">Toutes</a></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const img = (p) => `chars/${p}.webp`;
+
+// the real moments of the TV games (games.js): whose phone it is, who writes or calls, what, and the choice that follows
+const MOMENTS = [
+  { id: 'secret', name: 'Le secret', owner: 'Brooke', from: '+1 (514) 555-0187', face: null, ini: null, time: '1:47', bat: 41,
+    wall: 'bg/taverne_bar.webp', selfie: ['brooke/drunk_happy', 'justin_bar/drunk_happy'],
+    tv: 'Brooke reads a text. His face changes.',
+    msgs: [{ t: 'Say nothing about tonight. — S' }],
+    ch: [{ t: 'I’m good.', g: 'Put it away', gs: 'say “I’m good”', gi: 'lock' }, { t: 'Show them the text.', g: 'Show them', gs: 'turn the phone', gi: 'show' }] },
+  { id: 'appel', name: 'L’appel', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:13', bat: 22,
+    wall: 'bg/rempart.webp', selfie: ['brooke/drunk_smile', 'justin_bar/drunk_joke'],
+    tv: 'Brooke’s phone rings. The man in the suit looks at it.',
+    call: true, ch: [{ t: 'Answer' }, { t: 'Decline' }] },
+  { id: 'guide', name: 'Le guide', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '3:02', bat: 3,
+    wall: null, selfie: ['brooke/nervous', 'justin_bar/drunk_happy'],
+    tv: 'The basement. Pitch dark. Brooke’s screen lights up his face.',
+    msgs: [{ t: 'left' }, { t: 'then right' }],
+    ch: [{ t: 'Left door.', g: 'Left door', gi: 'left' }, { t: 'Right door.', g: 'Right door', gi: 'right' }] },
+  { id: 'vole', name: 'Le cell volé', owner: 'Justin', from: 'Brooke', face: 'brooke/texting', time: '2:31', bat: 64,
+    wall: 'bg/taverne_bar.webp', selfie: ['justin_bar/drunk_happy', 'cam/flirty'],
+    tv: 'Justin’s phone buzzes twice.',
+    old: [{ t: 'where r u?', out: true }],
+    msgs: [{ t: 'HELP,' }, { t: 'jk lol. all good. go home' }],
+    ch: [{ t: 'Go home.', g: 'Reply “ok”', gs: 'go home', gi: 'reply' }, { t: 'Go find him.', g: 'Call him', gs: 'go find him', gi: 'call' }] },
+  { id: 'voleb', name: 'Volé (Brooke)', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:30', bat: 22,
+    wall: 'bg/rempart.webp', selfie: ['brooke/drunk_smile', 'justin_bar/drunk_joke'],
+    tv: 'The man in the suit types on Brooke’s phone.',
+    old: [{ t: 'where r u?' }],
+    msgs: [{ t: 'HELP,', out: true }, { t: 'jk lol. all good. go home', out: true, ghost: true }], thread: true },
+];
+const VARIANTS = [
+  ['0', 'Actuel', 'Le cell reste noir avec la pause; les choix arrivent plein écran. Le point de comparaison.', 'now'],
+  ['A', 'Écran verrouillé', 'Le noir s’allume en écran verrouillé, l’heure du perso, sa batterie, et la notif. Les choix montent du bas, la notif reste.', 'lock'],
+  ['B', 'Juste la bannière', 'Rien ne change au jeu : le noir avec la pause, mais la bannière du vrai cell tombe d’en haut. Le plus petit pas.', 'banner'],
+  ['C', 'Le fil ouvert', 'Messages, ouvert sur la conversation : « … » il écrit, la bulle arrive. Tes choix = des réponses sous le fil.', 'thread'],
+  ['D', 'Glisser pour lire', 'La notif attend : il faut la toucher, comme lui, pour l’ouvrir. Le joueur fait le geste de son perso.', 'swipe'],
+  ['E', 'Son fond d’écran', 'A, mais le fond d’écran est une photo de lui avec son ami. On sait tout de suite à qui est ce cell.', 'selfie'],
+  ['F', 'Lecture géante', 'Pas d’interface de cell : les mots énormes sur le noir, qui écrit au-dessus. Lisible d’un coup d’œil, la télé à côté.', 'giant'],
+  ['G', 'Le choix est un geste', 'L’écran verrouillé, et les choix sont ce que tu fais avec le cell : le ranger (il s’éteint), le montrer (il se tourne), rappeler.', 'gest'],
+];
+
+// ---------- pieces ----------
+const SVG = {
+  sig: '<svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".7"/><rect x="5" y="5.5" width="3" height="6.5" rx=".7"/><rect x="10" y="3" width="3" height="9" rx=".7"/><rect x="15" y="0" width="3" height="12" rx=".7" opacity=".35"/></svg>',
+  wifi: '<svg viewBox="0 0 16 12"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.4 10.4 0 0 0 8 .4 10.4 10.4 0 0 0 .8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.8 6.8 0 0 0 8 4 6.8 6.8 0 0 0 3.4 5.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3zM8 9.4 10.2 7.6a3.3 3.3 0 0 0-4.4 0z"/></svg>',
+  msg: '<svg viewBox="0 0 24 24"><path d="M12 3C6.5 3 2 6.7 2 11.2c0 2.6 1.5 4.9 3.8 6.4-.2 1.3-.9 2.6-2 3.4 2 .1 3.9-.6 5.2-1.7 1 .3 2 .4 3 .4 5.5 0 10-3.7 10-8.4S17.5 3 12 3z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>',
+  torch: '<svg viewBox="0 0 24 24"><path d="M8 2h8v4l-2 4v11a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V10L8 6z"/></svg>',
+  cam: '<svg viewBox="0 0 24 24"><path d="M9 4h6l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5zM12 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>',
+  person: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M2 24c0-6 4.5-9 10-9s10 3 10 9z"/></svg>',
+};
+const GI = {   // the gestures (variant G)
+  lock: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  show: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  reply: '<svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-2"/></svg>',
+  call: '<svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>',
+  left: '<svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  right: '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+};
+const statusBar = (M, cls = '') => `<div class="sb ${cls}"><b>${M.time}</b><span class="ic">${SVG.sig}${SVG.wifi}<span class="bat ${M.bat <= 10 ? 'low' : ''}">${M.bat <= 10 ? `<em>${M.bat}%</em>` : ''}<span class="shell"><span class="lvl" style="width:${Math.max(M.bat, 6)}%"></span></span></span></span></div>`;
+// a round face: the sender's head from his whole-body sprite, else his initial, else the grey nobody
+const face = (M, cls = '') => M.face ? `<span class="fc ${cls}"><img src="${img(M.face)}" alt="" onload="headCrop(this)"></span>`
+  : `<span class="fc nobody ${cls}">${SVG.person}</span>`;
+const appIcon = (cls = '') => `<span class="app ${cls}">${SVG.msg}</span>`;
+const note = (M, m, k) => `<div class="nt k${k}"><span class="fw">${face(M)}${appIcon()}</span><div><b>${esc(M.from)}<small>now</small></b><span>${esc(m.t)}</span></div></div>`;
+const notes = (M, cls = '') => `<div class="nts ${cls}">${M.msgs.map((m, i) => note(M, m, i + 1)).join('')}</div>`;
+const wallpaper = (M, selfie) => {
+  if (selfie && M.selfie) return `<div class="wall img" style="background-image:url('${M.wall || 'bg/taverne.webp'}')">${M.selfie.map((p, i) => `<img class="self" src="${img(p)}" alt="" style="left:${i ? 50 : 6}%;transform:rotate(${i ? 4 : -3}deg)">`).join('')}</div>`;
+  return '<div class="wall"></div>';
+};
+const lockScreen = (M, selfie) => `<div class="lay">${wallpaper(M, selfie)}<div class="lk"><div class="d">Sunday, November 1</div><div class="t">${M.time}</div></div>
+  <div class="lkb"><i>${SVG.torch}</i><i>${SVG.cam}</i></div><div class="dimmer"></div></div>`;
+const choices = (M) => M.ch ? `<div class="chs">${M.ch.map((c, i) => `<button type="button" data-c="${i}">${esc(c.t)}</button>`).join('')}</div>` : '';
+const thread = (M) => `<div class="th"><div class="th-h"><span class="bk">‹<em>3</em></span>${face(M)}<b>${esc(M.from)}</b></div>
+  <div class="th-b"><div class="ts"><b>Today</b> ${M.time.replace(/:\d+$/, (s) => ':' + String(Math.max(0, +s.slice(1) - 9)).padStart(2, '0'))} AM</div>
+  ${(M.old || []).map((m) => `<div class="bb old ${m.out ? 'out' : ''}">${esc(m.t)}</div>`).join('')}
+  ${M.msgs.map((m, i) => `<div class="bb k${i + 1} ${m.out ? 'out' : ''}">${esc(m.t)}</div>`).join('')}
+  <div class="dots"><i></i><i></i><i></i></div><div class="rd">Delivered</div></div>
+  ${M.ch ? `<div class="rp"><b>${M.owner}</b>${M.ch.map((c, i) => `<button type="button" data-c="${i}">${esc(c.t)}</button>`).join('')}</div>` : ''}
+  <div class="cp"><i><span>+</span></i><span class="fld">iMessage</span></div>
+  <div class="kb"><div class="sug"><span>“lol”</span><span>ok</span><span>help</span></div>${[10, 9, 7].map((n) => `<div class="row">${'<i></i>'.repeat(n)}</div>`).join('')}</div></div>`;
+const callFull = (M) => `<div class="call"><div class="bgf">${M.face ? `<img src="${img(M.face)}" alt="">` : ''}</div>
+  <div class="cn">${esc(M.from)}</div><div class="cs">mobile</div>${face(M)}
+  <div class="cb"><button type="button" class="dc" data-c="1"><i>${SVG.phone}</i><span>Decline</span></button><button type="button" class="ac" data-c="0"><i>${SVG.phone}</i><span>Accept</span></button></div></div>`;
+const callLock = (M, selfie) => `<div class="call">${wallpaper(M, selfie).replace('class="wall', 'class="wall blur')}
+  <div class="cn">${esc(M.from)}</div><div class="cs">mobile</div>${face(M)}
+  <div class="c2"><span><i></i>Remind Me</span><span><i></i>Message</span></div>
+  <div class="sld"><i data-c="0">${SVG.phone}</i><span>slide to answer</span></div>
+  <button type="button" class="dcl" data-c="1">Decline</button></div>`;
+const callBanner = (M) => `<div class="cbn">${face(M)}<div><b>${esc(M.from)}</b><small>mobile</small></div><button type="button" class="dc" data-c="1">${SVG.phone}</button><button type="button" class="ac" data-c="0">${SVG.phone}</button></div>`;
+const callGiant = (M) => `<div class="gc"><div class="top">${face(M)}<b>${esc(M.from)}</b><small>calling</small></div><button type="button" class="ac" data-c="0">${SVG.phone} Answer</button><button type="button" class="dc" data-c="1">${SVG.phone} Decline</button></div>`;
+const mv = () => `<div class="mv">${SVG.pause}</div>`;
+
+// ---------- each variant: its screen and its timeline ----------
+// a step = [ms after the previous, what]: a class to add ('on'), '-x' to remove one, 'tap' (in the grid: a pause; big or
+// on your cell: waits for a touch), a function, or 'buzz' (the phone vibrates, on yours)
+function build(v, M) {
+  const kind = VARIANTS.find((x) => x[0] === v)[3];
+  let k = kind;
+  if (M.thread && !['thread', 'swipe'].includes(k)) k = k === 'now' || k === 'banner' ? 'now-thread' : 'thread';   // his own phone typing: it's always the thread
+  let html = '', steps = [];
+  const msgSteps = (gap = 2400, typing = false, from = 0) => {
+    const s = [];
+    M.msgs.forEach((m, i) => {
+      if (i < from) return;
+      if (m.ghost) s.push([1400, 'kbd'], [300, (st) => ghost(st, m.t)], [m.t.length * 140 + 500, (st) => { const f = $('.fld', st); f.textContent = 'iMessage'; f.classList.remove('typ'); }], [0, '-kbd'], [0, 'm' + (i + 1)], [600, 'rd1']);
+      else if (m.out) s.push([i ? gap : 1000, 'm' + (i + 1)], [500, 'rd1'], [600, '-rd1']);
+      else { if (typing) s.push([i > from ? gap - 1500 : 300, 'ty'], [1500, '-ty']); s.push([typing ? 0 : (i > from ? gap : 0), 'm' + (i + 1)], [0, 'buzz']); }
+    });
+    return s;
+  };
+  if (M.call) {
+    const callHtml = { now: '', lock: callLock(M), selfie: callLock(M, true), gest: callLock(M), swipe: callLock(M), banner: mv() + callBanner(M), thread: callFull(M), giant: callGiant(M) }[k];
+    html = statusBar(M, k === 'now' || k === 'banner' || k === 'giant' ? 'hide' : '') + callHtml + '<div class="home"></div>';
+    if (k === 'now') html = mv() + `<div class="chs">${M.ch.map((c, i) => `<button type="button" data-c="${i}">${c.t}</button>`).join('')}</div>`;
+    steps = k === 'now' ? [[1200, 'ch'], [0, 'buzz']] : [[900, 'on'], [0, 'ring'], [0, 'buzzcall'], [1800, 'ch'], [2600, 'tap']];
+    return { html: `${k === 'now' || k === 'banner' ? '' : '<div class="wake"></div>'}${html}`, steps, kind: k };
+  }
+  switch (k) {
+    case 'now':
+      html = mv() + choices(M);
+      steps = [[1600, 'buzz'], [0, 'ch']];
+      break;
+    case 'now-thread':
+      html = mv();
+      steps = [];
+      break;
+    case 'lock': case 'selfie':
+      html = lockScreen(M, k === 'selfie') + statusBar(M) + notes(M, 'stk') + choices(M) + '<div class="home"></div>';
+      steps = [[1000, 'on'], ...msgSteps(2600), [2200, 'ch'], [1800, 'tap']];
+      break;
+    case 'banner':
+      html = mv() + `<div class="bnr">${M.msgs.map((m, i) => note(M, m, i + 1)).join('')}</div>` + choices(M);
+      steps = [[1000, 'on'], ...msgSteps(2400), [2000, 'ch'], [1800, 'tap']];
+      break;
+    case 'thread':
+      html = statusBar(M) + thread(M) + '<div class="home"></div>';
+      steps = [[700, 'on'], ...msgSteps(2600, true), ...(M.ch ? [[1800, 'ch']] : []), [1800, 'tap']];
+      break;
+    case 'swipe':
+      html = lockScreen(M) + statusBar(M) + notes(M, 'stk') + `<div class="hint"><u></u>${M.thread ? 'Touch to open' : 'Touch to read'}</div>` + thread(M) + '<div class="home"></div>';
+      // only the first text on the lock screen; once open, the rest arrive in the thread
+      steps = [[1000, 'on'], ...(M.thread ? [] : [[0, 'm1'], [0, 'buzz']]), [M.thread ? 0 : 600, 'wait'], [1800, 'tap'], [0, '-wait'], [0, 'open'],
+        ...msgSteps(2600, true, M.thread ? 0 : 1), ...(M.ch ? [[1800, 'ch']] : []), [1800, 'tap']];
+      break;
+    case 'giant':
+      html = `<div class="gi"><div class="who">${face(M)}<b>${esc(M.from)}</b></div>${M.msgs.map((m, i) => `<div class="msg k${i + 1}">${esc(m.t)}</div>`).join('')}</div>` + choices(M);
+      steps = [[1000, 'on'], ...msgSteps(2800), [2200, 'ch'], [1800, 'tap']];
+      break;
+    case 'gest':
+      html = lockScreen(M) + statusBar(M) + notes(M, 'stk') + (M.ch ? `<div class="gs">${M.ch.map((c, i) => `<button type="button" data-c="${i}" data-g="${c.gi || ''}"><i>${GI[c.gi] || ''}</i><span>${esc(c.g || c.t)}${c.gs ? `<small>${esc(c.gs)}</small>` : ''}</span></button>`).join('')}</div>` : '') + '<div class="blk"></div><div class="home"></div>';
+      steps = [[1000, 'on'], ...msgSteps(2600), [2200, 'ch'], [1800, 'tap']];
+      break;
+  }
+  return { html: `${k.startsWith('now') || k === 'banner' ? '' : '<div class="wake"></div>'}${html}`, steps, kind: k };
+}
+// someone else types on his phone, letter by letter
+function ghost(st, text) {
+  const f = $('.fld', st); if (!f) return; f.textContent = ''; f.classList.add('typ'); let i = 0;
+  const go = () => { if (!st.isConnected || i > text.length) return; f.textContent = text.slice(0, i++); st._t.push(setTimeout(go, 110 + Math.random() * 70)); };
+  go();
+}
+
+// ---------- playing one phone ----------
+// live = big view or your own cell: 'tap' waits for a touch, the choices can be picked, it vibrates
+function play(ph, v, M, live) {
+  if (ph._st) ph._st._t.forEach(clearTimeout);
+  const { html, steps } = build(v, M);
+  ph.innerHTML = `<div class="st v-${v}">${html}</div>`;
+  const st = ph.firstChild; st._t = []; let i = 0;
+  const next = () => {
+    if (!st.isConnected) return;
+    if (i >= steps.length) { if (live) document.body.classList.add('done'); else st._t.push(setTimeout(() => play(ph, v, M, live), 2400)); return; }
+    const [ms, what] = steps[i++];
+    st._t.push(setTimeout(() => {
+      if (!st.isConnected) return;
+      if (what === 'tap') {
+        if (!live) return next();
+        if (st.classList.contains('wait')) { st._wait = next; return; }   // the notification: touching it opens
+        if (st.classList.contains('ch') || st.classList.contains('ring')) { st._wait = next; return; }   // waits for a choice
+        return next();
+      }
+      if (typeof what === 'function') what(st);
+      else if (what === 'buzz') { if (live && navigator.vibrate) navigator.vibrate([90, 70, 90]); }
+      else if (what === 'buzzcall') { if (live && navigator.vibrate) navigator.vibrate([400, 300, 400, 300, 400, 300, 400]); }
+      else if (what[0] === '-') st.classList.remove(what.slice(1));
+      else st.classList.add(what);
+      next();
+    }, what === 'tap' && live ? 0 : ms));
+  };
+  ph._st = st;
+  st.addEventListener('click', (e) => {
+    if (!live) return;
+    e.stopPropagation();
+    const b = e.target.closest('[data-c]');
+    if (st.classList.contains('wait')) { const w = st._wait; st._wait = null; if (w) w(); return; }
+    if (!b || st.dataset.picked) return;
+    st.dataset.picked = '1';
+    if (navigator.vibrate) navigator.vibrate(0);
+    st.querySelectorAll('[data-c]').forEach((x) => x.classList.toggle(x === b ? 'pk' : 'no', true));
+    const c = M.ch && M.ch[+b.dataset.c];
+    if (b.dataset.g === 'lock') st.classList.add('lockd');
+    if (b.dataset.g === 'show') st.classList.add('shown');
+    if (M.call && +b.dataset.c === 0) { const s = $('.sld', st); if (s) s.classList.add('ok'); }
+    if (M.call) st._t.push(setTimeout(() => st.classList.remove('ring'), 700));
+    const w = st._wait; st._wait = null; if (w) st._t.push(setTimeout(w, 600)); else document.body.classList.add('done');
+    void c;
+  });
+  next();
+}
+
+// ---------- the round faces: find his head in the sprite (as in the game) ----------
+const HEADS = {};
+function headCrop(im) {
+  const put = (h) => { if (!h) return; Object.assign(im.style, { width: h.k * 100 + '%', left: 50 - h.cx * h.k * 100 + '%', top: 50 - h.cy * h.k * 100 + '%', opacity: 1 }); };
+  if (HEADS[im.src] !== undefined) { put(HEADS[im.src]); return; }
+  let h = null;
+  try {
+    const w = 80, ht = Math.round(w * im.naturalHeight / im.naturalWidth), c = document.createElement('canvas');
+    c.width = w; c.height = ht; const g = c.getContext('2d'); g.drawImage(im, 0, 0, w, ht);
+    const px = g.getImageData(0, 0, w, ht).data, on = (x, y) => px[(y * w + x) * 4 + 3] > 40;
+    let y0 = -1, y1 = -1;
+    for (let y = 0; y < ht && y0 < 0; y++) for (let x = 0; x < w; x++) if (on(x, y)) { y0 = y; break; }
+    for (let y = ht - 1; y >= 0 && y1 < 0; y--) for (let x = 0; x < w; x++) if (on(x, y)) { y1 = y; break; }
+    if (y0 >= 0) {
+      const fig = y1 - y0, band = Math.max(2, Math.round(fig * 0.11)); let sx = 0, n = 0;
+      for (let y = y0; y < y0 + band; y++) for (let x = 0; x < w; x++) if (on(x, y)) { sx += x; n++; }
+      const head = fig * 0.13;
+      h = { cx: sx / n / w, cy: (y0 + head * 0.55) / w, k: (w * 0.75) / head };
+    }
+  } catch { /* can't read the picture: the plain one */ }
+  HEADS[im.src] = h; put(h || { cx: .5, cy: .12, k: 2.4 });
+}
+
+// ---------- the page ----------
+const favs = (() => { try { return new Set(JSON.parse(localStorage.getItem('cell-favs') || '[]')); } catch { return new Set(); } })();
+const saveFavs = () => { try { localStorage.setItem('cell-favs', JSON.stringify([...favs])); } catch { /* private window */ } };
+let mom = 'secret';
+try { mom = localStorage.getItem('cell-mom') || 'secret'; } catch { /* private window */ }
+if (!MOMENTS.some((m) => m.id === mom)) mom = 'secret';
+const Mo = () => MOMENTS.find((m) => m.id === mom);
+
+function paintTop() {
+  $('#mom').innerHTML = MOMENTS.map((m) => `<button type="button" data-m="${m.id}" class="${m.id === mom ? 'on' : ''}">${m.name}</button>`).join('');
+  const M = Mo();
+  $('#tvline').innerHTML = `À la télé, pendant ce temps : <i>${esc(M.tv)}</i> · le cell de <b>${M.owner}</b>${M.thread ? ' (son cell écrit tout seul : vu dans le fil)' : ''}`;
+}
+function paint() {
+  paintTop();
+  const M = Mo();
+  $('#grid').innerHTML = VARIANTS.map(([v, name, desc]) => `<div class="card ${favs.has(v) ? 'faved' : ''}" data-v="${v}">
+    <h2><i>${v}</i>${esc(name)}<button type="button" class="fav ${favs.has(v) ? 'on' : ''}" aria-label="Préférée">♥</button></h2>
+    <p>${esc(desc)}</p><div class="ph"></div><a class="solo" href="?m=${M.id}&v=${v}">Sur ton cell ↗</a></div>`).join('');
+  document.querySelectorAll('.card').forEach((c) => play($('.ph', c), c.dataset.v, M, false));
+}
+$('#mom').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; mom = b.dataset.m; try { localStorage.setItem('cell-mom', mom); } catch { /* private window */ } paint(); };
+$('#again').onclick = paint;
+$('#grid').onclick = (e) => {
+  const card = e.target.closest('.card'); if (!card) return;
+  if (e.target.closest('.fav')) { const v = card.dataset.v; favs.has(v) ? favs.delete(v) : favs.add(v); saveFavs(); card.classList.toggle('faved'); e.target.classList.toggle('on'); return; }
+  if (e.target.closest('.ph')) {
+    const big = $('#big'); big.hidden = false; big.innerHTML = '<div class="ph"></div>';
+    document.body.classList.remove('done');
+    play($('.ph', big), card.dataset.v, Mo(), true);
+  }
+};
+$('#big').onclick = (e) => { if (e.target.id === 'big') { $('#big').hidden = true; $('#big').innerHTML = ''; } };
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#big').onclick({ target: $('#big') }); });
+
+// ?m=secret&v=A: on your own cell, full screen
+const q = new URLSearchParams(location.search);
+if (q.get('v')) {
+  const v = VARIANTS.some((x) => x[0] === q.get('v')) ? q.get('v') : 'A';
+  if (q.get('m') && MOMENTS.some((m) => m.id === q.get('m'))) mom = q.get('m');
+  const M = Mo();
+  document.body.classList.add('solo');
+  $('#soloBox').innerHTML = '<div class="ph"></div>';
+  $('#tapWho').textContent = `Le cell de ${M.owner}`;
+  $('#tapGo').hidden = false;
+  const vi = VARIANTS.findIndex((x) => x[0] === v), nx = VARIANTS[(vi + 1) % VARIANTS.length][0];
+  $('#soloNext').href = `?m=${M.id}&v=${nx}`;
+  const go = () => { $('#tapGo').hidden = true; document.body.classList.remove('done'); play($('#soloBox .ph'), v, M, true); };
+  $('#tapGo').onclick = go;
+  $('#soloAgain').onclick = go;
+} else paint();
+</script>
+</body>
+</html>
