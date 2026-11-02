@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Écran de choix · variantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;0,900;1,700;1,900&family=Yeseva+One&display=swap">
+<style>
+/* L'écran de choix, en plusieurs hypothèses côte à côte, sur de vrais moments de Last call. Deux modes : Cell (l'histoire
+   sur le cell, les choix sous la réplique) et Télécommande (le cell d'un joueur sur une histoire à la télé : écran noir,
+   seulement les choix). Chaque variante = une hypothèse sur ce qui rend l'intention lisible le plus vite.
+   « Test éclair » : l'écran s'affiche 1,5 s puis disparaît; la personne dit ce qu'elle a retenu. */
+:root { --bg: #0b0a0f; --fg: #f5f5f7; --dim: #8e8e93; --line: #2c2c2e; --ui: 'Nunito', 'Segoe UI', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; background: rgba(11,10,15,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size: 14px; }
+.seg { display: flex; background: #1c1c1e; border-radius: 99px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 800; color: var(--dim); background: none; border: 0; border-radius: 99px; padding: 7px 14px; cursor: pointer; }
+.seg button.on { background: #f5f5f7; color: #000; }
+.flash { font: inherit; font-size: 14px; font-weight: 900; border: 0; border-radius: 99px; padding: 9px 16px; background: #ffd60a; color: #000; cursor: pointer; }
+.intro { max-width: 980px; padding: 18px 20px 0; color: #d1d1d6; font-size: 15px; line-height: 1.5; }
+.intro b { color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 28px 22px; padding: 22px 20px 60px; }
+.card { display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.card h2 i { font-style: normal; font-size: 12px; font-weight: 900; color: #000; background: #f5f5f7; border-radius: 6px; padding: 2px 6px; }
+.card p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--dim); min-height: 3.6em; }
+.fav { margin-left: auto; font: inherit; font-size: 18px; background: none; border: 0; color: #48484a; cursor: pointer; padding: 0 2px; }
+.fav.on { color: #ff375f; }
+.card.faved .ph { box-shadow: 0 0 0 3px #ff375f; }
+
+/* the phone: 9:16 like the game's stage; 1em = 1% of its height (as in the game) */
+.ph { position: relative; width: 100%; aspect-ratio: 9 / 16; border-radius: 18px; overflow: hidden; background: #000; container-type: size; cursor: zoom-in; box-shadow: 0 0 0 1px var(--line); }
+.st { position: absolute; inset: 0; font-size: 1cqh; color: #1d1a24; }
+.st.gone > * { visibility: hidden; }
+.st.gone::after { content: 'Qu’est-ce que tu as vu ?'; position: absolute; inset: 0; display: grid; place-items: center; color: #8e8e93; font-size: 3em; font-weight: 800; visibility: visible; }
+.scene { position: absolute; inset: 0; background: center / cover no-repeat; }
+.actor { position: absolute; left: 50%; bottom: 36%; height: 62%; transform: translateX(-50%); filter: drop-shadow(0 1em 2em rgba(0,0,0,.5)); }
+.ui { position: absolute; left: 6%; right: 6%; bottom: 3.5%; display: flex; flex-direction: column; gap: 1.3em; }
+.bub { position: relative; background: #fffdf9; border: .3em solid #cdbdf0; border-radius: 1.4em; padding: 1.7em 1.4em 1.1em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); font-size: 2.3em; font-weight: 600; line-height: 1.3; }
+.bub .tag { position: absolute; left: .8em; top: -.85em; padding: .25em .8em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: .8em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; }
+.bub.narr { background: rgba(22,18,30,.9); border-color: rgba(255,255,255,.14); color: #f4eefc; font-style: italic; text-align: center; }
+.ch { display: flex; flex-direction: column; gap: 1em; }
+.ch button { font: inherit; position: relative; display: flex; align-items: center; gap: .8em; text-align: left; border: 0; cursor: pointer; color: #fff; }
+.ch button.pk { outline: .25em solid #fff; outline-offset: .15em; }
+.ch .t { display: block; }
+.ch .k { display: block; }
+.ch .face { flex: none; position: relative; overflow: hidden; }
+.ch .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }   /* head and shoulders */
+
+/* ---- Cell ---- */
+.v-P0 .ch button { font-size: 2.3em; font-weight: 800; background: #34516d; border-radius: 1.4em; padding: .85em 1.2em; box-shadow: 0 .25em .7em rgba(0,0,0,.3); }
+.v-P1 .ch button { font-size: 2.3em; font-weight: 800; background: var(--m); border-radius: 1.4em; padding: .85em 1.2em; box-shadow: 0 .25em .7em rgba(0,0,0,.3); color: var(--mi, #fff); }
+.v-P2 .ch button { font-size: 2.2em; font-weight: 800; background: rgba(20,16,28,.92); border-radius: 1.4em; padding: .35em 1em .35em .35em; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.12); }
+.v-P2 .ch .face { width: 2.6em; height: 2.6em; border-radius: 50%; background: radial-gradient(circle at 50% 30%, var(--m), #000 90%); }
+.v-P3 .ch button { flex-direction: column; align-items: flex-start; gap: .1em; background: var(--m); color: var(--mi, #fff); border-radius: 1.2em; padding: .7em 1.1em .8em; }
+.v-P3 .ch .k { font-size: 3.4em; font-weight: 900; letter-spacing: -.01em; line-height: 1; text-transform: uppercase; }
+.v-P3 .ch .t { font-size: 1.8em; font-weight: 700; opacity: .85; }
+.v-P4 .ch button { font-size: 2.5em; font-weight: 900; background: #fff; color: #000; border-radius: .7em; padding: .7em .9em; box-shadow: 0 .3em 1em rgba(0,0,0,.5); }
+.v-P4 .ch .n { flex: none; width: 1.5em; height: 1.5em; border-radius: 50%; background: #000; color: #fff; display: grid; place-items: center; font-size: .75em; }
+.v-P5 .scene, .v-P5 .actor { filter: brightness(.3) blur(.4em) saturate(.6); }
+.v-P5 .actor { filter: brightness(.45) blur(.15em); }
+.v-P5 .ui { top: 6%; justify-content: flex-end; }
+.v-P5 .bub { background: none; border: 0; box-shadow: none; color: #fff; font-family: var(--display); font-weight: 400; font-size: 3.6em; text-align: center; padding: 0 .2em 1em; }
+.v-P5 .bub .tag { position: static; display: inline-block; margin-bottom: .6em; font-family: var(--ui); font-size: .45em; }
+.v-P5 .ch button { font-size: 2.6em; font-weight: 800; background: rgba(255,255,255,.1); border-radius: 1em; padding: .9em 1em; box-shadow: inset .25em 0 0 var(--m); }
+.v-P6 .ch button { font-size: 2.3em; font-weight: 800; border-radius: 1.4em; padding: .85em 1.2em; }
+.v-P6 .ch .ty-say { background: #fffdf9; color: #1d1a24; border: .14em solid #cdbdf0; }
+.v-P6 .ch .ty-do { background: #2b2233; color: #ffd60a; font-style: italic; border: .14em dashed rgba(255,214,10,.6); }
+.v-P6 .ch .ty-sms { background: #30d158; color: #00210a; border-radius: 1.4em 1.4em .3em 1.4em; }
+.v-P6 .ch .ic { flex: none; font-size: .8em; width: 1.6em; height: 1.6em; display: grid; place-items: center; border-radius: 50%; background: rgba(0,0,0,.08); }
+
+/* ---- Télécommande (black phone, only the choices) ---- */
+.rm { position: absolute; inset: 2.5% 3%; display: flex; flex-direction: column; gap: 1.4em; }
+.rm .ch { flex: 1; gap: 1.4em; }
+.rm .ch button { flex: 1; justify-content: center; text-align: center; }
+.v-R0 .ch button { font-size: 3.4em; font-weight: 800; background: #34516d; border-radius: .7em; padding: .6em; }
+.v-R1 .ch button { font-size: 3.6em; font-weight: 900; background: var(--m); color: var(--mi, #fff); border-radius: .7em; padding: .6em; line-height: 1.15; }
+.v-R2 .ch button { justify-content: flex-start; text-align: left; gap: .6em; font-size: 3em; font-weight: 800; background: linear-gradient(90deg, color-mix(in srgb, var(--m) 55%, #000), #111 70%); border-radius: .7em; padding: 0 .7em 0 0; overflow: hidden; }
+.v-R2 .ch .face { width: 4.6em; align-self: stretch; }
+.v-R2 .ch .face img { height: 260%; top: 6%; }
+.v-R3 .ch button { flex-direction: column; gap: .3em; background: #141217; border-radius: .7em; box-shadow: inset 0 -.5em 0 var(--m); padding: .5em .5em .9em; }
+.v-R3 .ch .k { font-size: 6.5em; font-weight: 900; line-height: .95; letter-spacing: -.02em; text-transform: uppercase; color: var(--m); }
+.v-R3 .ch .t { font-size: 2.2em; font-weight: 700; color: #d1d1d6; }
+.v-R4 .q .face { position: relative; overflow: hidden; }
+.v-R4 .q .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
+.v-R4 .q { flex: none; display: flex; gap: 1em; align-items: center; padding: 1em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
+.v-R4 .q .face { flex: none; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; }
+.v-R4 .q b { display: block; font-size: 2.2em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+.v-R4 .q span { display: block; font-size: 3.2em; font-weight: 700; line-height: 1.25; }
+.v-R4 .ch button { font-size: 3em; font-weight: 900; background: #fff; color: #000; border-radius: .7em; padding: .5em; }
+.v-R5 .ch button { font-size: 3.2em; font-weight: 800; border-radius: .7em; padding: .6em; flex-direction: column; gap: .3em; }
+.v-R5 .ch .ty-say { background: #fffdf9; color: #1d1a24; }
+.v-R5 .ch .ty-do { background: #2b2233; color: #ffd60a; font-style: italic; box-shadow: inset 0 0 0 .1em rgba(255,214,10,.6); }
+.v-R5 .ch .ty-sms { background: #30d158; color: #00210a; }
+.v-R5 .ch .ic { font-size: .55em; font-style: normal; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; opacity: .65; }
+.v-R6 .rm { gap: 0; inset: 0; }
+.v-R6 .ch { gap: 0; }
+.v-R6 .ch button { flex-direction: row; justify-content: flex-start; gap: 1em; padding: 0 1.2em; background: var(--m); color: var(--mi, #fff); border-radius: 0; text-align: left; font-size: 3em; font-weight: 900; }
+.v-R6 .ch .face { width: 5em; height: 5em; border-radius: 50%; background: rgba(0,0,0,.25); box-shadow: 0 0 0 .15em rgba(255,255,255,.5); }
+.v-R6 .ch .k { font-size: .6em; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+
+/* big view */
+#big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.85); display: grid; place-items: center; cursor: zoom-out; }
+#big[hidden] { display: none; }
+#big .ph { width: auto; height: 92vh; cursor: default; }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr 1fr; gap: 20px 12px; padding: 16px; } .card p { font-size: 12px; } header { padding: 12px 16px; } .intro { padding: 14px 16px 0; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Écran de choix · variantes</h1>
+  <div class="seg" id="mode"><button type="button" data-v="cell" class="on">Cell</button><button type="button" data-v="remote">Télécommande</button></div>
+  <div class="seg" id="mom"></div>
+  <button type="button" class="flash" id="flash">Test éclair 1,5 s</button>
+  <a href="index.html">‹ Accueil</a>
+</header>
+<div class="intro">Chaque variante est une hypothèse sur ce qui fait comprendre <b>l'intention</b> le plus vite : la couleur du mood, le visage, un seul mot, le contraste, le type de message. Touche un écran pour l'agrandir, ♥ pour garder tes préférées (gardées sur cet appareil). <b>Test éclair</b> : tout s'affiche 1,5 s puis disparaît : demande à quelqu'un ce qu'il a retenu, et laquelle il aurait choisie.</div>
+<div class="grid" id="grid"></div>
+<div id="big" hidden></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+// moods: one colour each, the same everywhere (mi = the text colour when the fill is light)
+const MOOD = {
+  tendre:  { c: '#ff6b8a', n: 'tendre' },
+  las:     { c: '#4f7fe0', n: 'las' },
+  ferme:   { c: '#ff453a', n: 'ferme' },
+  leger:   { c: '#ffd60a', n: 'léger', i: '#1d1a24' },
+  inquiet: { c: '#b07cff', n: 'inquiet' },
+  froid:   { c: '#8e9aaf', n: 'froid', i: '#111' },
+};
+// real moments of Last call (bar.js): who speaks, the line the choice answers, the options with their intent, their mood,
+// their type (say: a line, do: an action [ ], sms: a text) and the face Justin makes saying it
+const MOMENTS = [
+  { id: 'loyer', name: 'Le loyer', bg: 'bg/taverne_bar.webp', who: 'Cam', col: '#e2557a', sp: 'cam/worried', line: 'Why do you keep paying his rent?',
+    opts: [
+      { t: 'He’s my brother.', k: 'Loyal', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_talk' },
+      { t: 'Because no one else will.', k: 'Tired', m: 'las', ty: 'say', f: 'justin_bar/drunk_sad' },
+      { t: 'I’m done. Monday, he’s on his own.', k: 'Done', m: 'ferme', ty: 'say', f: 'justin_bar/angry' },
+    ] },
+  { id: 'mensonge', name: 'Le mensonge', bg: 'bg/taverne_bar.webp', who: 'Cam', col: '#e2557a', sp: 'cam/awkward', line: 'That I didn’t.',
+    opts: [
+      { t: 'Why’d you lie?', k: 'Press', m: 'ferme', ty: 'say', f: 'justin_bar/drunk_serious' },
+      { t: 'Probably a debt collector.', k: 'Dodge', m: 'leger', ty: 'say', f: 'justin_bar/drunk_happy' },
+      { t: '[Look at the bathroom door]', k: 'Worry', m: 'inquiet', ty: 'do', f: 'justin_bar/drunk_listen' },
+    ] },
+  { id: 'combien', name: 'Combien', bg: 'bg/galerie.webp', who: 'Julian', col: '#5b6b8c', sp: 'julian/listen', line: 'Ask him what she cost.',
+    opts: [
+      { t: '“Brooke. How much?”', k: 'Demand', m: 'ferme', ty: 'say', f: 'justin_bar/angry' },
+      { t: '“I don’t care. Cam, we’re leaving.”', k: 'Protect', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_serious' },
+      { t: '[Punch Julian]', k: 'Punch', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
+    ] },
+  { id: 'etage', name: 'L’étage', bg: 'bg/taverne_haut.webp', who: null, line: 'Cam goes upstairs with the man in the suit.',
+    opts: [
+      { t: 'Text Brooke: “where r u?? cam went upstairs w that guy”', k: 'Alert', m: 'inquiet', ty: 'sms', f: 'justin_bar/texting' },
+      { t: 'Go up after her.', k: 'Go', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
+      { t: 'Wait. She’s a big girl.', k: 'Wait', m: 'froid', ty: 'say', f: 'justin_bar/drunk_listen' },
+    ] },
+];
+const VARIANTS = {
+  cell: [
+    ['P0', 'Actuel', 'Le bleu de maintenant, le texte à gauche. Le point de comparaison.'],
+    ['P1', 'Couleur du mood', 'La couleur dit l’intention avant les mots : rose tendre, bleu las, rouge ferme, jaune léger, mauve inquiet.'],
+    ['P2', 'Le visage', 'Chaque choix montre la tête que fera ton perso. Un visage se lit avant une phrase.'],
+    ['P3', 'Un mot d’abord', 'L’intention en un mot géant (LOYAL, DONE), la réplique en petit dessous.'],
+    ['P4', 'Contraste max', 'Blanc, noir, numérotés. Pas de couleur : la lisibilité pure.'],
+    ['P5', 'Le projecteur', 'La scène s’éteint quand c’est à toi : la réplique en grand en haut, les choix seuls dans la lumière.'],
+    ['P6', 'Type de message', 'Une parole = bulle blanche, une action [ ] = jaune pointillé, un texto = bulle verte.'],
+  ],
+  remote: [
+    ['R0', 'Actuel', 'Les choix en bleu, plein écran, centrés. Le point de comparaison.'],
+    ['R1', 'Moitiés de couleur', 'Chaque choix a la couleur de son mood, plein écran : on voit le choix du coin de l’œil.'],
+    ['R2', 'Visage à gauche', 'La tête de ton perso en grand, la réplique à côté. Le cell = ton perso.'],
+    ['R3', 'Verbe géant', 'Un mot énorme par choix (PRESS / DODGE / WORRY), la réplique en petit. Pour lire d’un coup d’œil.'],
+    ['R4', 'La question en haut', 'Les yeux quittent la télé : on rappelle qui t’a dit quoi (visage + réplique), puis les choix en blanc.'],
+    ['R5', 'Type de message', 'PARLER, FAIRE, TEXTER : la forme dit ce que tu vas faire, pas juste quoi.'],
+    ['R6', 'Bandes de mood + visage', 'Bord à bord, une bande de couleur par choix, le visage de l’expression, le mot du mood.'],
+  ],
+};
+let mode = 'cell', mom = 0;
+try { mode = localStorage.getItem('choix-mode') || 'cell'; } catch { /* private window */ }
+const favs = (() => { try { return new Set(JSON.parse(localStorage.getItem('choix-favs') || '[]')); } catch { return new Set(); } })();
+const saveFavs = () => { try { localStorage.setItem('choix-favs', JSON.stringify([...favs])); } catch { /* private window */ } };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const img = (p) => `chars/${p}.webp`;
+const TY = { say: ['💬', 'Parler'], do: ['✋', 'Faire'], sms: ['📱', 'Texter'] };
+function opt(v, o, i) {
+  const m = MOOD[o.m], st = `--m:${m.c};${m.i ? `--mi:${m.i}` : ''}`, face = `<span class="face"><img src="${img(o.f)}" alt=""></span>`, t = `<span class="t">${esc(o.t)}</span>`, k = `<span class="k">${esc(o.k)}</span>`;
+  const inner = {
+    P2: face + t, P3: k + t, P4: `<span class="n">${i + 1}</span>` + t, P6: `<span class="ic">${TY[o.ty][0]}</span>` + t,
+    R2: face + t, R3: k + t, R5: `<span class="ic">${TY[o.ty][0]} ${TY[o.ty][1]}</span>` + t, R6: face + `<span>${`<span class="k">${esc(m.n)}</span>`}${t}</span>`,
+  }[v] || t;
+  return `<button type="button" class="ty-${o.ty}" style="${st}">${inner}</button>`;
+}
+function screenHtml(v) {
+  const M = MOMENTS[mom], opts = M.opts.map((o, i) => opt(v, o, i)).join('');
+  if (mode === 'remote') {
+    const q = v === 'R4' ? `<div class="q">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
+    return `<div class="st v-${v}"><div class="rm">${q}<div class="ch">${opts}</div></div></div>`;
+  }
+  const bub = M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
+  return `<div class="st v-${v}"><div class="scene" style="background-image:url(${M.bg})"></div>${M.sp ? `<img class="actor" src="${img(M.sp)}" alt="">` : ''}<div class="ui">${bub}<div class="ch">${opts}</div></div></div>`;
+}
+function wire(ph) {
+  ph.querySelectorAll('.ch button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); ph.querySelectorAll('.ch button').forEach((x) => x.classList.toggle('pk', x === b)); });
+}
+function paint() {
+  document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
+  $('#mom').innerHTML = MOMENTS.map((m, i) => `<button type="button" class="${i === mom ? 'on' : ''}" data-i="${i}">${esc(m.name)}</button>`).join('');
+  $('#mom').querySelectorAll('button').forEach((b) => b.onclick = () => { mom = +b.dataset.i; paint(); });
+  $('#grid').innerHTML = VARIANTS[mode].map(([v, n, h]) => `<div class="card${favs.has(v) ? ' faved' : ''}" data-v="${v}"><h2><i>${v}</i>${esc(n)}<button type="button" class="fav${favs.has(v) ? ' on' : ''}" aria-label="Préférée">♥</button></h2><div class="ph">${screenHtml(v)}</div><p>${esc(h)}</p></div>`).join('');
+  document.querySelectorAll('.card').forEach((c) => {
+    const v = c.dataset.v, ph = $('.ph', c); wire(ph);
+    $('.fav', c).onclick = () => { favs.has(v) ? favs.delete(v) : favs.add(v); saveFavs(); paint(); };
+    ph.onclick = () => { const big = $('#big'); big.innerHTML = `<div class="ph">${screenHtml(v)}</div>`; wire($('.ph', big)); $('.ph', big).onclick = (e) => e.stopPropagation(); big.hidden = false; };
+  });
+}
+$('#big').onclick = () => { $('#big').hidden = true; };
+document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { mode = b.dataset.v; try { localStorage.setItem('choix-mode', mode); } catch { /* private window */ } paint(); });
+let flashT = null;
+$('#flash').onclick = () => {
+  clearTimeout(flashT);
+  const all = document.querySelectorAll('.st'); all.forEach((s) => s.classList.remove('gone'));
+  flashT = setTimeout(() => all.forEach((s) => s.classList.add('gone')), 1500);
+  setTimeout(() => all.forEach((s) => s.classList.remove('gone')), 9000);
+};
+paint();
+</script>
+</body>
+</html>
