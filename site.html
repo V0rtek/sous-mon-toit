@@ -45,7 +45,7 @@ a.btn.main[href="demo.html"]:hover::before, a.btn.main[href="demo.html"]:focus-v
 .btn.ghost { color: var(--fg); background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px var(--line); }
 /* hovering « Try a demo »: 3 demos open under it (they stay while the pointer is on the button or on them), each its picture on hover */
 .demo { position: relative; display: inline-block; }
-.demos { position: absolute; left: 0; top: 100%; z-index: 20; padding-top: 12px; width: min(560px, calc(100vw - 32px)); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .2s, transform .2s, visibility 0s .2s; }
+.demos { position: absolute; left: 0; top: 100%; z-index: 20; padding-top: 12px; width: min(560px, calc(100vw - 32px - var(--dx, 0px))); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .2s, transform .2s, visibility 0s .2s; }
 .demo.r .demos { left: auto; right: 0; }
 .demo:hover .demos, .demo:focus-within .demos { opacity: 1; visibility: visible; transform: none; transition: opacity .2s, transform .2s; }
 .demos > .dm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; border-radius: 22px 22px 0 0; background: linear-gradient(rgba(11,11,13,.35), rgba(11,11,13,.75)), url(ref/demo_menu.webp) center / cover; box-shadow: 0 24px 50px -16px rgba(0,0,0,.9), inset 0 0 0 1px rgba(255,255,255,.12); }
@@ -58,6 +58,8 @@ a.btn.main[href="demo.html"]:hover::before, a.btn.main[href="demo.html"]:focus-v
 .dm b { position: relative; z-index: 1; padding: 0 8px 10px; font-size: 14px; line-height: 1.2; text-align: center; text-shadow: 0 1px 6px rgba(0,0,0,.8); }
 .demos .all { display: block; padding: 10px 16px; border-radius: 0 0 22px 22px; background: rgba(11,11,13,.92); font-size: 14px; font-weight: 800; text-decoration: none; color: var(--gold); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
 .demos .all:hover { color: #fff; }
+.ask .demos { --dx: clamp(36px, 6vw, 72px); }   /* the box's padding: stays on screen */
+@media (hover: none) { .demos { display: none; } }   /* a phone has no hover: the button goes straight to the demos */
 .topR { display: flex; align-items: center; gap: 10px; }
 .lang { font: inherit; font-weight: 800; font-size: 13px; letter-spacing: .08em; padding: 8px 12px; border-radius: 999px; border: 0; background: rgba(255,255,255,.1); color: var(--fg); cursor: pointer; }
 .btn.sm { padding: 9px 16px; font-size: 14px; }
