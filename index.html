@@ -33,7 +33,17 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 #world > * { position: absolute; }
 #bgimg { left: 0; top: 0; display: block; }
 .actor { transform-origin: 50% 100%; }   /* a sway ({walk glide}) turns from the waist */
-.actor img { width: 100%; height: 100%; display: block; }
+.actor img { width: 100%; height: 100%; display: block; transition: filter .6s; }
+/* a choice: the light on the one choosing (02/11, picked in choix.html, Persos seuls / Lui seul / Douce): the decor goes
+   dark under the characters (litDim, between the decor and the cast), or him alone stays lit, or a soft vignette on him */
+#litDim { position: absolute; left: -5000px; top: -5000px; width: 20000px; height: 20000px; background: #000; opacity: 0; pointer-events: none; transition: opacity .6s; }
+body.lit-chars #litDim, body.lit-him #litDim { opacity: .68; }
+#front { transition: filter .6s; }
+body.lit-chars #front, body.lit-him #front { filter: brightness(.32) saturate(.5); }
+body.lit-him #cast .actor:not(.lit-me) img { filter: brightness(.32) saturate(.5); }
+#litVig { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .6s; background: radial-gradient(ellipse 30% 36% at var(--lx, 50%) var(--ly, 35%), transparent 40%, rgba(0,0,0,.72) 100%); }
+body.lit-soft #litVig { opacity: 1; }
+#litToast { position: absolute; left: 50%; top: 3.5%; z-index: 80; transform: translateX(-50%); padding: .7em 1.4em; border-radius: 2em; background: rgba(28,28,30,.92); color: #fff; font-size: 2.2em; font-weight: 800; pointer-events: none; transition: opacity .4s; }
 .actor.talk { animation: talk .22s ease-out; }   /* a small, quick hop when someone starts talking */
 @keyframes talk { 40% { transform: translateY(-.6%); } }
 #shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.18), transparent 22%, transparent 60%, rgba(0,0,0,.28)); }
@@ -1455,7 +1465,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 </style>
 
 <div id="stage">
-  <div id="world"><img id="bgimg" alt=""><div id="backdrop"></div><div id="cast"></div><div id="front"></div></div>
+  <div id="world"><img id="bgimg" alt=""><div id="backdrop"></div><div id="litDim"></div><div id="cast"></div><div id="front"></div></div><div id="litVig"></div>
   <div id="shade"></div>
   <div id="texts"></div>
   <div id="far"></div>
@@ -1995,7 +2005,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="poseCard" hidden><img id="poseImg" alt=""><span id="poseName"></span></div>
   <button id="back" type="button" hidden aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
-  <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
+  <div id="menuPop" hidden><button type="button" data-m="light"></button><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
   <div id="tvIntro" hidden></div>
   <div id="tvWho"></div>
@@ -2880,9 +2890,34 @@ function drawCall() {
   const t = Math.floor((Date.now() - callNow.at) / 1000);
   $('#callTime').textContent = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
 }
+// ---- the light during a choice: on the one choosing (his character), on every screen of the story (the TV too) ----
+const LIGHT_NAMES = { chars: 'Persos seuls', him: 'Lui seul', soft: 'Douce', off: 'Rien' };
+let litMode = (() => { try { const v = localStorage.getItem('smt-light'); return LIGHT_NAMES[v] ? v : 'chars'; } catch { return 'chars'; } })(), litOn = null, litT = null;
+function setLight(m) {
+  litMode = m; try { localStorage.setItem('smt-light', m); } catch { /* private window */ }
+  let t = $('#litToast'); if (!t) { t = document.createElement('div'); t.id = 'litToast'; stage.appendChild(t); }
+  t.textContent = 'Lumière : ' + LIGHT_NAMES[m]; t.style.opacity = 1; clearTimeout(setLight.t); setLight.t = setTimeout(() => { t.style.opacity = 0; }, 1400);
+  if (litOn) litFocus(litOn);
+}
+function litPlace() {   // the soft vignette follows him (his upper body)
+  const a = litOn && actors[litOn]; if (!a) return;
+  const r = a.el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+  $('#litVig').style.setProperty('--lx', ((r.left + r.width / 2 - s.left) / s.width * 100).toFixed(1) + '%');
+  $('#litVig').style.setProperty('--ly', ((r.top + r.height * .3 - s.top) / s.height * 100).toFixed(1) + '%');
+}
+function litFocus(k) {
+  litOff(); litOn = k; if (litMode === 'off' || FAST) return;
+  const a = actors[k], mode = a ? litMode : 'chars';   // he isn't in the shot: just the decor goes dark
+  document.body.classList.add('lit-' + mode); if (a) a.el.classList.add('lit-me');
+  if (mode === 'soft') { litPlace(); litT = setInterval(litPlace, 400); }
+}
+function litOff() {
+  document.body.classList.remove('lit-chars', 'lit-him', 'lit-soft'); clearInterval(litT); litT = null;
+  document.querySelectorAll('#cast .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;
+}
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
-  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = '';
+  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; litFocus(seatFor(by));
   document.body.classList.toggle('choosing', mineFor(by)); $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
@@ -2923,7 +2958,7 @@ function pickChoice(i, afar = false) {
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
-    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing');
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing'); litOff();
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
@@ -3543,7 +3578,7 @@ function show(id) {
   if (id === '#infos') { $('#infos').scrollTop = 0; const v = $('#valBtn'); v.classList.remove('valcue'); void v.offsetWidth; v.classList.add('valcue'); }   // Valider l'idée: blinks, grows, the arrow points
 }
 function halt() {
-  document.body.classList.remove('choosing', 'privline');
+  document.body.classList.remove('choosing', 'privline'); litOff();
   $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
   run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
@@ -4271,6 +4306,7 @@ const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).in
 // icons, no words (the words stay as their labels): the sound shows how it is now, a tap switches it
 const SPEAKER = '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="#fff"/>';
 const MENU_ICON = {
+  light: '<circle cx="12" cy="10" r="5" fill="#ffd60a"/><path d="M9.5 17.5h5M10.5 20.5h3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
   on: `${SPEAKER}<path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
   off: `${SPEAKER}<path d="m15.5 9.5 5 5m0-5-5 5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
   again: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M4.5 3.8v4.6h4.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -4278,6 +4314,7 @@ const MENU_ICON = {
 };
 function paintMenu() {
   const set = (m, icon, label) => { const b = $(`#menuPop [data-m="${m}"]`); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICON[icon]}</svg>`; b.setAttribute('aria-label', label); return b; };
+  set('light', 'light', 'Lumière : ' + LIGHT_NAMES[litMode]);
   set('sound', muted ? 'off' : 'on', ui(muted ? 'unmute' : 'mute')).hidden = hostTv;
   set('again', 'again', ui(hasEps(state.story) ? 'restartEp' : 'restart')).hidden = ROLE !== 'host';
   set('quit', 'quit', ui('quit'));
@@ -4291,6 +4328,7 @@ $('#menuPop').onclick = (e) => {
   e.stopPropagation();
   const m = e.target.closest('[data-m]'); if (!m) return;
   if (m.dataset.m === 'sound') { setMuted(!muted); paintMenu(); return; }
+  if (m.dataset.m === 'light') { const k = Object.keys(LIGHT_NAMES); setLight(k[(k.indexOf(litMode) + 1) % k.length]); paintMenu(); return; }
   $('#menuPop').hidden = true;
   if (m.dataset.m === 'again') restartEpisode();
   else if (hostTv) sendIn('menu');   // a TV's story: back to the TV's home, everyone
@@ -4530,7 +4568,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261102200000';
+const BUILD = '20261102230000';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#tvPick', '#lobby', '#wait', '#end'].includes(screen)) return;
