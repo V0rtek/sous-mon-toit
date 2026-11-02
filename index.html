@@ -1193,6 +1193,12 @@ body:not(.home):not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.home) #gal
 #waitOther i:nth-child(3) { animation-delay: .2s; }
 #waitOther.done i { display: none; }
 body.tv #waitOther { font-size: 3em; bottom: 8%; }
+/* the clock of a choice someone else is making (the TV, the other player's phone): the same line, quiet, at the bottom */
+#waitClock { position: absolute; left: 50%; bottom: 2.2%; width: 16em; transform: translateX(-50%); height: .45em; border-radius: .25em; background: rgba(255,255,255,.12); z-index: 19; pointer-events: none; }
+#waitClock[hidden] { display: none; }
+#waitClock i { display: block; height: 100%; width: 100%; border-radius: .25em; opacity: .7; }
+body.tv #waitClock { left: 0; right: 0; bottom: 0; width: auto; transform: none; height: .7em; border-radius: 0; }
+body.tv #waitClock i { border-radius: 0; opacity: .55; }
 #waitOther i:nth-child(4) { animation-delay: .4s; }
 body.watch #choices button.mine { pointer-events: auto; }
 /* live: the QR to let someone watch, and the spectator's view (same screen, nothing to press) */
@@ -1606,6 +1612,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
+  <div id="waitClock" hidden><i></i></div>
   <div id="waitOther" hidden><span id="waitFace" hidden><img alt=""></span><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
@@ -3180,7 +3187,9 @@ function choose(opts, by, ring) {
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   }
   if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
-  clockStop(); if (mine && holder === choicesEl && !choicesEl.hidden && !isBot(by)) clockStart(opts);
+  clockStop();
+  if (mine && holder === choicesEl && !choicesEl.hidden && !isBot(by)) clockStart(opts);
+  else if ((waitsFor(by) || (TV && duo())) && !ring && !isBot(by)) clockStart(opts, true);
   if (isBot(by) && ROLE === 'host') botPick();
   if (cellOpen) { clearTimeout(closeCell.t); drawCell(); }
 }
@@ -3188,17 +3197,20 @@ function choose(opts, by, ring) {
 // story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
 let clockT = 0;
 const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
-function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); }
-function clockStart(opts) {
+function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); $('#waitClock').hidden = true; }
+function clockStart(opts, watching = false) {   // watching: someone else's choice (the TV, the other phone): the line only shows, never picks
   const ms = clockMs(); if (!ms || FAST || PREVIEW) return;
-  const el = document.createElement('div'); el.className = 'clock'; el.innerHTML = '<i></i>'; choicesEl.prepend(el);
+  let el;
+  if (watching) { el = $('#waitClock'); el.hidden = false; el.firstChild.style.width = '100%'; }
+  else { el = document.createElement('div'); el.className = 'clock'; el.innerHTML = '<i></i>'; choicesEl.prepend(el); }
   let left = ms, last = performance.now();
   clockT = setInterval(() => {
     const now = performance.now(), dt = now - last; last = now;
     if (waiting !== 'choice' || options !== opts) { clockStop(); return; }
-    if (paused || choicesEl.hidden || absentSeats().length || document.hidden || choicesEl.querySelector('.picked')) return;
+    if (paused || (!watching && choicesEl.hidden) || absentSeats().length || document.hidden || choicesEl.querySelector('.picked')) return;
     left -= dt; const p = Math.max(0, left / ms), bar = el.firstChild; bar.style.width = p * 100 + '%'; bar.style.background = `hsl(${(p * 50).toFixed(0)} 100% 55%)`;
     if (left > 0) return;
+    if (watching) return;   // the chooser's own phone picks; the line stays empty until the story goes on
     clearInterval(clockT); const i = Math.floor(Math.random() * opts.length);
     if (ROLE === 'host') pickChoice(i);
     else { const b = [...optionButtons()].find((x) => +x.dataset.i === i); if (b) b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
@@ -3207,7 +3219,7 @@ function clockStart(opts) {
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
   const o = options && options[i]; if (!o || waiting !== 'choice') return;
-  clearInterval(clockT);
+  clockStop();
   record('c' + i + tag(optionsLane));
   const by = optionsBy;
   const go = () => {
