@@ -1154,7 +1154,7 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .vd-ok { font-size: 2.2em; color: #30d158; margin: 1em 0 0; }
 .vd-note { font-size: 2em; color: #c7c7cc; margin: 0; }
 .vd-checks label { display: flex; align-items: flex-start; gap: .7em; cursor: pointer; }
-.vd-checks input { width: 1.1em; height: 1.1em; margin: .25em 0 0; flex: none; accent-color: #30d158; }
+.vd-checks input { width: .62em; height: .62em; margin: .3em 0 0; flex: none; accent-color: #30d158; }
 .vd-checks input:checked + span { color: #8e8e93; text-decoration: line-through; }
 .vd-checks em { font-style: normal; color: #8e8e93; font-size: .85em; }
 .vd-checks .vd-idea span { color: #c7c7cc; }
@@ -1988,10 +1988,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <section class="vd-card">
         <small class="vd-k">The plan of when we test</small>
         <h3>Test</h3>
-        <ul class="vd-list">
-          <li>Maman/Dan</li><li>Val/Math/Papa/José</li><li>Mohamed/Nico/Simon/Wissam</li><li>Dual tests</li><li>Leblancs</li>
-          <li>Grand-papa : lui faire tester le produit avec une histoire fantasy (avec Sir Walter ?)</li>
-        </ul>
+        <p class="vd-note">Avec qui : la liste des 50 tests plus bas.</p>
         <p class="vd-ok"><b>Succès :</b> ils finissent l'épisode, puis en veulent un 2e.</p>
         <h3>Questions</h3>
         <p class="vd-note">Les questions à poser : section « Interview · questions et hypothèses » plus bas.</p>
@@ -2005,18 +2002,21 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
           <button type="button" id="vdPlus" aria-label="Un test de plus">+</button>
         </div>
         <ul class="vd-checks">
+          <li><label><input type="checkbox"><span>Maman/Dan</span></label></li>
+          <li><label><input type="checkbox"><span>Val/Math/Papa/José</span></label></li>
+          <li><label><input type="checkbox"><span>Mohamed/Nico/Simon/Wissam</span></label></li>
           <li><label><input type="checkbox"><span>Mohamed/ <em>(à compléter)</em></span></label></li>
-          <li><label><input type="checkbox"><span>Dansamy, Potatoe : Discord ou un serveur de jeu pertinent</span></label></li>
+          <li><label><input type="checkbox"><span>Dual tests</span></label></li>
+          <li><label><input type="checkbox"><span>Leblancs</span></label></li>
+          <li><label><input type="checkbox"><span>Grand-papa : lui faire tester le produit avec une histoire fantasy (avec Sir Walter ?)</span></label></li>
+          <li><label><input type="checkbox"><span>Dansamy : Discord ou un serveur de jeu pertinent</span></label></li>
+          <li><label><input type="checkbox"><span>Potatoe : Discord ou un serveur de jeu pertinent</span></label></li>
           <li><label><input type="checkbox"><span>Post Reddit</span></label></li>
           <li><label><input type="checkbox"><span>Discord Showrunner : interviewer les utilisateurs, leur envoyer une vidéo</span></label></li>
           <li><label><input type="checkbox"><span>D&amp;D : aller voir des sessions, présenter le projet en court aux dungeon masters <em>(Dnd [...] à compléter)</em></span></label></li>
-          <li class="vd-idea"><label><input type="checkbox"><span>Ton entourage : groupes de chat, une soirée jeu, leurs amis <em>· idée</em></span></label></li>
           <li class="vd-idea"><label><input type="checkbox"><span>Communautés de fiction interactive (Discord, r/interactivefiction) <em>· idée</em></span></label></li>
           <li class="vd-idea"><label><input type="checkbox"><span>Subreddits de playtest (r/playmygame…) et fils playtest des forums de jeux indé <em>· idée</em></span></label></li>
-          <li class="vd-idea"><label><input type="checkbox"><span>itch.io : une page de playtest gratuite <em>· idée</em></span></label></li>
-          <li class="vd-idea"><label><input type="checkbox"><span>Streamers ou YouTubers de jeux narratifs : une démo en live <em>· idée</em></span></label></li>
           <li class="vd-idea"><label><input type="checkbox"><span>Événements Spark et meetups locaux (le plan, slide 0) <em>· idée</em></span></label></li>
-          <li class="vd-idea"><label><input type="checkbox"><span>Collègues, cours, équipes de sport <em>· idée</em></span></label></li>
         </ul>
       </section>
 
@@ -2032,7 +2032,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <small class="vd-k">Interview · questions et hypothèses</small>
         <ul class="inv"><li>I'm more involved in a story where I am the character.</li>
           <li>I'm more involved and want to come back more if I make the choices.</li>
-          <li>Last time hyped bout show? Would you be as hyped if x friend wouldn't be into it? [find pain]</li></ul>
+          <li>Last time hyped bout show? Would you be as hyped if x friend wouldn't be into it? [find pain]</li>
+          <li><b>À la fin :</b> tu connais d'autres personnes qui seraient down d'essayer aussi ?</li></ul>
       </section>
 
       <div id="valBody"></div>
