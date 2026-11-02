@@ -1341,6 +1341,47 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 body.tv #choices button { pointer-events: none; }
 body.tv #choices.tvpicked button:not(.picked) { opacity: .35; transition: opacity .3s; }
 #choices button.picked { transition: transform .3s; }
+/* the choice cards (02/11, from choix.html): your face (the one you'll make saying it), the line; on the remote (a phone on
+   a TV's story) the face full height and the intent in big. A dashed yellow card + a hand = an action, green + a phone =
+   a text (only when the options aren't all the same kind); the face of whom it's aimed at, when they aren't all for the
+   same person. T3 / N4+N1: who you answer, his face in a big circle, above (smt-cstyle / smt-rstyle, set in choix.html) */
+#choices.cx { gap: 1.1em; }
+#choices.cx button { font-size: 1em; position: relative; display: flex; align-items: center; gap: 1.1em; padding: .8em 1.3em .8em .8em; border-radius: 1.4em; background: rgba(20,16,28,.94); box-shadow: inset 0 0 0 .12em rgba(255,255,255,.12), 0 .3em 1em rgba(0,0,0,.4); text-align: left; }
+#choices.cx button:hover, #choices.cx button:focus-visible { background: rgba(48,42,62,.96); }
+#choices.cx .cf, #choices.cx .cf2, #qCard .qf { flex: none; position: relative; overflow: hidden; border-radius: 50%; }
+#choices.cx .cf { width: 5.6em; height: 5.6em; background: radial-gradient(circle at 50% 30%, #4a4458, #000 95%); }
+#choices.cx .cf img, #choices.cx .cf2 img, #qCard .qf img { position: absolute; left: 50%; top: 4%; height: 400%; width: auto; max-width: none; transform: translateX(-50%); }
+#choices.cx .ctx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .35em; }
+#choices.cx .ct { font-size: 2.3em; font-weight: 800; line-height: 1.25; }
+#choices.cx .ck { font-size: 4.2em; font-weight: 900; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; }
+#choices.cx .cto { flex: none; display: flex; align-items: center; gap: .5em; }
+#choices.cx .cto i { font-style: normal; font-size: 2.6em; font-weight: 900; opacity: .45; line-height: 1; }
+#choices.cx .cf2 { width: 4.6em; height: 4.6em; background: #2c2c2e; box-shadow: 0 0 0 .2em rgba(255,255,255,.25); }
+#choices.cx .tyb { position: absolute; right: -.6em; top: -.6em; width: 3em; height: 3em; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 .3em #0b0a0f; }
+#choices.cx .tyb svg { width: 1.8em; height: 1.8em; }
+#choices.cx .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
+#choices.cx .ty-do .tyb { background: #ffd60a; color: #000; }
+#choices.cx .ty-do .ct { font-style: italic; }
+#choices.cx .ty-sms { outline: .18em solid #30d158; outline-offset: -.18em; border-radius: 1.4em 1.4em .25em 1.4em; }
+#choices.cx .ty-sms .tyb { background: #30d158; color: #00210a; }
+#qCard { display: flex; align-items: center; gap: 1.4em; padding: 1.2em 1.6em 1.2em 1.2em; border-radius: 1.6em; background: rgba(20,16,28,.94); color: #f5f5f7; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.12); animation: rise .28s ease-out backwards; }
+#qCard .qf { width: 10em; height: 10em; background: #2c2c2e; box-shadow: 0 0 0 .35em var(--c, #8e8e93); }
+#qCard .qx { min-width: 0; display: flex; flex-direction: column; gap: .4em; }
+#qCard b { font-size: 2em; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c, #8e8e93) 55%, #fff); }
+#qCard .qx > span { font-size: 2.6em; font-weight: 700; line-height: 1.3; }
+body.phonemin #ui:has(#qCard) #bubble { display: none; }
+body.phonemin #qCard { flex: none; margin-top: 8.5em; padding: 1.6em 2em 1.6em 1.6em; }
+body.phonemin #qCard .qf { width: 14em; height: 14em; }
+body.phonemin #qCard .qx > span { font-size: 3.2em; }
+body.phonemin #choices.cx button { display: flex; align-items: center; justify-items: normal; text-align: left; font-size: 1em; padding: 0 1.6em 0 0; gap: 1.6em; border-radius: .9em; overflow: visible; }
+body.phonemin #choices.cx .cf { width: 13em; height: auto; align-self: stretch; border-radius: .9em 0 0 .9em; }
+body.phonemin #choices.cx .cf img { height: 330%; top: 5%; }
+body.phonemin #choices.cx .ct { font-size: 2.8em; }
+body.phonemin #choices.cx .ck { font-size: 6em; }
+body.phonemin #choices.cx .cf2 { width: 8em; height: 8em; }
+body.phonemin #choices.cx .cto i { font-size: 4em; }
+body.phonemin #choices.cx .tyb { right: .8em; top: .8em; width: 4em; height: 4em; box-shadow: none; }
+body.phonemin #choices.cx .tyb svg { width: 2.4em; height: 2.4em; }
 body.tv #choices.tvpicked button.picked { transform: scale(1.04); }
 /* the TV's screen is wide: the story fills it, the words and choices stay in a column at the bottom, the two players'
    panels in the bottom corners, over the scene */
@@ -2899,6 +2940,45 @@ function litOff() {
   document.body.classList.remove('lit-chars', 'lit-him');
   document.querySelectorAll('#cast .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;
 }
+// ---- the choice cards: what each option shows, read from the story (02/11) ----
+const CH_ICON = {
+  do: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V5.5a1.5 1.5 0 0 1 3 0V13M17 9.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-2L8 14.5"/></svg>',
+  sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>',
+};
+const chStyle = (remote) => { try { const v = localStorage.getItem(remote ? 'smt-rstyle' : 'smt-cstyle'); return remote ? (v === 'U1' ? 'U1' : 'N1') : (v === 'T3' ? 'T3' : 'T1'); } catch { return remote ? 'N1' : 'T1'; } };
+// an option, read from its answer: the face he makes (the pose of his first line, or the pose the story gives him), an
+// action ([…]) or a text (an sms of his, « Text … »), and whom it's aimed at (his first line's « to », the text's
+// receiver, or a character named in it)
+function optMeta(o, k) {
+  const steps = o.then || [], t = fill(o.t);
+  const line = steps.find((x) => x.say === k), poses = steps.find((x) => x.poses && x.poses[k]), sms = steps.find((x) => x.sms && x.sms.from === k);
+  const pose = (line && line.pose) || (poses && poses.poses[k]) || 'listen';
+  const ty = /^\[/.test(t) ? 'do' : sms || /^text\b/i.test(t) ? 'sms' : 'say';
+  let to = (line && line.to) || (sms && sms.sms.to) || null;
+  if (!to) to = [...new Set([...Object.keys(actors), ...seatsOf()])].find((id) => id !== k && castOf(id) && castOf(id).name && t.includes(fill(castOf(id).name))) || null;
+  if (to && (!castOf(to) || !SPRITES[spriteOf(to)])) to = null;
+  let face = null; try { face = SPRITES[spriteOf(k)] ? poseSrc(k, pose) : null; } catch { face = null; }
+  return { face, ty, to };
+}
+function choiceCard(o, m, all, remote) {
+  const tys = new Set(all.map((x) => x.ty)), tos = new Set(all.map((x) => x.to).filter(Boolean));
+  const ty = tys.size > 1 && m.ty !== 'say' ? m.ty : null;
+  let to = ''; if (tos.size > 1 && m.to) { try { to = `<span class="cto"><i>›</i><span class="cf2"><img src="${poseSrc(m.to, 'listen')}" alt=""></span></span>`; } catch { to = ''; } }
+  return { cls: ty ? 'ty-' + ty : '', html: `${m.face ? `<span class="cf"><img src="${m.face}" alt=""></span>` : ''}<span class="ctx">${remote && o.intent ? `<b class="ck">${esc(o.intent)}</b>` : ''}<span class="ct">${esc(fill(o.t))}</span></span>${to}${ty ? `<span class="tyb">${CH_ICON[ty]}</span>` : ''}` };
+}
+// T3 (a phone) / N4+N1 (the remote): whom you answer, above the choices: his face in a big circle, his name, his line
+function qCardShow(k) {
+  qCardOff();
+  const remote = document.body.classList.contains('phonemin'), st = chStyle(remote);
+  if (!(remote ? st === 'U1' : st === 'T3')) return;
+  const who = lastSpeaker, said = (typingFull || textEl.textContent || '').trim();
+  if (!who || who === k || !said || !castOf(who) || !SPRITES[spriteOf(who)]) return;
+  const a = actors[who]; let src = null; try { src = poseSrc(who, a ? a.shown || a.pose : 'listen'); } catch { return; }
+  const el = document.createElement('div'); el.id = 'qCard'; el.style.setProperty('--c', castOf(who).color || '#8e8e93');
+  el.innerHTML = `<div class="qf"><img src="${src}" alt=""></div><div class="qx"><b>${esc(fill(castOf(who).name || ''))}</b><span>${esc(said)}</span></div>`;
+  choicesEl.before(el); if (!remote) bubble.hidden = true;
+}
+function qCardOff() { const q = $('#qCard'); if (q) q.remove(); }
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
   options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; litFocus(seatFor(by));
@@ -2913,9 +2993,12 @@ function choose(opts, by, ring) {
   } else choicesEl.hidden = false;
   const holder = ring && !waitsFor(by) ? $('#ringBtns') : choicesEl;
   const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
+  const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k));
+  choicesEl.classList.add('cx');
+  if (mine && holder === choicesEl && !choicesEl.hidden) qCardShow(k);
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
-    if (holder === choicesEl) b.textContent = fill(o.t);
+    if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(c.cls); }
     else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
     b.dataset.i = i;
     if (mine && ROLE === 'watch') b.classList.add('mine');
@@ -2942,7 +3025,7 @@ function pickChoice(i, afar = false) {
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
-    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing'); litOff();
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing'); litOff(); qCardOff();
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
@@ -3562,7 +3645,7 @@ function show(id) {
   if (id === '#infos') { $('#infos').scrollTop = 0; const v = $('#valBtn'); v.classList.remove('valcue'); void v.offsetWidth; v.classList.add('valcue'); }   // Valider l'idée: blinks, grows, the arrow points
 }
 function halt() {
-  document.body.classList.remove('choosing', 'privline'); litOff();
+  document.body.classList.remove('choosing', 'privline'); litOff(); qCardOff();
   $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
   run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
@@ -4549,7 +4632,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261102230000';
+const BUILD = '20261103010000';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#tvPick', '#lobby', '#wait', '#end'].includes(screen)) return;

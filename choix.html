@@ -30,6 +30,10 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 .card p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--dim); min-height: 3.6em; }
 .fav { margin-left: auto; font: inherit; font-size: 18px; background: none; border: 0; color: #48484a; cursor: pointer; padding: 0 2px; }
 .fav.on { color: #ff375f; }
+.ingame { font: inherit; font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; border: 0; border-radius: 99px; padding: 4px 9px; background: #1c1c1e; color: var(--dim); cursor: pointer; }
+.ingame.on { background: #30d158; color: #000; }
+.card h2 .ingame { margin-left: auto; }
+.card h2 .ingame + .fav { margin-left: 6px; }
 .card.faved .ph { box-shadow: 0 0 0 3px #ff375f; }
 
 /* the phone: 9:16 like the game's stage; 1em = 1% of its height (as in the game) */
@@ -118,11 +122,11 @@ body.lt-him .mx.t-vig .a-l { filter: brightness(.3) saturate(.5); }
 body.lt-off .mx.t-vig .vig { display: none; }
 #light[hidden] { display: none; }
 .mx .ch { gap: .9em; }
-.mx .ch button { gap: .7em; padding: .55em .9em; border-radius: 1.2em; background: rgba(20,16,28,.94); box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1), 0 .3em 1em rgba(0,0,0,.4); }
-.mx .ch .tx { display: flex; flex-direction: column; gap: .15em; min-width: 0; }
-.mx .ch .t { font-size: 2.3em; font-weight: 800; line-height: 1.2; }
+.mx .ch button { gap: 1.1em; padding: .8em 1.3em .8em .8em; border-radius: 1.4em; background: rgba(20,16,28,.94); box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1), 0 .3em 1em rgba(0,0,0,.4); }
+.mx .ch .tx { display: flex; flex-direction: column; gap: .35em; min-width: 0; flex: 1; }
+.mx .ch .t { font-size: 2.3em; font-weight: 800; line-height: 1.25; }
 .mx.t-word .ch .k { font-size: 3.3em; font-weight: 900; line-height: 1; text-transform: uppercase; letter-spacing: -.01em; }
-.mx.t-word .ch .t { font-size: 1.75em; font-weight: 700; opacity: .75; }
+.mx.t-word .ch .t { font-size: 1.9em; font-weight: 700; opacity: .8; line-height: 1.3; }
 .mx .ch .face { width: 5.6em; height: 5.6em; border-radius: 50%; background: radial-gradient(circle at 50% 30%, var(--m), #000 95%); }
 .mx.t-white .ch button { background: #fff; color: #000; box-shadow: 0 .3em 1em rgba(0,0,0,.5); }
 .mx.t-white .ch .face { background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--m) 55%, #fff), #e5e5ea 95%); }
@@ -146,27 +150,27 @@ body.lt-off .mx.t-vig .vig { display: none; }
 .mx.t-white .ch .ty-sms { background: #e3fbe9; }
 .mx .ch button.pv { outline: .25em solid #ffd60a; outline-offset: .15em; }
 /* the remote: the same traits, full height */
-.mx .rm .ch button { flex: 1; justify-content: flex-start; text-align: left; border-radius: .8em; padding: 0 1em 0 0; overflow: hidden; }
+.mx .rm .ch button { flex: 1; justify-content: flex-start; text-align: left; border-radius: .9em; padding: 0 1.6em 0 0; gap: 1.6em; overflow: hidden; }
 .mx .rm .ch button:not(:has(.face)) { padding-left: 1.2em; }
 .mx .rm .ch .face { width: 12em; height: auto; align-self: stretch; border-radius: 0; }
 .mx .rm .ch .face img { height: 360%; top: 4%; }
 .mx .rm .ch .t { font-size: 2.8em; }
 .mx.t-word .rm .ch .k { font-size: 5.4em; }
-.mx.t-word .rm .ch .t { font-size: 2.2em; }
+.mx.t-word .rm .ch .t { font-size: 2.4em; line-height: 1.3; }
 .mx .rm .ch .tyb { font-size: 1.5em; }
 .mx .rm .ch .tyb { right: .5em; top: .5em; box-shadow: none; }
 .mx.t-edge .rm .ch button { box-shadow: inset .8em 0 0 var(--m); padding-left: .8em; }
-.mx .rm .q { flex: none; display: flex; gap: 1em; align-items: center; padding: 1em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
+.mx .rm .q { flex: none; display: flex; gap: 1.6em; align-items: center; padding: 1.6em 2em 1.6em 1.6em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
 .mx .rm .q .face { flex: none; position: relative; overflow: hidden; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; }
 .mx .rm .q .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
 .mx .rm .q b { display: block; font-size: 2.2em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
-.mx .rm .q span { display: block; font-size: 3.2em; font-weight: 700; line-height: 1.25; }
+.mx .rm .q span { display: block; font-size: 3.2em; font-weight: 700; line-height: 1.3; margin-top: .15em; }
 /* ---- tour 3 ---- */
-.mx .qc { display: flex; align-items: center; gap: 1em; padding: .9em 1.1em .9em .9em; border-radius: 1.2em; background: rgba(20,16,28,.94); color: #f5f5f7; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1); }
+.mx .qc { display: flex; align-items: center; gap: 1.4em; padding: 1.2em 1.6em 1.2em 1.2em; border-radius: 1.2em; background: rgba(20,16,28,.94); color: #f5f5f7; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1); }
 .mx .qc .face { flex: none; position: relative; overflow: hidden; width: 9em; height: 9em; border-radius: 50%; background: #2c2c2e; box-shadow: 0 0 0 .3em var(--c); }
 .mx .qc .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
 .mx .qc b { display: block; font-size: 1.9em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; color: var(--c); }
-.mx .qc span:not(.face) { display: block; font-size: 2.6em; font-weight: 700; line-height: 1.25; }
+.mx .qc span:not(.face) { display: block; font-size: 2.6em; font-weight: 700; line-height: 1.3; margin-top: .15em; }
 .mx.t-tall .ch button { min-height: 8.5em; padding: 0 .9em 0 0; overflow: hidden; border-radius: 1em; }
 .mx.t-tall .ch .face { width: 7.8em; height: auto; align-self: stretch; border-radius: 0; }
 .mx.t-tall .ch .face img { height: 330%; top: 5%; }
@@ -327,6 +331,9 @@ VARIANTS.t3r = [
   ['U5', 'N1 seul', 'Le N1 d’avant, avec les icônes de type.', ['face', 'word', 'type']],
 ];
 const TRAITS = Object.fromEntries([...VARIANTS.mixc, ...VARIANTS.mixr, ...VARIANTS.t3c, ...VARIANTS.t3r].map(([v, , , t]) => [v, new Set(t)]));
+// the game's choice cards (index.html reads these): T1 or T3 on a phone, N1 (U5) or N4+N1 (U1) on the remote
+const INGAME = { T1: ['smt-cstyle', 'T1'], T3: ['smt-cstyle', 'T3'], U5: ['smt-rstyle', 'N1'], U1: ['smt-rstyle', 'U1'] };
+const ingameOn = (v) => { const [k, val] = INGAME[v]; try { return (localStorage.getItem(k) || (k === 'smt-cstyle' ? 'T1' : 'N1')) === val; } catch { return false; } };
 const LIGHTS = [['him', 'Lui seul ✓'], ['chars', 'Persos seuls'], ['hard', 'Bord net'], ['head', 'Sa tête'], ['soft', 'Douce'], ['off', 'Rien']];
 let light = 'him';
 try { light = localStorage.getItem('choix-light') || 'him'; } catch { /* private window */ }
@@ -411,9 +418,10 @@ function paint() {
   $('#light').querySelectorAll('button').forEach((b) => b.onclick = () => { light = b.dataset.l; try { localStorage.setItem('choix-light', light); } catch { /* private window */ } paint(); });
   $('#mom').innerHTML = MOMENTS.map((m, i) => `<button type="button" class="${i === mom ? 'on' : ''}" data-i="${i}">${esc(m.name)}</button>`).join('');
   $('#mom').querySelectorAll('button').forEach((b) => b.onclick = () => { mom = +b.dataset.i; paint(); });
-  $('#grid').innerHTML = VARIANTS[mode].map(([v, n, h]) => `<div class="card${favs.has(v) ? ' faved' : ''}" data-v="${v}"><h2><i>${v}</i>${esc(n)}<button type="button" class="fav${favs.has(v) ? ' on' : ''}" aria-label="Préférée">♥</button></h2><div class="ph">${screenHtml(v)}</div><p>${esc(h)}</p></div>`).join('');
+  $('#grid').innerHTML = VARIANTS[mode].map(([v, n, h]) => `<div class="card${favs.has(v) ? ' faved' : ''}" data-v="${v}"><h2><i>${v}</i>${esc(n)}${INGAME[v] ? `<button type="button" class="ingame${ingameOn(v) ? ' on' : ''}" title="Ce que le jeu montre">${ingameOn(v) ? 'En jeu ✓' : 'En jeu'}</button>` : ''}<button type="button" class="fav${favs.has(v) ? ' on' : ''}" aria-label="Préférée">♥</button></h2><div class="ph">${screenHtml(v)}</div><p>${esc(h)}</p></div>`).join('');
   document.querySelectorAll('.card').forEach((c) => {
     const v = c.dataset.v, ph = $('.ph', c); wire(ph);
+    const ig = $('.ingame', c); if (ig) ig.onclick = () => { const [k, val] = INGAME[v]; try { localStorage.setItem(k, val); } catch { /* private window */ } paint(); };
     $('.fav', c).onclick = () => { favs.has(v) ? favs.delete(v) : favs.add(v); saveFavs(); paint(); };
     ph.onclick = () => { const big = $('#big'); big.innerHTML = `<div class="ph">${screenHtml(v)}</div>`; wire($('.ph', big)); $('.ph', big).onclick = (e) => e.stopPropagation(); big.hidden = false; };
   });
