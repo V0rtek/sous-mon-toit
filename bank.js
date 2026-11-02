@@ -366,7 +366,7 @@ Do not exaggerate the poses. Subtle and natural, like the reference. Mouth close
   };
   Object.assign(SHEETS, KIT_SHEETS);
   // the order: the base for everyone, then what the story needs (the older sheets stay for the characters that have them)
-  const PLACES = [['kit', 'Base, puis selon l’histoire', ['photo', 'debout', 'accoude', 'assis', 'prises', 'kiss', 'close']]];
+  const PLACES = [['kit', 'Base, puis selon l’histoire', ['debout', 'accoude', 'assis', 'prises', 'kiss', 'close']]];
   // the prompt that writes the LOCKED block from the character's picture (what each sheet keeps identical)
   const LOCK_HELP = `Look at the character in this image. Write the LOCKED block that describes them for a pose-sheet prompt, in exactly this shape and nothing else (one line each, concrete, what never changes):
 - Hair: color, length, texture, how it falls (front and back).
@@ -384,6 +384,7 @@ Example:
 
   // a sheet of Justin's -> the same sheet for someone else
   function make(id, c) {
+    if (id === 'deboutPhoto') return fromPhoto(make('debout', c));
     const [, , guides, src] = SHEETS[id], L = (c.locked || '').trim();
     let t;
     if (typeof src === 'function') { t = src(L); if (id === 'photo') return t; t = t.replace(/LOCKED — must not change in any way, even slightly:\n\n+/, ''); }
@@ -406,6 +407,11 @@ Example:
     }
     return t;
   }
+  // Debout straight from the photo (02/11): no single picture first, the sheet IS the character. Image 1 = their photo,
+  // image 2 = the style; the rest of the Debout prompt (the 6 cells) stays
+  const fromPhoto = (t) => t.replace(/^Create a character pose sheet of THIS EXACT character, (.*?), on (.*?)\. Image 1 is the reference:[\s\S]*?Every cell shows the character of image 1, exactly( \(a woman\))?\./,
+    (m, title, bg) => `Create a character pose sheet of the person in image 1 (a photo), ${title}, drawn in the exact art style of image 2, on ${bg}. Image 1 is a photo: keep the person recognizable (face shape, skin tone, eye color, hair color, length and texture, facial hair, build); their outfit is what they wear in the photo, simplified to a few clear pieces, nothing green. Image 2 shows ONLY the art style, drawn on ANOTHER person (a man): copy its line, shading, colors and the way it draws a face; never draw him, copy nothing of his look (face, hair, body, clothes). Every cell shows the same person, drawn the same way: same face, same hair, same outfit, same colors.`)
+    .replace(/, like image 1\./g, '.').replace(/identical to image 1/g, 'identical to image 2');
   const HAVE = ['brooke', 'cam', 'candy', 'james', 'julian', 'justin', 'ruby', 'suit'];   // ref/perso_<name>.webp
   const KEY = 'smt-newchar';
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
@@ -431,8 +437,10 @@ Example:
   BANK.newChar = () => {
     const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0], done = c.done || {};
     const nm = String(c.name || '').trim(), mine = HAVE.includes(nm.toLowerCase()) ? `perso_${nm.toLowerCase()}.webp` : null;
-    const sheets = place[2].filter((id) => id !== 'photo'), hasPic = !!mine || !!done.photo, n = sheets.filter((id) => done[id]).length;
-    const step = c.step || 1, me = mine ? `ref/${mine}` : null;
+    // step 2 = the Debout sheet (from the photo, or from their portrait); step 3 = the other sheets, image 1 = their listen pose
+    const sheets = place[2].filter((id) => id !== 'photo' && id !== 'debout'), hasPic = !!done.debout, n = sheets.filter((id) => done[id]).length;
+    const step = c.step || 1, sp = (window.SPRITES || {})[window.IMPORT ? IMPORT.slug(nm) : ''];
+    const me = mine ? `ref/${mine}` : sp && sp.poses.listen ? ((typeof MADE !== 'undefined' && MADE[IMPORT.slug(nm)]) || {}).listen || `chars/${IMPORT.slug(nm)}/listen.png` : null;
     const dots = `<div class="ncDots">${[[1, IC.who, !!nm], [2, IC.pic, hasPic], [3, IC.poses, n === sheets.length]].map(([k, ic, ok]) =>
       `<button type="button" data-ncstep="${k}" class="${k === step ? 'on' : ''}${ok ? ' ok' : ''}" aria-label="Étape ${k}">${ok && k !== step ? '<b>✓</b>' : ic}</button>`).join('<i></i>')}</div>`;
     let body = '';
@@ -442,13 +450,13 @@ Example:
         <div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
         + big('data-ncstep="2"', '', 'Suivant →', 'main');
     } else if (step === 2) {
-      body = mine
-        ? `<div class="ncEq one">${shot(me, '✓')}</div>` + big('data-ncstep="3"', '', 'Suivant →', 'main')
-        : `<div class="ncEq">${slot(1, 'Sa photo')}<em>+</em>${shot('ref/style.webp', 2)}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
-          + big('data-nccopy="photo"', IC.copy, 'Copier le prompt', 'main')
-          + `<div class="ncSmall"><button type="button" class="ncBtn" data-cimg="ref/style.webp">Copier l’image 2</button><a class="ncBtn" href="ref/style.webp" download="style.webp">Enregistrer l’image 2</a></div>`
-          + `<details class="ncMore"${c.locked ? ' open' : ''}><summary>⋯</summary><textarea data-nc="locked" rows="3" placeholder="À garder : cheveux roux bouclés, cicatrice, veste de cuir…">${esc(c.locked || '')}</textarea></details>`
-          + big(`data-ncdone="photo" data-ncnext="3"`, '', done.photo ? 'Fait ✓ · Suivant →' : 'C’est fait →', done.photo ? 'ok' : '');
+      body = `<div class="ncSheetTop"><b>Debout · 6 poses</b>${done.debout ? '<i>✓</i>' : ''}</div>`
+        + `<div class="ncEq">${mine ? shot(`ref/${mine}`, 1) : slot(1, 'Sa photo')}<em>+</em>${shot('ref/style.webp', 2)}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
+        + big(`data-nccopy="${mine ? 'debout' : 'deboutPhoto'}"`, IC.copy, 'Copier le prompt', 'main')
+        + `<div class="ncSmall"><button type="button" class="ncBtn" data-cimg="ref/style.webp">Copier l’image 2</button><a class="ncBtn" href="ref/style.webp" download="style.webp">Enregistrer l’image 2</a></div>`
+        + `<details class="ncMore"${c.locked ? ' open' : ''}><summary>⋯</summary><textarea data-nc="locked" rows="3" placeholder="À garder : cheveux roux bouclés, cicatrice, veste de cuir…">${esc(c.locked || '')}</textarea></details>`
+        + (window.IMPORT ? importBox('debout') : big('data-ncdone="debout"', '', done.debout ? 'Fait ✓' : 'C’est fait', done.debout ? 'ok' : ''))
+        + (done.debout ? big('data-ncstep="3"', '', 'Suivant →', 'main') : '');
     } else if (!c.open || !sheets.includes(c.open)) {
       body = `<div class="ncTiles">${sheets.map((id) => { const [t, , guides] = SHEETS[id], g = guides.find((f) => f !== 'style.webp') || guides[0] || 'style.webp';
         return `<button type="button" class="ncTile${done[id] ? ' done' : ''}" data-ncopen="${id}"><span><img loading="lazy" src="ref/${g}" alt=""></span><b>${esc(t.replace(/ \(base\)/, ''))}</b>${done[id] ? '<i>✓</i>' : ''}</button>`; }).join('')}</div>`;
@@ -457,7 +465,7 @@ Example:
       body = `<div class="ncSheetTop"><button type="button" class="ncBack" data-ncopen="${id}">‹</button><b>${esc(t)}</b>${done[id] ? '<i>✓</i>' : ''}</div>`
         + `<div class="ncEq">${one}${guides.map((f, k) => `<em>+</em>${shot(`ref/${f}`, k + 2)}`).join('')}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
         + big(`data-nccopy="${id}"`, IC.copy, 'Copier le prompt', 'main')
-        + `<div class="ncSmall">${guides.map((f, k) => `<button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image ${k + 2}</button>`).join('')}</div>`
+        + `<div class="ncSmall">${me ? `<button type="button" class="ncBtn" data-cimg="${me}">Copier l’image 1</button>` : ''}${guides.map((f, k) => `<button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image ${k + 2}</button>`).join('')}</div>`
         + (window.IMPORT && IMPORT.KINDS[id] ? importBox(id) : big(`data-ncdone="${id}"`, '', done[id] ? 'Fait ✓' : 'C’est fait', done[id] ? 'ok' : ''));
     }
     return dots + `<div class="ncPane">${body}</div>`;
