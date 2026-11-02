@@ -156,7 +156,11 @@ window.BANK = {
     stop();
     $('#bankTabs').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.t === tab));
     $('#bankBody').innerHTML = tabs[tab](); $('#bankBody').scrollTop = 0;
+    // Nouveau perso open: full screen, only the back arrow and its 3 steps on top (02/11)
+    document.body.classList.toggle('ncFull', tab === 'chars' && !editing && BANK.newCharIsOpen());
   }
+  // the back arrow (or the phone's back) closes Nouveau perso first
+  window.BANK_BACK = () => { if (!document.body.classList.contains('ncFull')) return false; BANK.newCharSet('shown', false); draw(); return true; };
   function stop() { if (playing) { playing.a.pause(); playing.b.classList.remove('on'); playing.b.firstChild.textContent = '▶'; playing = null; } }
   // the phone's back (gesture or button) works in the bank: it closes a big picture, else goes back to Plus, like ‹.
   // Opening the bank pushes a step in the history; leaving it by ‹ takes that step back
@@ -164,6 +168,7 @@ window.BANK = {
   addEventListener('popstate', () => {
     if (screen !== '#bank') return;
     if (!$('#bankBig').hidden) { $('#bankBig').hidden = true; history.pushState({ bank: 1 }, ''); return; }
+    if (BANK_BACK()) { history.pushState({ bank: 1 }, ''); return; }
     show('#more');
   });
   document.addEventListener('DOMContentLoaded', () => {
@@ -239,7 +244,7 @@ window.BANK = {
     }, true);
     $('#bankBody').oninput = (e) => { const k = e.target.dataset.nc; if (k) BANK.newCharSet(k, e.target.value); };   // kept as typed, no redraw (the keyboard stays)
   });
-  window.BANK_CLOSE = () => { stop(); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
+  window.BANK_CLOSE = () => { stop(); document.body.classList.remove('ncFull'); if (screen === '#bank' && history.state && history.state.bank) history.back(); };
 })();
 
 // ---- Nouveau perso (31/10): every pose sheet a new character needs for a place, its prompt written for him or her ----

@@ -238,6 +238,9 @@ body.uitop #ui { top: auto; bottom: 3%; }
 #bankTabs { display: flex; gap: .8em; padding: 0 5% 1.6em; }
 #bankTabs button { font: inherit; font-size: 1.3em; font-weight: 600; flex: 1; padding: .55em 0; border: 0; border-radius: 1em; background: #1c1c1e; color: #a1a1a6; cursor: pointer; }
 #bankTabs button.on { background: #f5f5f7; color: #000; }
+body.ncFull #bankTabs, body.ncFull #freshBtn, body.ncFull #bank .ncToggle { display: none !important; }
+body.ncFull #bank { padding-top: 4.3em; }
+body.ncFull #bank .ncDots { margin-top: 0; }
 #bankBody { flex: 1; overflow-y: auto; padding: 0 5% 6em; }
 #bank h3 { font-size: 2.1em; margin: 1.2em 0 .5em; }
 #bank h3 small { font-size: .7em; color: #86868b; font-weight: 500; }
@@ -1541,6 +1544,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="strips">
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée<svg class="pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></b></button>
       <a href="choix.html" id="choixBtn"><span class="art" style="--g:#ff6b8a"><img src="chars/justin_bar/drunk_serious.webp" alt=""></span><b>Écran de choix</b></a>
+      <a href="cell.html" id="cellBtn"><span class="art" style="--g:#0a84ff"><img src="chars/brooke/texting.webp" alt=""></span><b>Le cell de Brooke</b></a>
       <button type="button" id="mkBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Marketing</b></button>
       <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
       <button type="button" id="sparkBtn"><span class="art" style="--g:#ff375f"><img src="chars/julian/offer.webp" alt=""></span><b>Spark</b></button>
@@ -2080,7 +2084,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261102180000"></script>
 <script src="deck.js?v=20261034500000"></script>
-<script src="bank.js?v=20261102180000"></script>
+<script src="bank.js?v=20261102190000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -4365,6 +4369,7 @@ $('#back').onclick = (e) => {
   if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
   if (screen === '#techCard' && techPath.length > 1) { techPath.pop(); techOpen(); return; }   // a card: back one step of the path
   if (screen === '#plan') PLAN.closeSheet();
+  if (screen === '#bank' && window.BANK_BACK && BANK_BACK()) return;   // Nouveau perso open: back to the list
   if (screen === '#acte') ACT.closeSheet();
   const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up === '#acte') actBack(); else if (up) show(up); };
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
