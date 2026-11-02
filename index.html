@@ -1680,6 +1680,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="secSell" class="card menu sub" hidden>
     <div class="strips">
+      <button type="button" id="valBtnSell"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée<svg class="pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></b></button>
       <button type="button" id="mkBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Marketing</b></button>
       <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
       <button type="button" id="sparkBtn"><span class="art" style="--g:#ff375f"><img src="chars/julian/offer.webp" alt=""></span><b>Spark</b></button>
@@ -4330,6 +4331,7 @@ function renderVal() {
 }
 $('#statsBtn').onclick = (e) => { e.stopPropagation(); show('#statsScreen'); liveStats(); renderStats(); };
 $('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
+$('#valBtnSell').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStats(); renderVal(); };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#sparkBtn').onclick = (e) => { e.stopPropagation(); show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
