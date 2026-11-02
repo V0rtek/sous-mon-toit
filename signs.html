@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signs · test our game</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Yeseva+One&display=swap">
+<style>
+/* Signs to hold or put up: "We're searching for people to test our video game!" Print (Ctrl/Cmd+P) = one sign per page,
+   in the chosen variant. Hand sign: marker-readable from 5 m, black on yellow. */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; }
+.seg { display: flex; background: #1c1c1e; border-radius: 99px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 800; color: #8e8e93; background: none; border: 0; border-radius: 99px; padding: 7px 14px; cursor: pointer; }
+.seg button.on { background: #f5f5f7; color: #000; }
+.go { font: inherit; font-size: 14px; font-weight: 900; border: 0; border-radius: 99px; padding: 9px 16px; background: #ffd60a; color: #000; cursor: pointer; }
+.tips { max-width: 760px; margin: 14px auto 0; padding: 0 20px; color: #d1d1d6; font-size: 15px; line-height: 1.5; }
+.stage { display: grid; place-items: center; padding: 20px; }
+.sign { position: relative; overflow: hidden; width: min(92vw, 640px); color: #111; container-type: inline-size; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+/* 1. poster: portrait A4, the two persos and the line */
+.poster { aspect-ratio: 210 / 297; background: radial-gradient(circle at 50% 70%, #ffb347, #c2410c 70%, #3b0d02); color: #fff; text-align: center; display: flex; flex-direction: column; justify-content: space-between; padding: 7cqw; }
+.poster h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 11.5cqw; line-height: 1.02; text-shadow: 0 .6cqw 0 rgba(0,0,0,.35); }
+.poster h2 b { color: #ffd60a; font-weight: 400; }
+.poster .art { position: relative; flex: 1; margin: 2cqw 0; }
+.poster .art img { position: absolute; bottom: -7cqw; height: 118%; filter: drop-shadow(0 1cqw 2cqw rgba(0,0,0,.5)); }
+.poster .art .a { left: -3cqw; } .poster .art .b { right: -2cqw; height: 112%; }
+.poster p { margin: 0; font-weight: 900; font-size: 5.4cqw; letter-spacing: .01em; background: #fff; color: #111; border-radius: 99px; padding: 2.2cqw 3cqw; position: relative; }
+/* 2. hand sign: landscape, huge, black on yellow, readable from far */
+.hand { aspect-ratio: 297 / 210; background: #ffd60a; display: grid; place-items: center; text-align: center; padding: 4cqw; border: 1.6cqw solid #111; }
+.hand h2 { margin: 0; font-weight: 900; font-size: 8.4cqw; line-height: 1.02; text-transform: uppercase; letter-spacing: -.01em; }
+.hand p { margin: 2.4cqw 0 0; font-weight: 800; font-size: 4cqw; }
+/* 3. table card: art on the left, the offer on the right */
+.card { aspect-ratio: 297 / 210; background: #fff7e8; display: grid; grid-template-columns: 38% 1fr; }
+.card .art { position: relative; background: linear-gradient(#7c2d12, #c2410c); overflow: hidden; }
+.card .art img { position: absolute; left: 50%; transform: translateX(-50%); bottom: -4cqw; height: 112%; }
+.card .t { padding: 5cqw 5cqw 5cqw 4cqw; display: flex; flex-direction: column; justify-content: center; gap: 2.4cqw; }
+.card h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 6.2cqw; line-height: 1.05; }
+.card ul { margin: 0; padding: 0; list-style: none; font-weight: 800; font-size: 3.2cqw; display: grid; gap: 1cqw; }
+.card li::before { content: "✓ "; color: #c2410c; }
+.card .ask { margin: 0; font-weight: 900; font-size: 3.4cqw; color: #fff; background: #c2410c; border-radius: 99px; padding: 1.6cqw 3cqw; align-self: flex-start; }
+.sign[hidden] { display: none; }
+@media print {
+  @page { margin: 0; }
+  html, body { background: #fff; }
+  header, .tips { display: none; }
+  .stage { padding: 0; display: block; }
+  .sign { width: 100vw; box-shadow: none; page-break-after: always; }
+  .poster { height: 100vh; aspect-ratio: auto; }
+  .hand, .card { width: 100vw; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Signs · test our game</h1>
+  <div class="seg" id="seg"><button type="button" data-v="poster" class="on">Poster</button><button type="button" data-v="hand">Hand sign</button><button type="button" data-v="card">Table card</button></div>
+  <button type="button" class="go" onclick="window.print()">Print</button>
+  <a href="index.html">‹ Home</a>
+</header>
+<div class="tips"><b>Poster</b>: tape it up where friends hang out. <b>Hand sign</b>: hold it, big black on yellow, say nothing; the sign talks. <b>Table card</b>: next to you at a café or event. Print = one sign per page.</div>
+<div class="stage">
+  <div class="sign poster" data-s="poster"><h2>We’re searching for people to <b>test our video game!</b></h2><div class="art"><img class="a" src="chars/lily/smile.png" alt=""><img class="b" src="chars/pirate/bar_smile.webp" alt=""></div><p>10 min · Free · Play with a friend</p></div>
+  <div class="sign hand" data-s="hand" hidden><div><h2>We’re searching for people to test our video game!</h2><p>10 minutes · free · ask me</p></div></div>
+  <div class="sign card" data-s="card" hidden><div class="art"><img src="chars/lily/smile.png" alt=""></div><div class="t"><h2>We’re searching for people to test our video game!</h2><ul><li>10 minutes, 2–3 friends</li><li>I come to you</li><li>Free access to the game and all its stories</li></ul><p class="ask">Ask me ↗</p></div></div>
+</div>
+<script>
+document.getElementById('seg').onclick = (e) => { const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#seg button').forEach((x) => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.sign').forEach((s) => { s.hidden = s.dataset.s !== b.dataset.v; }); };
+</script>
+</body>
+</html>
