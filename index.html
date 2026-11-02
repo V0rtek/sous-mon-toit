@@ -1407,6 +1407,15 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 body.tv #choices button { pointer-events: none; }
 body.tv #choices.tvpicked button:not(.picked) { opacity: .35; transition: opacity .3s; }
 #choices button.picked { transition: transform .3s; }
+/* the choice's clock (D1) and tap (Slide), 02/11, from delai.html: a line above the choices that shrinks, yellow then red;
+   the chosen one slides aside and the others drop away. On the phone and on the remote */
+#choices { position: relative; }
+#choices > .clock { position: absolute; left: 0; right: 0; top: -1.6em; height: .9em; border-radius: .45em; background: rgba(255,255,255,.18); pointer-events: none; }
+#choices > .clock i { display: block; height: 100%; width: 100%; border-radius: .45em; }
+#choices.slide button { transition: transform .3s ease-out, opacity .3s; }
+#choices.slide button.picked { transform: translateX(6%); }
+#choices.slide:has(button.picked) button:not(.picked) { transform: translateY(140%); opacity: 0; }
+#choices:has(button.picked) > .clock { opacity: 0; transition: opacity .2s; }
 /* the choice cards (02/11, from choix.html): your face (the one you'll make saying it), the line; on the remote (a phone on
    a TV's story) the face full height and the intent in big. A dashed yellow card + a hand = an action, green + a phone =
    a text (only when the options aren't all the same kind); the face of whom it's aimed at, when they aren't all for the
@@ -3153,7 +3162,7 @@ function choose(opts, by, ring) {
   const holder = ring && !waitsFor(by) ? $('#ringBtns') : choicesEl;
   const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
   const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k));
-  choicesEl.classList.add('cx');
+  choicesEl.classList.add('cx', 'slide');
   if (mine && holder === choicesEl && !choicesEl.hidden) qCardShow(k);
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
@@ -3171,12 +3180,34 @@ function choose(opts, by, ring) {
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   }
   if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
+  clockStop(); if (mine && holder === choicesEl && !choicesEl.hidden && !isBot(by)) clockStart(opts);
   if (isBot(by) && ROLE === 'host') botPick();
   if (cellOpen) { clearTimeout(closeCell.t); drawCell(); }
+}
+// the clock on a choice (smt-timer: off, 6, 10 default, 20 seconds): a line that shrinks above the choices; it stops while the
+// story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
+let clockT = 0;
+const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
+function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); }
+function clockStart(opts) {
+  const ms = clockMs(); if (!ms || FAST || PREVIEW) return;
+  const el = document.createElement('div'); el.className = 'clock'; el.innerHTML = '<i></i>'; choicesEl.prepend(el);
+  let left = ms, last = performance.now();
+  clockT = setInterval(() => {
+    const now = performance.now(), dt = now - last; last = now;
+    if (waiting !== 'choice' || options !== opts) { clockStop(); return; }
+    if (paused || choicesEl.hidden || absentSeats().length || document.hidden || choicesEl.querySelector('.picked')) return;
+    left -= dt; const p = Math.max(0, left / ms), bar = el.firstChild; bar.style.width = p * 100 + '%'; bar.style.background = `hsl(${(p * 50).toFixed(0)} 100% 55%)`;
+    if (left > 0) return;
+    clearInterval(clockT); const i = Math.floor(Math.random() * opts.length);
+    if (ROLE === 'host') pickChoice(i);
+    else { const b = [...optionButtons()].find((x) => +x.dataset.i === i); if (b) b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
+  }, 80);
 }
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
   const o = options && options[i]; if (!o || waiting !== 'choice') return;
+  clearInterval(clockT);
   record('c' + i + tag(optionsLane));
   const by = optionsBy;
   const go = () => {
@@ -3194,7 +3225,7 @@ function pickChoice(i, afar = false) {
   const shown = !choicesEl.hidden || !$('#ringCard').hidden;
   if (TV && duo() && !FAST) {   // « Kev a choisi » — never what
     waiting = 'picked'; setTimeout(go, 700);
-  } else if ((ROLE === 'watch' || afar) && !FAST && shown && btn) { btn.classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }
+  } else if (!FAST && shown && btn) { btn.classList.add('picked'); waiting = 'picked'; setTimeout(go, 450); }   // the tap answers back (Slide) before the story goes on
   else go();
 }
 
