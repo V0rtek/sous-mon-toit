@@ -15,6 +15,7 @@ window.BANK = {
     ['cellphone vibrating (sound off) type 1', 'Ponctuel', 'cellulaire qui vibre, version 1'], ['cellphone vibrating (sound off) type 2', 'Ponctuel', 'cellulaire qui vibre, version 2'],
     ['classic 1995s phone ringing', 'Ponctuel', 'vieux téléphone qui sonne (années 90)'], ['phone or computer glitch error', 'Ponctuel', 'bug du téléphone ou de l’ordi'],
     ['whoosh', 'Ponctuel', 'un mouvement rapide'], ['object drop in water', 'Ponctuel', 'un objet tombe dans l’eau'],
+    ['reverse cinematic boom', 'Ponctuel', 'une montée à l’envers qui finit en boom, 5 s (la montée avant un impact)'],
     ['wooden ship on water loop', 'Ambiance', 'un bateau en bois sur l’eau'], ['immersive beautiful discovery moment ambient (magic)', 'Ambiance', 'moment de découverte, magique'],
   ],
   // sounds worth adding (not made yet)
