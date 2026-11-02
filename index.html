@@ -3594,8 +3594,8 @@ $('#whoForm').addEventListener('submit', (e) => {
   const v = $('#whoName').value.trim().slice(0, 16);
   try { localStorage.setItem('smt-name', v); } catch { /* private window */ }
   $('#whoName').blur();
-  if (ROLE === 'host') { state.name = v || 'Justin'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
-  else { myName = v || 'Kev'; show('#lobby'); goLive(); }
+  if (ROLE === 'host') { state.name = v || 'Toi'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
+  else { myName = v || 'Ami'; show('#lobby'); goLive(); }
 });
 // ---- analytics, on this device only: plays and finishes per story, how each choice splits (a real choice is closer to
 // 50/50 than 90/10), the answers to the 5 reviewer questions, what the generations cost ----
@@ -4583,11 +4583,11 @@ else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(
 else if (ROLE === 'host') {
   goLive();
   const lab = new URLSearchParams(location.search).has('lab');   // back from a test: straight to Mini-jeux
-  if ((home || lab) && $('#whoName').value) $('#whoForm .pill').click();
-  if (lab) { history.replaceState(null, '', location.pathname); if ($('#whoName').value) show('#labScreen'); }
+  $('#whoForm .pill').click();   // 02/11: never asks the name (the one it had, or « Toi »)
+  if (lab) { history.replaceState(null, '', location.pathname); show('#labScreen'); }
 }
 else if (MIRROR) { document.body.classList.add('mirror'); myName = '·'; hushed = true; show('#lobby'); goLive(); }
-else if ($('#whoName').value) $('#whoForm .pill').click();   // the name it had (a phone that comes back to the room goes straight in)
+else $('#whoForm .pill').click();   // straight in, never asks the name (the one it had, or « Ami »)
 {
   const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?(?:&invite=([a-z0-9]+)&iname=([^&]+))?$/);
   if (o && o[5]) { withFriend = decodeURIComponent(o[6]); withFriendTo = o[5]; }
