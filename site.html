@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Unwritten</title>
-<meta name="description" content="Des séries interactives faites pour ton groupe d'amis : vous êtes les personnages, chacun change la suite.">
+<meta name="description" content="Interactive shows made for your group of friends: you are the characters, and everyone steers the story.">
 <meta property="og:title" content="Unwritten">
-<meta property="og:description" content="Des séries interactives faites pour ton groupe d'amis.">
+<meta property="og:description" content="Interactive shows made for your group of friends.">
 <meta property="og:image" content="ref/brainstorm_couch.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Yeseva+One&display=swap">
@@ -38,6 +38,8 @@ section { padding: clamp(64px, 10vw, 120px) 0; }
 .btn:hover { transform: translateY(-1px); }
 .btn.main { color: #000; background: linear-gradient(90deg, var(--gold), var(--amber)); box-shadow: 0 10px 30px -10px var(--amber); }
 .btn.ghost { color: var(--fg); background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px var(--line); }
+.topR { display: flex; align-items: center; gap: 10px; }
+.lang { font: inherit; font-weight: 800; font-size: 13px; letter-spacing: .08em; padding: 8px 12px; border-radius: 999px; border: 0; background: rgba(255,255,255,.1); color: var(--fg); cursor: pointer; }
 .btn.sm { padding: 9px 16px; font-size: 14px; }
 .btn svg { width: 18px; height: 18px; }
 
@@ -126,105 +128,118 @@ footer.end .wrap { display: flex; flex-wrap: wrap; justify-content: space-betwee
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="#">UNWRITTEN</a><a class="btn main sm" href="demo.html">Essayer la démo</a></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="#">UNWRITTEN</a><div class="topR"><button type="button" class="lang" id="lang" aria-label="Langue">FR</button><a class="btn main sm" href="demo.html"><span data-t="0">Try the demo</span></a></div></div></header>
 
 <section class="hero">
   <img src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">
   <div class="wrap">
-    <span class="kick">Séries interactives · entre amis</span>
-    <h1>Une série faite pour <em>ton groupe.</em> Vous êtes dedans.</h1>
-    <p class="lead">Toi et tes amis devenez les personnages. L'histoire se joue comme un épisode, et à chaque choix, l'un de vous décide de la suite.</p>
-    <div class="ctas"><a class="btn main" href="demo.html"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>Essayer la démo</a><a class="btn ghost" href="#tester">Tester avec mon groupe</a></div>
+    <span class="kick"><span data-t="1">Interactive shows · with friends</span></span>
+    <h1><span data-t="2">A show made for <em>your group.</em> Starring you.</span></h1>
+    <p class="lead"><span data-t="3">You and your friends become the characters. The story plays like an episode, and at every choice, one of you decides what happens next.</span></p>
+    <div class="ctas"><a class="btn main" href="demo.html"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg><span data-t="0">Try the demo</span></a><a class="btn ghost" href="#tester"><span data-t="4">Test it with my group</span></a></div>
   </div>
 </section>
 
 <section id="pourquoi">
   <div class="wrap">
-    <span class="kick">Le problème</span>
-    <h2>On ne regarde plus les mêmes histoires.</h2>
+    <span class="kick"><span data-t="5">The problem</span></span>
+    <h2><span data-t="6">We no longer watch the same stories.</span></h2>
     <ol class="chain">
-      <li>L'IA rend le contenu abondant.</li>
-      <li>Le contenu perd sa rareté, sa valeur.</li>
-      <li>Chacun regarde des histoires de plus en plus différentes.</li>
-      <li>Les expériences partagées deviennent rares.</li>
-      <li><span>Les moments qui nous lient disparaissent.<small>La dernière saison de Game of Thrones : tout le monde en parlait.</small></span></li>
-      <li class="fix">Des histoires multijoueurs et personnalisées recréent ce moment.</li>
+      <li><span data-t="7">AI makes content abundant.</span></li>
+      <li><span data-t="8">Content loses its scarcity, its value.</span></li>
+      <li><span data-t="9">Everyone watches increasingly different stories.</span></li>
+      <li><span data-t="10">Shared experiences become rare.</span></li>
+      <li><span><span data-t="11">The moments that bond us vanish.<small>The last season of Game of Thrones: everyone was talking about it.</small></span></span></li>
+      <li class="fix"><span data-t="12">Multiplayer, personalized stories bring that moment back.</span></li>
     </ol>
     <div class="duo">
-      <figure><img src="ref/suit_cells.webp" alt="Chacun sur son cell, chacun son histoire" loading="lazy"><figcaption>Aujourd'hui : chacun son écran, chacun son histoire.</figcaption></figure>
-      <figure><img src="ref/suit_tele.webp" alt="Deux amis devant la télé, la même histoire de pirates" loading="lazy"><figcaption>Unwritten : la même histoire, ensemble.</figcaption></figure>
+      <figure><img src="ref/suit_cells.webp" alt="Chacun sur son cell, chacun son histoire" loading="lazy"><figcaption><span data-t="13">Today: everyone on their own screen, their own story.</span></figcaption></figure>
+      <figure><img src="ref/suit_tele.webp" alt="Deux amis devant la télé, la même histoire de pirates" loading="lazy"><figcaption><span data-t="14">Unwritten: the same story, together.</span></figcaption></figure>
     </div>
   </div>
 </section>
 
 <section id="comment" style="background:linear-gradient(180deg,transparent,rgba(255,55,95,.06),transparent)">
   <div class="wrap">
-    <span class="kick" style="--k:var(--rose)">Comment ça marche</span>
-    <h2>Une soirée ciné, sauf que c'est vous qui décidez.</h2>
+    <span class="kick" style="--k:var(--rose)"><span data-t="15">How it works</span></span>
+    <h2><span data-t="16">Movie night, except you decide.</span></h2>
     <div class="steps">
       <div class="step"><div class="pic"><img src="covers/lastcall.jpg" alt="Last call : Brooke et l'homme en complet" loading="lazy" style="object-position:center 25%"></div>
-        <div class="tx"><b>Choisis un monde</b><p>Un nouveau, ou la suite du dernier. La télé devient l'écran, ton cell la télécommande.</p></div></div>
+        <div class="tx"><b><span data-t="17">Pick a world</span></b><p><span data-t="18">A new one, or pick up where you left off. The TV is the screen, your phone the remote.</span></p></div></div>
       <div class="step"><div class="pic sel"><img class="face" src="ref/perso_cam.webp" alt="Une photo" loading="lazy"><i>→</i><img src="chars/cam/explaining.webp" alt="Le personnage qui en sort" loading="lazy"></div>
-        <div class="tx"><b>Ton selfie devient un perso</b><p>Une photo, et ton ami est l'un des héros de l'histoire. Il bouge, il réagit, il a ses émotions.</p></div></div>
+        <div class="tx"><b><span data-t="19">Your selfie becomes a character</span></b><p><span data-t="20">One photo, and your friend is one of the leads. They move, react, and show emotions.</span></p></div></div>
       <div class="step"><div class="pic"><img src="ref/suit_cell.webp" alt="Elle suit l'histoire sur son cell" loading="lazy"></div>
-        <div class="tx"><b>Le choix passe de main en main</b><p>Tous les 10 à 25 plans, l'un de vous choisit où va l'histoire. Même à distance : l'histoire suit chacun sur son cell.</p></div></div>
+        <div class="tx"><b><span data-t="21">The choice passes from hand to hand</span></b><p><span data-t="22">Every 10 to 25 shots, one of you chooses where the story goes. Even remotely: the story follows everyone on their phone.</span></p></div></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <span class="kick" style="--k:var(--green)">Ce qui accroche</span>
-    <h2>Trois choses normalement séparées.</h2>
+    <span class="kick" style="--k:var(--green)"><span data-t="23">What hooks you</span></span>
+    <h2><span data-t="24">Three things that are normally separate.</span></h2>
     <div class="three">
-      <div><b>Personnalisation</b><p>L'histoire, c'est toi et tes amis. Tu ES le personnage.</p></div>
-      <div><b>Agentivité</b><p>Tu changes ce qui arrive. C'est toi qui l'as fait, pas le perso.</p></div>
-      <div><b>Lien social</b><p>Vous la vivez ensemble, sur le même divan ou à distance.</p></div>
+      <div><b><span data-t="25">Personalization</span></b><p><span data-t="26">The story features you and your friends. You ARE the character.</span></p></div>
+      <div><b><span data-t="27">Agency</span></b><p><span data-t="28">You influence what happens. You did it, not the character.</span></p></div>
+      <div><b><span data-t="29">Social connection</span></b><p><span data-t="30">You experience it together, on the same couch or remotely.</span></p></div>
     </div>
-    <p class="note">Netflix ne fait aucun des trois.</p>
+    <p class="note"><span data-t="31">Netflix does none of the three.</span></p>
   </div>
 </section>
 
 <section style="padding-top:0">
   <div class="wrap">
-    <span class="kick" style="--k:var(--blue)">Une photo, un perso</span>
-    <h2>Chaque personnage vient d'une seule image.</h2>
-    <p class="lead">Le moteur en tire une feuille de poses : il marche, rit, se fâche, trinque. Les poses resservent dans toutes les scènes, alors un nouveau perso ne coûte presque rien.</p>
+    <span class="kick" style="--k:var(--blue)"><span data-t="32">One photo, one character</span></span>
+    <h2><span data-t="33">Every character comes from a single image.</span></h2>
+    <p class="lead"><span data-t="34">The engine turns it into a pose sheet: they walk, laugh, get angry, raise a glass. Poses are reused across scenes, so a new character costs almost nothing.</span></p>
     <div class="cast" id="cast"></div>
     <div class="cost">
-      <div class="bar"><span>Vidéo IA</span><i style="--w:100%;--c:var(--rose)"></i><b>~30 $ / min</b></div>
-      <div class="bar"><span>Unwritten</span><i style="--w:2.2%;--c:var(--gold)"></i><b>~0,66 $ / min</b></div>
+      <div class="bar"><span><span data-t="35">AI video</span></span><i style="--w:100%;--c:var(--rose)"></i><b><span data-t="37">~$30 / min</span></b></div>
+      <div class="bar"><span>Unwritten</span><i style="--w:2.2%;--c:var(--gold)"></i><b><span data-t="36">~$0.66 / min</span></b></div>
     </div>
-    <p class="fine">En 1080p. Vidéo générée par IA contre animation par feuilles de poses.</p>
+    <p class="fine"><span data-t="38">At 1080p. AI-generated video vs. pose-sheet animation.</span></p>
   </div>
 </section>
 
 <section style="padding-top:0">
   <div class="wrap">
-    <span class="kick">Pourquoi maintenant</span>
-    <h2>Le jeu vidéo et le cinéma fusionnent.</h2>
+    <span class="kick"><span data-t="39">Why now</span></span>
+    <h2><span data-t="40">Video games and cinema are merging.</span></h2>
     <div class="refs">
       <figure><img src="ref/maria_valenzuela.webp" alt=""><div><b>Maria Valenzuela</b><span>ex-SVP, Sony Pictures</span></div></figure>
-      <figure><img src="ref/doug_shapiro.webp" alt=""><div><b>Doug Shapiro</b><span>Analyste média · ex-Turner</span></div></figure>
+      <figure><img src="ref/doug_shapiro.webp" alt=""><div><b>Doug Shapiro</b><span><span data-t="41">Media analyst · ex-Turner</span></span></div></figure>
     </div>
-    <blockquote>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. »<footer>— Maria Valenzuela</footer></blockquote>
+    <blockquote><span data-t="42">“People don't want to create their own entertainment. They want it created for them.”</span><footer>— Maria Valenzuela</footer></blockquote>
   </div>
 </section>
 
 <section id="tester" style="padding-top:0">
   <div class="wrap">
     <div class="ask">
-      <span class="kick">Phase de validation</span>
-      <h2>Je cherche des groupes de 2-3 personnes pour essayer.</h2>
-      <ul><li>10 minutes, c'est tout.</li><li>Je fais le déplacement.</li><li>Ensuite, accès gratuit au produit et à toutes les histoires.</li></ul>
-      <div class="ctas"><a class="btn main" href="demo.html">Essayer la démo</a></div>
+      <span class="kick"><span data-t="43">Validation phase</span></span>
+      <h2><span data-t="44">I'm looking for groups of 2-3 people to try it.</span></h2>
+      <ul><li><span data-t="45">10 minutes, that's it.</span></li><li><span data-t="46">I come to you.</span></li><li><span data-t="47">Then, free access to the product and every story.</span></li></ul>
+      <div class="ctas"><a class="btn main" href="demo.html"><span data-t="0">Try the demo</span></a></div>
     </div>
   </div>
 </section>
 
-<footer class="end"><div class="wrap"><span>Unwritten · Justin Morand · Montréal</span><span>Je cherche aussi un cofounder.</span></div></footer>
+<footer class="end"><div class="wrap"><span>Unwritten · Justin Morand · Montréal</span><span><span data-t="48">Also looking for a cofounder.</span></span></div></footer>
 
 <script>
+// English by default; FR keeps the French (?lang=fr too). The choice is remembered on this browser
+const T = [["Essayer la démo", "Try the demo"], ["Séries interactives · entre amis", "Interactive shows · with friends"], ["Une série faite pour <em>ton groupe.</em> Vous êtes dedans.", "A show made for <em>your group.</em> Starring you."], ["Toi et tes amis devenez les personnages. L'histoire se joue comme un épisode, et à chaque choix, l'un de vous décide de la suite.", "You and your friends become the characters. The story plays like an episode, and at every choice, one of you decides what happens next."], ["Tester avec mon groupe", "Test it with my group"], ["Le problème", "The problem"], ["On ne regarde plus les mêmes histoires.", "We no longer watch the same stories."], ["L'IA rend le contenu abondant.", "AI makes content abundant."], ["Le contenu perd sa rareté, sa valeur.", "Content loses its scarcity, its value."], ["Chacun regarde des histoires de plus en plus différentes.", "Everyone watches increasingly different stories."], ["Les expériences partagées deviennent rares.", "Shared experiences become rare."], ["Les moments qui nous lient disparaissent.<small>La dernière saison de Game of Thrones : tout le monde en parlait.</small>", "The moments that bond us vanish.<small>The last season of Game of Thrones: everyone was talking about it.</small>"], ["Des histoires multijoueurs et personnalisées recréent ce moment.", "Multiplayer, personalized stories bring that moment back."], ["Aujourd'hui : chacun son écran, chacun son histoire.", "Today: everyone on their own screen, their own story."], ["Unwritten : la même histoire, ensemble.", "Unwritten: the same story, together."], ["Comment ça marche", "How it works"], ["Une soirée ciné, sauf que c'est vous qui décidez.", "Movie night, except you decide."], ["Choisis un monde", "Pick a world"], ["Un nouveau, ou la suite du dernier. La télé devient l'écran, ton cell la télécommande.", "A new one, or pick up where you left off. The TV is the screen, your phone the remote."], ["Ton selfie devient un perso", "Your selfie becomes a character"], ["Une photo, et ton ami est l'un des héros de l'histoire. Il bouge, il réagit, il a ses émotions.", "One photo, and your friend is one of the leads. They move, react, and show emotions."], ["Le choix passe de main en main", "The choice passes from hand to hand"], ["Tous les 10 à 25 plans, l'un de vous choisit où va l'histoire. Même à distance : l'histoire suit chacun sur son cell.", "Every 10 to 25 shots, one of you chooses where the story goes. Even remotely: the story follows everyone on their phone."], ["Ce qui accroche", "What hooks you"], ["Trois choses normalement séparées.", "Three things that are normally separate."], ["Personnalisation", "Personalization"], ["L'histoire, c'est toi et tes amis. Tu ES le personnage.", "The story features you and your friends. You ARE the character."], ["Agentivité", "Agency"], ["Tu changes ce qui arrive. C'est toi qui l'as fait, pas le perso.", "You influence what happens. You did it, not the character."], ["Lien social", "Social connection"], ["Vous la vivez ensemble, sur le même divan ou à distance.", "You experience it together, on the same couch or remotely."], ["Netflix ne fait aucun des trois.", "Netflix does none of the three."], ["Une photo, un perso", "One photo, one character"], ["Chaque personnage vient d'une seule image.", "Every character comes from a single image."], ["Le moteur en tire une feuille de poses : il marche, rit, se fâche, trinque. Les poses resservent dans toutes les scènes, alors un nouveau perso ne coûte presque rien.", "The engine turns it into a pose sheet: they walk, laugh, get angry, raise a glass. Poses are reused across scenes, so a new character costs almost nothing."], ["Vidéo IA", "AI video"], ["~0,66 $ / min", "~$0.66 / min"], ["~30 $ / min", "~$30 / min"], ["En 1080p. Vidéo générée par IA contre animation par feuilles de poses.", "At 1080p. AI-generated video vs. pose-sheet animation."], ["Pourquoi maintenant", "Why now"], ["Le jeu vidéo et le cinéma fusionnent.", "Video games and cinema are merging."], ["Analyste média · ex-Turner", "Media analyst · ex-Turner"], ["« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. »", "“People don't want to create their own entertainment. They want it created for them.”"], ["Phase de validation", "Validation phase"], ["Je cherche des groupes de 2-3 personnes pour essayer.", "I'm looking for groups of 2-3 people to try it."], ["10 minutes, c'est tout.", "10 minutes, that's it."], ["Je fais le déplacement.", "I come to you."], ["Ensuite, accès gratuit au produit et à toutes les histoires.", "Then, free access to the product and every story."], ["Je cherche aussi un cofounder.", "Also looking for a cofounder."]];
+let lang = 'en';
+try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('unw-lang') || 'en'; } catch { /* no storage */ }
+function setLang(l) {
+  lang = l === 'fr' ? 'fr' : 'en'; const k = lang === 'fr' ? 0 : 1;
+  document.querySelectorAll('[data-t]').forEach((el) => { el.innerHTML = T[+el.dataset.t][k]; });
+  document.documentElement.lang = lang; document.getElementById('lang').textContent = lang === 'fr' ? 'EN' : 'FR';
+  try { localStorage.setItem('unw-lang', lang); } catch { /* no storage */ }
+}
+document.getElementById('lang').onclick = () => setLang(lang === 'fr' ? 'en' : 'fr');
+setLang(lang);
+
 // the cast: each picture → its character, the character going through its poses
 const CAST = [
   ['ref/perso_brooke.webp', 'chars/brooke', 'drunk_listen drunk_talk drunk_smile drunk_happy drunk_point'],

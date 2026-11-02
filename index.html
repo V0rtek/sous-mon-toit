@@ -458,6 +458,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips .art.photo { left: 0; background-size: cover; background-position: center top; }
 .strips .art img { position: absolute; left: 55%; top: 7%; height: 240%; transform: translateX(-50%); }   /* head and shoulders */
 .strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
+.strips b .lk { width: .62em; height: .62em; margin-left: .35em; vertical-align: -.02em; opacity: .7; }   /* behind the façade's code */
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
 #infos .strips > *, #cosmo .strips > * { height: 13em; }
 #more .strips > * { height: 15em; }
@@ -1337,8 +1338,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="hub" class="card menu" hidden>
     <div class="strips">
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
-      <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos</b></button>
-      <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus</b></button>
+      <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>Le site</b></a>
+      <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
+      <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
     <button type="button" id="keyBtn" aria-label="Accès"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="password" autocomplete="off" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
