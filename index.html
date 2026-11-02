@@ -460,6 +460,11 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
 .strips b .lk { width: .62em; height: .62em; margin-left: .35em; vertical-align: -.02em; opacity: .7; }   /* behind the façade's code */
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
+/* the home: no scroll, its buttons share the height (24em each at most, smaller when there are more) */
+#hub { overflow: hidden; }
+html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
+#hub .strips { flex: 1 1 auto; min-height: 0; justify-content: center; margin: 0; }
+#hub .strips > * { height: auto; flex: 0 1 24em; min-height: 0; }
 #infos .strips > *, #cosmo .strips > * { height: 13em; }
 #more .strips > * { height: 15em; }
 #infos .strips b, #more .strips b, #cosmo .strips b { font-size: 3.2em; }
