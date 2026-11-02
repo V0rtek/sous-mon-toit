@@ -3293,6 +3293,17 @@ const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#lobby', '#wait', '
 const UP = { '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos', '#acte': '#infos' };   // where ‹ goes
 let screen = '#who';
+// in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
+// page comes back to the front (the phone drops it when hidden). Where it's not supported, nothing changes.
+let wake = null, wantWake = false;
+async function keepAwake(on) {
+  wantWake = on;
+  if (!('wakeLock' in navigator)) return;
+  if (!on) { if (wake) { wake.release().catch(() => {}); wake = null; } return; }
+  if (wake || document.visibilityState !== 'visible') return;
+  try { wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); if (!wantWake) keepAwake(false); } catch { /* refused (battery saver): the phone sleeps as usual */ }
+}
+document.addEventListener('visibilitychange', () => { if (wantWake && document.visibilityState === 'visible') keepAwake(true); });
 function show(id) {
   if (PRIVATE.has(id) && !unlocked()) id = '#hub';   // the façade: my screens only with the code
   if (TV && id === '#hub') id = '#tvPick';
@@ -3307,6 +3318,7 @@ function show(id) {
   if (document.body.classList.contains('wide') !== wide) { document.body.classList.toggle('wide', wide); fit(); }
   document.body.classList.toggle('inwait', id === '#wait');
   document.body.classList.toggle('instory', id === null);
+  keepAwake(TV || id === null || ['#wait', '#lobby', '#end', '#cover', '#tvPick'].includes(id));
   if (TV && id === '#tvPick') tvHome();
   if (id !== null) { showPause(); $('#absentBar').hidden = true; }
   if (id !== '#wait') document.body.classList.remove('roomfull');
