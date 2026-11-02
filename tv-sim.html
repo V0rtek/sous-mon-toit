@@ -89,7 +89,7 @@ setInterval(() => {
 // the TV first (it opens the room), the phones a moment later (they'd wait for it anyway)
 function go() {
   $('#start').hidden = true;
-  $('#tv').src = `index.html?tv&room=${room}`;
+  $('#tv').src = `index.html?tv&room=${room}&story=d_test`;   // always Test: nobody picks it
   setTimeout(() => names.forEach((n, i) => { $('#p' + (i + 1)).src = `index.html?watch=${room}&as=${encodeURIComponent(n)}`; }), 1200);
 }
 $('#start').onclick = go;

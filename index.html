@@ -181,7 +181,7 @@ body.uitop #ui { top: auto; bottom: 3%; }
 .wr-seat { font: inherit; color: inherit; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 2.4em; padding: 1.6em 1em 1.4em; display: flex; flex-direction: column; align-items: center; gap: .5em; cursor: pointer; transition: border-color .2s, background .2s; }
 .wr-seat img { height: 33em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 1em 1.5em rgba(0,0,0,.6)); transition: opacity .3s; }
 .wr-seat b { font-family: var(--display); font-weight: 400; font-size: 2.8em; margin-top: .2em; }
-.wr-seat q { font-size: 1.55em; font-style: italic; line-height: 1.35; color: #c7c7cc; text-align: center; min-height: 2.7em; }
+.wr-seat q { font-size: 1.55em; font-style: italic; line-height: 1.35; color: #c7c7cc; text-align: center; min-height: 2.7em; quotes: '“' '”' '‘' '’'; }
 .wr-who { display: flex; align-items: center; gap: .45em; font-size: 1.6em; font-weight: 700; color: #8e8e93; margin-top: .3em; text-align: center; }
 .wr-who i { flex: none; width: .7em; height: .7em; border-radius: 50%; background: #48484a; }
 .wr-seat.me { border-color: #34c759; background: rgba(52,199,89,.08); }
@@ -2117,7 +2117,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="demos.js?v=20261102210000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
-<script src="test.js?v=20261028143259"></script>
+<script src="test.js?v=20261102220000"></script>
 <script src="techniques.js?v=20261029120000"></script>
 <script src="ep1.js?v=20261030030000"></script>
 <script src="plan.js?v=20261031490000"></script>
@@ -4823,7 +4823,7 @@ function countEyes() {
 }
 function fromJoiner(m) {
   if (TV && watchers.has(m.id)) {
-    if (m.e === 'bot' && waitRoom) { const k = seatsOf().find((j) => !state.seats[j]); if (k) { state.seats[k] = { id: BOT, n: 'Le hasard' }; renderWait(); share(); startWhenFull(); } return; }
+    if (m.e === 'bot' && waitRoom) { const k = seatsOf().find((j) => !state.seats[j]); if (k) { state.seats[k] = { id: BOT, n: 'Random' }; renderWait(); share(); startWhenFull(); } return; }
     if (m.e === 'story' && !game && STORIES[m.s] && seatsOf(m.s).length === 2) { openWait(m.s, true); return; }
     if (m.e === 'menu' && screen !== '#tvPick') { toHub(); return; }
     if (m.e === 'again' && screen === '#end') { begin(state.story); return; }
@@ -5056,7 +5056,10 @@ if (PREVIEW) {
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
 } else if (PLAY_ONLY) { document.body.classList.add('playonly'); if ((window.TEST_LIST || []).some((t) => t.id === PLAY_ONLY)) document.body.classList.add('uitop'); state.name = 'You'; Promise.race([window.IMPORTS_READY, sleep(4000)]).finally(() => begin(PLAY_ONLY)); }   // the imported characters first
-else if (TV) { document.body.classList.add('tv'); state.name = 'TV'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
+else if (TV) { document.body.classList.add('tv'); state.name = 'TV'; goLive(); show('#hub');
+  // ?story=<id> (the simulator: Test): the TV opens that story's waiting room itself, nobody picks it
+  const st = new URLSearchParams(location.search).get('story');
+  if (st && STORIES[st] && seatsOf(st).length === 2) Promise.race([window.IMPORTS_READY, sleep(1500)]).finally(() => openWait(st, true)); }   // goLive first: the home's QR needs the room
 else if (ROLE === 'host') {
   goLive();
   const lab = new URLSearchParams(location.search).has('lab');   // back from a test: straight to Mini-jeux
