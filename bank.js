@@ -187,7 +187,7 @@ window.BANK = {
     if (screen !== '#bank') return;
     if (!$('#bankBig').hidden) { $('#bankBig').hidden = true; history.pushState({ bank: 1 }, ''); return; }
     if (BANK_BACK()) { history.pushState({ bank: 1 }, ''); return; }
-    show('#more');
+    show('#secWrite');
   });
   document.addEventListener('DOMContentLoaded', () => {
     const redraw = () => { const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; };

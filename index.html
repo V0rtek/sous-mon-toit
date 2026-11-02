@@ -543,7 +543,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
 /* the menus (home, Infos, Plus): full-width strips, each a picture of its world, black on the words' side (the onboarding's question) */
-#hub, #infos, #more, #cosmo { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
+#hub, #infos, .sub, #cosmo { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
 .strips { display: flex; flex-direction: column; margin: auto 0; }
 .strips > * { font: inherit; position: relative; flex: none; height: 24em; overflow: hidden; display: flex; align-items: center; padding: 0 7%; border: 0; border-top: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-align: left; text-decoration: none; cursor: pointer; }
 .strips > *::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 30%, rgba(0,0,0,.55) 52%, transparent 78%); pointer-events: none; }
@@ -558,20 +558,19 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
 #hub .strips { flex: 1 1 auto; min-height: 0; justify-content: center; margin: 0; }
 #hub .strips > * { height: auto; flex: 0 1 24em; min-height: 0; }
-#infos .strips > *, #cosmo .strips > * { height: 13em; }
-#more .strips > * { height: 15em; }
-#infos .strips b, #more .strips b, #cosmo .strips b { font-size: 3.2em; }
+.sub .strips > *, #infos .strips > *, #cosmo .strips > * { height: 13em; }
+.sub .strips b, #infos .strips b, #cosmo .strips b { font-size: 3.2em; }
 /* Infos: the test pages as a 2-column grid of tiles, all in view (not one tall row each) */
-#infos .strips > .pages { height: auto; flex: none; display: grid; grid-template-columns: 1fr 1fr; padding: 0; background: none; border-top: .25em solid #000; }
+.sub .strips > .pages { height: auto; flex: none; display: grid; grid-template-columns: 1fr 1fr; padding: 0; background: none; border-top: .25em solid #000; }
 .strips > .pages::after { display: none; }
-#infos .strips .pages > a { position: relative; height: 12em; overflow: hidden; display: flex; align-items: center; padding: 0 8%; border: 0; border-top: .25em solid #000; border-left: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-decoration: none; cursor: pointer; }
+.sub .strips .pages > a { position: relative; height: 12em; overflow: hidden; display: flex; align-items: center; padding: 0 8%; border: 0; border-top: .25em solid #000; border-left: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-decoration: none; cursor: pointer; }
 .strips .pages > a::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 20%, rgba(0,0,0,.5) 50%, transparent 85%); pointer-events: none; }
 .strips .pages > a .art { left: 20%; }
 .strips .pages > a .art img { left: 70%; }
-#infos .strips .pages b { font-size: 2.2em; line-height: 1.1; letter-spacing: -.01em; }
+.sub .strips .pages b { font-size: 2.2em; line-height: 1.1; letter-spacing: -.01em; }
 
 /* Infos: Valider l'idée first; every time Infos opens it blinks and grows, an arrow points at it */
-#infos { overflow-x: hidden; }
+#infos, .sub { overflow-x: hidden; }
 #valBtn { transform-origin: left center; }
 #valBtn .pt { width: .9em; height: .9em; margin-left: .45em; vertical-align: -.12em; }
 #valBtn.valcue { z-index: 2; animation: valPing 2s ease-in-out; }
@@ -603,7 +602,7 @@ html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
 .pnP select { font: inherit; font-size: 1em; padding: .2em .5em; border-radius: .6em; border: 0; background: #2c2c2e; color: #f5f5f7; }
 .pnP .pnSt { font-size: 1.8em; color: #30d158; min-height: 1.2em; }
 /* the façade: without the code, the home shows Full demo only; a small lock asks for the code */
-html.locked #infosBtn, html.locked #moreBtn { display: none !important; }
+html.locked #infosBtn { display: none !important; }
 #keyBtn { display: none; position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: 5em; height: 5em; border: 0; border-radius: 50%; background: transparent; color: #f5f5f7; opacity: .25; cursor: pointer; padding: 0; }
 #keyBtn svg { width: 2.6em; height: 2.6em; }
 html.locked #keyBtn { display: grid; place-items: center; }
@@ -1637,8 +1636,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b></a>
       <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
       <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
-      <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
-      <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
+      <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
     <button type="button" id="keyBtn" aria-label="Access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="password" autocomplete="off" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
@@ -1646,6 +1644,24 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="infos" class="card menu" hidden>
     <div class="strips">
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée<svg class="pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></b></button>
+      <button type="button" id="secWriteBtn"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Écrire</b></button>
+      <button type="button" id="secTestBtn"><span class="art" style="--g:#b3261e"><img src="chars/justin/punch.webp" alt=""></span><b>Tester</b></button>
+      <button type="button" id="secSellBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Vendre</b></button>
+      <button type="button" id="secRefBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/explaining.webp" alt=""></span><b>Référence</b></button>
+    </div>
+  </div>
+  <div id="secWrite" class="card menu sub" hidden>
+    <div class="strips">
+      <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
+      <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
+      <button type="button" id="techBtn"><span class="art" style="--g:#8a2b4f"><img src="chars/brooke/thinking.webp" alt=""></span><b>Techniques</b></button>
+      <button type="button" id="planBtn"><span class="art" style="--g:#a3561a"><img src="chars/cam/thinking.webp" alt=""></span><b>Plan de scène</b></button>
+      <button type="button" id="actBtn"><span class="art" style="--g:#2f6b4f"><img src="chars/james/thinking.webp" alt=""></span><b>Acte</b></button>
+    </div>
+  </div>
+  <div id="secTest" class="card menu sub" hidden>
+    <div class="strips">
+      <button type="button" id="lab"><span class="art" style="--g:#b3261e"><img src="chars/justin/punch.webp" alt=""></span><b>Mini-jeux</b></button>
       <div class="pages">
         <a href="choix.html" id="choixBtn"><span class="art" style="--g:#ff6b8a"><img src="chars/justin_bar/drunk_serious.webp" alt=""></span><b>Écran de choix</b></a>
         <a href="cell.html" id="cellBtn"><span class="art" style="--g:#0a84ff"><img src="chars/brooke/texting.webp" alt=""></span><b>Le cell de Brooke</b></a>
@@ -1659,26 +1675,24 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <a href="?play=d_mini_auto" id="miniAutoBtn"><span class="art" style="--g:#3b1f6e"><img src="chars/cam/flirty.webp" alt=""></span><b>Mini-histoire · tout seul</b></a>
         <a href="?play=d_pirate" id="pirateBtn"><span class="art" style="--g:#8e1b1b"><img src="chars/pirate/bar_smile.webp" alt=""></span><b>Le serment du pirate</b></a>
       </div>
+    </div>
+  </div>
+  <div id="secSell" class="card menu sub" hidden>
+    <div class="strips">
       <button type="button" id="mkBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Marketing</b></button>
       <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
       <button type="button" id="sparkBtn"><span class="art" style="--g:#ff375f"><img src="chars/julian/offer.webp" alt=""></span><b>Spark</b></button>
       <button type="button" id="invBtn"><span class="art" style="--g:#33415c"><img src="chars/suit/adjust.webp" alt=""></span><b>Investisseurs</b></button>
       <button type="button" id="brainBtn"><span class="art" style="--g:#7a2e5c"><img src="chars/ruby/thinking.webp" alt=""></span><b>Brainstorming</b></button>
+    </div>
+  </div>
+  <div id="secRef" class="card menu sub" hidden>
+    <div class="strips">
       <button type="button" id="statsBtn"><span class="art" style="--g:#c4622d"><img src="chars/justin_bar/explaining.webp" alt=""></span><b>Stats</b></button>
       <button type="button" id="sysBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/thinking.webp" alt=""></span><b>System</b></button>
       <button type="button" id="cosmoBtn"><span class="art" style="--g:#1f6f8b"><img src="chars/diane/thinking.webp" alt=""></span><b>Cosmograph</b></button>
-      <button type="button" id="techBtn"><span class="art" style="--g:#8a2b4f"><img src="chars/brooke/thinking.webp" alt=""></span><b>Techniques</b></button>
-      <button type="button" id="planBtn"><span class="art" style="--g:#a3561a"><img src="chars/cam/thinking.webp" alt=""></span><b>Plan de scène</b></button>
-      <button type="button" id="actBtn"><span class="art" style="--g:#2f6b4f"><img src="chars/james/thinking.webp" alt=""></span><b>Acte</b></button>
-    </div>
-  </div>
-  <div id="more" class="card menu" hidden>
-    <div class="strips">
-      <button type="button" id="lab"><span class="art" style="--g:#b3261e"><img src="chars/justin/punch.webp" alt=""></span><b>Mini-jeux</b></button>
-      <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
-      <button type="button" id="t3d"><span class="art photo" style="left:40%;background-image:url(ref/tease_3d.webp);background-position:60% 22%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%)"></span><b>3D</b></button>
-      <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
       <button type="button" id="roadBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/justin/thinking.webp" alt=""></span><b>Roadmap</b></button>
+      <button type="button" id="t3d"><span class="art photo" style="left:40%;background-image:url(ref/tease_3d.webp);background-position:60% 22%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%)"></span><b>3D</b></button>
     </div>
   </div>
   <div id="bank" class="card menu" hidden>
@@ -2210,7 +2224,7 @@ const $ = (s) => document.querySelector(s);
 const KEY_HASH = 323, keyHash = (s) => [...s.trim().toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
 let keyOk = false;   // entered this visit (a private window can't remember it)
 const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-key') === KEY_HASH; } catch { return false; } };
-const PRIVATE = new Set(['#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
+const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
 document.documentElement.classList.toggle('locked', !unlocked());
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
@@ -3817,9 +3831,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
-const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
-  '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos', '#acte': '#infos' };   // where ‹ goes
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
+const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell',
+  '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
 // page comes back to the front (the phone drops it when hidden). Where it's not supported, nothing changes.
@@ -4327,7 +4341,10 @@ $('#keyForm').onsubmit = (e) => {
   keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; $('#keyIn').value = '';
 };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
-$('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
+$('#secWriteBtn').onclick = (e) => { e.stopPropagation(); show('#secWrite'); };
+$('#secTestBtn').onclick = (e) => { e.stopPropagation(); show('#secTest'); };
+$('#secSellBtn').onclick = (e) => { e.stopPropagation(); show('#secSell'); };
+$('#secRefBtn').onclick = (e) => { e.stopPropagation(); show('#secRef'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); bossPlay(); };
 // Marketing · Face the boss: the city at peace, then the dragon lands on it with a roar, then its fire with the long one;
 // the four names come last. Plays when Marketing opens (the tap that opened it lets the sound through); a tap replays it
@@ -4385,7 +4402,7 @@ $('#techStages').innerHTML = TECH_STAGES.map((st) => `<section class="tStage"><h
 $('#techBtn').onclick = (e) => { e.stopPropagation(); $('#tech').scrollTop = 0; show('#tech'); };
 $('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (!b) return; e.stopPropagation(); techPath = [b.dataset.t]; techOpen(); };
 // ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
-$('#planBtn').onclick = (e) => { e.stopPropagation(); UP['#plan'] = '#infos'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
+$('#planBtn').onclick = (e) => { e.stopPropagation(); UP['#plan'] = '#secWrite'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // ---- Infos · Acte (act.js): one act of 5 episodes, each one's prompt 1 copied from its column ----
 $('#actBtn').onclick = (e) => { e.stopPropagation(); show('#acte'); ACT.mount($('#acteBody')); };
 // ‹ from a plan opened by the act goes back to the act (it opens again where it was)
@@ -4896,7 +4913,7 @@ function goHome() {
 // ---- an invite from a friend's device (PEOPLE): the card rises over the menu, never in the middle of a story ----
 let invNow = null;
 function gotInvite(v) {
-  if (!['#hub', '#infos', '#more', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
+  if (!['#hub', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
   invNow = v;
   $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} invites you`;
   $('#invTitle').textContent = storyTitle(v.invite.s) || v.invite.s;
