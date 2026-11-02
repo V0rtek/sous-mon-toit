@@ -82,27 +82,42 @@ window.BANK = {
   const ORDER = ['debout', 'accoude', 'assis', 'prises', 'close', 'base', 'back', 'barFront', 'barOther', 'kiss'];
   // image 1 of its prompts: its portrait if it has one, else its first standing pose
   const face = (id) => { const sp = SPRITES[id], p = ['listen', 'smile', ...Object.keys(sp.poses)].find((x) => sp.poses[x] && !(sp.half && sp.half.poses && sp.half.poses[x])) || Object.keys(sp.poses)[0]; return p ? src(id, p) : ''; };
+  // the same screen as Nouveau perso's step 3 (02/11): the character on top, every sheet as a tile (done = its result,
+  // to do = Justin's guide on green); a tile opens its sheet (image 1 = the character, Copier le prompt, Importer). Single
+  // poses (replace one, add one) behind « ⋯ »
+  let edOpen = null;
+  const KIT = ['debout', 'accoude', 'assis', 'prises', 'kiss', 'close'];
   function editView(id) {
     const sp = SPRITES[id], poses = Object.keys(sp.poses), half = (sp.half || {}).poses || {}, K = (window.IMPORT && IMPORT.KINDS) || {}, she = !!sheOf(id);
-    const kinds = ORDER.filter((k) => K[k] || BANK.sheetTitle(k));
+    const { IC, shot, big } = BANK.ncKit, me = face(id), nm = nameOf(id);
+    const first = (k) => ((K[k] || {}).poses || []).find((p) => sp.poses[p]);
+    const kinds = [...KIT, ...ORDER.filter((k) => !KIT.includes(k) && first(k))].filter((k) => BANK.sheetInfo(k));
     const missing = [...new Set(Object.values(K).flatMap((k) => k.poses))].filter((p) => !sp.poses[p]);
-    return `<div class="ncTop open"><button type="button" class="ncToggle" data-edclose="1"><b>Modifier · ${esc(nameOf(id))}</b><em>✕</em></button><div class="edIn">`
-      + `<div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-edshe="${v}" class="${(she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`
-      + (ed ? `<div class="edOut">${ed.msg ? `<p class="ncMsg">${esc(ed.msg)}</p>` : ''}${ed.imgs ? `<div class="ncCuts">${ed.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>` : ''}`
-        + (ed.ready ? `<div class="edRow"><button type="button" class="ncGo main" data-edsend="1">${esc(ed.what)}</button><button type="button" class="ncGo" data-edcancel="1">Annuler</button></div>` : '') + '</div>' : '')
-      + `<h3 class="bkH">Ses poses <small>touche une pose pour la remplacer</small></h3><div class="bkRow">${poses.map((p) =>
-        `<label class="bkPose${half[p] ? ' cut' : ''}"><img loading="lazy" src="${src(id, p)}" alt=""><span>${esc(p)}</span><input type="file" accept="image/*" data-edrep="${p}" hidden></label>`).join('')}</div>`
-      + `<h3 class="bkH">Ajouter une pose</h3><p class="bkNote">Une image : le perso seul, sur fond vert ou transparent.</p><div class="edAdd">`
-      + `<input id="edName" list="edPoses" placeholder="Nom de la pose (ex. sit_listen)" autocomplete="off"><datalist id="edPoses">${missing.map((p) => `<option value="${p}">`).join('')}</datalist>`
-      + `<select id="edType"><option value="full">En pied</option><option value="counter">Accoudé (coupé au rebord)</option><option value="table">Assis (coupé à la table)</option></select>`
-      + `<label class="ncGo">Choisir l’image<input type="file" accept="image/*" data-edone="1" hidden></label></div>`
-      + `<h3 class="bkH">Ses feuilles <small>6 poses d’un coup</small></h3>`
-      + `<div class="edRow"><button type="button" class="ncBtn" data-cimg="${face(id)}">Copier l’image 1 (le perso)</button></div>`
-      + kinds.map((k) => { const ps = (K[k] || {}).poses || [], n = ps.filter((p) => sp.poses[p]).length;
-        return `<div class="edSheet"><div><b>${esc((BANK.sheetTitle(k) || k).replace(/ \(base\)/, ''))}</b><small>${K[k] ? `${n}/6 poses` : 'pas d’import automatique'}</small></div>`
-          + `<button type="button" class="ncBtn" data-edcopy="${k}">Copier le prompt</button>`
-          + (K[k] ? `<label class="ncBtn">${n ? 'Remplacer' : 'Ajouter'}<input type="file" accept="image/*" data-edsheet="${k}" hidden></label>` : '') + '</div>'; }).join('')
-      + '</div></div>';
+    const out = ed ? `<div class="edOut">${ed.msg ? `<p class="ncMsg">${esc(ed.msg)}</p>` : ''}${ed.imgs ? `<div class="ncCuts">${ed.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>` : ''}`
+      + (ed.ready ? `<div class="edRow"><button type="button" class="ncGo main" data-edsend="1">${esc(ed.what)}</button><button type="button" class="ncGo" data-edcancel="1">Annuler</button></div>` : '') + '</div>' : '';
+    let body;
+    if (edOpen && kinds.includes(edOpen)) {
+      const k = edOpen, [t, , guides0] = BANK.sheetInfo(k), guides = k === 'debout' ? ['style.webp'] : guides0, n = ((K[k] || {}).poses || []).filter((p) => sp.poses[p]).length;
+      body = `<div class="ncSheetTop"><button type="button" class="ncBack" data-edopen="">‹</button><b>${esc(t)}</b>${n ? '<i>✓</i>' : ''}</div>`
+        + `<div class="ncEq">${shot(me, 1)}${guides.map((f, x) => `<em>+</em>${shot(`ref/${f}`, x + 2)}`).join('')}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
+        + big(`data-edcopy="${k}"`, IC.copy, 'Copier le prompt', 'main')
+        + `<div class="ncSmall"><button type="button" class="ncBtn" data-cimg="${me}">Copier l’image 1</button>${guides.map((f, x) => `<button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image ${x + 2}</button>`).join('')}</div>`
+        + out
+        + (K[k] && !(ed && ed.ready) ? `<label class="ncGo${n ? ' ok' : ''}">${IC.up}<span>${n ? 'Remplacer la feuille' : 'Importer le résultat'}</span><input type="file" accept="image/*" data-edsheet="${k}" hidden></label>` : '');
+    } else {
+      body = `<div class="ncHero"><img src="${me}" alt=""><b>${esc(nm)}</b><div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-edshe="${v}" class="${(she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
+        + out
+        + `<div class="ncTiles">${kinds.map((k) => { const [t, , guides] = BANK.sheetInfo(k), g = guides.find((f) => f !== 'style.webp') || guides[0] || 'style.webp', p = first(k);
+          return `<button type="button" class="ncTile${p ? ' done res' : ''}" data-edopen="${k}"><span><img loading="lazy" src="${p ? src(id, p) : `ref/${g}`}" alt=""></span><b>${esc(t.replace(/ \(base\)/, ''))}</b>${p ? '<i>✓</i>' : ''}</button>`; }).join('')}</div>`
+        + `<details class="ncMore edMore"${ed && ed.single ? ' open' : ''}><summary>⋯</summary>`
+        + `<h3 class="bkH">Ses poses <small>touche une pose pour la remplacer</small></h3><div class="bkRow">${poses.map((p) =>
+          `<label class="bkPose${half[p] ? ' cut' : ''}"><img loading="lazy" src="${src(id, p)}" alt=""><span>${esc(p)}</span><input type="file" accept="image/*" data-edrep="${p}" hidden></label>`).join('')}</div>`
+        + `<h3 class="bkH">Ajouter une pose</h3><p class="bkNote">Une image : le perso seul, sur fond vert ou transparent.</p><div class="edAdd">`
+        + `<input id="edName" list="edPoses" placeholder="Nom de la pose (ex. sit_listen)" autocomplete="off"><datalist id="edPoses">${missing.map((p) => `<option value="${p}">`).join('')}</datalist>`
+        + `<select id="edType"><option value="full">En pied</option><option value="counter">Accoudé (coupé au rebord)</option><option value="table">Assis (coupé à la table)</option></select>`
+        + `<label class="ncGo">Choisir l’image<input type="file" accept="image/*" data-edone="1" hidden></label></div></details>`;
+    }
+    return `<div class="ncTop open"><button type="button" class="ncToggle" data-edclose="1"><b>Modifier · ${esc(nm)}</b><em>✕</em></button><div class="edIn">${body}</div></div>`;
   }
   const tabs = {
     chars() {
@@ -157,10 +172,12 @@ window.BANK = {
     $('#bankTabs').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.t === tab));
     $('#bankBody').innerHTML = tabs[tab](); $('#bankBody').scrollTop = 0;
     // Nouveau perso open: full screen, only the back arrow and its 3 steps on top (02/11)
-    document.body.classList.toggle('ncFull', tab === 'chars' && !editing && BANK.newCharIsOpen());
+    document.body.classList.toggle('ncFull', tab === 'chars' && (!!editing || BANK.newCharIsOpen()));
   }
   // the back arrow (or the phone's back) closes Nouveau perso first
-  window.BANK_BACK = () => { if (!document.body.classList.contains('ncFull')) return false; BANK.newCharSet('shown', false); draw(); return true; };
+  window.BANK_BACK = () => { if (!document.body.classList.contains('ncFull')) return false;
+    if (editing) { if (edOpen) edOpen = null; else editing = null; ed = null; } else BANK.newCharSet('shown', false);
+    draw(); return true; };
   function stop() { if (playing) { playing.a.pause(); playing.b.classList.remove('on'); playing.b.firstChild.textContent = '▶'; playing = null; } }
   // the phone's back (gesture or button) works in the bank: it closes a big picture, else goes back to Plus, like ‹.
   // Opening the bank pushes a step in the history; leaving it by ‹ takes that step back
@@ -175,16 +192,17 @@ window.BANK = {
     const redraw = () => { const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; };
     $('#bankTabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { e.stopPropagation(); tab = b.dataset.t; draw(); } };
     $('#bankBody').onclick = (e) => {
-      const eo = e.target.closest('[data-edit],[data-edclose],[data-edshe],[data-edcopy],[data-edsend],[data-edcancel]');
+      const eo = e.target.closest('[data-edit],[data-edclose],[data-edshe],[data-edcopy],[data-edsend],[data-edcancel],[data-edopen]');
       if (eo) {
         e.stopPropagation(); const d = eo.dataset;
-        if (d.edit) { editing = d.edit; ed = null; draw(); return; }
-        if (d.edclose || d.edcancel) { if (d.edclose) editing = null; ed = null; redraw(); return; }
+        if (d.edit) { editing = d.edit; edOpen = null; ed = null; draw(); return; }
+        if (d.edopen !== undefined) { edOpen = d.edopen || null; ed = null; draw(); return; }
+        if (d.edclose || d.edcancel) { if (d.edclose) { editing = null; edOpen = null; } ed = null; redraw(); return; }
         if (d.edshe !== undefined) { setShe(editing, !!d.edshe); redraw(); return; }
         if (d.edcopy) { const t = BANK.newCharPromptFor(d.edcopy, { name: nameOf(editing), she: sheOf(editing) }), was = eo.textContent, ok = () => { eo.textContent = 'Copié ✓'; setTimeout(() => { eo.textContent = was; }, 1600); };
           navigator.clipboard.writeText(t).then(ok, () => { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); ok(); }); return; }
         if (d.edsend) { ed = { ...ed, ready: false, msg: 'Envoi…' }; redraw();
-          IMPORT.add().then((m) => { ed = { ...ed, msg: m }; }, (err) => { ed = { ...ed, msg: `Pas ajouté : ${err.message}` }; }).then(redraw); return; }
+          IMPORT.add().then((m) => { ed = { msg: m, single: ed.single }; edOpen = null; }, (err) => { ed = { ...ed, msg: `Pas ajouté : ${err.message}` }; }).then(() => { draw(); $('#bankBody').scrollTop = 0; }); return; }
       }
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
       const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
@@ -215,19 +233,19 @@ window.BANK = {
     };
     $('#bankBig').onclick = (e) => { e.stopPropagation(); $('#bankBig').hidden = true; };
     // Modifier: the picture cut and shown, then « Remplacer » / « Ajouter au jeu » sends it
-    const edCut = async (job, what) => {
-      ed = { msg: 'Découpe…' }; redraw();
-      try { ed = { imgs: await job((t) => { const m = document.querySelector('.edOut .ncMsg'); if (m) m.textContent = t; }), ready: true, what, msg: '' }; }
-      catch (err) { ed = { msg: err.message || 'Je n’arrive pas à la découper.' }; }
+    const edCut = async (job, what, single) => {
+      ed = { msg: 'Découpe…', single }; redraw();
+      try { ed = { imgs: await job((t) => { const m = document.querySelector('.edOut .ncMsg'); if (m) m.textContent = t; }), ready: true, what, msg: '', single }; }
+      catch (err) { ed = { msg: err.message || 'Je n’arrive pas à la découper.', single }; }
       $('#bankBody').scrollTop = 0; draw();
     };
     $('#bankBody').onchange = (e) => { const d = e.target.dataset, f = e.target.files && e.target.files[0];
       if (f && editing && (d.edrep || d.edsheet || d.edone)) {
         const id = editing, name = nameOf(id);
-        if (d.edrep) edCut(() => IMPORT.one(f, id, d.edrep), `Remplacer ${d.edrep}`);
+        if (d.edrep) edCut(() => IMPORT.one(f, id, d.edrep), `Remplacer ${d.edrep}`, true);
         else if (d.edsheet) edCut((tell) => IMPORT.cut(f, d.edsheet, name, tell, id), (IMPORT.KINDS[d.edsheet].poses.some((p) => SPRITES[id].poses[p]) ? 'Remplacer' : 'Ajouter') + ' la feuille');
         else { const pose = IMPORT.slug($('#edName').value); if (!pose) { ed = { msg: 'Donne un nom à la pose d’abord.' }; e.target.value = ''; redraw(); return; }
-          edCut(() => IMPORT.one(f, id, pose, SPRITES[id].poses[pose] ? undefined : $('#edType').value), `${SPRITES[id].poses[pose] ? 'Remplacer' : 'Ajouter'} ${pose}`); }
+          edCut(() => IMPORT.one(f, id, pose, SPRITES[id].poses[pose] ? undefined : $('#edType').value), `${SPRITES[id].poses[pose] ? 'Remplacer' : 'Ajouter'} ${pose}`, true); }
         e.target.value = ''; return;
       }
       if (d.ncfile && f) BANK.newCharFile(d.ncfile, f, redraw);
@@ -434,6 +452,7 @@ Example:
   const shot = (src, n) => `<span class="ncShot"><img src="${src}" alt="" data-img="${src}"><i>${n}</i></span>`;
   const slot = (n, label) => `<span class="ncShot ncSlot">${IC.cam}<b>${esc(label)}</b><i>${n}</i></span>`;
   const big = (attr, icon, label, cls = '') => `<button type="button" class="ncGo ${cls}" ${attr}>${icon}<span>${label}</span></button>`;
+  BANK.ncKit = { IC, shot, big };   // Modifier draws with the same pieces
   BANK.newChar = () => {
     const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0], done = c.done || {};
     const nm = String(c.name || '').trim(), mine = HAVE.includes(nm.toLowerCase()) ? `perso_${nm.toLowerCase()}.webp` : null;
@@ -511,6 +530,7 @@ Example:
   };
   BANK.newCharGrip = (pose, fx, fy) => { const r = IMPORT.setGrip(pose, fx, fy), m = r && shown && shown.imgs && shown.imgs.find((x) => x.pose === pose); if (m) { m.grip = r; shown.moved = true; } return !!m; };
   BANK.sheetTitle = (id) => SHEETS[id] && SHEETS[id][0];
+  BANK.sheetInfo = (id) => SHEETS[id];
   BANK.newCharPromptFor = (id, c) => (id === 'help' ? LOCK_HELP : make(id, c));   // the Spark panel: one per person
   BANK.newCharPrompt = (id) => (id === 'help' ? LOCK_HELP : make(id, load()));
   BANK.newCharSet = (k, v) => { const c = load(); c[k] = v; keep(c); };

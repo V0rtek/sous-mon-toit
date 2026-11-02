@@ -256,6 +256,8 @@ body.ncFull #bank .ncDots { margin-top: 0; }
 .bkPose i { display: block; font-style: normal; color: #ff9f0a; font-size: .85em; }
 .bkEdit { font: inherit; float: right; font-size: .6em; font-weight: 600; padding: .35em .9em; border: 0; border-radius: 1em; background: #2c2c2e; color: #f5f5f7; cursor: pointer; }
 .edIn { display: flex; flex-direction: column; gap: 1.2em; }
+.edIn .ncSheetTop { justify-content: center; min-height: 5.4em; }   /* beside the back arrow, which closes the sheet */
+.edIn .ncSheetTop .ncBack { display: none; }
 .edIn .bkH small { font-size: .6em; color: #86868b; font-weight: 500; margin-left: .4em; }
 .edIn .bkPose { cursor: pointer; }
 .edOut { display: flex; flex-direction: column; gap: 1em; background: #1c1c1e; border-radius: 1.4em; padding: 1.2em; }
@@ -2137,7 +2139,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261102180000"></script>
 <script src="deck.js?v=20261034500000"></script>
-<script src="bank.js?v=20261102230000"></script>
+<script src="bank.js?v=20261102240000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
