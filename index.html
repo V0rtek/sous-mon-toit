@@ -486,6 +486,15 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .pnChips button.on { background: #ffd60a; color: #000; }
 .pnP select { font: inherit; font-size: 1em; padding: .2em .5em; border-radius: .6em; border: 0; background: #2c2c2e; color: #f5f5f7; }
 .pnP .pnSt { font-size: 1.8em; color: #30d158; min-height: 1.2em; }
+/* the façade: without the code, the home shows Full demo only; a small lock asks for the code */
+html.locked #infosBtn, html.locked #moreBtn { display: none !important; }
+#keyBtn { display: none; position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: 5em; height: 5em; border: 0; border-radius: 50%; background: transparent; color: #f5f5f7; opacity: .25; cursor: pointer; padding: 0; }
+#keyBtn svg { width: 2.6em; height: 2.6em; }
+html.locked #keyBtn { display: grid; place-items: center; }
+#keyForm { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; gap: 1em; }
+#keyForm[hidden] { display: none; }
+#keyForm input { font: inherit; font-size: 2.4em; width: 7em; padding: .4em .7em; border: 0; border-radius: 1em; background: #1c1c1e; color: #f5f5f7; outline: 0; }
+#keyForm.no input { box-shadow: 0 0 0 .12em #ff453a; }
 /* the Spark deck: the whole width, one beat per slide, the colour of its stage */
 #deck { padding: 0; cursor: pointer; background: radial-gradient(90% 80% at 15% 10%, color-mix(in srgb, var(--c, #ff9f0a) 28%, transparent), transparent 60%), #0b0b0d; }
 #deck .dkSlide { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 2.4em; padding: 8em 9%; }
@@ -1324,6 +1333,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos</b></button>
       <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus</b></button>
     </div>
+    <button type="button" id="keyBtn" aria-label="Accès"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+    <form id="keyForm" hidden><input id="keyIn" type="password" autocomplete="off" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
   </div>
   <div id="infos" class="card menu" hidden>
     <div class="strips">
@@ -1855,6 +1866,13 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
+// Façade (02/11): by default the link shows only Full demo. Infos and Plus (my own stuff) open after the code; the browser
+// remembers it. Only its hash is here (the code itself: CLAUDE.md). A wall for visitors, not real security.
+const KEY_HASH = 323, keyHash = (s) => [...s.trim().toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+let keyOk = false;   // entered this visit (a private window can't remember it)
+const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-key') === KEY_HASH; } catch { return false; } };
+const PRIVATE = new Set(['#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
+document.documentElement.classList.toggle('locked', !unlocked());
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
   black = $('#black'), caption = $('#caption'), hint = $('#hint'), textsEl = $('#texts'), slateEl = $('#slate'), farEl = $('#far');
@@ -3275,6 +3293,7 @@ const UP = { '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos', '#acte': '#infos' };   // where ‹ goes
 let screen = '#who';
 function show(id) {
+  if (PRIVATE.has(id) && !unlocked()) id = '#hub';   // the façade: my screens only with the code
   if (TV && id === '#hub') id = '#tvPick';
   if (id !== '#bank' && window.BANK_CLOSE) BANK_CLOSE();   // leaving the bank stops its sound (and takes back its history step)
   $('#storyNote').hidden = !(state.story === 'gen' && (id === null || id === '#end'));   // the "?" of a generated story: in it and on its end card
@@ -3736,6 +3755,14 @@ $('#valBtn').onclick = (e) => { e.stopPropagation(); show('#validate'); liveStat
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#sparkBtn').onclick = (e) => { e.stopPropagation(); show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
+$('#keyBtn').onclick = (e) => { e.stopPropagation(); $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
+$('#keyForm').onclick = (e) => e.stopPropagation();
+$('#keyForm').onsubmit = (e) => {
+  e.preventDefault(); const f = $('#keyForm');
+  if (keyHash($('#keyIn').value) !== KEY_HASH) { f.classList.remove('no'); void f.offsetWidth; f.classList.add('no'); $('#keyIn').select(); return; }
+  try { localStorage.setItem('smt-key', String(KEY_HASH)); } catch { /* private window: open for this visit only */ }
+  keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; $('#keyIn').value = '';
+};
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#moreBtn').onclick = (e) => { e.stopPropagation(); show('#more'); };
 $('#mkBtn').onclick = (e) => { e.stopPropagation(); $('#marketing').scrollTop = 0; show('#marketing'); bossPlay(); };
