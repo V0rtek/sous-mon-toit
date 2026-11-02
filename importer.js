@@ -30,8 +30,9 @@
   const median = (a) => { const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
 
   // the sheet -> 6 cut poses, each with its canvas and its measures (in its own pixels)
-  async function cut(file, kind, tell = () => {}) {
-    const K = KINDS[kind], bmp = await createImageBitmap(file), k = Math.min(1, 1536 / bmp.width);
+  // the picture -> its pixels with the backdrop keyed out (alpha)
+  async function key(file) {
+    const bmp = await createImageBitmap(file), k = Math.min(1, 1536 / bmp.width);
     const W = Math.round(bmp.width * k), H = Math.round(bmp.height * k);
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(bmp, 0, 0, W, H);
@@ -69,18 +70,36 @@
       for (const n of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) if (n >= 0 && n < W * H && dist[n] > dd) { dist[n] = dd; q[qt++] = n; } }
     const edge = dist;
     for (let i = 0; i < W * H; i++) if (edge[i] <= 8) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; if (g > Math.max(r, b) + 12) d[i * 4 + 1] = Math.max(r, b); }
-    const out = [];
+    return { W, H, d, alpha, cx };
+  }
+  // a sheet: its 6 cells, left to right, top row first
+  async function cut(file, kind, tell = () => {}) {
+    const K = KINDS[kind], P = await key(file), out = [];
     for (let n = 0; n < 6; n++) {
       tell(`Découpe ${n + 1}/6…`); await breathe();
-      const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2;
+      const c = n % 3, r = (n / 3) | 0, cw = P.W / 3, ch = P.H / 2;
       // a figure can lean past its cell (a raised mug): search a little wider, keep the blobs of this cell's figure
-      const x0 = Math.max(0, Math.round(c * cw - cw * 0.05)), x1 = Math.min(W, Math.round((c + 1) * cw + cw * 0.05));
-      const y0 = Math.round(r * ch), y1 = Math.round((r + 1) * ch);
+      const x0 = Math.max(0, Math.round(c * cw - cw * 0.05)), x1 = Math.min(P.W, Math.round((c + 1) * cw + cw * 0.05));
+      const cell = pick(P, x0, Math.round(r * ch), x1, Math.round((r + 1) * ch), c * cw, (c + 1) * cw, K.poses[n]);
+      if (!cell) throw new Error(`Personne dans la case ${n + 1} : 3 colonnes × 2 rangées sur fond vert.`);
+      out.push(cell);
+    }
+    return out;
+  }
+  // one pose alone on its picture (Banque › Modifier: replace a pose, add one)
+  async function cutOne(file, pose) {
+    const P = await key(file), cell = pick(P, 0, 0, P.W, P.H, 0, P.W, pose);
+    if (!cell) throw new Error('Personne sur l’image : un perso sur fond vert ou transparent.');
+    return cell;
+  }
+  // the figure in a region of the keyed picture: its blobs whose centre is between lo and hi (not the neighbour's back
+  // that pokes in), cut out, with its measures
+  function pick({ W, H, d, alpha, cx }, x0, y0, x1, y1, lo, hi, pose) {
+    {
       const f = figureOf(W, x0, y0, x1, y1, alpha);
-      if (!f) throw new Error(`Personne dans la case ${n + 1} : 3 colonnes × 2 rangées sur fond vert.`);
-      // keep only the blobs whose centre is in this cell (not the neighbour's back that pokes in)
+      if (!f) return null;
       const sums = new Map(); for (let i = 0; i < f.lab.length; i++) { const l = f.lab[i]; if (l && f.ids.has(l)) { const t = sums.get(l) || [0, 0]; t[0] += i % f.w; t[1]++; sums.set(l, t); } }
-      const own = new Set([...sums].filter(([, [sx, m]]) => { const mx = x0 + sx / m; return mx >= c * cw && mx < (c + 1) * cw; }).map(([id]) => id));
+      const own = new Set([...sums].filter(([, [sx, m]]) => { const mx = x0 + sx / m; return mx >= lo && mx < hi; }).map(([id]) => id));
       let bx0 = 1e9, by0 = 1e9, bx1 = -1, by1 = -1;
       for (let i = 0; i < f.lab.length; i++) if (own.has(f.lab[i])) { const x = i % f.w, y = (i / f.w) | 0; if (x < bx0) bx0 = x; if (x > bx1) bx1 = x; if (y < by0) by0 = y; if (y > by1) by1 = y; }
       const w = bx1 - bx0 + 1, h = by1 - by0 + 1, img = cx.createImageData(w, h), solid = new Uint8Array(w * h);
@@ -121,21 +140,20 @@
         if (y === h - 1) { if (x < b0) b0 = x; if (x > b1) b1 = x; }
       }
       // the hand: the figure's rightmost point in the band where that pose holds it (his hands reach to the right)
-      const band = { hold_mouth: [0, 0.45], hold_raise: [0, 0.7], hold_front: [0.3, 0.95], hold_give: [0.15, 0.95], bar_put: [0.8, 1] }[K.poses[n]];
+      const band = { hold_mouth: [0, 0.45], hold_raise: [0, 0.7], hold_front: [0.3, 0.95], hold_give: [0.15, 0.95], bar_put: [0.8, 1] }[pose];
       let grip = null;
       if (band) { let gx = -1, gy = 0; for (let y = Math.floor(h * band[0]); y < Math.ceil(h * band[1]); y++) for (let x = w - 1; x > gx; x--) if (solid[y * w + x]) { gx = x; gy = y; break; }
-        grip = [Math.round(gx - w * 0.03), K.poses[n] === 'bar_put' ? Math.min(arm, hand || arm) + 1 : gy]; }
+        grip = [Math.round(gx - w * 0.03), pose === 'bar_put' ? Math.min(arm, hand || arm) + 1 : gy]; }
       // the ledge = the higher of the two bottoms: the body's on the left (a mug hanging lower on the right doesn't count),
       // the forearms' on the right (a belt or a skirt drawn under them on the left doesn't count)
-      out.push({ slot, pose: K.poses[n], canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip, rect: [(x0 + bx0) / W, (y0 + by0) / H, w / W, h / H] });
+      return { slot, pose, canvas: p, w, h, arm: Math.min(arm, hand || arm) + 1, face, mid: (b0 + b1) / 2, grip, rect: [(x0 + bx0) / W, (y0 + by0) / H, w / W, h / H] };
     }
-    return out;
   }
 
   // the cut poses -> what the engine needs: SPRITES[id] (sizes, and for a cut pose its x, its cut row, its cut height,
   // its scale), measured like Justin's
-  function measure(kind, cells) {
-    const K = KINDS[kind], sp = { poses: {}, half: { unit: 1483, belt: 0.6, poses: {}, full: {} } };
+  function measure(cutType, cells) {
+    const K = { cut: cutType }, sp = { poses: {}, half: { unit: 1483, belt: 0.6, poses: {}, full: {} } };
     if (K.cut === 'full') {   // head to feet: all the poses of the sheet at one scale, the tallest = 700
       const s = GUIDE.full.h / Math.max(...cells.map((c) => c.h));
       for (const c of cells) { c.scale = s; sp.poses[c.pose] = [Math.round(c.w * s), Math.round(c.h * s)]; (sp.rects = sp.rects || {})[c.pose] = c.rect; }
@@ -198,11 +216,11 @@
   const b64 = (s) => btoa(unescape(encodeURIComponent(s)));
   const fromB64 = (s) => decodeURIComponent(escape(atob(s.replace(/\n/g, ''))));
   const blobB64 = (blob) => new Promise((ok) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1]); fr.readAsDataURL(blob); });
-  async function push(token, id, name, kind, cells, sp) {
+  async function push(token, id, name, kind, cells, sp, from = 'Nouveau perso') {
     const read = async (path) => { const f = await gh(token, `contents/${path}?ref=main`); return f ? JSON.parse(fromB64(f.content)) : null; };
     const old = (await read(`chars/${id}/sprite.json`)) || { name, ext: 'png', poses: {}, half: { unit: 0, belt: 0.6, poses: {}, full: {} } };
     const list = (await read('chars/imports.json')) || [];
-    const data = { ...old, v: Date.now(), name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), kind])], poses: { ...old.poses, ...sp.poses } };
+    const data = { ...old, v: Date.now(), name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), ...(KINDS[kind] ? [kind] : [])])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
@@ -212,7 +230,7 @@
     }
     files.push({ path: `chars/${id}/sprite.json`, content: JSON.stringify(data, null, 1), encoding: 'utf-8' });
     if (!list.includes(id)) files.push({ path: 'chars/imports.json', content: JSON.stringify([...list, id]), encoding: 'utf-8' });
-    await commit(token, files, `${name || id} : feuille ${kind} importée depuis Nouveau perso`);
+    await commit(token, files, KINDS[kind] ? `${name || id} : feuille ${kind} importée depuis ${from}` : `${name || id} : pose ${cells.map((c) => c.pose).join(', ')} depuis ${from}`);
     return data;
   }
   async function commit(token, files, message) {
@@ -232,21 +250,36 @@
   let last = null;   // the sheet cut and shown, waiting for « Ajouter au jeu »
   window.IMPORT = {
     KINDS, slug,
-    async cut(file, kind, name, tell) {
-      const cells = await cut(file, kind, tell), sp = measure(kind, cells);
+    // id: an existing character (Banque › Modifier); else the name makes it
+    async cut(file, kind, name, tell, id) {
+      const cells = await cut(file, kind, tell), sp = measure(KINDS[kind].cut, cells);
       for (const c of cells) {   // the picture at its final size (a full-body sheet is scaled to 700 tall)
         await breathe(); const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
         const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o;
       }
       for (const c of cells) { await breathe(); c.src = c.out.toDataURL('image/png'); }
-      last = { id: slug(name), name: String(name || '').trim(), kind, cells, sp };
+      last = { id: id || slug(name), name: String(name || '').trim(), kind, cells, sp, from: id ? 'la Banque' : 'Nouveau perso' };
       return cells.map((c) => ({ pose: c.pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }));
+    },
+    // one pose of an existing character, alone on its picture: replaces it (cut like the pose it replaces, at its height)
+    // or adds it (cutType: full = head to feet, 700 tall; counter, table = cut at a ledge, like a sheet's)
+    async one(file, id, pose, cutType) {
+      const sp0 = SPRITES[id] || { poses: {} }, old = sp0.poses[pose], oldHalf = sp0.half && sp0.half.poses && sp0.half.poses[pose];
+      const type = cutType || (oldHalf ? (oldHalf[2] < 0.5 ? 'table' : 'counter') : 'full');
+      const c = await cutOne(file, pose), sp = measure(type, [c]);
+      if (type === 'full') {   // its height: the pose it replaces, else a standing one (700)
+        const h = old ? old[1] : (sp0.refH || GUIDE.full.h); c.scale = h / c.h; sp.poses[pose] = [Math.round(c.w * c.scale), h]; delete sp.refH;
+      }
+      const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
+      const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o; c.src = o.toDataURL('image/png');
+      last = { id, name: (window.CAST && CAST[id] && CAST[id].name) || id, kind: null, cells: [c], sp, from: 'la Banque' };
+      return [{ pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }];
     },
     lastRects: () => last && last.sp.rects,
     // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)
     setGrip(pose, fx, fy) {
       const c = last && last.cells.find((x) => x.pose === pose); if (!c || !c.grip) return null;
-      c.grip = [Math.round(fx * c.w), Math.round(fy * c.h)]; last.sp.grip[pose] = c.grip; return [fx, fy];
+      c.grip = [Math.round(fx * c.w), Math.round(fy * c.h)]; (last.sp.grip = last.sp.grip || {})[pose] = c.grip; return [fx, fy];
     },
     // in this page right away (a test can use him), then in the repo for every device
     async add() {
@@ -255,7 +288,7 @@
       apply(last.id, { ...last.sp, name: last.name }, urls);
       const token = ls('smt-gh-token');
       if (!token) return 'Jouable sur ce téléphone. Pour la télé et les autres : ajoute ton jeton GitHub (Acte › Générer › Garder pour Claude), puis réimporte la feuille.';
-      await push(token, last.id, last.name, last.kind, last.cells, last.sp);
+      await push(token, last.id, last.name, last.kind, last.cells, last.sp, last.from);
       return `Ajouté au jeu : ${last.name}. Partout dans une minute environ.`;
     },
     apply,
