@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unwritten · la télé</title>
+<style>
+/* The TV mode on one screen: the TV in the middle, a phone on each side, all live (the real game, three pages talking
+   through the relay like three devices). The TV gets a room of its own (?tv&room=sim…), each phone joins it with its
+   own name (?watch=…&as=Léa), so the two phones of this browser are two players. */
+:root { --bg: #07070a; --fg: #f5f5f7; --dim: #8e8e93; --line: #2c2c2e; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; overflow: hidden; }
+main { height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 2.2vw; padding: 3vh 2vw 2vh; }
+.col { display: flex; flex-direction: column; align-items: center; gap: 1.2vh; height: 100%; justify-content: center; min-width: 0; }
+.lbl { font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+.phone { height: min(82vh, 60vw); aspect-ratio: 9 / 19.5; border-radius: 2.6em; padding: .7em; background: #111; box-shadow: 0 0 0 2px var(--line), 0 2em 5em rgba(0,0,0,.7); }
+.phone iframe { width: 100%; height: 100%; border: 0; border-radius: 2em; display: block; background: #000; }
+.tv { width: 100%; max-height: 78vh; aspect-ratio: 16 / 9; padding: .8vw; border-radius: 1vw; background: #111; box-shadow: 0 0 0 2px var(--line), 0 2em 6em rgba(0,0,0,.8); }
+.tv iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+.stand { width: 18%; height: 1.2vh; border-radius: 0 0 .6vw .6vw; background: #1c1c1e; margin-top: -1.2vh; }
+.bar { display: flex; gap: .8em; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.bar button, .bar a { font: inherit; font-weight: 700; color: var(--fg); background: #1c1c1e; border: 0; border-radius: 2em; padding: .55em 1.1em; cursor: pointer; text-decoration: none; }
+.bar button:hover, .bar a:hover { background: #2c2c2e; }
+#start { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: rgba(0,0,0,.72); cursor: pointer; text-align: center; }
+#start[hidden] { display: none; }
+#start b { display: block; font-size: 28px; margin-bottom: .4em; }
+#start span { font-size: 15px; color: #d1d1d6; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  html, body { overflow: auto; }
+  main { height: auto; grid-template-columns: 1fr 1fr; padding: 16px; gap: 16px; }
+  .col.mid { grid-column: 1 / -1; order: -1; }
+  .phone { height: auto; width: 100%; }
+  .tv { max-height: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="col"><div class="lbl" id="n1">Cell 1</div><div class="phone"><iframe id="p1" title="Cell 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
+  <div class="col mid">
+    <div class="lbl">La télé · code <span id="code"></span></div>
+    <div class="tv"><iframe id="tv" title="La télé" allow="autoplay; fullscreen; screen-wake-lock"></iframe></div><div class="stand"></div>
+    <div class="bar">Choisis l'histoire sur un cell, puis chacun prend son perso. Un clic sur la télé = pause.
+      <button type="button" id="again">Nouvelle salle</button><a href="index.html">‹ Accueil</a></div>
+  </div>
+  <div class="col"><div class="lbl" id="n2">Cell 2</div><div class="phone"><iframe id="p2" title="Cell 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
+</main>
+<div id="start"><div><b>Simuler la télé</b><span>Touche pour commencer (le son vient de la télé)</span></div></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const room = 'tv' + Math.random().toString(36).slice(2, 6).padEnd(4, '0');
+const names = ['Léa', 'Kev'];
+$('#code').textContent = room.toUpperCase();
+names.forEach((n, i) => { $('#n' + (i + 1)).textContent = n; });
+// the TV first (it opens the room), the phones a moment later (they'd wait for it anyway)
+function go() {
+  $('#start').hidden = true;
+  $('#tv').src = `index.html?tv&room=${room}`;
+  setTimeout(() => names.forEach((n, i) => { $('#p' + (i + 1)).src = `index.html?watch=${room}&as=${encodeURIComponent(n)}`; }), 1200);
+}
+$('#start').onclick = go;
+$('#again').onclick = () => location.reload();
+</script>
+</body>
+</html>

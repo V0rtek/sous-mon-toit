@@ -1139,7 +1139,7 @@ body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #mirrorWho b { color: #fff; }
 #mirrorPhone { height: 80%; aspect-ratio: 9 / 19.5; border-radius: 4.5em; padding: 1.2em; background: #111; box-shadow: 0 0 0 .3em #2c2c2e, 0 3em 8em rgba(0,0,0,.8); overflow: hidden; box-sizing: border-box; }
 #mirrorPhone iframe { width: 100%; height: 100%; border: 0; border-radius: 3.4em; display: block; background: #000; pointer-events: none; }
-#tvPick .tv-join .qr { width: 26em; height: 26em; }
+#tvPick .tv-join .qr { width: 20em; height: 20em; }
 #tvNames { margin-top: 2em; text-align: center; font-size: 2.4em; font-weight: 800; color: #34c759; min-height: 1.3em; }
 /* a player's phone on a TV's story: the list of stories in the lobby, a pause button in the story, again on the end card */
 #lobbyList { width: 100%; margin-top: 3em; }
@@ -1211,6 +1211,25 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 #pauseCard .pc-btns { display: flex; gap: 1.2em; margin-top: 2.4em; }
 #pauseCard .pc-btns button { flex: 1; font: inherit; font-size: 2.4em; font-weight: 800; border: 0; border-radius: 1em; padding: .8em; cursor: pointer; color: #fff; background: #34c759; }
 #pauseCard .pc-btns button + button { flex: 0 1 auto; background: rgba(255,255,255,.14); }
+#tvCode { font-size: 9em; font-weight: 800; letter-spacing: .18em; color: #fff; line-height: 1; margin: .1em 0 .15em; font-variant-numeric: tabular-nums; }
+.tv-join .tv-or { font-size: 1.5em; color: #8e8e93; }
+#tvPick .tv-join p b { color: #fff; }
+#tvBtn .tvHere { position: absolute; z-index: 1; right: 7%; display: flex; align-items: center; gap: .8em; font-size: 2em; font-weight: 700; }
+#tvBtn .tvHere[hidden] { display: none; }
+#tvBtn .tvHere i { width: .8em; height: .8em; border-radius: 50%; background: #34c759; box-shadow: 0 0 .8em #34c759; }
+#tvBtn .tvHere em { font-style: normal; letter-spacing: .1em; }
+#tvFind { background: radial-gradient(circle at 50% 25%, #1d2238, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; text-align: center; }
+#tvFind h2 { font-family: var(--display); font-weight: 400; font-size: 4.4em; line-height: 1.1; margin: .2em 0 .3em; }
+#tvFind .tf-p { font-size: 2.2em; color: #d1d1d6; margin: 0 0 2em; }
+#tvFound { display: flex; flex-direction: column; gap: 1.4em; }
+#tvFound button { font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: 1.4em 1.6em; border: 0; border-radius: 1.6em; background: #34c759; color: #000; cursor: pointer; }
+#tvFound button span { font-size: 2.4em; font-weight: 700; }
+#tvFound button b { font-size: 3.4em; font-weight: 800; letter-spacing: .14em; }
+#tvFound .tf-none { font-size: 2em; color: #8e8e93; line-height: 1.5; padding: 1.4em; border-radius: 1.6em; background: rgba(255,255,255,.06); }
+#tvFound .tf-none b { color: #f5f5f7; }
+.tf-alt { margin-top: 4em; display: flex; flex-direction: column; gap: 1.2em; }
+.tf-alt > * { font: inherit; font-size: 2.1em; font-weight: 700; padding: .9em 1em; border: 0; border-radius: 1em; background: rgba(255,255,255,.1); color: #f5f5f7; cursor: pointer; text-decoration: none; }
+.tf-alt > *:hover { background: rgba(255,255,255,.2); }
 #tvPick { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 10em 6% 4em; overflow-y: auto; }
 #tvPick h2 { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .8em; }
 .tv-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; }
@@ -1362,6 +1381,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="strips">
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
       <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>Le site</b></a>
+      <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>Sur la télé</b><span class="tvHere" hidden><i></i><em></em></span></button>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
       <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
@@ -1706,7 +1726,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Choisis l'histoire</div><div id="lobbyList" class="tv-list" hidden></div></div>
   <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>UNWRITTEN</h2>
-    <div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell (ou ouvre ce lien), puis choisis l'histoire</p><code id="tvLink"></code></div><div id="tvNames"></div></div>
+    <div class="tv-join"><p>Sur ton cell : ouvre Unwritten, touche <b>Sur la télé</b>, puis ce code</p><div id="tvCode"></div><p class="tv-or">ou scanne</p><div class="qr"></div><code id="tvLink"></code></div><div id="tvNames"></div></div>
+  <div id="tvFind" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>Jouer à deux, sur un grand écran</h2>
+    <p class="tf-p">Les téléphones jouent, la télé montre l'histoire.</p>
+    <div id="tvFound"></div>
+    <div class="tf-alt"><button type="button" id="tvBecome">Cet écran devient la télé</button><a href="tv-sim.html" id="tvSim">Simuler : la télé et les deux cells, sur un écran</a></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="placeScreen" class="card menu" hidden><div class="step"><h2>Placer un objet</h2><div id="placeBody"></div></div></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
@@ -1934,6 +1958,10 @@ const state = { name: 'Justin', seats: {}, story: 't1', f: {}, isa: ISA_LOOKS[0]
 // the TV (index.html?tv): it runs the story for the room and plays nobody, two phones / computers join it and play the
 // two characters. hostTv: a joiner whose host is a TV (a choice of nobody's goes to a player, the sound stays on the TV)
 const TV = (() => { const u = new URLSearchParams(location.search); return u.has('tv') && !u.get('watch'); })();
+// ?tv&room=<code>: that room (the simulator, tv-sim.html, picks it); ?watch=<room>&as=Léa: a phone of its own, with that
+// name, even beside another one in the same browser (the simulator's two phones)
+const TV_ROOM = TV && (s => (/^[a-z0-9]{4,12}$/.test(s || '') ? s : null))(new URLSearchParams(location.search).get('room'));
+const AS = (s => (s && s.trim() ? s.trim().slice(0, 16) : null))(new URLSearchParams(location.search).get('as'));
 let hostTv = false;
 const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
 const story = () => STORIES[state.story];
@@ -3329,8 +3357,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
-const UP = { '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#more', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
+const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#more', '#wait': '#hub', '#about3d': '#more', '#video3d': '#more', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#more', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#infos', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#more', '#investors': '#infos', '#brainstorm': '#infos',
   '#infos': '#hub', '#more': '#hub', '#marketing': '#infos', '#pitch': '#infos', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#infos', '#system': '#infos', '#cosmo': '#infos', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#infos', '#techCard': '#tech', '#plan': '#infos', '#acte': '#infos' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
@@ -3360,6 +3388,7 @@ function show(id) {
   document.body.classList.toggle('instory', id === null);
   keepAwake(TV || id === null || ['#wait', '#lobby', '#end', '#cover', '#tvPick'].includes(id));
   if (TV && id === '#tvPick') tvHome();
+  if (id === '#tvFind' || id === '#hub') paintTvs();
   if (id !== null) { showPause(); $('#absentBar').hidden = true; }
   if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
@@ -3495,7 +3524,7 @@ function renderWait() {
     ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">L’autre joue au hasard</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
     ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
-    ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-join"><div class="qr"></div><p>Scanne avec ton cell, ou ouvre ce lien sur ton ordi, puis prends un perso</p><code>${esc(joinUrl())}</code></div>`
+    ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-join"><p>Sur ton cell : <b>Sur la télé</b>, puis le code <b>${esc(room.toUpperCase())}</b> · ou scanne</p><div class="qr"></div><p>Puis prends un perso</p></div>`
       : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
   if (TV && !full) tvQr($('#room .tv-join .qr'));
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
@@ -3607,10 +3636,28 @@ function tvStoryList(box) {
 }
 // the TV's home: the QR, and who's already in
 function tvHome() {
-  $('#tvLink').textContent = joinUrl(); tvQr($('#tvPick .tv-join .qr'));
+  $('#tvLink').textContent = joinUrl(); $('#tvCode').textContent = room ? room.toUpperCase() : '…'; tvQr($('#tvPick .tv-join .qr'));
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
   $('#tvNames').textContent = names.length ? `Ici : ${names.join(', ')} · choisissez l'histoire sur un cell` : '';
 }
+// No link to paste: an open TV says so under sousmontoit/v1/tv/<room> (retained, refreshed every 10 s, emptied when it
+// closes; silent for 30 s = gone). Every phone's home hears it: « Sur la télé » lights up with its code, a tap joins.
+// The relay is public (every TV everywhere): the code on the TV tells which one is yours.
+const TVS = `${NS}/tv`, tvs = new Map();   // room -> {room, t}
+const tvsOpen = () => [...tvs.values()].filter((r) => Date.now() - r.t < 30000).sort((a, b) => b.t - a.t);
+function tvBeacon(on) { if (TV && live && live.connected && room) live.publish(`${TVS}/${room}`, on ? JSON.stringify({ room, t: Date.now(), v: BUILD }) : '', { retain: true }); }
+function paintTvs() {
+  const list = tvsOpen(), here = $('#tvBtn .tvHere');
+  here.hidden = !list.length;
+  if (list.length) here.lastChild.textContent = list.length > 1 ? `${list.length} télés` : list[0].room.toUpperCase();
+  const box = $('#tvFound');
+  box.innerHTML = list.length ? list.map((r) => `<button type="button" data-r="${r.room}"><span>Rejoindre la télé</span><b>${r.room.toUpperCase()}</b></button>`).join('')
+    : '<div class="tf-none">Aucune télé ouverte pour l\'instant.<br>Sur la télé ou l\'ordi branché dessus : ouvre ce site, <b>Sur la télé</b>, puis <b>Cet écran devient la télé</b>. Elle apparaît ici toute seule.</div>';
+  box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); joinRoom(b.dataset.r); });
+}
+$('#tvBtn').onclick = (e) => { e.stopPropagation(); feat('Sur la télé'); show('#tvFind'); };
+$('#tvBecome').onclick = (e) => { e.stopPropagation(); location.href = `${location.pathname}?tv`; };
+setInterval(() => { if (screen === '#hub' || screen === '#tvFind') paintTvs(); }, 5000);
 function takeSeat(k, id, n) {
   if (!waitRoom || !seatsOf().includes(k)) return;
   const s = state.seats[k];
@@ -3645,7 +3692,7 @@ function openFromDemo(id) {
 $('#whoForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const v = $('#whoName').value.trim().slice(0, 16);
-  try { localStorage.setItem('smt-name', v); } catch { /* private window */ }
+  if (!AS) try { localStorage.setItem('smt-name', v); } catch { /* private window */ }   // the simulator's names stay there
   $('#whoName').blur();
   if (ROLE === 'host') { state.name = v || 'Toi'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
   else { myName = v || 'Ami'; show('#lobby'); goLive(); }
@@ -4318,6 +4365,7 @@ let myName = '', sentK = -1, hostId = null;   // joiner: its name, the last line
 let myId = (() => {
   const fresh = () => Math.random().toString(36).slice(2, 10);
   if (TV) return 'tv' + fresh();   // the TV's own: a player's tab in the same browser (the TV shown from that computer) keeps the stored one
+  if (AS) return 'as' + fresh();   // the simulator's phones: one each
   try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
 })();
 const topic = () => `${NS}/${room}`;
@@ -4325,19 +4373,20 @@ function loadScript(src) {
   return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
 }
 function roomCode() {
-  const fresh = () => Math.random().toString(36).slice(2, 8).padEnd(6, '0');
-  try { let c = localStorage.getItem('smt-room'); if (!c) { c = fresh(); localStorage.setItem('smt-room', c); } return c; } catch { return fresh(); }
+  if (TV_ROOM) return TV_ROOM;
+  const fresh = () => Math.random().toString(36).slice(2, 8).padEnd(6, '0'), key = TV ? 'smt-tvroom' : 'smt-room';   // the TV: its own (a game open in another tab of that browser keeps its room)
+  try { let c = localStorage.getItem(key); if (!c) { c = fresh(); localStorage.setItem(key, c); } return c; } catch { return fresh(); }
 }
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261101230000';
+const BUILD = '20261102120000';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#tvPick', '#lobby', '#wait', '#end'].includes(screen)) return;
   newer.done = true;
   try { sessionStorage.setItem(ROLE === 'watch' ? 'smt-auto' : 'smt-home', '1'); } catch { /* private window */ }
-  location.replace(`${location.pathname}?${ROLE === 'watch' ? `watch=${room}&` : TV ? 'tv&' : ''}v=${v}`);
+  location.replace(`${location.pathname}?${ROLE === 'watch' ? `watch=${room}&${AS ? `as=${encodeURIComponent(AS)}&` : ''}` : TV ? `tv&${TV_ROOM ? `room=${TV_ROOM}&` : ''}` : ''}v=${v}`);
 }
 function share() {
   if (ROLE !== 'host' || quiet || !live || !live.connected) return;
@@ -4463,7 +4512,7 @@ async function goLive() {
   });
   addEventListener('online', () => { if (!live.connected) try { live.reconnect(); } catch { /* it reconnects by itself */ } });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${OPEN}/+`]); if (waitRoom) announce(true); }
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${OPEN}/+`, ...(TV ? [] : [`${TVS}/+`])]); if (waitRoom) announce(true); tvBeacon(true); }
     else { live.subscribe(topic(), { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
@@ -4472,6 +4521,13 @@ async function goLive() {
     addEventListener('pagehide', () => { if (!MIRROR && live.connected) live.publish(seat, '', { retain: true }); });
   } else {
     live.on('message', (t, buf, packet) => {
+      if (t.startsWith(TVS + '/')) {
+        const r = t.slice(TVS.length + 1);
+        let v = null; try { v = buf.length ? JSON.parse(buf.toString()) : null; } catch { /* not ours */ }
+        if (v && v.room === r && /^[a-z0-9]{4,12}$/.test(r)) tvs.set(r, { room: r, t: packet && packet.retain ? Math.min(Date.now(), +v.t || 0) : Date.now() });
+        else tvs.delete(r);
+        if (screen === '#hub' || screen === '#tvFind') paintTvs(); return;
+      }
       if (t.startsWith(OPEN + '/')) {
         const r = t.slice(OPEN.length + 1);
         let v = null; try { v = buf.length ? JSON.parse(buf.toString()) : null; } catch { /* not ours */ }
@@ -4496,7 +4552,8 @@ async function goLive() {
     setInterval(countEyes, 5000);
     setInterval(showRooms, 5000);   // a room that stopped refreshing fades from the menu
     setInterval(() => { if (waitRoom) announce(true); }, 10000);
-    addEventListener('pagehide', () => { if (waitRoom) announce(false); });
+    addEventListener('pagehide', () => { if (waitRoom) announce(false); tvBeacon(false); });
+    if (TV) setInterval(() => tvBeacon(true), 10000);
   }
 }
 
@@ -4640,7 +4697,7 @@ else if (ROLE === 'host') {
   if (lab) { history.replaceState(null, '', location.pathname); show('#labScreen'); }
 }
 else if (MIRROR) { document.body.classList.add('mirror'); myName = '·'; hushed = true; show('#lobby'); goLive(); }
-else $('#whoForm .pill').click();   // straight in, never asks the name (the one it had, or « Ami »)
+else { if (AS) $('#whoName').value = AS; $('#whoForm .pill').click(); }   // straight in, never asks the name (the one it had, or « Ami »)
 {
   const o = location.hash.match(/^#open=(\w+)(?:&ep=(\d+))?(?:&with=([^&]+))?(?:&in=([^&]+))?(?:&invite=([a-z0-9]+)&iname=([^&]+))?$/);
   if (o && o[5]) { withFriend = decodeURIComponent(o[6]); withFriendTo = o[5]; }
