@@ -127,9 +127,15 @@ body.lt-off .mx.t-vig .vig { display: none; }
 .mx.t-white .ch button { background: #fff; color: #000; box-shadow: 0 .3em 1em rgba(0,0,0,.5); }
 .mx.t-white .ch .face { background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--m) 55%, #fff), #e5e5ea 95%); }
 .mx.t-edge .ch button { box-shadow: inset .55em 0 0 var(--m), 0 .3em 1em rgba(0,0,0,.5); padding-left: 1.2em; }
-.mx .ch .tyb { position: absolute; right: .6em; top: 50%; transform: translateY(-50%); width: 3.2em; height: 3.2em; border-radius: 50%; display: grid; place-items: center; }
-.mx .ch .tyb svg { width: 1.9em; height: 1.9em; }
-.mx .ch .ty-do, .mx .ch .ty-sms { padding-right: 4.4em; }
+.mx .ch .tyb { position: absolute; right: -.6em; top: -.6em; z-index: 1; width: 3em; height: 3em; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 .3em #0b0a0f; }
+.mx .ch .tyb svg { width: 1.8em; height: 1.8em; }
+.mx .ch button:has(.tyb) { overflow: visible !important; }
+.mx .ch .ty-ans { outline: .2em solid #30d158; outline-offset: -.2em; }
+.mx .ch .ty-ans .tyb { background: #30d158; color: #00210a; }
+.mx .ch .ty-dec { outline: .2em solid #ff453a; outline-offset: -.2em; }
+.mx .ch .ty-dec .tyb { background: #ff453a; color: #fff; }
+.mx.t-white .ch .ty-ans { background: #e3fbe9; }
+.mx.t-white .ch .ty-dec { background: #ffe5e3; }
 .mx .ch .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
 .mx .ch .ty-do .tyb { background: #ffd60a; color: #000; }
 .mx .ch .ty-do .t { font-style: italic; }
@@ -148,7 +154,7 @@ body.lt-off .mx.t-vig .vig { display: none; }
 .mx.t-word .rm .ch .k { font-size: 5.4em; }
 .mx.t-word .rm .ch .t { font-size: 2.2em; }
 .mx .rm .ch .tyb { font-size: 1.5em; }
-.mx .rm .ch .ty-do, .mx .rm .ch .ty-sms { padding-right: 6em; }
+.mx .rm .ch .tyb { right: .5em; top: .5em; box-shadow: none; }
 .mx.t-edge .rm .ch button { box-shadow: inset .8em 0 0 var(--m); padding-left: .8em; }
 .mx .rm .q { flex: none; display: flex; gap: 1em; align-items: center; padding: 1em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
 .mx .rm .q .face { flex: none; position: relative; overflow: hidden; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; }
@@ -167,8 +173,25 @@ body.lt-off .mx.t-vig .vig { display: none; }
 .mx.t-bigface .ch .face { width: 7.6em; height: 7.6em; box-shadow: 0 0 0 .25em var(--m); }
 .mx.t-glow .ch button { background: linear-gradient(90deg, color-mix(in srgb, var(--m) 55%, #000), #141217 72%); }
 .mx .rm .q.qbig { flex-direction: column; text-align: center; gap: .6em; padding: 1.4em 1em; }
-.mx .rm .q.qbig .face { width: 17em; height: 17em; box-shadow: 0 0 0 .35em var(--c); }
+.mx .rm .q.qbig .face { width: 12.5em; height: 12.5em; box-shadow: 0 0 0 .35em var(--c); }
 .mx .rm .q .face { box-shadow: 0 0 0 .3em var(--c, #2c2c2e); }
+/* the circle when no one spoke (dashed, an icon badge, the line in italics) and for a call (the caller, rings) */
+.mx .fw { position: relative; flex: none; display: block; }
+.mx .fw .face { display: block; }
+.mx .sum .face { box-shadow: none !important; outline: .3em dashed #8e8e93; outline-offset: .2em; }
+.mx .sum span:not(.face) { font-style: italic; font-weight: 600 !important; color: #d1d1d6; }
+.mx .fw > i { position: absolute; right: -.4em; bottom: -.4em; width: 3.4em; height: 3.4em; border-radius: 50%; display: grid; place-items: center; background: #f5f5f7; color: #000; box-shadow: 0 0 0 .3em #1c1c1e; }
+.mx .call .fw > i { background: #30d158; color: #00210a; }
+.mx .fw > i svg { width: 1.9em; height: 1.9em; }
+.mx .call .face { animation: ringPulse 1.2s ease-out infinite; }
+@keyframes ringPulse { 0% { box-shadow: 0 0 0 .3em var(--c), 0 0 0 .3em rgba(48,209,88,.6); } 100% { box-shadow: 0 0 0 .3em var(--c), 0 0 0 2.4em rgba(48,209,88,0); } }
+.mx .call b { font-size: 3em !important; color: #fff !important; text-transform: none !important; letter-spacing: 0 !important; }
+.mx .call .ringing { display: flex !important; align-items: center; gap: .5em; color: #30d158; font-size: 1em !important; margin-top: .4em; }
+.mx .call .ringing svg { width: 3em; height: 3em; animation: ringShake 1s ease-in-out infinite; }
+.mx .call .ringing em { width: .9em; height: .9em; border-radius: 50%; background: #30d158; animation: blink 1.2s infinite; }
+.mx .call .ringing em:nth-of-type(2) { animation-delay: .2s; } .mx .call .ringing em:nth-of-type(3) { animation-delay: .4s; }
+@keyframes ringShake { 0%, 50%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(-14deg); } 20%, 40% { transform: rotate(14deg); } }
+@keyframes blink { 50% { opacity: .3; } }
 /* big view */
 #big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.85); display: grid; place-items: center; cursor: zoom-out; }
 #big[hidden] { display: none; }
@@ -221,10 +244,23 @@ const MOMENTS = [
       { t: '[Punch Julian]', k: 'Punch', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
     ] },
   { id: 'etage', name: 'L’étage', bg: 'bg/taverne_haut.webp', who: null, line: 'Cam goes upstairs with the man in the suit.',
+    sum: { face: 'cam/flirty', icon: 'up' },   // no one spoke: the circle sums up what you answer (Cam, going up)
     opts: [
       { t: 'Text Brooke: “where r u?? cam went upstairs w that guy”', k: 'Alert', m: 'inquiet', ty: 'sms', f: 'justin_bar/texting' },
       { t: 'Go up after her.', k: 'Go', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
       { t: 'Wait. She’s a big girl.', k: 'Wait', m: 'froid', ty: 'say', f: 'justin_bar/drunk_listen' },
+    ] },
+  // two choices only
+  { id: 'attente', name: '2 choix', bg: 'bg/taverne_bar.webp', who: 'Cam', col: '#e2557a', sp: 'cam/thinking', line: 'He’s taking forever.',
+    opts: [
+      { t: 'Text him: “where u at?”', k: 'Check', m: 'inquiet', ty: 'sms', f: 'justin_bar/texting' },
+      { t: 'Stay with Cam.', k: 'Stay', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_happy' },
+    ] },
+  // a call: Brooke's phone rings, Justin calling (games.js, L'appel); Brooke chooses
+  { id: 'appel', name: 'Appel', bg: 'bg/galerie.webp', who: null, me: 'brooke/drunk_listen', line: 'Justin', call: { face: 'justin_bar/texting', col: '#2a9d8f' },
+    opts: [
+      { t: 'Answer', k: 'Answer', m: 'tendre', ty: 'ans', f: 'brooke/texting' },
+      { t: 'Decline', k: 'Decline', m: 'froid', ty: 'dec', f: 'brooke/drunk_sad' },
     ] },
 ];
 const VARIANTS = {
@@ -272,9 +308,6 @@ VARIANTS.t3c = [
   ['T1', 'M4', 'Les cartes sombres avec sa tête. La base.', ['vig', 'face', 'type']],
   ['T2', 'M4 + mot', 'Sa tête et le mot en gros.', ['vig', 'face', 'word', 'type']],
   ['T3', 'La question en grand', 'N4 dans le cell : la tête de qui t’a parlé, en grand, à la place de la bulle; tes réponses avec ta tête.', ['vig', 'qc', 'face', 'type']],
-  ['T4', 'N1 dans le cell', 'Cartes hautes, ta tête pleine hauteur, le mot énorme.', ['vig', 'tall', 'face', 'word', 'type']],
-  ['T5', 'La question + N1', 'T3 + T4 : sa tête à lui en haut, les tiennes en grand dessous.', ['vig', 'qc', 'tall', 'face', 'word', 'type']],
-  ['T6', 'Grande tête cerclée', 'Ta tête plus grande, cerclée de la couleur du mood. Pas de mot.', ['vig', 'bigface', 'face', 'type']],
   ['T7', 'Lueur du mood', 'M4 + le mood qui déborde de ta tête dans la carte.', ['vig', 'glow', 'face', 'word', 'type']],
 ];
 VARIANTS.t3r = [
@@ -295,11 +328,21 @@ const favs = (() => { try { return new Set(JSON.parse(localStorage.getItem('choi
 const saveFavs = () => { try { localStorage.setItem('choix-favs', JSON.stringify([...favs])); } catch { /* private window */ } };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const img = (p) => `chars/${p}.webp`;
-const TY = { say: ['💬', 'Parler'], do: ['✋', 'Faire'], sms: ['📱', 'Texter'] };
+const TY = { say: ['💬', 'Parler'], do: ['✋', 'Faire'], sms: ['📱', 'Texter'], ans: ['📞', 'Répondre'], dec: ['📵', 'Refuser'] };
 const TYI = {
   do: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V5.5a1.5 1.5 0 0 1 3 0V13M17 9.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-2L8 14.5"/></svg>',
   sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>',
+  ans: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>',
+  dec: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1a1 1 0 0 1-.56.9 11.5 11.5 0 0 0-2.66 1.85 1 1 0 0 1-1.4 0L.29 13.08a1 1 0 0 1 0-1.41A17 17 0 0 1 12 7c4.6 0 8.75 1.8 11.71 4.67a1 1 0 0 1 0 1.41l-2.48 2.48a1 1 0 0 1-1.4 0 11.3 11.3 0 0 0-2.67-1.85 1 1 0 0 1-.56-.9v-3.1A15 15 0 0 0 12 9z"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4v-4h4v-4h4V8h4"/><path d="M15 4h5v5"/></svg>',
 };
+// the circle on top (N4, T3): who spoke; no one did = what you answer (dashed, an icon); a call = who's calling (rings)
+function circle(M, cls) {
+  if (M.who) return `<div class="${cls}" style="--c:${M.col}"><span class="face"><img src="${img(M.sp)}" alt=""></span><div><b>${esc(M.who)}</b><span>${esc(M.line)}</span></div></div>`;
+  if (M.call) return `<div class="${cls} call" style="--c:${M.call.col}"><div class="fw"><span class="face"><img src="${img(M.call.face)}" alt=""></span><i>${TYI.ans}</i></div><div><b>${esc(M.line)}</b><span class="ringing">${TYI.ans}<em></em><em></em><em></em></span></div></div>`;
+  if (M.sum) return `<div class="${cls} sum" style="--c:#8e8e93"><div class="fw"><span class="face"><img src="${img(M.sum.face)}" alt=""></span><i>${TYI[M.sum.icon] || ''}</i></div><div><span>${esc(M.line)}</span></div></div>`;
+  return '';
+}
 function opt(v, o, i) {
   const m = MOOD[o.m], st = `--m:${m.c};${m.i ? `--mi:${m.i}` : ''}`, face = `<span class="face"><img src="${img(o.f)}" alt=""></span>`, t = `<span class="t">${esc(o.t)}</span>`, k = `<span class="k">${esc(o.k)}</span>`;
   const inner = {
@@ -319,14 +362,14 @@ function screenHtml(v) {
   if (T) {
     const tc = 'mx ' + [...T].map((x) => 't-' + x).join(' ');
     if (mode === 'mixr' || mode === 't3r') {
-      const qOn = T.has('q') || (T.has('q3') && M.who);   // tour 3: the question only with the face of who spoke
-      const q = qOn ? `<div class="q${T.has('qbig') ? ' qbig' : ''}" style="--c:${M.col || '#2c2c2e'}">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
+      const q3 = T.has('q3') ? circle(M, 'q' + (T.has('qbig') ? ' qbig' : '')) : '';
+      const q = q3 || !T.has('q') ? q3 : `<div class="q${T.has('qbig') ? ' qbig' : ''}" style="--c:${M.col || '#2c2c2e'}">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>`;
       return `<div class="st ${tc}"><div class="rm">${q}<div class="ch">${opts}</div></div></div>`;
     }
     // the scene with both: who speaks on the left, the one choosing (Justin) on the right; the vignette is on him
     const two = !!M.sp, jx = two ? 70 : 50;
-    const bub = T.has('qc') && M.who ? `<div class="qc" style="--c:${M.col}"><span class="face"><img src="${img(M.sp)}" alt=""></span><div><b>${esc(M.who)}</b><span>${esc(M.line)}</span></div></div>`
-      : M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
+    const bub = T.has('qc') && (M.who || M.call || M.sum) ? circle(M, 'qc')
+      : M.call ? `<div class="bub narr">📞 ${esc(M.line)}</div>` : M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
     return `<div class="st ${tc}" style="--jx:${jx}%"><div class="scene" style="background-image:url(${M.bg})"></div>${two ? `<img class="actor a-l" src="${img(M.sp)}" alt="">` : ''}<img class="actor a-me${two ? '' : ' solo'}" src="${img(M.me || 'justin_bar/drunk_listen')}" data-rest="${img(M.me || 'justin_bar/drunk_listen')}" alt=""><div class="vig"></div><div class="ui">${bub}<div class="ch">${opts}</div></div></div>`;
   }
   if (mode === 'remote') {
