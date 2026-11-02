@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music loops</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* Ten loops, from happy to terrifying: style, tone, emotion. Everything is synthesized (Web Audio), no files. One plays at
+   a time; tap a card to start it, tap again to stop. Each says where it fits in a story. */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 16px; padding: 14px 20px; background: rgba(11,10,15,.94); border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a, header button { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; background: none; border: 0; cursor: pointer; font-family: inherit; }
+.ruler { margin: 16px 20px 0; display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #8e8e93; }
+.bar { margin: 6px 20px 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #ffd60a, #30d158, #5ac8fa, #bf5af2, #ff9f0a, #ff453a, #7a0010); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 18px 20px 60px; }
+.card { position: relative; text-align: left; font: inherit; color: inherit; border: 0; border-radius: 16px; padding: 16px 16px 14px; cursor: pointer; background: #17161c; border-left: 6px solid var(--c); display: flex; flex-direction: column; gap: 6px; transition: background .2s, transform .2s; }
+.card:hover { background: #1f1d26; }
+.card.on { background: color-mix(in srgb, var(--c) 22%, #17161c); transform: scale(1.02); box-shadow: 0 0 40px -8px var(--c); }
+.card .n { font-size: 11px; font-weight: 900; color: var(--c); letter-spacing: .1em; }
+.card h2 { margin: 0; font-size: 20px; font-weight: 900; }
+.card .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.card .tags i { font-style: normal; font-size: 12px; font-weight: 800; color: #c7c7cc; background: #2a2931; border-radius: 99px; padding: 3px 9px; }
+.card p { margin: 2px 0 0; font-size: 13.5px; line-height: 1.45; color: #aeaeb2; }
+.card p b { color: #f5f5f7; }
+.card .eq { position: absolute; right: 14px; top: 14px; display: flex; gap: 3px; align-items: flex-end; height: 16px; opacity: 0; }
+.card.on .eq { opacity: 1; }
+.eq u { width: 4px; background: var(--c); animation: eq .6s ease-in-out infinite alternate; }
+.eq u:nth-child(2) { animation-delay: .15s; } .eq u:nth-child(3) { animation-delay: .3s; }
+@keyframes eq { from { height: 4px; } to { height: 16px; } }
+</style>
+</head>
+<body>
+<header><h1>Music loops</h1><button type="button" id="stop">Stop</button><a href="tension.html">Tension levels ›</a><a href="index.html">‹ Home</a></header>
+<div class="ruler"><span>Happy</span><span>Scary</span></div><div class="bar"></div>
+<div class="grid" id="grid"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+let ac, master, cur = null, timer, next = 0, S = 0;
+const mtof = (n) => 440 * Math.pow(2, (n - 69) / 12);
+const rnd = (k) => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function boot() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); const c = ac.createDynamicsCompressor(); master = ac.createGain(); master.gain.value = .75; master.connect(c); c.connect(ac.destination); }
+let nbuf; const noiseBuf = () => nbuf || (() => { nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return nbuf; })();
+// a note: type, volume, attack, optional low-pass, optional glide to another note, optional detune (cents)
+function tone(t, n, dur, o = {}) {
+  const osc = ac.createOscillator(), g = ac.createGain(), a = o.a || .005; osc.type = o.type || 'triangle'; osc.frequency.setValueAtTime(mtof(n), t);
+  if (o.glide != null) osc.frequency.exponentialRampToValueAtTime(mtof(o.glide), t + dur); if (o.det) osc.detune.value = o.det;
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(o.vol || .3, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  let out = osc; if (o.lp) { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; osc.connect(f); out = f; }
+  out.connect(g); g.connect(master); osc.start(t); osc.stop(t + dur + .05);
+}
+const pad = (t, notes, dur, vol = .09, type = 'sawtooth', lp = 700) => notes.forEach((n, k) => tone(t, n, dur, { type, vol, a: dur * .35, lp, det: k * 4 - 4 }));
+function noise(t, dur, o = {}) {
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), a = o.a || .002; s.buffer = noiseBuf(); f.type = o.type || 'highpass'; f.frequency.setValueAtTime(o.f || 7000, t); f.Q.value = o.q || 1;
+  if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(o.vol || .1, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + .05);
+}
+const kick = (t, v = .7) => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(125, t); o.frequency.exponentialRampToValueAtTime(42, t + .13); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + .26); o.connect(g); g.connect(master); o.start(t); o.stop(t + .3); };
+const snare = (t, v = .3) => { noise(t, .15, { f: 1800, type: 'bandpass', vol: v }); tone(t, 55, .1, { type: 'triangle', vol: v }); };
+const hat = (t, v = .08) => noise(t, .05, { f: 7000, vol: v });
+const click = (t, v = .14) => noise(t, .03, { f: 1400, type: 'bandpass', q: 4, vol: v });
+
+// the loops, from happy to scary. step(i, bar, t, bl): i = the 16th step in the bar (0..15), bl = a bar's length in seconds
+const LOOPS = [
+  { id: 'joy', name: 'Sunny day', emo: 'joy', c: '#ffd60a', bpm: 124, tags: ['bouncy', 'major', 'pop'], use: 'The gang’s together, a win, the first time he feels at home.',
+    step(i, bar, t) { const R = [48, 43, 45, 41][bar % 4], m = bar % 4 === 2 ? 3 : 4;
+      if (i % 4 === 0) { kick(t, .5); tone(t, R, .22, { vol: .5 }); } if (i === 4 || i === 12) noise(t, .08, { f: 1800, type: 'bandpass', vol: .15 }); if (i % 2) hat(t);
+      if (i % 2 === 0) tone(t, R + 24 + [0, m, 7, 12, 7, m, 7, 9][(i / 2) % 8], .14, { vol: .2, lp: 4000 }); } },
+  { id: 'cozy', name: 'Warm blanket', emo: 'comfort', c: '#30d158', bpm: 82, tags: ['soft', 'major', 'slow'], use: 'A kitchen at night, a hand on a shoulder, nobody in a hurry.',
+    step(i, bar, t, bl) { const R = [41, 46, 48, 41][bar % 4]; if (i === 0) pad(t, [R + 12, R + 16, R + 19], bl * 1.05, .1, 'sine', 900);
+      if (i === 0 || i === 6 || i === 10) tone(t, R + 31 + [0, 2, 4, -3][Math.floor(rnd(S) * 4)], .8, { type: 'sine', vol: .16 }); if (i % 4 === 2) hat(t, .04); } },
+  { id: 'quirk', name: 'Tiptoe', emo: 'playful', c: '#5ac8fa', bpm: 132, tags: ['staccato', 'major', 'sneaky'], use: 'A plan with a hole in it, a prank, someone sneaking in.',
+    step(i, bar, t) { const R = [43, 43, 50, 48][bar % 4]; if (i === 0 || i === 6 || i === 10) tone(t, R, .1, { vol: .5 });
+      if ([0, 3, 6, 8, 11, 14].includes(i)) tone(t, [67, 71, 74, 71, 69, 72, 76, 72][Math.floor(rnd(S + bar) * 8)], .07, { type: 'square', vol: .06, lp: 2500 }); if (i % 4 === 2) click(t); } },
+  { id: 'love', name: 'Slow glance', emo: 'tender', c: '#ff6b8a', bpm: 72, tags: ['arpeggio', 'minor → major', 'bells'], use: 'He looks at her a second too long. A goodbye that isn’t one.',
+    step(i, bar, t, bl) { const R = [45, 41, 48, 43][bar % 4], q = bar % 4 === 0 ? 3 : 4; if (i === 0) pad(t, [R + 12, R + 12 + q, R + 19], bl * 1.05, .08, 'sine', 800);
+      if (i % 2 === 0) tone(t, R + 24 + [0, 7, 12, q + 12, 19, q + 12, 12, 7][(i / 2) % 8], .9, { type: 'sine', vol: .17 }); } },
+  { id: 'hero', name: 'Into the storm', emo: 'epic', c: '#ff9f0a', bpm: 142, tags: ['driving', 'minor', 'drums'], use: 'The crew sails at dawn. Everyone runs. The chase begins.',
+    step(i, bar, t) { const R = [38, 38, 34, 36][bar % 4]; if (i % 2 === 0) tone(t, R, .12, { type: 'sawtooth', vol: .3, lp: 500 });
+      if (i === 0 || i === 8 || i === 10) kick(t, .7); if (i === 4 || i === 12) snare(t); if (i % 2) hat(t, .06);
+      if (i === 0 || i === 6 || i === 10) [R + 24, R + 27, R + 31].forEach((n) => tone(t, n, .24, { type: 'sawtooth', vol: .07, lp: 1800 })); } },
+  { id: 'myst', name: 'Who’s there?', emo: 'curious', c: '#bf5af2', bpm: 88, tags: ['sparse', 'phrygian', 'bells'], use: 'A door nobody opens. A name nobody says. Where is he?',
+    step(i, bar, t, bl) { if (i === 0 && bar % 2 === 0) pad(t, [40, 47, 52], bl * 2.1, .09, 'sawtooth', 500);
+      if (i % 4 === 2 && rnd(S) > .5) tone(t, [76, 77, 79, 83, 84][Math.floor(rnd(S + 3) * 5)], 1.5, { type: 'sine', vol: .13 });
+      if (bar % 4 === 3 && i === 0) noise(t, bl, { f: 500, sweep: 3500, type: 'bandpass', q: 2, vol: .08, a: bl * .8 }); } },
+  { id: 'sad', name: 'The empty chair', emo: 'sad', c: '#6e8bd6', bpm: 58, tags: ['slow', 'minor', 'falling'], use: 'A loss. The letter was true. Nobody came.',
+    step(i, bar, t, bl) { const R = [45, 41, 48, 40][bar % 4], q = bar % 4 === 0 ? 3 : 4; if (i === 0) pad(t, [R + 12, R + 12 + q, R + 19], bl * 1.05, .09, 'sine', 700);
+      if (i === 0) tone(t, [76, 74, 72, 71][bar % 4], 2.2, { type: 'sine', vol: .2 }); if (i === 8) tone(t, [72, 71, 69, 68][bar % 4], 2, { type: 'sine', vol: .16 }); } },
+  { id: 'tense', name: 'Walls closing', emo: 'tense', c: '#ff453a', bpm: 112, tags: ['pulse', 'tritone', 'kick'], use: 'The clock’s running. Someone is about to walk in. (see Tension levels)',
+    step(i, bar, t) { if (i % 2 === 0) tone(t, i === 14 ? 39 : 38, .16, { vol: .5 }); if (i % 4 === 0) kick(t, .8); if (i % 2) hat(t, .07);
+      if (i === 0 && bar % 2 === 0) pad(t, [50, 56], 4.2 * 112 / 112, .06, 'sawtooth', 450); } },
+  { id: 'creep', name: 'Music box', emo: 'creepy', c: '#a14a7a', bpm: 76, tags: ['detuned', 'chromatic', 'heartbeat'], use: 'A child’s room that’s too quiet. The wrong lullaby.',
+    step(i, bar, t, bl) { if ([0, 2, 5, 7, 8, 10, 13].includes(i)) { const n = [69, 72, 76, 75, 72, 71, 68, 64][Math.floor(rnd(S) * 8)]; tone(t, n, 1, { type: 'sine', vol: .1 }); tone(t, n, 1, { type: 'triangle', vol: .05, det: 28 }); }
+      if (i === 0 && bar % 2 === 0) pad(t, [38, 39], bl * 2.1, .08, 'sawtooth', 300); if (bar % 2 && (i === 0 || i === 2)) kick(t, .3);
+      if (bar % 4 === 3 && i === 8) noise(t, bl / 2, { f: 400, sweep: 5000, type: 'bandpass', q: 3, vol: .09, a: bl * .35 }); } },
+  { id: 'terror', name: 'Run', emo: 'terror', c: '#7a0010', bpm: 156, tags: ['clash', 'sub', 'screech'], use: 'The lights go out. It’s in the house. Don’t turn around.',
+    step(i, bar, t) { tone(t, bar % 2 ? 27 : 26, .11, { type: 'sawtooth', vol: .4, lp: 260 }); if (i % 4 === 0) kick(t, .85); if (i % 2) hat(t, .08);
+      if (i === 0 || i === 6 || i === 11) [50, 51, 57].forEach((n) => tone(t, n, .18, { type: 'sawtooth', vol: .09, lp: 3000 }));
+      if (i === 14 && bar % 2) tone(t, 78, .5, { type: 'sawtooth', vol: .08, glide: 100, lp: 4000 }); } },
+];
+function sched() { const L = cur; if (!L) return; const bl = 240 / L.bpm;
+  while (next < ac.currentTime + .12) { L.step(S % 16, Math.floor(S / 16), next, bl); next += 60 / L.bpm / 4; S++; } }
+function play(L) { boot(); ac.resume(); clearInterval(timer);
+  cur = L; S = 0; next = ac.currentTime + .06; timer = setInterval(sched, 25);
+  document.querySelectorAll('.card').forEach((c) => c.classList.toggle('on', c.dataset.id === L.id)); }
+function stop() { clearInterval(timer); cur = null; document.querySelectorAll('.card').forEach((c) => c.classList.remove('on')); }
+$('#grid').innerHTML = LOOPS.map((L, k) => `<button type="button" class="card" data-id="${L.id}" style="--c:${L.c}"><span class="eq"><u></u><u></u><u></u></span>
+  <span class="n">${String(k + 1).padStart(2, '0')} · ${L.emo.toUpperCase()} · ${L.bpm} BPM</span><h2>${L.name}</h2><span class="tags">${L.tags.map((t) => `<i>${t}</i>`).join('')}</span><p><b>Fits:</b> ${L.use}</p></button>`).join('');
+$('#grid').onclick = (e) => { const b = e.target.closest('.card'); if (!b) return; const L = LOOPS.find((x) => x.id === b.dataset.id); if (cur === L) stop(); else play(L); };
+$('#stop').onclick = stop;
+</script>
+</body>
+</html>

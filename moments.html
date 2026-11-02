@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moments</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* Moments (02/11): the scenes that stay with you, taken apart so they can be rebuilt. One card = the moment as it
+   plays, what makes it hit, and the recipe to do the same in a story. Add yours at the bottom (kept on this device). */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; }
+main { max-width: 760px; margin: 0 auto; padding: 20px 20px 80px; display: grid; gap: 22px; }
+.m { background: #17161c; border-radius: 18px; padding: 20px 22px; border-left: 6px solid var(--c, #ff9f0a); }
+.m .k { font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--c, #ff9f0a); }
+.m h2 { margin: 4px 0 2px; font-family: var(--display); font-weight: 400; font-size: 28px; }
+.m .src { color: #8e8e93; font-size: 13px; margin-bottom: 12px; }
+.m h3 { margin: 16px 0 6px; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #8e8e93; }
+.m p, .m li { margin: 0 0 6px; font-size: 16px; line-height: 1.5; color: #e5e5ea; }
+.m ol { margin: 0; padding-left: 22px; }
+.line { font-weight: 800; font-size: 19px; color: #fff; border-left: 3px solid var(--c, #ff9f0a); padding-left: 12px; margin: 8px 0; }
+.del { float: right; font: inherit; font-size: 13px; font-weight: 800; color: #8e8e93; background: none; border: 0; cursor: pointer; }
+form { background: #17161c; border-radius: 18px; padding: 20px 22px; display: grid; gap: 10px; }
+form h2 { margin: 0; font-size: 18px; }
+input, textarea { font: inherit; color: #fff; background: #0b0a0f; border: 1px solid #2c2c2e; border-radius: 10px; padding: 10px 12px; width: 100%; }
+textarea { min-height: 70px; resize: vertical; }
+button.add { font: inherit; font-weight: 900; border: 0; border-radius: 99px; padding: 11px 20px; background: #ffd60a; color: #000; cursor: pointer; justify-self: start; }
+</style>
+</head>
+<body>
+<header><h1>Moments</h1><a href="index.html">‹ Accueil</a></header>
+<main id="list"></main>
+<main><form id="f"><h2>Ajouter un moment</h2>
+  <input name="title" placeholder="Titre (ex. Le nom de sa mère)" required>
+  <input name="src" placeholder="D’où ça vient (film, série, jeu…)">
+  <textarea name="plays" placeholder="Comment ça se joue : la réplique, ce qu’on voit"></textarea>
+  <textarea name="why" placeholder="Pourquoi ça frappe"></textarea>
+  <textarea name="recipe" placeholder="La recette, une étape par ligne"></textarea>
+  <button class="add" type="submit">Ajouter</button></form></main>
+<script>
+const esc = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// the first one is Justin's (02/11): the scene's canon details are his memory, to check against the show
+const BASE = [{
+  c: '#ff9f0a', kind: 'Révélation par un détail', title: 'Le nom de sa mère', src: 'Naruto · d’après Justin (la scène exacte est à retrouver)',
+  plays: ['Ils poursuivent un méchant depuis longtemps. Un perso, presque sans y penser, demande :', '« Au fait… c’est quoi le nom de ta mère, déjà ? »', 'Il répond. C’est exactement le nom du méchant qu’ils poursuivent.'],
+  why: 'La question est anodine : personne ne s’attend à une révélation. Le joueur a déjà l’autre morceau (le nom du méchant) depuis longtemps : en une seule réplique, tout ce qu’il a vu se relit autrement. Rien n’est expliqué, le silence fait le travail.',
+  recipe: ['Planter tôt un nom (ou un détail) qui sert à désigner le méchant, sans que ça paraisse important.', 'Laisser du temps passer : l’oublier, avancer.', 'Mettre une question banale dans la bouche de quelqu’un, une réplique, pas plus.', 'La réponse est le détail planté. Silence (la musique tombe), gros plan sur les visages.', 'Ne rien expliquer tout de suite : laisser le joueur faire le lien, puis la scène suivante en paie le prix.'],
+}];
+const mine = () => { try { return JSON.parse(localStorage.getItem('moments.mine') || '[]'); } catch (e) { return []; } };
+const save = (a) => { try { localStorage.setItem('moments.mine', JSON.stringify(a)); } catch (e) {} };
+const card = (m, i) => `<article class="m" style="--c:${m.c || '#0a84ff'}">${i >= 0 ? `<button class="del" data-i="${i}" type="button">Retirer</button>` : ''}
+  <div class="k">${esc(m.kind || 'Moment')}</div><h2>${esc(m.title)}</h2><div class="src">${esc(m.src)}</div>
+  <h3>Comment ça se joue</h3>${[].concat(m.plays).map((l, k, a) => (a.length > 1 && k === 1 ? `<p class="line">${esc(l)}</p>` : `<p>${esc(l)}</p>`)).join('')}
+  <h3>Pourquoi ça frappe</h3><p>${esc(m.why)}</p>
+  <h3>La recette</h3><ol>${[].concat(m.recipe).map((l) => `<li>${esc(l)}</li>`).join('')}</ol></article>`;
+function draw() { $l.innerHTML = BASE.map((m) => card(m, -1)).join('') + mine().map((m, i) => card(m, i)).join(''); }
+const $l = document.getElementById('list');
+$l.onclick = (e) => { const b = e.target.closest('.del'); if (!b) return; const a = mine(); a.splice(+b.dataset.i, 1); save(a); draw(); };
+document.getElementById('f').onsubmit = (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target));
+  const a = mine(); a.push({ title: d.title, src: d.src, plays: d.plays.split('\n').filter(Boolean), why: d.why, recipe: d.recipe.split('\n').filter(Boolean), kind: 'Moment' }); save(a); e.target.reset(); draw(); };
+draw();
+</script>
+</body>
+</html>

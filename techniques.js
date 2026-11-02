@@ -6,7 +6,7 @@
 const TECH_STAGES = [
   { n: '01', c: '#0a84ff', name: 'Investment + Anticipation', line: '"I want to see what happens."', techs: ['hookSeconds', 'charEngaging', 'pillars', 'introChar', 'relEngaging', 'desire', 'curiosity'] },
   { n: '02', c: '#ff9f0a', name: 'Escalation + Complication', line: '"This is harder than I expected."', techs: ['raiseStakes', 'complication', 'nearSuccess'] },
-  { n: '03', c: '#bf5af2', name: 'Revelation + Recontextualization', line: '"Wait. I misunderstood everything."', techs: ['twist', 'motifs', 'expandConflict'] },
+  { n: '03', c: '#bf5af2', name: 'Revelation + Recontextualization', line: '"Wait. I misunderstood everything."', techs: ['twist', 'nameDrop', 'motifs', 'expandConflict'] },
   { n: '04', c: '#ff453a', name: 'Crisis + Maximum Suspense', line: '"How can this possibly work out?"', techs: ['impossibleChoice', 'clock', 'conflictingDesire', 'apparentDefeat', 'threat', 'sacrifice'] },
   { n: '05', c: '#30d158', name: 'Payoff + Emotional Resolution', line: '"It was worth watching."', techs: ['resolve', 'showConsequences', 'philoConflict'] },
 ];
@@ -212,6 +212,14 @@ const TECH = {
     ex: [['Julian est un chef respecté.', 'On le voit coincé devant le conseil, sans la majorité, personne de son côté. Il pose son stylo, regarde chacun une seconde de trop, et dit un seul nom. Deux mains se lèvent.']],
     subs: [],
     leads: [['relEngaging', 'SI sa surprise touche quelqu’un de précis']],
+  },
+
+  nameDrop: {
+    name: 'Le détail qui retourne tout',
+    how: 'Planter tôt un détail (un nom, un objet, un geste) qui désigne quelqu’un, puis le faire resurgir par une question banale dont la réponse est ce détail. Le joueur fait le lien lui-même : une réplique, un silence, et ce qu’il a vu se relit. Les moments complets sont dans Infos › Moments.',
+    ex: [['« Le méchant s’appelait Ren. » (dit, expliqué, fermé)', '« Au fait, c’est quoi le nom de ta mère, déjà ? » / « …Ren. » (silence)']],
+    subs: [],
+    leads: [['resolve', 'SI le lien devient la grande question de la fin'], ['relEngaging', 'SI le détail touche la famille de quelqu’un']],
   },
 
   // ---- 02 · Escalation + Complication: the situation becomes harder to resolve ----
