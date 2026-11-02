@@ -103,6 +103,47 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 .v-R6 .ch .face { width: 5em; height: 5em; border-radius: 50%; background: rgba(0,0,0,.25); box-shadow: 0 0 0 .15em rgba(255,255,255,.5); }
 .v-R6 .ch .k { font-size: .6em; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
 
+/* ---- tour 2: mixes, by trait ---- */
+.mx .actor { height: 58%; bottom: 38%; transition: filter .3s; }
+.mx .a-l { left: 30%; }
+.mx .a-me { left: var(--jx); }
+.mx .vig { display: none; }
+.mx.t-vig .vig { display: block; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 34% 30% at var(--jx) 26%, transparent 0, rgba(0,0,0,.35) 45%, rgba(0,0,0,.9) 100%); }
+.mx.t-vig .a-l { filter: brightness(.6) saturate(.7); }
+.mx .ch { gap: .9em; }
+.mx .ch button { gap: .7em; padding: .55em .9em; border-radius: 1.2em; background: rgba(20,16,28,.94); box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1), 0 .3em 1em rgba(0,0,0,.4); }
+.mx .ch .tx { display: flex; flex-direction: column; gap: .15em; min-width: 0; }
+.mx .ch .t { font-size: 2.3em; font-weight: 800; line-height: 1.2; }
+.mx.t-word .ch .k { font-size: 3.3em; font-weight: 900; line-height: 1; text-transform: uppercase; letter-spacing: -.01em; }
+.mx.t-word .ch .t { font-size: 1.75em; font-weight: 700; opacity: .75; }
+.mx .ch .face { width: 5.6em; height: 5.6em; border-radius: 50%; background: radial-gradient(circle at 50% 30%, var(--m), #000 95%); }
+.mx.t-white .ch button { background: #fff; color: #000; box-shadow: 0 .3em 1em rgba(0,0,0,.5); }
+.mx.t-white .ch .face { background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--m) 55%, #fff), #e5e5ea 95%); }
+.mx.t-edge .ch button { box-shadow: inset .55em 0 0 var(--m), 0 .3em 1em rgba(0,0,0,.5); padding-left: 1.2em; }
+.mx .ch .tyb { align-self: flex-start; font-size: 1.3em; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; padding: .2em .6em; border-radius: .5em; margin-bottom: .2em; }
+.mx .ch .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
+.mx .ch .ty-do .tyb { background: #ffd60a; color: #000; }
+.mx .ch .ty-do .t { font-style: italic; }
+.mx .ch .ty-sms .tyb { background: #30d158; color: #00210a; }
+.mx .ch .ty-sms { border-radius: 1.2em 1.2em .3em 1.2em; outline: .18em solid #30d158; outline-offset: -.18em; }
+.mx.t-white .ch .ty-do { background: #fff8d6; }
+.mx.t-white .ch .ty-sms { background: #e3fbe9; }
+.mx .ch button.pv { outline: .25em solid #ffd60a; outline-offset: .15em; }
+/* the remote: the same traits, full height */
+.mx .rm .ch button { flex: 1; justify-content: flex-start; text-align: left; border-radius: .8em; padding: 0 1em 0 0; overflow: hidden; }
+.mx .rm .ch button:not(:has(.face)) { padding-left: 1.2em; }
+.mx .rm .ch .face { width: 12em; height: auto; align-self: stretch; border-radius: 0; }
+.mx .rm .ch .face img { height: 360%; top: 4%; }
+.mx .rm .ch .t { font-size: 2.8em; }
+.mx.t-word .rm .ch .k { font-size: 5.4em; }
+.mx.t-word .rm .ch .t { font-size: 2.2em; }
+.mx .rm .ch .tyb { font-size: 1.6em; }
+.mx.t-edge .rm .ch button { box-shadow: inset .8em 0 0 var(--m); padding-left: .8em; }
+.mx .rm .q { flex: none; display: flex; gap: 1em; align-items: center; padding: 1em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
+.mx .rm .q .face { flex: none; position: relative; overflow: hidden; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; }
+.mx .rm .q .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
+.mx .rm .q b { display: block; font-size: 2.2em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+.mx .rm .q span { display: block; font-size: 3.2em; font-weight: 700; line-height: 1.25; }
 /* big view */
 #big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.85); display: grid; place-items: center; cursor: zoom-out; }
 #big[hidden] { display: none; }
@@ -113,12 +154,12 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 <body>
 <header>
   <h1>Écran de choix · variantes</h1>
-  <div class="seg" id="mode"><button type="button" data-v="cell" class="on">Cell</button><button type="button" data-v="remote">Télécommande</button></div>
+  <div class="seg" id="mode"><button type="button" data-v="mixc" class="on">Mix · Cell</button><button type="button" data-v="mixr">Mix · Télécommande</button><button type="button" data-v="cell">Tour 1 · Cell</button><button type="button" data-v="remote">Tour 1 · Télé</button></div>
   <div class="seg" id="mom"></div>
   <button type="button" class="flash" id="flash">Test éclair 1,5 s</button>
   <a href="index.html">‹ Accueil</a>
 </header>
-<div class="intro">Chaque variante est une hypothèse sur ce qui fait comprendre <b>l'intention</b> le plus vite : la couleur du mood, le visage, un seul mot, le contraste, le type de message. Touche un écran pour l'agrandir, ♥ pour garder tes préférées (gardées sur cet appareil). <b>Test éclair</b> : tout s'affiche 1,5 s puis disparaît : demande à quelqu'un ce qu'il a retenu, et laquelle il aurait choisie.</div>
+<div class="intro"><b>Mix</b> = tour 2, des mélanges de P2, P3, P4, P6 et une vignette autour de celui qui choisit (le type de message ne s’affiche que si les choix sont de types différents : essaie <b>Le mensonge</b> et <b>L’étage</b>). Chaque variante est une hypothèse sur ce qui fait comprendre <b>l'intention</b> le plus vite : la couleur du mood, le visage, un seul mot, le contraste, le type de message. Touche un écran pour l'agrandir, ♥ pour garder tes préférées (gardées sur cet appareil). <b>Test éclair</b> : tout s'affiche 1,5 s puis disparaît : demande à quelqu'un ce qu'il a retenu, et laquelle il aurait choisie.</div>
 <div class="grid" id="grid"></div>
 <div id="big" hidden></div>
 <script>
@@ -135,7 +176,7 @@ const MOOD = {
 // real moments of Last call (bar.js): who speaks, the line the choice answers, the options with their intent, their mood,
 // their type (say: a line, do: an action [ ], sms: a text) and the face Justin makes saying it
 const MOMENTS = [
-  { id: 'loyer', name: 'Le loyer', bg: 'bg/taverne_bar.webp', who: 'Cam', col: '#e2557a', sp: 'cam/worried', line: 'Why do you keep paying his rent?',
+  { id: 'loyer', name: 'Le loyer', me: 'justin_bar/drunk_listen', bg: 'bg/taverne_bar.webp', who: 'Cam', col: '#e2557a', sp: 'cam/worried', line: 'Why do you keep paying his rent?',
     opts: [
       { t: 'He’s my brother.', k: 'Loyal', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_talk' },
       { t: 'Because no one else will.', k: 'Tired', m: 'las', ty: 'say', f: 'justin_bar/drunk_sad' },
@@ -179,9 +220,30 @@ const VARIANTS = {
     ['R5', 'Type de message', 'PARLER, FAIRE, TEXTER : la forme dit ce que tu vas faire, pas juste quoi.'],
     ['R6', 'Bandes de mood + visage', 'Bord à bord, une bande de couleur par choix, le visage de l’expression, le mot du mood.'],
   ],
+  // tour 2 (02/11): Justin aimed P2 (the face), P3 (one word), P4 (contrast), P6 (the type, only when they differ),
+  // and P5's darkness as a vignette around the one choosing. Each mix = a list of traits
+  mixc: [
+    ['M1', 'Visage + mot', 'P2 + P3 : la tête qu’il fera, le mot en gros, la réplique dessous.', ['face', 'word', 'type']],
+    ['M2', 'Blanc + visage', 'P4 + P2 : cartes blanches, le visage à la place du numéro.', ['white', 'face', 'type']],
+    ['M3', 'Blanc + mot', 'P4 + P3 : cartes blanches, un mot noir énorme, la réplique en gris.', ['white', 'word', 'type']],
+    ['M4', 'Vignette + visage', 'Tout s’assombrit autour de celui qui choisit; ses choix avec sa tête.', ['vig', 'face', 'type']],
+    ['M5', 'Vignette + blanc + mot', 'La lumière sur lui et sur trois cartes blanches. Rien d’autre.', ['vig', 'white', 'word', 'type']],
+    ['M6', 'Le tout', 'Vignette, cartes blanches, visage, mot. Le maximum de signal.', ['vig', 'white', 'face', 'word', 'type']],
+    ['M7', 'Il réagit', 'Pas de visage sur les boutons : touche un choix, ton perso fait la tête dans la scène; touche encore = choisi.', ['vig', 'white', 'word', 'react', 'type']],
+    ['M8', 'Blanc + visage + bord de mood', 'M2 avec un liseré de la couleur du mood : le contraste reste, la couleur chuchote.', ['white', 'face', 'edge', 'type']],
+  ],
+  mixr: [
+    ['N1', 'Visage + mot', 'Plein écran : la tête en grand à gauche, le mot énorme, la réplique dessous.', ['face', 'word', 'type']],
+    ['N2', 'Blanc + visage + mot', 'Les mêmes, en cartes blanches : le contraste max, lisible en baissant les yeux.', ['white', 'face', 'word', 'type']],
+    ['N3', 'Blanc + mot', 'Sans visage : juste le mot noir géant et la réplique.', ['white', 'word', 'type']],
+    ['N4', 'Question + visage + mot', 'Qui t’a dit quoi, en haut (R4), puis les choix visage + mot.', ['q', 'white', 'face', 'word', 'type']],
+    ['N5', 'Blanc + visage + bord de mood', 'Cartes blanches, visage, liseré du mood.', ['white', 'face', 'edge', 'type']],
+  ],
 };
-let mode = 'cell', mom = 0;
-try { mode = localStorage.getItem('choix-mode') || 'cell'; } catch { /* private window */ }
+const TRAITS = Object.fromEntries([...VARIANTS.mixc, ...VARIANTS.mixr].map(([v, , , t]) => [v, new Set(t)]));
+let mode = 'mixc', mom = 0;
+try { mode = localStorage.getItem('choix-mode2') || 'mixc'; } catch { /* private window */ }
+if (!VARIANTS[mode]) mode = 'mixc';
 const favs = (() => { try { return new Set(JSON.parse(localStorage.getItem('choix-favs') || '[]')); } catch { return new Set(); } })();
 const saveFavs = () => { try { localStorage.setItem('choix-favs', JSON.stringify([...favs])); } catch { /* private window */ } };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -193,10 +255,27 @@ function opt(v, o, i) {
     P2: face + t, P3: k + t, P4: `<span class="n">${i + 1}</span>` + t, P6: `<span class="ic">${TY[o.ty][0]}</span>` + t,
     R2: face + t, R3: k + t, R5: `<span class="ic">${TY[o.ty][0]} ${TY[o.ty][1]}</span>` + t, R6: face + `<span>${`<span class="k">${esc(m.n)}</span>`}${t}</span>`,
   }[v] || t;
+  const T = TRAITS[v];
+  if (T) {   // a mix: its traits, in that order; the type shows only when the options aren't all the same kind
+    const mixed = new Set(MOMENTS[mom].opts.map((x) => x.ty)).size > 1, ty = T.has('type') && mixed && o.ty !== 'say' ? `<span class="tyb">${TY[o.ty][0]} ${TY[o.ty][1]}</span>` : '';
+    const txt = `<span class="tx">${ty}${T.has('word') ? k : ''}${t}</span>`;
+    return `<button type="button" class="${mixed ? `ty-${o.ty}` : ''}" style="${st}" data-f="${o.f}">${T.has('face') ? face : ''}${txt}</button>`;
+  }
   return `<button type="button" class="ty-${o.ty}" style="${st}">${inner}</button>`;
 }
 function screenHtml(v) {
-  const M = MOMENTS[mom], opts = M.opts.map((o, i) => opt(v, o, i)).join('');
+  const M = MOMENTS[mom], opts = M.opts.map((o, i) => opt(v, o, i)).join(''), T = TRAITS[v];
+  if (T) {
+    const tc = 'mx ' + [...T].map((x) => 't-' + x).join(' ');
+    if (mode === 'mixr') {
+      const q = T.has('q') ? `<div class="q">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
+      return `<div class="st ${tc}"><div class="rm">${q}<div class="ch">${opts}</div></div></div>`;
+    }
+    // the scene with both: who speaks on the left, the one choosing (Justin) on the right; the vignette is on him
+    const two = !!M.sp, jx = two ? 70 : 50;
+    const bub = M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
+    return `<div class="st ${tc}" style="--jx:${jx}%"><div class="scene" style="background-image:url(${M.bg})"></div>${two ? `<img class="actor a-l" src="${img(M.sp)}" alt="">` : ''}<img class="actor a-me${two ? '' : ' solo'}" src="${img(M.me || 'justin_bar/drunk_listen')}" data-rest="${img(M.me || 'justin_bar/drunk_listen')}" alt=""><div class="vig"></div><div class="ui">${bub}<div class="ch">${opts}</div></div></div>`;
+  }
   if (mode === 'remote') {
     const q = v === 'R4' ? `<div class="q">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
     return `<div class="st v-${v}"><div class="rm">${q}<div class="ch">${opts}</div></div></div>`;
@@ -205,7 +284,17 @@ function screenHtml(v) {
   return `<div class="st v-${v}"><div class="scene" style="background-image:url(${M.bg})"></div>${M.sp ? `<img class="actor" src="${img(M.sp)}" alt="">` : ''}<div class="ui">${bub}<div class="ch">${opts}</div></div></div>`;
 }
 function wire(ph) {
-  ph.querySelectorAll('.ch button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); ph.querySelectorAll('.ch button').forEach((x) => x.classList.toggle('pk', x === b)); });
+  const me = ph.querySelector('.a-me'), react = ph.querySelector('.t-react');
+  const look = (b) => { if (me) me.src = b ? img(b.dataset.f) : me.dataset.rest; };
+  ph.querySelectorAll('.ch button').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      // Il réagit: the first tap shows his face (in the scene), the second picks
+      if (react && !b.classList.contains('pv')) { ph.querySelectorAll('.ch button').forEach((x) => x.classList.toggle('pv', x === b)); look(b); return; }
+      ph.querySelectorAll('.ch button').forEach((x) => x.classList.toggle('pk', x === b));
+    };
+    if (react) { b.onpointerenter = () => look(b); b.onpointerleave = () => { const pv = ph.querySelector('.ch .pv'); look(pv); }; }
+  });
 }
 function paint() {
   document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
@@ -219,7 +308,7 @@ function paint() {
   });
 }
 $('#big').onclick = () => { $('#big').hidden = true; };
-document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { mode = b.dataset.v; try { localStorage.setItem('choix-mode', mode); } catch { /* private window */ } paint(); });
+document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { mode = b.dataset.v; try { localStorage.setItem('choix-mode2', mode); } catch { /* private window */ } paint(); });
 let flashT = null;
 $('#flash').onclick = () => {
   clearTimeout(flashT);
