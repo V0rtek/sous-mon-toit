@@ -336,7 +336,8 @@ window.ACT = (() => {
   // ---- the act's prompt: an idea (optional) + the two people drawn -> the act, as JSON. A basic model fills the arc,
   // it never builds one: every field is one concrete sentence, done with its technique ----
   let pair = PAIRS[Math.floor(Math.random() * PAIRS.length)];
-  const promptAct = (idea, [ra, rb]) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in English, unless the idea is written in another language (then in that language).
+  // seed (Créer, forge.js): the people, the decor, their pillars, the incident -> quest -> conflict; it comes before the examples
+  const promptAct = (idea, [ra, rb], seed) => `You plan ONE act of an interactive story for a phone game: 5 episodes. No dialogue: only what happens. The player plays the main character, "justin". Write every text in English, unless the idea is written in another language (then in that language).
 Reply with ONE JSON object and nothing else (its shape is at the end).
 
 THE ARC (always this one: you fill it, you never change it)
@@ -346,8 +347,8 @@ justin is caught between two people he cares about, A and B. A asks him for some
 - Episode 3: the secret comes out. The two planted things suddenly make sense. What the player believed is turned around.
 - Episode 4: A and B each ask him for the same moment. He must choose: A or B.
 - Episode 5: what his choice cost (one version per choice), and what stays open.
-
-THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit, gender included: a father or a brother is a man (james, amare), a mother or a sister is a woman. If no decor has both, keep the closest relation that fits (his father becomes his mother) and write it in "is". Use the character's real gender everywhere (he/she).
+${seed ? `\nTHE SEED (build the act on it; it wins over everything else except the rules; fit it inside the arc):\n${seed.text}\n${seed.ep1 ? `Episode 1 opens on:\n${seed.ep1}\n` : ''}` : ''}
+${seed ? `THE TWO PEOPLE: A is the character "${seed.a}", B is the character "${seed.b}", in the decor "${seed.decor}". Choose who they are to justin so the seed works. Use their real gender everywhere (he/she).` : `THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit, gender included: a father or a brother is a man (james, amare), a mother or a sister is a woman. If no decor has both, keep the closest relation that fits (his father becomes his mother) and write it in "is". Use the character's real gender everywhere (he/she).`}
 
 THE ACT'S TECHNIQUES (each field below says which one does it; follow them). Their examples come from OTHER stories: take the shape, never their people, events, objects or durations (no hospital, no lease, no audition, no "three years ago", no letter, no one leaving at sunrise). Invent from the idea and the two people:
 ${Object.keys(AT).map(atLine).join('\n')}
@@ -429,7 +430,7 @@ ${arc.at.map(atLine).join('\n')}
 It must contain, each in its own rectangle of box "ep", in this order (the other rectangles go around them):
 ${items.map(([, , en, v], i) => `${i + 1}. ${en}${v ? ': ' + v : ''}`).join('\n')}
 "turn": ${turn || '…'}
-${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box "later" = 1 rectangle: what stays open for the next act.'}`;
+${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box "later" = 1 rectangle: what stays open for the next act.'}${A.seed ? `\nTHE SEED OF THE ACT (keep it true):\n${A.seed.text}${n === 1 && A.seed.ep1 ? `\nTHIS EPISODE OPENS ON:\n${A.seed.ep1}` : ''}` : ''}`;
   }
   const planPrompt = (n) => window.PLAN.prompt1('', false, { n, text: actText(n) });
 
@@ -463,7 +464,8 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
       case 'pasteAct': { let j;
         try { j = LOOSE_JSON(draft.act); } catch { return say('act', 'Ce n’est pas un acte (JSON).'); }
         if (!j.a || !j.b || !Array.isArray(j.episodes)) return say('act', 'Il manque A, B ou les épisodes.');
-        store.list.push(fix({ ...j, done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
+        const sd = (() => { try { return JSON.parse(ls('smt-act-seed')); } catch { return null; } })(); try { localStorage.removeItem('smt-act-seed'); } catch { /* private window */ }
+        store.list.push(fix({ ...j, ...(sd ? { seed: sd } : {}), done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
         keep('acte', { act: A });
         draft.act = ''; ep = 1; render(); say('act', 'Ouvert.'); return; }
       case 'visual': mode = 'visual'; ls('smt-act-mode', mode); render(); el.querySelector('.aView').scrollTop = 0; return;
@@ -504,12 +506,12 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
     }
   }
   // tell(text) = the progress shown on the screen. Returns what Haiku cost (tokens), after the story starts playing
-  async function auto(key, { idea = '', n = 1, newAct = true } = {}, tell = () => {}) {
+  async function auto(key, { idea = '', n = 1, newAct = true, seed = null } = {}, tell = () => {}) {
     const used = { in: 0, out: 0 }, of = newAct ? 3 : 2;
     if (newAct) {
       tell(`1/${of} · L’acte (5 épisodes)…`);
-      const j = await viaHaiku(key, promptAct(idea, pair), 8000, (x) => x.a && x.b && Array.isArray(x.episodes), used);
-      store.list.push(fix({ ...j, done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
+      const j = await viaHaiku(key, promptAct(idea, pair, seed), 8000, (x) => x.a && x.b && Array.isArray(x.episodes), used);
+      store.list.push(fix({ ...j, ...(seed ? { seed } : {}), done: {}, picks: {}, plans: {} })); store.cur = store.list.length - 1; A = store.list[store.cur]; save();
       keep('acte', { act: A, by: 'haiku' });
     }
     ep = n;
@@ -535,5 +537,5 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
   }
   // a feedback given after a generated story (index.html): kept with the act's episode
   window.ACT_KEEP = (name, data) => keep(`${name}-ep${ep}`, { ep, plan: window.PLAN ? PLAN.get().title : '', ...data });
-  return { mount, closeSheet, redraw: () => render(), get: () => A, bundle, auto, actText, promptAct: (idea) => promptAct(idea, pair) };
+  return { mount, closeSheet, redraw: () => render(), get: () => A, bundle, auto, actText, promptAct: (idea) => promptAct(idea, pair), promptSeed: (seed) => promptAct('', pair, seed) };
 })();

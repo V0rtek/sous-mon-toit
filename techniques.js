@@ -4,7 +4,7 @@
 // subs (the ways to do it) and leads ([id, 'SI ...']: the neighbouring techniques it sets off, and when).
 // The doors in are the 5 steps of System, each with its techniques ----
 const TECH_STAGES = [
-  { n: '01', c: '#0a84ff', name: 'Investment + Anticipation', line: '"I want to see what happens."', techs: ['hookSeconds', 'charEngaging', 'pillars', 'introChar', 'relEngaging', 'desire', 'curiosity'] },
+  { n: '01', c: '#0a84ff', name: 'Investment + Anticipation', line: '"I want to see what happens."', techs: ['hookSeconds', 'inciting', 'charEngaging', 'pillars', 'introChar', 'relEngaging', 'desire', 'curiosity'] },
   { n: '02', c: '#ff9f0a', name: 'Escalation + Complication', line: '"This is harder than I expected."', techs: ['raiseStakes', 'complication', 'nearSuccess'] },
   { n: '03', c: '#bf5af2', name: 'Revelation + Recontextualization', line: '"Wait. I misunderstood everything."', techs: ['twist', 'nameDrop', 'motifs', 'expandConflict'] },
   { n: '04', c: '#ff453a', name: 'Crisis + Maximum Suspense', line: '"How can this possibly work out?"', techs: ['impossibleChoice', 'clock', 'conflictingDesire', 'apparentDefeat', 'threat', 'sacrifice'] },
@@ -180,8 +180,8 @@ const TECH = {
   // ---- how a character is engaging: his pillar, and the way he is introduced (02/11) ----
   pillars: {
     name: 'Piliers et archétypes d’un perso',
-    how: 'Un perso engageant tient sur un pilier, ce pour quoi on veut le suivre. Chaque pilier est un archétype, et on peut en mélanger deux : un pilier principal (visible tout de suite) et un secondaire (qui surprend plus tard). 1. Le chef (respect, charisme) : prend le contrôle d’une situation impossible. 2. Le charmeur (désir) : on le regarde, il le sait. 3. Le dangereux (peur) : la salle se tait quand il entre. 4. Le génie (compétence) : fait paraître facile ce qui est dur. 5. Le clown (chaleur) : fait rire, tout le monde l’aime, et ça cache autre chose. 6. L’énigme (mystère) : on ne sait pas ce qu’il veut. 7. L’outsider (empathie) : veut quelque chose très fort, tout est contre lui. 8. Le protecteur (loyauté) : paie pour quelqu’un d’autre.',
-    ex: [['Il est charismatique.', 'Le chef : on le voit coincé devant tout le monde, sans issue, et il retourne la salle sans élever la voix.'], ['Elle est drôle.', 'Le clown + l’outsider : elle fait rire toute la salle, puis on la voit seule dans le couloir, la même blague au bord des lèvres, et elle ne rit pas.']],
+    how: 'Un perso engageant tient sur un pilier, ce pour quoi on veut le suivre. Chaque pilier est un archétype, et on peut en mélanger deux : un pilier principal (visible tout de suite) et un secondaire (qui surprend plus tard), plus une faille qui le rend humain. Chaque archétype a ses propres expressions (la tristesse du chef ne se voit pas : il devient juste sérieux). 1. 👑 Le chef (respect, charisme) : prend le contrôle d’une situation impossible. Markus, Detroit. 2. 💋 Le charmeur (désir) : on le regarde, il le sait. 3. 🔪 Le dangereux (peur) : la salle se tait quand il entre. Le Joker. 4. 🧠 Le génie (compétence) : fait paraître facile ce qui est dur. Le Professeur, Casa de papel. 5. 🤡 Le clown (chaleur) : fait rire, tout le monde l’aime, et ça cache autre chose. Naruto. 6. 🌑 Le mystérieux (mystère) : on ne sait pas ce qu’il veut. Sasuke. 7. 🥊 L’outsider (empathie) : veut quelque chose très fort, tout est contre lui. 8. 🛡️ Le protecteur (loyauté) : paie pour quelqu’un d’autre. Un mélange : le Mentalist = charmeur + génie, charismatique et culotté, mais lâche quand le danger arrive.',
+    ex: [['Il est charismatique.', 'Le chef : on le voit coincé devant tout le monde, sans issue, et il retourne la salle sans élever la voix.'], ['Elle est drôle.', 'Le clown + l’outsider : elle fait rire toute la salle, puis on la voit seule dans le couloir, la même blague au bord des lèvres, et elle ne rit pas.'], ['Il est intelligent et drôle.', 'Le Mentalist : il lit un suspect en trois phrases devant tous les flics, sourire en coin ; le suspect sort une arme, il se cache derrière la policière.']],
     subs: ['introChar'],
     leads: [['introChar', 'SI on doit montrer ce pilier dès la première apparition']],
   },
@@ -208,11 +208,19 @@ const TECH = {
   },
   pillarSurprise: {
     name: 'La surprise de son pilier',
-    how: 'Quand il paraît, il prouve son pilier en faisant une chose qu’on n’attendait pas, devant tout le monde. Chef : coincé dans une situation impossible, il reprend le contrôle. Charmeur : il désarme l’hostile d’un mot. Dangereux : il ne fait rien, et la salle plie. Génie : il règle en dix secondes ce qui bloquait tout le monde. Clown : il fait rire pour couvrir la douleur de quelqu’un. Énigme : il répond à côté et dit juste. Outsider : il se trompe, et personne n’a envie de le lâcher.',
+    how: 'Quand il paraît, il prouve son pilier en faisant une chose qu’on n’attendait pas, devant tout le monde. Chef : coincé dans une situation impossible, il reprend le contrôle. Charmeur : il désarme l’hostile d’un mot. Dangereux : il ne fait rien, et la salle plie. Génie : il règle en dix secondes ce qui bloquait tout le monde. Clown : il fait rire pour couvrir la douleur de quelqu’un. Mystérieux : il répond à côté et dit juste. Outsider : il se trompe, et personne n’a envie de le lâcher. Protecteur : il prend le coup à la place d’un autre.',
     ex: [['Julian est un chef respecté.', 'On le voit coincé devant le conseil, sans la majorité, personne de son côté. Il pose son stylo, regarde chacun une seconde de trop, et dit un seul nom. Deux mains se lèvent.']],
     subs: [],
     leads: [['relEngaging', 'SI sa surprise touche quelqu’un de précis']],
+  },  // ---- the inciting incident (02/11): what starts the quest, and the conflict that stands in the way ----
+  inciting: {
+    name: 'L’élément déclencheur',
+    how: 'Un événement lance la quête, et la quête a toujours un conflit. Trois déclencheurs : ⚡ quelqu’un qui change tout arrive, 🚪 quelqu’un avec un enjeu attaché débarque sans prévenir, 👻 quelqu’un disparaît. Ils lancent une quête : 😤 chasser l’antagoniste qui flirte avec ta blonde, ❤️ une romance avec le nouveau perso, 🔦 le retrouver. Et il faut un conflit : 😇 tout le monde trouve l’antagoniste génial, 💍 la personne a déjà quelqu’un, 🌲 il faut se perdre dans une forêt dangereuse.',
+    ex: [['Un nouveau arrive en ville.', '⚡ Le nouveau capitaine débarque, et dès le premier soir il offre un verre à Ruby. 😤 Justin veut s’en débarrasser. 😇 Mais toute la taverne l’adore : il a payé la tournée à tout le monde.'], ['Melissa est partie.', '👻 Sa chope est encore pleine, personne ne sait où elle est. 🔦 Justin part la chercher. 🌲 La seule piste mène à la forêt où personne ne va la nuit.']],
+    subs: ['whoIsX', 'whereIsX', 'introChar'],
+    leads: [['introChar', 'SI quelqu’un arrive : le présenter en 3 temps'], ['whereIsX', 'SI quelqu’un disparaît']],
   },
+
 
   nameDrop: {
     name: 'Le détail qui retourne tout',

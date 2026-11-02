@@ -918,6 +918,54 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .pFocus .pBeat.on { opacity: 1; }
 #planSheet, #actSheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; max-height: 78%; overflow-y: auto; background: #1c1c1e; border-radius: 2.4em 2.4em 0 0; box-shadow: 0 -1em 4em rgba(0,0,0,.6); }
 #planSheet[hidden], #actSheet[hidden] { display: none; }
+/* Créer (forge.js): the story by taps: a row = an icon + its chips; a person = his face, 8 pillars (full = his, ring =
+   mixed in), 5 flaws, 🧍 his pose sheet; then ▶ / 📋 */
+#forge { justify-content: flex-start; overflow-y: auto; padding: 13em 6% 8em; scroll-snap-type: none; }
+#forgeBody { gap: 1.8em; }
+.fTop { display: flex; align-items: center; justify-content: space-between; }
+.fTop b { font-size: 3.2em; letter-spacing: -.02em; }
+.fDice { font: inherit; font-size: 3.4em; background: none; border: 0; cursor: pointer; padding: 0; line-height: 1; }
+.fRow { display: flex; gap: 1em; align-items: center; }
+.fI { flex: none; width: 1.5em; font-style: normal; font-size: 2.6em; text-align: center; }
+.fChips { display: flex; flex-wrap: wrap; gap: .8em; align-items: center; min-width: 0; }
+.fChip { font: inherit; font-size: 1.6em; display: inline-flex; flex-direction: column; align-items: center; gap: .25em; min-width: 4.6em; padding: .55em .7em .5em; border-radius: 1em; border: 0; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
+.fChip span { font-size: 1.7em; line-height: 1; }
+.fChip small { font-size: .78em; font-weight: 600; color: #8e8e93; white-space: nowrap; }
+.fChip.on { background: var(--c); color: #000; }
+.fChip.on small { color: rgba(0,0,0,.75); }
+.fFace { font: inherit; position: relative; display: inline-flex; flex-direction: column; align-items: center; gap: .3em; background: none; border: 0; padding: 0; cursor: pointer; color: #8e8e93; opacity: .5; }
+.fFace .pFace { width: 6em; height: 6em; border: .25em solid transparent; }
+.fFace small { font-size: 1.5em; font-weight: 600; }
+.fFace i { position: absolute; top: -.2em; right: -.2em; width: 1.6em; height: 1.6em; border-radius: 50%; background: #0a84ff; color: #fff; display: grid; place-items: center; font-style: normal; font-size: 1.4em; font-weight: 800; }
+.fFace.on { opacity: 1; color: #f5f5f7; }
+.fFace.on .pFace { border-color: #0a84ff; }
+.fFace.sm .pFace { width: 4.6em; height: 4.6em; }
+.fFace.sm.on .pFace { border-color: #ff453a; }
+.fSub { display: inline-flex; gap: .6em; margin-left: .6em; padding-left: 1.2em; border-left: .15em solid #2c2c2e; }
+.fWho { display: flex; gap: 1.4em; align-items: flex-start; padding: 1.3em 1.4em; border-radius: 1.6em; background: #141416; border-left: .5em solid var(--c); }
+.fWho > .pFace { width: 6.4em; height: 6.4em; }
+.fWhoR { display: flex; flex-direction: column; gap: .7em; min-width: 0; flex: 1; }
+.fWhoR b { font-size: 2em; display: flex; flex-wrap: wrap; gap: .2em .6em; align-items: baseline; }
+.fWhoR em { font-style: normal; font-size: .72em; font-weight: 600; color: var(--c); }
+.fPs { display: flex; flex-wrap: wrap; gap: .5em; }
+.fP { font: inherit; font-size: 2em; width: 1.9em; height: 1.9em; padding: 0; border-radius: 50%; border: .12em solid #2c2c2e; background: #1c1c1e; cursor: pointer; display: grid; place-items: center; filter: grayscale(1); opacity: .45; line-height: 1; }
+.fP.on { background: var(--c); border-color: var(--c); filter: none; opacity: 1; }
+.fP.mix { border: .16em solid var(--c); filter: none; opacity: 1; }
+.fFl .fP { font-size: 1.6em; }
+.fFl .fP.on { background: #3a3a3c; border-color: #8e8e93; }
+.fPose { font: inherit; font-size: 1.8em; margin-left: auto; padding: .2em .6em; border-radius: 2em; border: 0; background: #1c1c1e; cursor: pointer; }
+.fIntro { display: flex; align-items: center; gap: .8em; padding: 1em 1.4em; border-radius: 1.6em; background: #141416; border-left: .5em solid var(--c); }
+.fIntro .pFace { width: 6em; height: 6em; }
+.fIntro .fSt { font-size: 2.4em; display: inline-flex; align-items: center; white-space: nowrap; }
+.fIntro .fSt:not(:last-of-type)::after { content: '→'; margin-left: .3em; font-size: .6em; color: #636366; }
+.fIntro b { font-size: 1.8em; color: var(--c); line-height: 1.25; }
+.fGo { display: flex; flex-wrap: wrap; gap: .8em; align-items: center; }
+.fGo button { font: inherit; font-size: 2em; padding: .6em 1.1em; border-radius: 2em; border: 0; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
+.fGo button.go { background: #30d158; color: #000; font-weight: 700; }
+.fGo button:disabled { opacity: .4; }
+.fGo input { flex: 1 1 100%; }
+.fMsg { font-size: 1.7em; color: #aeaeb2; margin: 0; }
+.fMsg:empty { display: none; }
 /* Acte (act.js): the act on top, then its 5 episodes side by side (one step of System each, in its colour); what an
    episode must contain, a tap = done; orange = a setup from planted to paid, purple = the secret from raised to out */
 #acte { justify-content: flex-start; overflow: hidden; padding: 12em 0 0; scroll-snap-type: none; }
@@ -1679,6 +1727,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="secWrite" class="card menu sub" hidden>
     <div class="strips">
+      <button type="button" id="forgeBtn"><span class="art" style="--g:#ff375f"><img src="chars/ruby/explaining.webp" alt=""></span><b>⚡ Créer</b></button>
       <button type="button" id="mine"><span class="art" style="--g:#2c6fb3"><img src="chars/astro_orion/listen.webp" alt=""></span><b>Ton histoire</b></button>
       <button type="button" id="bankBtn"><span class="art" style="--g:#b07a2a"><img src="chars/justin/walk_mid.webp" alt=""></span><b>Banque</b></button>
       <button type="button" id="techBtn"><span class="art" style="--g:#8a2b4f"><img src="chars/brooke/thinking.webp" alt=""></span><b>Techniques</b></button>
@@ -1782,6 +1831,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="plan" class="card menu" hidden>
     <div class="step" id="planBody"></div>
     <div id="planSheet" hidden></div>
+  </div>
+  <div id="forge" class="card menu" hidden>
+    <div class="step" id="forgeBody"></div>
   </div>
   <div id="acte" class="card menu" hidden>
     <div class="step" id="acteBody"></div>
@@ -2280,10 +2332,11 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261102220000"></script>
-<script src="techniques.js?v=20261029120000"></script>
+<script src="techniques.js?v=20261102300000"></script>
 <script src="ep1.js?v=20261030030000"></script>
 <script src="plan.js?v=20261031490000"></script>
-<script src="act.js?v=20261031490000"></script>
+<script src="act.js?v=20261102300000"></script>
+<script src="forge.js?v=20261102300000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031580000"></script>
@@ -2298,8 +2351,10 @@ const $ = (s) => document.querySelector(s);
 // remembers it. Only its hash is here (the code itself: CLAUDE.md). A wall for visitors, not real security.
 const KEY_HASH = 323, keyHash = (s) => [...s.trim().toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
 let keyOk = false;   // entered this visit (a private window can't remember it)
-const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-key') === KEY_HASH; } catch { return false; } };
-const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
+// its own slot (smt-open): smt-key is the Haiku key. A code kept in smt-key before (02/11) moves there
+try { if (+localStorage.getItem('smt-key') === KEY_HASH) { localStorage.setItem('smt-open', String(KEY_HASH)); localStorage.removeItem('smt-key'); } } catch { /* private window */ }
+const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-open') === KEY_HASH; } catch { return false; } };
+const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
 document.documentElement.classList.toggle('locked', !unlocked());
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
@@ -3906,9 +3961,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#bank'];
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
 const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell',
-  '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite' };   // where ‹ goes
+  '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
 // page comes back to the front (the phone drops it when hidden). Where it's not supported, nothing changes.
@@ -4440,7 +4495,7 @@ $('#keyForm').onclick = (e) => e.stopPropagation();
 $('#keyForm').onsubmit = (e) => {
   e.preventDefault(); const f = $('#keyForm');
   if (keyHash($('#keyIn').value) !== KEY_HASH) { f.classList.remove('no'); void f.offsetWidth; f.classList.add('no'); $('#keyIn').select(); return; }
-  try { localStorage.setItem('smt-key', String(KEY_HASH)); } catch { /* private window: open for this visit only */ }
+  try { localStorage.setItem('smt-open', String(KEY_HASH)); } catch { /* private window: open for this visit only */ }
   keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; $('#keyIn').value = '';
 };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
@@ -4507,7 +4562,10 @@ $('#techStages').onclick = (e) => { const b = e.target.closest('[data-t]'); if (
 // ---- Infos · Plan de scène (plan.js): the plan of a story, edited by hand ----
 $('#planBtn').onclick = (e) => { e.stopPropagation(); UP['#plan'] = '#secWrite'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
 // ---- Infos · Acte (act.js): one act of 5 episodes, each one's prompt 1 copied from its column ----
-$('#actBtn').onclick = (e) => { e.stopPropagation(); show('#acte'); ACT.mount($('#acteBody')); };
+$('#actBtn').onclick = (e) => { e.stopPropagation(); UP['#acte'] = '#secWrite'; show('#acte'); ACT.mount($('#acteBody')); };
+// ---- Écrire · Créer (forge.js): the story by taps, then ▶ (Haiku: act, plan, story) or 📋 (the act's prompt) ----
+$('#forgeBtn').onclick = (e) => { e.stopPropagation(); show('#forge'); $('#forge').scrollTop = 0; FORGE.mount($('#forgeBody')); };
+window.FORGE_TO_ACT = () => { UP['#acte'] = '#forge'; show('#acte'); ACT.mount($('#acteBody')); };
 // ‹ from a plan opened by the act goes back to the act (it opens again where it was)
 const actBack = () => { show('#acte'); ACT.mount($('#acteBody')); };
 window.ACT_TO_PLAN = () => { ACT.closeSheet(); UP['#plan'] = '#acte'; show('#plan'); $('#plan').scrollTop = 0; PLAN.mount($('#planBody')); };
@@ -4697,7 +4755,7 @@ $('#back').onclick = (e) => {
   if (screen === '#plan') PLAN.closeSheet();
   if (screen === '#bank' && window.BANK_BACK && BANK_BACK()) return;   // Nouveau perso open: back to the list
   if (screen === '#acte') ACT.closeSheet();
-  const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up === '#acte') actBack(); else if (up) show(up); };
+  const up = UP[screen]; if (ROLE !== 'host' && hostTv && ['#wait', '#end'].includes(screen)) sendIn('menu'); else if (ROLE !== 'host') goHome(); else if (up === '#hub') toHub(); else if (up === '#acte') actBack(); else if (up === '#forge') { show('#forge'); FORGE.mount($('#forgeBody')); } else if (up) show(up); };
 // ---- the story's menu (the dots, bottom right): sound on / off, the episode from its start (the one who runs the story
 // only), quit = back where you came from (Full demo or the menu), like the episode card's home button ----
 const hasEps = (id) => !!STORIES[id].episodeAt || JSON.stringify(STORIES[id]).includes('"episode"');
