@@ -361,7 +361,13 @@ body.ncFull #bank .ncDots { margin-top: 0; }
 .ncTile img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
 .ncTile b { font-size: 1.7em; padding: 0 .2em; }
 .ncTile > i { position: absolute; right: .5em; top: .5em; width: 1.6em; height: 1.6em; border-radius: 50%; background: #30d158; color: #000; display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: 1.8em; }
-.ncTile.done span { opacity: .55; }
+.ncTile.done:not(.res) span { opacity: .55; }
+.ncTile.res span { background: repeating-conic-gradient(#2c2c2e 0 25%, #232325 0 50%) 0 0 / 1.4em 1.4em; }
+.ncTile.res img { object-fit: contain; object-position: 50% 100%; }
+.ncTile.done { box-shadow: inset 0 0 0 .2em #30d158; }
+.ncHero { display: flex; flex-direction: column; align-items: center; gap: .6em; margin-bottom: 1.6em; }
+.ncHero img { height: 26em; max-width: 100%; object-fit: contain; filter: drop-shadow(0 1em 1.5em rgba(0,0,0,.6)); }
+.ncHero b { font-size: 2.6em; font-weight: 800; }
 .ncSheetTop { display: flex; align-items: center; gap: .8em; }
 .ncSheetTop b { font-size: 2.2em; }
 .ncSheetTop > i { font-style: normal; color: #30d158; font-weight: 900; font-size: 2.2em; }
@@ -2131,7 +2137,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261102180000"></script>
 <script src="deck.js?v=20261034500000"></script>
-<script src="bank.js?v=20261102200000"></script>
+<script src="bank.js?v=20261102230000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);

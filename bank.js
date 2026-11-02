@@ -438,7 +438,7 @@ Example:
     const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0], done = c.done || {};
     const nm = String(c.name || '').trim(), mine = HAVE.includes(nm.toLowerCase()) ? `perso_${nm.toLowerCase()}.webp` : null;
     // step 2 = the Debout sheet (from the photo, or from their portrait); step 3 = the other sheets, image 1 = their listen pose
-    const sheets = place[2].filter((id) => id !== 'photo' && id !== 'debout'), hasPic = !!done.debout, n = sheets.filter((id) => done[id]).length;
+    const all = place[2].filter((id) => id !== 'photo'), sheets = all.filter((id) => id !== 'debout'), hasPic = !!done.debout, n = sheets.filter((id) => done[id]).length;
     const step = c.step || 1, sp = (window.SPRITES || {})[window.IMPORT ? IMPORT.slug(nm) : ''];
     const me = mine ? `ref/${mine}` : sp && sp.poses.listen ? ((typeof MADE !== 'undefined' && MADE[IMPORT.slug(nm)]) || {}).listen || `chars/${IMPORT.slug(nm)}/listen.png` : null;
     const dots = `<div class="ncDots">${[[1, IC.who, !!nm], [2, IC.pic, hasPic], [3, IC.poses, n === sheets.length]].map(([k, ic, ok]) =>
@@ -449,17 +449,21 @@ Example:
         <input data-nc="name" placeholder="Son nom" value="${esc(nm)}" autocomplete="off">
         <div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
         + big('data-ncstep="2"', '', 'Suivant →', 'main');
-    } else if (step === 2) {
-      body = `<div class="ncSheetTop"><b>Debout · 6 poses</b>${done.debout ? '<i>✓</i>' : ''}</div>`
+    } else if (step === 2 || c.open === 'debout') {
+      // Debout from the photo: imported = done, and on to step 3 by itself (no preview, no Suivant)
+      body = (c.open === 'debout' ? `<div class="ncSheetTop"><button type="button" class="ncBack" data-ncopen="debout">‹</button><b>Debout · 6 poses</b>${done.debout ? '<i>✓</i>' : ''}</div>` : `<div class="ncSheetTop"><b>Debout · 6 poses</b></div>`)
         + `<div class="ncEq">${mine ? shot(`ref/${mine}`, 1) : slot(1, 'Sa photo')}<em>+</em>${shot('ref/style.webp', 2)}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
         + big(`data-nccopy="${mine ? 'debout' : 'deboutPhoto'}"`, IC.copy, 'Copier le prompt', 'main')
         + `<div class="ncSmall"><button type="button" class="ncBtn" data-cimg="ref/style.webp">Copier l’image 2</button><a class="ncBtn" href="ref/style.webp" download="style.webp">Enregistrer l’image 2</a></div>`
         + `<details class="ncMore"${c.locked ? ' open' : ''}><summary>⋯</summary><textarea data-nc="locked" rows="3" placeholder="À garder : cheveux roux bouclés, cicatrice, veste de cuir…">${esc(c.locked || '')}</textarea></details>`
-        + (window.IMPORT ? importBox('debout') : big('data-ncdone="debout"', '', done.debout ? 'Fait ✓' : 'C’est fait', done.debout ? 'ok' : ''))
-        + (done.debout ? big('data-ncstep="3"', '', 'Suivant →', 'main') : '');
-    } else if (!c.open || !sheets.includes(c.open)) {
-      body = `<div class="ncTiles">${sheets.map((id) => { const [t, , guides] = SHEETS[id], g = guides.find((f) => f !== 'style.webp') || guides[0] || 'style.webp';
-        return `<button type="button" class="ncTile${done[id] ? ' done' : ''}" data-ncopen="${id}"><span><img loading="lazy" src="ref/${g}" alt=""></span><b>${esc(t.replace(/ \(base\)/, ''))}</b>${done[id] ? '<i>✓</i>' : ''}</button>`; }).join('')}</div>`;
+        + (window.IMPORT ? importBox('debout', true) : big('data-ncdone="debout"', '', done.debout ? 'Fait ✓' : 'C’est fait', done.debout ? 'ok' : ''));
+    } else if (!c.open || !all.includes(c.open)) {
+      // step 3: the character on top (its listen pose), then every sheet: to do = the guide on green, done = its result
+      const res = (id) => { const k = window.IMPORT && IMPORT.KINDS[id], p = k && k.poses[0], sl = IMPORT.slug(nm), s2 = (window.SPRITES || {})[sl];
+        return p && s2 && s2.poses[p] ? (((typeof MADE !== 'undefined' && MADE[sl]) || {})[p] || `chars/${sl}/${p}.png`) : null; };
+      body = (me ? `<div class="ncHero"><img src="${me}" alt=""><b>${esc(nm)}</b></div>` : '')
+        + `<div class="ncTiles">${all.map((id) => { const [t, , guides] = SHEETS[id], g = guides.find((f) => f !== 'style.webp') || guides[0] || 'style.webp', r = done[id] && res(id);
+        return `<button type="button" class="ncTile${done[id] ? ' done' : ''}${r ? ' res' : ''}" data-ncopen="${id}"><span><img loading="lazy" src="${r || `ref/${g}`}" alt=""></span><b>${esc(t.replace(/ \(base\)/, ''))}</b>${done[id] ? '<i>✓</i>' : ''}</button>`; }).join('')}</div>`;
     } else {
       const id = c.open, [t, , guides] = SHEETS[id], one = me ? shot(me, 1) : slot(1, nm || 'Le perso');
       body = `<div class="ncSheetTop"><button type="button" class="ncBack" data-ncopen="${id}">‹</button><b>${esc(t)}</b>${done[id] ? '<i>✓</i>' : ''}</div>`
@@ -472,7 +476,7 @@ Example:
   };
   // the generated sheet -> into the game (importer.js): pick it, see the 6 poses cut, « Ajouter au jeu »
   let shown = null;   // { kind, imgs, msg }
-  const importBox = (id) => { const s = shown && shown.kind === id ? shown : null, done = (load().done || {})[id];
+  const importBox = (id, lite) => { const s0 = shown && shown.kind === id ? shown : null, s = lite && s0 ? { msg: s0.msg } : s0, done = (load().done || {})[id];
     return `<div class="ncImport"><label class="ncGo${done ? ' ok' : ''}">${IC.up}<span>${done ? 'Fait ✓ · Importer une autre' : s && s.imgs ? 'Importer une autre' : 'Importer le résultat'}</span><input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
       + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '')
       + (s && s.imgs ? `<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>${s.moved ? `<button type="button" class="bkCopy" data-ncadd="${id}">Enregistrer la prise</button>` : ''}` : '')
@@ -499,7 +503,9 @@ Example:
   };
   BANK.newCharAdd = async (kind, redraw) => {
     shown = { ...shown, moved: false, msg: 'Envoi…' }; redraw();
-    try { shown = { ...shown, msg: await IMPORT.add() }; const c = load(); c.done = c.done || {}; c.done[kind] = true; keep(c); }
+    try { shown = { ...shown, msg: await IMPORT.add() }; const c = load(); c.done = c.done || {}; c.done[kind] = true;
+      if (kind !== 'prises') { c.step = 3; c.open = null; shown = null; }   // done: on to the tiles, where it shows as done
+      keep(c); }
     catch (err) { shown = { ...shown, msg: `Pas ajouté : ${err.message}` }; }
     redraw();
   };
