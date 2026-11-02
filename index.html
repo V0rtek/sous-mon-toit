@@ -1568,19 +1568,19 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="slate" hidden></div>
   <div id="who" class="card menu">
     <form id="whoForm" class="ask">
-      <input id="whoName" maxlength="16" autocomplete="off" placeholder="Ton nom" aria-label="Ton nom">
-      <button class="pill" type="submit">Entrer</button>
+      <input id="whoName" maxlength="16" autocomplete="off" placeholder="Your name" aria-label="Your name">
+      <button class="pill" type="submit">Enter</button>
     </form>
   </div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Full demo</b></a>
-      <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>Le site</b></a>
-      <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>Sur la télé</b><span class="tvHere" hidden><i></i><em></em></span></button>
+      <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
+      <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>On the TV</b><span class="tvHere" hidden><i></i><em></em></span></button>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Infos<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
       <button type="button" id="moreBtn"><span class="art" style="--g:#b8741a"><img src="chars/toutou/gentleman.webp" alt=""></span><b>Plus<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
-    <button type="button" id="keyBtn" aria-label="Accès"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+    <button type="button" id="keyBtn" aria-label="Access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="password" autocomplete="off" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
   </div>
   <div id="infos" class="card menu" hidden>
@@ -1921,26 +1921,26 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <button class="pill" id="watch3d" type="button" aria-label="Voir la vidéo"><svg viewBox="0 0 24 24" fill="#000" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg></button>
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
-  <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Choisis l'histoire</div><div id="lobbyList" class="tv-list" hidden></div></div>
+  <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Pick the story</div><div id="lobbyList" class="tv-list" hidden></div></div>
   <div id="tvPick" class="card menu" hidden><h2>UNWRITTEN</h2>
     <div class="tvp-row"><div class="qr" id="tvQrBox"></div>
-      <div class="tvp-phone" aria-hidden="true"><i></i><i></i><div class="tvp-tile">Sur la télé<span><em></em><b id="tvCode"></b></span><u></u></div><i></i></div></div>
+      <div class="tvp-phone" aria-hidden="true"><i></i><i></i><div class="tvp-tile">On the TV<span><em></em><b id="tvCode"></b></span><u></u></div><i></i></div></div>
     <div id="tvNames"></div></div>
   <div id="tvFind" class="card menu" hidden>
     <div id="tvFound"></div>
-    <div class="tf-alt"><button type="button" id="tvBecome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Cet écran = la télé</button><a href="tv-sim.html" id="tvSim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Simuler</a></div></div>
+    <div class="tf-alt"><button type="button" id="tvBecome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>This screen = the TV</button><a href="tv-sim.html" id="tvSim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Simulate</a></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="placeScreen" class="card menu" hidden><div class="step"><h2>Placer un objet</h2><div id="placeBody"></div></div></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
   <div id="fbCard" hidden><div class="fb">
-    <b>Ton avis</b>
+    <b>Your feedback</b>
     <div id="fbQs"></div>
-    <textarea id="fbText" rows="2" maxlength="300" placeholder="Autre chose? (optionnel)" aria-label="Autre chose"></textarea>
-    <div class="obsBtns"><button type="button" id="fbSend">Envoyer</button><button type="button" id="fbClose">Fermer</button></div>
-    <button type="button" id="fbClaude" class="fbClaude" hidden>Envoyer et copier pour Claude (tout)</button>
+    <textarea id="fbText" rows="2" maxlength="300" placeholder="Anything else? (optional)" aria-label="Anything else"></textarea>
+    <div class="obsBtns"><button type="button" id="fbSend">Send</button><button type="button" id="fbClose">Close</button></div>
+    <button type="button" id="fbClaude" class="fbClaude" hidden>Send and copy for Claude (everything)</button>
   </div></div>
   <button id="storyNote" type="button" aria-label="Notes" hidden><span>?</span></button>
-  <div id="inviteCard" hidden><div class="box"><p id="invFrom"></p><h3 id="invTitle"></h3><button type="button" class="go" id="invGo">Rejoindre</button><button type="button" id="invLater">Plus tard</button></div></div>
+  <div id="inviteCard" hidden><div class="box"><p id="invFrom"></p><h3 id="invTitle"></h3><button type="button" class="go" id="invGo">Join</button><button type="button" id="invLater">Later</button></div></div>
   <div id="todoCard" hidden><div class="todo"><b id="todoTitle"></b><ul id="todoList"></ul>
     <div class="obs" id="obsBox" hidden><textarea id="obsText" rows="2" maxlength="300" placeholder="Une observation…" aria-label="Une observation"></textarea>
       <div class="obsBtns"><button type="button" id="obsAdd">Ajouter</button><button type="button" id="obsCopy">Copier tout</button></div></div></div></div>
@@ -1949,29 +1949,29 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="genScreen" class="card menu" hidden>
     <div class="step">
-      <h2>Ton histoire</h2>
-      <p class="lead">Décris l'idée en une ou deux phrases. Haiku écrit une histoire courte avec des choix. Ou tout par Haiku : l'acte de 5 épisodes, le plan, puis l'épisode 1 (l'idée est facultative, 1 à 3 min).</p>
-      <textarea id="genIdea" rows="5" maxlength="600" placeholder="Ex. : Ruby découvre que James a menti sur où il était hier soir." aria-label="Ton idée"></textarea>
-      <input id="genKey" type="password" autocomplete="off" placeholder="Ta clé API Anthropic (reste sur cet appareil)" aria-label="Clé API Anthropic">
-      <button class="pill" id="genGo" type="button">Écrire l'histoire</button>
-      <button class="pill" id="genAct" type="button">Tout par Haiku : acte, plan, épisode 1</button>
-      <label class="genCounter"><input type="checkbox" id="genCounter"> Au comptoir, avec les poses que chaque perso a maintenant</label>
+      <h2>Your story</h2>
+      <p class="lead">Describe the idea in one or two sentences. Haiku writes a short story with choices. Or all by Haiku: the 5-episode act, the plan, then episode 1 (the idea is optional, 1 to 3 min).</p>
+      <textarea id="genIdea" rows="5" maxlength="600" placeholder="E.g. Ruby finds out James lied about where he was last night." aria-label="Your idea"></textarea>
+      <input id="genKey" type="password" autocomplete="off" placeholder="Your Anthropic API key (stays on this device)" aria-label="Anthropic API key">
+      <button class="pill" id="genGo" type="button">Write the story</button>
+      <button class="pill" id="genAct" type="button">All by Haiku: act, plan, episode 1</button>
+      <label class="genCounter"><input type="checkbox" id="genCounter"> At the counter, with the poses each character has now</label>
       <p class="lead" id="genMsg"></p>
-      <button class="ghost" id="genHistBtn" type="button">Dernières histoires</button>
+      <button class="ghost" id="genHistBtn" type="button">Latest stories</button>
     </div>
     <button id="genNote" type="button" aria-label="Notes"><span>?</span></button>
-    <button id="genPromptBtn" type="button" aria-label="Le prompt"><svg viewBox="0 0 24 24" fill="none" stroke="#f5f5f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9.5 12.5h5M9.5 16.5h5"/></svg></button>
+    <button id="genPromptBtn" type="button" aria-label="The prompt"><svg viewBox="0 0 24 24" fill="none" stroke="#f5f5f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9.5 12.5h5M9.5 16.5h5"/></svg></button>
   </div>
   <div id="genPrompt" class="card menu" hidden>
-    <div class="step"><h2>Le prompt</h2>
-      <div class="prompt"><p id="genPromptText"></p><button type="button" class="genCopy" aria-label="Copier"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
-      <p class="lead">Si un bouton dépasse 27 caractères :</p>
-      <div class="prompt"><p id="genShortText"></p><button type="button" class="genCopy" aria-label="Copier"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
-      <h2 class="epH">Épisode 1</h2>
-      <p class="lead">La graine de toute l'histoire, puis le premier épisode avec les techniques. Remplace [ton idée] à la fin, donne-le à l'AI, colle sa réponse en bas.</p>
-      <div class="prompt"><p id="epPromptText"></p><button type="button" class="genCopy" aria-label="Copier"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
-      <textarea id="epPaste" rows="4" placeholder="Colle ici la réponse (le JSON)" aria-label="La réponse de l'AI"></textarea>
-      <button class="pill" id="epGo" type="button">Jouer l'épisode</button>
+    <div class="step"><h2>The prompt</h2>
+      <div class="prompt"><p id="genPromptText"></p><button type="button" class="genCopy" aria-label="Copy"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <p class="lead">If a button is longer than 27 characters:</p>
+      <div class="prompt"><p id="genShortText"></p><button type="button" class="genCopy" aria-label="Copy"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <h2 class="epH">Episode 1</h2>
+      <p class="lead">The seed of the whole story, then the first episode with the techniques. Replace [your idea] at the end, give it to the AI, paste its answer below.</p>
+      <div class="prompt"><p id="epPromptText"></p><button type="button" class="genCopy" aria-label="Copy"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <textarea id="epPaste" rows="4" placeholder="Paste the answer here (the JSON)" aria-label="The AI's answer"></textarea>
+      <button class="pill" id="epGo" type="button">Play the episode</button>
       <p class="lead" id="epMsg"></p>
     </div>
   </div>
@@ -2015,80 +2015,80 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <p class="brainNote">7 excellent stories beat 14 good ones.</p></div>
   </div>
   <div id="genHist" class="card menu" hidden>
-    <div class="step"><h2>Dernières histoires</h2><p class="lead" id="histEmpty">Rien encore.</p><div id="histList"></div></div>
+    <div class="step"><h2>Latest stories</h2><p class="lead" id="histEmpty">Nothing yet.</p><div id="histList"></div></div>
   </div>
   <div id="newChar" class="card menu" hidden>
     <div class="step" id="nc1">
-      <h2>Étape 1 sur 3</h2>
+      <h2>Step 1 of 3</h2>
       <input id="actorPhoto" type="file" accept="image/*" hidden>
-      <button class="ncAct" id="actorPhotoBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2.5h6L16.5 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.5"/></svg></i><div><b>Ajouter une photo</b></div></button>
-      <p class="lead">Décris ton acteur : son look et son langage corporel.</p>
-      <textarea id="actorDesc" rows="6" maxlength="600" placeholder="Ex. : homme début trentaine, cheveux courts bruns, veston bleu marine. Posé, regarde en coin, parle avec les mains." aria-label="Décris ton acteur"></textarea>
-      <button class="pill" id="nc1Go" type="button">Suivant</button>
+      <button class="ncAct" id="actorPhotoBtn" type="button"><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2.5h6L16.5 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.5"/></svg></i><div><b>Add a photo</b></div></button>
+      <p class="lead">Describe your actor: their look and body language.</p>
+      <textarea id="actorDesc" rows="6" maxlength="600" placeholder="E.g. man in his early thirties, short brown hair, navy blazer. Calm, side glances, talks with his hands." aria-label="Describe your actor"></textarea>
+      <button class="pill" id="nc1Go" type="button">Next</button>
     </div>
     <div class="step" id="nc2" hidden>
-      <h2>Étape 2 sur 3</h2>
-      <p class="lead" id="nc2Lead">Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l'image qu'il te donne.</p>
-    <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copier le prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
-      <button class="pill" id="nc2Go" type="button">J'ai mon image</button>
-      <button class="ghost" id="nc2Back" type="button">Retour</button>
+      <h2>Step 2 of 3</h2>
+      <p class="lead" id="nc2Lead">Copy this prompt into ChatGPT, with a photo if you have one. Keep the image it gives you.</p>
+    <div class="prompt"><p id="promptText"></p><button type="button" id="copy" aria-label="Copy the prompt"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>
+      <button class="pill" id="nc2Go" type="button">I have my image</button>
+      <button class="ghost" id="nc2Back" type="button">Back</button>
     </div>
     <div class="step" id="nc3" hidden>
-      <h2>Étape 3 sur 3</h2>
-      <p class="lead">Dépose la feuille de poses.</p>
+      <h2>Step 3 of 3</h2>
+      <p class="lead">Drop the pose sheet.</p>
     <div class="sheetUp">
       <input id="sheetFile" type="file" accept="image/*" hidden>
-      <button class="pill" id="sheetPick" type="button">Ajouter la feuille de poses</button>
+      <button class="pill" id="sheetPick" type="button">Add the pose sheet</button>
       <p id="sheetMsg"></p>
       <div class="grid3" id="sheetPrev" hidden></div>
-      <div class="ask" id="sheetSave" hidden><input id="sheetName" maxlength="16" autocomplete="off" placeholder="Nom du personnage" aria-label="Nom du personnage"><button class="pill" id="sheetOk" type="button">Créer le personnage</button></div>
+      <div class="ask" id="sheetSave" hidden><input id="sheetName" maxlength="16" autocomplete="off" placeholder="Character name" aria-label="Character name"><button class="pill" id="sheetOk" type="button">Create the character</button></div>
     </div>
-      <button class="ghost" id="nc3Back" type="button">Retour</button>
+      <button class="ghost" id="nc3Back" type="button">Back</button>
     </div>
   </div>
   <div id="charView" class="card menu" hidden>
     <h2 id="charName"></h2>
-    <div class="from"><span>Provient de :</span><img id="fromImg" alt=""></div>
+    <div class="from"><span>Comes from:</span><img id="fromImg" alt=""></div>
     <div class="grid3" id="poseList"></div>
     <div class="refs" id="refList"></div>
-    <button class="pill" id="charDel" type="button" hidden>Supprimer ce personnage</button>
+    <button class="pill" id="charDel" type="button" hidden>Delete this character</button>
   </div>
   <div id="cover" class="card" hidden>
     <div class="art" style="background-image:url(bg/terrasse.jpg)"></div>
     <img class="hero" src="chars/isa_nuit/listen.webp" alt="">
     <div class="veil"></div>
-    <div class="kicker">Chapitre 1</div>
+    <div class="kicker">Chapter 1</div>
     <div class="title">UNWRITTEN</div>
-    <p class="lede">Ton père part un mois. Une amie à lui emménage ce soir. Ta blonde ne l'a pas encore vue.</p>
+    <p class="lede">Your dad is leaving for a month. A friend of his moves in tonight. Your girlfriend hasn't seen her yet.</p>
     <form id="start">
-      <button class="go" type="submit">Commencer</button>
+      <button class="go" type="submit">Start</button>
     </form>
   </div>
   <div id="looks" class="card" hidden>
     <div class="art" style="background-image:url(bg/salon.jpg)"></div>
     <div class="veil"></div>
-    <div class="kicker">Personnalise</div>
+    <div class="kicker">Customize</div>
     <div class="title" style="font-size:6em">Isa</div>
     <div class="looks" id="lookList"></div>
-    <button class="go" id="lookGo" type="button">C'est elle</button>
+    <button class="go" id="lookGo" type="button">That's her</button>
   </div>
   <div id="epCard" hidden></div>
   <div id="end" class="card" hidden>
     <div class="art" style="background-image:url(bg/salon.jpg)"></div>
     <div class="veil"></div>
-    <div class="kicker" id="endKicker">Fin du chapitre 1</div>
-    <div class="title" id="endTitle">À suivre…</div>
-    <p class="lede" id="endLede">Isa allait dire quelque chose. Chapitre 2 bientôt.</p>
+    <div class="kicker" id="endKicker">End of chapter 1</div>
+    <div class="title" id="endTitle">To be continued…</div>
+    <p class="lede" id="endLede">Isa was about to say something. Chapter 2 soon.</p>
     <ul class="picks" id="picks"></ul>
-    <div class="endRow"><button class="go" id="again" type="button">Rejouer</button><button class="go" id="fbBtn" type="button">Avis</button></div>
+    <div class="endRow"><button class="go" id="again" type="button">Replay</button><button class="go" id="fbBtn" type="button">Feedback</button></div>
     <p class="credits" id="credits"></p>
   </div>
-  <button id="freshBtn" type="button" aria-label="Mettre à jour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
-  <button id="qrBtn" type="button" hidden aria-label="Faire regarder quelqu'un"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
-  <div id="eyes" hidden aria-label="Spectateurs"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
-  <button id="galBtn" type="button" aria-label="Personnages"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
+  <button id="freshBtn" type="button" aria-label="Update"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+  <button id="qrBtn" type="button" hidden aria-label="Let someone watch"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
+  <div id="eyes" hidden aria-label="Viewers"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
+  <button id="galBtn" type="button" aria-label="Characters"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
   <div id="poseCard" hidden><img id="poseImg" alt=""><span id="poseName"></span></div>
-  <button id="back" type="button" hidden aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button id="back" type="button" hidden aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
@@ -2098,12 +2098,12 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="absentBar" hidden></div>
   <div id="minView"></div>
   <div id="cellView"></div>
-  <button id="viewBtn" type="button" aria-label="Voir l'histoire"></button>
-  <button id="skipBtn" type="button" hidden aria-label="Passer l'intro"></button>
+  <button id="viewBtn" type="button" aria-label="Watch the story"></button>
+  <button id="skipBtn" type="button" hidden aria-label="Skip the intro"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
-    <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">Ce qui vient de se passer</div><ol></ol></div></div>
-    <div class="pc-btns"><button type="button" class="pc-go">Reprendre</button><button type="button" class="pc-quit">Quitter</button></div></div>
+    <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">What just happened</div><ol></ol></div></div>
+    <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
 </div>
 
@@ -2114,7 +2114,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="bar.js?v=20261031240000"></script>
 <script src="games.js?v=20261028143259"></script>
 <script src="gen.js?v=20261031490000"></script>
-<script src="demos.js?v=20261028143259"></script>
+<script src="demos.js?v=20261102210000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261028143259"></script>
@@ -2170,9 +2170,9 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { you: 'Tu es', choosing: 'choisit', reading: 'lit quelque chose', calling: 'appel entrant…', choices: 'Vos choix', again: 'Rejouer', delivered: 'Distribué', read: 'Lu', callEnded: 'Appel terminé',
-  newText: 'Nouveau message', epEnd: "Fin de l'épisode", finished: 'Tu as fini', won: 'Tu gagnes…', added: 'Ajouté à tes persos', episode: 'Épisode', next: 'Continuer', home: "Retour à l'accueil", finale: 'Voir la fin',
-  mute: 'Couper le son', unmute: 'Remettre le son', restartEp: "Recommencer l'épisode", restart: 'Recommencer', quit: 'Quitter' };
+const UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading something', calling: 'incoming call…', choices: 'Your choices', again: 'Replay', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended',
+  newText: 'New message', epEnd: 'End of episode', finished: 'You finished', won: 'You win…', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending',
+  mute: 'Mute', unmute: 'Unmute', restartEp: 'Restart the episode', restart: 'Start over', quit: 'Quit' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
 // a 2-player story brings its own players (its cast), the rest of the cast is shared
 const castOf = (id) => (story().cast && story().cast[id]) || CAST[id];
@@ -2953,7 +2953,7 @@ let absentKey = '';
 function showAbsent(names = absentSeats().map((k) => seatName(k))) {
   const bar = $('#absentBar'), on = names.length > 0 && screen === null && !TV;
   bar.hidden = !on; bar.classList.toggle('take', on && ROLE === 'host' && !TV);
-  if (on) bar.innerHTML = `${esc(names.join(', '))} ${names.length > 1 ? 'se sont déconnectés' : "s'est déconnecté"} · on l'attend…${ROLE === 'host' && !TV ? '<small>Touche pour jouer à sa place</small>' : ''}`;
+  if (on) bar.innerHTML = `${esc(names.join(', '))} disconnected · waiting for them…${ROLE === 'host' && !TV ? '<small>Tap to play for them</small>' : ''}`;
   const key = names.join('|');
   if (ROLE === 'host' && key !== absentKey) {
     absentKey = key; share();
@@ -3200,7 +3200,7 @@ async function tvIntro(at) {
   }).join('');
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
-  if (!(await slide('<div class="ti ti-h">Chacun fait ses choix en secret sur son cell.</div><div class="ti ti-h">Ici, vous verrez ce qui en découle.</div>', 5200))) return false;
+  if (!(await slide('<div class="ti ti-h">Everyone makes their choices in secret on their phone.</div><div class="ti ti-h">Here, you\'ll see what comes of them.</div>', 5200))) return false;
   tvPhase = null; skipVotes.clear(); share(); box.classList.add('out');
   if (!(await hold(1900))) return false;
   box.hidden = true; return true;
@@ -3235,7 +3235,7 @@ function showPause() {
   $('#pauseCard ol').innerHTML = last.length ? last.map((p) => {
     const k = p.who || p.by, c = (k && castOf(k)) || {};
     return `<li style="--c:${c.color || '#ff9a4d'}"><b>${esc(seatName(k) || seatLabel(k) || '')} <i>a choisi</i> « ${esc(fill(p.t))} »</b>${p.after ? `<span>${esc(p.after)}</span>` : ''}</li>`;
-  }).join('') : '<li class="none">Pas encore de choix : l\'histoire vient de commencer.</li>';
+  }).join('') : '<li class="none">No choices yet: the story just started.</li>';
 }
 $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
 // a phone on a TV's story: black with its character, its choices and its private lines (the story is on the TV);
@@ -3288,7 +3288,7 @@ const badge = (k) => `<span class="pbadge" style="--c:${(castOf(k) || {}).color 
 function openMirror(k) {
   if (!TV || !state.seats[k]) return;
   $('#mirrorWho').innerHTML = `${badge(k)}<span>${esc(seatName(k))}</span>`;
-  $('#mirrorPhone').innerHTML = `<iframe src="${location.pathname}?watch=${room}&mirror=${k}" title="L'écran de ${esc(seatName(k))}"></iframe>`;
+  $('#mirrorPhone').innerHTML = `<iframe src="${location.pathname}?watch=${room}&mirror=${k}" title="${esc(seatName(k))}'s screen"></iframe>`;
   $('#mirrorCard').hidden = false;
 }
 function closeMirror() { $('#mirrorCard').hidden = true; $('#mirrorPhone').innerHTML = ''; }
@@ -3480,7 +3480,7 @@ function endCard(d) {
   $('#endLede').textContent = fill(e.lede || ''); $('#endLede').hidden = !e.lede;
   const ul = $('#picks'); ul.innerHTML = '';
   const head = document.createElement('li'); head.innerHTML = `<b>${two ? ui('choices') : 'Tes choix'}</b>`; ul.appendChild(head);
-  $('#again').textContent = ui('again'); $('#fbBtn').textContent = 'Avis';
+  $('#again').textContent = ui('again'); $('#fbBtn').textContent = 'Feedback';
   for (const p of state.picks) {
     const li = document.createElement('li');
     li.append(`${two ? seatName(p.by) + ' · ' : ''}« ${fill(p.t)} » `);
@@ -3865,25 +3865,25 @@ function renderWait() {
   const card = (k, i) => {
     const s = state.seats[k], p = pick[k] || { pose: 'listen' };
     const nat = (FACE[spriteOf(k)] || {})[poseOf(k, p.pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');   // they face each other
-    const [cls, who] = s && s.id === myId ? ['me', 'Toi'] : s ? ['taken', s.n]
-      : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invitation envoyée à ${invite.n}…` : 'En attente d’un joueur…'] : ['free', 'Libre'];
+    const [cls, who] = s && s.id === myId ? ['me', 'You'] : s ? ['taken', s.n]
+      : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', 'Open'];
     return `<button type="button" class="wr-seat ${cls}" data-seat="${k}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
       <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   document.body.classList.toggle('roomfull', full);
   // a story with a love interest to pick (Un été de trop: Maya or Alex), under your character
-  const lovers = story().lovers && !full ? `<div class="wr-kick wr-lk">Choisis ton love interest</div><div class="wr-lovers">${story().lovers.map(([id, k, n]) => {
+  const lovers = story().lovers && !full ? `<div class="wr-kick wr-lk">Pick your love interest</div><div class="wr-lovers">${story().lovers.map(([id, k, n]) => {
     const sp = SPRITES[k], pose = sp && Object.keys(sp.poses)[0];
     return `<button type="button" class="${id === state.story ? 'on' : ''}" data-love="${id}"><span class="wr-head"><span><img src="${charUrl(k, pose)}" alt=""></span></span><b>${esc(n)}</b></button>`;
   }).join('')}</div>` : '';
-  $('#room').innerHTML = `<div class="wr-kick">Choisis ton perso</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Épisode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${lovers}
-    ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Ouvrir au public</button>' : ''}<button type="button" data-o="alone">Jouer seul</button></div>` : ''}
-    ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">L’autre joue au hasard</button></div>' : ''}
-    ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
+  $('#room').innerHTML = `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${lovers}
+    ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Open to the public</button>' : ''}<button type="button" data-o="alone">Play alone</button></div>` : ''}
+    ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">The other plays at random</button></div>' : ''}
+    ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Cancel</button></div>' : ''}
     ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-corner"><div class="qr"></div><b>${esc(room.toUpperCase())}</b></div>`
-      : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
+      : host && !mine ? '<p class="wr-hint">Tap the character you want to play.</p>' : ''}`;
   if (TV && !full) tvQr($('#room .tv-corner .qr'));
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
@@ -4008,10 +4008,10 @@ function tvBeacon(on) { if (TV && live && live.connected && room) live.publish(`
 function paintTvs() {
   const list = tvsOpen(), here = $('#tvBtn .tvHere');
   here.hidden = !list.length;
-  if (list.length) here.lastChild.textContent = list.length > 1 ? `${list.length} télés` : list[0].room.toUpperCase();
+  if (list.length) here.lastChild.textContent = list.length > 1 ? `${list.length} TVs` : list[0].room.toUpperCase();
   const box = $('#tvFound');
-  box.innerHTML = list.length ? list.map((r) => `<button type="button" data-r="${r.room}" aria-label="Rejoindre la télé ${r.room.toUpperCase()}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><b>${r.room.toUpperCase()}</b></button>`).join('')
-    : '<div class="tf-none" aria-label="On cherche une télé…"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><i></i></div>';
+  box.innerHTML = list.length ? list.map((r) => `<button type="button" data-r="${r.room}" aria-label="Join TV ${r.room.toUpperCase()}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><b>${r.room.toUpperCase()}</b></button>`).join('')
+    : '<div class="tf-none" aria-label="Looking for a TV…"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><i></i></div>';
   box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); joinRoom(b.dataset.r); });
 }
 $('#tvBtn').onclick = (e) => { e.stopPropagation(); feat('Sur la télé'); show('#tvFind'); };
@@ -4053,7 +4053,7 @@ $('#whoForm').addEventListener('submit', (e) => {
   const v = $('#whoName').value.trim().slice(0, 16);
   if (!AS) try { localStorage.setItem('smt-name', v); } catch { /* private window */ }   // the simulator's names stay there
   $('#whoName').blur();
-  if (ROLE === 'host') { state.name = v || 'Toi'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
+  if (ROLE === 'host') { state.name = v || 'You'; show('#hub'); share(); if (openAfterName) { const id = openAfterName; openAfterName = null; openFromDemo(id); } }
   else { myName = v || 'Ami'; show('#lobby'); goLive(); }
 });
 // ---- analytics, on this device only: plays and finishes per story, how each choice splits (a real choice is closer to
@@ -4067,7 +4067,7 @@ function bump(f) {
 }
 const feat = (name) => bump((st) => { st.f = st.f || {}; st.f[name] = (st.f[name] || 0) + 1; });   // a feature used
 const tally = (f) => bump((st) => { st.s = st.s || {}; const id = sid(state.story), r = (st.s[id] = st.s[id] || {}); if (storyName(state.story) !== state.story) r.n = storyName(state.story); f(r); });
-const FB_QS = [{ k: 'compris', q: "J'ai compris ?" }, { k: 'suite', q: "J'ai envie de voir la suite ?" }];   // by key: older answers (by number) stay out
+const FB_QS = [{ k: 'compris', q: 'Did I get it?' }, { k: 'suite', q: 'Do I want to see what happens next?' }];   // by key: older answers (by number) stay out
 let fbAns = {};
 let fbDone = false;   // a review counts once, whichever button sent it
 function openFb() {
@@ -4082,11 +4082,11 @@ function openFb() {
       row.appendChild(b);
     }
     const why = document.createElement('textarea'); why.className = 'why'; why.rows = 2; why.maxLength = 300; why.hidden = true; why.dataset.k = k;
-    why.placeholder = 'Pourquoi ?'; why.setAttribute('aria-label', 'Pourquoi');
+    why.placeholder = 'Why?'; why.setAttribute('aria-label', 'Why');
     $('#fbQs').append(row, why);
   });
   $('#fbClaude').hidden = state.story !== 'gen' || !window.ACT;   // a generated story: the act, the plan, the story and this review
-  $('#fbClaude').textContent = 'Envoyer et copier pour Claude (tout)';
+  $('#fbClaude').textContent = 'Send and copy for Claude (everything)';
   $('#fbCard').hidden = false;
 }
 $('#fbBtn').onclick = (e) => { e.stopPropagation(); openFb(); };
@@ -4096,7 +4096,7 @@ $('#fbSend').onclick = (e) => { e.stopPropagation(); sendFb(); };
 // the review saved first, then everything copied in one piece (the act, its plans, the plan open, this story and its review)
 $('#fbClaude').onclick = (e) => {
   e.stopPropagation(); sendFb(true); const b = $('#fbClaude'), text = JSON.stringify(ACT.bundle());
-  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { b.textContent = 'Copié : colle-le dans le chat'; $('#fbBtn').textContent = 'Copié pour Claude'; }, () => { b.textContent = 'Copie impossible'; });
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { b.textContent = 'Copied: paste it in the chat'; $('#fbBtn').textContent = 'Copied for Claude'; }, () => { b.textContent = 'Can\'t copy'; });
 };
 function sendFb(keepOpen) {
   if (fbDone) return; fbDone = true;
@@ -4118,9 +4118,9 @@ function sendFb(keepOpen) {
   } catch { /* private window */ }
   if (id === 'gen' && window.ACT_KEEP) ACT_KEEP('avis', { ans: fbAns, whys, text, story: (getGens()[0] || {}).idea });   // kept for Claude (act.js)
   if (!keepOpen) $('#fbCard').hidden = true;
-  $('#fbBtn').textContent = 'Merci';
+  $('#fbBtn').textContent = 'Thanks';
 }
-const storyName = (id) => ({ t1: 'UNWRITTEN', play: 'Le café', bar: 'Last call', gen: 'Ton histoire' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
+const storyName = (id) => ({ t1: 'UNWRITTEN', play: 'Le café', bar: 'Last call', gen: 'Your story' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
 // ---- Stats and Valider l'idée: every device's tally (usage.js), added up live ----
 function sumUp(devs) {
   const S = {}, F = {}, A = { n: 0, back: 0, play: 0, ep: 0, next: 0, gen: { n: 0, in: 0, out: 0 }, notes: [] };
@@ -4390,8 +4390,8 @@ function renderHist() {
       (g.used ? ` · ~${GEN.cost(g.used).toLocaleString('fr-CA', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} $` : '');
     const p = document.createElement('p'); p.textContent = g.idea;
     const row = document.createElement('div'); row.className = 'row';
-    const play = document.createElement('button'); play.type = 'button'; play.textContent = 'Jouer';
-    const txt = document.createElement('button'); txt.type = 'button'; txt.textContent = 'Texte';
+    const play = document.createElement('button'); play.type = 'button'; play.textContent = 'Play';
+    const txt = document.createElement('button'); txt.type = 'button'; txt.textContent = 'Text';
     const pre = document.createElement('pre'); pre.hidden = true; pre.textContent = GEN.text(steps);
     play.onclick = (e) => { e.stopPropagation(); playGen(steps); };
     txt.onclick = (e) => { e.stopPropagation(); pre.hidden = !pre.hidden; };
@@ -4408,17 +4408,17 @@ $('#genHistBtn').onclick = (e) => { e.stopPropagation(); renderHist(); show('#ge
 // the prompt as sent: the instructions + "The idea: " and what's typed right now; below, the small call that shortens a button
 $('#genPromptBtn').onclick = (e) => {
   e.stopPropagation();
-  $('#genPromptText').textContent = GEN.SYSTEM + String.fromCharCode(10, 10) + 'The idea: ' + ($('#genIdea').value.trim() || '[ton idée]');
+  $('#genPromptText').textContent = GEN.SYSTEM + String.fromCharCode(10, 10) + 'The idea: ' + ($('#genIdea').value.trim() || '[your idea]');
   $('#genShortText').textContent = GEN.SHORTEN; show('#genPrompt'); $('#genPrompt').scrollTop = 0;
-  $('#epPromptText').textContent = EP1.PROMPT + String.fromCharCode(10, 10) + 'The idea: ' + ($('#genIdea').value.trim() || '[ton idée]');
+  $('#epPromptText').textContent = EP1.PROMPT + String.fromCharCode(10, 10) + 'The idea: ' + ($('#genIdea').value.trim() || '[your idea]');
 };
 // Épisode 1 (ep1.js): the answer of whatever AI got the prompt, pasted here, plays like a generated story and joins the last ones
 $('#epGo').onclick = (e) => {
   e.stopPropagation(); const raw = $('#epPaste').value, a = raw.indexOf('{'), b = raw.lastIndexOf('}');
   try {
-    if (a < 0 || b < a) throw new Error('Pas de JSON dans ce qui est collé.');
+    if (a < 0 || b < a) throw new Error('No JSON in what was pasted.');
     const json = JSON.parse(raw.slice(a, b + 1)), st = GEN.build(json);
-    saveGen('Épisode 1 · ' + ((json.seed && json.seed.premise) || json.title || ''), json); $('#epMsg').textContent = ''; playGen(st);
+    saveGen('Episode 1 · ' + ((json.seed && json.seed.premise) || json.title || ''), json); $('#epMsg').textContent = ''; playGen(st);
   } catch (err) { $('#epMsg').textContent = err.message; }
 };
 for (const b of document.querySelectorAll('.genCopy')) b.onclick = async (e) => {
@@ -4438,17 +4438,17 @@ $('#genAct').onclick = async (e) => {
   if (!key) { $('#genKey').focus(); return; }
   try { localStorage.setItem('smt-key', key); localStorage.setItem('smt-idea', idea); } catch { /* private window */ }
   $('#genAct').disabled = $('#genGo').disabled = true;
-  try { const u = await ACT.auto(key, { idea, n: 1, newAct: true }, (t) => ($('#genMsg').textContent = t)); GEN_USED(u); $('#genMsg').textContent = `Fait : ${(GEN.cost(u)).toFixed(2)} $. La suite : Acte › Générer › épisode 2.`; }
-  catch (err) { $('#genMsg').textContent = err.message || "Ça n'a pas marché."; }
+  try { const u = await ACT.auto(key, { idea, n: 1, newAct: true }, (t) => ($('#genMsg').textContent = t)); GEN_USED(u); $('#genMsg').textContent = `Done: $${(GEN.cost(u)).toFixed(2)}. Next: Acte › Générer › episode 2.`; }
+  catch (err) { $('#genMsg').textContent = err.message || "It didn't work."; }
   $('#genAct').disabled = $('#genGo').disabled = false;
 };
 $('#genGo').onclick = async (e) => {
   e.stopPropagation(); const idea = $('#genIdea').value.trim(), key = $('#genKey').value.trim();
   if (!idea || !key) { $(idea ? '#genKey' : '#genIdea').focus(); return; }
   try { localStorage.setItem('smt-key', key); localStorage.setItem('smt-idea', idea); } catch { /* private window */ }
-  $('#genGo').disabled = true; $('#genMsg').textContent = 'Haiku écrit…';
+  $('#genGo').disabled = true; $('#genMsg').textContent = 'Haiku is writing…';
   try { const st = await GEN.make(idea, key); saveGen(idea, st.src, st.used); bump((x) => { const g = (x.gen = x.gen || { n: 0, in: 0, out: 0 }); g.n++; g.in += st.used.in; g.out += st.used.out; }); playGen(st); }
-  catch (err) { $('#genMsg').textContent = err.message || "Ça n'a pas marché."; }
+  catch (err) { $('#genMsg').textContent = err.message || "It didn't work."; }
   $('#genGo').disabled = false;
 };
 // Full demo is its own page: coming back (its ‹ or the phone's back) lands on these tiles, not on the name screen
@@ -4548,7 +4548,7 @@ function galTile(g) {
 }
 for (const g of GALLERY.filter((x) => !x.recolor)) galTile(g);
 {
-  const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'Nouveau personnage');
+  const add = document.createElement('button'); add.type = 'button'; add.className = 'add'; add.setAttribute('aria-label', 'New character');
   const plus = document.createElement('span'); plus.textContent = '+'; add.appendChild(plus);
   add.onclick = (e) => { e.stopPropagation(); ncStep(1); show('#newChar'); };
   $('#galList').appendChild(add);
@@ -4568,13 +4568,13 @@ $('#actorPhoto').onchange = () => {
   if (actorPhoto) URL.revokeObjectURL(actorPhoto);
   actorPhoto = URL.createObjectURL(f);
   $('#actorPhotoBtn i').innerHTML = `<img src="${actorPhoto}" alt="">`;
-  $('#actorPhotoBtn b').textContent = 'Photo ajoutée';
+  $('#actorPhotoBtn b').textContent = 'Photo added';
 };
 function ncStep(n) {
   for (const k of [1, 2, 3]) $('#nc' + k).hidden = k !== n;
   if (n === 2) {
     $('#promptText').textContent = sheetPrompt();
-    $('#nc2Lead').textContent = actorPhoto ? 'Copie ce prompt dans ChatGPT et joins-lui ta photo. Garde l’image qu’il te donne.' : 'Copie ce prompt dans ChatGPT, avec une photo si tu en as une. Garde l’image qu’il te donne.';
+    $('#nc2Lead').textContent = actorPhoto ? 'Copy this prompt into ChatGPT and attach your photo. Keep the image it gives you.' : 'Copy this prompt into ChatGPT, with a photo if you have one. Keep the image it gives you.';
   }
   $('#newChar').scrollTop = 0;
 }
@@ -4639,7 +4639,7 @@ async function cutSheet(file, ORDER = POSE_ORDER) {
   for (let n = 0; n < ORDER.length; n++) {
     const c = n % 3, r = (n / 3) | 0, cw = W / 3, ch = H / 2, x0 = Math.round(c * cw + cw * 0.015), y0 = Math.round(r * ch + ch * 0.015);
     const f = figureOf(W, x0, y0, Math.round((c + 1) * cw - cw * 0.015), Math.round((r + 1) * ch - ch * 0.015), alpha);
-    if (!f) throw new Error(`Je ne vois personne dans la case ${n + 1} (3 colonnes × 2 rangées, un fond uni).`);
+    if (!f) throw new Error(`I can't see anyone in cell ${n + 1} (3 columns × 2 rows, a plain background).`);
     cells.push({ ...f, x0, y0 });
   }
   const scale = CUT_H / Math.max(...cells.map((c) => c.by1 - c.by0 + 1)), out = [];
@@ -4666,12 +4666,12 @@ let cutNow = null, openG = null;
 $('#sheetPick').onclick = (e) => { e.stopPropagation(); $('#sheetFile').click(); };
 $('#sheetFile').onchange = async () => {
   const f = $('#sheetFile').files[0]; if (!f) return;
-  $('#sheetMsg').textContent = 'Découpe…'; $('#sheetPrev').hidden = $('#sheetSave').hidden = true; cutNow = null;
+  $('#sheetMsg').textContent = 'Cutting…'; $('#sheetPrev').hidden = $('#sheetSave').hidden = true; cutNow = null;
   try {
     cutNow = await cutSheet(f); $('#sheetPrev').innerHTML = '';
     for (const p of cutNow) $('#sheetPrev').appendChild(tile(URL.createObjectURL(p.blob), p.pose));
-    $('#sheetPrev').hidden = $('#sheetSave').hidden = false; $('#sheetMsg').textContent = "Les 6 poses sont découpées. Un nom, et c'est fait.";
-  } catch (err) { $('#sheetMsg').textContent = err.message || "Cette image ne s'ouvre pas."; }
+    $('#sheetPrev').hidden = $('#sheetSave').hidden = false; $('#sheetMsg').textContent = 'The 6 poses are cut. A name, and you\'re done.';
+  } catch (err) { $('#sheetMsg').textContent = err.message || "This image won't open."; }
   $('#sheetFile').value = '';
 };
 $('#sheetOk').onclick = async (e) => {
@@ -4795,7 +4795,7 @@ let invNow = null;
 function gotInvite(v) {
   if (!['#hub', '#infos', '#more', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
   invNow = v;
-  $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} t'invite`;
+  $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} invites you`;
   $('#invTitle').textContent = storyTitle(v.invite.s) || v.invite.s;
   $('#inviteCard').hidden = false;
 }
@@ -5028,8 +5028,8 @@ try { $('#whoName').value = localStorage.getItem('smt-name') || ''; } catch { /*
 fit();
 if (PREVIEW) {
   // one phone plays both seats, offline; Full demo forwards each tap as where it landed (so choices work too)
-  document.body.classList.add('preview'); state.name = 'Toi';
-  if (seatsOf(PREVIEW).length) state.seats = Object.fromEntries(seatsOf(PREVIEW).map((k) => [k, { id: myId, n: 'Toi' }]));
+  document.body.classList.add('preview'); state.name = 'You';
+  if (seatsOf(PREVIEW).length) state.seats = Object.fromEntries(seatsOf(PREVIEW).map((k) => [k, { id: myId, n: 'You' }]));
   // &cut=14-19,53-62: only those stretches of the story (in taps), the jumps behind a black card
   const cut = (new URLSearchParams(location.search).get('cut') || '').split(',').map((x) => x.split('-').map(Number)).filter((x) => x.length === 2 && x.every((n) => n >= 0));
   const veil = document.createElement('div');
@@ -5055,8 +5055,8 @@ if (PREVIEW) {
     } else if (el) el.click();
     setTimeout(() => { if (cut[part] && tape.length >= cut[part][1] && cut[part + 1]) { part++; goTo(cut[part][0]); } else report(); }, 50);
   });
-} else if (PLAY_ONLY) { document.body.classList.add('playonly'); if ((window.TEST_LIST || []).some((t) => t.id === PLAY_ONLY)) document.body.classList.add('uitop'); state.name = 'Toi'; Promise.race([window.IMPORTS_READY, sleep(4000)]).finally(() => begin(PLAY_ONLY)); }   // the imported characters first
-else if (TV) { document.body.classList.add('tv'); state.name = 'Télé'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
+} else if (PLAY_ONLY) { document.body.classList.add('playonly'); if ((window.TEST_LIST || []).some((t) => t.id === PLAY_ONLY)) document.body.classList.add('uitop'); state.name = 'You'; Promise.race([window.IMPORTS_READY, sleep(4000)]).finally(() => begin(PLAY_ONLY)); }   // the imported characters first
+else if (TV) { document.body.classList.add('tv'); state.name = 'TV'; goLive(); show('#hub'); }   // goLive first: the home's QR needs the room
 else if (ROLE === 'host') {
   goLive();
   const lab = new URLSearchParams(location.search).has('lab');   // back from a test: straight to Mini-jeux
@@ -5074,7 +5074,7 @@ else { if (AS) $('#whoName').value = AS; $('#whoForm .pill').click(); }   // str
   if (o && ROLE === 'host' && (STORIES[o[1]] || o[1] === 'histoire' || o[1] === 'perso')) {
     openAfterName = o[1]; fromDemo = true; history.replaceState(null, '', location.pathname + location.search);
     if (screen === '#hub') { openAfterName = null; openFromDemo(o[1]); } else if ($('#whoName').value) $('#whoForm .pill').click();
-    else { openAfterName = null; state.name = 'Toi'; show('#hub'); share(); openFromDemo(o[1]); }   // Full demo never asks your name
+    else { openAfterName = null; state.name = 'You'; show('#hub'); share(); openFromDemo(o[1]); }   // Full demo never asks your name
   }
 }
 const jump = location.hash.match(/^#([tpb])(\d+)$/);

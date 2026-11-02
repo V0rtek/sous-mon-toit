@@ -132,8 +132,8 @@ const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12
 // height %, top %, class]); win: who you win at the end of that episode (désir: whoever you fell for). Episode 1's text = what
 // comes after the opening, to the end of the episode. ----
 const TASTES = {
-  revanche: { name: 'La revanche', color: '#e8c25a', title: 'Regarde-moi bien', hook: 'Il y a un an, il a ri de toi devant 200 personnes. Ce soir, tu reviens.',
-    poster: [['julian', 'smirk', 50, 104, 8]], row: [['julian', 'smirk', 78, 320, -12]], verb: 'Te venger',
+  revanche: { name: 'Revenge', color: '#e8c25a', title: 'Regarde-moi bien', hook: 'A year ago, he laughed at you in front of 200 people. Tonight, you\'re back.',
+    poster: [['julian', 'smirk', 50, 104, 8]], row: [['julian', 'smirk', 78, 320, -12]], verb: 'Get revenge',
     win: { ep: 2, sprite: 'suit', pose: 'adjust', name: 'Victor' },
     eps: [
       { title: 'La suite du gala', sum: 'Le contrat passe de main en main. Julian rit trop fort, puis plus du tout. Il te prend à part sur la terrasse : d’où vient l’argent ? Toi, tu sais ce qu’il ignore : ce n’est pas ton argent. Victor s’approche et murmure que la personne qui paie veut te voir, ce soir.', end: '« Elle dit que tu lui dois un service. »' },
@@ -142,8 +142,8 @@ const TASTES = {
       { title: 'Deux ennemis', sum: 'Deux ennemis, un seul contrat. Diane veut que tu fermes la compagnie demain matin. Julian veut que tu la sauves. Victor te souffle une info : Diane a déjà fait ça à quelqu’un, avant toi. Choix : à qui tu fais confiance.', end: '« Cette personne-là n’est jamais revenue. »' },
       { title: 'La signature', sum: 'Salle du conseil. Diane, Julian, deux cents actionnaires, comme au gala d’il y a un an. Tout le monde attend ta signature. Cette fois, c’est toi qui tiens le micro. Choix : couler Julian, couler Diane, ou les deux.', end: 'Avant que tu parles, les écrans s’allument. Une vidéo de toi. Celle que personne ne devait voir.' },
     ] },
-  desir: { name: 'Le désir', color: '#ff5c8a', title: 'Interdite', hook: 'La blonde de ton meilleur ami te regarde comme ça depuis une heure.',
-    poster: [['cam', 'flirty', 56, 108, 9]], row: [['cam', 'flirty', 78, 330, -10]], verb: 'Tomber pour quelqu’un',
+  desir: { name: 'Desire', color: '#ff5c8a', title: 'Interdite', hook: 'Your best friend\'s girlfriend has been looking at you like that for an hour.',
+    poster: [['cam', 'flirty', 56, 108, 9]], row: [['cam', 'flirty', 78, 330, -10]], verb: 'Fall for someone',
     win: { ep: 2, love: true },
     eps: [
       { title: 'La suite du party', sum: 'La porte s’ouvre : {P}, à moitié {p:endormi|endormie}, cherche ses clés. {p:Il|Elle} vous regarde, toi et {LI}, une seconde de trop. Personne ne dit rien. Sur le chemin du retour, ton cell vibre : « On en reparle jamais. » Trois points. Un deuxième texto.', end: '« Sauf demain. Au chalet. 14 h. »' },
@@ -152,8 +152,8 @@ const TASTES = {
       { title: 'Le témoin', sum: '{LI} te coince dans le garage : « Si tu me dis de pas dire oui, je dis non. » Tout repose sur toi. Tu vas voir {P} pour lui parler, et {p:il|elle} te montre la bague, les yeux pleins d’eau. Choix : lui dire ou te taire.', end: 'Ton cell vibre. Un texto de {P}, envoyé à toi par erreur : « Je sais pour l’été. »' },
       { title: 'Je sais', sum: '{P} savait depuis le début : la demande était un test. {p:Il|Elle} vous réunit sur le quai, le soir, et pose une seule question : « Lequel de vous deux me ment depuis un an ? » {LI} te regarde. Choix : te sacrifier ou {li:le|la} laisser tomber.', end: '{LI} répond avant toi. Et ce n’est pas ce que vous aviez prévu.' },
     ] },
-  etrange: { name: 'L’étrange', color: '#a78bfa', title: 'Personne se souvient', hook: 'Ce matin, ta sœur n’existe plus. Sauf pour toi.',
-    poster: [['isa_nuit', 'listen', 46, 100, 12, 'spirit']], row: [['isa_nuit', 'listen', 74, 300, -8, 'spirit']], verb: 'L’inexpliqué',
+  etrange: { name: 'The strange', color: '#a78bfa', title: 'Personne se souvient', hook: 'This morning, your sister no longer exists. Except to you.',
+    poster: [['isa_nuit', 'listen', 46, 100, 12, 'spirit']], row: [['isa_nuit', 'listen', 74, 300, -8, 'spirit']], verb: 'The unexplained',
     win: { ep: 2, sprite: 'isa_nuit', pose: 'listen', name: 'Emma' },
     eps: [
       { title: 'La suite du matin', sum: 'Maman insiste, tout sourire, pour voir ton téléphone. Tu sors par la porte de derrière. Dehors, les voisins te saluent comme d’habitude, mais la balançoire d’Emma n’est plus dans la cour, comme si elle n’y avait jamais été. Ton cell vibre. Un deuxième vocal, plus faible.', end: '« Si tu m’oublies toi aussi, je disparais pour vrai. »' },
@@ -162,8 +162,8 @@ const TASTES = {
       { title: 'Le remplaçant', sum: 'Le « frère » prend ta place : tes amis, ton lit, ton nom. Plus il existe, plus tu t’effaces : tes textos disparaissent, ton reflet tarde. Emma t’explique comment la ramener : quelqu’un doit dire son nom à voix haute, devant la chose. Choix : le faire ce soir ou attendre.', end: '« Mais si tu dis mon nom devant elle, elle saura que tu te souviens. »' },
       { title: 'Dis son nom', sum: 'Souper de famille. La chose qui ressemble à maman, le frère qui a ton visage, une chaise vide. Tout le monde attend que tu oublies. Choix : dire le nom d’Emma, ou garder ta place.', end: 'Tu dis « Emma ». La chaise vide recule toute seule.' },
     ] },
-  danger: { name: 'Le danger', color: '#ff453a', title: 'Ouvre pas', hook: '3 h 12. Un texto de ton propre numéro.',
-    poster: [], row: [], notif: ['Toi', 'Ouvre pas la porte.'], verb: 'Avoir peur',
+  danger: { name: 'Danger', color: '#ff453a', title: 'Ouvre pas', hook: '3:12 a.m. A text from your own number.',
+    poster: [], row: [], notif: ['Toi', 'Ouvre pas la porte.'], verb: 'Get scared',
     win: { ep: 2, sprite: 'rae', pose: 'kneel', name: 'Léa' },
     eps: [
       { title: 'La suite de la nuit', sum: 'Par l’entrebâillement, « Léa » sourit. Trop. Tu refermes. Elle cogne encore, puis plus rien. Texto de ton numéro : « Bien joué. Va voir dans ta chambre. » Sur ton lit, il y a ton cell. Alors celui que tu tiens dans ta main n’est pas le tien.', end: 'L’écran s’allume. Appel entrant : Léa.' },
@@ -208,7 +208,7 @@ const episodesDone = () => Object.values(get('ser', {})).reduce((a, b) => a + b,
 // the app opens up as you play: Social after 2 episodes, then Explorer, Recherche, Créer. A profile from before the
 // onboarding (or « Tout débloqué ») has everything.
 const LADDER = { social: 2, explore: 3, search: 4, add: 5 };
-const LABEL = { social: 'Social', explore: 'Explorer', search: 'Recherche', add: 'Créer' };
+const LABEL = { social: 'Social', explore: 'Explore', search: 'Search', add: 'Create' };
 const progressive = () => !!onb() && !get('all', false);
 const isOpen = (tab) => !progressive() || !LADDER[tab] || episodesDone() >= LADDER[tab];
 // the next episode to play: your story's, then Last call's once yours is over
@@ -248,12 +248,12 @@ const tease = (c, titled = true) => `<div class="tz"><div class="art a-${c.w}"><
 function episode(box, k, n, opts = {}) {
   const T = TASTES[k], ep = T.eps[n - 1];
   box.innerHTML = `<div class="se"><div class="se-body">
-    <span class="se-inc">Incomplet</span>
-    <p class="se-hyp">Voici la suite hypothétique de cet épisode</p>
-    <div class="se-k">${esc(T.title)} · Épisode ${n}</div>
+    <span class="se-inc">Incomplete</span>
+    <p class="se-hyp">Here is how this episode could go</p>
+    <div class="se-k">${esc(T.title)} · Episode ${n}</div>
     <h2>${esc(fill(ep.title))}</h2>
     <p class="se-sum">${esc(fill(ep.sum))}</p>
-    <button class="se-go" data-x="done">Fin de l’épisode</button></div></div>`;
+    <button class="se-go" data-x="done">End of episode</button></div></div>`;
   box.hidden = false;
   box.onclick = (e) => {
     const b = e.target.closest('[data-x]'); if (!b) return;
@@ -284,21 +284,21 @@ function endOf(box, k, n, opts) {
   }
   const nx = nextEp(), timers = [];
   const later = (ms, f) => timers.push(setTimeout(() => { if (box.contains(card)) f(); }, ms));
-  box.innerHTML = `<div class="sw"><div class="sw-a"><div class="sw-done"><small>Tu as fini</small><b>Épisode ${n}</b></div>
-    ${won ? `<div class="sw-kick">Tu gagnes…</div><div class="sw-rays"></div><div class="sw-shake"><div class="sw-glow"></div><img class="sw-fig" src="chars/${w.sprite}/${w.pose}.webp" alt=""></div>
+  box.innerHTML = `<div class="sw"><div class="sw-a"><div class="sw-done"><small>You finished</small><b>Episode ${n}</b></div>
+    ${won ? `<div class="sw-kick">You win…</div><div class="sw-rays"></div><div class="sw-shake"><div class="sw-glow"></div><img class="sw-fig" src="chars/${w.sprite}/${w.pose}.webp" alt=""></div>
       <div class="sw-ring"></div><div class="sw-sparks">${sparks()}</div><div class="sw-flash"></div>
-      <div class="sw-won"><b>${esc(w.name)}</b><span>Ajouté à tes persos</span></div>` : ''}</div></div>`;
+      <div class="sw-won"><b>${esc(w.name)}</b><span>Added to your characters</span></div>` : ''}</div></div>`;
   const card = box.firstChild;
   const tease = () => {
     timers.forEach(clearTimeout); card.onclick = null;
     const pic = !nx ? '' : nx.k === 'lastcall' ? `<img src="covers/lastcall${nx.n > 1 ? '_ep' + nx.n : ''}.jpg" alt="">` : art(nx.k, false);
     const title = !nx ? '' : nx.k === 'lastcall' ? 'Last call' : fill(TASTES[nx.k].eps[nx.n - 1].title);
     card.className = 'sw';
-    card.innerHTML = `<div class="sw-t">${nx ? `<div class="sw-kick">Épisode ${nx.n}</div><h2>${esc(title)}</h2><div class="sw-img${nx.k === 'lastcall' ? '' : ' tall'}">${pic}</div>` : '<h2 class="sw-later">La suite arrive.</h2>'}
+    card.innerHTML = `<div class="sw-t">${nx ? `<div class="sw-kick">Episode ${nx.n}</div><h2>${esc(title)}</h2><div class="sw-img${nx.k === 'lastcall' ? '' : ' tall'}">${pic}</div>` : '<h2 class="sw-later">Coming soon.</h2>'}
       ${opened.map((t) => `<div class="se-new">Nouveau : ${LABEL[t]}</div>`).join('')}
       <div class="se-btns">${nx ? `<button class="se-go" data-x="next">${PLAY}Continuer</button>` : ''}
-        ${won && opts.profile ? '<button class="se-home" data-x="profile">Voir dans mon profil</button>' : ''}
-        <button class="se-home" data-x="home">Retour à l’accueil</button></div></div>`;
+        ${won && opts.profile ? '<button class="se-home" data-x="profile">See it in my profile</button>' : ''}
+        <button class="se-home" data-x="home">Back to home</button></div></div>`;
   };
   later(60, () => card.classList.add('done'));
   if (!won) later(2200, tease);

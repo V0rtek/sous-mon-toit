@@ -60,7 +60,7 @@ const dVerre = [
   cam('one', 'cam'), say('cam', 'worried', 'Quelqu’un qui sait où tu habites.', { to: 'brooke' }),
   { episode: { n: 1, win: { sprite: 'brooke', pose: 'drunk_joke', name: 'Brooke' } } },
   { fade: 'out', ms: 1600 },
-  { end: { kicker: "Fin de l'épisode 1", title: 'Le dernier verre', lede: '{LEDE}', art: null } },
+  { end: { kicker: 'End of episode 1', title: 'Le dernier verre', lede: '{LEDE}', art: null } },
 ];
 dVerre.seats = ['brooke', 'cam'];   // one phone plays both: no "you are…" card
 dVerre.solo = { brooke: 'Brooke', cam: 'Cam' };

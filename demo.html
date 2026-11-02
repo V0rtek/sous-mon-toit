@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -729,14 +729,14 @@ body.t-search #switch { visibility: hidden; }
     <section id="search" class="view" hidden></section>
   </div>
   <header id="top">
-    <button class="round" data-act="back" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="round" data-act="back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="switch">
-      <button class="round" data-act="vprev" aria-label="Version précédente"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="round" data-act="vprev" aria-label="Previous version"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="vName" data-act="gear"></button>
-      <button class="round" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="round" data-act="vnext" aria-label="Next version"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <button class="round gearBtn" data-act="gear" aria-label="Réglages"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
-    <button class="round" id="savedBtn" data-act="tab" data-tab="saved" aria-label="Sauvés"></button>
+    <button class="round gearBtn" data-act="gear" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="7" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="9" cy="17" r="2.3" fill="none" stroke="#fff" stroke-width="2.2"/></svg></button>
+    <button class="round" id="savedBtn" data-act="tab" data-tab="saved" aria-label="Saved"></button>
   </header>
   <nav id="tabs"></nav>
   <div id="detail" hidden></div>
@@ -749,7 +749,7 @@ body.t-search #switch { visibility: hidden; }
 <script src="chars.js"></script>
 <script src="people.js"></script>
 <script src="usage.js"></script>
-<script src="series.js"></script>
+<script src="series.js?v=20261102210000"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -796,8 +796,8 @@ const NAMES = { astro_gore: 'Vesper', astro_tentacle: 'Abysse', astro_orion: 'Or
 // on: online; doing: the story they're in (a room waiting for you, or playing); seen: when, if offline
 const FRIENDS = [
   { n: 'Léa', c: '#ff4f8b', ch: 'mila', on: true, doing: 'cles', waits: true }, { n: 'Max', c: '#4f9dff', ch: 'ninja', on: true },
-  { n: 'Sam', c: '#ff9f2e', ch: 'belier_blanc', on: true }, { n: 'Inès', c: '#9b6bff', ch: 'plage', on: false, seen: 'il y a 3 h' },
-  { n: 'Noé', c: '#25c48a', ch: 'exile', on: false, seen: 'hier' },
+  { n: 'Sam', c: '#ff9f2e', ch: 'belier_blanc', on: true }, { n: 'Inès', c: '#9b6bff', ch: 'plage', on: false, seen: '3 h ago' },
+  { n: 'Noé', c: '#25c48a', ch: 'exile', on: false, seen: 'yesterday' },
 ];
 const STRANGERS = [{ n: 'Nico', c: '#5ac8c8', ch: 'dan' }, { n: 'Zoé', c: '#c97b4a', ch: 'ruby' }, { n: 'Malik', c: '#7f8cff', ch: 'amare' }, { n: 'Jade', c: '#d4609b', ch: 'isa_nuit' }, { n: 'Hugo', c: '#8bbf4a', ch: 'alex' }];
 // a real person ('@' + their id: every device with the app open) or one of the fake ones (by name)
@@ -816,95 +816,95 @@ const DEMOS = [
     eps: [{ title: 'Last call', img: 'covers/lastcall.jpg', win: { sprite: 'cam', pose: 'listen', name: 'Cam' }, tease: 'One last drink. Then Brooke goes to the bathroom — someone is already waiting.' },
       { title: 'The house', img: 'covers/lastcall_ep2.jpg', win: { sprite: 'julian', pose: 'smirk', name: 'Julian' }, tease: 'Every window is lit. Every glass of red means something.' },
       { title: 'The red door', img: 'covers/lastcall_ep3.jpg', win: { sprite: 'suit', pose: 'adjust', name: 'The stranger' }, tease: 'Third door. The red light. Someone is already inside.' }],
-    pitch: "Trois amis, un dernier verre, et Brooke qui allait enfin dire quelque chose à Cam. Puis il part aux toilettes — et l'homme en complet qui l'y attend a un boulot pour lui.",
+    pitch: "Three friends, one last drink, and Brooke was finally about to tell Cam something. Then he goes to the bathroom — and the man in the suit waiting there has a job for him.",
     lines: [[-1, 'Saturday, 1:40 a.m.'], [0, 'Man… I think…', 'drunk_happy'], [0, 'I think we’re getting too old for this shit.', 'drunk_talk'], [2, 'Man… I think…', 'drunk_talk'], [2, 'I think I’m having my best fucking life, man.', 'drunk_smile'], [1, 'Thought you had a job interview tomorrow.', 'thinking'], [2, 'I’m a broke ass bitch, I ain’t got nothing tomorrow.', 'drunk_smile'], [0, 'Rent’s due Monday, man. I’m not covering you again.', 'drunk_listen'], [2, 'Justin. My brother. My rock.', 'drunk_smile'], [0, 'No.', 'drunk_talk'], [0, 'I need water. Like… a lot of water.', 'drunk_talk'], [1, '…What?', 'tipsy_laugh']] },
   // Test: the demo that runs through every system (test.js), clean enough to show anyone; always in Accueil
   { id: 'test', title: 'Test', by: '@unwritten', plays: '—', bg: 'maison', pos: '50% 50%', fx: 'grayscale(.85) brightness(.32)', glow: '#fff3cf',
-    full: 'd_test', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'suit', pose: 'adjust', name: "L'étranger" }, tease: 'La suite arrive.' }],
+    full: 'd_test', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'suit', pose: 'adjust', name: 'The stranger' }, tease: 'Coming soon.' }],
     cast: [['justin_bar', 'drunk_serious'], ['suit', 'adjust'], ['brooke', 'nervous']], players: 2, byoc: false, live: null, you: 0,
-    pitch: "2 h du matin. Justin et Brooke, une salle d'interrogatoire, et un homme en complet qui parle d'une mallette disparue. Il n'a montré de badge à personne.",
+    pitch: "2 a.m. Justin and Brooke, an interrogation room, and a man in a suit talking about a missing briefcase. He hasn't shown anyone a badge.",
     lines: [[-1, 'Poste 12 · 2 h 14'], [1, "Messieurs. Merci d'être venus.", 'adjust'], [0, 'On avait pas vraiment le choix.', 'drunk_serious'], [1, 'Une mallette a disparu du Larina ce soir.', 'listen'], [2, 'Une mallette ? On a même pas vu de mallette.', 'nervous'], [1, 'Vos téléphones sur la table.', 'offer'], [0, "Votre badge d'abord.", 'angry'], [1, 'Plus tard.', 'adjust']] },
   // a series: the island (its poster is the beach of day 1; the preview, night 3 in the forest)
   { id: 'ile', title: "Ce qui reste de l'île", by: '@ileperdue', plays: '19,7 k', bg: 'forest', glow: '#ff3b3b',
-    full: 'd_ile', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'mila', pose: 'beach', name: 'Mila' }, tease: 'La suite arrive.' }],
+    full: 'd_ile', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'mila', pose: 'beach', name: 'Mila' }, tease: 'Coming soon.' }],
     cast: [['dan', 'stand'], ['rae', 'kneel']], players: 2, byoc: false, live: { strangers: 1, since: 2 }, you: 0,
-    pitch: "Quatre amis, une île, une semaine de soleil. Le bateau devait revenir il y a deux jours — et Mila, qu'ils ont vue tomber, chante encore dans la forêt.",
+    pitch: "Four friends, an island, a week of sun. The boat was due back two days ago — and Mila, whom they saw fall, is still singing in the forest.",
     lines: [[0, "Rae. Lève-toi. Il fait presque nuit.", "stand"], [1, "Deux minutes. Juste… deux minutes."], [0, "T'as entendu ça ?", "scared"], [1, "Arrête. Y a rien."], [-1, "Derrière les arbres, quelqu'un chante. La voix de Mila."], [0, "Mila est morte, Rae. On l'a vue tomber.", "scared"], [1, "…Alors pourquoi elle m'appelle ?"], [1, "Elle dit qu'il y a de la place pour nous deux.", "possessed"]] },
   // drawn from one sheet (25/10): one pose each, so their lines carry none
   { id: 'beliers', title: "Deux béliers", by: '@colline', plays: '2,1 k', bg: 'maison', pos: '70% 50%', fx: 'saturate(.7) brightness(.55) hue-rotate(50deg)', glow: '#e8dcc0',
-    full: 'd_beliers', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'belier_blanc', pose: 'stand', name: 'Neige' }, tease: 'La suite arrive.' }],
+    full: 'd_beliers', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'belier_blanc', pose: 'stand', name: 'Neige' }, tease: 'Coming soon.' }],
     cast: [['belier_noir', 'stand'], ['belier_blanc', 'stand']], players: 2, byoc: false, live: { strangers: 1, since: 4 }, you: 0,
-    pitch: "Depuis dix ans, Ébène et Neige se disputent le sommet de la colline. Ce matin, quelqu'un a gravé un nom sur le vieux chêne — et ce n'est aucun des deux.",
+    pitch: "For ten years, Ébène and Neige have fought over the top of the hill. This morning, someone carved a name into the old oak — and it's neither of theirs.",
     lines: [[0, "Tu es en retard, Neige."], [1, "Je suis en avance. C'est toi qui as dormi ici."], [0, "Quelqu'un doit garder le sommet."], [1, "Garder, ou empêcher les autres de monter ?"], [-1, "Sur l'écorce du vieux chêne, un nom. Fraîchement gravé."], [0, "…Ce n'est pas mon écriture."], [1, "Ni la mienne."], [-1, "En bas, dans la brume, tout le troupeau les regarde."]] },
   { id: 'ombre', title: "Ce qui dort sous la ville", by: '@nuitblanche', plays: '9,8 k', bg: 'maison', pos: '40% 50%', fx: 'hue-rotate(320deg) saturate(2) brightness(.28)', glow: '#ff3b3b',
-    full: 'd_ombre', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'ombre', pose: 'stand', name: 'L’Ombre' }, tease: 'La suite arrive.' }],
+    full: 'd_ombre', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'ombre', pose: 'stand', name: 'L’Ombre' }, tease: 'Coming soon.' }],
     cast: [['ombre', 'stand']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "3 h du matin, station vide, et les rails vibrent encore. Ce qui dort sous la ville vient de prononcer ton nom.",
+    pitch: "3 a.m., an empty station, and the rails are still humming. What sleeps under the city just said your name.",
     lines: [[0, "Tu m'entends. Personne ne m'entend, d'habitude."], [-1, "Les rails vibrent. Le dernier métro est passé il y a une heure."], [0, "J'ai dormi sous cette ville cent ans. Tu m'as réveillé."], [0, "Alors tu vas m'aider. Ou tu vas me nourrir."], [-1, "Les néons s'éteignent un par un, jusqu'à ton quai."], [0, "Choisis vite."]] },
   { id: 'serment', title: "Le serment brisé", by: '@kunai', plays: '15,3 k', bg: 'terrasse', pos: '15% 50%', fx: 'grayscale(.4) brightness(.4) hue-rotate(160deg)', glow: '#ff6a3d',
-    full: 'd_serment', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'ninja', pose: 'stand', name: 'Sora' }, tease: 'La suite arrive.' }],
+    full: 'd_serment', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'ninja', pose: 'stand', name: 'Sora' }, tease: 'Coming soon.' }],
     cast: [['exile', 'stand'], ['ninja', 'stand']], players: 2, byoc: false, live: { strangers: 2, since: 1 }, you: 0,
-    pitch: "Six ans qu'il cherche son frère d'armes. Ce soir, il le retrouve sur le pont — et c'est l'autre qui a les réponses.",
+    pitch: "Six years searching for his brother in arms. Tonight he finds him on the bridge — and it's the other one who has the answers.",
     lines: [[1, "Six ans. Six ans que je te cherche."], [0, "Et tu m'as trouvé. Félicitations."], [1, "Rentre avec moi. Ils peuvent encore te pardonner."], [0, "Ce n'est pas moi qui ai besoin de pardon."], [-1, "Les chaînes cliquettent. Six lames tournent lentement."], [1, "Je ne me battrai pas contre toi."], [0, "Alors tu vas perdre."], [1, "…Qu'est-ce qu'ils t'ont fait, cette nuit-là ?"], [0, "Demande-leur ce qu'ils m'ont pris."]] },
   { id: 'ete', title: "Un été de trop", by: '@chalet', plays: '6,2 k', bg: 'chalet', pos: '60% 50%', fx: 'saturate(1.35) brightness(1.02) sepia(.15)', glow: '#ffc46b',
-    full: 'd_ete', taps: 9, cut: '0-9', eps: [{ title: 'Épisode 1', win: { sprite: 'plage', pose: 'stand', name: 'Maya' }, tease: 'La suite arrive.' }],
+    full: 'd_ete', taps: 9, cut: '0-9', eps: [{ title: 'Episode 1', win: { sprite: 'plage', pose: 'stand', name: 'Maya' }, tease: 'Coming soon.' }],
     cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "Cinq ans après, tu retrouves Maya sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière elle.",
+    pitch: "Five years later, you find Maya on the cabin's deck as if nothing had changed. Then the door opens behind her.",
     lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
   { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
-    full: 'd_verre', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'brooke', pose: 'drunk_joke', name: 'Brooke' }, tease: 'La suite arrive.' }],
+    full: 'd_verre', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'brooke', pose: 'drunk_joke', name: 'Brooke' }, tease: 'Coming soon.' }],
     cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
-    pitch: "Cam a enfin osé s'asseoir à côté de toi. Son téléphone vibre pour la troisième fois — et elle refuse de dire qui c'est.",
+    pitch: "Cam finally dared to sit next to you. Her phone buzzes for the third time — and she won't say who it is.",
     lines: [[1, "Si je te dis un secret, tu me promets de pas partir ?", "flirty"], [0, "Ça dépend. C'est un beau secret ou un laid ?", "drunk_joke"], [1, "Les deux.", "tipsy_laugh"], [-1, "Son téléphone vibre. Elle le retourne, écran contre la table."], [0, "C'était lui ?", "drunk_listen"], [1, "…Comment tu sais qu'il y a un « lui » ?", "awkward"], [0, "T’as retourné ton téléphone. Personne fait ça pour sa mère.", "drunk_point"], [1, "Il sait que je suis ici. Avec toi.", "worried"], [0, "Et c'est un problème ?", "drunk_talk"], [1, "Ça va le devenir.", "sip"], [-1, "Le téléphone vibre encore. Trois fois."], [1, "Faut que tu partes. Maintenant.", "worried"]] },
   { id: 'table', title: 'Sous la table', by: '@nego_club', plays: '8,1 k', bg: 'salon', pos: '60% 50%', fx: 'hue-rotate(190deg) brightness(.45) saturate(.8)', glow: '#5cc8ff',
-    full: 'd_table', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'julian', pose: 'smirk', name: 'Julian' }, tease: 'La suite arrive.' }],
+    full: 'd_table', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'julian', pose: 'smirk', name: 'Julian' }, tease: 'Coming soon.' }],
     cast: [['suit', 'adjust'], ['julian', 'smirk']], players: 1, byoc: true, live: null, you: 0,
-    pitch: "Deux millions sur la table, un stylo doré, dix secondes pour signer. L'un des deux hommes en face de toi ment — pas forcément celui que tu crois.",
+    pitch: "Two million on the table, a gold pen, ten seconds to sign. One of the two men across from you is lying — not necessarily the one you think.",
     lines: [[1, "Signez, et personne n'apprendra ce que vous avez fait à Montréal.", "offer"], [0, "Je ne suis jamais allé à Montréal.", "adjust"], [1, "Ce n'est pas ce que dit cette photo.", "smirk"], [-1, "Il glisse une photo sur la table. Face cachée."], [0, "Retournez-la.", "angry"], [1, "Signez d'abord.", "cold"], [0, "Vous bluffez.", "listen"], [1, "Peut-être. Vous avez dix secondes pour le découvrir.", "cold"], [-1, "Le stylo doré roule jusqu'à ta main."]] },
   { id: 'cles', title: 'Trois clés, une porte', by: '@escape.qc', plays: '21 k', bg: 'maison', pos: '50% 50%', fx: 'sepia(.45) brightness(.6)', glow: '#ffd36b',
-    full: 'd_cles', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'diane', pose: 'explaining', name: 'Diane' }, tease: 'La suite arrive.' }],
+    full: 'd_cles', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'diane', pose: 'explaining', name: 'Diane' }, tease: 'Coming soon.' }],
     cast: [['ruby', 'holding'], ['james', 'thinking'], ['diane', 'explaining']], players: 3, byoc: true, live: { friend: 'Léa', strangers: 1, since: 3 }, you: 0,
-    pitch: "Trois colocs reçoivent chacun une clé, sans un mot. Derrière la porte : la chambre de Sophie, partie sans dire au revoir il y a six mois… sauf à l'un d'eux.",
+    pitch: "Three roommates each get a key, without a word. Behind the door: the room of Sophie, who left without saying goodbye six months ago… except to one of them.",
     lines: [[0, "Qui a mis une clé dans ma boîte aux lettres ?", "holding"], [1, "Moi aussi, j'en ai reçu une.", "surprised"], [2, "Moi aussi. C'est la clé de la chambre de Sophie.", "explaining"], [0, "Sophie est partie il y a six mois.", "angry"], [2, "Elle t'a dit au revoir, à toi, James ?", "angry"], [1, "…Pourquoi tu me regardes comme ça ?", "surprised"], [2, "Parce qu'elle m'a écrit la veille. Elle avait peur de toi.", "explaining"], [1, "C'est faux.", "thinking"], [0, "Alors ouvre la porte en premier.", "listen"], [-1, "Trois clés. Une serrure. James ne bouge pas."]] },
   { id: 'appel', title: 'Appel manqué', by: '@justin', plays: '5,6 k', bg: 'maison', pos: '30% 50%', fx: 'grayscale(.6) brightness(.45) hue-rotate(180deg)', glow: '#7aa7ff',
-    full: 'd_appel', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'justin_b', pose: 'phone_call', name: 'Justin' }, tease: 'La suite arrive.' }],
+    full: 'd_appel', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'justin_b', pose: 'phone_call', name: 'Justin' }, tease: 'Coming soon.' }],
     cast: [['justin', 'phone_shock']], players: 1, byoc: false, live: null, you: 0,
-    pitch: "17 appels manqués de ton frère. Quand tu arrives chez lui, la porte est ouverte, la télé allumée, et il t'a laissé une note : « Ne me cherche pas. »",
+    pitch: "17 missed calls from your brother. When you get to his place, the door is open, the TV is on, and he left you a note: “Don't look for me.”",
     lines: [[0, "Marco ? Marco, réponds !", "phone_call"], [-1, "Messagerie. Pour la dix-septième fois."], [0, "T'as laissé ta porte ouverte, man…", "surprised"], [-1, "La télé allumée. Le son coupé. Une assiette encore chaude."], [0, "Il était là. Il y a cinq minutes.", "thinking"], [-1, "Sur la table, une note. Son écriture."], [0, "« Ne me cherche pas. Ils écoutent. »", "phone_shock"], [0, "Qui ça, « ils » ?", "listen"], [-1, "Ton téléphone vibre. Numéro inconnu."], [0, "…Allô ?", "phone_call"]] },
   { id: 'mensonge', title: 'Où étais-tu hier soir ?', by: '@ruby_writes', plays: '9,3 k', bg: 'salon', pos: '40% 50%', fx: 'hue-rotate(320deg) brightness(.6) saturate(1.4)', glow: '#ff5c8a',
-    full: 'd_mensonge', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'james_noir', pose: 'angry', name: 'James' }, tease: 'La suite arrive.' }],
+    full: 'd_mensonge', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'james_noir', pose: 'angry', name: 'James' }, tease: 'Coming soon.' }],
     cast: [['ruby', 'angry'], ['james', 'listen']], players: 2, byoc: false, live: { friend: 'Max', since: 6 }, you: 0,
-    pitch: "Un reçu pour deux, un mardi, 22 h. James a une explication. Puis une deuxième. Puis son téléphone vibre.",
+    pitch: "A receipt for two, a Tuesday, 10 p.m. James has an explanation. Then a second one. Then his phone buzzes.",
     lines: [[0, "C'est qui, « Marc », qui commande le tiramisu pour deux ?", "angry"], [1, "Un client.", "explaining"], [0, "Un mardi. À 22 h.", "thinking"], [1, "Les clients sont pas toujours dispos le jour.", "listen"], [0, "Appelle-le. Maintenant. Sur haut-parleur.", "holding"], [1, "Ruby…", "thinking"], [0, "Appelle-le.", "angry"], [-1, "Le téléphone de James vibre dans sa main. « Merci pour hier ❤ »"], [1, "Je peux t’expliquer.", "surprised"], [0, "Non. Lis-le à voix haute.", "explaining"]] },
   { id: 'nuit', title: 'Nuit blanche', by: '@insomnie', plays: '3,2 k', bg: 'terrasse', pos: '20% 50%', fx: 'hue-rotate(220deg) brightness(.38) saturate(1.5)', glow: '#9b8cff',
-    full: 'd_nuit', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'isa_noir', pose: 'holding', name: 'Isa (braise)' }, tease: 'La suite arrive.' }],
+    full: 'd_nuit', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'isa_noir', pose: 'holding', name: 'Isa (braise)' }, tease: 'Coming soon.' }],
     cast: [['isa_nuit', 'thinking']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "4 h du matin, sur le toit, une inconnue t'attendait. Elle connaît ton vrai prénom — et elle dit que vous n'avez plus beaucoup de temps.",
+    pitch: "4 a.m., on the roof, a stranger was waiting for you. She knows your real name — and she says you don't have much time left.",
     lines: [[0, "Enfin. Je pensais que tu viendrais plus tôt.", "listen"], [0, "Fais pas cette tête. On s'est déjà parlé.", "explaining"], [0, "Pas ici. Pas comme ça. Mais souvent.", "thinking"], [0, "Tu te souviens de rien, hein ?", "surprised"], [-1, "Au loin, toutes les lumières de la ville s'éteignent. D'un coup."], [0, "Ok. On a moins de temps que prévu.", "angry"], [0, "Tu me fais confiance ?", "holding"]] },
   { id: 'gala', title: "Gala d'or", by: '@galanoir', plays: '14 k', bg: 'salon', pos: '55% 50%', fx: 'sepia(.9) saturate(2) brightness(.6) hue-rotate(-10deg)', glow: '#ffd24d',
-    full: 'd_gala', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'isa_or', pose: 'holding', name: 'Isa (or)' }, tease: 'La suite arrive.' }],
+    full: 'd_gala', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'isa_or', pose: 'holding', name: 'Isa (or)' }, tease: 'Coming soon.' }],
     cast: [['isa_or', 'holding'], ['suit', 'adjust'], ['julian', 'cold']], players: 3, byoc: true, live: { strangers: 1, since: 2 }, you: 1,
-    pitch: "Le collier vient de disparaître et les portes sont verrouillées. Trois invités, trois alibis — un seul est vrai.",
+    pitch: "The necklace just vanished and the doors are locked. Three guests, three alibis — only one is true.",
     lines: [[0, "Mon collier était à mon cou il y a dix minutes.", "angry"], [1, "Et vous m'accusez ? Je ne touche pas aux bijoux.", "angry"], [2, "Seulement aux contrats.", "smirk"], [0, "Personne ne sort d'ici avant que je le retrouve.", "holding"], [-1, "Les portes se ferment. Clic. Clic. Clic."], [2, "Je l'ai vu près du vestiaire, lui.", "cold"], [1, "Et vous, on vous a vu près de madame.", "adjust"], [0, "Alors on va jouer à un jeu. Le premier qui ment…", "explaining"], [2, "…perd quoi ?", "listen"], [0, "Tout.", "thinking"]] },
   { id: 'coloc', title: 'Le colocataire', by: '@amare.stories', plays: '6,7 k', bg: 'maison', pos: '65% 50%', fx: 'brightness(.85) saturate(.7)', glow: '#c8ffd9',
-    full: 'd_coloc', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'amare', pose: 'holding', name: 'Amare' }, tease: 'La suite arrive.' }],
+    full: 'd_coloc', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'amare', pose: 'holding', name: 'Amare' }, tease: 'Coming soon.' }],
     cast: [['amare', 'listen']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "Ton nouveau coloc cuisine, range et paie d'avance. Il ne dort jamais — et il sait déjà ce qui t'attend demain.",
+    pitch: "Your new roommate cooks, cleans and pays in advance. He never sleeps — and he already knows what's waiting for you tomorrow.",
     lines: [[0, "T'as bien dormi ? Je t'ai entendu rêver.", "listen"], [0, "De la mer. Encore.", "thinking"], [0, "Moi ? Non, je dors jamais vraiment. C'est une condition.", "explaining"], [-1, "Sur le comptoir, ton agenda. Ouvert à demain. Annoté. Pas par toi."], [0, "Demain va être une grosse journée pour toi.", "holding"], [0, "J'ai juste voulu être prêt.", "surprised"], [0, "Toi, t'es prêt ?", "listen"]] },
   { id: 'feu', title: 'Autour du feu', by: '@campfire', plays: '11,2 k', bg: 'terrasse', pos: '50% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(.4)', glow: '#ff7a2e',
-    full: 'd_feu', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'brooke', pose: 'sit_fire', name: 'Brooke' }, tease: 'La suite arrive.' }],
+    full: 'd_feu', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'brooke', pose: 'sit_fire', name: 'Brooke' }, tease: 'Coming soon.' }],
     cast: [['brooke', 'sit_fire'], ['justin', 'listen']], players: 2, byoc: true, live: { friend: 'Inès', since: 12 }, you: 1,
-    pitch: "Une histoire de fantôme au chalet, à deux voix. Chaque fois que quelqu'un ment, le feu baisse… et il vient de baisser.",
+    pitch: "A ghost story at the cabin, told by two. Every time someone lies, the fire dies down… and it just did.",
     lines: [[0, "Tu veux la vraie histoire du lac ou celle qu'on raconte aux enfants ?", "sit_fire"], [1, "La vraie.", "listen"], [0, "Une fille nageait ici toutes les nuits. Un soir, elle est remontée… avec quelqu'un.", "drunk_talk"], [-1, "Le feu baisse d'un coup."], [1, "T'as vu ça ?", "surprised"], [0, "C'est le vent.", "nervous"], [1, "Y a pas de vent.", "angry"], [0, "…Alors quelqu'un vient de mentir.", "nervous"]] },
   { id: 'candy', title: 'Candy ne ment jamais', by: '@sucre', plays: '4,4 k', bg: 'terrasse', pos: '80% 50%', fx: 'hue-rotate(290deg) saturate(1.6) brightness(.85)', glow: '#ff9ce6',
-    full: 'd_candy', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'candy', pose: 'explaining', name: 'Candy' }, tease: 'La suite arrive.' }],
+    full: 'd_candy', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'candy', pose: 'explaining', name: 'Candy' }, tease: 'Coming soon.' }],
     cast: [['candy', 'explaining']], players: 1, byoc: false, live: null, you: -1,
-    pitch: "Candy ne ment jamais. Jamais. Et elle vient de s'asseoir au brunch entre ta mère et ton chum.",
+    pitch: "Candy never lies. Never. And she just sat down at brunch between your mom and your boyfriend.",
     lines: [[0, "J'adore ta mère ! Elle est exactement comme tu l'as décrite.", "explaining"], [0, "Non mais pas dans le mauvais sens. Juste… intense.", "thinking"], [0, "Pis toi, t'es le fameux chum ! Celui du test.", "holding"], [-1, "Ton chum pose sa fourchette. Ta mère aussi."], [0, "Oups. Il savait pas pour le test ?", "surprised"], [0, "Bon. Je mens jamais, alors je vais tout dire.", "explaining"], [0, "Aïe ! Pourquoi tu me donnes des coups de pied ?", "angry"], [0, "Version courte : il a passé. De justesse.", "listen"]] },
   { id: 'contrat', title: 'Un dernier boulot', by: '@julianfiles', plays: '7,8 k', bg: 'salon', pos: '25% 50%', fx: 'grayscale(1) brightness(.55) contrast(1.2)', glow: '#ffffff',
-    full: 'd_contrat', taps: 8, cut: '0-8', eps: [{ title: 'Épisode 1', win: { sprite: 'julian', pose: 'cold', name: 'Julian' }, tease: 'La suite arrive.' }],
+    full: 'd_contrat', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'julian', pose: 'cold', name: 'Julian' }, tease: 'Coming soon.' }],
     cast: [['julian', 'talk']], players: 1, byoc: false, live: null, you: -1,
-    pitch: "Un dernier boulot : facile, payant, sans risque. C'est exactement ce que Julian avait dit la dernière fois.",
+    pitch: "One last job: easy, well paid, no risk. That's exactly what Julian said last time.",
     lines: [[0, "Un dernier boulot. Après, tu me revois plus jamais.", "talk"], [0, "Je sais. J'ai dit ça la dernière fois.", "hands_up"], [0, "Une enveloppe. Point A, point B. Dix mille.", "offer"], [-1, "L'enveloppe est lourde. Trop pour du papier."], [0, "Pose pas de questions, c'est inclus dans le prix.", "cold"], [0, "Et regarde-moi. Pas l'homme derrière moi.", "cold"], [0, "Alors ? On a un deal ?", "listen"]] },
 ];
 // drawn settings (no photo for these): a beach in full sun, a forest at night
@@ -940,8 +940,8 @@ const loveAlex = (() => {
 })();
 if (loveAlex) {
   const d = DEMOS.find((x) => x.id === 'ete');
-  Object.assign(d, { full: 'd_ete_alex', cast: [['alex', 'beach']], eps: [{ title: 'Épisode 1', win: { sprite: 'alex', pose: 'beach', name: 'Alex' }, tease: 'La suite arrive.' }],
-    pitch: "Cinq ans après, tu retrouves Alex sur la terrasse du chalet comme si rien n'avait changé. Puis la porte s'ouvre derrière lui.",
+  Object.assign(d, { full: 'd_ete_alex', cast: [['alex', 'beach']], eps: [{ title: 'Episode 1', win: { sprite: 'alex', pose: 'beach', name: 'Alex' }, tease: 'Coming soon.' }],
+    pitch: "Five years later, you find Alex on the cabin's deck as if nothing had changed. Then the door opens behind him.",
     lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière lui, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] });
   POSTER.ete = { bg: 'chalet', cast: [['alex', 'beach']] };
 }
@@ -1022,21 +1022,21 @@ const mine = keep.get('mine', []);
 const all = () => [...mine, ...DEMOS.filter(ofMyTaste), ...DEMOS.filter((d) => !ofMyTaste(d))];
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
-  ...(myTaste ? [['Pour toi', ofMyTaste]] : []),
-  ['Tendances', ['lastcall', 'ile', 'serment', 'cles', 'verre', 'gala', 'feu', 'mensonge']],
-  ['Quelqu\'un t\'attend', (d) => d.live],
-  ['À plusieurs', (d) => d.players > 1],
-  ['Amène ton perso', (d) => d.byoc],
+  ...(myTaste ? [['For you', ofMyTaste]] : []),
+  ['Trending', ['lastcall', 'ile', 'serment', 'cles', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Someone is waiting', (d) => d.live],
+  ['With friends', (d) => d.players > 1],
+  ['Bring your character', (d) => d.byoc],
   ['Solo', (d) => d.players === 1],
-  ['Nouveautés', ['beliers', 'ombre', 'serment', 'ete', 'candy', 'nuit', 'contrat', 'coloc', 'appel', 'table']],
+  ['New', ['beliers', 'ombre', 'serment', 'ete', 'candy', 'nuit', 'contrat', 'coloc', 'appel', 'table']],
 ];
 const shelf = (pick) => typeof pick === 'function' ? all().filter(pick) : pick.map(byId).filter(Boolean);
 
 // ---- every alternative: L = layouts (‹ › at the top), the rest in ⚙ ----
-const LAYOUTS = [['rows', 'Rangées'], ['grid2', 'Grille 2'], ['grid3', 'Mur d\'affiches'], ['feed', 'Plein écran'], ['carousel', 'Carrousel'], ['stack', 'Pile à swiper'], ['list', 'Liste'], ['magazine', 'Magazine'], ['live', 'En direct d\'abord'], ['spotlight', 'Projecteur'], ['bubbles', 'Test bulles']];
+const LAYOUTS = [['rows', 'Rows'], ['grid2', 'Grid 2'], ['grid3', 'Poster wall'], ['feed', 'Full screen'], ['carousel', 'Carousel'], ['stack', 'Swipe stack'], ['list', 'List'], ['magazine', 'Magazine'], ['live', 'Live first'], ['spotlight', 'Spotlight'], ['bubbles', 'Bubble test']];
 const OPTIONS = [
-  ['detail', 'Voir plus', '', [['veil', 'Voile noir plein écran'], ['zoom', 'Affiche zoomée'], ['sheet', 'Panneau du bas']]],
-  ['tabs', 'Onglets', '', [['labels', 'Icônes + texte'], ['icons', 'Icônes seules'], ['pill', 'Pilule flottante']]],
+  ['detail', 'See more', '', [['veil', 'Full-screen black veil'], ['zoom', 'Zoomed poster'], ['sheet', 'Bottom sheet']]],
+  ['tabs', 'Tabs', '', [['labels', 'Icons + text'], ['icons', 'Icons only'], ['pill', 'Floating pill']]],
 ];
 const O = Object.assign({ layout: 'rows', live: 'dot', play: 'dot', byoc: 'icon', save: 'bookmark', detail: 'veil', progress: 'corner', tabs: 'labels' }, keep.get('opts', {}));
 const L = (i) => String.fromCharCode(65 + i);   // A, B, C... so "the best is D + 2" is easy to say
@@ -1070,19 +1070,19 @@ const place = (v) => DECOR[v.bg] ? `background:${DECOR[v.bg]};filter:${v.fx || '
 // how many play it: a user icon and the number ("Solo" for one)
 function players(d) {
   const n = d.players;
-  return `<span class="mk" title="${n === 1 ? 'Solo' : n + ' joueurs'}">${I.person}<span>${n === 1 ? 'Solo' : n === 3 ? '2–3' : n}</span></span>`;
+  return `<span class="mk" title="${n === 1 ? 'Solo' : n + ' players'}">${I.person}<span>${n === 1 ? 'Solo' : n === 3 ? '2–3' : n}</span></span>`;
 }
 function byoc(d, inMeta) {
   if (!d.byoc) return '';
-  if (inMeta || O.byoc === 'tag') return `<span class="mk byoc">${O.byoc === 'tag' && !inMeta ? '' : I.byoc}<span>Ton perso</span></span>`;
-  if (O.byoc === 'icon') return `<span class="mk byoc" title="Amène ton perso">${I.byoc}</span>`;
+  if (inMeta || O.byoc === 'tag') return `<span class="mk byoc">${O.byoc === 'tag' && !inMeta ? '' : I.byoc}<span>Your character</span></span>`;
+  if (O.byoc === 'icon') return `<span class="mk byoc" title="Bring your character">${I.byoc}</span>`;
   return '';
 }
 function liveMark(d) {
   const l = d.live; if (!l) return '';
   const f = l.friend && friend(l.friend);
   if (O.live === 'dot') return f ? `<i class="ldot f" style="--c:${f.c}">${mug(f.n)}</i>` : `<i class="ldot" style="--c:var(--stranger)"></i>`;
-  if (O.live === 'badge') return f ? `<span class="lbadge f"><i></i>${esc(f.n)} attend</span>` : `<span class="lbadge" style="--c:var(--stranger)"><i></i>${l.strangers} en attente</span>`;
+  if (O.live === 'badge') return f ? `<span class="lbadge f"><i></i>${esc(f.n)} is waiting</span>` : `<span class="lbadge" style="--c:var(--stranger)"><i></i>${l.strangers} waiting</span>`;
   if (O.live === 'avatar') { const w = waiting(d)[0]; return `<span class="lav${f ? '' : ' s'}" style="--c:${w.c};background:${w.c}">${mug(w.n)}</span>`; }
   return '';
 }
@@ -1095,12 +1095,12 @@ function saveIcon(on) {
 const saveCls = () => ({ heart: '', bookmark: ' bm', plus: ' pl' })[O.save];
 function saveBtn(d) {
   const on = !!saved[d.id];
-  return `<button class="save${on ? ' on' : ''}${saveCls()}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>`;
+  return `<button class="save${on ? ' on' : ''}${saveCls()}" data-act="save" data-id="${d.id}" aria-label="Save">${saveIconOf(d.id)}</button>`;
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
 // (solo is the default: only 2-3 players get a mark)
 function card(d, { title = false, sub = false, saveB = false, byocB = true, extra = '', live = true, multi = true } = {}) {
-  const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
+  const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">YOUR CHARACTER</span>' : '';
   return `<div class="card${live ? ringCls(d) : ''}" data-act="open" data-id="${d.id}">
     <div class="cvw">${cover(d)}${corner}<div class="marks">${multi && d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${live ? liveMark(d) : ''}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
@@ -1117,13 +1117,13 @@ const playDot = (d) => {
 function playBtn(d, cls = '', how = O.play) {
   const l = d.live, f = l && l.friend && friend(l.friend);
   if (l && how === 'color') {
-    return f ? `<button class="btn live-f ${cls}" data-act="play" data-id="${d.id}">${av(f.n)}Rejoindre ${esc(f.n)}</button>`
-      : `<button class="btn live-s ${cls}" data-act="play" data-id="${d.id}">${I.play}Rejoindre la salle</button>`;
+    return f ? `<button class="btn live-f ${cls}" data-act="play" data-id="${d.id}">${av(f.n)}Join ${esc(f.n)}</button>`
+      : `<button class="btn live-s ${cls}" data-act="play" data-id="${d.id}">${I.play}Join the room</button>`;
   }
   const dot = how === 'dot' ? playDot(d) : '';
   return `<button class="btn main ${cls}" data-act="play" data-id="${d.id}">${I.play}Jouer${dot}</button>`;
 }
-const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>`;
+const saveWide = (d) => `<button class="btn ghost" data-act="save" data-id="${d.id}" aria-label="Save">${saveIconOf(d.id)}</button>`;
 const actions = (d) => `<div class="row">${playBtn(d, 'wide')}${saveWide(d)}</div>`;
 
 // ---- explore: one renderer per layout ----
@@ -1135,18 +1135,18 @@ const R = {
       <div class="info"><div class="row">${playBtn(h)}${saveWide(h)}</div></div></div>`;
     SHELVES.forEach(([name, pick], i) => {
       const list = shelf(pick); if (!list.length) return;
-      s += `<div class="h2">${name}${i === 1 ? `<small>${list.length} salles ouvertes</small>` : ''}</div><div class="shelf${i === 1 ? ' big' : ''}">${list.map((d) => card(d)).join('')}</div>`;
+      s += `<div class="h2">${name}${i === 1 ? `<small>${list.length} open rooms</small>` : ''}</div><div class="shelf${i === 1 ? ' big' : ''}">${list.map((d) => card(d)).join('')}</div>`;
     });
-    if (mine.length) s = s.replace('</div></div></div>', `</div></div></div><div class="h2">Tes démos</div><div class="shelf">${mine.map((d) => card(d)).join('')}</div>`);
+    if (mine.length) s = s.replace('</div></div></div>', `</div></div></div><div class="h2">Your demos</div><div class="shelf">${mine.map((d) => card(d)).join('')}</div>`);
     return s;
   },
   grid2() { return filters() + `<div class="grid g2">${filtered().map((d) => card(d)).join('')}</div>`; },
   grid3() { return filters() + `<div class="grid g3">${filtered().map((d) => card(d)).join('')}</div>`; },
   feed() {
-    return `<div class="feedhint">Glisse vers le haut ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="${blurOf(d)}"></div>
-      <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}${liveMark(d)}</div>
+    return `<div class="feedhint">Swipe up ↑</div>` + all().map((d) => `<div class="fi"><div class="blur" style="${blurOf(d)}"></div>
+      <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">YOUR CHARACTER</span>' : ''}${liveMark(d)}</div>
       <div class="side"><button data-act="save" data-id="${d.id}"><i>${saveIconOf(d.id)}</i><span>${saveWord(d.id)}</span></button>
-        <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Infos</span></button></div>
+        <button data-act="open" data-id="${d.id}"><i>${I.info}</i><span>Info</span></button></div>
       <div class="txt"><h3>${esc(d.title)}</h3>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide')}</div></div></div>`).join('');
   },
   carousel() {
@@ -1154,11 +1154,11 @@ const R = {
   },
   stack() {
     const left = all().filter((d) => !deckGone.includes(d.id));
-    if (!left.length) return `<div class="empty"><p>Tu as tout vu.</p><br><button class="btn main" data-act="deckReset">Recommencer</button></div>`;
-    const top = left.slice(0, 3).reverse().map((d, i, a) => card(d, { saveB: false, extra: '<span class="stamp yes">SAUVÉ</span><span class="stamp no">PASSE</span>' }).replace('class="card', `class="card k${a.length - 1 - i}`)).join('');
+    if (!left.length) return `<div class="empty"><p>You've seen it all.</p><br><button class="btn main" data-act="deckReset">Start over</button></div>`;
+    const top = left.slice(0, 3).reverse().map((d, i, a) => card(d, { saveB: false, extra: '<span class="stamp yes">SAVED</span><span class="stamp no">PASS</span>' }).replace('class="card', `class="card k${a.length - 1 - i}`)).join('');
     return `<div class="deck" id="deck">${top}</div>
-      <div class="deckBtns"><button class="no" data-act="deckNo" aria-label="Passer">${I.close}</button><button class="pl" data-act="play" data-id="${left[0].id}" aria-label="Jouer">${I.play}</button><button class="yes" data-act="deckYes" aria-label="Sauver">${saveIcon(false)}</button></div>
-      <div class="deckTip">Glisse → pour sauver, ← pour passer. Touche pour les détails.</div>`;
+      <div class="deckBtns"><button class="no" data-act="deckNo" aria-label="Pass">${I.close}</button><button class="pl" data-act="play" data-id="${left[0].id}" aria-label="Play">${I.play}</button><button class="yes" data-act="deckYes" aria-label="Save">${saveIcon(false)}</button></div>
+      <div class="deckTip">Swipe → to save, ← to pass. Tap for details.</div>`;
   },
   list() {
     return filters() + filtered().map((d) => `<div class="li" data-act="open" data-id="${d.id}"><div style="width:17em;flex:none">${card(d, { title: false, saveB: false })}</div>
@@ -1178,13 +1178,13 @@ const R = {
       const l = d.live, f = l.friend && friend(l.friend), c = f ? f.c : 'var(--stranger)';
       const ws = waiting(d), seats = Array.from({ length: d.players }, (_, i) => ws[i] ? `<i class="full" style="--c:${ws[i].c}">${mug(ws[i].n)}</i>` : '<i></i>').join('');
       return `<div class="room" style="--c:${c}" data-act="open" data-id="${d.id}"><div class="cvw">${cover(d)}</div><div class="body">
-        <h4>${esc(d.title)}</h4><div class="who">${av(waiting(d)[0].n)}${esc(waiting(d)[0].n)} ${f ? 't\'attend' : 'attend'}</div>
+        <h4>${esc(d.title)}</h4><div class="who">${av(waiting(d)[0].n)}${esc(waiting(d)[0].n)} ${f ? 'is waiting for you' : 'is waiting'}</div>
         <div class="seatsMini">${seats}</div>${playBtn(d)}</div></div>`;
     };
     const online = FRIENDS.filter((f) => f.on);
-    return `<div class="h2" style="margin-top:0">En direct <small>${rooms.length} salles</small></div><div class="rooms">${rooms.map(room).join('')}</div>
-      <div class="h2">Amis en ligne</div><div class="chips">${online.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}<button class="chip" data-act="tab" data-tab="add">${I.plus.replace('<svg', '<svg style="width:1em;height:1em"')}Inviter</button></div>
-      <div class="h2">Ouvre une salle</div><div class="grid g2">${all().filter((d) => !d.live).map((d) => card(d)).join('')}</div>`;
+    return `<div class="h2" style="margin-top:0">Live <small>${rooms.length} rooms</small></div><div class="rooms">${rooms.map(room).join('')}</div>
+      <div class="h2">Friends online</div><div class="chips">${online.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}<button class="chip" data-act="tab" data-tab="add">${I.plus.replace('<svg', '<svg style="width:1em;height:1em"')}Invite</button></div>
+      <div class="h2">Open a room</div><div class="grid g2">${all().filter((d) => !d.live).map((d) => card(d)).join('')}</div>`;
   },
   // the same preview in each format, as the real app shows it (the feed, its buttons, the tabs): one live copy per format.
   // 4 and 5 are the in-betweens of 1 (the prettiest) and 2 (the quickest)
@@ -1192,14 +1192,14 @@ const R = {
     const d = byId(TEST.id);
     const frame = ([k, title, sub]) => `<div class="h2">${k} · ${title}<small>${sub}</small></div>
       <div class="tf app"><iframe src="demo.html?fmt=${k}&start=${TEST.id}#current/explore" title="${esc(title)}" loading="lazy"></iframe></div>`;
-    return `<p class="tlead">${esc(d.title)} dans chaque format, comme dans l'app : touche pour avancer, glisse pour la démo suivante.</p>`
-      + [['1', 'Le moteur du jeu', 'le plus beau'], ['2', 'Imitation', 'la plus rapide'], ['4', 'Imitation fidèle', 'compromis : rapide, avec la bulle et la caméra du jeu'],
-        ['5', 'Moteur allégé', "compromis : l'image tout de suite, le vrai jeu dès qu'il est prêt"], ['3', 'Ma bulle, rapprochée', 'plus lisible']].map(frame).join('');
+    return `<p class="tlead">${esc(d.title)} in every format, like in the app: tap to advance, swipe for the next demo.</p>`
+      + [['1', 'The game engine', 'the most beautiful'], ['2', 'Imitation', 'the fastest'], ['4', 'Faithful imitation', 'trade-off: fast, with the game\'s bubble and camera'],
+        ['5', 'Light engine', 'trade-off: the picture right away, the real game as soon as it\'s ready'], ['3', 'My bubble, closer', 'easier to read']].map(frame).join('');
   },
   spotlight() {
     const a = all(); const d = byId(spotSel) || a[0]; spotSel = d.id;
     return `<div class="spot"><div class="blur" style="${blurOf(d, 'blur(3.5em) brightness(.45)')}"></div>
-      <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : ''}<div class="marks">${players(d)}${byoc(d)}</div>${liveMark(d)}</div>
+      <div class="cvw" data-act="open" data-id="${d.id}">${cover(d)}${d.byoc && O.byoc === 'corner' ? '<span class="ribbon">YOUR CHARACTER</span>' : ''}<div class="marks">${players(d)}${byoc(d)}</div>${liveMark(d)}</div>
       <div class="info"><h3>${esc(d.title)}</h3><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>
       <div class="strip">${a.map((x) => `<div class="card${x.id === d.id ? ' sel' : ''}" data-act="spot" data-id="${x.id}">${cover(x).replace(/<div class="cvt">.*?<\/div>/, '')}</div>`).join('')}</div></div>`;
   },
@@ -1229,7 +1229,7 @@ function stageHtml(d, i, mode, feed) {
     : `<div class="tb${mode === 2 ? ' g' : ''}" style="left:${left}%;width:${w}%;--t:${tail}%"><b${mode === 2 ? ` style="background:${tint}"` : ''}>${esc(name)}</b>${esc(text)}</div>`;
   return `<div class="tw" style="${zoom}"><div class="tbg" style="${place(d)}"></div>${people}</div>${say}${feed ? '' : `<div class="tc">${at + 1}/${n}</div>`}`;
 }
-const FILTERS = [['all', 'Tout'], ['live', '● En direct'], ['solo', 'Solo'], ['multi', 'À plusieurs'], ['byoc', 'Ton perso']];
+const FILTERS = [['all', 'All'], ['live', '● Live'], ['solo', 'Solo'], ['multi', 'With friends'], ['byoc', 'Your character']];
 const filters = () => `<div class="chips">${FILTERS.map(([k, n]) => `<button class="chip${filter === k ? ' on' : ''}" data-act="filter" data-f="${k}">${n}</button>`).join('')}</div>`;
 const filtered = () => all().filter((d) => filter === 'all' || (filter === 'live' && d.live) || (filter === 'solo' && d.players === 1) || (filter === 'multi' && d.players > 1) || (filter === 'byoc' && d.byoc));
 
@@ -1247,10 +1247,10 @@ function renderExplore() {
 const finishedIds = () => Object.keys(prog).filter((id) => byId(id) && !gone[id] && done(id)).sort((a, b) => prog[b].at - prog[a].at);
 function renderSaved() {
   const ids = Object.keys(saved).filter(byId).sort((a, b) => saved[b].at - saved[a].at), fin = finishedIds();
-  const finHtml = fin.length ? `<div class="h2">Finis <small>${fin.length}</small></div><div class="grid g2">${fin.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
+  const finHtml = fin.length ? `<div class="h2">Finished <small>${fin.length}</small></div><div class="grid g2">${fin.map((id) => card(byId(id), { byocB: false, live: false })).join('')}</div>` : '';
   if (!ids.length && fin.length) { $('#saved').innerHTML = finHtml.replace('<div class="h2">', '<div class="h2" style="margin-top:0">'); return; }
-  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Rien de sauvé pour l'instant.<br>Touche ${O.save === 'heart' ? 'le cœur' : O.save === 'plus' ? '+' : 'le signet'} sur une démo.</p></div>`; return; }
-  $('#saved').innerHTML = `<div class="h2" style="margin-top:0">Sauvés <small>${ids.length}</small></div>
+  if (!ids.length) { $('#saved').innerHTML = `<div class="empty">${saveIcon(false)}<p>Nothing saved yet.<br>Tap ${O.save === 'heart' ? 'the heart' : O.save === 'plus' ? '+' : 'the bookmark'} on a demo.</p></div>`; return; }
+  $('#saved').innerHTML = `<div class="h2" style="margin-top:0">Saved <small>${ids.length}</small></div>
     <div class="grid g2">${ids.map((id) => {
       return card(byId(id), { byocB: false, live: false });
     }).join('')}</div>${finHtml}`;
@@ -1260,17 +1260,17 @@ function renderSaved() {
 const getGens = () => { try { return JSON.parse(localStorage.getItem('smt-gens')) || []; } catch { return []; } };
 // Tes histoires (a button, only once you've written one): the list, in a sheet; tap one to make a demo of it
 function myStories() {
-  const row = (g) => `<button class="story" data-act="story" data-at="${g.at}"><div><b>${esc((g.json && g.json.title) || 'Sans titre')}</b><span>${esc(g.idea || '')}</span></div>${mine.some((x) => x.story === g.at) ? '<i>Démo</i>' : ''}</button>`;
-  sheet(`<h3>Tes histoires</h3><div class="stories" style="padding:0">${getGens().map(row).join('')}</div>`);
+  const row = (g) => `<button class="story" data-act="story" data-at="${g.at}"><div><b>${esc((g.json && g.json.title) || 'Untitled')}</b><span>${esc(g.idea || '')}</span></div>${mine.some((x) => x.story === g.at) ? '<i>Demo</i>' : ''}</button>`;
+  sheet(`<h3>Your stories</h3><div class="stories" style="padding:0">${getGens().map(row).join('')}</div>`);
 }
 function renderAdd() {
   if (!SERIES.isOpen('add')) return;
   const gens = getGens();
   $('#add').innerHTML = `<div class="acts">
-      <button class="act" data-act="write" style="--c:#e2557a"><i>${I.pen}</i><div><b>Créer une histoire</b></div></button>
-      <button class="act" data-act="newperso" style="--c:#4f9dff"><i>${I.byoc}</i><div><b>Créer un personnage</b></div></button>
-      ${gens.length ? `<button class="act" data-act="mystories" style="--c:#ff9f0a"><i>${I.book}</i><div><b>Tes histoires</b><span>${gens.length} histoire${gens.length > 1 ? 's' : ''}</span></div></button>` : ''}</div>
-    <button class="lab" data-act="mode" data-s="all">Versions et tests</button>`;
+      <button class="act" data-act="write" style="--c:#e2557a"><i>${I.pen}</i><div><b>Create a story</b></div></button>
+      <button class="act" data-act="newperso" style="--c:#4f9dff"><i>${I.byoc}</i><div><b>Create a character</b></div></button>
+      ${gens.length ? `<button class="act" data-act="mystories" style="--c:#ff9f0a"><i>${I.book}</i><div><b>Your stories</b><span>${gens.length} stor${gens.length > 1 ? "ies" : "y"}</span></div></button>` : ''}</div>
+    <button class="lab" data-act="mode" data-s="all">Versions and tests</button>`;
 }
 // a written story, line by line: its decor, its people, its lines (the first option of each choice)
 const GEN_POSES = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
@@ -1295,12 +1295,12 @@ function openStory(stamp) {
   const st = storyOf(g), n = st.lines.length, made = mine.find((d) => d.story === g.at);
   let a = 0, b = Math.min(n - 1, 11), next = 'a';   // the first tap picks the first line, the second the last
   const box = sheet(`<h3>${esc(st.title)}</h3><p class="lead">${esc(g.idea || '')}</p>
-    <p class="lead">Touche la première réplique de la démo, puis la dernière.</p>
+    <p class="lead">Tap the demo's first line, then its last.</p>
     <div class="lns">${st.lines.map(([w, t], k) => `<button class="ln" data-k="${k}"><b>${esc(NAMES[st.cast[w][0]] || st.cast[w][0])}</b>${esc(t)}</button>`).join('')}</div>
-    <div class="row"><button class="btn main wide" id="mkGo"></button>${made ? '<button class="btn" id="mkSee">Voir la démo</button>' : ''}</div>`);
+    <div class="row"><button class="btn main wide" id="mkGo"></button>${made ? '<button class="btn" id="mkSee">See the demo</button>' : ''}</div>`);
   const paint = () => {
     $$('.ln', box).forEach((x) => { const k = +x.dataset.k; x.classList.toggle('on', k >= a && k <= b); x.classList.toggle('end', k === a || k === b); });
-    $('#mkGo').textContent = `Créer la démo · ${b - a + 1} réplique${b > a ? 's' : ''}`;
+    $('#mkGo').textContent = `Create the demo · ${b - a + 1} line${b > a ? 's' : ''}`;
   };
   $$('.ln', box).forEach((x) => x.onclick = () => {
     const k = +x.dataset.k;
@@ -1321,7 +1321,7 @@ function renderTabs() {
   // a tab not open yet (series.js: the app opens up as you play) stays, dimmed; its page says what opens it
   const t = (k, icon, label, cls = '') => `<button class="${cls}${tab === k ? ' on' : ''}${SERIES.isOpen(k) ? '' : ' locked'}" data-act="tab" data-tab="${k}" aria-label="${label}">${icon}<span>${label}</span></button>`;
   // Accueil, the main tab, in the middle; what you saved is in it (no tab of its own)
-  $('#tabs').innerHTML = t('explore', I.explore, 'Explorer') + t('search', I.search, 'Recherche') + t('home', `<i>${I.home}</i>`, 'Accueil', 'main') + t('add', I.plus, 'Créer') + t('social', I.people, 'Social');
+  $('#tabs').innerHTML = t('explore', I.explore, 'Explore') + t('search', I.search, 'Search') + t('home', `<i>${I.home}</i>`, 'Home', 'main') + t('add', I.plus, 'Create') + t('social', I.people, 'Social');
 }
 // which page shows: one of the tabs (Explorer = the Current scroll, or All's layouts while testing)
 const page = () => tab !== 'explore' ? tab : screen === 'current' ? 'current' : 'explore';
@@ -1421,7 +1421,7 @@ function paintSavedBtn() {
 let noteT = 0;
 function saveNote() {
   $$('.saveNote').forEach((n) => n.remove()); clearTimeout(noteT);
-  const n = document.createElement('div'); n.className = 'saveNote'; n.innerHTML = `${I.bookmarkOn}Sauvé`;
+  const n = document.createElement('div'); n.className = 'saveNote'; n.innerHTML = `${I.bookmarkOn}Saved`;
   stage.appendChild(n);
   noteT = setTimeout(() => { n.classList.add('out'); setTimeout(() => n.remove(), 400); }, 1400);
 }
@@ -1468,7 +1468,7 @@ const face3 = (id, p) => `<div class="lzc"><img src="chars/${id}/${p}.webp" alt=
 const SPARK = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2.5l2.1 6.4 6.4 2.1-6.4 2.1L11 19.5l-2.1-6.4L2.5 11l6.4-2.1z"/><path d="M19 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></svg>';
 // « à partir d'une image quelconque »: the picture keeps changing (a drawing, a plush, a photo, an AI picture) and so does
 // what it becomes (a « ? » until that character exists)
-const ANY = [['ref/tease_dessin.webp', 'Un dessin', 'astro', 'bw'], ['ref/tease_toutou.webp', 'Un toutou', 'toutou', 'gentleman'], ['ref/perso_julian.webp', 'Une photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'Une image IA', 'james', 'holding']];
+const ANY = [['ref/tease_dessin.webp', 'A drawing', 'astro', 'bw'], ['ref/tease_toutou.webp', 'A doggo', 'toutou', 'gentleman'], ['ref/perso_julian.webp', 'A photo', 'julian', 'smirk'], ['ref/perso_james.webp', 'An AI image', 'james', 'holding']];
 const LOCKED = {
   explore: {
     back: () => `<div class="grid g2">${SERIES.TEASE.map((c) => SERIES.tease(c)).join('')}</div>`,
@@ -1478,9 +1478,9 @@ const LOCKED = {
   search: {
     back: () => `<div class="grid g3">${['cam', 'isa_or', 'brooke', 'amare', 'julian', 'isa_nuit', 'suit', 'candy', 'melissa'].map((id) => face3(id, SPRITES[id].poses.listen ? 'listen' : Object.keys(SPRITES[id].poses)[0])).join('')}</div>`,
     show: () => slides([
-      `<h3>Des histoires faites pour toi</h3><div class="lzq">${I.search}<span data-type="romance, fin heureuse, 10 min"></span></div>
-        <div class="lzr lztg"><div class="lzch"><b>Romance</b><b>Fin heureuse</b><b>10 min</b></div></div><div class="lzr">${SERIES.tease(SERIES.TEASE[0], false)}${SERIES.tease(SERIES.TEASE[3], false)}</div>`,
-      `<h3>Trouve un perso</h3><div class="lzq">${I.search}<span data-type="elfe, anime"></span></div>
+      `<h3>Stories made for you</h3><div class="lzq">${I.search}<span data-type="romance, happy ending, 10 min"></span></div>
+        <div class="lzr lztg"><div class="lzch"><b>Romance</b><b>Happy ending</b><b>10 min</b></div></div><div class="lzr">${SERIES.tease(SERIES.TEASE[0], false)}${SERIES.tease(SERIES.TEASE[3], false)}</div>`,
+      `<h3>Find a character</h3><div class="lzq">${I.search}<span data-type="elf, anime"></span></div>
         <div class="lzr">${face3('isa_or', 'holding')}${face3('isa_nuit', 'listen')}${face3('melissa', 'listen')}</div>`,
     ]),
   },
@@ -1488,20 +1488,20 @@ const LOCKED = {
     back: () => `<div class="lzm"><div class="lzp"><img src="ref/perso_justin.webp" alt=""></div></div>`,
     // his words (26/10): « Transforme un selfie en personnage jouable », « à partir d'une image quelconque », « intègre-les dans tes propres histoires »
     show: () => slides([
-      `<h3>Transforme un selfie en personnage jouable</h3><div class="lzm"><div class="lzp"><img src="ref/perso_justin.webp" alt=""></div>${ARR}<div class="lzp"><img class="sp" data-poses="holding,punch,thinking,surprised,explaining" src="chars/justin/holding.webp" alt=""></div></div>`,
-      `<h3>À partir d’une image quelconque</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
-      `<h3>Intègre-les dans tes propres histoires</h3><div class="lzq">${I.pen}<span data-gen="Mon toutou se venge"></span><em>✓ Épisode 1 créé</em></div>
-        <div class="lzgo"><div class="lzg">${SPARK}Générer</div>
-        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:34%;height:60%;transform:translateX(-50%)"><b>La revanche du toutou</b></div></div>`,
+      `<h3>Turn a selfie into a playable character</h3><div class="lzm"><div class="lzp"><img src="ref/perso_justin.webp" alt=""></div>${ARR}<div class="lzp"><img class="sp" data-poses="holding,punch,thinking,surprised,explaining" src="chars/justin/holding.webp" alt=""></div></div>`,
+      `<h3>From any picture</h3><div class="lzm" data-any><div class="lzp"><img src="${ANY[0][0]}" alt=""></div>${ARR}<div class="lzp"><div class="lzx">?</div></div></div><div class="lzl">${ANY[0][1]}</div>`,
+      `<h3>Put them in your own stories</h3><div class="lzq">${I.pen}<span data-gen="My doggo gets revenge"></span><em>✓ Episode 1 created</em></div>
+        <div class="lzgo"><div class="lzg">${SPARK}Generate</div>
+        <div class="lzs"><div class="lzsh"></div>${SERIES.art('revanche', false).replace(/<img[^>]*>/g, '')}<img src="chars/toutou/gentleman.webp" alt="" style="position:absolute;left:50%;top:34%;height:60%;transform:translateX(-50%)"><b>The doggo's revenge</b></div></div>`,
     ]),
   },
   social: {
     back: () => `<div class="chips" style="justify-content:center">${FRIENDS.map((f) => `<span class="chip">${av(f.n)}${esc(f.n)}</span>`).join('')}</div>`,
     // one story, two phones: each plays their own character and has their own choices; while one chooses, the other waits
     // (Brooke on the left, Cam on the right: they face each other)
-    show: () => slides([`<h3>Une histoire avec des amis, un perso chacun</h3><div class="lzd">${[['Léa', 'brooke', 'drunk_smile', ['L’embrasser.', 'Partir.']], ['Toi', 'cam', 'flirty', ['Lui avouer.', 'Changer de sujet.']]].map(([n, sp, p, opts], i) =>
+    show: () => slides([`<h3>One story with friends, a character each</h3><div class="lzd">${[['Léa', 'brooke', 'drunk_smile', ['Kiss her.', 'Leave.']], ['You', 'cam', 'flirty', ['Tell him.', 'Change the subject.']]].map(([n, sp, p, opts], i) =>
       `<div class="lzcel${i ? ' mine' : ''}"><div class="art a-desir"><div class="bg"></div>${SERIES.spr(sp, p, 50, 120, 14)}</div><div class="lzn"><i></i>${n}</div>
-        <div class="lzo">${opts.map((o) => `<b>${o}</b>`).join('')}</div><div class="lzw">${i ? 'Léa' : 'Toi'} choisit…</div></div>`).join('')}</div>`]),
+        <div class="lzo">${opts.map((o) => `<b>${o}</b>`).join('')}</div><div class="lzw">${i ? 'Léa' : 'You'} choosing…</div></div>`).join('')}</div>`]),
   },
 };
 function renderLocked(v) {
@@ -1510,8 +1510,8 @@ function renderLocked(v) {
   const box = $('#' + v); box.scrollTop = 0;
   box.innerHTML = `<div class="lkv"><div class="lkbg">${L.back ? L.back() : ''}</div><div class="lkt">${SERIES.LABEL[tab]}</div>
     <svg class="lkic" data-act="lockinfo" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="currentColor"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
-    <div class="lkn">${n} / ${need} épisodes</div>
-    ${L.show ? `<div class="lkup">Glisse vers le haut<svg viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}<div class="lkx">${L.show ? L.show() : ''}</div></div>`;
+    <div class="lkn">${n} / ${need} episodes</div>
+    ${L.show ? `<div class="lkup">Swipe up<svg viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}<div class="lkx">${L.show ? L.show() : ''}</div></div>`;
   // a swipe up reveals the glimpse (the count and the hint go), a swipe down (or the hint, or the padlock's tap) brings the padlock screen back
   const lk = $('.lkv', box); let y0 = null;
   const swipe = (y) => { if (y0 === null || !lk) return; const dy = y - y0; y0 = null; if (dy < -40) lk.classList.add('up'); else if (dy > 40) lk.classList.remove('up'); };
@@ -1583,11 +1583,11 @@ const lockedChar = (id) => {
   const src = [...toWin(), ...Object.values(SERIES.TASTES).filter((t) => t.win && t.win.sprite).map((t) => ({ ...t.win, from: t.title }))];
   return src.find((w) => w.sprite === id) || null;
 };
-const charName = (id) => ({ isa_nuit: 'Isa · Minuit', isa_or: 'Isa · Doré', isa_noir: 'Isa · Braise', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
+const charName = (id) => ({ isa_nuit: 'Isa · Midnight', isa_or: 'Isa · Gold', isa_noir: 'Isa · Ember', melissa: 'Melissa' })[id] || NAMES[id] || id;   // Isa's 3 looks
 function renderSearch() {
   if (!SERIES.isOpen('search')) return;
-  const kinds = [['stories', 'Histoires'], ['chars', 'Persos']], styles = [['semi', 'Semi-réaliste'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
-  $('#search').innerHTML = `<div class="srw"><input class="sq" id="sQ" placeholder="Rechercher" value="${esc(sQ)}" autocomplete="off" enterkeyhint="search">
+  const kinds = [['stories', 'Stories'], ['chars', 'Characters']], styles = [['semi', 'Semi-realistic'], ['anime', 'Anime'], ['cartoon', 'Cartoon']];
+  $('#search').innerHTML = `<div class="srw"><input class="sq" id="sQ" placeholder="Search" value="${esc(sQ)}" autocomplete="off" enterkeyhint="search">
     <div class="chips">${kinds.map(([k, l]) => `<button class="chip${sKind === k ? ' on' : ''}" data-act="sKind" data-k="${k}">${l}</button>`).join('')}</div>
     ${sKind === 'chars' ? `<div class="chips">${styles.map(([k, l]) => `<button class="chip${sStyle === k ? ' on' : ''}" data-act="sStyle" data-k="${k}">${l}</button>`).join('')}</div>` : ''}
     <div id="sRes"></div></div>`;
@@ -1607,8 +1607,8 @@ function renderHome() {
   if (epOf(byId('lastcall')) && !prog.lastcall && !gone.lastcall) track('lastcall', 0);   // an episode reached in the game counts as started
   if (byId('test') && !prog.test) track('test', 0);   // Test is always in Accueil, first
   const ids = Object.keys(prog).filter((id) => byId(id) && (id === 'test' || !done(id))).sort((a, b) => (b === 'test') - (a === 'test') || prog[b].at - prog[a].at);   // a finished one goes to Sauvés
-  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Rien en cours.<br>Commence une histoire dans Explorer.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explorer</button></div>`; return; }
-  const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Fini</span>' : ''}</div></div>`;
+  if (!ids.length) { $('#home').innerHTML = `<div class="empty">${I.play}<p>Nothing in progress.<br>Start a story in Explore.</p><br><button class="btn main" data-act="tab" data-tab="explore">Explore</button></div>`; return; }
+  const cardOf = (id) => `<div class="card" data-act="resume" data-id="${id}"><div class="cvw">${cover(epd(byId(id)))}${done(id) ? '<span class="sdone">Finished</span>' : ''}</div></div>`;
   $('#home').innerHTML = `<div class="carBg" id="homeBg"></div><div class="hfirst"><div class="car home" id="homeCar">${ids.map(cardOf).join('')}</div>
     <div class="carInfo" id="homeInfo"></div></div><div class="hx" id="homeX"></div><div class="hmore" id="homeMore"></div>`;
   let centre = ids[0];
@@ -1649,9 +1649,9 @@ function renderHome() {
   };
   snap($('#homeCar'), (id) => {
     const d = byId(id), p = prog[id]; centre = homeCentre = id;
-    $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} avec ${esc(p.with.join(', '))}</p>` : ''}
+    $('#homeInfo').innerHTML = `${p.with.length ? `<p class="where">${p.with.map((x) => av(x)).join('')} with ${esc(p.with.join(', '))}</p>` : ''}
       <button class="btn main" data-act="ep" data-id="${id}" data-n="${epTo(d)}">${I.play}${goLabel(d)}</button>
-      <button class="hdown" data-act="hdown">Infos${I.down}</button>`;
+      <button class="hdown" data-act="hdown">Info${I.down}</button>`;
     $('#homeMore').innerHTML = moreHtml(d);
     $('#homeBg').style.cssText = blurOf(d, 'blur(4em) brightness(.35)');
   });
@@ -1672,9 +1672,9 @@ function epsHtml(d) {
   const ep = (e, k) => {
     const n = k + 1, st = n < now ? 'done' : n === now ? 'now' : 'lock';
     return `<button class="ep ${st}" data-act="ep" data-id="${d.id}" data-n="${n}"><span class="th">${e.img ? `<img src="${e.img}" alt="">` : cover({ ...d, title: '' })}</span>
-      <div><small>Épisode ${n}</small><b>${esc(e.title)}</b>${e.tease ? `<p>${esc(e.tease)}</p>` : ''}</div><span class="st">${st === 'done' ? I.check : st === 'now' ? I.play : I.lock}</span></button>`;
+      <div><small>Episode ${n}</small><b>${esc(e.title)}</b>${e.tease ? `<p>${esc(e.tease)}</p>` : ''}</div><span class="st">${st === 'done' ? I.check : st === 'now' ? I.play : I.lock}</span></button>`;
   };
- return `<div class="h2">Épisodes</div><div class="eps">${eps.map(ep).join('')}</div>`;
+ return `<div class="h2">Episodes</div><div class="eps">${eps.map(ep).join('')}</div>`;
 }
 function moreHtml(d) {
   return `${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${epsHtml(d)}
@@ -1700,9 +1700,9 @@ function lookSheet(id) {
   let asPic = false;   // tap the big picture: how it will show as your round profile picture, and back
   const paint = () => {
     const col = myColor() || LOOK_COLORS[0], ps = bestOf(c), bg = `style="background:${col}"`, n = savedName();
-    $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(n)}" placeholder="Ton nom" size="${Math.max(6, n.length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Nom">${I.pen}</label>
+    $('.look', box).innerHTML = `<label class="lk-name"><input value="${esc(n)}" placeholder="Your name" size="${Math.max(6, n.length)}" maxlength="16" enterkeyhint="done" autocomplete="off" spellcheck="false" aria-label="Name">${I.pen}</label>
       <div class="lk-big${asPic ? ' pic' : ''}" ${asPic ? '' : bg}>${asPic ? `<span class="pp" style="background:${col}"><img src="${picOf(c)}" alt=""></span>` : `<img src="${picOf(c)}" alt="">`}</div>
-      <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Couleur"></button>`).join('')}</div>
+      <div class="lk-cols">${LOOK_COLORS.map((x) => `<button class="${x === col ? 'on' : ''}" data-col="${x}" style="background:${x}" aria-label="Color"></button>`).join('')}</div>
       ${ps.length > 1 ? `<div class="lk-poses">${ps.map((p) => `<button class="${picOf(c) === c.poses[p] ? 'on' : ''}" data-pose="${p}" ${bg}><img src="${c.poses[p]}" alt=""></button>`).join('')}</div>` : ''}`;
   };
   box.oninput = (e) => {   // your name, kept as you type (never emptied: the last one stays)
@@ -1728,15 +1728,15 @@ function lookSheet(id) {
 function friendSheet(k) {
   const f = friend(k), fd = f.doing && byId(f.doing);
   if (fd && f.waits) {
-    return sheet(`<div class="cvw fsCv">${cover(fd)}</div><p class="lead">${av(k)} ${esc(f.n)} t'attend</p><p class="pitch">${esc(fd.pitch)}</p>
-      <div class="pick"><button class="btn main" data-act="joinf" data-id="${fd.id}" data-f="${esc(k)}">Rejoindre ${esc(f.n)}</button></div>`);
+    return sheet(`<div class="cvw fsCv">${cover(fd)}</div><p class="lead">${av(k)} ${esc(f.n)} is waiting for you</p><p class="pitch">${esc(fd.pitch)}</p>
+      <div class="pick"><button class="btn main" data-act="joinf" data-id="${fd.id}" data-f="${esc(k)}">Join ${esc(f.n)}</button></div>`);
   }
   const duo = (ids) => ids.map(byId).filter((d) => d && d.players > 1);
   const going = duo(Object.keys(prog).filter((id) => !gone[id]).sort((a, b) => prog[b].at - prog[a].at));
   const kept = duo(Object.keys(saved).sort((a, b) => saved[b].at - saved[a].at)).filter((d) => !going.includes(d));
   const grid = (ds) => `<div class="grid g3">${ds.map((d) => `<div class="card" data-act="invite" data-id="${d.id}" data-f="${esc(k)}"><div class="cvw">${cover(d)}</div></div>`).join('')}</div>`;
-  return sheet(`<h3>${av(k)}Inviter ${esc(f.n)} dans…</h3>${going.length ? `<div class="h2">En cours</div>${grid(going)}` : ''}${kept.length ? `<div class="h2">Sauvés</div>${grid(kept)}` : ''}
-    ${going.length || kept.length ? '' : '<div class="pick"><button class="btn main" data-act="sheetTab" data-tab="explore">Explorer</button></div>'}`);
+  return sheet(`<h3>${av(k)}Invite ${esc(f.n)} to…</h3>${going.length ? `<div class="h2">In progress</div>${grid(going)}` : ''}${kept.length ? `<div class="h2">Saved</div>${grid(kept)}` : ''}
+    ${going.length || kept.length ? '' : '<div class="pick"><button class="btn main" data-act="sheetTab" data-tab="explore">Explore</button></div>'}`);
 }
 // invite a friend into a film: your waiting room opens; a real one's device rings once you've taken your character,
 // a fake one accepts after a moment
@@ -1776,7 +1776,7 @@ function gotInvite(v) {
   pendingInvite = v;
   const d = DEMOS.find((x) => x.full === v.invite.s);
   sheet(`${d ? `<div class="cvw fsCv">${cover(d)}</div>` : ''}<p class="lead">${av('@' + v.from)} ${esc(inviter.n)} t'invite</p>${d ? '' : `<h3>${esc(v.invite.s)}</h3>`}
-    <div class="pick"><button class="btn main" data-act="accept">Rejoindre</button><button class="btn" data-act="later">Plus tard</button></div>`);
+    <div class="pick"><button class="btn main" data-act="accept">Join</button><button class="btn" data-act="later">Later</button></div>`);
 }
 {
   const myId = (() => {   // the game's own id for this device (index.html keeps the same one)
@@ -1795,10 +1795,10 @@ function renderSocial() {
   if (!SERIES.isOpen('social')) return;
   const m = me();
   const chars = owned().map((c) => `<button class="mc${c.id === m.id ? ' on' : ''}" data-act="pick" data-c="${esc(c.id)}"><img src="${poseOf(c, 'listen')}" alt=""><span>${esc(c.name)}</span></button>`).join('');
-  const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Épisode ${w.ep}</small></div>`).join('');
+  const locked = toWin().map((w) => `<div class="mc lock"><img src="chars/${w.sprite}/${w.pose}.webp" alt=""><span>${esc(w.from)}</span><small>${I.lock}Episode ${w.ep}</small></div>`).join('');
   const row = (f) => {
     const d = f.doing && byId(f.doing);
-    const what = d ? (f.waits ? `t'attend dans ${esc(d.title)}` : `joue à ${esc(d.title)}`) : f.on ? 'En ligne' : `Hors ligne · ${f.seen}`;
+    const what = d ? (f.waits ? `is waiting for you in ${esc(d.title)}` : `is playing ${esc(d.title)}`) : f.on ? 'Online' : `Offline · ${f.seen}`;
     return `<div class="fr${f.on ? '' : ' still'}"${f.on ? ` data-act="friend" data-f="${esc(keyOf(f))}"` : ''}><span class="fav">${av(keyOf(f))}<i class="${d ? 'play' : f.on ? 'on' : ''}"></i></span>
       <div><b>${esc(f.n)}</b><span class="${d ? 'busy' : f.on ? 'on' : ''}">${what}</span></div>${d ? `<span class="th">${cover({ ...d, title: '' })}</span>` : ''}</div>`;
   };
@@ -1806,8 +1806,8 @@ function renderSocial() {
   const rank = (f) => f.doing && f.waits ? 0 : f.doing ? 1 : f.on ? 2 : 3;
   const everyone = [...realFriends(), ...FRIENDS], order = everyone.sort((a, b) => rank(a) - rank(b));
   $('#social').innerHTML = `<div class="prof${charsOpen ? ' open' : ''}"><button class="me" data-act="chars">${face(m)}<div><b>${esc(myName())}</b></div></button>
-      ${charsOpen ? `<div class="mcs">${chars}<button class="mc add" data-act="newperso">${I.plus}<span>Créer</span></button>${locked}</div>` : ''}</div>
-    <div class="h2">Amis <small>${everyone.filter((f) => f.on).length} en ligne</small></div><div class="frs">${order.map(row).join('')}</div>`;
+      ${charsOpen ? `<div class="mcs">${chars}<button class="mc add" data-act="newperso">${I.plus}<span>Create</span></button>${locked}</div>` : ''}</div>
+    <div class="h2">Friends <small>${everyone.filter((f) => f.on).length} online</small></div><div class="frs">${order.map(row).join('')}</div>`;
 }
 
 // ---- the fake friends live a little: they come online, play something for a few minutes, stop, leave. Now and then one
@@ -1826,7 +1826,7 @@ function renderSocial() {
   function ping(f, d) {
     const p = $('#ping');
     p.innerHTML = `<div class="ping" data-act="friend" data-f="${esc(f.n)}">${av(f.n)}<div><b>${esc(f.n)} t'invite</b><span>${esc(d.title)}</span></div>
-      <button class="btn main" data-act="joinf" data-id="${d.id}" data-f="${esc(f.n)}">Rejoindre</button></div>`;
+      <button class="btn main" data-act="joinf" data-id="${d.id}" data-f="${esc(f.n)}">Join</button></div>`;
     p.hidden = false; clearTimeout(hideT); hideT = setTimeout(hidePing, 9000);
   }
   $('#ping').addEventListener('click', () => setTimeout(hidePing, 0));
@@ -1837,7 +1837,7 @@ function renderSocial() {
     if (!f.on) { f.on = true; delete f.seen; f.until = now + rnd(3, 8) * MIN; return; }   // back online
     const r = Math.random(), d = r < .35 && pickOf(free(false));
     if (d) { f.doing = d.id; f.until = now + rnd(4, 10) * MIN; }                            // plays something
-    else if (r > .75) { f.on = false; f.seen = "à l'instant"; f.until = now + rnd(10, 30) * MIN; }   // leaves
+    else if (r > .75) { f.on = false; f.seen = 'just now'; f.until = now + rnd(10, 30) * MIN; }   // leaves
     else f.until = now + rnd(2, 5) * MIN;
   }
   function tick() {
@@ -1872,9 +1872,9 @@ function renderCurrent() {
       ? `${late ? '<div class="stage"></div>' : ''}<iframe class="gframe${late ? ' late' : ''}" data-src="index.html?preview=${g}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>`
       : DRAWN ? '<div class="stage"></div>' : `<div class="pbg" style="${bgOf(d)}"></div><div class="pcast n${castOf(d).length}">${actors(castOf(d))}</div><div class="pshade"></div>`}
     <div class="pc-corner"></div><div class="cline"></div>
-    <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Jouer">${I.play}${playDot(d)}</button>
-      <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Sauver">${saveIconOf(d.id)}</button>
-      <button class="rb" data-act="info" data-id="${d.id}" aria-label="Infos">${I.info}</button></div></div>`; }).join('');
+    <div class="rail"><button class="rb play" data-act="play" data-id="${d.id}" aria-label="Play">${I.play}${playDot(d)}</button>
+      <button class="rb sv${saved[d.id] ? ' on' : ''}" data-act="save" data-id="${d.id}" aria-label="Save">${saveIconOf(d.id)}</button>
+      <button class="rb" data-act="info" data-id="${d.id}" aria-label="Info">${I.info}</button></div></div>`; }).join('');
   $$('.ci', box).forEach((ci) => line(ci, at[ci.dataset.id] || 0));
   if (seen) seen.disconnect();
   seen = new IntersectionObserver((es) => es.forEach((e) => {
@@ -1993,7 +1993,7 @@ const bgOf = (d) => d.series ? `background:radial-gradient(circle at 50% 30%, ${
 function lineHtml(d, who, text) {
   if (who < 0) return `<div class="pnar">${esc(text)}</div>`;
   const m = castOf(d)[who];
-  return `<div class="pbub"><b>${esc(m.name)}${m.me ? '<small>(toi)</small>' : ''}</b><p>${esc(text)}</p></div>`;
+  return `<div class="pbub"><b>${esc(m.name)}${m.me ? '<small>(you)</small>' : ''}</b><p>${esc(text)}</p></div>`;
 }
 function syncCurrent() {
   $$('#current .sv').forEach((b) => { b.classList.toggle('on', !!saved[b.dataset.id]); b.innerHTML = saveIconOf(b.dataset.id); });
@@ -2038,7 +2038,7 @@ function apply(st) {
   if (!layers.length || layers[0].k !== 'sheet') $('#sheet').hidden = true;
   document.body.classList.toggle('atroot', !st.ov);
 }
-const TAB_NAME = { explore: 'Explorer', search: 'Recherche', home: 'Accueil', add: 'Créer', social: 'Social', saved: 'Sauvés' };
+const TAB_NAME = { explore: 'Explore', search: 'Search', home: 'Home', add: 'Create', social: 'Social', saved: 'Saved' };
 function setTab(t) {
   if (t === tab) { $('#' + page()).scrollTop = 0; return; }
   if (TAB_NAME[t]) USAGE.feature(TAB_NAME[t]);   // a closed tab counts too: they wanted it
@@ -2111,12 +2111,12 @@ function swipe(yes) {
 function openDetail(id, inCurrent) {
   const d = byId(id), box = $('#detail');
   if (inCurrent) {   // Current: the cover, full screen, black at the bottom (not the scene where you left off)
-    box.innerHTML = `<div class="imm scroll"><div class="imm-first"><div class="cvw">${cover(d, true)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Fermer">${I.close}</button></div><div class="imm-more">${epsHtml(d)}</div></div>`;
+    box.innerHTML = `<div class="imm scroll"><div class="imm-first"><div class="cvw">${cover(d, true)}</div><div class="shade"></div><div class="txt"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p><div class="row">${playBtn(d, 'wide', 'dot')}${saveWide(d)}</div></div><button class="x" data-act="closeD" aria-label="Close">${I.close}</button></div><div class="imm-more">${epsHtml(d)}</div></div>`;
     box.dataset.id = id; box.dataset.cur = 1; box.hidden = false; return;
   }
   delete box.dataset.cur;
   const body = `<h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>${actions(d)}`;
-  const marks = d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';   // who's waiting: on Jouer
+  const marks = d.byoc && O.byoc === 'corner' ? '<span class="ribbon">YOUR CHARACTER</span>' : '';   // who's waiting: on Jouer
   if (O.detail === 'veil') box.innerHTML = `<div class="veil"><div class="cvw">${cover(d, true)}${marks}</div><div class="shade"></div><div class="txt">${body}</div><button class="x" data-act="closeD">${I.close}</button></div>`;
   else if (O.detail === 'zoom') box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="zoom"><div class="cvw">${cover(d, true)}${marks}<div class="over">${body}</div></div></div>`;
   else box.innerHTML = `<div class="dim" data-act="closeD"></div><div class="sheetD"><div class="grab"></div><div class="top"><div class="cvw">${cover(d, true)}${marks}</div><div><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}</div></div><p class="pitch">${esc(d.pitch)}</p>${actions(d)}</div>`;
@@ -2131,12 +2131,12 @@ const refreshDetail = () => {
 // (in En cours, a story with lines played counts as started)
 function goLabel(d) {
   const n = epTo(d), eps = (d.eps || [d]).length, on = started(d) || (prog[d.id] && prog[d.id].i > 0);
-  return finished(d) ? 'Rejouer' : `${on ? 'Continuer' : 'Jouer'}${eps > 1 || n > 1 ? ` · Épisode ${n}` : ''}`;
+  return finished(d) ? 'Replay' : `${on ? 'Continue' : 'Play'}${eps > 1 || n > 1 ? ` · Episode ${n}` : ''}`;
 }
 // ---- Jouer (Explorer): not the preview again, the series: its cover, what it is, Jouer the episode you're at, all its episodes ----
 function openSeries(id) {
   const d = byId(id), box = $('#series'), n = epTo(d), go = goLabel(d);
-  box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  box.innerHTML = `<button class="sr-x" data-act="closeD" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="sr-hero">${cover(d.eps ? { ...d, img: d.eps[n - 1].img } : d, true)}</div>
     <div class="sr-body"><h2 class="dTitle">${esc(d.title)}</h2>${meta(d)}<p class="pitch">${esc(d.pitch)}</p>
       <div class="row"><button class="btn main wide" data-act="ep" data-id="${id}" data-n="${n}">${I.play}${go}</button>${saveWide(d)}</div>${epsHtml(d)}</div>`;
@@ -2151,9 +2151,9 @@ function playNow(id) {
   const d = byId(id), real = realIn(d).slice(0, 1), keys = real.length ? real.map((p) => '@' + p.id) : othersIn(d);   // a real room first
   if (!keys.length) { playEp(id, epTo(d)); return; }
   const ws = keys.map((k) => friend(k).n);
-  const names = ws.length > 1 ? `${ws.slice(0, -1).join(', ')} et ${ws[ws.length - 1]}` : ws[0];
-  sheet(`<h3>${esc(d.title)}</h3><p class="lead">${keys.map((k) => av(k)).join('')} ${esc(names)} ${ws.length > 1 ? 'sont' : 'est'} déjà dans une salle</p>
-    <div class="pick"><button class="btn main" data-act="joinroom" data-id="${id}">Rejoindre ${esc(names)}</button><button class="btn" data-act="ownroom" data-id="${id}">Créer ta salle</button></div>`);
+  const names = ws.length > 1 ? `${ws.slice(0, -1).join(', ')} and ${ws[ws.length - 1]}` : ws[0];
+  sheet(`<h3>${esc(d.title)}</h3><p class="lead">${keys.map((k) => av(k)).join('')} ${esc(names)} ${ws.length > 1 ? 'are' : 'is'} already in a room</p>
+    <div class="pick"><button class="btn main" data-act="joinroom" data-id="${id}">Join ${esc(names)}</button><button class="btn" data-act="ownroom" data-id="${id}">Create your room</button></div>`);
 }
 
 // ---- saving: a tap saves, another takes it back out ----
@@ -2173,7 +2173,7 @@ function toggleSave(id) {
   renderTabs();
 }
 const saveIconOf = (id) => saveIcon(!!saved[id]);
-const saveWord = (id) => saved[id] ? (O.save === 'plus' ? 'Dans ma liste' : 'Sauvé') : (O.save === 'plus' ? 'Ma liste' : 'Sauver');
+const saveWord = (id) => saved[id] ? (O.save === 'plus' ? 'In my list' : 'Saved') : (O.save === 'plus' ? 'My list' : 'Save');
 function after() {
   renderTabs();
   const v = page();
@@ -2195,26 +2195,26 @@ function closeSheet(then) {
 // what the app knows about the player, from the onboarding (smtDemo.onb {k, me, li}): the taste picked, boy or girl, and who they're into
 function knownHtml() {
   const o = SERIES.onb() || {}, t = SERIES.TASTES[o.k], lv = SERIES.LOVE[o.li];
-  const row = (l, v) => `<div class="kn"><span>${l}</span><b${v ? '' : ' class="no"'}>${v || 'On ne sait pas encore'}</b></div>`;
-  return `<div class="opt"><b>Ce qu'on sait de toi</b>${row('Ce que tu aimes', t && t.name)}${row('Tu es', o.me === 'f' ? 'Une fille' : o.me === 'm' ? 'Un gars' : '')}${row('Tu es attiré par', lv ? (lv.fem ? 'Les filles' : 'Les gars') : '')}</div>`;
+  const row = (l, v) => `<div class="kn"><span>${l}</span><b${v ? '' : ' class="no"'}>${v || 'We don\'t know yet'}</b></div>`;
+  return `<div class="opt"><b>What we know about you</b>${row('What you like', t && t.name)}${row('You are', o.me === 'f' ? 'A girl' : o.me === 'm' ? 'A guy' : '')}${row('You\'re into', lv ? (lv.fem ? 'Girls' : 'Guys') : '')}</div>`;
 }
 // the game's choice cards (index.html reads them; also set in choix.html): on a phone, on the remote of a TV's story
 const CHOICE_OPTS = [
-  ['smt-cstyle', 'Choix sur le cell', 'T1', [['T1', 'Ta tête'], ['T3', 'Ta tête + qui te parle']]],
-  ['smt-rstyle', 'Choix sur la télécommande', 'N1', [['N1', 'Ta tête + le mot'], ['U1', '+ qui te parle']]],
+  ['smt-cstyle', 'Choices on the phone', 'T1', [['T1', 'Your face'], ['T3', 'Your face + who\'s talking']]],
+  ['smt-rstyle', 'Choices on the remote', 'N1', [['N1', 'Your face + the word'], ['U1', '+ who\'s talking']]],
 ];
 const lsGet = (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } };
 function choiceOptsHtml() {
   return CHOICE_OPTS.map(([k, name, d, ch]) => `<div class="opt"><b>${name}</b><div class="chips">${ch.map(([v, label]) => `<button class="chip${lsGet(k, d) === v ? ' on' : ''}" data-ls="${k}" data-v="${v}">${label}</button>`).join('')}</div></div>`).join('');
 }
 function options() {
-  const box = sheet(`<h3>Réglages</h3>` +
+  const box = sheet(`<h3>Settings</h3>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
     choiceOptsHtml() + knownHtml() +
-    `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Réinitialiser mon profil</button>
-    <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>
-    ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Parcours progressif' : 'Tout débloqué (démo)'}</button>` : ''}
-    <button class="btn" id="toGame" style="width:100%;margin-top:1em">Menu du jeu</button>`);
+    `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Reset my profile</button>
+    <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Your created and unlocked characters, your name, your progress, your saved stories.</p>
+    ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Step-by-step unlocks' : 'Everything unlocked (demo)'}</button>` : ''}
+    <button class="btn" id="toGame" style="width:100%;margin-top:1em">Game menu</button>`);
   box.onclick = (e) => {
     const ls = e.target.closest('[data-ls]');
     if (ls) { try { localStorage.setItem(ls.dataset.ls, ls.dataset.v); } catch { /* private window */ } $$(`[data-ls="${ls.dataset.ls}"]`, box).forEach((x) => x.classList.toggle('on', x === ls)); return; }
@@ -2226,7 +2226,7 @@ function options() {
     // two taps: the first says what goes, the second wipes
     const w = e.target.closest('#wipe');
     if (w && w.dataset.sure) wipeProfile();
-    else if (w) { w.dataset.sure = '1'; w.textContent = 'Touche encore : tout effacer'; Object.assign(w.style, { background: '#ff453a', color: '#fff' }); $('#wipeWhat', box).hidden = false; }
+    else if (w) { w.dataset.sure = '1'; w.textContent = 'Tap again: erase everything'; Object.assign(w.style, { background: '#ff453a', color: '#fff' }); $('#wipeWhat', box).hidden = false; }
   };
 }
 // a new profile: everything this browser kept about the player (characters made or won, name, progress, saved, looks, who
@@ -2256,10 +2256,10 @@ function play(id, host = false, from = 0) {
   // in the bubble format: drawn the game's way, and (1, 5) the game itself when the demo has a version for it, from the same line
   const g = (FMT === '1' || FMT === '5') && ENGINE[d.id];
   box.innerHTML = DRAWN ? `<div class="stage"></div>${g ? `<iframe class="gframe${FMT === '5' ? ' late' : ''}" src="index.html?preview=${g}${from ? `&cut=${from}-999` : ''}" title="${esc(d.title)}" tabindex="-1"></iframe><div class="catch"></div>` : ''}
-    <div id="pProg"></div><button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button>`
+    <div id="pProg"></div><button class="pclose" data-act="pclose" aria-label="Close">${I.close}</button>`
     : `<div class="pbg" style="${bgOf(d)}"></div>
     <div class="pcast n${cast.length}">${actors(cast)}</div><div class="pshade"></div><div id="pProg"></div>
-    <button class="pclose" data-act="pclose" aria-label="Fermer">${I.close}</button><div id="pLine"></div>`;
+    <button class="pclose" data-act="pclose" aria-label="Close">${I.close}</button><div id="pLine"></div>`;
   $$('.pcast .sp', box).forEach((img, k) => { img.src = srcOf(cast[k], P.poses[k]); });
   if (d.img && !DRAWN) $('.pbg', box).style.cssText = `background:url(${d.img}) center/cover`;
   box.hidden = false;
@@ -2271,13 +2271,13 @@ function join(d, host) {
   const ws = host ? [] : waiting(d).slice(0, d.players - 1), f = ws.find((w) => !w.stranger), st = ws.filter((w) => w.stranger);
   const seat = (pic, name) => `<div class="seat">${pic}<b>${esc(name)}</b></div>`;
   const seats = [seat(face(me()), myName()), ...ws.map((w) => seat(av(w.n), w.n)),
-    ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Libre'))];
-  const say = f ? `${esc(f.n)} t'attend${st.length ? ` avec ${esc(st.map((w) => w.n).join(', '))}` : ''}.`
-    : st.length ? `${esc(st[0].n)} est déjà dans la salle. Vous ne vous connaissez pas : vous jouez l'histoire ensemble.`
-    : 'Personne encore. Pour l\'aperçu, l\'autre rôle est joué au hasard.';
+    ...Array.from({ length: Math.max(0, (d.players === 3 ? 3 : 2) - 1 - ws.length) }, () => seat('<span class="empty-seat"></span>', 'Open'))];
+  const say = f ? `${esc(f.n)} is waiting for you${st.length ? ` with ${esc(st.map((w) => w.n).join(', '))}` : ''}.`
+    : st.length ? `${esc(st[0].n)} is already in the room. You don't know each other: you play the story together.`
+    : 'Nobody yet. For the preview, the other role is played at random.';
   const box = document.createElement('div'); box.className = 'pjoin';
-  box.innerHTML = `<button class="jback" data-act="pclose" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <small class="kick">Salle d'attente</small><h3>${esc(d.title)}</h3><div class="seats">${seats.join('')}</div><p>${say}</p>
+  box.innerHTML = `<button class="jback" data-act="pclose" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15.5 4.5 8 12l7.5 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <small class="kick">Waiting room</small><h3>${esc(d.title)}</h3><div class="seats">${seats.join('')}</div><p>${say}</p>
     <button class="btn main" data-act="pgo">${I.play}Commencer</button>`;
   $('#player').appendChild(box);
   P.with = ws.map((w) => w.n);
@@ -2285,14 +2285,14 @@ function join(d, host) {
 }
 function withChip(names) {
   const w = document.createElement('div'); w.className = 'pwith';
-  w.innerHTML = `${names.map((n) => av(n)).join('')}avec ${esc(names.join(', '))}`; $('#player').appendChild(w);
+  w.innerHTML = `${names.map((n) => av(n)).join('')}with ${esc(names.join(', '))}`; $('#player').appendChild(w);
 }
 function progress() {
   const t = total(P.d), n = Math.min(P.i + 1, t), el = $('#pProg');
   if (O.progress === 'corner') el.innerHTML = `<div class="pc-corner">${n}/${t}</div>`;
   else if (O.progress === 'bar') el.innerHTML = `<div class="pc-bar">${Array.from({ length: t }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div>`;
   else if (O.progress === 'ring') { const c = 2 * Math.PI * 15; el.innerHTML = `<div class="pc-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c * n / t} ${c}"/></svg><span>${n}/${t}</span></div>`; }
-  else el.innerHTML = `<div class="pc-pill">Aperçu · ${n} sur ${t}</div>`;
+  else el.innerHTML = `<div class="pc-pill">Preview · ${n} of ${t}</div>`;
 }
 // the game in the player, once it's the one showing (5: once it took over)
 const playerGame = () => { const f = $('#player iframe.gframe'); return f && (!f.classList.contains('late') || f.classList.contains('on')) ? f : null; };
@@ -2353,7 +2353,7 @@ stage.addEventListener('click', (e) => {
     case 'ownroom': closeSheet(() => playEp(id, epTo(byId(id)))); break;
     case 'resume': openPlayer(id, false, byId(id).full || !prog[id] || done(id) ? 0 : prog[id].i); break;
     case 'closeD': case 'closeS': back(); break;
-    case 'lockinfo': { const k = SERIES.LADDER[tab] - SERIES.episodesDone(); if (k > 0) sheet(`<p class="lead">Tu dois avoir fini ${k} épisode${k > 1 ? 's' : ''} supplémentaire${k > 1 ? 's' : ''} pour avoir accès à cette section.</p>`); break; }
+    case 'lockinfo': { const k = SERIES.LADDER[tab] - SERIES.episodesDone(); if (k > 0) sheet(`<p class="lead">Finish ${k} more episode${k > 1 ? 's' : ''} to unlock this section.</p>`); break; }
     case 'hdown': $('#home').scrollTo({ top: $('#homeMore').offsetTop - 40, behavior: 'smooth' }); break;
     case 'ep': playEp(id, +el.dataset.n); break;
     case 'friend': friendSheet(el.dataset.f); break;
@@ -2369,8 +2369,8 @@ stage.addEventListener('click', (e) => {
     }
     case 'pose': {   // a pose up close; a character you don't have yet says what it takes to get it
       const w = lockedChar(id);
-      if (w) sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${I.lock} Tu dois finir l’épisode ${w.ep} de « ${esc(w.from)} » pour avoir ce perso.</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Retour</button>`);
-      else sheet(`<div class="closeup"><img src="chars/${id}/${el.dataset.p}.webp" alt=""></div><h3>${esc(charName(id))}</h3><p class="lead">${esc(el.dataset.p.replace(/_/g, ' '))}</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Retour</button>`);
+      if (w) sheet(`<h3>${esc(charName(id))}</h3><p class="lead">${I.lock} Finish episode ${w.ep} of “${esc(w.from)}” to get this character.</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Back</button>`);
+      else sheet(`<div class="closeup"><img src="chars/${id}/${el.dataset.p}.webp" alt=""></div><h3>${esc(charName(id))}</h3><p class="lead">${esc(el.dataset.p.replace(/_/g, ' '))}</p><button class="btn" data-act="chr" data-id="${id}" style="width:100%">Back</button>`);
       break;
     }
     case 'sStyle': sStyle = el.dataset.k; renderSearch(); break;

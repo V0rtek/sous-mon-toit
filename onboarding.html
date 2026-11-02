@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -125,14 +125,14 @@ body.locked #top { display: none; }
   <div id="screen" class="screen"></div>
   <header id="top">
     <div id="vsw">
-      <button data-act="vprev" aria-label="Version précédente"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button data-act="vprev" aria-label="Previous version"><svg viewBox="0 0 24 24"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="vName" data-act="restart"></button>
-      <button data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button data-act="vnext" aria-label="Next version"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <button id="statBtn" data-act="stats" aria-label="Résultats"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    <button id="statBtn" data-act="stats" aria-label="Results"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
   </header>
 </div>
-<script src="series.js"></script>
+<script src="series.js?v=20261102210000"></script>
 <script src="usage.js"></script>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
@@ -248,11 +248,11 @@ const poster = (k) => `<div class="poster" data-k="${k}">${art(k, true)}<div cla
 
 // ---- the versions: each one changes only HOW the taste is picked; the openings after are the same ----
 const VERSIONS = [
-  { id: 'grille', name: 'Grille', draw: drawGrid },
+  { id: 'grille', name: 'Grid', draw: drawGrid },
   { id: 'duel', name: 'Duel', draw: drawDuel },
-  { id: 'fil', name: 'Fil', draw: drawFeed },
-  { id: 'question', name: 'Une question', draw: drawQuestion },
-  { id: 'dedans', name: 'Dans l’histoire', draw: drawInside },
+  { id: 'fil', name: 'Feed', draw: drawFeed },
+  { id: 'question', name: 'One question', draw: drawQuestion },
+  { id: 'dedans', name: 'In the story', draw: drawInside },
 ];
 const ARGS = new URLSearchParams(location.search);
 // ?v=2 (or ?v=duel): that version only, no testing bar, no numbers at the end (the link for strangers)
@@ -354,7 +354,7 @@ function drawDuel(box) {
   const pairs = [shuffle(['desir', 'danger']), shuffle(['revanche', 'etrange'])];
   let p = 0;
   const draw = () => {
-    box.innerHTML = pairs[p].map(poster).join('') + `<button class="reroll" aria-label="Deux autres"><svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    box.innerHTML = pairs[p].map(poster).join('') + `<button class="reroll" aria-label="Two others"><svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
     $$('.poster', box).forEach((el) => el.onclick = () => choose(el));
     $('.reroll', box).onclick = () => { run.rerolls++; save(); p = 1 - p; draw(); };
   };
@@ -364,7 +364,7 @@ function drawDuel(box) {
 function drawFeed(box) {
   run.order = shuffle(KEYS); run.dwell = {};
   box.innerHTML = `<div class="feed">${run.order.map((k, i) => `<div class="poster" data-k="${k}">${art(k, false)}<div class="shade"></div><div class="fline"></div>
-    <div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div><button class="go">Jouer</button>
+    <div class="ptxt"><h2>${esc(ARCH[k].title)}</h2><p>${esc(ARCH[k].hook)}</p></div><button class="go">Play</button>
     ${i === 0 ? '<svg class="chev" viewBox="0 0 24 24"><path d="m6 14.5 6-6 6 6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}</div>`).join('')}</div>`;
   let cur = null, since = 0, loop = null;
   const leave = () => { if (cur) run.dwell[cur.dataset.k] = (run.dwell[cur.dataset.k] || 0) + Math.round(performance.now() - since); clearInterval(loop); };
@@ -381,7 +381,7 @@ function drawFeed(box) {
 // 4 · the feeling, in words, nothing else
 function drawQuestion(box) {
   box.className = 'screen question'; run.order = ['revanche', 'desir', 'etrange', 'danger'];   // Justin's order (26/10), not shuffled
-  box.innerHTML = `<h1>Ce soir, t’as envie de…</h1>${run.order.map((k) => `<button data-k="${k}">${art(k, false, 'row')}<b>${esc(ARCH[k].verb)}</b></button>`).join('')}`;
+  box.innerHTML = `<h1>Tonight, you feel like…</h1>${run.order.map((k) => `<button data-k="${k}">${art(k, false, 'row')}<b>${esc(ARCH[k].verb)}</b></button>`).join('')}`;
   $$('button', box).forEach((b) => b.onclick = () => {
     const k = b.dataset.k; $('b', b).style.color = ARCH[k].color; picked(k);
     setTimeout(() => { box.style.transition = 'opacity .3s'; box.style.opacity = 0; setTimeout(() => { box.style.opacity = ''; playGame(k); }, 300); }, 250);
@@ -451,11 +451,11 @@ function scene(k, lines) {
 function lovePick(box, then) {
   const card = document.createElement('div'); card.className = 'pick';
   card.onclick = (e) => e.stopPropagation();
-  card.innerHTML = '<h2>Tu es</h2><div class="two"><button data-me="m">Un gars</button><button data-me="f">Une fille</button></div>';
+  card.innerHTML = '<h2>You are</h2><div class="two"><button data-me="m">A guy</button><button data-me="f">A girl</button></div>';
   box.append(card);
   $$('[data-me]', card).forEach((b) => b.onclick = () => {
     run.me = b.dataset.me; save();
-    card.innerHTML = `<h2>Tu craques pour</h2><div class="two">${['brooke', 'cam'].map((s) => `<button class="face" data-li="${s}"><div class="art a-desir"><div class="bg"></div>${spr(s, s === 'cam' ? 'flirty' : 'drunk_smile', 50, 190, 4)}</div><b>${LOVE[s].name}</b></button>`).join('')}</div>`;
+    card.innerHTML = `<h2>You have a crush on</h2><div class="two">${['brooke', 'cam'].map((s) => `<button class="face" data-li="${s}"><div class="art a-desir"><div class="bg"></div>${spr(s, s === 'cam' ? 'flirty' : 'drunk_smile', 50, 190, 4)}</div><b>${LOVE[s].name}</b></button>`).join('')}</div>`;
     $$('[data-li]', card).forEach((f) => f.onclick = () => { run.li = f.dataset.li; save(); card.remove(); then(); });
   });
 }
@@ -471,16 +471,16 @@ function end() {
     box.className = 'screen';
     return SERIES.episode(box, run.k, 1, { home: () => location.replace(BACK), next: (k) => location.replace(BACK + '#play=' + k) });
   }
-  const rows = [['Choisi en', sec(run.pick)]];
-  if (run.rerolls) rows.push(['↻', run.rerolls + ' fois']);
-  if (run.dwell) rows.push(['Regardé', run.order.filter((k) => run.dwell[k]).map((k) => `${ARCH[k].title} ${sec(run.dwell[k])}`).join(' · ')]);
-  if (run.me) rows.push(['Toi', run.me === 'f' ? 'une fille' : 'un gars'], ['Craque pour', love().name]);
-  if (run.choice) rows.push(['Son choix', run.choice]);
-  rows.push(['En tout', sec(run.done)]);
-  box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">La suite arrive.</div>
+  const rows = [['Picked in', sec(run.pick)]];
+  if (run.rerolls) rows.push(['↻', run.rerolls + ' times']);
+  if (run.dwell) rows.push(['Looked at', run.order.filter((k) => run.dwell[k]).map((k) => `${ARCH[k].title} ${sec(run.dwell[k])}`).join(' · ')]);
+  if (run.me) rows.push(['You', run.me === 'f' ? 'a girl' : 'a guy'], ['Crush on', love().name]);
+  if (run.choice) rows.push(['Their choice', run.choice]);
+  rows.push(['In total', sec(run.done)]);
+  box.innerHTML = `<h1 style="color:${a.color}">${esc(a.name)}</h1><div class="lede">Coming soon.</div>
     ${LOCKED ? '' : `<dl>${rows.map(([t, d]) => `<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl>`}
-    <div class="row"><button class="round" data-act="restart" aria-label="Recommencer"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4v4.5H9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    ${LOCKED ? '' : `<button class="round main" data-act="vnext" aria-label="Version suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}</div>`;
+    <div class="row"><button class="round" data-act="restart" aria-label="Start over"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4v4.5H9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    ${LOCKED ? '' : `<button class="round main" data-act="vnext" aria-label="Next version"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}</div>`;
 }
 
 // ---- results, per version ----
@@ -488,14 +488,14 @@ function stats() {
   const med = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
   const body = VERSIONS.map((v) => {
     const r = RUNS.filter((x) => x.v === v.id), p = r.filter((x) => x.k), d = r.filter((x) => x.done);
-    if (!r.length) return `<h2>${esc(v.name)}</h2><p><span>Pas encore joué.</span></p>`;
+    if (!r.length) return `<h2>${esc(v.name)}</h2><p><span>Not played yet.</span></p>`;
     const by = KEYS.map((k) => `${ARCH[k].name} ${p.filter((x) => x.k === k).length}`).join(' · ');
     const m = med(p.map((x) => x.pick));
-    return `<h2>${esc(v.name)}</h2><p>${r.length} essai${r.length > 1 ? 's' : ''} · ${p.length} choisi${p.length > 1 ? 's' : ''} · ${d.length} jusqu’au bout<br>
-      <span>Temps pour choisir (médiane)</span> ${m === null ? '·' : sec(m)}<br><span>Choix</span> ${by}</p>`;
+    return `<h2>${esc(v.name)}</h2><p>${r.length} run${r.length > 1 ? 's' : ''} · ${p.length} picked · ${d.length} to the end<br>
+      <span>Time to pick (median)</span> ${m === null ? '·' : sec(m)}<br><span>Choices</span> ${by}</p>`;
   }).join('');
-  stage.insertAdjacentHTML('beforeend', `<div id="stats"><button class="round close" data-act="unstats" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-    ${body}<button class="wipe" data-act="wipe">Effacer les résultats</button></div>`);
+  stage.insertAdjacentHTML('beforeend', `<div id="stats"><button class="round close" data-act="unstats" aria-label="Close"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    ${body}<button class="wipe" data-act="wipe">Erase the results</button></div>`);
 }
 
 stage.addEventListener('click', (e) => {

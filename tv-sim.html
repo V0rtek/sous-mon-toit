@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Unwritten · la télé</title>
+<title>Unwritten · the TV</title>
 <style>
 /* The TV mode on one screen: the TV in the middle, a phone on each side, all live (the real game, three pages talking
    through the relay like three devices). The TV gets a room of its own (?tv&room=sim…), each phone joins it with its
@@ -57,14 +57,14 @@ main { height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-
 </head>
 <body>
 <main>
-  <div class="col show" data-p="1"><div class="lbl" id="n1">Cell 1</div><div class="phone"><iframe id="p1" title="Cell 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
+  <div class="col show" data-p="1"><div class="lbl" id="n1">Phone 1</div><div class="phone"><iframe id="p1" title="Phone 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
   <div class="col mid">
     <div class="lbl"><span id="code"></span></div>
-    <div class="tv"><iframe id="tv" title="La télé" allow="autoplay; fullscreen; screen-wake-lock"></iframe></div><div class="stand"></div>
+    <div class="tv"><iframe id="tv" title="The TV" allow="autoplay; fullscreen; screen-wake-lock"></iframe></div><div class="stand"></div>
     <div class="bar"><button type="button" id="again">↻</button><a href="index.html">‹</a></div>
   </div>
-  <div id="pick"><button type="button" class="on" data-p="1"></button><button type="button" class="both" data-p="0" aria-label="Les deux"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v1"/><rect x="10" y="6" width="11" height="16" rx="2"/><path d="M14.5 18.5h2"/></svg></button><button type="button" data-p="2"></button></div>
-  <div class="col" data-p="2"><div class="lbl" id="n2">Cell 2</div><div class="phone"><iframe id="p2" title="Cell 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
+  <div id="pick"><button type="button" class="on" data-p="1"></button><button type="button" class="both" data-p="0" aria-label="Both"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v1"/><rect x="10" y="6" width="11" height="16" rx="2"/><path d="M14.5 18.5h2"/></svg></button><button type="button" data-p="2"></button></div>
+  <div class="col" data-p="2"><div class="lbl" id="n2">Phone 2</div><div class="phone"><iframe id="p2" title="Phone 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
 </main>
 <div id="start"><div><b>▶</b></div></div>
 <script>
