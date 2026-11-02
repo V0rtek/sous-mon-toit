@@ -118,12 +118,36 @@ window.FORGE = (() => {
     { id: 'rival', e: '⚔️', n: 'Rivaux', en: 'rivals' }, { id: 'mentor', e: '🧭', n: 'Mentor', en: 'mentor and student', good: 1 },
   ];
   const R = Object.fromEntries(RELS.map((r) => [r.id, r]));
+  // the infos: picked from this list, never typed and never invented (02/11). x, y = the people in it (a tap on a face
+  // = the next one). k: secret (comes out in episode 3), mask (falls in episode 3), past (told early), object (seen early,
+  // opened in episode 3)
+  const INFO_K = [{ id: 'secret', e: '🤫', n: 'Secret', d: 'Ce qu’un perso cache. Sort en épisode 3.' }, { id: 'mask', e: '🎭', n: 'Faux visage', d: 'Il n’est pas ce qu’il montre. Tombe en épisode 3.' },
+    { id: 'past', e: '🕰️', n: 'Passé', d: 'Ce qui s’est passé entre eux. Raconté tôt.' }, { id: 'object', e: '📦', n: 'Objet', d: 'Un objet qu’on voit tôt, qu’on ouvre en épisode 3.' }];
   const INFOS = [
-    { id: 'secret', e: '🤫', n: 'Un secret', who: 1, d: 'Un secret que l’IA invente, qui explique un geste étrange de ce perso. Sort en épisode 3.', en: (x) => `${x} has a secret (invent it: it explains something odd ${x} does; it comes out in episode 3)` },
-    { id: 'mask', e: '🎭', n: 'Faux visage', who: 1, d: 'Ce perso n’est pas ce qu’il montre. L’IA invente ce qu’il cache.', en: (x) => `${x} is not who they seem (invent what they hide)` },
-    { id: 'past', e: '🕰️', n: 'Un passé', d: 'Un passé commun (une phrase) entre deux persos liés, que l’IA invente.', en: () => 'a shared past between two of them, in one sentence (invent it)' },
-    { id: 'object', e: '📦', n: 'Un objet', d: 'Un objet, une lettre, une porte : quelqu’un sait ce qu’il y a dedans et ne dit rien.', en: () => 'a mystery object, letter or door: someone knows what is inside and will not tell' },
+    { k: 'secret', id: 'sibling', e: '🧬', s: 2, fr: (x, y) => `${x} est de la famille de ${y}, en cachette`, en: (x, y) => `${x} is ${y}'s hidden sibling (or close family); ${y} does not know` },
+    { k: 'secret', id: 'parent', e: '👶', s: 2, fr: (x, y) => `${x} est le parent de ${y}`, en: (x, y) => `${x} is ${y}'s parent, and ${y} does not know` },
+    { k: 'secret', id: 'betray', e: '🗡️', s: 2, fr: (x, y) => `${x} a trahi ${y}`, en: (x, y) => `${x} betrayed ${y} in the past, and ${y} does not know` },
+    { k: 'secret', id: 'crush', e: '💌', s: 2, fr: (x, y) => `${x} aime ${y} en secret`, en: (x, y) => `${x} is secretly in love with ${y}` },
+    { k: 'secret', id: 'cause', e: '🔥', s: 2, fr: (x, y) => `${x} a causé ce que ${y} a perdu`, en: (x, y) => `${x} caused what ${y} lost most, and hides it` },
+    { k: 'secret', id: 'leaving', e: '🧳', s: 1, fr: (x) => `${x} part bientôt, sans le dire`, en: (x) => `${x} is leaving soon and has told no one` },
+    { k: 'secret', id: 'sick', e: '🩺', s: 1, fr: (x) => `${x} est malade`, en: (x) => `${x} is sick and hides it` },
+    { k: 'mask', id: 'villain', e: '🦹', s: 1, fr: (x) => `${x} est celui qu’on cherche`, en: (x) => `${x} is the very one everyone is looking for (a name planted early gives it away later)` },
+    { k: 'mask', id: 'spy', e: '🕵️', s: 2, fr: (x, y) => `${x} travaille pour ${y}`, en: (x, y) => `${x} secretly works for ${y}` },
+    { k: 'mask', id: 'pretend', e: '🎭', s: 2, fr: (x, y) => `${x} fait semblant d’aimer ${y}`, en: (x, y) => `${x} only pretends to care for ${y}` },
+    { k: 'mask', id: 'name', e: '🪪', s: 1, fr: (x) => `${x} ment sur son nom`, en: (x) => `${x} lies about their name and where they come from` },
+    { k: 'mask', id: 'royal', e: '👑', s: 1, fr: (x) => `${x} est de sang royal`, en: (x) => `${x} is of royal blood and hides it` },
+    { k: 'past', id: 'exes', e: '💔', s: 2, fr: (x, y) => `${x} et ${y} ont été ensemble`, en: (x, y) => `${x} and ${y} were together once` },
+    { k: 'past', id: 'saved', e: '🦸', s: 2, fr: (x, y) => `${x} a sauvé ${y}`, en: (x, y) => `${x} once saved ${y}'s life` },
+    { k: 'past', id: 'grew', e: '🏡', s: 2, fr: (x, y) => `${x} et ${y} ont grandi ensemble`, en: (x, y) => `${x} and ${y} grew up together` },
+    { k: 'past', id: 'fight', e: '🥊', s: 2, fr: (x, y) => `${x} et ${y} ne se parlent plus`, en: (x, y) => `${x} and ${y} fell out and have not spoken since` },
+    { k: 'past', id: 'promise', e: '🤞', s: 2, fr: (x, y) => `${x} a fait une promesse à ${y}`, en: (x, y) => `${x} once made ${y} a promise, still binding` },
+    { k: 'object', id: 'letter', e: '✉️', s: 2, fr: (x, y) => `Une lettre de ${x} pour ${y}`, en: (x, y) => `a sealed letter from ${x} to ${y}` },
+    { k: 'object', id: 'ring', e: '💍', s: 1, fr: (x) => `La bague de ${x}`, en: (x) => `${x}'s ring, that they never take off` },
+    { k: 'object', id: 'key', e: '🗝️', s: 1, fr: (x) => `La clé de ${x}`, en: (x) => `${x}'s key, to a door nobody opens` },
+    { k: 'object', id: 'photo', e: '🖼️', s: 2, fr: (x, y) => `Une photo de ${x} avec ${y}`, en: (x, y) => `an old photo of ${x} with ${y}` },
+    { k: 'object', id: 'map', e: '🗺️', s: 1, fr: (x) => `La carte de ${x}`, en: (x) => `${x}'s map, of a place nobody goes` },
   ];
+  const IN = Object.fromEntries(INFOS.map((i) => [i.id, i]));
 
   // ---- HOW 1, the engine: the inciting incident, why it's hard (some only make sense with what's chosen) ----
   const INC = [
@@ -153,10 +177,10 @@ window.FORGE = (() => {
   const KEY = 'smt-forge2';
   const BASE = () => ({ decor: 'taverne', cast: ['ruby', 'amare', 'melissa'], pil: { justin: ['charmeur', 'genie'], ruby: ['mysterieux'], amare: ['chef', 'charmeur'], melissa: ['protecteur'] },
     flaw: { justin: 'lache' }, want: { justin: { v: 'love', t: 'ruby' }, amare: { v: 'love', t: 'ruby' } }, rel: { 'amare|ruby': 'couple', 'justin|melissa': 'friend' },
-    info: { secret: 'amare' }, inc: { k: 'shift', who: 'amare' }, hard: { liked: 1 }, tech: { sexy: 1, who: 1, plant: 1, twist: 1 } });
-  let S = (() => { try { const s = JSON.parse(ls(KEY)); if (s && Array.isArray(s.cast)) return { ...BASE(), ...s }; } catch { /* none yet */ } return BASE(); })();
+    infos: [{ id: 'villain', x: 'amare' }, { id: 'exes', x: 'justin', y: 'ruby' }], inc: { k: 'shift', who: 'amare' }, hard: { liked: 1 }, tech: { sexy: 1, who: 1, plant: 1, twist: 1 } });
+  let S = (() => { try { const s = JSON.parse(ls(KEY)); if (s && Array.isArray(s.cast)) { if (!Array.isArray(s.infos)) s.infos = []; return { ...BASE(), ...s }; } } catch { /* none yet */ } return BASE(); })();
   const save = () => ls(KEY, JSON.stringify(S));
-  let el = null, msg = '';
+  let el = null, msg = '', openK = null;
 
   const J = 'justin';
   const people = () => [J, ...S.cast];
@@ -168,6 +192,10 @@ window.FORGE = (() => {
   const live = (id) => id === J || S.cast.includes(id);
   const wantOf = (id) => { const w = S.want[id]; return w && W[w.v] && (!W[w.v].t || live(w.t)) ? w : null; };
   const incWho = () => (live(S.inc.who) && S.inc.who !== J ? S.inc.who : S.cast[0]);
+  // the infos in play: their people still in the story
+  const infos = () => (S.infos || []).filter((i) => IN[i.id] && live(i.x) && (IN[i.id].s < 2 || live(i.y)));
+  const infoFr = (i) => IN[i.id].fr(nm(i.x), nm(i.y)), infoEn = (i) => IN[i.id].en(en(i.x), en(i.y));
+  const kinds = (k) => infos().filter((i) => IN[i.id].k === k);
   const mini = (id) => `<span class="fMini">${face(id)}</span>`;
 
   // ---- the conflicts of desire, found from what each one wants and their relations ----
@@ -197,12 +225,12 @@ window.FORGE = (() => {
     const dear = S.cast.find((id) => id !== target && id !== against && (R[rel(J, id)] || {}).good) || null;
     return { target, against, dear, a: target, b: dear || against || S.cast.find((id) => id !== target) || target };
   }
-  const hardOk = (h) => (h === 'liked' ? !!roles().against : h === 'danger' ? S.inc.k === 'gone' || people().some((id) => { const w = wantOf(id); return w && ['find', 'free'].includes(w.v); }) : h === 'gag' ? !!(S.info.secret && live(S.info.secret)) : true);
+  const hardOk = (h) => (h === 'liked' ? !!roles().against : h === 'danger' ? S.inc.k === 'gone' || people().some((id) => { const w = wantOf(id); return w && ['find', 'free'].includes(w.v); }) : h === 'gag' ? kinds('secret').length > 0 : true);
 
   // ---- OUTPUT: the events of the 5 episodes, worked out from WHAT and HOW. { e, fr (here), en (the prompts) } ----
   function events() {
     const r = roles(), x = incWho(), inc = by(INC, S.inc.k), pX = P[pillarsOf(x)[0]], jw = wantOf(J), cs = conflicts(), t = (id) => S.tech[id];
-    const sec = S.info.secret && live(S.info.secret) ? S.info.secret : null, mask = S.info.mask && live(S.info.mask) ? S.info.mask : null;
+    const secs = kinds('secret'), masks = kinds('mask'), pasts = kinds('past'), objs = kinds('object'), sec = secs.length || masks.length;
     const H = (id) => S.hard[id] && hardOk(id);
     const E = [[], [], [], [], []], put = (n, e, fr, en2) => E[n].push({ e, fr, en: en2 });
     const hooks = TECHS.filter((h) => ['sexy', 'where', 'who', 'what'].includes(h.id) && t(h.id));
@@ -215,19 +243,22 @@ window.FORGE = (() => {
     const jWant = jw || { v: S.inc.k === 'gone' ? 'find' : 'love', t: r.target };
     put(0, W[jWant.v].e, `Justin veut ${W[jWant.v].t ? `${W[jWant.v].n.toLowerCase()} ${nm(jWant.t)}` : W[jWant.v].n.toLowerCase()}`, `justin says out loud what he wants: he ${W[jWant.v].en(en(jWant.t))}.`);
     if (cs[0]) put(0, cs[0].e, cs[0].fr, `The conflict shows: ${cs[0].en}.`);
-    if (t('plant') || sec || mask) put(0, '🌱', 'Un détail planté', 'Plant a harmless detail in a line, passing for something else.');
+    pasts.forEach((i, k) => put(k ? 1 : 0, '🕰️', infoFr(i), `Told out loud, early (a story or a shared memory, never explained): ${infoEn(i)}.`));
+    for (const i of objs) put(0, IN[i.id].e, `On voit : ${infoFr(i).charAt(0).toLowerCase() + infoFr(i).slice(1)}`, `Seen early, not opened: ${infoEn(i)}. Someone knows what it holds and will not tell.`);
+    if (t('plant') || sec) put(0, '🌱', 'Un détail planté', `Plant a harmless detail in a line, passing for something else${sec ? ` (it points to: ${[...secs, ...masks].map(infoEn).join('; ')})` : ''}.`);
     put(0, '⚖️', 'Choix 1', 'The main choice of the episode: two outcomes, each with big consequences on a bond.');
     for (const c of cs.slice(1)) put(1, c.e, c.fr, `Another conflict of desire comes in: ${c.en}.`);
     if (H('liked') && r.against) put(1, '😇', `Tout le monde adore ${nm(r.against)}`, `Everyone thinks ${en(r.against)} is great: justin is alone against them.`);
     if (H('danger')) put(1, '🌲', 'Le lieu dangereux', 'To get there, justin must go through a dangerous place of this world.');
     put(1, '↘️', 'L’effort facile rate', 'justin tries the easy way; it backfires and makes things worse.');
     if (t('plant') || sec) put(1, '🌱', 'Un 2e détail', 'Plant a second detail.');
-    if (H('gag')) put(1, '🤐', 'Le secret bloque', `Telling ${en(sec)}'s secret would settle everything, but costs too much.`);
+    if (H('gag')) put(1, '🤐', 'Le secret bloque', `Telling the secret (${infoEn(secs[0])}) would settle everything, but costs too much.`);
     if (t('stakes')) put(1, '📈', 'L’enjeu monte', 'What can be lost grows.');
     put(1, '⚖️', 'Choix 2', 'The main choice of the episode.');
-    if (sec) put(2, '🤫', `Le secret de ${nm(sec)} sort`, `${en(sec)}'s secret comes out.`);
-    if (mask) put(2, '🎭', `${nm(mask)} tombe le masque`, `${en(mask)} is not who they seemed: it comes out.`);
-    if (t('twist') || sec || mask) put(2, '🔄', 'On revoit tout', 'What the player believed is turned around; the planted details now make sense.');
+    for (const i of secs) put(2, IN[i.id].e, infoFr(i), `The secret comes out, in the scene (until now: ${infoEn(i)}).`);
+    for (const i of masks) put(2, IN[i.id].e, infoFr(i), `The mask falls: ${infoEn(i)}.`);
+    for (const i of objs) put(2, IN[i.id].e, 'On l’ouvre', `It is opened at last: what ${infoEn(i)} holds ties into the rest.`);
+    if (t('twist') || sec) put(2, '🔄', 'On revoit tout', 'What the player believed is turned around; the planted details now make sense.');
     put(2, '⚖️', 'Choix 3', 'The main choice of the episode.');
     if (H('clock')) put(3, '⏳', 'L’horloge', 'The clock: it must be decided now.');
     put(3, '⚖️', `${nm(r.a)} ou ${nm(r.b)}`, `The impossible choice: ${en(r.a)} or ${en(r.b)}, each side painful to lose.`);
@@ -242,12 +273,12 @@ window.FORGE = (() => {
     const who = (id) => { const ps = pillarsOf(id), f = S.flaw[id] && F[S.flaw[id]], w = wantOf(id);
       return `- ${id === J ? 'justin (the player)' : `${en(id)} (id "${id}")`}: ${ps.length ? ps.map((p, i) => (i ? `mixed with ${P[p].en}` : P[p].en)).join(', ') : 'free'}${f ? `; flaw: ${f.en}` : ''}${w ? `; ${W[w.v].en(en(w.t))}` : ''}.`; };
     const rels = Object.entries(S.rel).filter(([k, v]) => v && k.split('|').every(live)).map(([k, v]) => `- ${k.split('|').map(en).join(' and ')}: ${R[v].en}`);
-    const infos = INFOS.filter((i) => S.info[i.id] && (!i.who || live(S.info[i.id]))).map((i) => `- ${i.en(en(S.info[i.id]))}`);
+    const facts = infos().map((i) => `- ${infoEn(i)}`);
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
     const techs = TECHS.filter((h) => S.tech[h.id]).map((h) => `- ${h.en}`);
     const E = events(), epText = E.map((list) => list.map((ev) => `- ${ev.en}`).join('\n'));
     const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
-      ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(infos.length ? ['INFOS TO INVENT:', ...infos] : []),
+      ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(facts.length ? ['THE FACTS OF THE STORY (use exactly these; never invent another secret or past):', ...facts] : []),
       `THE INCITING INCIDENT: ${by(INC, S.inc.k).en(en(x))}.`,
       ...(cs.length ? ['THE CONFLICTS OF DESIRE (the story is these wants colliding):', ...cs.map((c) => `- ${c.en}`)] : []),
       ...(hard.length ? ['WHY IT IS HARD:', ...hard] : []), ...(techs.length ? ['PLOT TECHNIQUES:', ...techs] : []),
@@ -296,7 +327,8 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else { want[J] = { v: 'love', t: T }; if (O) { want[O] = { v: 'love', t: T }; if (coin(0.5)) rl[pk(O, T)] = 'couple'; } }
     if (C) rl[pk(J, C)] = pick(['friend', 'family', 'mentor']);
     S = { decor: pick(DECORS).id, cast, pil: Object.fromEntries([J, ...cast].map((id) => [id, pl()])), flaw: { [J]: coin(0.6) ? pick(FLAWS).id : null }, want, rel: rl,
-      info: coin(0.6) ? { secret: pick(cast) } : {}, inc: { k, who: k === 'gone' ? T : O || T }, hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
+      infos: (() => { const out = [], two = (k) => { const c = INFOS.filter((i) => i.k === k), i = pick(c), x = pick([J, ...cast]); let y; do y = pick([J, ...cast]); while (y === x && cast.length);
+        out.push({ id: i.id, x, y }); }; if (coin(0.7)) two(pick(['secret', 'mask'])); if (coin(0.5)) two('past'); if (coin(0.3)) two('object'); return out; })(), inc: { k, who: k === 'gone' ? T : O || T }, hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
       tech: { sexy: 1, [k === 'gone' ? 'where' : 'who']: 1, plant: coin(0.6) ? 1 : 0, twist: 1, stakes: coin(0.5) ? 1 : 0 } };
   }
 
@@ -332,8 +364,10 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + row('👥', POOL().map((id) => { const k = S.cast.indexOf(id); return `<button type="button" class="fFace${k >= 0 ? ' on' : ''}" data-cast="${id}" data-tip="${esc(nm(id))}">${face(id)}<small>${esc(nm(id))}</small></button>`; }).join(''), 'Qui est dans l’histoire avec Justin (tous ceux qui ont la feuille de base)')
       + people().map(person).join('')
       + (S.cast.length ? row('🔗', relRows(), 'Leurs liens : un tap change le lien') : '')
-      + row('🗂️', INFOS.map((i) => chip(`data-info="${i.id}"`, i.e, i.n, !!S.info[i.id], '#64d2ff', `${i.d}\nL’IA l’invente.`)).join('')
-        + INFOS.filter((i) => i.who && S.info[i.id]).map((i) => `<span class="fTag">${i.e}</span>${facePick('data-infowho', S.info[i.id], S.cast, '#64d2ff').replace(/data-infowho="/g, `data-infowho="${i.id}:`)}`).join(''), 'Les infos que l’IA invente (rien à taper)')
+      + row('🗂️', INFO_K.map((k) => chip(`data-ik="${k.id}"`, k.e, k.n, openK === k.id, '#64d2ff', `${k.d}\nUn tap = la liste`)).join(''), 'Les infos : choisies dans une liste, rien à taper, rien d’inventé')
+      + (openK ? `<div class="fPick">${INFOS.filter((i) => i.k === openK).map((i) => `<button type="button" data-iadd="${i.id}" data-tip="${esc(i.fr('X', 'Y'))}"><b>${i.e}</b>${esc(i.fr('X', 'Y'))}</button>`).join('')}</div>` : '')
+      + (infos().length ? `<section class="fInfos">${infos().map((i) => { const k = (S.infos || []).indexOf(i), it = IN[i.id];
+        return `<div><b data-tip="${esc(INFO_K.find((x) => x.id === it.k).n)}">${it.e}</b><button type="button" class="fCyc" data-icyc="${k}:x" data-tip="Un tap = le perso suivant">${mini(i.x)}</button>${it.s > 1 ? `<button type="button" class="fCyc" data-icyc="${k}:y" data-tip="Un tap = le perso suivant">${mini(i.y)}</button>` : ''}<span class="fCt">${esc(infoFr(i))}</span><button type="button" class="fX" data-idel="${k}" data-tip="Retirer">✕</button></div>`; }).join('')}</section>` : '')
       // HOW
       + layer('2', 'Comment', '1. Le moteur : ce qui lance et bloque l’histoire. 2. Les techniques de plot.')
       + row('💥', INC.map((o) => chip(`data-inc="${o.id}"`, o.e, o.n, o.id === S.inc.k, '#ff453a', o.d)).join('') + facePick('data-incwho', x, S.cast, '#ff453a'), 'Le déclencheur, et qui')
@@ -375,8 +409,11 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       if (cur && cur.v === v) delete S.want[id]; else S.want[id] = { v, t: W[v].t ? (cur && cur.t && cur.t !== id && live(cur.t) ? cur.t : people().find((o) => o !== id)) : null }; }
     else if (d.wt) { const [id, o] = d.wt.split(':'); if (S.want[id]) S.want[id].t = o; }
     else if (d.rel) { const k = RELS.findIndex((r) => r.id === (S.rel[d.rel] || '')); S.rel[d.rel] = RELS[(k + 1) % RELS.length].id; }
-    else if (d.info) { const i = INFOS.find((x) => x.id === d.info); S.info[d.info] = S.info[d.info] ? null : i.who ? S.cast[0] || null : 1; }
-    else if (d.infowho) { const [k, id] = d.infowho.split(':'); S.info[k] = id; }
+    else if (d.ik) openK = openK === d.ik ? null : d.ik;
+    else if (d.iadd) { const ps = people(), x = S.cast[0] || J, y = ps.find((o) => o !== x) || x; (S.infos = S.infos || []).push({ id: d.iadd, x, y }); openK = null; }
+    else if (d.icyc) { const [k, f] = d.icyc.split(':'), i = S.infos[+k], ps = people(), other = f === 'x' ? i.y : i.x; let n = ps.indexOf(i[f]);
+      do n = (n + 1) % ps.length; while (IN[i.id].s > 1 && ps[n] === other && ps.length > 1); i[f] = ps[n]; }
+    else if (d.idel) S.infos.splice(+d.idel, 1);
     else if (d.inc) S.inc.k = d.inc;
     else if (d.incwho) S.inc.who = d.incwho;
     else if (d.hard) { if (!hardOk(d.hard)) return; S.hard[d.hard] = S.hard[d.hard] ? 0 : 1; }
