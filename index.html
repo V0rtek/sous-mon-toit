@@ -1443,6 +1443,24 @@ body.tv #choices.tvpicked button.picked { transform: scale(1.04); }
 /* the TV's screen is wide: the story fills it, the words and choices stay in a column at the bottom, the two players'
    panels in the bottom corners, over the scene */
 body.tv #ui { left: 50%; right: auto; width: 72em; transform: translateX(-50%); top: auto; bottom: 5%; }
+
+/* the talk box, other ways (02/11, from paroles.html): Cinéma = no box, the words heavy-shadowed at the bottom, the
+   speaker's name above in his colour; Bande = a dark band across the bottom (no face circle); Mot par mot (TV) = big,
+   the word being said lights up. Chosen in Réglages (smt-tstyle on the phone, smt-vstyle on the TV) or ?tb=cine|band|kar */
+body.tb-cine #ui, body.tb-kar #ui { top: auto; bottom: 7%; }
+body.tb-cine #bubble, body.tb-kar #bubble, body.tb-band #bubble { background: none !important; border: 0 !important; box-shadow: none !important; color: #fff !important; padding: 0 !important; }
+body.tb-cine #tail, body.tb-kar #tail, body.tb-band #tail { display: none; }
+body.tb-cine #tag, body.tb-kar #tag, body.tb-band #tag { position: static; display: block; width: fit-content; margin: 0 auto .25em; padding: 0; background: none !important; box-shadow: none; color: var(--rim, #fff); font-size: calc(var(--tagsz) * .8); }
+body.tb-cine #text, body.tb-kar #text { text-align: center; font-weight: 800; font-size: calc(var(--tx) * 1.2); text-shadow: 0 0 .3em #000, 0 .08em .25em #000, 0 0 .7em rgba(0,0,0,.9); }
+body.tb-kar #text { font-weight: 900; font-size: calc(var(--tx) * 1.5); }
+body.tb-kar #text b { font-weight: 900; color: rgba(255,255,255,.55); animation: say .01s linear forwards; animation-delay: var(--d); }
+@keyframes say { to { color: #ffd60a; } }
+body.tb-band #ui { left: 0; right: 0; top: auto; bottom: 0; padding: 3em 5% 4.5em; background: linear-gradient(transparent, rgba(8,6,12,.92) 30%); }
+body.tb-band #tag { margin: 0 0 .2em; }
+body.tb-band #text { text-shadow: 0 .06em .2em #000; }
+body.tb-band #bubble.narr #text { text-align: center; }
+body.tv.tb-cine #ui, body.tv.tb-kar #ui { width: 120em; bottom: 6%; }
+body.tv.tb-band #ui { left: 0; right: 0; width: auto; transform: none; padding: 6em 10% 5em; }
 body.tv #tvPick, body.tv #wait, body.tv #end { padding-left: calc(50% - 40em); padding-right: calc(50% - 40em); }
 /* the characters, each side: only in the pause (a click on one = his screen) */
 #tvSides { display: none; }
@@ -1604,6 +1622,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <a href="tension.html" id="tensionBtn"><span class="art" style="--g:#bf5af2"><img src="chars/justin_bar/angry.webp" alt=""></span><b>Musique de tension</b></a>
       <a href="boucles.html" id="boucleBtn"><span class="art" style="--g:#ff9f0a"><img src="chars/cam/tipsy_laugh.webp" alt=""></span><b>Boucles musicales</b></a>
       <a href="moments.html" id="momentsBtn"><span class="art" style="--g:#e2557a"><img src="chars/cam/worried.webp" alt=""></span><b>Moments</b></a>
+      <a href="delai.html" id="delaiBtn"><span class="art" style="--g:#ff453a"><img src="chars/justin_bar/drunk_serious.webp" alt=""></span><b>Délai et clic des choix</b></a>
       <button type="button" id="mkBtn"><span class="art" style="--g:#c9a227"><img src="chars/isa_or/listen.webp" alt=""></span><b>Marketing</b></button>
       <button type="button" id="pitchBtn"><span class="art" style="--g:#2b4f9e"><img src="chars/julian/offer.webp" alt=""></span><b>Pitch</b></button>
       <button type="button" id="sparkBtn"><span class="art" style="--g:#ff375f"><img src="chars/julian/offer.webp" alt=""></span><b>Spark</b></button>
@@ -2132,6 +2151,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
+<script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
 <script src="test.js?v=20261102220000"></script>
@@ -2176,6 +2196,8 @@ const state = { name: 'Justin', seats: {}, story: 't1', f: {}, isa: ISA_LOOKS[0]
 // the TV (index.html?tv): it runs the story for the room and plays nobody, two phones / computers join it and play the
 // two characters. hostTv: a joiner whose host is a TV (a choice of nobody's goes to a player, the sound stays on the TV)
 const TV = (() => { const u = new URLSearchParams(location.search); return u.has('tv') && !u.get('watch'); })();
+// the talk box's style (see the CSS, tb-*): the phone's own (smt-tstyle), the TV's (smt-vstyle), or ?tb= for a test
+document.body.classList.add('tb-' + (() => { try { const v = new URLSearchParams(location.search).get('tb') || localStorage.getItem(TV ? 'smt-vstyle' : 'smt-tstyle'); return v === 'cine' || v === 'band' || (TV && v === 'kar') ? v : 'box'; } catch { return 'box'; } })());
 // ?tv&room=<code>: that room (the simulator, tv-sim.html, picks it); ?watch=<room>&as=Léa: a phone of its own, with that
 // name, even beside another one in the same browser (the simulator's two phones)
 const TV_ROOM = TV && (s => (/^[a-z0-9]{4,12}$/.test(s || '') ? s : null))(new URLSearchParams(location.search).get('room'));
@@ -2874,6 +2896,7 @@ let typingFull = '';   // the whole line, shown at once when someone taps while 
 function typeText(t) {
   clearInterval(typing); textEl.textContent = ''; typingFull = t;
   if (REDUCED || FAST) { textEl.textContent = t; typing = null; return; }
+  if (document.body.classList.contains('tb-kar')) { textEl.innerHTML = t.split(' ').map((w, n) => `<b style="--d:${(0.25 + n * 0.28).toFixed(2)}s">${esc(w)}</b>`).join(' '); typing = null; return; }   // word by word: the whole line, the words light up
   let i = 0;
   typing = setInterval(() => { i += 4; textEl.textContent = t.slice(0, i); if (i >= t.length) { clearInterval(typing); typing = null; } }, 13);   // ~300 characters a second
 }
@@ -3317,7 +3340,7 @@ $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sen
 const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
 let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
 function autoTick() {
-  if (!TV || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }
+  if ((!TV && !(STORIES[state.story] || {}).auto) || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }   // the TV, or a story that plays itself (auto)
   const now = Date.now(), due = (k, id, ms) => { if (autoKey[k] !== id) { autoKey[k] = id; autoKey[k + 't'] = now + ms; } return now >= autoKey[k + 't']; };
   if (waiting === 'click' && !typing) {
     const id = run + ':' + tape.length, ms = !slateEl.hidden ? 3500 : onlyNow ? 5000 : readMs(typingFull);
@@ -3328,7 +3351,7 @@ function autoTick() {
     else autoKey[g.seat] = null;
   }
 }
-if (TV) setInterval(autoTick, 200);
+setInterval(autoTick, 200);
 const OFF_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>';
 let tvWhoKey = '';
 function tvWho() {

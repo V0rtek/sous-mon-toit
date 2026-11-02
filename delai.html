@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choice timer + tap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* A choice with a clock: how the time left looks (8 ideas) and what a tap does (6 effects). Each phone loops by itself:
+   the time runs out ("Time's up" = the game picks, here it only restarts), or you tap a choice and see the effect chosen
+   at the top. Duration is a setting too. 1em = 1% of the phone's height, as in the game. */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; background: rgba(11,10,15,.94); backdrop-filter: blur(10px); border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; }
+.seg { display: flex; flex-wrap: wrap; background: #1c1c1e; border-radius: 20px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 800; color: #8e8e93; background: none; border: 0; border-radius: 99px; padding: 7px 14px; cursor: pointer; }
+.seg button.on { background: #f5f5f7; color: #000; }
+.lbl { font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: #8e8e93; }
+.intro { max-width: 900px; padding: 18px 20px 0; color: #d1d1d6; font-size: 15px; line-height: 1.5; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px 22px; padding: 22px 20px 60px; }
+.card { display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.card h2 i { font-style: normal; font-size: 12px; font-weight: 900; color: #000; background: #f5f5f7; border-radius: 6px; padding: 2px 6px; }
+.card p { margin: 0; font-size: 13px; line-height: 1.45; color: #8e8e93; min-height: 3.6em; }
+
+.ph { position: relative; width: 100%; aspect-ratio: 9 / 16; border-radius: 18px; overflow: hidden; background: #000 url(bg/taverne_bar.webp) center / cover; container-type: size; box-shadow: 0 0 0 1px #2c2c2e; user-select: none; }
+.st { position: absolute; inset: 0; font-size: 1cqh; color: #fff; font-family: var(--ui); --p: 0; background: rgba(0,0,0,.45); }
+.st * { box-sizing: border-box; }
+.q { position: absolute; left: 5%; right: 5%; top: 16%; background: #fffdf9; color: #1d1a24; border: .3em solid #e8a6b8; border-radius: 1.4em; padding: 1.4em 1.4em 1.2em; font-size: 2.2em; font-weight: 600; line-height: 1.3; }
+.q b { position: absolute; left: 1.2em; top: -1.4em; background: #e2557a; color: #fff; font-style: italic; text-transform: uppercase; font-size: .8em; padding: .3em 1em; border-radius: 1em; font-weight: 900; }
+.ch { position: absolute; left: 5%; right: 5%; bottom: 7%; display: flex; flex-direction: column; gap: 1.1em; }
+.ch button { position: relative; overflow: hidden; font: inherit; font-size: 2.3em; font-weight: 800; color: #fff; text-align: left; background: var(--c); border: 0; border-radius: 1.2em; padding: .8em 1.1em; cursor: pointer; box-shadow: 0 .25em .7em rgba(0,0,0,.3); transition: transform .25s, opacity .3s, filter .3s; }
+.ch button:nth-child(1) { --c: #4f7fe0; } .ch button:nth-child(2) { --c: #ff453a; } .ch button:nth-child(3) { --c: #8e6bd0; }
+.done .ch button:not(.pk) { pointer-events: none; }
+.up { position: absolute; inset: 0; display: grid; place-items: center; font-size: 5em; font-weight: 900; text-shadow: 0 .05em .3em #000; opacity: 0; pointer-events: none; }
+.late .up { opacity: 1; }
+.hot { color: hsl(calc(50 - var(--p) * 50) 100% 58%); }
+
+/* ===== the clocks (--p: 0 = full time, 1 = out) ===== */
+/* D1: one line above the choices, shrinking toward the left, yellow then red */
+.d1 .tl { position: absolute; left: 5%; right: 5%; bottom: calc(7% + 33.5em); height: .9em; border-radius: .45em; background: rgba(255,255,255,.15); }
+.d1 .tl::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc((1 - var(--p)) * 100%); border-radius: .45em; background: hsl(calc(50 - var(--p) * 50) 100% 55%); }
+/* D2: the line is under each choice (a thin edge), all three at once */
+.d2 .ch button::after { content: ""; position: absolute; left: 0; bottom: 0; height: .35em; width: calc((1 - var(--p)) * 100%); background: hsl(calc(50 - var(--p) * 50) 100% 60%); }
+/* D3: a ring round the screen, draining around the clock */
+.d3 .ring { position: absolute; inset: 0; padding: 1em; background: conic-gradient(from 0deg, hsl(calc(50 - var(--p) * 50) 100% 55%) calc((1 - var(--p)) * 360deg), transparent 0); -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); border-radius: 0; opacity: .95; }
+/* D4: the choices are a tank that drains (the fill goes down behind them) */
+.d4 .tank { position: absolute; left: 0; right: 0; bottom: 0; height: calc((1 - var(--p)) * 46%); background: linear-gradient(transparent, hsl(calc(50 - var(--p) * 50) 100% 55% / .45)); }
+/* D5: no bar: a red vignette that beats faster as the time goes */
+.d5 .vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(255,0,0,calc(var(--p) * .7)) 120%); animation: beat calc(1.5s - var(--p) * 1.05s) ease-in-out infinite; pointer-events: none; }
+@keyframes beat { 50% { opacity: .35; } }
+/* D6: five dots, going out one by one */
+.d6 .dots { position: absolute; left: 0; right: 0; bottom: calc(7% + 33em); display: flex; justify-content: center; gap: 1.6em; }
+.d6 .dots i { width: 1.8em; height: 1.8em; border-radius: 50%; background: hsl(calc(50 - var(--p) * 50) 100% 58%); opacity: clamp(.18, calc((1 - var(--p)) * 5 - var(--i)), 1); transform: scale(clamp(.6, calc((1 - var(--p)) * 5 - var(--i) + .6), 1)); }
+/* D7: the choices squeeze together, they lean in on you */
+.d7 .ch { gap: calc(1.1em * (1 - var(--p))); transform: scale(calc(1 + var(--p) * .05)); transform-origin: 50% 100%; }
+.d7 .ch button { border-radius: calc(1.2em - var(--p) * .8em); }
+/* D8: the seconds, big, and the whole thing shakes at the end */
+.d8 .num { position: absolute; right: 7%; bottom: calc(7% + 33.5cqh); font-size: 9em; font-weight: 900; line-height: 1; text-shadow: 0 .05em .3em #000; }
+.d8.last .ch { animation: shake .3s linear infinite; }
+@keyframes shake { 25% { transform: translateX(.35em); } 75% { transform: translateX(-.35em); } }
+
+/* ===== the taps ===== */
+.st:not(.done) .ch button:active { transform: scale(.98); }
+.c1.done .pk { transform: scale(1.06); } .c1.done .ch button:not(.pk) { opacity: .2; transform: scale(.96); }
+.c2.done .pk { filter: brightness(1.5); }
+.ripple { position: absolute; width: 1em; height: 1em; margin: -.5em 0 0 -.5em; border-radius: 50%; background: rgba(255,255,255,.55); transform: scale(0); animation: rip .7s ease-out forwards; pointer-events: none; }
+@keyframes rip { to { transform: scale(60); opacity: 0; } }
+.c3.done .pk { transform: translateX(1.5em); } .c3.done .ch button:not(.pk) { transform: translateY(5em); opacity: 0; }
+.c4.done .pk::before { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.3); transform-origin: left; animation: sweep .45s ease-out forwards; }
+@keyframes sweep { from { transform: scaleX(0); } }
+.c4.done .ch button:not(.pk) { opacity: .35; }
+.shock { position: absolute; width: 2em; height: 2em; margin: -1em 0 0 -1em; border: .35em solid #fff; border-radius: 50%; transform: scale(0); animation: shk .6s ease-out forwards; pointer-events: none; z-index: 4; }
+@keyframes shk { to { transform: scale(60); opacity: 0; } }
+.c5.done .q { animation: jolt .25s linear; } @keyframes jolt { 20% { transform: translate(.6em, -.4em); } 50% { transform: translate(-.5em, .3em); } 80% { transform: translate(.3em, 0); } }
+.c6.done .pk::after { content: "✓"; position: absolute; right: .7em; top: 50%; margin-top: -.9em; width: 1.8em; height: 1.8em; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--c); font-size: .9em; animation: stamp .35s cubic-bezier(.3,1.8,.5,1); }
+@keyframes stamp { from { transform: scale(3); opacity: 0; } }
+.c6.done .ch button:not(.pk) { opacity: .45; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Choice timer + tap</h1>
+  <span class="lbl">Tap</span><div class="seg" id="tapSeg"></div>
+  <span class="lbl">Time</span><div class="seg" id="durSeg"></div>
+  <a href="index.html">‹ Home</a>
+</header>
+<div class="intro">Eight ways to show the time left on a choice, and six ways a tap answers back. Each phone runs by itself; tap a choice to see the effect picked above. <b>Time’s up</b> flashes at the end (in the game, that’s where it picks for you).</div>
+<div class="grid" id="grid"></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const TIMERS = [
+  ['D1', 'The shrinking line', 'One thin bar above the choices, short and red at the end. Simple, readable.', '<div class="tl"></div>'],
+  ['D2', 'Line under each choice', 'The clock is the edge of every choice: it’s drained from the thing you tap.', ''],
+  ['D3', 'Ring round the screen', 'The whole frame is the clock, draining like a pie. Nothing on the choices.', '<div class="ring"></div>'],
+  ['D4', 'The tank', 'The choices stand in a tank that empties. You feel it without reading.', '<div class="tank"></div>'],
+  ['D5', 'Heartbeat', 'No bar at all: a red vignette beating faster. Stress, not a number.', '<div class="vig"></div>'],
+  ['D6', 'Five dots', 'Five dots go out one by one. A rhythm: “three left”.', '<div class="dots">' + [0, 1, 2, 3, 4].map((i) => `<i style="--i:${i}"></i>`).join('') + '</div>'],
+  ['D7', 'The squeeze', 'The choices press closer together as the time goes, then they’re nearly touching.', ''],
+  ['D8', 'The seconds', 'A big number, and the choices shake for the last three seconds.', '<div class="num hot"></div>'],
+];
+const TAPS = [['c1', 'Pop'], ['c2', 'Ripple'], ['c3', 'Slide'], ['c4', 'Fill'], ['c5', 'Shockwave'], ['c6', 'Stamp']];
+const state = { tap: 'c1', dur: 6 };
+const OPTS = ['Why’d you lie?', 'Probably a debt collector.', '[Look at the bathroom door]'];
+function mk(t, i) {
+  const c = document.createElement('div'); c.className = 'card';
+  c.innerHTML = `<h2><i>${t[0]}</i>${t[1]}</h2><div class="ph"><div class="st d${i + 1}"><div class="q"><b>Cam</b>That I didn’t.</div>${t[3]}
+    <div class="ch">${OPTS.map((o) => `<button type="button">${o}</button>`).join('')}</div><div class="up">Time’s up</div></div></div><p>${t[2]}</p>`;
+  const st = $('.st', c), num = $('.num', c); let t0, raf, hold;
+  const run = () => { cancelAnimationFrame(raf); clearTimeout(hold); st.className = `st d${i + 1} ${state.tap}`; st.querySelectorAll('.ripple, .shock').forEach((x) => x.remove());
+    st.querySelectorAll('.pk').forEach((b) => b.classList.remove('pk')); st.style.setProperty('--p', 0); t0 = performance.now(); tick(); };
+  const tick = () => { const p = Math.min(1, (performance.now() - t0) / (state.dur * 1000)); st.style.setProperty('--p', p);
+    if (num) { num.textContent = Math.ceil((1 - p) * state.dur) || 0; st.classList.toggle('last', (1 - p) * state.dur <= 3); }
+    if (p >= 1) { st.classList.add('late'); hold = setTimeout(run, 1400); return; } raf = requestAnimationFrame(tick); };
+  st.addEventListener('click', (e) => { const b = e.target.closest('.ch button'); if (!b || st.classList.contains('done') || st.classList.contains('late')) return;
+    cancelAnimationFrame(raf); st.classList.add('done'); b.classList.add('pk'); const r = st.getBoundingClientRect(), s = st.offsetHeight / 100;
+    if (state.tap === 'c2') { const br = b.getBoundingClientRect(), x = document.createElement('span'); x.className = 'ripple'; x.style.left = (e.clientX - br.left) + 'px'; x.style.top = (e.clientY - br.top) + 'px'; b.append(x); }
+    if (state.tap === 'c5') { const x = document.createElement('span'); x.className = 'shock'; x.style.left = (e.clientX - r.left) + 'px'; x.style.top = (e.clientY - r.top) + 'px'; st.append(x); try { navigator.vibrate && navigator.vibrate(30); } catch (_) {} }
+    hold = setTimeout(run, 1900); });
+  c.run = run; run(); return c;
+}
+function render() { const g = $('#grid'); g.innerHTML = ''; TIMERS.forEach((t, i) => g.append(mk(t, i))); }
+function seg(el, items, key) { el.innerHTML = items.map(([v, l]) => `<button type="button" data-v="${v}" class="${String(v) === String(state[key]) ? 'on' : ''}">${l}</button>`).join('');
+  el.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; state[key] = key === 'dur' ? +b.dataset.v : b.dataset.v; [...el.children].forEach((x) => x.classList.toggle('on', x === b)); document.querySelectorAll('.card').forEach((c) => c.run()); }; }
+seg($('#tapSeg'), TAPS, 'tap'); seg($('#durSeg'), [[4, '4 s'], [6, '6 s'], [10, '10 s']], 'dur');
+render();
+</script>
+</body>
+</html>
