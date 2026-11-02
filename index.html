@@ -1221,6 +1221,14 @@ body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #pauseBtn svg { width: 3.6em; height: 3.6em; }
 #viewBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: none; place-items: center; cursor: pointer; padding: 0; }
 #viewBtn svg { width: 4em; height: 4em; }
+/* a phone, during the TV's black opening: skip it, when both players want to (the dots: who voted; never on the TV) */
+#skipBtn { position: absolute; left: 50%; bottom: 6%; z-index: 70; transform: translateX(-50%); font: inherit; display: flex; align-items: center; gap: 1.4em; padding: 1.4em 2.4em; border: 0; border-radius: 4em; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; animation: rise .4s ease-out; }
+#skipBtn svg { width: 4em; height: 4em; }
+#skipBtn i { width: 1.4em; height: 1.4em; border-radius: 50%; box-shadow: inset 0 0 0 .25em rgba(255,255,255,.5); }
+#skipBtn i.on { background: #fff; box-shadow: none; }
+#skipBtn.me { background: #fff; color: #000; }
+#skipBtn.me i { box-shadow: inset 0 0 0 .25em rgba(0,0,0,.35); }
+#skipBtn.me i.on { background: #000; }
 body.hosttv.instory #viewBtn { display: grid; }
 body.watch.hosttv.instory #back { display: none !important; }
 #minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; place-items: center; cursor: pointer; }
@@ -1972,6 +1980,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="absentBar" hidden></div>
   <div id="minView"></div>
   <button id="viewBtn" type="button" aria-label="Voir l'histoire"></button>
+  <button id="skipBtn" type="button" hidden aria-label="Passer l'intro"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
     <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">Ce qui vient de se passer</div><ol></ol></div></div>
@@ -2930,12 +2939,12 @@ function afterOf(o) {
 // ---- a TV's story opens on black: its title, what's going on (story.intro: a few sentences), who plays whom, how it
 // works — each line fades in slowly, in turn. "Who plays whom" is when each phone shows its "Tu es …" card (ip: the
 // opening's phase, in the shared state); the phones start the story with the TV, once the opening has faded out ----
-let tvPhase = null, tvOpen = null;   // TV: 'ctx' | 'cast' while it opens; a player's phone: its opening, waiting on the TV's
+let tvPhase = null, tvOpen = null, skipVotes = new Set(), introSkip = false;   // the TV: who voted to skip its opening; all did   // TV: 'ctx' | 'cast' while it opens; a player's phone: its opening, waiting on the TV's
 async function tvIntro(at) {
   const box = $('#tvIntro'), st = story();
   const hold = async (ms) => {   // a wait that a pause stretches
-    for (let t = 0; t < ms; t += 100) { await new Promise((r) => setTimeout(r, 100)); if (run !== at) return false; while (paused) { await new Promise((r) => setTimeout(r, 200)); if (run !== at) return false; } }
-    return true;
+    for (let t = 0; t < ms && !introSkip; t += 100) { await new Promise((r) => setTimeout(r, 100)); if (run !== at) return false; while (paused) { await new Promise((r) => setTimeout(r, 200)); if (run !== at) return false; } }
+    return true;   // skipped (both phones voted): every wait that's left is over at once
   };
   // one thing at a time on the black: it fades in, stays, fades out, and only then the next one comes
   const slide = async (html, ms, cls = '') => {
@@ -2946,7 +2955,7 @@ async function tvIntro(at) {
     el.querySelectorAll('.ti').forEach((x) => x.classList.remove('in'));
     return hold(1700);
   };
-  box.innerHTML = ''; box.className = ''; box.hidden = false;
+  box.innerHTML = ''; box.className = ''; box.hidden = false; skipVotes.clear(); introSkip = false;
   if (!(await hold(1800))) return false;
   if (!(await slide(`<div class="ti ti-k">UNWRITTEN</div><div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;
   for (const x of st.intro || []) if (!(await slide(`<div class="ti ti-p">${esc(fill(x))}</div>`, Math.max(4000, 1800 + 55 * x.length)))) return false;
@@ -2960,10 +2969,20 @@ async function tvIntro(at) {
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
   if (!(await slide('<div class="ti ti-h">Chacun fait ses choix en secret sur son cell.</div><div class="ti ti-h">Ici, vous verrez ce qui en découle.</div>', 5200))) return false;
-  tvPhase = null; share(); box.classList.add('out');
+  tvPhase = null; skipVotes.clear(); share(); box.classList.add('out');
   if (!(await hold(1900))) return false;
   box.hidden = true; return true;
 }
+// a player's phone, while the TV opens: a skip button; it skips once every player tapped it (one dot per player)
+function skipPaint() {
+  const b = $('#skipBtn'), seats = (remote && remote.seats) || {}, mine = Object.values(seats).some((x) => x.id === myId);
+  const on = ROLE === 'watch' && hostTv && !MIRROR && mine && !!(remote && remote.ip && remote.g);
+  b.hidden = !on; if (!on) return;
+  const votes = new Set(remote.sk || []), need = Object.values(seats).filter((x) => x.id !== BOT);
+  b.classList.toggle('me', votes.has(myId));
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg>' + need.map((x) => `<i class="${votes.has(x.id) ? 'on' : ''}"></i>`).join('');
+}
+$('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 // a player's phone: black until the TV says who's who, then its "Tu es …" card, then the story with the TV
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; return; }
@@ -4466,7 +4485,7 @@ function roomCode() {
 // the game's version (tools/site.py stamps it). Two phones on different versions can't play one story together, and
 // GitHub keeps the old one in a phone's cache ~10 min: a phone that hears of a newer version reloads to it, between
 // stories (never in the middle of one)
-const BUILD = '20261102120000';
+const BUILD = '20261102200000';
 function newer(v) {
   if (BUILD === 'dev' || !v || v === 'dev' || v <= BUILD || newer.done) return;
   if (!['#who', '#hub', '#tvPick', '#lobby', '#wait', '#end'].includes(screen)) return;
@@ -4477,7 +4496,7 @@ function newer(v) {
 function share() {
   if (ROLE !== 'host' || quiet || !live || !live.connected) return;
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, ip: tvPhase || undefined, p: paused || undefined, x: absentSeats().map((k) => seatName(k)) }), { retain: true, qos: 1 });
+  live.publish(topic(), JSON.stringify({ g: game, s: state.story, h: myId, n: state.name, r: names, w: waitRoom ? state.story : null, seats: state.seats, t: tape, j: startEp, v: BUILD, tv: TV || undefined, ip: tvPhase || undefined, sk: tvPhase && skipVotes.size ? [...skipVotes] : undefined, p: paused || undefined, x: absentSeats().map((k) => seatName(k)) }), { retain: true, qos: 1 });
 }
 function record(ev) { if (ROLE === 'host') { tape.push(ev); if (!quiet) share(); } }   // a jump sends its taps once, at its end
 
@@ -4553,6 +4572,12 @@ function fromJoiner(m) {
     if (m.e === 'story' && !game && STORIES[m.s] && seatsOf(m.s).length === 2) { openWait(m.s, true); return; }
     if (m.e === 'menu' && screen !== '#tvPick') { toHub(); return; }
     if (m.e === 'again' && screen === '#end') { begin(state.story); return; }
+    if (m.e === 'skip' && tvPhase && Object.values(state.seats).some((x) => x.id === m.id)) {   // a vote to skip the opening (again = taken back)
+      if (skipVotes.has(m.id)) skipVotes.delete(m.id); else skipVotes.add(m.id);
+      const need = Object.values(state.seats).filter((x) => x.id !== BOT).map((x) => x.id);
+      if (need.every((id) => skipVotes.has(id))) introSkip = true;
+      share(); return;
+    }
     if (m.e === 'pause' && game && screen === null) { paused = paused ? null : String(m.n || '?').slice(0, 16); autoKey = {}; showPause(); share(); return; }
   }
   if ((paused || absentSeats().length) && (m.e === 'a' || /^c\d$/.test(m.e))) return;   // paused, or someone's gone: nothing moves
@@ -4670,7 +4695,7 @@ function follow(msg) {
   if (msg) showAbsent((msg.x || []).filter((n) => n !== myName));
   newer(msg && msg.v);
   if (!msg || !msg.g) {
-    remote = null;
+    remote = null; skipPaint();
     if (msg && STORIES[msg.w]) { if (screen !== '#wait') halt(); state.story = msg.w; state.seats = msg.seats || {}; renderWait(); }
     else toLobby(msg || {});
     return;
@@ -4681,6 +4706,7 @@ function follow(msg) {
     begin(STORIES[msg.s] ? msg.s : 't1');
   } else remote = msg;
   if (tvOpen) tvOpenStep();   // the TV's opening moved on (who's who: the "Tu es …" card)
+  skipPaint();
   pump();
 }
 function toLobby(msg) {
