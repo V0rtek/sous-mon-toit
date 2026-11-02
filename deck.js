@@ -165,6 +165,8 @@ window.DECK = (() => {
     "Je suis en phase de validation. Je cherche des groupes de 2-3 personnes prêts à prendre 10 minutes pour essayer le produit : je fais le déplacement. Si vous êtes curieux d'essayer les autres histoires, venez me voir : si vous dites oui, je vous donne accès au produit et aux histoires gratuitement. Et je cherche un cofounder.",
     "Les questions : je tape celle qu'on me pose, la réponse s'affiche. Les mêmes sont dans le plan (slide 0, étape 3).",
   ];
+  // slide 0, under the plan: my notepad for how to say it (mine to edit, kept on this device)
+  const PAD = "Share those informations as \"what's interesting is that we saw x stat\", not like a salesman tryna prove or convince.\nSpeak in a tone that makes people believe (the smoking speaker).\n\n\"What's amazing with a choice game. Is that if you hide the choices and pick them for the player it is literally a movie.\"\n\nLower volume = drags us in. Everyone wanna know what's next.\n\nSpeak with stories and relatable feeling:\n- I like listening to thrillers with my partner\n- Movie night with my friends\n\n\"Humans are like water. If there's a wall we try and get around it.\" (pirated episodes)";
   let noteOpen = false;
   let spot = 0, sub = 0;   // sub: the step inside a slide (the perso's 2nd pose on the slide where we first see it)
   function draw() {
@@ -253,9 +255,9 @@ window.DECK = (() => {
   return {
     mount(el) {
       root = el; i = -1; sub = 0; qa = -1;
-      el.innerHTML = '<div class="dkPrep"><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
+      el.innerHTML = '<div class="dkPrep"><div class="pnHost"></div><div class="dkPlan"></div><div class="dkPad"><b>Bloc-notes</b><div class="dkPadTx" contenteditable="true" spellcheck="false"></div></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
-        if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
+        if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn, .dkPad')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const q = e.target.closest('[data-qa]');
         if (q) { qa = qa === +q.dataset.qa ? -1 : +q.dataset.qa; draw(); return; }
@@ -265,10 +267,11 @@ window.DECK = (() => {
         const r = el.getBoundingClientRect(); go(e.clientX - r.left < r.width / 3 ? -1 : 1);
       };
       el.onchange = (e) => { const p = e.target.closest('.dkPic'); if (p && e.target.files[0]) pick(e.target.files[0], p.dataset.k); };
-      el.oninput = (e) => { const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t && t.dataset.name) { saved['n_' + t.dataset.name] = t.textContent.trim(); save(); return; } if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
+      el.oninput = (e) => { if (e.target.closest('.dkPadTx')) { saved.pad = e.target.closest('.dkPadTx').innerText; save(); return; } const nt = e.target.closest('.dkNote'); if (nt) { saved['note_' + i] = nt.textContent; save(); return; } const t = e.target.closest('.dkTyped'); if (t && t.dataset.name) { saved['n_' + t.dataset.name] = t.textContent.trim(); save(); return; } if (t) { saved['t_' + t.dataset.t] = t.textContent; save(); } };
       el.querySelector('.dkPlan').appendChild(document.getElementById('sparkPlan').content.cloneNode(true));
       el.querySelector('.dkPlan .spark').insertAdjacentHTML('beforeend', '<div class="sp-arrow"></div><div class="sp-stage" style="--g:#0a84ff"><div class="sp-tag"><i>3</i>Les questions · mes réponses</div>'
         + QA.map(([q, a]) => `<div class="sp-card"><b>${esc(q)}</b>${a.map((l) => `<small>${esc(l)}</small>`).join('')}</div>`).join('') + '</div>');
+      el.querySelector('.dkPadTx').textContent = saved.pad ?? PAD;
       panel.mount(el.querySelector('.pnHost'));
       draw();
     },

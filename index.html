@@ -646,6 +646,10 @@ html.locked #keyBtn { display: grid; place-items: center; }
 #deck.prep .dkSlide, #deck.prep .dkBar, #deck.prep .dkNote, #deck.prep .dkNoteBtn { display: none; }
 .dkPrep .dkStart { font: inherit; font-size: 2.4em; font-weight: 700; padding: .5em 1.1em; border: 0; border-radius: 2em; color: #000; background: linear-gradient(90deg, #ffd60a, #ff9f0a); cursor: pointer; }
 .dkPrep .spark { margin: 4em 0 0; }
+/* slide 0, at the very bottom: the notepad (how to say it) */
+.dkPad { margin-top: 1.6em; padding: 2em 1.6em; border-radius: 1.8em; background: #1c1b17; box-shadow: inset 0 0 0 .12em rgba(255,214,10,.25); cursor: auto; }
+.dkPad b { display: block; font-size: 2.2em; font-weight: 800; color: #ffd60a; margin-bottom: .6em; }
+.dkPadTx { white-space: pre-wrap; font-size: 2.1em; line-height: 1.5; color: #e5e5ea; outline: 0; cursor: text; user-select: text; -webkit-user-select: text; }
 .dkPrep .sp-head, .dkPrep .sp-stage { border-radius: 0; }
 #deck .dkBar { position: absolute; left: 0; right: 0; bottom: 0; height: .8em; background: rgba(255,255,255,.08); }
 .dkBar i { display: block; height: 100%; background: var(--c); transition: width .25s; }
