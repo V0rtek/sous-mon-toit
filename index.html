@@ -3316,7 +3316,7 @@ function ghostRun(g) {
     else if (s.choice) { g.waiting = 'choice'; g.options = s.choice; autoGhost(g); return; }
   }
   g.done = true; g.waiting = null;
-  if (waiting === 'join' && joined()) { split = null; waiting = null; waitNote(''); next(); }
+  if (waiting === 'join' && joined()) { split = null; apart(); waiting = null; waitNote(''); next(); }
 }
 function ghostTap(g) {
   if (g.waiting !== 'click') return;
@@ -3360,7 +3360,7 @@ async function next() {
     else if (s.join) {
       laneNow = null;
       if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); return; }
-      split = null;
+      split = null; apart();
     }
     else if (s.mark) markReached(s.mark);
     else if (s.waitMark) {
