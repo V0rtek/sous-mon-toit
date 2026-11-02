@@ -375,7 +375,7 @@ Example:
       `<button type="button" data-ncstep="${k}" class="${k === step ? 'on' : ''}${ok ? ' ok' : ''}" aria-label="Étape ${k}">${ok && k !== step ? '<b>✓</b>' : ic}</button>`).join('<i></i>')}</div>`;
     let body = '';
     if (step === 1) {
-      body = `<div class="ncWho"><span class="ncAv">${me ? `<img src="${me}" alt="">` : nm ? esc([...nm][0].toUpperCase()) : IC.who}</span>
+      body = `<div class="ncWho"><span class="ncAv">${me ? `<img src="${me}" alt="">` : nm ? `<b>${esc([...nm][0].toUpperCase())}</b>` : IC.who}</span>
         <input data-nc="name" placeholder="Son nom" value="${esc(nm)}" autocomplete="off">
         <div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
         + big('data-ncstep="2"', '', 'Suivant →', 'main');
