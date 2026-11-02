@@ -444,8 +444,15 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     tipEl.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
     tipEl.style.top = (r.top - h - 8 > 8 ? r.top - h - 8 : r.bottom + 8) + 'px'; };
   const tipHide = () => { if (tipEl) tipEl.hidden = true; };
+  let lastTouch = false, toastEl = null, toastT = 0;
+  addEventListener('pointerdown', (e) => { lastTouch = e.pointerType === 'touch'; }, true);
+  const toast = (text) => { if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'fToast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = text.split('\n').slice(0, 2).join('\n'); toastEl.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { toastEl.hidden = true; }, 2600); };
   function mount(root) {
-    el = root; root.onclick = (e) => { if (held) { held = false; e.stopPropagation(); return; } tipHide(); onClick(e); }; msg = ''; render();
+    // on a phone (no hover), a tap also says briefly, at the bottom, what was just touched
+    root.onclick = (e) => { if (held) { held = false; e.stopPropagation(); return; } tipHide();
+      const t = e.target.closest('[data-tip]'), say = lastTouch && t && el.contains(t) ? t.dataset.tip : ''; onClick(e); if (say) toast(say); };
+    el = root; msg = ''; render();
     root.onmouseover = (e) => { if (e.pointerType === 'touch') return; const t = e.target.closest('[data-tip]'); if (t && el.contains(t)) tipShow(t); else tipHide(); };
     root.onmouseleave = tipHide;
     root.onpointerdown = (e) => { if (e.pointerType !== 'touch') return; held = false; clearTimeout(holdT); const t = e.target.closest('[data-tip]');
