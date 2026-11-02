@@ -1099,10 +1099,10 @@ function saveBtn(d) {
 }
 // a cover with its marks (players, byoc, live, save); the title under it when that's the option
 // (solo is the default: only 2-3 players get a mark)
-function card(d, { title = false, sub = false, saveB = false, byocB = true, extra = '', live = true } = {}) {
+function card(d, { title = false, sub = false, saveB = false, byocB = true, extra = '', live = true, multi = true } = {}) {
   const corner = byocB && d.byoc && O.byoc === 'corner' ? '<span class="ribbon">TON PERSO</span>' : '';
   return `<div class="card${live ? ringCls(d) : ''}" data-act="open" data-id="${d.id}">
-    <div class="cvw">${cover(d)}${corner}<div class="marks">${d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${live ? liveMark(d) : ''}${saveB ? saveBtn(d) : ''}${extra}</div>
+    <div class="cvw">${cover(d)}${corner}<div class="marks">${multi && d.players > 1 ? players(d) : ''}${byocB ? byoc(d) : ''}</div>${live ? liveMark(d) : ''}${saveB ? saveBtn(d) : ''}${extra}</div>
     ${title ? `<div class="ct">${esc(d.title)}</div>` : ''}${sub ? `<div class="cs">${esc(d.by)} · ${d.plays} parties</div>` : ''}
   </div>`;
 }
@@ -1600,7 +1600,7 @@ function searchRes() {
   $('#sRes').innerHTML = sKind === 'chars'
     ? `<div class="grid g3">${Object.keys(SERIES.STYLE).filter((id) => window.SPRITES && SPRITES[id] && (!sStyle || SERIES.STYLE[id] === sStyle) && has(charName(id)))
         .map((id) => `<div class="chr" data-act="chr" data-id="${id}"><div class="im"><img src="chars/${id}/${face(id)}.webp" alt="" loading="lazy"></div><b>${esc(charName(id))}</b></div>`).join('')}</div>`
-    : `<div class="grid g2">${all().filter((d) => has(d.title)).map((d) => card(d, { byocB: false })).join('')}</div>`;
+    : `<div class="grid g2">${all().filter((d) => has(d.title)).map((d) => card(d, { byocB: false, live: false, multi: false })).join('')}</div>`;   // Recherche: no players icon, no live dot (strangers or friends)
 }
 function renderHome() {
   if (SERIES.progressive()) seedHome();
