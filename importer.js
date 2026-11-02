@@ -292,6 +292,24 @@
       return `Ajouté au jeu : ${last.name}. Partout dans une minute environ.`;
     },
     apply,
+    // the characters being made (Banque › Nouveau perso), shared across devices in chars/drafts.json: { slug: {name, she, done, …, t} }.
+    // pull = read it (the token reads it fresh; without, the published file), push = merge ours into it (needs the token). The newest t wins
+    drafts: {
+      merge(a, b) { const m = { ...a }; for (const [k, d] of Object.entries(b || {})) if (!m[k] || (d.t || 0) > (m[k].t || 0)) m[k] = d; return m; },
+      async pull() {
+        const token = ls('smt-gh-token');
+        try {
+          if (token) { const f = await gh(token, 'contents/chars/drafts.json?ref=main'); return f ? JSON.parse(fromB64(f.content)) : {}; }
+          const r = await fetch(`chars/drafts.json?t=${Date.now()}`, { cache: 'no-store' }); return r.ok ? await r.json() : {};
+        } catch { return {}; }
+      },
+      async push(local) {
+        const token = ls('smt-gh-token'); if (!token) return null;
+        const old = await this.pull(), merged = this.merge(old, local);
+        if (JSON.stringify(merged) !== JSON.stringify(old)) await commit(token, [{ path: 'chars/drafts.json', content: JSON.stringify(merged, null, 1), encoding: 'utf-8' }], 'Persos en cours (Banque › Nouveau perso)');
+        return merged;
+      },
+    },
     // a layer the size of the sheet, the object alone where it goes (the rest transparent): cut with each pose's rect
     async layer(file, kind, name, obj) {
       const id = slug(name), sp = SPRITES[id], poses = KINDS[kind].poses.filter((p) => sp && sp.rects && sp.rects[p]);

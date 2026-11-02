@@ -126,7 +126,7 @@ window.BANK = {
       const open = BANK.newCharIsOpen();
       // open: the new character alone on screen (the others come back when it's closed)
       if (open) return `<div class="ncTop open"><button type="button" class="ncToggle" data-nctoggle="1"><b>Nouveau perso</b><em>✕</em></button><div class="ncIn">${BANK.newChar()}</div></div>`;
-      return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div>`
+      return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div><div id="bankDrafts">${draftsHtml()}</div>`
         // the newest imported first, then the others
         + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
@@ -171,6 +171,7 @@ window.BANK = {
     stop();
     $('#bankTabs').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.t === tab));
     $('#bankBody').innerHTML = tabs[tab](); $('#bankBody').scrollTop = 0;
+    if (tab === 'chars' && !pulled) BANK.draftPull();
     // Nouveau perso open: full screen, only the back arrow and its 3 steps on top (02/11)
     document.body.classList.toggle('ncFull', tab === 'chars' && (!!editing || BANK.newCharIsOpen()));
   }
@@ -206,6 +207,9 @@ window.BANK = {
       }
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
       const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
+      const dr = e.target.closest('[data-drop]'), dd = e.target.closest('[data-drdel]');
+      if (dr) { e.stopPropagation(); BANK.draftOpen(dr.dataset.drop); draw(); return; }
+      if (dd) { e.stopPropagation(); BANK.draftDel(dd.dataset.drdel); refreshDrafts(); return; }
       const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]'), tg = e.target.closest('[data-nctoggle]'), sp = e.target.closest('[data-ncstep]');
       if (op || tk || tg || sp) { e.stopPropagation(); if (tg) BANK.newCharSet('shown', !BANK.newCharIsOpen()); else if (sp) BANK.newCharStep(+sp.dataset.ncstep); else if (op) BANK.newCharOpen(op.dataset.ncopen); else { if (!(tk.dataset.ncnext && tk.classList.contains('ok'))) BANK.newCharTick(tk.dataset.ncdone); if (tk.dataset.ncnext) BANK.newCharStep(+tk.dataset.ncnext); } const y = sp || op || (tk && tk.dataset.ncnext) ? 0 : $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (nc || ci) {   // Nouveau perso: a prompt, or a picture as png (the promise keeps it inside the tap, for Safari)
@@ -433,7 +437,47 @@ Example:
   const HAVE = ['brooke', 'cam', 'candy', 'james', 'julian', 'justin', 'ruby', 'suit'];   // ref/perso_<name>.webp
   const KEY = 'smt-newchar';
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
-  const keep = (c) => { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } };
+  const keep = (c) => { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } mirror(c); };
+  // ---- the characters being made, saved as you go and shared across devices (chars/drafts.json via importer.js). Locally
+  // every draft by name (smt-drafts); the repo copy needs the GitHub token, and a tap on a draft picks it up where it was ----
+  const DK = 'smt-drafts', dslug = (n) => (window.IMPORT ? IMPORT.slug(n) : String(n).toLowerCase().replace(/[^a-z0-9]+/g, '_'));
+  const drafts = () => { try { return JSON.parse(localStorage.getItem(DK)) || {}; } catch { return {}; } };
+  const putDrafts = (m) => { try { localStorage.setItem(DK, JSON.stringify(m)); } catch { /* private window */ } };
+  let dState = '', dTimer = null, pulled = false;   // dState: '' | 'saving' | 'saved' | 'local' (no token) | 'error'
+  function mirror(c) {
+    const nm = String(c.name || '').trim(); if (!nm) return;
+    const m = drafts(), k = dslug(nm), d = { name: nm, she: !!c.she, locked: c.locked || '', place: c.place || '', done: c.done || {}, t: Date.now() };
+    const core = (x) => JSON.stringify([x.name, !!x.she, x.locked || '', x.place || '', x.done || {}]);
+    if (m[k] && !m[k].gone && core(m[k]) === core(d)) return;   // nothing new: no commit
+    m[k] = d; putDrafts(m); clearTimeout(dTimer); dTimer = setTimeout(syncDrafts, 4000);
+  }
+  async function syncDrafts() {
+    if (!window.IMPORT) return;
+    const hasToken = (() => { try { return !!localStorage.getItem('smt-gh-token'); } catch { return false; } })();
+    dState = hasToken ? 'saving' : 'local'; refreshDrafts();
+    try {
+      const remote = hasToken ? await IMPORT.drafts.push(drafts()) : await IMPORT.drafts.pull();
+      if (remote) putDrafts(IMPORT.drafts.merge(drafts(), remote));
+      if (hasToken) dState = 'saved';
+    } catch { dState = 'error'; }
+    refreshDrafts();
+  }
+  // redraw only the drafts list (not while typing in Nouveau perso, nor in Modifier)
+  function refreshDrafts() { const box = $('#bankDrafts'); if (box) box.innerHTML = draftsHtml(); }
+  function draftsHtml() {
+    const all = Object.entries(drafts()).filter(([, d]) => !d.gone).sort(([, a], [, b]) => (b.t || 0) - (a.t || 0));
+    if (!all.length && !dState) return '';
+    const note = { saving: 'Enregistrement…', saved: 'Enregistrés ✓ (partagés sur tous les appareils)', error: 'Pas enregistrés : réessaie (jeton GitHub ?)',
+      local: 'Sur cet appareil seulement : ajoute ton jeton GitHub (Acte › Générer › Garder pour Claude) pour les partager' }[dState] || '';
+    return `<div class="bkDrafts"><h3 class="bkH">En cours <small>${esc(note)}</small></h3><div class="bkRow">${all.map(([k, d]) => {
+      const n = Object.values(d.done || {}).filter(Boolean).length;
+      return `<div class="bkDraft"><button type="button" class="ncBtn" data-drop="${esc(k)}"><b>${esc(d.name)}</b> <small>${d.she ? 'Elle' : 'Il'} · ${n} feuille${n > 1 ? 's' : ''}</small></button><button type="button" class="ncBtn" data-drdel="${esc(k)}" aria-label="Retirer ${esc(d.name)}">✕</button></div>`; }).join('')}</div></div>`;
+  }
+  BANK.draftOpen = (k) => { const d = drafts()[k]; if (!d) return; const c = { name: d.name, she: !!d.she, locked: d.locked || '', place: d.place || undefined, done: d.done || {}, step: d.done && d.done.debout ? 3 : 1, shown: true };
+    try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } };
+  BANK.draftDel = (k) => { const m = drafts(); if (m[k]) { m[k] = { ...m[k], gone: true, done: {}, t: Date.now() }; putDrafts(m); clearTimeout(dTimer); dTimer = setTimeout(syncDrafts, 1000); } };
+  // opening the Banque: what the other devices saved comes in
+  BANK.draftPull = async () => { if (pulled || !window.IMPORT) return; pulled = true; mirror(load()); /* a draft made before this existed (Walter) is picked up from this browser */ const r = await IMPORT.drafts.pull(); if (r && Object.keys(r).length) { putDrafts(IMPORT.drafts.merge(drafts(), r)); refreshDrafts(); } };
   const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
   // a picture to attach: big, with Copier (into the clipboard, as png) and Enregistrer (a download)
   const pic = (f, label) => `<div class="ncPic"><img src="ref/${f}" alt="" data-img="ref/${f}"><span>${esc(label)}</span><div><button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image</button><a class="ncBtn" href="ref/${f}" download="${f}">Enregistrer</a></div></div>`;
