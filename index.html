@@ -579,9 +579,23 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 /* the 3 layers of investment, the 3 skills */
 .dkInv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .3em; font-family: var(--display); font-size: 10em; line-height: 1.05; }
 .dkInv b { font-weight: 400; color: var(--c); }
+.dkChain { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.1em; }
+.dkChain li { display: flex; align-items: baseline; gap: 1em; font-size: 4.6em; line-height: 1.2; transition: opacity .3s; }
+.dkChain li::before { content: '→'; color: var(--c); flex: none; }
+.dkChain li:first-child::before { content: '•'; }
+.dkChain li.off { opacity: .08; }
+.dkChain li { flex-wrap: wrap; row-gap: .15em; }
+.dkChain li b { flex: 1 1 0; min-width: 0; }
+.dkChain li span { flex-basis: 100%; padding-left: 2.1em; font-size: .62em; color: #aeaeb2; }
+.dkChain li.fix { font-family: var(--display); font-size: 6em; color: var(--c); }
+.dkChain li.fix b { font-weight: 400; }
+#deck .dkPics2 { gap: 3em; justify-content: center; }
+#deck .dkPics2 .dkPic { width: 42%; height: 58em; }
+#deck .dkPics2 .dkArrow { width: 6em; }
+#deck .dkPics2 .dkPic[style] { background-size: contain; background-repeat: no-repeat; background-position: center; background-color: transparent; box-shadow: none; }
 .dkSkills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3em; }
 .dkSkills div { padding: 3em 2.6em; border-radius: 2.4em; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 .15em color-mix(in srgb, var(--c) 50%, transparent); }
-.dkSkills b { display: block; font-family: var(--display); font-weight: 400; font-size: 6.4em; line-height: 1; color: var(--c); }
+.dkSkills b { display: block; font-family: var(--display); font-weight: 400; font-size: 5.2em; line-height: 1; color: var(--c); }
 .dkSkills span { display: block; margin-top: .8em; font-size: 3.2em; line-height: 1.25; color: #e5e5ea; }
 /* the questions: tap one, its answer on the right */
 #deck .dkSlide:has(.dkQA) { justify-content: flex-start; gap: 1.6em; padding: 10em 6% 6em; }
@@ -1611,8 +1625,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
             <li><b>Slide vide</b></li>
             <li><b>« Or avant ce soir — et c'est important — je ne le connaissais pas. »</b></li>
             <li><b>« J'y reviens plus tard. »</b><small>Le speech : bâtir l'attente, le contexte, expliquer le problème</small></li>
-            <li><b>Le problème · 1 : l'IA rend le contenu infini</b><small>Quand tout est abondant, plus rien n'a de valeur</small><span class="sp-chip">Slide</span></li>
-            <li><b>Le problème · 2 : on ne regarde plus les mêmes histoires</b><small>La dernière saison de GoT : ça criait à table. Ces moments vont devenir rares</small><span class="sp-chip">Slide</span></li>
+            <li><b>Le problème, un maillon par tap</b><small>L'IA rend le contenu abondant → il perd sa rareté, sa valeur → chacun regarde des histoires différentes → les expériences partagées deviennent rares → les moments qui nous lient disparaissent (GoT : tout le monde en parlait) → des histoires multijoueurs et personnalisées recréent ce moment</small><span class="sp-chip">Slide</span></li>
+            <li><b>Les deux images : seul dans le tunnel d'écrans → les amis autour du cell</b><small>Je les laisse parler</small><span class="sp-chip">Slide · 2 images</span></li>
             <li><b>Maria Valenzuela (ex-SVP Sony Pictures)</b><small>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. » Puis : « Je vous montre. »</small><span class="sp-chip">Slide</span></li>
             <li><b>Son selfie, une flèche vers son perso</b><span class="sp-chip">Slide</span></li>
             <li><b>Le catalogue d'histoires : je clique sur une histoire de pirates immersive</b><span class="sp-chip">Démo · télé</span></li>
@@ -1623,7 +1637,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
             <li><b>Démo 5 · Plot twist : c'est du multijoueur</b><small>Un choix qui compte, fait par une autre personne dans la salle</small><span class="sp-chip">Démo · télé</span></li>
             <li><b>Au 2e choix, pause : le plot twist</b><small>« Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure</small><span class="sp-chip">Slide · sa photo</span></li>
             <li><b>Un joueur peut même aller sur le bol et continuer à suivre l'histoire sur son cell</b><small>L'histoire ne l'attend pas dans la salle : elle le suit</small></li>
-            <li><b>Pourquoi ça accroche : tu ES le perso, tu DÉCIDES, tu le vis AVEC tes amis</b><small>Netflix ne fait aucun des trois</small><span class="sp-chip">Slide</span></li>
+            <li><b>Trois choses normalement séparées : personnalisation, agentivité, lien social</b><small>L'histoire, c'est toi et tes amis · tu changes ce qui arrive · vous la vivez ensemble, même à distance. Netflix ne fait aucun des trois</small><span class="sp-chip">Slide</span></li>
             <li><b>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</b><small>Étrangement, non : montrer le concept de monde, d'histoires et mon système d'histoire</small></li>
             <li><b>Pourquoi moi : jeux, procédural, récit</b><small>Il faut les trois en même temps. 50+ jeux, un générateur de villages, 100+ histoires</small><span class="sp-chip">Slide</span></li>
             <li><b>0 $ : ce que coûte un nouveau perso</b><small>4 images gratuites sur ChatGPT × 6 poses = 24 poses. La vidéo IA : environ 30 $ la minute</small><span class="sp-chip">Slide</span></li>

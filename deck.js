@@ -54,6 +54,12 @@ window.DECK = (() => {
       'Plus d’un perso par compte = abonné.',
       'Des packs de mondes en partenariat avec des séries : « Tu es un Jedi dans Star Wars ».',
       'Si ça devient comme Episode (Pocket Gems) : plus de 1 M$ par mois.']],
+    ['C’est quoi la différence avec Netflix, ou un jeu?', [
+      'Le produit combine trois choses normalement séparées.',
+      'La personnalisation : l’histoire, c’est toi et tes amis.',
+      'L’agentivité : tu changes ce qui arrive.',
+      'Le lien social : vous la vivez ensemble, même à distance.',
+      'Netflix n’a aucun des trois. Un jeu a l’agentivité, rarement le reste.']],
     ['Pourquoi maintenant?', [
       'Le contenu IA devient infini : ce qui reste rare, c’est une histoire faite pour ton groupe, vécue ensemble.',
       'Le jeu vidéo et le cinéma fusionnent : c’est un nouveau marché (Maria Valenzuela, ex-SVP Sony Pictures).',
@@ -86,13 +92,22 @@ window.DECK = (() => {
       'Oui, je fais tout. Je me cherche un cofounder, mais j’avance sans attendre.']],
   ];
   let qa = 0;
+  // the problem, one link at a time (a tap = the next one); the last one is the answer
+  const CHAIN = [
+    ['L’IA rend le contenu abondant.'],
+    ['Le contenu perd sa rareté, sa valeur.'],
+    ['Chacun regarde des histoires de plus en plus différentes.'],
+    ['Les expériences partagées deviennent rares.'],
+    ['Les moments qui nous lient disparaissent.', 'La dernière saison de GoT : tout le monde en parlait.'],
+    ['Des histoires multijoueurs et personnalisées recréent ce moment.'],
+  ];
   const S = [
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Avant de commencer… »</h1><p>J'aimerais vous parler d'une merveilleuse rencontre que j'ai faite ce soir.</p>` },
     { c: '#ffd60a', h: () => `<small>Spark</small><h1>« Il me faut un volontaire pour que je prenne en photo. »</h1><p>Un étranger monte sur scène. Personne ne le connaît encore.</p>` },
     { c: '#ff9f0a', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}</div>` },
     { c: '#ff9f0a', h: () => '' },
-    { c: '#ffd60a', h: () => `<small>Le problème</small><h1>L'IA rend le contenu infini.</h1><p>Quand tout est abondant, plus rien n'a de valeur.</p>` },
-    { c: '#ffd60a', h: () => `<small>Le problème</small><h1>On ne regarde plus les mêmes histoires.</h1><p>La dernière saison de Game of Thrones : tout le monde en parlait. Chez nous, ça criait à table.</p>` },
+    { c: '#ffd60a', steps: () => CHAIN.length, h: () => `<small>Le problème</small><ol class="dkChain">${CHAIN.map(([a, b], n) => `<li class="${n > sub ? 'off' : ''}${n === CHAIN.length - 1 ? ' fix' : ''}"><b>${a}</b>${b ? `<span>${b}</span>` : ''}</li>`).join('')}</ol>` },
+    { c: '#ffd60a', h: () => `<div class="dkRow dkPics2">${slot('i1', 'Seul · le tunnel d’écrans')}<i class="dkArrow"></i>${slot('i2', 'Ensemble · les amis autour du cell')}</div>` },
     { c: '#ffd60a', h: () => `<h1>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. »</h1><p>Maria Valenzuela · ex-SVP, Sony Pictures</p>` },
     { c: '#ff375f', h: () => `<div class="dkRow">${slot('x', 'Photo de [X]')}<i class="dkArrow"></i>${slot('xc', 'Son perso', sub && saved.xc2 ? 'xc2' : 'xc')}</div>`, steps: () => (saved.xc2 ? 2 : 1) },
     { c: '#ff375f', h: () => `<h2>Le catalogue d'histoires</h2><div class="dkCat">${CAT.map(([t, bg, cs, [hb, hs, hk], tz, pick]) => `<div class="dkCard${pick ? ' pick' : ''}" style="${bg ? `background-image:url(${bg})` : ''}">${cs.map((c) => `<img class="dkCh" src="${c}" alt="">`).join('')}<b>${esc(t)}</b><div class="dkHv ${hk || ''}"${hb ? ` style="background-image:url(${hb})"` : ''}>${hk === 'wc' ? WC : ''}${hs.map((u) => `<img src="${u}" alt="">`).join('')}<span>${esc(tz)}</span></div></div>`).join('')}</div>` },
@@ -106,7 +121,7 @@ window.DECK = (() => {
     { c: '#ffd60a', h: () => `<h1>Il y avait quelqu'un d'autre.</h1><div class="dkRow">${slot('y', 'Selfie de [Y]')}<i class="dkArrow"></i>${slot('yc', 'Son perso')}</div><p>Il est dans la salle. Il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.</p>` },
     { c: '#ff375f', full: true, h: () => `<img class="dkFull" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">` },
     { c: '#30d158', wall: true, h: () => `<div class="dkQuad"><img src="ref/suit_tele.webp" alt="Deux amis devant la télé, l’histoire de pirates à l’écran"><img src="ref/suit_cells.webp" alt="Chacun sur son cell, l’un aux toilettes, l’autre sur le divan"><img src="ref/suit_cell.webp" alt="Elle suit l’histoire sur son cell"><div class="dkWall">${WALL.map(([a, b]) => `<div><img src="${a}" alt=""><i class="dkArrow"></i><img class="dkAnim" src="${b[0]}" alt=""></div>`).join('')}</div></div>` },
-    { c: '#30d158', h: () => `<small>Pourquoi ça accroche</small><ol class="dkInv"><li><b>Tu es</b> le personnage.</li><li><b>Tu décides</b> à sa place.</li><li><b>Tu le vis</b> avec tes amis.</li></ol><p>Netflix ne fait aucun des trois.</p>` },
+    { c: '#30d158', h: () => `<small>Trois choses normalement séparées</small><div class="dkSkills"><div><b>Personnalisation</b><span>L’histoire, c’est toi et tes amis.</span></div><div><b>Agentivité</b><span>Tu changes ce qui arrive.</span></div><div><b>Lien social</b><span>Vous la vivez ensemble, même à distance.</span></div></div><p>Netflix ne fait aucun des trois.</p>` },
     { c: '#ff375f', h: () => `<h1>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</h1><p>Étrangement, non.</p>` },
     { c: '#0a84ff', h: () => `<small>Pourquoi moi</small><div class="dkSkills"><div><b>Jeux</b><span>50+ depuis 14 ans</span></div><div><b>Procédural</b><span>Des arbres de choix qui tiennent</span></div><div><b>Récit</b><span>100+ histoires</span></div></div><p>Il faut les trois en même temps.</p>` },
     { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div><p class="dkZeroP">Un nouveau perso : 24 poses, avec 4 images gratuites sur ChatGPT.</p>` },
@@ -119,8 +134,8 @@ window.DECK = (() => {
     "« Il me faut un volontaire pour que je prenne en photo. » Un étranger monte sur scène : c'est lui, [Y], qui pose pour la photo.",
     "[X], présenté en une phrase : « [X] est en cybersécurité et adore… » Slide : sa photo.",
     "Slide vide. « Or avant ce soir — et c'est important — je ne le connaissais pas. J'y reviens plus tard. »",
-    "Lent. L'IA va générer des films et des histoires sans fin, faits pour les goûts de chacun. Quand le contenu devient infini, chaque histoire perd sa rareté, sa valeur.",
-    "Chacun son flux, donc de moins en moins d'histoires en commun. Les soirées ciné, une réplique que tout le monde connaît, « T'as vu le dernier épisode? » : c'est comme ça qu'on se lie. La dernière saison de GoT, ça criait à table chez nous. Ces moments-là vont devenir rares.",
+    "Lent, un maillon par tap. L'IA rend le contenu abondant → il perd sa rareté, sa valeur → chacun regarde des histoires différentes → les expériences partagées deviennent rares → les moments qui nous lient disparaissent (la dernière saison de GoT : tout le monde en parlait, ça criait à table chez nous) → des histoires multijoueurs et personnalisées recréent ce moment.",
+    "Les deux images : seul dans le tunnel d'écrans → des amis qui rient autour d'un cell. (Tape un cadre pour mettre l'image, elle reste sur cet appareil.) Je les laisse parler, une seconde de silence.",
     "Conférence sur le futur du cinéma avec l'IA : Maria Valenzuela (ex-SVP Sony Pictures) prédit l'explosion du contenu IA et la fusion du cinéma et du jeu vidéo. Et : les gens veulent qu'on crée pour eux, selon leurs goûts. La solution : une histoire faite pour ton groupe, avec vous dedans, où chacun change la suite. « Je vous montre. »",
     "Son selfie, une flèche vers son perso.",
     "Le catalogue d'histoires : je clique sur une histoire de pirates immersive. Démo · télé.",
@@ -134,7 +149,7 @@ window.DECK = (() => {
     "Au 2e choix, pause : le plot twist. « Il y avait quelqu'un d'autre. » Le selfie de [Y], une flèche vers son perso : il est dans la salle et il joue depuis tout à l'heure. Le personnage arrive dans l'histoire : c'est lui.",
     "Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé.",
     "Devant la télé, ensemble. Chacun sur son cell, même aux toilettes : l'histoire le suit. Elle continue sur son cell. Tous ces persos viennent d'une photo, chacun joue ses poses.",
-    "Après la démo. Le sommet de l'investissement dans un perso : 1. ÊTRE le perso (c'est ta face). 2. Prendre ses décisions : c'est MOI qui l'ai fait, pas le perso. 3. Le vivre avec les gens avec qui tu veux partager des émotions. Netflix ne fait aucun des trois.",
+    "Après la démo. Le produit combine trois choses normalement séparées : la personnalisation (l'histoire, c'est toi et tes amis : tu ES le perso), l'agentivité (tu changes ce qui arrive : c'est MOI qui l'ai fait, pas le perso), le lien social (vous la vivez ensemble, même à distance). Netflix ne fait aucun des trois.",
     "« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine. » Étrangement, non : je montre le concept de monde, d'histoires et mon système d'histoire.",
     "Il faut 3 choses en même temps : faire des jeux (l'interactif, le visuel), le procédural (des arbres de choix qui tiennent), la théorie du récit (des épisodes qui accrochent). Je fais les trois depuis 14 ans : 50+ jeux, un générateur de villages, 100+ histoires.",
     "Ce que coûte un nouveau perso : 0 $. 4 images gratuites par jour sur ChatGPT × 6 poses = 24 poses et expressions. Les décors sont faits d'avance pour les poses. La vidéo IA : environ 30 $ la minute.",
