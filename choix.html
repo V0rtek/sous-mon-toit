@@ -192,6 +192,15 @@ body.lt-off .mx.t-vig .vig { display: none; }
 .mx .call .ringing em:nth-of-type(2) { animation-delay: .2s; } .mx .call .ringing em:nth-of-type(3) { animation-delay: .4s; }
 @keyframes ringShake { 0%, 50%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(-14deg); } 20%, 40% { transform: rotate(14deg); } }
 @keyframes blink { 50% { opacity: .3; } }
+/* the one it's aimed at (only when the options aim at different people) */
+.mx .ch .to { margin-left: auto; flex: none; display: flex; align-items: center; gap: .2em; padding-left: .4em; }
+.mx .ch .to i { font-style: normal; font-size: 2.6em; font-weight: 900; opacity: .45; line-height: 1; }
+.mx .ch .tf { position: relative; display: block; overflow: hidden; width: 4.6em; height: 4.6em; border-radius: 50%; background: #2c2c2e; box-shadow: 0 0 0 .2em rgba(255,255,255,.25); }
+.mx .ch .tf img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
+.mx .rm .ch .to { padding-right: .4em; }
+.mx .rm .ch .tf { width: 8em; height: 8em; }
+.mx .rm .ch .to i { font-size: 4em; }
+.mx .ch button:has(.to) .tx { min-width: 0; }
 /* big view */
 #big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.85); display: grid; place-items: center; cursor: zoom-out; }
 #big[hidden] { display: none; }
@@ -238,17 +247,17 @@ const MOMENTS = [
       { t: 'Probably a debt collector.', k: 'Dodge', m: 'leger', ty: 'say', f: 'justin_bar/drunk_happy' },
       { t: '[Look at the bathroom door]', k: 'Worry', m: 'inquiet', ty: 'do', f: 'justin_bar/drunk_listen' },
     ] },
-  { id: 'combien', name: 'Combien', bg: 'bg/galerie.webp', who: 'Julian', col: '#5b6b8c', sp: 'julian/listen', line: 'Ask him what she cost.',
+  { id: 'combien', name: 'Combien', me: 'justin_bar/angry', bg: 'bg/galerie.webp', who: 'Julian', col: '#5b6b8c', sp: 'julian/listen', line: 'Ask him what she cost.',
     opts: [
-      { t: '“Brooke. How much?”', k: 'Demand', m: 'ferme', ty: 'say', f: 'justin_bar/angry' },
-      { t: '“I don’t care. Cam, we’re leaving.”', k: 'Protect', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_serious' },
-      { t: '[Punch Julian]', k: 'Punch', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
+      { t: '“Brooke. How much?”', k: 'Demand', m: 'ferme', ty: 'say', f: 'justin_bar/angry', to: 'brooke/drunk_sad' },
+      { t: '“I don’t care. Cam, we’re leaving.”', k: 'Protect', m: 'tendre', ty: 'say', f: 'justin_bar/drunk_serious', to: 'cam/worried' },
+      { t: '[Punch Julian]', k: 'Punch', m: 'ferme', ty: 'do', f: 'justin_bar/angry', to: 'julian/cold' },
     ] },
   { id: 'etage', name: 'L’étage', bg: 'bg/taverne_haut.webp', who: null, line: 'Cam goes upstairs with the man in the suit.',
     sum: { face: 'cam/flirty', icon: 'up' },   // no one spoke: the circle sums up what you answer (Cam, going up)
     opts: [
-      { t: 'Text Brooke: “where r u?? cam went upstairs w that guy”', k: 'Alert', m: 'inquiet', ty: 'sms', f: 'justin_bar/texting' },
-      { t: 'Go up after her.', k: 'Go', m: 'ferme', ty: 'do', f: 'justin_bar/angry' },
+      { t: 'Text Brooke: “where r u?? cam went upstairs w that guy”', k: 'Alert', m: 'inquiet', ty: 'sms', f: 'justin_bar/texting', to: 'brooke/texting' },
+      { t: 'Go up after her.', k: 'Go', m: 'ferme', ty: 'do', f: 'justin_bar/angry', to: 'cam/flirty' },
       { t: 'Wait. She’s a big girl.', k: 'Wait', m: 'froid', ty: 'say', f: 'justin_bar/drunk_listen' },
     ] },
   // two choices only
@@ -354,7 +363,9 @@ function opt(v, o, i) {
   if (T) {   // a mix: its traits, in that order; the type shows only when the options aren't all the same kind
     const mixed = new Set(MOMENTS[mom].opts.map((x) => x.ty)).size > 1, ty = T.has('type') && mixed && o.ty !== 'say' ? `<span class="tyb">${TYI[o.ty]}</span>` : '';
     const txt = `<span class="tx">${ty}${T.has('word') ? k : ''}${t}</span>`;
-    return `<button type="button" class="${mixed ? `ty-${o.ty}` : ''}" style="${st}" data-f="${o.f}">${T.has('face') ? face : ''}${txt}</button>`;
+    // who it's aimed at, when the options aren't all for the same person (Punch Julian / Demand Brooke): his face, on the right
+    const tos = new Set(MOMENTS[mom].opts.map((x) => x.to).filter(Boolean)), to = tos.size > 1 && o.to ? `<span class="to"><i>›</i><span class="tf"><img src="${img(o.to)}" alt=""></span></span>` : '';
+    return `<button type="button" class="${mixed ? `ty-${o.ty}` : ''}" style="${st}" data-f="${o.f}">${T.has('face') ? face : ''}${txt}${to}</button>`;
   }
   return `<button type="button" class="ty-${o.ty}" style="${st}">${inner}</button>`;
 }
