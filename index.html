@@ -1276,6 +1276,49 @@ body.phonemin #pauseCard .pc-go { flex: 1; font-size: 4em; border-radius: .7em; 
 body.phonemin #pauseCard .pc-quit { flex: 0 0 auto; font-size: 2.4em; padding: 1em; }
 body.phonemin:not(.privline) #bubble, body.phonemin #waitOther, body.phonemin #caption, body.phonemin #callBar { visibility: hidden; }
 body.hosttv.instory #pauseBtn { display: grid; }
+/* a phone on a TV's story becomes his phone when he texts or gets a text: Messages, open on that conversation (the earlier
+   texts above), his hour, his battery; the choices that follow come under the thread */
+#cellView { position: absolute; inset: 0; z-index: 13; background: #000; display: none; flex-direction: column; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; cursor: default; }
+body.cellon #cellView { display: flex; animation: cvIn .3s ease-out; }
+@keyframes cvIn { from { opacity: 0; transform: translateY(2em); } }
+body.cellon #viewBtn, body.cellon #pauseBtn, body.cellon #qCard { display: none !important; }
+body.cellon #ui { z-index: 14; }
+body.cellon #texts { visibility: hidden; }
+.cv-sb { flex: none; height: 4.4em; display: flex; align-items: center; justify-content: space-between; padding: .6em 2.4em 0 3em; }
+.cv-sb b { font-size: 1.6em; font-weight: 600; }
+.cv-sb > span { display: flex; align-items: center; gap: .5em; }
+.cv-sb svg { height: 1.3em; width: auto; fill: #fff; }
+.cv-bat { display: flex; align-items: center; gap: .35em; }
+.cv-bat em { font-style: normal; font-size: 1.25em; font-weight: 600; }
+.cv-bat i { width: 2.5em; height: 1.25em; border-radius: .38em; border: .13em solid rgba(255,255,255,.45); padding: .12em; display: flex; }
+.cv-bat i u { display: block; border-radius: .16em; background: #fff; }
+.cv-bat.low em { color: #ff3b30; }
+.cv-bat.low i u { background: #ff3b30; }
+.cv-h { flex: none; display: flex; flex-direction: column; align-items: center; gap: .5em; padding: .4em 2em 1.1em; background: rgba(28,28,30,.92); border-bottom: .1em solid #2c2c2e; }
+.cv-h .sf { width: 5.4em; height: 5.4em; background: linear-gradient(#a5a5aa, #6e6e73); }
+.cv-h .sf.nobody svg { position: absolute; left: 15%; top: 18%; width: 70%; fill: rgba(255,255,255,.85); }
+.cv-h b { font-size: 1.5em; font-weight: 500; }
+.cv-b { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: .5em; padding: 1em 2.2em var(--cvb, 1.4em); overflow: hidden; }
+.cv-ts { align-self: center; font-size: 1.3em; color: #8e8e93; margin-bottom: .5em; }
+.cv-ts b { font-weight: 600; }
+.cv-m { max-width: 76%; flex: none; font-size: 2.05em; line-height: 1.28; padding: .45em .75em; border-radius: 1em; background: #262629; align-self: flex-start; overflow-wrap: anywhere; }
+.cv-m.out { background: #0a84ff; align-self: flex-end; }
+.cv-m.fresh { animation: smsIn .32s ease-out backwards; }
+.cv-r { align-self: flex-end; font-size: 1.25em; color: #8e8e93; margin-top: -.2em; }
+.cv-dots { align-self: flex-start; display: flex; gap: .4em; padding: .9em 1em; border-radius: 1.4em; background: #262629; }
+.cv-dots i { width: .95em; height: .95em; border-radius: 50%; background: #8e8e93; animation: blink 1.2s infinite; }
+.cv-dots i:nth-child(2) { animation-delay: .2s; } .cv-dots i:nth-child(3) { animation-delay: .4s; }
+.cv-cp { flex: none; display: flex; align-items: center; gap: 1em; padding: .8em 1.6em 2.4em; }
+.cv-cp > i { width: 3.4em; height: 3.4em; border-radius: 50%; background: #2c2c2e; display: grid; place-items: center; font-style: normal; color: #aeaeb2; font-size: 2.2em; width: 1.55em; height: 1.55em; line-height: 1; }
+.cv-cp > span { flex: 1; min-height: 3.4em; border-radius: 1.7em; border: .12em solid #3a3a3c; display: flex; align-items: center; padding: .3em 1.2em; font-size: 1.85em; min-height: 1.85em; color: #636366; }
+.cv-cp > span.typ { color: #fff; }
+.cv-cp > span.typ::after { content: ''; width: .08em; height: 1.1em; background: #0a84ff; margin-left: .05em; animation: blink 1s steps(1) infinite; }
+#cellView.chs .cv-cp { display: none; }
+/* the choices, under the thread: white, their natural height */
+body.cellon #ui { top: auto; }
+body.phonemin.cellon #ui { top: auto; bottom: 2.5%; }
+body.cellon #choices:not([hidden]) { flex: none; height: auto; gap: 1em; }
+body.cellon #choices button { flex: none; background: #fff !important; color: #000 !important; box-shadow: none !important; padding: .55em .8em !important; }
 body.watch.hosttv #again { display: block !important; }
 /* the TV's opening: black, then white words, one at a time, slowly: the title, what's going on, who plays whom (the
    phones show "Tu es …" at that moment), how it works; then it fades into the story */
@@ -2054,6 +2097,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="apart"></div>
   <div id="absentBar" hidden></div>
   <div id="minView"></div>
+  <div id="cellView"></div>
   <button id="viewBtn" type="button" aria-label="Voir l'histoire"></button>
   <button id="skipBtn" type="button" hidden aria-label="Passer l'intro"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
@@ -2456,6 +2500,7 @@ function rects(list, el) {
   }
 }
 function setScene(id, cast) {
+  if (cellOpen) closeCell();   // a new place: he put his phone away
   if (sc && sc.ambience && sc.ambience !== SCENES[id].ambience) stopSfx(sc.ambience);
   sc = SCENES[id]; actors = {}; castEl.innerHTML = ''; frontEl.innerHTML = ''; backEl.innerHTML = '';
   if (sc.ambience && !sfxLoops[sc.ambience]) sfx(sc.ambience, 'scene');   // the room's sound, looping (scene.ambience)
@@ -2550,9 +2595,10 @@ function textMsg(m, sent) {
   if (sent) Object.assign(sent, { t, draft: false, status: 'delivered' });   // the bubble he typed goes out as it is
   // {sms: {…, by: id}}: someone else types it on the sender's phone (the stranger, on Brooke's): the bubble shows beside
   // the one typing, the other end gets it from the phone's owner
-  else (texts[m.by || m.from] = texts[m.by || m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' });
+  else { (texts[m.by || m.from] = texts[m.by || m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' }); logText(m.from, sent, m.to); }
   // {sms: {…, only: seat}}: a private text — the others see his phone buzz and him read it, never the words
-  (texts[m.to] = texts[m.to] || []).push({ t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from });
+  const got = { t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from };
+  (texts[m.to] = texts[m.to] || []).push(got); logText(m.to, got, m.from);
   if (!FAST && ((actors[m.to] && !afar(m.to)) || mineTo(m.to))) buzz();   // his phone on screen, or yours
   drawTexts();
   setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
@@ -2573,11 +2619,12 @@ async function sendText(m, r) {
   if (!onScreen(hand)) { textMsg(m); return true; }
   setPose(hand, 'texting');
   const t = fill(m.text), d = { t: '', out: true, fresh: true, draft: true };
-  (texts[hand] = texts[hand] || []).push(d); drawTexts();
+  (texts[hand] = texts[hand] || []).push(d); logText(m.from, d, m.to); drawTexts();
   const each = Math.min(Math.max(t.length * 40, 400), 1200) / t.length;
   for (let i = 1; i <= t.length; i++) {
     await sleep(each); if (r !== run) return false;
     d.t = t.slice(0, i); const el = textsEl.querySelector('.sms.draft'); if (el) el.textContent = d.t;
+    const f = cellOpen && $('#cellView .cv-cp > span.typ'); if (f) f.textContent = d.t;
   }
   await sleep(150); if (r !== run) return false;
   textMsg(m, d);
@@ -2668,6 +2715,60 @@ function drawTexts(wait = 0) {
     textsEl.appendChild(d);
   }
 }
+
+// ---- a player's phone on a TV's story: when the one he plays texts, gets a text, or someone types on his phone, the
+// phone becomes his: Messages, open on that conversation, the earlier texts above. His hour (story.phone.time, the
+// clock runs from the story's start) and his battery (story.phone.bat[seat]). The choices that follow come under the
+// thread; it closes after the next choice, at a new scene, or after a while with nothing ----
+let phoneLog = {}, cellOpen = null, storyAt = Date.now();   // phoneLog[seat]: the texts on his phone, in order; cellOpen: whose phone is shown
+const cellMode = () => ROLE === 'watch' && hostTv;
+function logText(owner, m, other) {
+  m.other = other; m.at = m.at || Date.now();
+  (phoneLog[owner] = phoneLog[owner] || []).push(m);
+  if (cellMode() && !FAST && mineTo(owner) && (!m.only || sees(m.only))) openCell(owner);
+  else if (cellOpen && phoneLog[other] && cellOpen === other) drawCell();   // he's typing to you: the dots
+}
+function openCell(owner) { cellOpen = owner; clearTimeout(closeCell.t); drawCell(); cellIdle(); }
+function closeCell() { clearTimeout(closeCell.t); cellOpen = null; document.body.classList.remove('cellon'); $('#cellView').innerHTML = ''; }
+function cellIdle() { clearTimeout(closeCell.t); closeCell.t = setTimeout(() => { if (document.body.classList.contains('choosing') || (phoneLog[cellOpen] || []).some((m) => m.draft)) cellIdle(); else closeCell(); }, 12000); }
+// the story's hour on his phone: "1:47", running from the story's start (no hour given: the real one)
+function cellClock(at = Date.now()) {
+  const p = (story() && story().phone) || {}, d = new Date(at);
+  if (p.time) { const [h, mi] = p.time.split(':').map(Number); d.setTime(Date.UTC(2000, 0, 1, h, mi) + (at - storyAt)); return { h: d.getUTCHours(), m: d.getUTCMinutes() }; }
+  return { h: d.getHours(), m: d.getMinutes() };
+}
+const clockTxt = (c, ampm) => `${c.h % 12 || 12}:${String(c.m).padStart(2, '0')}${ampm ? (c.h < 12 ? ' AM' : ' PM') : ''}`;
+const CV_SIG = '<svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".7"/><rect x="5" y="5.5" width="3" height="6.5" rx=".7"/><rect x="10" y="3" width="3" height="9" rx=".7"/><rect x="15" y="0" width="3" height="12" rx=".7" opacity=".35"/></svg>';
+const CV_NOBODY = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M2 24c0-6 4.5-9 10-9s10 3 10 9z"/></svg>';
+function drawCell() {
+  const box = $('#cellView'), owner = cellOpen;
+  if (!owner || !cellMode()) { document.body.classList.remove('cellon'); return; }
+  const all = phoneLog[owner] || [], last = all[all.length - 1]; if (!last) return;
+  const other = last.other, list = all.filter((m) => m.other === other && !(m.only && !sees(m.only)));
+  const c = castOf(other) || {}, p = (story() && story().phone) || {};
+  // a contact he has (a name, a face), or a number he doesn't know
+  const known = !c.num && c.sprite, who = c.num || nameOf(other) || '?';
+  const bat = (p.bat && p.bat[owner]) || 38, low = bat <= 20;
+  const shown = list.filter((m) => !m.draft), draft = list.find((m) => m.draft);
+  const typing = (phoneLog[other] || []).some((m) => m.draft && m.other === owner);
+  const lastOut = shown[shown.length - 1];
+  box.innerHTML = `<div class="cv-sb"><b>${clockTxt(cellClock())}</b><span>${CV_SIG}<span class="cv-bat${low ? ' low' : ''}"><em>${bat}</em><i><u style="width:${Math.max(bat, 8)}%"></u></i></span></span></div>
+    <div class="cv-h">${known ? faceOf(other) : `<span class="sf nobody">${CV_NOBODY}</span>`}<b>${esc(who)}</b></div>
+    <div class="cv-b">${shown.length ? `<div class="cv-ts"><b>Today</b> ${clockTxt(cellClock(shown[0].at), true)}</div>` : ''}${shown.map((m) => `<div class="cv-m${m.out ? ' out' : ''}${m.cvShown ? '' : ' fresh'}">${esc(m.t)}</div>`).join('')}${lastOut && lastOut.out && lastOut.status ? `<div class="cv-r">${esc(ui(lastOut.status))}</div>` : ''}${typing ? '<div class="cv-dots"><i></i><i></i><i></i></div>' : ''}</div>
+    <div class="cv-cp"><i>+</i><span${draft ? ' class="typ"' : ''}>${draft ? esc(draft.t) : 'iMessage'}</span></div>`;
+  for (const m of shown) m.cvShown = true;
+  document.body.classList.add('cellon');
+  cellRoom();
+}
+// the thread makes room for the choices under it
+function cellRoom() {
+  const b = $('#cellView .cv-b'); if (!b) return;
+  requestAnimationFrame(() => {
+    const ui = $('#ui'), on = !choicesEl.hidden; $('#cellView').classList.toggle('chs', on);
+    b.style.setProperty('--cvb', on ? ($('#cellView').offsetHeight - ui.offsetTop + 12) + 'px' : '1.4em');
+  });
+}
+$('#cellView').onclick = (e) => { if (document.body.classList.contains('phonemin')) $('#minView').onclick(e); };   // as the black: a tap = pause (apart: the stage's tap, the next line)
 
 // ---- sound: sfx/<name>.mp3 next to the page, through Web Audio (a missing file stays silent: drop the file in, it
 // plays). {sfx: name} once, {sfx: name, loop: true} until {stop: name}. The phone's buzz is synthesized. Browsers open
@@ -3017,6 +3118,7 @@ function choose(opts, by, ring) {
   }
   if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
   if (isBot(by) && ROLE === 'host') botPick();
+  if (cellOpen) { clearTimeout(closeCell.t); drawCell(); }
 }
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
@@ -3030,6 +3132,7 @@ function pickChoice(i, afar = false) {
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
     choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing'); litOff(); qCardOff();
+    if (cellOpen) { cellRoom(); clearTimeout(closeCell.t); closeCell.t = setTimeout(closeCell, 1600); }   // what he does next may be a text: it opens again
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
   };
@@ -3657,7 +3760,7 @@ function halt() {
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   const was = !!split;
-  split = null; laneNow = null; if (was) apart(); texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
+  split = null; laneNow = null; if (was) apart(); texts = {}; phoneLog = {}; closeCell(); storyAt = Date.now(); textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
   asides.clear(); $('#todoCard').hidden = true; $('#ringCard').hidden = true; ringTone(false); onlyNow = null;
   clearInterval(callNow && callNow.tick); callNow = null; $('#callBar').hidden = true;
 }

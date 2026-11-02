@@ -28,13 +28,15 @@ const MG_CAST = {
   pa: { name: 'Justin', color: '#1f7a74', sprite: 'justin_bar' },
   pb: { name: 'Brooke', color: '#2a4f8f', sprite: 'brooke' },
   cam: { name: 'Cam', color: '#3b1f6e', sprite: 'cam', scale: 0.95 },
-  suit: { name: 'Stranger', color: '#26262b', sprite: 'suit' },
+  suit: { name: 'Stranger', color: '#26262b', sprite: 'suit', num: '+1 (514) 555-0187' },   // num: on Brooke's phone, a number he doesn't know
 };
 const MG_UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading', calling: 'Incoming call…', choices: 'Your choices',
   again: 'Play again', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended',
   mute: 'Sound off', unmute: 'Sound on', restartEp: 'Restart episode', restart: 'Restart', quit: 'Quit' };
 const mg = (steps) => Object.assign(steps, { gaze: true, credits: '', seats: ['pa', 'pb'], solo: { pa: 'Justin', pb: 'Brooke' },
   cast: MG_CAST, ui: MG_UI,
+  // their phones on a TV's story (the thread on the player's cell): the hour of the night, what's left of the battery
+  phone: { time: '1:47', bat: { pa: 31, pb: 18 } },
   pick: { pa: { pose: 'drunk_talk', line: 'I need water. Like… a lot of water.' }, pb: { pose: 'drunk_point', line: 'THAT’S my brother.' } } });
 const mgEnd = (title, lede) => [{ fade: 'out', ms: 800 }, { end: { kicker: 'Mini-game', title, lede, art: null } }];
 
@@ -304,6 +306,10 @@ const mgGuide = mg([
   { fn: (f) => (f.j1 === 'l' && f.j2 === 'r' ? mgEnd('Out', 'Left, then right. You got him out.') : mgEnd('Dead end', 'The way out was left, then right.')) },
 ]);
 
+// the later ones are later in the night (the guide: Brooke at 3%, as the story says)
+mgCall.phone = { time: '2:13', bat: { pa: 27, pb: 14 } };
+mgStolen.phone = { time: '2:31', bat: { pa: 24, pb: 12 } };
+mgGuide.phone = { time: '3:02', bat: { pa: 19, pb: 3 } };
 window.GAMES = { secret: mgSecret, versions: mgVersions, rat: mgRat, argue: mgArgue, call: mgCall, stolen: mgStolen, guide: mgGuide };
 window.GAME_LIST = [
   { id: 'secret', name: 'Le secret' },

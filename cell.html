@@ -313,12 +313,12 @@ const img = (p) => `chars/${p}.webp`;
 
 // the real moments of the TV games (games.js): whose phone it is, who writes or calls, what, and the choice that follows
 const MOMENTS = [
-  { id: 'secret', name: 'Le secret', owner: 'Brooke', from: '+1 (514) 555-0187', face: null, ini: null, time: '1:47', bat: 41,
+  { id: 'secret', name: 'Le secret', owner: 'Brooke', from: '+1 (514) 555-0187', face: null, ini: null, time: '1:47', bat: 18,
     wall: 'bg/taverne_bar.webp', selfie: ['brooke/drunk_happy', 'justin_bar/drunk_happy'],
     tv: 'Brooke reads a text. His face changes.',
     msgs: [{ t: 'Say nothing about tonight. — S' }],
     ch: [{ t: 'I’m good.', g: 'Put it away', gs: 'say “I’m good”', gi: 'lock' }, { t: 'Show them the text.', g: 'Show them', gs: 'turn the phone', gi: 'show' }] },
-  { id: 'appel', name: 'L’appel', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:13', bat: 22,
+  { id: 'appel', name: 'L’appel', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:13', bat: 14,
     wall: 'bg/rempart.webp', selfie: ['brooke/drunk_smile', 'justin_bar/drunk_joke'],
     tv: 'Brooke’s phone rings. The man in the suit looks at it.',
     call: true, ch: [{ t: 'Answer' }, { t: 'Decline' }] },
@@ -327,13 +327,13 @@ const MOMENTS = [
     tv: 'The basement. Pitch dark. Brooke’s screen lights up his face.',
     msgs: [{ t: 'left' }, { t: 'then right' }],
     ch: [{ t: 'Left door.', g: 'Left door', gi: 'left' }, { t: 'Right door.', g: 'Right door', gi: 'right' }] },
-  { id: 'vole', name: 'Le cell volé', owner: 'Justin', from: 'Brooke', face: 'brooke/texting', time: '2:31', bat: 64,
+  { id: 'vole', name: 'Le cell volé', owner: 'Justin', from: 'Brooke', face: 'brooke/texting', time: '2:31', bat: 24,
     wall: 'bg/taverne_bar.webp', selfie: ['justin_bar/drunk_happy', 'cam/flirty'],
     tv: 'Justin’s phone buzzes twice.',
     old: [{ t: 'where r u?', out: true }],
     msgs: [{ t: 'HELP,' }, { t: 'jk lol. all good. go home' }],
     ch: [{ t: 'Go home.', g: 'Reply “ok”', gs: 'go home', gi: 'reply' }, { t: 'Go find him.', g: 'Call him', gs: 'go find him', gi: 'call' }] },
-  { id: 'voleb', name: 'Volé (Brooke)', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:30', bat: 22,
+  { id: 'voleb', name: 'Volé (Brooke)', owner: 'Brooke', from: 'Justin', face: 'justin_bar/texting', time: '2:30', bat: 12,
     wall: 'bg/rempart.webp', selfie: ['brooke/drunk_smile', 'justin_bar/drunk_joke'],
     tv: 'The man in the suit types on Brooke’s phone.',
     old: [{ t: 'where r u?' }],
@@ -383,7 +383,7 @@ const wallpaper = (M, selfie) => {
 const lockScreen = (M, selfie) => `<div class="lay">${wallpaper(M, selfie)}<div class="lk"><div class="d">Sunday, November 1</div><div class="t">${M.time}</div></div>
   <div class="lkb"><i>${SVG.torch}</i><i>${SVG.cam}</i></div><div class="dimmer"></div></div>`;
 const choices = (M) => M.ch ? `<div class="chs">${M.ch.map((c, i) => `<button type="button" data-c="${i}">${esc(c.t)}</button>`).join('')}</div>` : '';
-const thread = (M) => `<div class="th"><div class="th-h"><span class="bk">‹<em>3</em></span>${face(M)}<b>${esc(M.from)}</b></div>
+const thread = (M) => `<div class="th"><div class="th-h">${face(M)}<b>${esc(M.from)}</b></div>
   <div class="th-b"><div class="ts"><b>Today</b> ${M.time.replace(/:\d+$/, (s) => ':' + String(Math.max(0, +s.slice(1) - 9)).padStart(2, '0'))} AM</div>
   ${(M.old || []).map((m) => `<div class="bb old ${m.out ? 'out' : ''}">${esc(m.t)}</div>`).join('')}
   ${M.msgs.map((m, i) => `<div class="bb k${i + 1} ${m.out ? 'out' : ''}">${esc(m.t)}</div>`).join('')}
