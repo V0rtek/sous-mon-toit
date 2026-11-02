@@ -4,7 +4,7 @@
 // subs (the ways to do it) and leads ([id, 'SI ...']: the neighbouring techniques it sets off, and when).
 // The doors in are the 5 steps of System, each with its techniques ----
 const TECH_STAGES = [
-  { n: '01', c: '#0a84ff', name: 'Investment + Anticipation', line: '"I want to see what happens."', techs: ['charEngaging', 'relEngaging', 'desire', 'curiosity'] },
+  { n: '01', c: '#0a84ff', name: 'Investment + Anticipation', line: '"I want to see what happens."', techs: ['hookSeconds', 'charEngaging', 'pillars', 'introChar', 'relEngaging', 'desire', 'curiosity'] },
   { n: '02', c: '#ff9f0a', name: 'Escalation + Complication', line: '"This is harder than I expected."', techs: ['raiseStakes', 'complication', 'nearSuccess'] },
   { n: '03', c: '#bf5af2', name: 'Revelation + Recontextualization', line: '"Wait. I misunderstood everything."', techs: ['twist', 'motifs', 'expandConflict'] },
   { n: '04', c: '#ff453a', name: 'Crisis + Maximum Suspense', line: '"How can this possibly work out?"', techs: ['impossibleChoice', 'clock', 'conflictingDesire', 'apparentDefeat', 'threat', 'sacrifice'] },
@@ -17,7 +17,7 @@ const TECH = {
     name: 'Create char engagingness',
     how: 'Faire qu’on aime passer du temps avec le perso avant de lui demander quoi que ce soit. On le montre en action avec les autres, on ne le décrit pas.',
     ex: [],
-    subs: ['tellStory', 'camaraderie', 'empathy', 'relatable', 'unexpected', 'desire'],
+    subs: ['pillars', 'introChar', 'tellStory', 'camaraderie', 'empathy', 'relatable', 'unexpected', 'desire'],
     leads: [['relEngaging', 'SI le perso a déjà quelqu’un dans sa vie'], ['impossibleChoice', 'SI on aime assez le perso pour qu’un choix contre lui fasse mal']],
   },
   relEngaging: {
@@ -38,7 +38,7 @@ const TECH = {
     name: 'Create curiosity',
     how: 'Ouvrir des questions que le joueur veut voir fermées : une boucle ouverte, un perso qui surprend, un antagoniste qui cache quelque chose.',
     ex: [],
-    subs: ['openLoop', 'unexpected', 'antagonist'],
+    subs: ['whereIsX', 'whoIsX', 'whatIsInX', 'openLoop', 'unexpected', 'antagonist'],
     leads: [['twist', 'SI la réponse change ce qu’on croyait'], ['resolve', 'SI c’est une question centrale : la fermer à la fin']],
   },
   tellStory: {
@@ -131,6 +131,87 @@ const TECH = {
     ex: [],
     subs: [],
     leads: [['raiseStakes', 'SI on montre ce qu’il peut faire'], ['curiosity', 'SI on cache ce qu’il veut']],
+  },
+
+
+  // ---- the first seconds (02/11): the most value in the least time, before anyone decides to leave ----
+  hookSeconds: {
+    name: 'Les premières secondes',
+    how: 'Donner un maximum de valeur dès le début, tout de suite : une envie (le désir), une question (la curiosité), un enjeu qui approche (le stress avant d’entrer en scène), un perso qu’on a envie de suivre. Au moins deux sur quatre dans la 1re minute, sans attendre le contexte.',
+    ex: [['« Il était une fois, dans une ville… » (rien à désirer, rien à craindre, rien à savoir)', 'Une femme magnifique entre dans la salle, tout le monde se tait. Le patron : « Où est Marco ? Il devait être là à minuit. » Un autre : « Respire. Dans deux minutes, on entre. »']],
+    subs: ['sexDrive', 'whereIsX', 'whoIsX', 'whatIsInX', 'stakesBefore', 'pillars'],
+    leads: [['raiseStakes', 'SI l’enjeu doit grandir tout de suite après'], ['introChar', 'SI le premier perso doit être présenté dans la foulée']],
+  },
+  sexDrive: {
+    name: 'Attirance (le désir physique)',
+    how: 'Persos beaux et en forme, regards qui durent, répliques qui flirtent avec un double sens, un geste de trop près. Ce que les autres persos remarquent d’eux compte plus que ce qu’on voit : qu’on les regarde. Ça attire le joueur avant qu’il sache pourquoi, et ça donne envie de les revoir.',
+    ex: [['Nora est belle. (dit, rien à voir)', 'Nora : « T’as coupé tes cheveux. … Refais plus jamais ça, j’ai failli dire une niaiserie. » Sam, qui n’a pas bougé depuis dix minutes, vient de se lever pour sortir avec elle.']],
+    subs: [],
+    leads: [['conflictingDesire', 'SI deux persos désirent la même personne'], ['curiosity', 'SI on ne sait pas encore s’il y a un lien']],
+  },
+  whereIsX: {
+    name: 'Où est X ?',
+    how: 'Un perso qui devrait être là n’y est pas. Tout le monde le cherche, sa place est vide, son cell sonne dans la poche d’un autre. La question « où ? » dure jusqu’à ce qu’on le revoie, et chaque indice pose la suivante.',
+    ex: [['Marco est absent ce soir.', 'Sa chope est encore pleine sur le comptoir. Le patron la regarde, puis la porte. Personne ne dit où il est. Quelqu’un baisse la voix : « Il avait ta clé. »']],
+    subs: [],
+    leads: [['whoIsX', 'SI on apprend ce qu’il faisait avant de disparaître'], ['threat', 'SI sa disparition est un danger pour les autres']],
+  },
+  whoIsX: {
+    name: 'Qui est X ?',
+    how: 'Un perso dit une chose étrange, ou les autres parlent de lui sans qu’on le voie à l’écran. On se fait une idée de lui avant de le rencontrer. Et on annonce qu’on va le rencontrer bientôt (c’est l’élément déclencheur : on attend son arrivée).',
+    ex: [['Il y a un nouveau capitaine.', 'Un matelot : « Il paraît qu’il a jamais perdu un duel. » Un autre, très bas : « Il en a jamais fini un. » Le patron : « Il passe ce soir. Ne le regardez pas dans les yeux. »']],
+    subs: ['introChar'],
+    leads: [['introChar', 'SI son arrivée doit tenir ce qu’on a promis']],
+  },
+  whatIsInX: {
+    name: 'Qu’y a-t-il dans X ?',
+    how: 'Un objet, une pièce, une enveloppe, une porte qu’on ne montre pas encore. Quelqu’un sait ce qu’il y a dedans et ne le dit pas. Le joueur veut l’ouvrir.',
+    ex: [['Elle a reçu une lettre.', 'Elle la glisse dans sa botte sans la lire. « Pas ici. » Elle regarde la porte du fond, celle qu’on n’ouvre jamais, et quelqu’un tousse en détournant les yeux.']],
+    subs: [],
+    leads: [['twist', 'SI ce qu’il y a dedans change ce qu’on croyait']],
+  },
+  stakesBefore: {
+    name: 'Le stress avant l’entrée',
+    how: 'Montrer l’enjeu avant que ça commence : quelqu’un est sur le point d’entrer en scène, de rentrer chez lui, d’ouvrir une porte, et il est stressé. Le joueur sent le poids avant l’action. Plus on attend, plus ça pèse : on peut ralentir une seconde juste avant.',
+    ex: [['Elle va passer le conseil.', 'Elle relit trois fois la même phrase, ses mains tremblent sur le papier. Derrière la porte, quarante voix qui s’arrêtent. Quelqu’un : « C’est ton tour. »']],
+    subs: [],
+    leads: [['raiseStakes', 'SI un enjeu s’ajoute juste avant d’entrer']],
+  },
+  // ---- how a character is engaging: his pillar, and the way he is introduced (02/11) ----
+  pillars: {
+    name: 'Piliers et archétypes d’un perso',
+    how: 'Un perso engageant tient sur un pilier, ce pour quoi on veut le suivre. Chaque pilier est un archétype, et on peut en mélanger deux : un pilier principal (visible tout de suite) et un secondaire (qui surprend plus tard). 1. Le chef (respect, charisme) : prend le contrôle d’une situation impossible. 2. Le charmeur (désir) : on le regarde, il le sait. 3. Le dangereux (peur) : la salle se tait quand il entre. 4. Le génie (compétence) : fait paraître facile ce qui est dur. 5. Le clown (chaleur) : fait rire, tout le monde l’aime, et ça cache autre chose. 6. L’énigme (mystère) : on ne sait pas ce qu’il veut. 7. L’outsider (empathie) : veut quelque chose très fort, tout est contre lui. 8. Le protecteur (loyauté) : paie pour quelqu’un d’autre.',
+    ex: [['Il est charismatique.', 'Le chef : on le voit coincé devant tout le monde, sans issue, et il retourne la salle sans élever la voix.'], ['Elle est drôle.', 'Le clown + l’outsider : elle fait rire toute la salle, puis on la voit seule dans le couloir, la même blague au bord des lèvres, et elle ne rit pas.']],
+    subs: ['introChar'],
+    leads: [['introChar', 'SI on doit montrer ce pilier dès la première apparition']],
+  },
+  introChar: {
+    name: 'Présenter un perso (3 temps)',
+    how: 'Trois temps, dans cet ordre : 1. Créer l’attente : les autres parlent de lui, on voit les effets de son absence. 2. Teaser l’arrivée : on annonce qu’il arrive bientôt, un détail le précède. 3. Une surprise qui prouve son pilier : il fait la chose qu’on n’attendait pas, devant tout le monde. Le but : qu’on l’ait espéré, puis qu’il dépasse ce qu’on espérait.',
+    ex: [['Voici Julian, le patron.', '1. Tout le monde baisse la voix : « Il a pas encore vu le contrat. » 2. Sa voiture arrive, une secrétaire en panique : « Dites-lui pas pour la salle. » 3. Il entre, la salle est en feu, il referme le dossier, sourit : « Parfait. Ce qui manque, c’est l’honnêteté. » Il a repris le contrôle sans un geste.']],
+    subs: ['setExpect', 'teaseArrival', 'pillarSurprise'],
+    leads: [['whoIsX', 'SI le perso n’est pas encore à l’écran'], ['pillars', 'SI on doit choisir sa surprise selon son pilier']],
+  },
+  setExpect: {
+    name: 'Créer l’attente',
+    how: 'Les façons de le faire avant qu’il paraisse : les autres parlent de lui (leur peur, leur admiration, leur blague), un objet à lui qu’on voit, ce que son absence a changé, une règle que tout le monde suit à cause de lui. L’attente doit être une promesse précise (« il n’a jamais perdu »), pas un adjectif (« il est fort »).',
+    ex: [['« Il est dangereux. » (un adjectif)', 'Le barman, en rangeant les chopes : « Si tu l’entends rire, c’est que quelqu’un est déjà mort. » Il n’a pas levé les yeux.']],
+    subs: [],
+    leads: [['teaseArrival', 'SI l’attente est posée : on annonce l’arrivée']],
+  },
+  teaseArrival: {
+    name: 'Teaser l’arrivée',
+    how: 'Annoncer qu’il arrive, et que ce sera bientôt : une date, une heure, un bruit dans le couloir, quelqu’un qui part en courant pour le prévenir. Ne pas le montrer encore. Le joueur attend, le stress monte (la musique aussi : un cran de plus).',
+    ex: [['Julian arrive plus tard.', '« Il sera là dans cinq minutes. » Tout le monde remet sa chemise. Quelqu’un efface une phrase du tableau.']],
+    subs: [],
+    leads: [['pillarSurprise', 'SI il paraît enfin : la surprise']],
+  },
+  pillarSurprise: {
+    name: 'La surprise de son pilier',
+    how: 'Quand il paraît, il prouve son pilier en faisant une chose qu’on n’attendait pas, devant tout le monde. Chef : coincé dans une situation impossible, il reprend le contrôle. Charmeur : il désarme l’hostile d’un mot. Dangereux : il ne fait rien, et la salle plie. Génie : il règle en dix secondes ce qui bloquait tout le monde. Clown : il fait rire pour couvrir la douleur de quelqu’un. Énigme : il répond à côté et dit juste. Outsider : il se trompe, et personne n’a envie de le lâcher.',
+    ex: [['Julian est un chef respecté.', 'On le voit coincé devant le conseil, sans la majorité, personne de son côté. Il pose son stylo, regarde chacun une seconde de trop, et dit un seul nom. Deux mains se lèvent.']],
+    subs: [],
+    leads: [['relEngaging', 'SI sa surprise touche quelqu’un de précis']],
   },
 
   // ---- 02 · Escalation + Complication: the situation becomes harder to resolve ----

@@ -76,6 +76,10 @@ window.ACT = (() => {
     ex: ['Nora est amoureuse de Justin. (dit, rien à voir) / Nora : « Je t’aime. » (trop tôt, plus rien à attendre)', 'Nora : « T’as coupé tes cheveux. … Refais plus jamais ça, j’ai failli dire une niaiserie. » / Sam, à Nora : « Il est pris, ce soir. » Nora : « Ah oui ? »'],
     en: 'At least one of the two is drawn to justin (both, and it is a rivalry). It shows in the lines from episode 1: teasing that lasts a beat too long, a compliment someone regrets, jealousy between them. Never said ("I love you") before the story has earned it. The player wonders: "does she...?"',
     enEx: ['Nora is in love with justin. (told, nothing to see) / Nora: "I love you." (too soon, nothing left to wait for)', 'Nora: "You cut your hair. ...Never do that again, I almost said something stupid." / Sam, to Nora: "He\'s taken tonight." Nora: "Is he?"'] };
+  AT.intro = { n: 'Présenter un perso', how: 'Un perso qui n’est pas là au début se présente en trois temps : les autres parlent de lui (une promesse précise, jamais un adjectif), on annonce qu’il arrive bientôt, puis il paraît et fait ce qu’on n’attendait pas, devant tout le monde : la preuve de ce pour quoi on le suit (le chef reprend le contrôle d’une situation impossible, le charmeur désarme d’un mot, le dangereux ne fait rien et la salle plie).',
+    ex: ['Voici Julian, le patron. Il est très respecté. (dit, aucune attente, aucune preuve)', '« Il a pas encore vu le contrat. » / « Il sera là dans cinq minutes. » Il entre, la salle est en feu, il referme le dossier : « Parfait. Ce qui manque, c’est l’honnêteté. »'],
+    en: 'A character who is not there at the start is introduced in three beats: the others talk about him (a precise promise, never an adjective), someone announces he is coming soon, then he arrives and does what nobody expected, in front of everyone: the proof of what we follow him for (the leader takes back control of an impossible situation, the charmer disarms with one word, the dangerous one does nothing and the room bends).',
+    enEx: ['Julian is the boss. He is very respected. (told, no expectation, no proof)', '"He hasn\'t seen the contract yet." / "He\'ll be here in five minutes." He walks in, the room is on fire, he closes the file: "Perfect. What\'s missing is honesty."'] };
   const atLine = (id) => `- ${AT[id].n}: ${AT[id].en} Flat: "${AT[id].enEx[0]}" -> works: "${AT[id].enEx[1]}"`;
 
   // the two people, drawn for the act's prompt ("Autre" draws again): who they are to justin, never a job
@@ -116,7 +120,7 @@ window.ACT = (() => {
   // the arc: per episode, its goal, what's at stake (it grows), its act techniques, and what it must contain:
   // [key, label here, label in the prompt, the act's value, thread]. Episode 1 carries three things and one plant
   const ARC = [
-    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'first', 'spark', 'want', 'here', 'because', 'danger', 'loop', 'plant', 'hook'],
+    { goal: 'Qu’on les aime, et qu’on voie le piège', en: 'the player cares about the people and sees the trap', stake: () => 'Ce qu’il veut', at: ['visible', 'first', 'spark', 'intro', 'want', 'here', 'because', 'danger', 'loop', 'plant', 'hook'],
       items: (A) => [['first', 'La 1re réplique', 'The FIRST line (La 1re réplique): understood alone, knowing nothing; a conflict, a surprise or a confession between two people on screen', ''],
         ['love', `On aime ${nm(A, 'a')} et ${nm(A, 'b')}`, `The player likes ${nm(A, 'a')} and ${nm(A, 'b')} and their bond with justin, on what is happening right now ("char" or "rel"); at least one of them is drawn to him, and it shows (Une étincelle)`, ''],
         ['want', 'Justin veut', `What justin has wanted for a long time, and why (Un rêve à lui): he says it himself, out loud, BEFORE ${nm(A, 'a')} asks; the request then lands on it`, A.justin_wants],
