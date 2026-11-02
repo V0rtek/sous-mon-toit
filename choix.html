@@ -214,7 +214,6 @@ body.lt-off .mx.t-vig .vig { display: none; }
   <div class="seg" id="mode"><button type="button" data-v="t3c" class="on">Tour 3 · Cell</button><button type="button" data-v="t3r">Tour 3 · Télé</button><button type="button" data-v="mixc">Mix · Cell</button><button type="button" data-v="mixr">Mix · Télé</button><button type="button" data-v="cell">Tour 1 · Cell</button><button type="button" data-v="remote">Tour 1 · Télé</button></div>
   <div class="seg" id="mom"></div>
   <div class="seg" id="light" title="La lumière sur celui qui choisit"></div>
-  <a href="index.html#open=bar" id="tryLight" class="flash" style="text-decoration:none;background:#30d158">▶ Essayer en histoire</a>
   <button type="button" class="flash" id="flash">Test éclair 1,5 s</button>
   <a href="index.html">‹ Accueil</a>
 </header>
@@ -328,9 +327,9 @@ VARIANTS.t3r = [
   ['U5', 'N1 seul', 'Le N1 d’avant, avec les icônes de type.', ['face', 'word', 'type']],
 ];
 const TRAITS = Object.fromEntries([...VARIANTS.mixc, ...VARIANTS.mixr, ...VARIANTS.t3c, ...VARIANTS.t3r].map(([v, , , t]) => [v, new Set(t)]));
-const LIGHTS = [['chars', 'Persos seuls'], ['him', 'Lui seul'], ['hard', 'Bord net'], ['head', 'Sa tête'], ['soft', 'Douce'], ['off', 'Rien']];
-let light = 'chars';
-try { light = localStorage.getItem('choix-light') || 'chars'; } catch { /* private window */ }
+const LIGHTS = [['him', 'Lui seul ✓'], ['chars', 'Persos seuls'], ['hard', 'Bord net'], ['head', 'Sa tête'], ['soft', 'Douce'], ['off', 'Rien']];
+let light = 'him';
+try { light = localStorage.getItem('choix-light') || 'him'; } catch { /* private window */ }
 let mode = 't3c', mom = 0;
 try { mode = localStorage.getItem('choix-mode3') || 't3c'; } catch { /* private window */ }
 if (!VARIANTS[mode]) mode = 't3c';
@@ -410,9 +409,6 @@ function paint() {
   $('#light').hidden = !['t3c', 'mixc'].includes(mode);
   $('#light').innerHTML = LIGHTS.map(([k, n]) => `<button type="button" class="${k === light ? 'on' : ''}" data-l="${k}">${n}</button>`).join('');
   $('#light').querySelectorAll('button').forEach((b) => b.onclick = () => { light = b.dataset.l; try { localStorage.setItem('choix-light', light); } catch { /* private window */ } paint(); });
-  // the game reads smt-light (Persos seuls, Lui seul, Douce, Rien); the others fall back to Persos seuls there
-  try { localStorage.setItem('smt-light', ['chars', 'him', 'soft', 'off'].includes(light) ? light : 'chars'); } catch { /* private window */ }
-  $('#tryLight').hidden = $('#light').hidden;
   $('#mom').innerHTML = MOMENTS.map((m, i) => `<button type="button" class="${i === mom ? 'on' : ''}" data-i="${i}">${esc(m.name)}</button>`).join('');
   $('#mom').querySelectorAll('button').forEach((b) => b.onclick = () => { mom = +b.dataset.i; paint(); });
   $('#grid').innerHTML = VARIANTS[mode].map(([v, n, h]) => `<div class="card${favs.has(v) ? ' faved' : ''}" data-v="${v}"><h2><i>${v}</i>${esc(n)}<button type="button" class="fav${favs.has(v) ? ' on' : ''}" aria-label="Préférée">♥</button></h2><div class="ph">${screenHtml(v)}</div><p>${esc(h)}</p></div>`).join('');
