@@ -10,6 +10,7 @@ window.FORGE = (() => {
   const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { /* private window */ } return null; };
   const sprite = (id) => (id === 'isa' && typeof ISA_LOOKS !== 'undefined' ? ISA_LOOKS[0].sprite : id);
   const pose = (id) => { const S = window.SPRITES && SPRITES[sprite(id)]; return S ? (S.poses.listen ? 'listen' : Object.keys(S.poses)[0]) : null; };
+  const img = (id) => { const p = pose(id); return p ? `chars/${sprite(id)}/${p}.webp` : ''; };
   const face = (id) => { const p = pose(id); return `<span class="pFace">${p ? `<img src="chars/${sprite(id)}/${p}.webp" alt="">` : ''}</span>`; };
 
   // ---- the 8 pillars (what we follow a character for), mixable: the 1st tap = his pillar, the 2nd = the one mixed in.
@@ -190,8 +191,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     const ps = pillarsOf(id), c = (P[ps[0]] || { c: '#3a3a3c' }).c;
     return `<section class="fWho" style="--c:${c}">${face(id)}<div class="fWhoR"><b>${id === 'justin' ? '🎮 Justin' : cap(id)}<em>${esc(tag(id))}</em></b>`
       + `<div class="fPs">${PILLARS.map((p) => { const k = ps.indexOf(p.id); return `<button type="button" class="fP${k === 0 ? ' on' : k === 1 ? ' mix' : ''}" style="--c:${p.c}" data-pil="${id}:${p.id}" title="${esc(p.n)} · ${esc(p.ex)}">${p.e}</button>`; }).join('')}</div>`
-      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" title="${esc(f.n)}">${f.e}</button>`).join('')}`
-      + `<button type="button" class="fPose" data-pose="${id}" title="Prompt de sa feuille de poses">🧍</button></div></div></section>`;
+      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" title="${esc(f.n)}">${f.e}</button>`).join('')}</div></div></section>`;
   }
   function render() {
     if (!el) return;
@@ -208,18 +208,34 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + (inc.enter && pX ? `<section class="fIntro" style="--c:${pX.c}">${face(x)}<span class="fSt">🗣️</span><span class="fSt">⏰</span><span class="fSt">💥</span><b>${esc(pX.sur)}</b></section>` : '')
       + `<section class="fGo">${hasKey ? '' : '<input type="password" data-key="1" placeholder="Clé API (sk-ant-…)" autocomplete="off">'}`
       + '<button type="button" class="go" data-x="play">▶ Jouer</button><button type="button" data-x="copy">📋 Prompt</button><button type="button" data-x="acte">Acte ›</button></section>'
-      + `<p class="pMsg fMsg">${esc(msg)}</p>`;
+      + `<p class="pMsg fMsg">${esc(msg)}</p>`
+      + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
+      + people().map((id) => { const src = img(id), ps = pillarsOf(id);
+        return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
+          + `<div class="fSheetR"><b>${id === 'justin' ? 'Justin' : cap(id)}<em>${esc(tag(id))}</em></b>`
+          + `<div class="fBtns"><button type="button" data-pose="${id}">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp">⬇</a>` : ''}</div></div></section>`; }).join('');
   }
   const copy = (text, then) => (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { msg = then; render(); }, () => { msg = 'Copie impossible'; render(); });
+  // an image into the clipboard, as png (ChatGPT takes a paste); where it can't, it opens to save it
+  async function copyImg(src, btn) {
+    try {
+      const im = new Image(); im.src = src; await im.decode();
+      const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext('2d').drawImage(im, 0, 0);
+      const blob = await new Promise((ok) => c.toBlob(ok, 'image/png'));
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      const was = btn.textContent; btn.textContent = '✓ Copiée'; setTimeout(() => (btn.textContent = was), 1400);
+    } catch { window.open(src, '_blank'); }
+  }
   function onClick(e) {
-    const t = e.target.closest('button'); if (!t || !el.contains(t)) return;
+    const t = e.target.closest('button'); if (!t || !el.contains(t)) return;   // ⬇ is a link: it downloads by itself
     e.stopPropagation();
     const d = t.dataset; msg = '';
     if (d.decor) { S.decor = d.decor; const w = D[d.decor].who; S.cast = S.cast.filter((id) => w.includes(id)); for (const id of w) if (S.cast.length < 2 && !S.cast.includes(id)) S.cast.push(id); }
     else if (d.cast) { const k = S.cast.indexOf(d.cast); if (k >= 0) S.cast.splice(k, 1); else { if (S.cast.length >= 2) S.cast.shift(); S.cast.push(d.cast); } if (S.who >= S.cast.length) S.who = 0; }
     else if (d.pil) { const [id, p] = d.pil.split(':'), a = (S.pil[id] = pillarsOf(id)), k = a.indexOf(p); if (k >= 0) a.splice(k, 1); else { if (a.length >= 2) a.pop(); a.push(p); } }
     else if (d.flaw) { const [id, f] = d.flaw.split(':'); S.flaw[id] = S.flaw[id] === f ? null : f; }
-    else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${cap(d.pose)} copié · image 1 = chars/${sprite(d.pose)}/${pose(d.pose) || 'listen'}.webp`); }
+    else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${cap(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
+    else if (d.cimg) return copyImg(d.cimg, t);
     else if (d.inc) { S.inc = d.inc; S.quest = by(INC, d.inc).q; S.conf = by(QUEST, S.quest).c; S.hooks.where = d.inc === 'gone' ? 1 : 0; S.hooks.who = d.inc === 'gone' ? 0 : 1; }
     else if (d.who) S.who = +d.who;
     else if (d.quest) { S.quest = d.quest; S.conf = by(QUEST, d.quest).c; }
@@ -234,7 +250,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   }
   async function play(btn) {
     if (S.cast.length < 2) { msg = '👥 ×2'; return render(); }
-    const inp = el.querySelector('[data-key]'); if (inp && inp.value.trim()) ls('smt-key', inp.value.trim());
+    const inp = el.querySelector('[data-key]'); if (inp && inp.value.trim()) { ls('smt-key', inp.value.trim()); if (window.KEY_SYNC) KEY_SYNC(); }
     const key = ls('smt-key'); if (!key) { if (inp) inp.focus(); return; }
     save(); btn.disabled = true;
     const tell = (t) => { const m = el.querySelector('.fMsg'); if (m) m.textContent = t; };
