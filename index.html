@@ -1411,6 +1411,8 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 .tv-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; }
 .tv-list button { font: inherit; font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 1em; padding: 1em .8em; cursor: pointer; text-align: center; }
 .tv-list button:hover, .tv-list button:focus-visible { background: rgba(255,255,255,.22); outline: none; }
+.tv-list button.demo { grid-column: 1 / -1; background: #34c759; color: #04210f; box-shadow: 0 0 1.2em rgba(52,199,89,.45); }   /* the demo, first and obvious */
+.tv-list button.demo:hover, .tv-list button.demo:focus-visible { background: #5ad97a; }
 .tv-list h3 { grid-column: 1 / -1; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; text-align: center; margin: 1em 0 0; }
 #choices .tv-who { align-self: center; font-size: 2em; font-weight: 800; color: #fff; padding: .5em 1.2em; border-radius: 2em; background: rgba(15,12,20,.75); }
 #choices .tv-who img { width: 1.9em; height: 1.9em; border-radius: 50%; object-fit: cover; object-position: 50% 0; vertical-align: middle; margin: -.3em .5em -.2em -.4em; background: rgba(255,255,255,.15); }
@@ -4089,7 +4091,7 @@ $('#labNote').onclick = (e) => { e.stopPropagation(); openNote(GAME_IDEAS); };
 // a TV's story is picked on a player's phone, in the lobby: every 2-player story, then the mini-games
 function tvStoryList(box) {
   const two = Object.keys(STORIES).filter((id) => seatsOf(id).length === 2).sort((a, b) => (b === 'd_test') - (a === 'd_test')), games = new Set(GAME_LIST.map((g) => g.id));   // Test first
-  const btns = (ids) => ids.map((id) => `<button type="button" data-s="${id}">${esc(storyTitle(id) || id)}</button>`).join('');
+  const btns = (ids) => ids.map((id) => `<button type="button" data-s="${id}"${id === 'd_test' ? ' class="demo"' : ''}>${esc(storyTitle(id) || id)}</button>`).join('');
   box.innerHTML = btns(two.filter((id) => !games.has(id))) + (two.some((id) => games.has(id)) ? `<h3>Mini-jeux</h3>${btns(two.filter((id) => games.has(id)))}` : '');
   box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); sendIn('story', { s: b.dataset.s }); });
 }
