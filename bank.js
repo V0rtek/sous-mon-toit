@@ -126,7 +126,7 @@ window.BANK = {
       const open = BANK.newCharIsOpen();
       // open: the new character alone on screen (the others come back when it's closed)
       if (open) return `<div class="ncTop open"><button type="button" class="ncToggle" data-nctoggle="1"><b>Nouveau perso</b><em>✕</em></button><div class="ncIn">${BANK.newChar()}</div></div>`;
-      return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div><div id="bankDrafts">${BANK.draftsHtml()}</div>`
+      return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div>${BANK.keysHtml()}<div id="bankDrafts">${BANK.draftsHtml()}</div>`
         // the newest imported first, then the others
         + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
@@ -244,6 +244,7 @@ window.BANK = {
       $('#bankBody').scrollTop = 0; draw();
     };
     $('#bankBody').onchange = (e) => { const d = e.target.dataset, f = e.target.files && e.target.files[0];
+      if (d.bkkey) { BANK.keySave(d.bkkey, e.target.value); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (f && editing && (d.edrep || d.edsheet || d.edone)) {
         const id = editing, name = nameOf(id);
         if (d.edrep) edCut(() => IMPORT.one(f, id, d.edrep), `Remplacer ${d.edrep}`, true);
@@ -446,7 +447,13 @@ Example:
   let dState = '', dTimer = null, pulled = false;   // dState: '' | 'saving' | 'saved' | 'local' (no token) | 'error'
   function mirror(c) {
     const nm = String(c.name || '').trim(); if (!nm) return;
-    const m = drafts(), k = dslug(nm), d = { name: nm, she: !!c.she, locked: c.locked || '', place: c.place || '', done: c.done || {}, t: Date.now() };
+    const m = drafts();
+    if (!c.id) {   // first time: an id that stays; the half-typed names ("w", "wa"…) of this same draft are dropped
+      c.id = 'd' + Date.now().toString(36); const low = nm.toLowerCase();
+      for (const [j, x] of Object.entries(m)) if (!x.gone && low.startsWith(String(x.name).toLowerCase()) && !Object.values(x.done || {}).some(Boolean) && low.length - x.name.length < 3) delete m[j];
+      try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ }
+    }
+    const k = c.id, d = { name: nm, she: !!c.she, locked: c.locked || '', place: c.place || '', done: c.done || {}, t: Date.now() };
     const core = (x) => JSON.stringify([x.name, !!x.she, x.locked || '', x.place || '', x.done || {}]);
     if (m[k] && !m[k].gone && core(m[k]) === core(d)) return;   // nothing new: no commit
     m[k] = d; putDrafts(m); clearTimeout(dTimer); dTimer = setTimeout(syncDrafts, 4000);
@@ -473,8 +480,16 @@ Example:
       const n = Object.values(d.done || {}).filter(Boolean).length;
       return `<div class="bkDraft"><button type="button" class="ncBtn" data-drop="${esc(k)}"><b>${esc(d.name)}</b> <small>${d.she ? 'Elle' : 'Il'} · ${n} feuille${n > 1 ? 's' : ''}</small></button><button type="button" class="ncBtn" data-drdel="${esc(k)}" aria-label="Retirer ${esc(d.name)}">✕</button></div>`; }).join('')}</div></div>`;
   }
+  // the two keys, in one clear place (Banque › Persos, and inside Nouveau perso): Haiku (smt-key) and GitHub (smt-gh-token)
+  const lsGet = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
+  const KEYS = [['smt-key', 'Clé Haiku', 'sk-ant-…'], ['smt-gh-token', 'Jeton GitHub', 'github_pat_…']];
+  BANK.keysHtml = () => { const ok = KEYS.map(([k]) => !!lsGet(k)), all = ok.every(Boolean);
+    return `<details class="bkKeys"${all ? '' : ' open'}><summary>🔑 Clés <small>${KEYS.map(([, l], i) => `${l} ${ok[i] ? '✓' : '—'}`).join(' · ')}</small></summary>`
+      + KEYS.map(([k, l, ph], i) => `<label class="bkKey"><span>${l}</span><input type="password" data-bkkey="${k}" placeholder="${ph}" value="${ok[i] ? '••••••••' : ''}" autocomplete="off"></label>`).join('')
+      + `<p class="bkNote">Gardées dans ce navigateur seulement. Le jeton GitHub partage tes persos et leurs feuilles sur tous les appareils.</p></details>`; };
+  BANK.keySave = (k, v) => { v = v.trim(); if (/^•+$/.test(v)) return; try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch { /* private window */ } if (k === 'smt-gh-token' && v) { pulled = false; syncDrafts(); } };
   BANK.draftsHtml = draftsHtml; BANK.draftsRefresh = refreshDrafts;   // the tabs are drawn in the other block
-  BANK.draftOpen = (k) => { const d = drafts()[k]; if (!d) return; const c = { name: d.name, she: !!d.she, locked: d.locked || '', place: d.place || undefined, done: d.done || {}, step: d.done && d.done.debout ? 3 : 1, shown: true };
+  BANK.draftOpen = (k) => { const d = drafts()[k]; if (!d) return; const c = { id: k, name: d.name, she: !!d.she, locked: d.locked || '', place: d.place || undefined, done: d.done || {}, step: d.done && d.done.debout ? 3 : 1, shown: true };
     try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } };
   BANK.draftDel = (k) => { const m = drafts(); if (m[k]) { m[k] = { ...m[k], gone: true, done: {}, t: Date.now() }; putDrafts(m); clearTimeout(dTimer); dTimer = setTimeout(syncDrafts, 1000); } };
   // opening the Banque: what the other devices saved comes in
@@ -536,7 +551,8 @@ Example:
         + `<div class="ncSmall">${me ? `<button type="button" class="ncBtn" data-cimg="${me}">Copier l’image 1</button>` : ''}${guides.map((f, k) => `<button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image ${k + 2}</button>`).join('')}</div>`
         + (window.IMPORT && IMPORT.KINDS[id] ? importBox(id) : big(`data-ncdone="${id}"`, '', done[id] ? 'Fait ✓' : 'C’est fait', done[id] ? 'ok' : ''));
     }
-    return dots + `<div class="ncPane">${body}</div>`;
+    const nameRow = step !== 1 ? `<label class="ncNameRow"><span>Nom du perso</span><input data-nc="name" placeholder="Son nom" value="${esc(nm)}" autocomplete="off"></label>` : '';
+    return dots + nameRow + `<div class="ncPane">${body}</div>` + BANK.keysHtml();
   };
   // the generated sheet -> into the game (importer.js): pick it, see the 6 poses cut, « Ajouter au jeu »
   let shown = null;   // { kind, imgs, msg }
