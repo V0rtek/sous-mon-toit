@@ -2198,15 +2198,26 @@ function knownHtml() {
   const row = (l, v) => `<div class="kn"><span>${l}</span><b${v ? '' : ' class="no"'}>${v || 'On ne sait pas encore'}</b></div>`;
   return `<div class="opt"><b>Ce qu'on sait de toi</b>${row('Ce que tu aimes', t && t.name)}${row('Tu es', o.me === 'f' ? 'Une fille' : o.me === 'm' ? 'Un gars' : '')}${row('Tu es attiré par', lv ? (lv.fem ? 'Les filles' : 'Les gars') : '')}</div>`;
 }
+// the game's choice cards (index.html reads them; also set in choix.html): on a phone, on the remote of a TV's story
+const CHOICE_OPTS = [
+  ['smt-cstyle', 'Choix sur le cell', 'T1', [['T1', 'Ta tête'], ['T3', 'Ta tête + qui te parle']]],
+  ['smt-rstyle', 'Choix sur la télécommande', 'N1', [['N1', 'Ta tête + le mot'], ['U1', '+ qui te parle']]],
+];
+const lsGet = (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } };
+function choiceOptsHtml() {
+  return CHOICE_OPTS.map(([k, name, d, ch]) => `<div class="opt"><b>${name}</b><div class="chips">${ch.map(([v, label]) => `<button class="chip${lsGet(k, d) === v ? ' on' : ''}" data-ls="${k}" data-v="${v}">${label}</button>`).join('')}</div></div>`).join('');
+}
 function options() {
   const box = sheet(`<h3>Réglages</h3>` +
     OPTIONS.map(([k, name, help, ch]) => `<div class="opt"><b>${name}</b>${help ? `<p>${help}</p>` : ''}<div class="chips">${ch.map(([v, label], i) => `<button class="chip${O[k] === v ? ' on' : ''}" data-k="${k}" data-v="${v}">${k === 'layout' ? `<em>${L(i)}</em>` : ''}${label}</button>`).join('')}</div></div>`).join('') +
-    knownHtml() +
+    choiceOptsHtml() + knownHtml() +
     `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Réinitialiser mon profil</button>
     <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Tes persos créés et gagnés, ton nom, ta progression, tes sauvés.</p>
     ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Parcours progressif' : 'Tout débloqué (démo)'}</button>` : ''}
     <button class="btn" id="toGame" style="width:100%;margin-top:1em">Menu du jeu</button>`);
   box.onclick = (e) => {
+    const ls = e.target.closest('[data-ls]');
+    if (ls) { try { localStorage.setItem(ls.dataset.ls, ls.dataset.v); } catch { /* private window */ } $$(`[data-ls="${ls.dataset.ls}"]`, box).forEach((x) => x.classList.toggle('on', x === ls)); return; }
     const c = e.target.closest('[data-k]');
     if (c) { O[c.dataset.k] = c.dataset.v; keep.set('opts', O); $$(`[data-k="${c.dataset.k}"]`, box).forEach((x) => x.classList.toggle('on', x === c)); render(); }
     if (e.target.id === 'reset') { keep.set('opts', {}); location.reload(); }
