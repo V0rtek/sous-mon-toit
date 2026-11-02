@@ -26,24 +26,39 @@ main { height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-
 #start[hidden] { display: none; }
 #start b { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; background: #fff; color: #000; font-size: 40px; padding-left: 6px; }
 #start span { font-size: 15px; color: #d1d1d6; }
+#pick { display: none; }
+/* on a phone: everything on this phone. The TV on top, one player's phone below (Léa | Kev); it switches by itself to
+   whoever has a choice to make */
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
-  html, body { overflow: auto; }
-  main { height: auto; grid-template-columns: 1fr 1fr; padding: 16px; gap: 16px; }
-  .col.mid { grid-column: 1 / -1; order: -1; }
-  .phone { height: auto; width: 100%; }
-  .tv { max-height: none; }
+  main { height: 100dvh; display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 8px 8px max(8px, env(safe-area-inset-bottom)); }
+  .col.mid { order: -1; height: auto; flex: none; gap: 6px; align-items: stretch; }
+  .col.mid .lbl, .stand { display: none; }
+  .tv { max-height: none; padding: 3px; border-radius: 8px; }
+  .bar { position: fixed; top: 10px; right: 10px; z-index: 3; }
+  .bar button, .bar a { padding: .35em .8em; background: rgba(28,28,30,.85); }
+  #pick { display: flex; flex: none; order: -1; justify-content: center; gap: 6px; }
+  #pick button { font: inherit; font-size: 15px; font-weight: 800; flex: 1; max-width: 180px; padding: 9px 0; border: 0; border-radius: 99px; background: #1c1c1e; color: var(--dim); cursor: pointer; position: relative; }
+  #pick button.on { background: #f5f5f7; color: #000; }
+  #pick button.turn::after { content: ''; position: absolute; right: 14px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: #ffd60a; animation: pulse 1s infinite; }
+  .col:not(.mid) { display: none; flex: 1; min-height: 0; height: auto; }
+  .col.show { display: flex; }
+  .col:not(.mid) .lbl { display: none; }
+  .phone { height: 100%; width: auto; max-width: 100%; aspect-ratio: 9 / 16; border-radius: 1.4em; padding: .35em; }
+  .phone iframe { border-radius: 1.1em; }
 }
+@keyframes pulse { 50% { opacity: .3; } }
 </style>
 </head>
 <body>
 <main>
-  <div class="col"><div class="lbl" id="n1">Cell 1</div><div class="phone"><iframe id="p1" title="Cell 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
+  <div class="col show" data-p="1"><div class="lbl" id="n1">Cell 1</div><div class="phone"><iframe id="p1" title="Cell 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
   <div class="col mid">
     <div class="lbl"><span id="code"></span></div>
     <div class="tv"><iframe id="tv" title="La télé" allow="autoplay; fullscreen; screen-wake-lock"></iframe></div><div class="stand"></div>
     <div class="bar"><button type="button" id="again">↻</button><a href="index.html">‹</a></div>
   </div>
-  <div class="col"><div class="lbl" id="n2">Cell 2</div><div class="phone"><iframe id="p2" title="Cell 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
+  <div id="pick"><button type="button" class="on" data-p="1"></button><button type="button" data-p="2"></button></div>
+  <div class="col" data-p="2"><div class="lbl" id="n2">Cell 2</div><div class="phone"><iframe id="p2" title="Cell 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
 </main>
 <div id="start"><div><b>▶</b></div></div>
 <script>
@@ -51,7 +66,16 @@ const $ = (s) => document.querySelector(s);
 const room = 'tv' + Math.random().toString(36).slice(2, 6).padEnd(4, '0');
 const names = ['Léa', 'Kev'];
 $('#code').textContent = room.toUpperCase();
-names.forEach((n, i) => { $('#n' + (i + 1)).textContent = n; });
+names.forEach((n, i) => { $('#n' + (i + 1)).textContent = n; $(`#pick [data-p="${i + 1}"]`).textContent = n; });
+// on a phone, one player at a time: a tap on a name, or by itself when it's someone's turn to choose
+let shown = 1, auto = true, was = [false, false];
+function showP(k) { shown = k; document.querySelectorAll('.col[data-p]').forEach((c) => c.classList.toggle('show', +c.dataset.p === k)); document.querySelectorAll('#pick button').forEach((b) => b.classList.toggle('on', +b.dataset.p === k)); }
+document.querySelectorAll('#pick button').forEach((b) => b.onclick = () => showP(+b.dataset.p));
+setInterval(() => {
+  const turn = [1, 2].map((k) => { try { return $('#p' + k).contentDocument.body.classList.contains('choosing'); } catch { return false; } });
+  turn.forEach((t, i) => { $(`#pick [data-p="${i + 1}"]`).classList.toggle('turn', t); if (t && !was[i] && auto) showP(i + 1); });
+  was = turn;
+}, 300);
 // the TV first (it opens the room), the phones a moment later (they'd wait for it anyway)
 function go() {
   $('#start').hidden = true;
