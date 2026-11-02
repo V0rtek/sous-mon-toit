@@ -24,7 +24,7 @@ main { height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-
 .bar button:hover, .bar a:hover { background: #2c2c2e; }
 #start { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: rgba(0,0,0,.72); cursor: pointer; text-align: center; }
 #start[hidden] { display: none; }
-#start b { display: block; font-size: 28px; margin-bottom: .4em; }
+#start b { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; background: #fff; color: #000; font-size: 40px; padding-left: 6px; }
 #start span { font-size: 15px; color: #d1d1d6; }
 @media (max-width: 760px), (max-aspect-ratio: 1/1) {
   html, body { overflow: auto; }
@@ -39,14 +39,13 @@ main { height: 100%; display: grid; grid-template-columns: auto 1fr auto; align-
 <main>
   <div class="col"><div class="lbl" id="n1">Cell 1</div><div class="phone"><iframe id="p1" title="Cell 1" allow="autoplay; screen-wake-lock"></iframe></div></div>
   <div class="col mid">
-    <div class="lbl">La télé · code <span id="code"></span></div>
+    <div class="lbl"><span id="code"></span></div>
     <div class="tv"><iframe id="tv" title="La télé" allow="autoplay; fullscreen; screen-wake-lock"></iframe></div><div class="stand"></div>
-    <div class="bar">Choisis l'histoire sur un cell, puis chacun prend son perso. Un clic sur la télé = pause.
-      <button type="button" id="again">Nouvelle salle</button><a href="index.html">‹ Accueil</a></div>
+    <div class="bar"><button type="button" id="again">↻</button><a href="index.html">‹</a></div>
   </div>
   <div class="col"><div class="lbl" id="n2">Cell 2</div><div class="phone"><iframe id="p2" title="Cell 2" allow="autoplay; screen-wake-lock"></iframe></div></div>
 </main>
-<div id="start"><div><b>Simuler la télé</b><span>Touche pour commencer (le son vient de la télé)</span></div></div>
+<div id="start"><div><b>▶</b></div></div>
 <script>
 const $ = (s) => document.querySelector(s);
 const room = 'tv' + Math.random().toString(36).slice(2, 6).padEnd(4, '0');

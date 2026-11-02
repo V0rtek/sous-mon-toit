@@ -1139,8 +1139,28 @@ body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #mirrorWho b { color: #fff; }
 #mirrorPhone { height: 80%; aspect-ratio: 9 / 19.5; border-radius: 4.5em; padding: 1.2em; background: #111; box-shadow: 0 0 0 .3em #2c2c2e, 0 3em 8em rgba(0,0,0,.8); overflow: hidden; box-sizing: border-box; }
 #mirrorPhone iframe { width: 100%; height: 100%; border: 0; border-radius: 3.4em; display: block; background: #000; pointer-events: none; }
-#tvPick .tv-join .qr { width: 20em; height: 20em; }
-#tvNames { margin-top: 2em; text-align: center; font-size: 2.4em; font-weight: 800; color: #34c759; min-height: 1.3em; }
+#tvPick .tvp-row { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10em; }
+#tvPick .qr { width: 34em; height: 34em; background: #fff; border-radius: 2em; padding: 2em; box-sizing: border-box; }
+#tvPick .qr svg { width: 100%; height: 100%; display: block; }
+/* a phone, drawn: the home's strips, the TV one lit with this TV's code, a finger tapping it */
+.tvp-phone { width: 24em; height: 46em; border-radius: 3.6em; border: .5em solid #3a3a3c; background: #000; padding: 6em 1.4em 3em; box-sizing: border-box; display: flex; flex-direction: column; gap: 1.2em; }
+.tvp-phone > i { height: 6.5em; border-radius: .8em; background: #1c1c1e; }
+.tvp-tile { position: relative; height: 9em; border-radius: .8em; background: #1c1c1e; box-shadow: 0 0 0 .35em #34c759, 0 0 4em rgba(52,199,89,.45); display: flex; flex-direction: column; justify-content: center; gap: .3em; padding: 0 1.2em; font-size: 2.1em; font-weight: 800; color: #fff; }
+.tvp-tile span { display: flex; align-items: center; gap: .4em; font-size: 1.15em; letter-spacing: .12em; }
+.tvp-tile em { width: .55em; height: .55em; border-radius: 50%; background: #34c759; }
+.tvp-tile u { position: absolute; right: 18%; bottom: -.9em; width: 2.4em; height: 2.4em; border-radius: 50%; background: rgba(255,255,255,.85); animation: tvpTap 1.8s ease-in-out infinite; }
+@keyframes tvpTap { 0%, 100% { transform: scale(1); opacity: .9; } 45% { transform: scale(.7); opacity: 1; } 60% { transform: scale(1.5); opacity: 0; } 61% { transform: scale(1); opacity: 0; } }
+/* who's in: two seats, empty (dashed) until a phone arrives */
+#tvNames { display: flex; justify-content: center; gap: 4em; padding-bottom: 2em; }
+#tvNames > div { display: flex; flex-direction: column; align-items: center; gap: .8em; }
+#tvNames .av { width: 9em; height: 9em; border-radius: 50%; border: .35em dashed #48484a; box-sizing: border-box; display: grid; place-items: center; font-size: 1em; }
+#tvNames .on .av { border: 0; background: #34c759; color: #000; font-size: 4.4em; font-weight: 900; width: 2.05em; height: 2.05em; animation: rise .4s ease-out; }
+#tvNames b { font-size: 2.6em; font-weight: 800; color: #fff; min-height: 1.3em; }
+/* the TV's waiting room: the way in, small, in a corner */
+.tv-corner { position: fixed; right: 3%; bottom: 4%; display: flex; flex-direction: column; align-items: center; gap: .8em; }
+.tv-corner .qr { width: 14em; height: 14em; background: #fff; border-radius: 1em; padding: 1em; box-sizing: border-box; }
+.tv-corner .qr svg { width: 100%; height: 100%; display: block; }
+.tv-corner b { font-size: 2.6em; font-weight: 800; letter-spacing: .12em; color: #fff; }
 /* a player's phone on a TV's story: the list of stories in the lobby, a pause button in the story, again on the end card */
 #lobbyList { width: 100%; margin-top: 3em; }
 #lobby:has(#lobbyList:not([hidden])) { justify-content: flex-start; padding-top: 14em; overflow-y: auto; }
@@ -1211,36 +1231,28 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 #pauseCard .pc-btns { display: flex; gap: 1.2em; margin-top: 2.4em; }
 #pauseCard .pc-btns button { flex: 1; font: inherit; font-size: 2.4em; font-weight: 800; border: 0; border-radius: 1em; padding: .8em; cursor: pointer; color: #fff; background: #34c759; }
 #pauseCard .pc-btns button + button { flex: 0 1 auto; background: rgba(255,255,255,.14); }
-#tvCode { font-size: 9em; font-weight: 800; letter-spacing: .18em; color: #fff; line-height: 1; margin: .1em 0 .15em; font-variant-numeric: tabular-nums; }
-.tv-join .tv-or { font-size: 1.5em; color: #8e8e93; }
-#tvPick .tv-join p b { color: #fff; }
 #tvBtn .tvHere { position: absolute; z-index: 1; right: 7%; display: flex; align-items: center; gap: .8em; font-size: 2em; font-weight: 700; }
 #tvBtn .tvHere[hidden] { display: none; }
 #tvBtn .tvHere i { width: .8em; height: .8em; border-radius: 50%; background: #34c759; box-shadow: 0 0 .8em #34c759; }
 #tvBtn .tvHere em { font-style: normal; letter-spacing: .1em; }
-#tvFind { background: radial-gradient(circle at 50% 25%, #1d2238, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 13em 7% 6em; overflow-y: auto; text-align: center; }
-#tvFind h2 { font-family: var(--display); font-weight: 400; font-size: 4.4em; line-height: 1.1; margin: .2em 0 .3em; }
-#tvFind .tf-p { font-size: 2.2em; color: #d1d1d6; margin: 0 0 2em; }
-#tvFound { display: flex; flex-direction: column; gap: 1.4em; }
-#tvFound button { font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: 1.4em 1.6em; border: 0; border-radius: 1.6em; background: #34c759; color: #000; cursor: pointer; }
-#tvFound button span { font-size: 2.4em; font-weight: 700; }
-#tvFound button b { font-size: 3.4em; font-weight: 800; letter-spacing: .14em; }
-#tvFound .tf-none { font-size: 2em; color: #8e8e93; line-height: 1.5; padding: 1.4em; border-radius: 1.6em; background: rgba(255,255,255,.06); }
-#tvFound .tf-none b { color: #f5f5f7; }
-.tf-alt { margin-top: 4em; display: flex; flex-direction: column; gap: 1.2em; }
-.tf-alt > * { font: inherit; font-size: 2.1em; font-weight: 700; padding: .9em 1em; border: 0; border-radius: 1em; background: rgba(255,255,255,.1); color: #f5f5f7; cursor: pointer; text-decoration: none; }
+#tvFind { background: radial-gradient(circle at 50% 30%, #1d2238, #000 75%); color: #f5f5f7; justify-content: center; padding: 13em 7% 6em; overflow-y: auto; text-align: center; }
+#tvFound { display: flex; flex-direction: column; gap: 2em; }
+#tvFound button { font: inherit; display: flex; flex-direction: column; align-items: center; gap: 1em; padding: 4em 2em; border: 0; border-radius: 2.4em; background: #34c759; color: #000; cursor: pointer; animation: rise .3s ease-out; }
+#tvFound button svg { width: 12em; height: 12em; }
+#tvFound button b { font-size: 5.4em; font-weight: 900; letter-spacing: .14em; line-height: 1; }
+#tvFound .tf-none { display: flex; flex-direction: column; align-items: center; gap: 1.6em; color: #48484a; }
+#tvFound .tf-none svg { width: 16em; height: 16em; }
+#tvFound .tf-none i { width: 1.6em; height: 1.6em; border-radius: 50%; background: #48484a; animation: blink 1.4s infinite; }
+.tf-alt { margin-top: 5em; display: flex; gap: 1.2em; }
+.tf-alt > * { flex: 1; font: inherit; font-size: 2em; font-weight: 700; padding: 1em .6em; border: 0; border-radius: 1em; background: rgba(255,255,255,.1); color: #d1d1d6; cursor: pointer; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: .4em; }
+.tf-alt svg { width: 2em; height: 2em; }
 .tf-alt > *:hover { background: rgba(255,255,255,.2); }
-#tvPick { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 10em 6% 4em; overflow-y: auto; }
-#tvPick h2 { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .8em; }
+#tvPick { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 5em 6% 4em; overflow: hidden; }
+#tvPick h2 { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4em; letter-spacing: .1em; color: #8e8e93; margin: 0; }
 .tv-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; }
 .tv-list button { font: inherit; font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 1em; padding: 1em .8em; cursor: pointer; text-align: center; }
 .tv-list button:hover, .tv-list button:focus-visible { background: rgba(255,255,255,.22); outline: none; }
 .tv-list h3 { grid-column: 1 / -1; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; text-align: center; margin: 1em 0 0; }
-.tv-join { margin-top: 1.6em; display: flex; flex-direction: column; align-items: center; gap: 1.2em; text-align: center; }
-.tv-join .qr { width: 17em; height: 17em; background: #fff; border-radius: 1.4em; padding: 1.4em; box-sizing: border-box; }
-.tv-join .qr svg { width: 100%; height: 100%; display: block; }
-.tv-join p { margin: 0; font-size: 1.8em; font-weight: 700; color: #d1d1d6; }
-.tv-join code { font-family: inherit; font-size: 1.7em; color: #8e8e93; word-break: break-all; }
 #choices .tv-who { align-self: center; font-size: 2em; font-weight: 800; color: #fff; padding: .5em 1.2em; border-radius: 2em; background: rgba(15,12,20,.75); }
 #choices .tv-who img { width: 1.9em; height: 1.9em; border-radius: 50%; object-fit: cover; object-position: 50% 0; vertical-align: middle; margin: -.3em .5em -.2em -.4em; background: rgba(255,255,255,.15); }
 body.tv #choices button { pointer-events: none; }
@@ -1726,12 +1738,13 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="video3d" class="card menu" hidden><div class="frame16"><iframe id="yt" title="3D" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>
   <div id="lobby" class="card menu" hidden><div class="names" id="names"></div><div class="wr-kick" id="lobbyKick" hidden>Choisis l'histoire</div><div id="lobbyList" class="tv-list" hidden></div></div>
-  <div id="tvPick" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>UNWRITTEN</h2>
-    <div class="tv-join"><p>Sur ton cell : ouvre Unwritten, touche <b>Sur la télé</b>, puis ce code</p><div id="tvCode"></div><p class="tv-or">ou scanne</p><div class="qr"></div><code id="tvLink"></code></div><div id="tvNames"></div></div>
-  <div id="tvFind" class="card menu" hidden><div class="wr-kick">Sur la télé</div><h2>Jouer à deux, sur un grand écran</h2>
-    <p class="tf-p">Les téléphones jouent, la télé montre l'histoire.</p>
+  <div id="tvPick" class="card menu" hidden><h2>UNWRITTEN</h2>
+    <div class="tvp-row"><div class="qr" id="tvQrBox"></div>
+      <div class="tvp-phone" aria-hidden="true"><i></i><i></i><div class="tvp-tile">Sur la télé<span><em></em><b id="tvCode"></b></span><u></u></div><i></i></div></div>
+    <div id="tvNames"></div></div>
+  <div id="tvFind" class="card menu" hidden>
     <div id="tvFound"></div>
-    <div class="tf-alt"><button type="button" id="tvBecome">Cet écran devient la télé</button><a href="tv-sim.html" id="tvSim">Simuler : la télé et les deux cells, sur un écran</a></div></div>
+    <div class="tf-alt"><button type="button" id="tvBecome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Cet écran = la télé</button><a href="tv-sim.html" id="tvSim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Simuler</a></div></div>
   <div id="wait" class="card menu" hidden><div id="room"></div><button id="todoBtn" type="button" hidden aria-label="What to fix"><span>?</span></button></div>
   <div id="placeScreen" class="card menu" hidden><div class="step"><h2>Placer un objet</h2><div id="placeBody"></div></div></div>
   <div id="labScreen" class="card menu" hidden><div class="tiles" id="labTiles"></div><button id="labNote" type="button" aria-label="Ideas"><span>?</span></button></div>
@@ -3525,9 +3538,9 @@ function renderWait() {
     ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">L’autre joue au hasard</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Annuler</button></div>' : ''}
     ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
-    ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-join"><p>Sur ton cell : <b>Sur la télé</b>, puis le code <b>${esc(room.toUpperCase())}</b> · ou scanne</p><div class="qr"></div><p>Puis prends un perso</p></div>`
+    ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-corner"><div class="qr"></div><b>${esc(room.toUpperCase())}</b></div>`
       : host && !mine ? '<p class="wr-hint">Touche le perso que tu veux jouer.</p>' : ''}`;
-  if (TV && !full) tvQr($('#room .tv-join .qr'));
+  if (TV && !full) tvQr($('#room .tv-corner .qr'));
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
     if (ROLE !== 'host') return sendIn('seat', { s: k });
@@ -3637,9 +3650,10 @@ function tvStoryList(box) {
 }
 // the TV's home: the QR, and who's already in
 function tvHome() {
-  $('#tvLink').textContent = joinUrl(); $('#tvCode').textContent = room ? room.toUpperCase() : '…'; tvQr($('#tvPick .tv-join .qr'));
+  $('#tvCode').textContent = room ? room.toUpperCase() : '…'; tvQr($('#tvQrBox'));
   const names = [...watchers.values()].map((w) => w.n).filter(Boolean);
-  $('#tvNames').textContent = names.length ? `Ici : ${names.join(', ')} · choisissez l'histoire sur un cell` : '';
+  $('#tvNames').innerHTML = Array.from({ length: Math.max(2, names.length) }, (_, i) => names[i]
+    ? `<div class="on"><span class="av">${esc([...names[i]][0].toUpperCase())}</span><b>${esc(names[i])}</b></div>` : '<div><span class="av"></span><b></b></div>').join('');
 }
 // No link to paste: an open TV says so under sousmontoit/v1/tv/<room> (retained, refreshed every 10 s, emptied when it
 // closes; silent for 30 s = gone). Every phone's home hears it: « Sur la télé » lights up with its code, a tap joins.
@@ -3652,8 +3666,8 @@ function paintTvs() {
   here.hidden = !list.length;
   if (list.length) here.lastChild.textContent = list.length > 1 ? `${list.length} télés` : list[0].room.toUpperCase();
   const box = $('#tvFound');
-  box.innerHTML = list.length ? list.map((r) => `<button type="button" data-r="${r.room}"><span>Rejoindre la télé</span><b>${r.room.toUpperCase()}</b></button>`).join('')
-    : '<div class="tf-none">Aucune télé ouverte pour l\'instant.<br>Sur la télé ou l\'ordi branché dessus : ouvre ce site, <b>Sur la télé</b>, puis <b>Cet écran devient la télé</b>. Elle apparaît ici toute seule.</div>';
+  box.innerHTML = list.length ? list.map((r) => `<button type="button" data-r="${r.room}" aria-label="Rejoindre la télé ${r.room.toUpperCase()}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><b>${r.room.toUpperCase()}</b></button>`).join('')
+    : '<div class="tf-none" aria-label="On cherche une télé…"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><i></i></div>';
   box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); joinRoom(b.dataset.r); });
 }
 $('#tvBtn').onclick = (e) => { e.stopPropagation(); feat('Sur la télé'); show('#tvFind'); };
