@@ -210,6 +210,9 @@ window.ACT = (() => {
       + (n === 4 ? `<div class="aPick">${pickBtns()}</div>` : `<input class="aNote" data-note="${n}" value="${esc(A.picks[n] || '')}" placeholder="Ce que Justin a choisi (une fois joué)">`)
       + `<div class="aGo"><button type="button" data-copy="${n}">Copier le prompt du plan · épisode ${n}</button></div></section>`;
   }
+  // an act made in Créer (forge.js) has its own number of episodes, each standing for a step of the arc (seed.stages)
+  const nEps = () => (A.seed && A.seed.eps ? A.seed.eps.length : 5);
+  const stageOf = (n) => (A.seed && A.seed.stages ? A.seed.stages[n - 1] : n - 1);
   const pickBtns = () => ['a', 'b'].map((w) => `<button type="button" data-pick="${w}" class="${A.picks[4] === w ? 'on' : ''}">Il a choisi ${esc(nm(A, w))}</button>`).join('');
   function visual() {
     const who = (w) => `<div class="aWho">${face(A[w].id)}<div><b>${esc(nm(A, w))}</b><span>${esc(A[w].is)}</span><em>Veut : ${esc(A[w].wants)}</em>${A[w].because ? `<i>parce que ${esc(A[w].because)}</i>` : ''}</div></div>`;
@@ -242,7 +245,7 @@ window.ACT = (() => {
       + '<div class="aBtns"><button type="button" data-s="pasteAct">Coller l’acte</button><button type="button" data-s="visual">Voir l’acte</button></div>'
       + `<p class="aNow">Acte ouvert : <b>${esc(A.title)}</b></p><p class="pMsg" data-m="act"></p></section>`
       + `<section class="aStep"><h3><i>2</i>Le plan de l’épisode</h3><p class="pD">Le prompt du Plan de scène, avec l’acte : ce qui s’est passé avant et ce que cet épisode doit contenir.</p>`
-      + `<div class="aEps">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-ep="${n}" class="${n === ep ? 'on' : ''}">${n}${A.plans && A.plans[n] ? ' ✓' : ''}</button>`).join('')}</div>`
+      + `<div class="aEps">${Array.from({ length: nEps() }, (_, i) => i + 1).map((n) => `<button type="button" data-ep="${n}" class="${n === ep ? 'on' : ''}">${n}${A.plans && A.plans[n] ? ' ✓' : ''}</button>`).join('')}</div>`
       + `<div class="aBtns"><button type="button" class="go" data-s="copyPlan">Copier le prompt du plan · épisode ${ep}</button><button type="button" data-s="haiku">Haiku : plan + histoire · épisode ${ep}</button></div>`
       + `<small>La réponse</small>${box('plan', 'Colle ici le JSON du plan')}`
       + '<div class="aBtns"><button type="button" data-s="pastePlan">Coller le plan</button><button type="button" data-s="seePlan">Voir le plan</button></div>'
@@ -251,8 +254,8 @@ window.ACT = (() => {
       + '<div class="aBtns"><button type="button" class="go" data-s="copyStory">Copier le prompt de l’histoire</button></div>'
       + `<small>La réponse</small>${box('story', 'Colle ici le JSON de l’histoire')}`
       + '<div class="aBtns"><button type="button" class="go" data-s="play">Jouer l’histoire</button></div><p class="pMsg" data-m="story"></p>'
-      + `<small>Une fois jouée</small>${ep === 4 ? `<div class="aPick">${pickBtns()}</div>` : `<input class="aNote" data-note="${ep}" value="${esc(A.picks[ep] || '')}" placeholder="Ce que Justin a choisi">`}`
-      + (ep < 5 ? `<div class="aBtns"><button type="button" data-s="next">Épisode ${ep + 1} →</button></div>` : '') + '</section>'
+      + `<small>Une fois jouée</small>${stageOf(ep) === 3 ? `<div class="aPick">${pickBtns()}</div>` : `<input class="aNote" data-note="${ep}" value="${esc(A.picks[ep] || '')}" placeholder="Ce que Justin a choisi">`}`
+      + (ep < nEps() ? `<div class="aBtns"><button type="button" data-s="next">Épisode ${ep + 1} →</button></div>` : '') + '</section>'
       + `<section class="aStep"><h3><i>✓</i>Garder pour Claude</h3><p class="pD">${ls('smt-gh-token') ? 'Activé : chaque acte, plan, histoire et avis va dans le repo (essais/auto), où Claude peut les lire.' : 'Pas activé. Une fois : sur github.com, Settings › Developer settings › Fine-grained tokens › Generate : seulement le repo sous-mon-toit, Contents : Read and write. Colle le jeton ici (il reste sur ce téléphone).'}</p>`
       + `<input class="aNote secret" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-token="1" placeholder="Jeton GitHub (github_pat_…)" value="${ls('smt-gh-token') ? '••••••••' : ''}">`
       + '<div class="aBtns"><button type="button" data-s="saveToken">Enregistrer le jeton</button><button type="button" data-s="bundle">Copier pour Claude</button></div></section>';
@@ -412,7 +415,32 @@ The idea: ${idea || '(none: invent it from the two people)'}`;
       `${nm(A, 'a')}: ${dot(e(4).a_asks)} ${nm(A, 'b')}: ${dot(e(4).b_asks)}`];
     return said.slice(0, n - 1).map((t, i) => `- Episode ${i + 1}: ${t} ${p(i + 1)}`.trim()).join('\n');
   };
+  // an act from Créer: its episodes are the seed's, each one's events are what its plan must contain, in order
+  function actTextSeed(n) {
+    const sd = A.seed, N = sd.eps.length, st = sd.stages[n - 1], arc = ARC[Math.min(4, Math.max(0, st))], rev = sd.reveal != null && sd.reveal >= 0 ? sd.reveal : sd.stages.indexOf(2);
+    const sec = rev < 0 ? 'Keep it for later.' : n - 1 < rev ? 'The player must NOT learn it in this episode.' : n - 1 === rev ? 'It comes out in THIS episode.' : `It came out in episode ${rev + 1}.`;
+    const who = (w) => `- ${nm(A, w)} (id "${A[w].id}"): ${dot(A[w].is)} Wants: ${dot(A[w].wants)}${A[w].because ? ` Because: ${dot(A[w].because)}` : ''}`;
+    const pick = (k) => (sd.stages[k - 1] === 3 ? (A.picks[4] ? ` justin chose ${nm(A, A.picks[4])}.` : '') : A.picks[k] ? ` justin chose: ${A.picks[k]}.` : '');
+    const before = sd.eps.slice(0, n - 1).map((t, k) => `Episode ${k + 1}:\n${t}${pick(k + 1)}`).join('\n');
+    const lines = sd.eps[n - 1].split('\n'), turn = lines[lines.length - 1].replace(/^- /, '');
+    return `THE ACT (${N} episodes): justin is caught between people he cares about; their wants collide; what was hidden comes out; he must choose.
+Scene: "${A.scene}". The question the act argues (never said as a moral): ${A.question}
+${who('a')}
+${who('b')}
+- justin wants: ${dot(A.justin_wants)}${A.past ? `\n- The past (one sentence, say no more of it): ${dot(A.past)}` : ''}
+- The secret of ${holder(A)}: ${dot(A.secret && A.secret.what)} ${sec}
+THE SEED OF THE ACT (keep it true):
+${sd.text}
+${n > 1 ? `BEFORE THIS EPISODE (the player saw it):\n${before}\n` : ''}THIS EPISODE: episode ${n} of ${N}: ${arc.en}. Everything happens between the people on screen, here, now.
+THE ACT'S TECHNIQUES FOR THIS EPISODE:
+${arc.at.map(atLine).join('\n')}
+It must contain, each in its own rectangle of box "ep", in this order (the other rectangles go around them):
+${sd.eps[n - 1]}
+"turn": ${turn}
+${n < N ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${sd.eps[n].split('\n').slice(0, 3).map((x) => x.replace(/^- /, '')).join(' / ')}` : 'Box "later" = 1 rectangle: what stays open for the next act.'}`;
+  }
   function actText(n) {
+    if (A.seed && A.seed.eps && A.seed.stages) return actTextSeed(n);
     const st = STAGES()[n - 1] || { name: '', line: '' }, arc = ARC[n - 1], all = arc.items(A), end = all.find(([k]) => k === 'end');
     const items = all.filter((it) => it !== end), turn = end ? end[3] : `justin has to choose: ${nm(A, 'a')} or ${nm(A, 'b')} (the last choice of the episode, nothing after its branches)`;
     const sec = n < 3 ? 'The player must NOT learn it in this episode.' : n === 3 ? 'It comes out in THIS episode.' : 'It came out in episode 3.';
@@ -486,7 +514,7 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
         return; }
       case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && /^(github_pat_|ghp_)/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
       case 'bundle': return copy(JSON.stringify(bundle()), btn);
-      case 'next': ep = Math.min(5, ep + 1); render(); el.querySelector('.aView').scrollTop = 0; return;
+      case 'next': ep = Math.min(nEps(), ep + 1); render(); el.querySelector('.aView').scrollTop = 0; return;
     }
   }
   // ---- Haiku does the 3 layers itself, with Justin's key (GEN.ask: claude-haiku-4-5, nothing bigger): the act (if

@@ -227,45 +227,71 @@ window.FORGE = (() => {
   }
   const hardOk = (h) => (h === 'liked' ? !!roles().against : h === 'danger' ? S.inc.k === 'gone' || people().some((id) => { const w = wantOf(id); return w && ['find', 'free'].includes(w.v); }) : h === 'gag' ? kinds('secret').length > 0 : true);
 
-  // ---- OUTPUT: the events of the 5 episodes, worked out from WHAT and HOW. { e, fr (here), en (the prompts) } ----
-  function events() {
+  // ---- OUTPUT: ONE line of events, in story order, then cut into episodes. { id, e, fr (here), en (the prompts),
+  // part: setup | reveal | crisis | end, glue: stays with the next one }. The cuts: automatic (each episode about 4
+  // events, the reveals together, the impossible choice, then what it cost), or moved by hand (a tap between two events
+  // cuts there, a tap on ✂️ joins); every episode but the crisis and the end closes on a ⚖️ choice ----
+  function line() {
     const r = roles(), x = incWho(), inc = by(INC, S.inc.k), pX = P[pillarsOf(x)[0]], jw = wantOf(J), cs = conflicts(), t = (id) => S.tech[id];
     const secs = kinds('secret'), masks = kinds('mask'), pasts = kinds('past'), objs = kinds('object'), sec = secs.length || masks.length;
     const H = (id) => S.hard[id] && hardOk(id);
-    const E = [[], [], [], [], []], put = (n, e, fr, en2) => E[n].push({ e, fr, en: en2 });
+    const L = [], put = (id, part, e, fr, en2, glue) => L.push({ id, part, e, fr, en: en2, glue: !!glue });
     const hooks = TECHS.filter((h) => ['sexy', 'where', 'who', 'what'].includes(h.id) && t(h.id));
-    if (hooks.length) put(0, hooks.map((h) => h.e).join(''), 'Les premières secondes', `The first seconds, the most value at once: ${hooks.map((h) => h.en).join(' ')}`);
-    if (inc.enter) {
-      put(0, '🗣️', `On parle de ${nm(x)}`, `${en(x)} is not there yet: ${pX ? pX.exp : 'the others talk about them, a precise promise'}.`);
-      put(0, '⏰', `${nm(x)} arrive bientôt`, `Someone announces ${en(x)} arrives soon.`);
-      put(0, '💥', `${nm(x)} : ${pX ? pX.sur.toLowerCase() : 'sa surprise'}`, `INCITING INCIDENT: ${inc.en(en(x))}. ${en(x)} appears and proves their pillar${pX ? `: ${pX.surEn}` : ''}.`);
-    } else put(0, '👻', `${nm(x)} disparaît`, `INCITING INCIDENT: ${inc.en(en(x))}.`);
+    if (hooks.length) put('hooks', 'setup', hooks.map((h) => h.e).join(''), 'Les premières secondes', `The first seconds, the most value at once: ${hooks.map((h) => h.en).join(' ')}`);
     const jWant = jw || { v: S.inc.k === 'gone' ? 'find' : 'love', t: r.target };
-    put(0, W[jWant.v].e, `Justin veut ${W[jWant.v].t ? `${W[jWant.v].n.toLowerCase()} ${nm(jWant.t)}` : W[jWant.v].n.toLowerCase()}`, `justin says out loud what he wants: he ${W[jWant.v].en(en(jWant.t))}.`);
-    if (cs[0]) put(0, cs[0].e, cs[0].fr, `The conflict shows: ${cs[0].en}.`);
-    pasts.forEach((i, k) => put(k ? 1 : 0, '🕰️', infoFr(i), `Told out loud, early (a story or a shared memory, never explained): ${infoEn(i)}.`));
-    for (const i of objs) put(0, IN[i.id].e, `On voit : ${infoFr(i).charAt(0).toLowerCase() + infoFr(i).slice(1)}`, `Seen early, not opened: ${infoEn(i)}. Someone knows what it holds and will not tell.`);
-    if (t('plant') || sec) put(0, '🌱', 'Un détail planté', `Plant a harmless detail in a line, passing for something else${sec ? ` (it points to: ${[...secs, ...masks].map(infoEn).join('; ')})` : ''}.`);
-    put(0, '⚖️', 'Choix 1', 'The main choice of the episode: two outcomes, each with big consequences on a bond.');
-    for (const c of cs.slice(1)) put(1, c.e, c.fr, `Another conflict of desire comes in: ${c.en}.`);
-    if (H('liked') && r.against) put(1, '😇', `Tout le monde adore ${nm(r.against)}`, `Everyone thinks ${en(r.against)} is great: justin is alone against them.`);
-    if (H('danger')) put(1, '🌲', 'Le lieu dangereux', 'To get there, justin must go through a dangerous place of this world.');
-    put(1, '↘️', 'L’effort facile rate', 'justin tries the easy way; it backfires and makes things worse.');
-    if (t('plant') || sec) put(1, '🌱', 'Un 2e détail', 'Plant a second detail.');
-    if (H('gag')) put(1, '🤐', 'Le secret bloque', `Telling the secret (${infoEn(secs[0])}) would settle everything, but costs too much.`);
-    if (t('stakes')) put(1, '📈', 'L’enjeu monte', 'What can be lost grows.');
-    put(1, '⚖️', 'Choix 2', 'The main choice of the episode.');
-    for (const i of secs) put(2, IN[i.id].e, infoFr(i), `The secret comes out, in the scene (until now: ${infoEn(i)}).`);
-    for (const i of masks) put(2, IN[i.id].e, infoFr(i), `The mask falls: ${infoEn(i)}.`);
-    for (const i of objs) put(2, IN[i.id].e, 'On l’ouvre', `It is opened at last: what ${infoEn(i)} holds ties into the rest.`);
-    if (t('twist') || sec) put(2, '🔄', 'On revoit tout', 'What the player believed is turned around; the planted details now make sense.');
-    put(2, '⚖️', 'Choix 3', 'The main choice of the episode.');
-    if (H('clock')) put(3, '⏳', 'L’horloge', 'The clock: it must be decided now.');
-    put(3, '⚖️', `${nm(r.a)} ou ${nm(r.b)}`, `The impossible choice: ${en(r.a)} or ${en(r.b)}, each side painful to lose.`);
-    put(4, '💔', 'Ce que ça coûte', 'What the choice cost, shown (one version per side).');
-    put(4, '❔', 'Ce qui reste ouvert', 'What stays open for the next act.');
-    return E;
+    put('want', 'setup', W[jWant.v].e, `Justin veut ${W[jWant.v].t ? `${W[jWant.v].n.toLowerCase()} ${nm(jWant.t)}` : W[jWant.v].n.toLowerCase()}`, `justin says out loud what he wants: he ${W[jWant.v].en(en(jWant.t))}.`);
+    if (inc.enter) {
+      put('expect', 'setup', '🗣️', `On parle de ${nm(x)}`, `${en(x)} is not there yet: ${pX ? pX.exp : 'the others talk about them, a precise promise'}.`, 1);
+      put('tease', 'setup', '⏰', `${nm(x)} arrive bientôt`, `Someone announces ${en(x)} arrives soon.`, 1);
+      put('inc', 'setup', '💥', `${nm(x)} : ${pX ? pX.sur.toLowerCase() : 'sa surprise'}`, `INCITING INCIDENT: ${inc.en(en(x))}. ${en(x)} appears and proves their pillar${pX ? `: ${pX.surEn}` : ''}.`);
+    } else put('inc', 'setup', '👻', `${nm(x)} disparaît`, `INCITING INCIDENT: ${inc.en(en(x))}.`);
+    if (cs[0]) put('c0', 'setup', cs[0].e, cs[0].fr, `The conflict shows: ${cs[0].en}.`);
+    if (pasts[0]) put('past0', 'setup', '🕰️', infoFr(pasts[0]), `Told out loud (a story or a shared memory, never explained): ${infoEn(pasts[0])}.`);
+    objs.forEach((i, k) => put(`obj${k}`, 'setup', IN[i.id].e, `On voit : ${infoFr(i).charAt(0).toLowerCase() + infoFr(i).slice(1)}`, `Seen, not opened: ${infoEn(i)}. Someone knows what it holds and will not tell.`));
+    if (t('plant') || sec) put('plant1', 'setup', '🌱', 'Un détail planté', `Plant a harmless detail in a line, passing for something else${sec ? ` (it points to: ${[...secs, ...masks].map(infoEn).join('; ')})` : ''}.`);
+    cs.slice(1).forEach((c, k) => put(`c${k + 1}`, 'setup', c.e, c.fr, `Another conflict of desire comes in: ${c.en}.`));
+    if (H('liked') && r.against) put('liked', 'setup', '😇', `Tout le monde adore ${nm(r.against)}`, `Everyone thinks ${en(r.against)} is great: justin is alone against them.`);
+    if (H('danger')) put('danger', 'setup', '🌲', 'Le lieu dangereux', 'To get there, justin must go through a dangerous place of this world.');
+    pasts.slice(1).forEach((i, k) => put(`past${k + 1}`, 'setup', '🕰️', infoFr(i), `Told out loud (a story or a shared memory, never explained): ${infoEn(i)}.`));
+    put('easy', 'setup', '↘️', 'L’effort facile rate', 'justin tries the easy way; it backfires and makes things worse.');
+    if (t('plant') || sec) put('plant2', 'setup', '🌱', 'Un 2e détail', 'Plant a second detail.');
+    if (H('gag')) put('gag', 'setup', '🤐', 'Le secret bloque', `Telling the secret (${infoEn(secs[0])}) would settle everything, but costs too much.`);
+    if (t('stakes')) put('stakes', 'setup', '📈', 'L’enjeu monte', 'What can be lost grows.');
+    secs.forEach((i, k) => put(`sec${k}`, 'reveal', IN[i.id].e, infoFr(i), `The secret comes out, in the scene (until now: ${infoEn(i)}).`));
+    masks.forEach((i, k) => put(`mask${k}`, 'reveal', IN[i.id].e, infoFr(i), `The mask falls: ${infoEn(i)}.`));
+    objs.forEach((i, k) => put(`open${k}`, 'reveal', IN[i.id].e, 'On l’ouvre', `It is opened at last: what ${infoEn(i)} holds ties into the rest.`));
+    if (t('twist') || sec) put('twist', 'reveal', '🔄', 'On revoit tout', 'What the player believed is turned around; the planted details now make sense.');
+    if (H('clock')) put('clock', 'crisis', '⏳', 'L’horloge', 'The clock: it must be decided now.', 1);
+    put('pick', 'crisis', '⚖️', `${nm(r.a)} ou ${nm(r.b)}`, `The impossible choice, the last of the episode: ${en(r.a)} or ${en(r.b)}, each side painful to lose.`);
+    put('cost', 'end', '💔', 'Ce que ça coûte', 'What the choice cost, shown (one version per side).');
+    put('open', 'end', '❔', 'Ce qui reste ouvert', 'What stays open for the next act.');
+    return L;
   }
+  // the automatic cuts (after index i): the setup in chunks of about 4 (never inside a glued group), then a cut after the
+  // setup, after the reveals, after the impossible choice
+  function autoCuts(L) {
+    const cuts = [], last = (part) => L.map((x) => x.part).lastIndexOf(part), su = last('setup');
+    const n = su + 1, k = Math.max(1, Math.round(n / 4)), size = n / k;
+    for (let c = 1; c < k; c++) { let i = Math.round(c * size) - 1; while (i < su && L[i].glue) i++; if (i < su && !cuts.includes(i)) cuts.push(i); }
+    const lone = L.filter((x) => x.part === 'crisis').length < 2;   // the impossible choice alone: it closes the reveal's episode
+    for (const i of [su, lone ? -1 : last('reveal'), last('crisis')]) if (i >= 0 && i < L.length - 1 && !cuts.includes(i)) cuts.push(i);
+    return cuts.sort((a, b) => a - b);
+  }
+  const sigOf = (L) => L.map((x) => x.id).join(',');
+  const cutsOf = (L) => (S.cut && S.cut.sig === sigOf(L) ? S.cut.at.filter((i) => i < L.length - 1) : autoCuts(L));
+  // the episodes: their events (with the index in the line), a ⚖️ choice added at the end of each but the crisis and the
+  // end, and the act's step they stand for (act.js ARC: 0 the first, 1 the setup after, 2 the reveal, 3 the choice, 4 the cost)
+  function episodes() {
+    const L = line(), cuts = cutsOf(L), eps = []; let cur = [];
+    L.forEach((ev, i) => { cur.push({ ...ev, i }); if (cuts.includes(i)) { eps.push(cur); cur = []; } }); if (cur.length) eps.push(cur);
+    let ch = 0;
+    return eps.map((evs, n) => { const has = (p) => evs.some((x) => x.part === p);
+      const stage = has('crisis') ? 3 : has('end') && !has('setup') && !has('reveal') ? 4 : has('reveal') ? 2 : n === 0 ? 0 : 1;
+      const list = evs.slice();
+      if (!has('crisis') && !has('end')) list.push({ e: '⚖️', fr: `Choix ${++ch}`, en: 'The main choice of the episode, its last: two outcomes, each with big consequences on a bond.', choice: 1 });
+      return { list, stage }; });
+  }
+  const events = () => episodes().map((x) => x.list);
 
   // ---- the seed: what the act's prompt and every episode's plan prompt carry (act.js) ----
   function seed() {
@@ -276,15 +302,15 @@ window.FORGE = (() => {
     const facts = infos().map((i) => `- ${infoEn(i)}`);
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
     const techs = TECHS.filter((h) => S.tech[h.id]).map((h) => `- ${h.en}`);
-    const E = events(), epText = E.map((list) => list.map((ev) => `- ${ev.en}`).join('\n'));
+    const EP = episodes(), E = EP.map((x) => x.list), epText = E.map((list) => list.map((ev) => `- ${ev.en}`).join('\n'));
     const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
       ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(facts.length ? ['THE FACTS OF THE STORY (use exactly these; never invent another secret or past):', ...facts] : []),
       `THE INCITING INCIDENT: ${by(INC, S.inc.k).en(en(x))}.`,
       ...(cs.length ? ['THE CONFLICTS OF DESIRE (the story is these wants colliding):', ...cs.map((c) => `- ${c.en}`)] : []),
       ...(hard.length ? ['WHY IT IS HARD:', ...hard] : []), ...(techs.length ? ['PLOT TECHNIQUES:', ...techs] : []),
-      `In the arc: A = ${en(r.a)}, B = ${en(r.b)}; the episode 4 choice is ${en(r.a)} or ${en(r.b)}. Other characters may appear when the events need them.`].join('\n');
+      `In the arc: A = ${en(r.a)}, B = ${en(r.b)}; the impossible choice is ${en(r.a)} or ${en(r.b)}. The story is cut in ${E.length} episodes (the events below); the 5 "episodes" of the JSON are the 5 steps of the arc, in that order. Other characters may appear when the events need them.`].join('\n');
     const all = E.map((list, i) => `Episode ${i + 1}:\n${epText[i]}`).join('\n');
-    return { decor: S.decor, a: r.a, b: r.b, text, ep1: `THE EVENTS, EPISODE BY EPISODE (place them):\n${all}`, eps: epText, forge: JSON.parse(JSON.stringify(S)) };
+    return { decor: S.decor, a: r.a, b: r.b, text, ep1: `THE EVENTS, EPISODE BY EPISODE (place them):\n${all}`, eps: epText, stages: EP.map((x) => x.stage), reveal: EP.findIndex((x) => x.list.some((ev) => ev.part === 'reveal')), forge: JSON.parse(JSON.stringify(S)) };
   }
 
   // ---- 🧍 a pose sheet of this character's archetype: his 6 faces, his way (bank.js: the same format as the base sheet) ----
@@ -376,7 +402,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + row('🧭', TECHS.map((h) => chip(`data-tech="${h.id}"`, h.e, h.n, !!S.tech[h.id], '#ffd60a', `${h.lv} ${h.d}`)).join(''), 'Les techniques de plot (🧭 plot · 🧭🎬 le plot les place, la scène les joue)')
       // OUTPUT
       + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
-      + `<section class="fOut">${E.map((list, i) => `<div class="fEp"><i>${i + 1}</i><div>${list.map((ev) => `<span><b>${ev.e}</b>${esc(ev.fr)}</span>`).join('')}</div></div>`).join('')}</section>`
+      + `<section class="fOut">${E.map((list, n) => `${n ? `<button type="button" class="fCut" data-uncut="${E[n - 1].filter((ev) => !ev.choice).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><i>${n + 1}</i><div>${list.map((ev, k) => `<span class="${ev.choice || ev.id === 'pick' ? 'ch' : ''}"><b>${ev.e}</b>${esc(ev.fr)}</span>${!ev.choice && list[k + 1] && !list[k + 1].choice ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}`).join('')}</div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
       + '<button type="button" class="go" data-x="play" data-tip="Haiku écrit l’acte, le plan de l’épisode 1 et l’histoire, puis ça joue">▶ Jouer</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat ; la réponse se colle dans Acte › Générer › 1">📋 Prompt</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
@@ -420,6 +446,9 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else if (d.tech) S.tech[d.tech] = S.tech[d.tech] ? 0 : 1;
     else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
     else if (d.cimg) return copyImg(d.cimg, t);
+    else if (d.cut || d.uncut) { const L = line(), at = new Set(cutsOf(L)), i = +(d.cut || d.uncut); if (d.cut) at.add(i); else at.delete(i);
+      S.cut = { sig: sigOf(L), at: [...at].sort((a, b) => a - b) }; }
+    else if (d.x === 'autocut') S.cut = null;
     else if (d.x === 'dice') dice();
     else if (d.x === 'copy') { if (!S.cast.length) { msg = '👥 ?'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
       return copy(ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
@@ -461,5 +490,5 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     root.oncontextmenu = (e) => { if (e.target.closest('[data-tip]')) e.preventDefault(); };
     const sc = root.closest('#forge'); if (sc) sc.onscroll = tipHide;
   }
-  return { mount, PILLARS, FLAWS, sheet, seed, events, conflicts };
+  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts };
 })();
