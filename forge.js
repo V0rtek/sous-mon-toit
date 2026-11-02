@@ -1,9 +1,9 @@
-// ---- Écrire · Créer (02/11): the whole story in one screen, by taps, almost no text. Who (each one with a pillar, two
-// can mix, and a flaw), the inciting incident -> the quest it starts -> the conflict in the way, the first seconds. The
-// newcomer's entrance (3 steps) comes from his pillar. Then ▶ = Haiku writes the act, the plan of episode 1 and its
-// story, and it plays (act.js); 📋 = the act's prompt, to paste in a chat (its answer goes in Acte › Générer, the seed
-// follows). 🧍 on a person = the prompt of a pose sheet with the 6 faces of HIS archetype (the chef's sadness doesn't
-// show: he's just serious). Kept on this phone ----
+// ---- Écrire · Créer (02/11): the PLOT of an act, by taps, almost no text (the scenes are Plan de scène's job). Three
+// layers: WHAT (the place, who, their pillar and flaw, what each one wants and from whom, their relations, the infos the
+// AI invents: a secret, a shared past...), HOW (1. the engine: the inciting incident, the conflicts of desire it finds by
+// itself, why it's hard; 2. the plot techniques), OUTPUT (the events of the 5 episodes, worked out here from the rest:
+// the newcomer's 🗣️ → ⏰ → 💥, the choices). Then ▶ = Haiku writes the act, the plan of episode 1 and its story, and it
+// plays (act.js); 📋 = the act's prompt. Each episode's plan prompt gets its own events. 🧍 = the pose sheets. Kept here ----
 window.FORGE = (() => {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cap = (s) => String(s || '?').charAt(0).toUpperCase() + String(s || '?').slice(1);
@@ -99,62 +99,161 @@ window.FORGE = (() => {
   // ---- the decors of the act (act.js DECORS): only the place; anyone can be there ----
   const DECORS = [{ id: 'taverne', e: '🍺', n: 'Taverne', d: 'La terrasse d’une taverne au-dessus d’une ville fantasy' }, { id: 'maison', e: '🏠', n: 'Maison', d: 'L’intérieur d’une maison' },
     { id: 'salon', e: '🛋️', n: 'Salon', d: 'Un salon' }];
-  const D = Object.fromEntries(DECORS.map((d) => [d.id, d]));
 
-  // ---- inciting incident -> quest -> conflict. X = the one the incident is about, Y = the other one ----
+  // ---- WHAT: what each one wants (t = toward whom), their relations, the infos the AI invents ----
+  const WANTS = [
+    { id: 'love', e: '❤️', n: 'Séduire', t: 1, d: 'Veut une romance avec quelqu’un.', en: (t) => `wants a romance with ${t}` },
+    { id: 'protect', e: '🛡️', n: 'Protéger', t: 1, d: 'Veut protéger quelqu’un, quoi qu’il en coûte.', en: (t) => `wants to protect ${t}` },
+    { id: 'find', e: '🔦', n: 'Retrouver', t: 1, d: 'Veut retrouver quelqu’un.', en: (t) => `wants to find ${t} back` },
+    { id: 'oust', e: '😤', n: 'Évincer', t: 1, d: 'Veut se débarrasser de quelqu’un.', en: (t) => `wants to get rid of ${t}` },
+    { id: 'win', e: '🏆', n: 'Être reconnu', d: 'Veut être reconnu, gagner sa place.', en: () => 'wants to be recognized, to win their place' },
+    { id: 'free', e: '🕊️', n: 'Partir', d: 'Veut partir, être libre.', en: () => 'wants to leave and be free' },
+    { id: 'hide', e: '🤫', n: 'Cacher', d: 'Veut que personne ne sache une chose (son secret).', en: () => 'wants nobody to find out their secret' },
+  ];
+  const W = Object.fromEntries(WANTS.map((w) => [w.id, w]));
+  const RELS = [
+    { id: '', e: '·', n: 'Rien', en: '' }, { id: 'crush', e: '❤️', n: 'Attirance', en: 'drawn to each other (unsaid)', good: 1 },
+    { id: 'couple', e: '💍', n: 'En couple', en: 'a couple', good: 1 }, { id: 'ex', e: '💔', n: 'Ex', en: 'exes' },
+    { id: 'friend', e: '🤝', n: 'Amis', en: 'close friends', good: 1 }, { id: 'family', e: '👪', n: 'Famille', en: 'family (pick the bond that fits)', good: 1 },
+    { id: 'rival', e: '⚔️', n: 'Rivaux', en: 'rivals' }, { id: 'mentor', e: '🧭', n: 'Mentor', en: 'mentor and student', good: 1 },
+  ];
+  const R = Object.fromEntries(RELS.map((r) => [r.id, r]));
+  const INFOS = [
+    { id: 'secret', e: '🤫', n: 'Un secret', who: 1, d: 'Un secret que l’IA invente, qui explique un geste étrange de ce perso. Sort en épisode 3.', en: (x) => `${x} has a secret (invent it: it explains something odd ${x} does; it comes out in episode 3)` },
+    { id: 'mask', e: '🎭', n: 'Faux visage', who: 1, d: 'Ce perso n’est pas ce qu’il montre. L’IA invente ce qu’il cache.', en: (x) => `${x} is not who they seem (invent what they hide)` },
+    { id: 'past', e: '🕰️', n: 'Un passé', d: 'Un passé commun (une phrase) entre deux persos liés, que l’IA invente.', en: () => 'a shared past between two of them, in one sentence (invent it)' },
+    { id: 'object', e: '📦', n: 'Un objet', d: 'Un objet, une lettre, une porte : quelqu’un sait ce qu’il y a dedans et ne dit rien.', en: () => 'a mystery object, letter or door: someone knows what is inside and will not tell' },
+  ];
+
+  // ---- HOW 1, the engine: the inciting incident, why it's hard (some only make sense with what's chosen) ----
   const INC = [
-    { id: 'shift', e: '⚡', n: 'Arrive, tout change', d: 'Quelqu’un arrive et change l’équilibre. On le présente en 3 temps.', q: 'rival', en: (X) => `${X} arrives, and their arrival shifts everything for justin`, enter: true },
-    { id: 'arrive', e: '🚪', n: 'Débarque sans prévenir', d: 'Quelqu’un avec un enjeu attaché débarque sans prévenir. On le présente en 3 temps.', q: 'love', en: (X) => `${X} shows up without warning, with something at stake attached to them`, enter: true },
-    { id: 'gone', e: '👻', n: 'Disparaît', d: 'On le voit dans les premières répliques, puis il n’est plus là. Où est-il ?', q: 'find', en: (X) => `${X} disappears: on screen in the first lines, then gone`, enter: false },
+    { id: 'shift', e: '⚡', n: 'Arrive, tout change', enter: 1, d: 'Quelqu’un arrive et change l’équilibre. On le présente en 3 temps.', en: (x) => `${x} arrives, and their arrival shifts everything` },
+    { id: 'arrive', e: '🚪', n: 'Débarque', enter: 1, d: 'Quelqu’un avec un enjeu attaché débarque sans prévenir. On le présente en 3 temps.', en: (x) => `${x} shows up without warning, with something at stake attached to them` },
+    { id: 'gone', e: '👻', n: 'Disparaît', d: 'On le voit dans les premières répliques, puis il n’est plus là.', en: (x) => `${x} disappears: on screen in the first lines, then gone` },
   ];
-  const QUEST = [
-    { id: 'rival', e: '😤', n: 'Chasser le rival', d: 'Se débarrasser du rival qui flirte avec celle (celui) que Justin aime.', c: 'liked', en: (X, Y) => `get rid of ${X}, the rival who flirts with ${Y}, the one justin loves` },
-    { id: 'love', e: '❤️', n: 'Séduire', d: 'Une romance avec le nouveau perso.', c: 'taken', en: (X) => `start a romance with ${X}` },
-    { id: 'find', e: '🔦', n: 'Retrouver', d: 'Retrouver celui qui a disparu.', c: 'danger', en: (X) => `find ${X} back` },
+  const HARD = [
+    { id: 'liked', e: '😇', n: 'Tout le monde l’adore', d: 'L’obstacle de Justin, tout le monde le trouve génial : Justin est seul contre lui.', en: 'everyone thinks the one against justin is a great person: justin is alone against them', need: 'Il faut quelqu’un contre Justin (un désir qui croise le sien).' },
+    { id: 'danger', e: '🌲', n: 'Lieu dangereux', d: 'Il faut passer par un endroit dangereux (une forêt la nuit).', en: 'to get there, justin must go through a dangerous place of this world', need: 'Il faut retrouver quelqu’un, partir, ou une disparition.' },
+    { id: 'clock', e: '⏳', n: 'Horloge', d: 'Une limite de temps : avant demain, avant qu’il parte.', en: 'a clock: it must be settled before a precise moment' },
+    { id: 'gag', e: '🤐', n: 'Le secret bloque', d: 'Dire le secret réglerait tout, mais coûterait trop.', en: 'telling the secret would settle everything, but would cost too much', need: 'Il faut un 🤫 secret dans les infos.' },
   ];
-  const CONF = [
-    { id: 'liked', e: '😇', n: 'Tout le monde l’adore', d: 'Tout le monde trouve l’antagoniste génial : Justin est seul contre lui.', en: (X) => `everyone thinks ${X} is a great person: justin is alone against them` },
-    { id: 'taken', e: '💍', n: 'Déjà pris', d: 'La personne qu’il veut a déjà quelqu’un.', en: (X, Y, love) => `${love} already has someone else` },
-    { id: 'danger', e: '🌲', n: 'Lieu dangereux', d: 'Pour y arriver, il faut passer par un endroit dangereux (une forêt la nuit).', en: () => 'to get there, justin must go through a dangerous place of this world' },
-  ];
-  // the first seconds: give everything at once
-  const HOOKS = [
-    { id: 'sexy', e: '🔥', n: 'Attirance', d: 'Persos hot, regards qui durent, répliques à double sens, dès la 1re ligne.', en: () => 'Attraction from the first line: hot characters, a look that lasts too long, a flirty double meaning, the others noticing them.' },
-    { id: 'where', e: '🔍', n: 'Où ?', d: 'Où est X ? Quelqu’un devrait être là et n’y est pas.', en: (X, gone) => (gone ? `Where is ${X}? Their seat is empty, nobody says where they went; the question lasts.` : 'Where is someone? A person who should be there is not; the question lasts.') },
-    { id: 'who', e: '👤', n: 'Qui ?', d: 'Qui est X ? On parle de lui sans le voir, et on annonce qu’on va le rencontrer.', en: (X, gone, enter) => (enter ? `Who is ${X}? The others talk about them before we see them (a precise promise), and say we will meet them soon.` : 'Who is someone? The others talk about a person we do not see, and say we will meet them soon.') },
-    { id: 'what', e: '📦', n: 'Quoi ?', d: 'Qu’y a-t-il dans X ? Une lettre, une porte : quelqu’un sait et ne dit rien.', en: () => 'What is in it? An object, a room or a letter someone knows the content of and will not tell.' },
-    { id: 'stakes', e: '⏳', n: 'Enjeu', d: 'Un gros enjeu approche : quelqu’un est stressé juste avant d’entrer en scène.', en: () => 'Big stakes coming: someone is stressed right before going on stage (walking in, opening a door); we feel the weight before the action.' },
+  // ---- HOW 2, the plot techniques (🧭 plot, or 🧭🎬 placed by the plot, played by the scene: techniques.js TECH_LVL) ----
+  const TECHS = [
+    { id: 'sexy', e: '🔥', n: 'Attirance', lv: '🧭🎬', d: 'Persos hot, regards qui durent, double sens, dès la 1re ligne.', en: 'Attraction from the first line: hot characters, looks that last, flirty double meanings, the others noticing them.' },
+    { id: 'where', e: '🔍', n: 'Où ?', lv: '🧭🎬', d: 'Où est X ? Quelqu’un devrait être là et n’y est pas.', en: 'Where is someone? A person who should be there is not; the question lasts.' },
+    { id: 'who', e: '👤', n: 'Qui ?', lv: '🧭🎬', d: 'Qui est X ? On parle de lui sans le voir, on annonce qu’on va le rencontrer.', en: 'Who is someone? The others talk about a person we do not see yet (a precise promise), and say we will meet them soon.' },
+    { id: 'what', e: '📦', n: 'Quoi ?', lv: '🧭🎬', d: 'Qu’y a-t-il dans X ? Quelqu’un sait et ne dit rien.', en: 'What is inside? An object, a room or a letter someone knows about and will not tell.' },
+    { id: 'plant', e: '🌱', n: 'Planter, payer', lv: '🧭', d: 'Un détail anodin tôt, qui retourne tout plus tard (le nom de sa mère).', en: 'Plant a harmless detail early that turns everything around later.' },
+    { id: 'twist', e: '🔄', n: 'Twist', lv: '🧭', d: 'Une révélation qui change ce qu’on croyait sur quelqu’un.', en: 'A reveal that changes what the player believed about someone.' },
+    { id: 'stakes', e: '📈', n: 'L’enjeu monte', lv: '🧭🎬', d: 'Ce qui peut être perdu grandit à chaque épisode.', en: 'What can be lost grows every episode.' },
   ];
   const by = (list, id) => list.find((x) => x.id === id) || list[0];
 
   // ---- the state, kept on this phone ----
-  const KEY = 'smt-forge';
-  const BASE = () => ({ decor: 'maison', cast: ['ruby', 'james'], pil: { justin: ['charmeur', 'genie'], ruby: ['mysterieux'], james: ['chef'] }, flaw: { justin: 'lache' },
-    inc: 'gone', who: 0, quest: 'find', conf: 'danger', hooks: { sexy: 1, where: 1, stakes: 1 } });
-  let S = (() => { try { const s = JSON.parse(ls(KEY)); if (s && s.decor && Array.isArray(s.cast)) return { ...BASE(), ...s }; } catch { /* none yet */ } return BASE(); })();
+  const KEY = 'smt-forge2';
+  const BASE = () => ({ decor: 'taverne', cast: ['ruby', 'amare', 'melissa'], pil: { justin: ['charmeur', 'genie'], ruby: ['mysterieux'], amare: ['chef', 'charmeur'], melissa: ['protecteur'] },
+    flaw: { justin: 'lache' }, want: { justin: { v: 'love', t: 'ruby' }, amare: { v: 'love', t: 'ruby' } }, rel: { 'amare|ruby': 'couple', 'justin|melissa': 'friend' },
+    info: { secret: 'amare' }, inc: { k: 'shift', who: 'amare' }, hard: { liked: 1 }, tech: { sexy: 1, who: 1, plant: 1, twist: 1 } });
+  let S = (() => { try { const s = JSON.parse(ls(KEY)); if (s && Array.isArray(s.cast)) return { ...BASE(), ...s }; } catch { /* none yet */ } return BASE(); })();
   const save = () => ls(KEY, JSON.stringify(S));
   let el = null, msg = '';
 
-  const people = () => ['justin', ...S.cast];
-  const X = () => S.cast[S.who] || S.cast[0], Y = () => S.cast[1 - S.who] || S.cast[1];
+  const J = 'justin';
+  const people = () => [J, ...S.cast];
+  const nm = (id) => (id === J ? 'Justin' : nameOf(id)), en = (id) => (id === J ? 'justin' : nameOf(id));
   const pillarsOf = (id) => (S.pil[id] || []).filter((p) => P[p]);
   const tag = (id) => { const ps = pillarsOf(id); return ps.length ? ps.map((p) => `${P[p].e} ${P[p].n}`).join(' + ') + (S.flaw[id] ? ` · ${F[S.flaw[id]].e}` : '') : ''; };
+  const pk = (a, b) => [a, b].sort().join('|');
+  const rel = (a, b) => S.rel[pk(a, b)] || '';
+  const live = (id) => id === J || S.cast.includes(id);
+  const wantOf = (id) => { const w = S.want[id]; return w && W[w.v] && (!W[w.v].t || live(w.t)) ? w : null; };
+  const incWho = () => (live(S.inc.who) && S.inc.who !== J ? S.inc.who : S.cast[0]);
+  const mini = (id) => `<span class="fMini">${face(id)}</span>`;
+
+  // ---- the conflicts of desire, found from what each one wants and their relations ----
+  function conflicts() {
+    const out = [], ps = people(), seen = new Set();
+    const add = (a, b, e, fr, en2) => { const k = pk(a, b) + e; if (seen.has(k)) return; seen.add(k); out.push({ a, b, e, fr, en: en2 }); };
+    for (const a of ps) for (const b of ps) {
+      if (a === b) continue;
+      const wa = wantOf(a), wb = wantOf(b);
+      if (wa && wb && wa.t && wa.t === wb.t && wa.t !== a && wa.t !== b && ['love', 'protect', 'find'].includes(wa.v) && wa.v === wb.v) add(a, b, '⚔️', `${nm(a)} et ${nm(b)} veulent ${nm(wa.t)}`, `${en(a)} and ${en(b)} both ${W[wa.v].en(en(wa.t)).replace('wants', 'want')}`);
+      if (wa && wa.v === 'love' && wb && wb.v === 'protect' && wb.t === wa.t) add(a, b, '🛡️', `${nm(b)} protège ${nm(wa.t)} de ${nm(a)}`, `${en(b)} protects ${en(wa.t)} from ${en(a)}`);
+      if (wa && wa.v === 'oust' && wa.t === b) add(a, b, '😤', `${nm(a)} veut évincer ${nm(b)}`, `${en(a)} wants to get rid of ${en(b)}`);
+      if (wa && wa.v === 'love' && wa.t !== b && rel(wa.t, b) === 'couple') add(a, b, '💍', `${nm(wa.t)} est déjà avec ${nm(b)}`, `${en(a)} wants ${en(wa.t)}, who is already with ${en(b)}`);
+      if (wa && wa.v === 'love' && wa.t === b && wb && wb.v === 'love' && wb.t !== a) add(a, b, '💘', `${nm(b)} en veut un autre`, `${en(a)} loves ${en(b)}, who wants ${en(wb.t)}`);
+      if (wa && wa.v === 'free' && wb && ['love', 'protect'].includes(wb.v) && wb.t === a) add(a, b, '🕊️', `${nm(b)} veut garder ${nm(a)}`, `${en(a)} wants to leave; ${en(b)} wants to keep them`);
+      if (wa && wa.v === 'find' && wa.t === b && wb && ['free', 'hide'].includes(wb.v)) add(a, b, '🔦', `${nm(b)} ne veut pas être trouvé`, `${en(a)} wants to find ${en(b)}, who does not want to be found`);
+      if (wa && wa.v === 'win' && wb && wb.v === 'win' && a < b) add(a, b, '🏆', `${nm(a)} et ${nm(b)} veulent la même place`, `${en(a)} and ${en(b)} want the same place`);
+      if (rel(a, b) === 'rival' && a < b) add(a, b, '⚔️', `${nm(a)} et ${nm(b)} sont rivaux`, `${en(a)} and ${en(b)} are rivals`);
+    }
+    return out;
+  }
+  // the roles the arc needs (act.js: A asks, B is hurt, episode 4 = A or B): Justin's target, who's against him, who he'd lose
+  function roles() {
+    const jw = wantOf(J), cs = conflicts().filter((c) => c.a === J || c.b === J), x = incWho();
+    const target = (jw && jw.t) || (S.inc.k === 'gone' ? x : S.cast.find((id) => id !== x) || x);
+    const against = cs.map((c) => (c.a === J ? c.b : c.a)).find((id) => id !== target) || (target !== x ? x : null);
+    const dear = S.cast.find((id) => id !== target && id !== against && (R[rel(J, id)] || {}).good) || null;
+    return { target, against, dear, a: target, b: dear || against || S.cast.find((id) => id !== target) || target };
+  }
+  const hardOk = (h) => (h === 'liked' ? !!roles().against : h === 'danger' ? S.inc.k === 'gone' || people().some((id) => { const w = wantOf(id); return w && ['find', 'free'].includes(w.v); }) : h === 'gag' ? !!(S.info.secret && live(S.info.secret)) : true);
+
+  // ---- OUTPUT: the events of the 5 episodes, worked out from WHAT and HOW. { e, fr (here), en (the prompts) } ----
+  function events() {
+    const r = roles(), x = incWho(), inc = by(INC, S.inc.k), pX = P[pillarsOf(x)[0]], jw = wantOf(J), cs = conflicts(), t = (id) => S.tech[id];
+    const sec = S.info.secret && live(S.info.secret) ? S.info.secret : null, mask = S.info.mask && live(S.info.mask) ? S.info.mask : null;
+    const H = (id) => S.hard[id] && hardOk(id);
+    const E = [[], [], [], [], []], put = (n, e, fr, en2) => E[n].push({ e, fr, en: en2 });
+    const hooks = TECHS.filter((h) => ['sexy', 'where', 'who', 'what'].includes(h.id) && t(h.id));
+    if (hooks.length) put(0, hooks.map((h) => h.e).join(''), 'Les premières secondes', `The first seconds, the most value at once: ${hooks.map((h) => h.en).join(' ')}`);
+    if (inc.enter) {
+      put(0, '🗣️', `On parle de ${nm(x)}`, `${en(x)} is not there yet: ${pX ? pX.exp : 'the others talk about them, a precise promise'}.`);
+      put(0, '⏰', `${nm(x)} arrive bientôt`, `Someone announces ${en(x)} arrives soon.`);
+      put(0, '💥', `${nm(x)} : ${pX ? pX.sur.toLowerCase() : 'sa surprise'}`, `INCITING INCIDENT: ${inc.en(en(x))}. ${en(x)} appears and proves their pillar${pX ? `: ${pX.surEn}` : ''}.`);
+    } else put(0, '👻', `${nm(x)} disparaît`, `INCITING INCIDENT: ${inc.en(en(x))}.`);
+    const jWant = jw || { v: S.inc.k === 'gone' ? 'find' : 'love', t: r.target };
+    put(0, W[jWant.v].e, `Justin veut ${W[jWant.v].t ? `${W[jWant.v].n.toLowerCase()} ${nm(jWant.t)}` : W[jWant.v].n.toLowerCase()}`, `justin says out loud what he wants: he ${W[jWant.v].en(en(jWant.t))}.`);
+    if (cs[0]) put(0, cs[0].e, cs[0].fr, `The conflict shows: ${cs[0].en}.`);
+    if (t('plant') || sec || mask) put(0, '🌱', 'Un détail planté', 'Plant a harmless detail in a line, passing for something else.');
+    put(0, '⚖️', 'Choix 1', 'The main choice of the episode: two outcomes, each with big consequences on a bond.');
+    for (const c of cs.slice(1)) put(1, c.e, c.fr, `Another conflict of desire comes in: ${c.en}.`);
+    if (H('liked') && r.against) put(1, '😇', `Tout le monde adore ${nm(r.against)}`, `Everyone thinks ${en(r.against)} is great: justin is alone against them.`);
+    if (H('danger')) put(1, '🌲', 'Le lieu dangereux', 'To get there, justin must go through a dangerous place of this world.');
+    put(1, '↘️', 'L’effort facile rate', 'justin tries the easy way; it backfires and makes things worse.');
+    if (t('plant') || sec) put(1, '🌱', 'Un 2e détail', 'Plant a second detail.');
+    if (H('gag')) put(1, '🤐', 'Le secret bloque', `Telling ${en(sec)}'s secret would settle everything, but costs too much.`);
+    if (t('stakes')) put(1, '📈', 'L’enjeu monte', 'What can be lost grows.');
+    put(1, '⚖️', 'Choix 2', 'The main choice of the episode.');
+    if (sec) put(2, '🤫', `Le secret de ${nm(sec)} sort`, `${en(sec)}'s secret comes out.`);
+    if (mask) put(2, '🎭', `${nm(mask)} tombe le masque`, `${en(mask)} is not who they seemed: it comes out.`);
+    if (t('twist') || sec || mask) put(2, '🔄', 'On revoit tout', 'What the player believed is turned around; the planted details now make sense.');
+    put(2, '⚖️', 'Choix 3', 'The main choice of the episode.');
+    if (H('clock')) put(3, '⏳', 'L’horloge', 'The clock: it must be decided now.');
+    put(3, '⚖️', `${nm(r.a)} ou ${nm(r.b)}`, `The impossible choice: ${en(r.a)} or ${en(r.b)}, each side painful to lose.`);
+    put(4, '💔', 'Ce que ça coûte', 'What the choice cost, shown (one version per side).');
+    put(4, '❔', 'Ce qui reste ouvert', 'What stays open for the next act.');
+    return E;
+  }
 
   // ---- the seed: what the act's prompt and every episode's plan prompt carry (act.js) ----
   function seed() {
-    const x = cap(X()), y = cap(Y()), inc = by(INC, S.inc), q = by(QUEST, S.quest), love = S.quest === 'rival' ? y : x;
-    const who = (id) => { const ps = pillarsOf(id), f = S.flaw[id] && F[S.flaw[id]];
-      return `- ${id === 'justin' ? 'justin (the player)' : cap(id)}: ${ps.length ? ps.map((p, i) => (i ? `mixed with ${P[p].en}` : P[p].en)).join(', ') : 'free'}${f ? `; flaw: ${f.en}` : ''}. It shows in how they talk and act, every line.`; };
-    const pX = P[pillarsOf(X())[0]];
-    const text = [`THE CHARACTERS AND THEIR PILLAR (what we follow them for):`, ...people().map(who),
-      `THE INCITING INCIDENT (episode 1, it starts the quest): ${inc.en(x)}.`,
-      `THE QUEST (what justin goes after): ${q.en(x, y)}.`,
-      `THE CONFLICT (what stands in the way): ${by(CONF, S.conf).en(x, y, love)}.`,
-      `Fit it in the arc: A's request is about the quest, and giving it hurts B.`].join('\n');
-    const hooks = HOOKS.filter((h) => S.hooks[h.id]).map((h) => `- ${h.en(x, S.inc === 'gone', inc.enter)}`);
-    const intro = inc.enter && pX ? `INTRODUCE ${x.toUpperCase()} IN 3 STEPS (Présenter un perso): 1. ${x} is not there yet: ${pX.exp}. 2. Someone announces ${x} arrives soon. 3. ${x} appears and proves their pillar: ${pX.surEn}.` : '';
-    const ep1 = [...(hooks.length ? ['THE FIRST SECONDS (the most value in the least time, at least two of these in the first lines):', ...hooks] : []), intro].filter(Boolean).join('\n');
-    return { decor: S.decor, a: X(), b: Y(), text, ep1, forge: JSON.parse(JSON.stringify(S)) };
+    const r = roles(), x = incWho(), cs = conflicts();
+    const who = (id) => { const ps = pillarsOf(id), f = S.flaw[id] && F[S.flaw[id]], w = wantOf(id);
+      return `- ${id === J ? 'justin (the player)' : `${en(id)} (id "${id}")`}: ${ps.length ? ps.map((p, i) => (i ? `mixed with ${P[p].en}` : P[p].en)).join(', ') : 'free'}${f ? `; flaw: ${f.en}` : ''}${w ? `; ${W[w.v].en(en(w.t))}` : ''}.`; };
+    const rels = Object.entries(S.rel).filter(([k, v]) => v && k.split('|').every(live)).map(([k, v]) => `- ${k.split('|').map(en).join(' and ')}: ${R[v].en}`);
+    const infos = INFOS.filter((i) => S.info[i.id] && (!i.who || live(S.info[i.id]))).map((i) => `- ${i.en(en(S.info[i.id]))}`);
+    const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
+    const techs = TECHS.filter((h) => S.tech[h.id]).map((h) => `- ${h.en}`);
+    const E = events(), epText = E.map((list) => list.map((ev) => `- ${ev.en}`).join('\n'));
+    const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
+      ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(infos.length ? ['INFOS TO INVENT:', ...infos] : []),
+      `THE INCITING INCIDENT: ${by(INC, S.inc.k).en(en(x))}.`,
+      ...(cs.length ? ['THE CONFLICTS OF DESIRE (the story is these wants colliding):', ...cs.map((c) => `- ${c.en}`)] : []),
+      ...(hard.length ? ['WHY IT IS HARD:', ...hard] : []), ...(techs.length ? ['PLOT TECHNIQUES:', ...techs] : []),
+      `In the arc: A = ${en(r.a)}, B = ${en(r.b)}; the episode 4 choice is ${en(r.a)} or ${en(r.b)}. Other characters may appear when the events need them.`].join('\n');
+    const all = E.map((list, i) => `Episode ${i + 1}:\n${epText[i]}`).join('\n');
+    return { decor: S.decor, a: r.a, b: r.b, text, ep1: `THE EVENTS, EPISODE BY EPISODE (place them):\n${all}`, eps: epText, forge: JSON.parse(JSON.stringify(S)) };
   }
 
   // ---- 🧍 a pose sheet of this character's archetype: his 6 faces, his way (bank.js: the same format as the base sheet) ----
@@ -186,44 +285,71 @@ Row 2, left to right:
 The face says what they feel; the mouth is open only where a cell says so. Keep it natural, like the reference.`;
   }
 
-  // ---- 🎲 everything drawn: a decor, two of its people, pillars, the chain ----
+  // ---- 🎲 everything drawn: a place, 2 to 4 people, wants that collide, relations, the rest ----
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const coin = (p) => Math.random() < p;
   function dice() {
-    const d = pick(DECORS), w = [...POOL()].sort(() => Math.random() - 0.5).slice(0, 2), inc = pick(INC), q = Math.random() < 0.7 ? inc.q : pick(QUEST).id;
-    const pl = () => { const a = pick(PILLARS).id; if (Math.random() < 0.5) return [a]; let b; do b = pick(PILLARS).id; while (b === a); return [a, b]; };
-    S = { decor: d.id, cast: w, pil: { justin: pl(), [w[0]]: pl(), [w[1]]: pl() }, flaw: { justin: Math.random() < 0.6 ? pick(FLAWS).id : null }, inc: inc.id, who: Math.round(Math.random()),
-      quest: q, conf: Math.random() < 0.7 ? by(QUEST, q).c : pick(CONF).id, hooks: { sexy: 1, [inc.id === 'gone' ? 'where' : 'who']: 1, stakes: Math.random() < 0.6 ? 1 : 0, what: Math.random() < 0.3 ? 1 : 0 } };
+    const pool = [...POOL()].sort(() => Math.random() - 0.5), cast = pool.slice(0, Math.min(pool.length, 2 + Math.floor(Math.random() * 2)));
+    const [T, O, C] = cast, pl = () => { const a = pick(PILLARS).id; if (coin(0.5)) return [a]; let b; do b = pick(PILLARS).id; while (b === a); return [a, b]; };
+    const k = pick(INC).id, want = {}, rl = {};
+    if (k === 'gone') { want[J] = { v: 'find', t: T }; if (O) want[O] = coin(0.5) ? { v: 'protect', t: T } : { v: 'oust', t: J }; if (coin(0.5)) want[T] = { v: 'free' }; }
+    else { want[J] = { v: 'love', t: T }; if (O) { want[O] = { v: 'love', t: T }; if (coin(0.5)) rl[pk(O, T)] = 'couple'; } }
+    if (C) rl[pk(J, C)] = pick(['friend', 'family', 'mentor']);
+    S = { decor: pick(DECORS).id, cast, pil: Object.fromEntries([J, ...cast].map((id) => [id, pl()])), flaw: { [J]: coin(0.6) ? pick(FLAWS).id : null }, want, rel: rl,
+      info: coin(0.6) ? { secret: pick(cast) } : {}, inc: { k, who: k === 'gone' ? T : O || T }, hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
+      tech: { sexy: 1, [k === 'gone' ? 'where' : 'who']: 1, plant: coin(0.6) ? 1 : 0, twist: 1, stakes: coin(0.5) ? 1 : 0 } };
   }
 
   // ---- the screen ----
-  const chip = (attrs, e, n, on, c, tip) => `<button type="button" class="fChip${on ? ' on' : ''}" ${attrs}${c ? ` style="--c:${c}"` : ''}${tip ? ` data-tip="${esc(tip)}"` : ''}><span>${e}</span><small>${esc(n)}</small></button>`;
+  const chip = (attrs, e, n, on, c, tip, off) => `<button type="button" class="fChip${on ? ' on' : ''}${off ? ' off' : ''}" ${attrs}${c ? ` style="--c:${c}"` : ''}${tip ? ` data-tip="${esc(tip)}"` : ''}><span>${e}</span><small>${esc(n)}</small></button>`;
   const row = (icon, inner, tip) => `<section class="fRow"><i class="fI"${tip ? ` data-tip="${esc(tip)}"` : ''}>${icon}</i><div class="fChips">${inner}</div></section>`;
+  const layer = (k, name, tip) => `<h3 class="fL" data-tip="${esc(tip)}"><i>${k}</i>${name}</h3>`;
+  const facePick = (attr, cur, ids, c) => `<span class="fSub">${ids.map((id) => `<button type="button" class="fFace sm${id === cur ? ' on' : ''}" ${attr}="${id}" style="--c:${c}" data-tip="${esc(nm(id))}">${face(id)}</button>`).join('')}</span>`;
   function person(id) {
-    const ps = pillarsOf(id), c = (P[ps[0]] || { c: '#3a3a3c' }).c;
-    return `<section class="fWho" style="--c:${c}">${face(id)}<div class="fWhoR"><b>${id === 'justin' ? '🎮 Justin' : esc(nameOf(id))}<em>${esc(tag(id))}</em></b>`
+    const ps = pillarsOf(id), c = (P[ps[0]] || { c: '#3a3a3c' }).c, w = S.want[id] || {}, wv = W[w.v];
+    return `<section class="fWho" style="--c:${c}">${face(id)}<div class="fWhoR"><b>${id === J ? '🎮 Justin' : esc(nm(id))}<em>${esc(tag(id))}</em></b>`
       + `<div class="fPs">${PILLARS.map((p) => { const k = ps.indexOf(p.id); return `<button type="button" class="fP${k === 0 ? ' on' : k === 1 ? ' mix' : ''}" style="--c:${p.c}" data-pil="${id}:${p.id}" data-tip="${esc(p.d)}">${p.e}</button>`; }).join('')}</div>`
-      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" data-tip="${esc(`${f.e} ${f.n} (faille)\n${f.d}`)}">${f.e}</button>`).join('')}</div></div></section>`;
+      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" data-tip="${esc(`${f.e} ${f.n} (faille)\n${f.d}`)}">${f.e}</button>`).join('')}</div>`
+      + `<div class="fPs fWant"><i class="fWi" data-tip="Ce qu’il veut (et de qui). Des désirs qui se croisent = l’histoire">🎯</i>${WANTS.map((x) => `<button type="button" class="fP${w.v === x.id ? ' on' : ''}" style="--c:#ff375f" data-want="${id}:${x.id}" data-tip="${esc(`${x.e} ${x.n}\n${x.d}`)}">${x.e}</button>`).join('')}</div>`
+      + (wv && wv.t ? `<div class="fPs">${people().filter((o) => o !== id).map((o) => `<button type="button" class="fFace sm${w.t === o ? ' on' : ''}" style="--c:#ff375f" data-wt="${id}:${o}" data-tip="${esc(`${wv.n} ${nm(o)}`)}">${face(o)}</button>`).join('')}</div>` : '')
+      + '</div></section>';
+  }
+  function relRows() {
+    const ps = people(), out = [];
+    for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) {
+      const r = R[rel(ps[i], ps[j])] || RELS[0];
+      out.push(`<button type="button" class="fRel${r.id ? ' on' : ''}" data-rel="${pk(ps[i], ps[j])}" data-tip="${esc(`${nm(ps[i])} et ${nm(ps[j])} : ${r.n}\nUn tap = le lien suivant (${RELS.slice(1).map((x) => x.e).join(' ')})`)}">${mini(ps[i])}<b>${r.e}</b>${mini(ps[j])}</button>`);
+    }
+    return out.join('');
   }
   function render() {
     if (!el) return;
-    const inc = by(INC, S.inc), x = X(), pX = P[pillarsOf(x)[0]], hasKey = !!ls('smt-key');
+    const inc = by(INC, S.inc.k), x = incWho(), cs = conflicts(), E = events(), hasKey = !!ls('smt-key');
     el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fDice" data-x="dice" aria-label="Au hasard" data-tip="Tout au hasard">🎲</button></div>`
+      // WHAT
+      + layer('1', 'Quoi', 'Le lieu, les persos, ce qu’ils veulent, leurs liens, les infos')
       + row('📍', DECORS.map((o) => chip(`data-decor="${o.id}"`, o.e, o.n, o.id === S.decor, '#8e8e93', o.d)).join(''), 'Le lieu')
-      + row('👥', POOL().map((id) => { const k = S.cast.indexOf(id); return `<button type="button" class="fFace${k >= 0 ? ' on' : ''}" data-cast="${id}" data-tip="${esc(nameOf(id))}\n1er choisi = A (celui qui demande), 2e = B">${face(id)}${k >= 0 ? `<i>${'AB'[k]}</i>` : ''}<small>${esc(nameOf(id))}</small></button>`; }).join(''), 'Les deux persos avec Justin (tous ceux qui ont la feuille de base)')
+      + row('👥', POOL().map((id) => { const k = S.cast.indexOf(id); return `<button type="button" class="fFace${k >= 0 ? ' on' : ''}" data-cast="${id}" data-tip="${esc(nm(id))}">${face(id)}<small>${esc(nm(id))}</small></button>`; }).join(''), 'Qui est dans l’histoire avec Justin (tous ceux qui ont la feuille de base)')
       + people().map(person).join('')
-      + row('💥', INC.map((o) => chip(`data-inc="${o.id}"`, o.e, o.n, o.id === S.inc, '#ff453a', o.d)).join('')
-        + `<span class="fSub">${S.cast.map((id, i) => `<button type="button" class="fFace sm${i === S.who ? ' on' : ''}" data-who="${i}" data-tip="C’est ${esc(nameOf(id))} qui ${esc(by(INC, S.inc).n.toLowerCase())}">${face(id)}</button>`).join('')}</span>`, 'L’élément déclencheur : il lance la quête')
-      + row('🎯', QUEST.map((o) => chip(`data-quest="${o.id}"`, o.e, o.n, o.id === S.quest, '#ff9f0a', o.d)).join(''), 'La quête : ce que Justin poursuit')
-      + row('⚔️', CONF.map((o) => chip(`data-conf="${o.id}"`, o.e, o.n, o.id === S.conf, '#bf5af2', o.d)).join(''), 'Le conflit : ce qui bloque')
-      + row('⏱️', HOOKS.map((o) => chip(`data-hook="${o.id}"`, o.e, o.n, !!S.hooks[o.id], '#ffd60a', o.d)).join(''), 'Les premières secondes : le max de valeur tout de suite (2 ou plus)')
-      + (inc.enter && pX ? `<section class="fIntro" style="--c:${pX.c}">${face(x)}<span class="fSt" data-tip="1. Créer l’attente : ${esc(pX.exp ? 'les autres parlent de lui, une promesse précise' : '')}">🗣️</span><span class="fSt" data-tip="2. Teaser l’arrivée : on annonce qu’il arrive bientôt">⏰</span><span class="fSt" data-tip="3. La surprise de son pilier, devant tout le monde">💥</span><b>${esc(pX.sur)}</b></section>` : '')
+      + (S.cast.length ? row('🔗', relRows(), 'Leurs liens : un tap change le lien') : '')
+      + row('🗂️', INFOS.map((i) => chip(`data-info="${i.id}"`, i.e, i.n, !!S.info[i.id], '#64d2ff', `${i.d}\nL’IA l’invente.`)).join('')
+        + INFOS.filter((i) => i.who && S.info[i.id]).map((i) => `<span class="fTag">${i.e}</span>${facePick('data-infowho', S.info[i.id], S.cast, '#64d2ff').replace(/data-infowho="/g, `data-infowho="${i.id}:`)}`).join(''), 'Les infos que l’IA invente (rien à taper)')
+      // HOW
+      + layer('2', 'Comment', '1. Le moteur : ce qui lance et bloque l’histoire. 2. Les techniques de plot.')
+      + row('💥', INC.map((o) => chip(`data-inc="${o.id}"`, o.e, o.n, o.id === S.inc.k, '#ff453a', o.d)).join('') + facePick('data-incwho', x, S.cast, '#ff453a'), 'Le déclencheur, et qui')
+      + `<section class="fConf" data-tip="Les conflits de désir, trouvés à partir de ce que chacun veut et de leurs liens">${cs.length ? cs.map((c) => `<div>${mini(c.a)}<b>${c.e}</b>${mini(c.b)}<span class="fCt">${esc(c.fr)}</span></div>`).join('') : '<div class="none">⚠️ <span class="fCt">Pas de conflit : donne des 🎯 qui se croisent</span></div>'}</section>`
+      + row('🧱', HARD.map((h) => { const ok = hardOk(h.id); return chip(`data-hard="${h.id}"`, h.e, h.n, ok && !!S.hard[h.id], '#bf5af2', ok ? h.d : `${h.d}\n${h.need}`, !ok); }).join(''), 'Pourquoi c’est dur (plusieurs à la fois)')
+      + row('🧭', TECHS.map((h) => chip(`data-tech="${h.id}"`, h.e, h.n, !!S.tech[h.id], '#ffd60a', `${h.lv} ${h.d}`)).join(''), 'Les techniques de plot (🧭 plot · 🧭🎬 le plot les place, la scène les joue)')
+      // OUTPUT
+      + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
+      + `<section class="fOut">${E.map((list, i) => `<div class="fEp"><i>${i + 1}</i><div>${list.map((ev) => `<span><b>${ev.e}</b>${esc(ev.fr)}</span>`).join('')}</div></div>`).join('')}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
       + '<button type="button" class="go" data-x="play" data-tip="Haiku écrit l’acte, le plan de l’épisode 1 et l’histoire, puis ça joue">▶ Jouer</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat ; la réponse se colle dans Acte › Générer › 1">📋 Prompt</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
       + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
       + people().map((id) => { const src = img(id), ps = pillarsOf(id);
         return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
-          + `<div class="fSheetR"><b>${id === 'justin' ? 'Justin' : esc(nameOf(id))}<em>${esc(tag(id))}</em></b>`
+          + `<div class="fSheetR"><b>${esc(nm(id))}<em>${esc(tag(id))}</em></b>`
           + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div></div></section>`; }).join('');
   }
   const copy = (text, then) => (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { msg = then; render(); }, () => { msg = 'Copie impossible'; render(); });
@@ -242,26 +368,31 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     e.stopPropagation();
     const d = t.dataset; msg = '';
     if (d.decor) S.decor = d.decor;
-    else if (d.cast) { const k = S.cast.indexOf(d.cast); if (k >= 0) S.cast.splice(k, 1); else { if (S.cast.length >= 2) S.cast.shift(); S.cast.push(d.cast); } if (S.who >= S.cast.length) S.who = 0; }
+    else if (d.cast) { const k = S.cast.indexOf(d.cast); if (k >= 0) S.cast.splice(k, 1); else S.cast.push(d.cast); }
     else if (d.pil) { const [id, p] = d.pil.split(':'), a = (S.pil[id] = pillarsOf(id)), k = a.indexOf(p); if (k >= 0) a.splice(k, 1); else { if (a.length >= 2) a.pop(); a.push(p); } }
     else if (d.flaw) { const [id, f] = d.flaw.split(':'); S.flaw[id] = S.flaw[id] === f ? null : f; }
-    else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${cap(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
+    else if (d.want) { const [id, v] = d.want.split(':'), cur = S.want[id];
+      if (cur && cur.v === v) delete S.want[id]; else S.want[id] = { v, t: W[v].t ? (cur && cur.t && cur.t !== id && live(cur.t) ? cur.t : people().find((o) => o !== id)) : null }; }
+    else if (d.wt) { const [id, o] = d.wt.split(':'); if (S.want[id]) S.want[id].t = o; }
+    else if (d.rel) { const k = RELS.findIndex((r) => r.id === (S.rel[d.rel] || '')); S.rel[d.rel] = RELS[(k + 1) % RELS.length].id; }
+    else if (d.info) { const i = INFOS.find((x) => x.id === d.info); S.info[d.info] = S.info[d.info] ? null : i.who ? S.cast[0] || null : 1; }
+    else if (d.infowho) { const [k, id] = d.infowho.split(':'); S.info[k] = id; }
+    else if (d.inc) S.inc.k = d.inc;
+    else if (d.incwho) S.inc.who = d.incwho;
+    else if (d.hard) { if (!hardOk(d.hard)) return; S.hard[d.hard] = S.hard[d.hard] ? 0 : 1; }
+    else if (d.tech) S.tech[d.tech] = S.tech[d.tech] ? 0 : 1;
+    else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
     else if (d.cimg) return copyImg(d.cimg, t);
-    else if (d.inc) { S.inc = d.inc; S.quest = by(INC, d.inc).q; S.conf = by(QUEST, S.quest).c; S.hooks.where = d.inc === 'gone' ? 1 : 0; S.hooks.who = d.inc === 'gone' ? 0 : 1; }
-    else if (d.who) S.who = +d.who;
-    else if (d.quest) { S.quest = d.quest; S.conf = by(QUEST, d.quest).c; }
-    else if (d.conf) S.conf = d.conf;
-    else if (d.hook) S.hooks[d.hook] = S.hooks[d.hook] ? 0 : 1;
     else if (d.x === 'dice') dice();
-    else if (d.x === 'copy') { if (S.cast.length < 2) { msg = '👥 ×2'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
+    else if (d.x === 'copy') { if (!S.cast.length) { msg = '👥 ?'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
       return copy(ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
     else if (d.x === 'acte') { save(); return window.FORGE_TO_ACT && FORGE_TO_ACT(); }
     else if (d.x === 'play') return play(t);
-    save(); render();
+    save(); const y = el.closest('#forge') ? el.closest('#forge').scrollTop : 0; render(); if (el.closest('#forge')) el.closest('#forge').scrollTop = y;
   }
   async function play(btn) {
-    if (S.cast.length < 2) { msg = '👥 ×2'; return render(); }
-    const inp = el.querySelector('[data-key]'); if (inp && /^sk-ant-/.test(inp.value.trim())) { ls('smt-key', inp.value.trim()); if (window.KEY_SYNC) KEY_SYNC(); }
+    if (!S.cast.length) { msg = '👥 ?'; return render(); }
+    const inp = el.querySelector('[data-key]'); if (inp && /^sk-ant-/.test(inp.value.trim())) { ls('smt-key', inp.value.trim()); }
     const key = ls('smt-key'); if (!key) { if (inp) inp.focus(); return; }
     save(); btn.disabled = true;
     const tell = (t) => { const m = el.querySelector('.fMsg'); if (m) m.textContent = t; };
@@ -286,5 +417,5 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     root.oncontextmenu = (e) => { if (e.target.closest('[data-tip]')) e.preventDefault(); };
     const sc = root.closest('#forge'); if (sc) sc.onscroll = tipHide;
   }
-  return { mount, PILLARS, FLAWS, sheet, seed };
+  return { mount, PILLARS, FLAWS, sheet, seed, events, conflicts };
 })();

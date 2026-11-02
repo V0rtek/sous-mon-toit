@@ -347,7 +347,7 @@ justin is caught between two people he cares about, A and B. A asks him for some
 - Episode 3: the secret comes out. The two planted things suddenly make sense. What the player believed is turned around.
 - Episode 4: A and B each ask him for the same moment. He must choose: A or B.
 - Episode 5: what his choice cost (one version per choice), and what stays open.
-${seed ? `\nTHE SEED (build the act on it; it wins over everything else except the rules; fit it inside the arc):\n${seed.text}\n${seed.ep1 ? `Episode 1 opens on:\n${seed.ep1}\n` : ''}` : ''}
+${seed ? `\nTHE SEED (build the act on it; it wins over everything else except the rules; fit it inside the arc):\n${seed.text}\n${seed.ep1 ? `${seed.eps ? '' : 'Episode 1 opens on:\n'}${seed.ep1}\n` : ''}` : ''}
 ${seed ? `THE TWO PEOPLE: A is the character "${seed.a}", B is the character "${seed.b}", in the decor "${seed.decor}". Choose who they are to justin so the seed works. Use their real gender everywhere (he/she).` : `THE TWO PEOPLE: A is ${ra}, B is ${rb}. Pick them among the characters of the decor (${DECORS}). Choose the decor where two characters fit, gender included: a father or a brother is a man (james, amare), a mother or a sister is a woman. If no decor has both, keep the closest relation that fits (his father becomes his mother) and write it in "is". Use the character's real gender everywhere (he/she).`}
 
 THE ACT'S TECHNIQUES (each field below says which one does it; follow them). Their examples come from OTHER stories: take the shape, never their people, events, objects or durations (no hospital, no lease, no audition, no "three years ago", no letter, no one leaving at sunrise). Invent from the idea and the two people:
@@ -430,7 +430,7 @@ ${arc.at.map(atLine).join('\n')}
 It must contain, each in its own rectangle of box "ep", in this order (the other rectangles go around them):
 ${items.map(([, , en, v], i) => `${i + 1}. ${en}${v ? ': ' + v : ''}`).join('\n')}
 "turn": ${turn || '…'}
-${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box "later" = 1 rectangle: what stays open for the next act.'}${A.seed ? `\nTHE SEED OF THE ACT (keep it true):\n${A.seed.text}${n === 1 && A.seed.ep1 ? `\nTHIS EPISODE OPENS ON:\n${A.seed.ep1}` : ''}` : ''}`;
+${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box "later" = 1 rectangle: what stays open for the next act.'}${A.seed ? `\nTHE SEED OF THE ACT (keep it true):\n${A.seed.text}${A.seed.eps && A.seed.eps[n - 1] ? `\nTHIS EPISODE'S EVENTS (each one in a rectangle, in this order; the act's items above still apply):\n${A.seed.eps[n - 1]}` : n === 1 && A.seed.ep1 ? `\nTHIS EPISODE OPENS ON:\n${A.seed.ep1}` : ''}` : ''}`;
   }
   const planPrompt = (n) => window.PLAN.prompt1('', false, { n, text: actText(n) });
 

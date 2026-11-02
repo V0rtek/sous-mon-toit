@@ -396,3 +396,13 @@ const TECH = {
     leads: [],
   },
 };
+
+// ---- plot or scene (02/11): a plot technique decides WHAT happens across the act (Créer, Acte); a scene technique decides
+// HOW a moment is written and played (Plan de scène). Some are both: the plot places them, the scene does them ----
+const TECH_LVL = (() => {
+  const P = ['antagonist', 'inciting', 'nameDrop', 'complication', 'nearSuccess', 'personalWin', 'twist', 'motifs', 'expandConflict', 'impossibleChoice',
+    'stakesRel', 'clock', 'conflictingDesire', 'apparentDefeat', 'sacrifice', 'resolve', 'philoConflict', 'pillars', 'otherChoice'];
+  const B = ['desire', 'curiosity', 'openLoop', 'raiseStakes', 'painfulConsequences', 'threat', 'showConsequences', 'introChar', 'positioning', 'charEngaging',
+    'relEngaging', 'empathy', 'communityWin', 'triesGood', 'unexpected', 'sexDrive', 'whereIsX', 'whoIsX', 'whatIsInX'];
+  const m = {}; for (const id of Object.keys(TECH)) m[id] = P.includes(id) ? 'plot' : B.includes(id) ? 'both' : 'scene'; return m;
+})();
