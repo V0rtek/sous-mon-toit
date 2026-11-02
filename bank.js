@@ -78,7 +78,9 @@ window.BANK = {
     chars() {
       // Nouveau perso on top (a tap opens its 4 steps), then every character we have
       const open = BANK.newCharIsOpen();
-      return `<div class="ncTop${open ? ' open' : ''}"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b><em>${open ? '−' : 'les feuilles de poses, pas à pas'}</em></button>${open ? `<div class="ncIn">${BANK.newChar()}</div>` : ''}</div>`
+      // open: the new character alone on screen (the others come back when it's closed)
+      if (open) return `<div class="ncTop open"><button type="button" class="ncToggle" data-nctoggle="1"><b>Nouveau perso</b><em>✕</em></button><div class="ncIn">${BANK.newChar()}</div></div>`;
+      return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div>`
         // the newest imported first, then the others
         + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
@@ -138,8 +140,8 @@ window.BANK = {
     $('#bankBody').onclick = (e) => {
       const s = e.target.closest('[data-snd]'), im = e.target.closest('[data-img]'), cp = e.target.closest('[data-copy]');
       const nc = e.target.closest('[data-nccopy]'), ci = e.target.closest('[data-cimg]'), she = e.target.closest('[data-ncshe]'), pl = e.target.closest('[data-ncplace]');
-      const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]'), tg = e.target.closest('[data-nctoggle]');
-      if (op || tk || tg) { e.stopPropagation(); if (tg) BANK.newCharSet('shown', !BANK.newCharIsOpen()); else if (op) BANK.newCharOpen(op.dataset.ncopen); else BANK.newCharTick(tk.dataset.ncdone); const y = $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
+      const op = e.target.closest('[data-ncopen]'), tk = e.target.closest('[data-ncdone]'), tg = e.target.closest('[data-nctoggle]'), sp = e.target.closest('[data-ncstep]');
+      if (op || tk || tg || sp) { e.stopPropagation(); if (tg) BANK.newCharSet('shown', !BANK.newCharIsOpen()); else if (sp) BANK.newCharStep(+sp.dataset.ncstep); else if (op) BANK.newCharOpen(op.dataset.ncopen); else { if (!(tk.dataset.ncnext && tk.classList.contains('ok'))) BANK.newCharTick(tk.dataset.ncdone); if (tk.dataset.ncnext) BANK.newCharStep(+tk.dataset.ncnext); } const y = sp || op || (tk && tk.dataset.ncnext) ? 0 : $('#bankBody').scrollTop; draw(); $('#bankBody').scrollTop = y; return; }
       if (nc || ci) {   // Nouveau perso: a prompt, or a picture as png (the promise keeps it inside the tap, for Safari)
         e.stopPropagation(); const b = nc || ci, was = b.textContent, done = (ok) => { b.textContent = ok ? 'Copié ✓' : 'Copie impossible : Enregistrer'; setTimeout(() => { b.textContent = was; }, 1800); };
         if (nc) { const t = BANK.newCharPrompt(nc.dataset.nccopy); navigator.clipboard.writeText(t).then(() => done(true), () => { const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); document.execCommand('copy'); x.remove(); done(true); }); return; }
@@ -349,36 +351,65 @@ Example:
   const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
   // a picture to attach: big, with Copier (into the clipboard, as png) and Enregistrer (a download)
   const pic = (f, label) => `<div class="ncPic"><img src="ref/${f}" alt="" data-img="ref/${f}"><span>${esc(label)}</span><div><button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image</button><a class="ncBtn" href="ref/${f}" download="${f}">Enregistrer</a></div></div>`;
-  // the screen: 4 steps, one card each, short. 4 = the sheets of the place, one line each: a tap opens it (its pictures,
-  // its prompt), « Fait » ticks it; one open at a time
+  // the screen (02/11: show, don't tell): one step at a time. 1 who (name, il/elle) · 2 their picture (their photo + the
+  // style → ChatGPT) · 3 their poses, a grid of tiles; a tile opens its sheet: the 2 images to attach, Copier le prompt,
+  // Importer le résultat (ticks it). The rest (what to keep, an object drawn by hand) behind a small « ⋯ »
+  const IC = {
+    who: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+    pic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>',
+    poses: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+    cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+    chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',
+    up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>',
+  };
+  const shot = (src, n) => `<span class="ncShot"><img src="${src}" alt="" data-img="${src}"><i>${n}</i></span>`;
+  const slot = (n, label) => `<span class="ncShot ncSlot">${IC.cam}<b>${esc(label)}</b><i>${n}</i></span>`;
+  const big = (attr, icon, label, cls = '') => `<button type="button" class="ncGo ${cls}" ${attr}>${icon}<span>${label}</span></button>`;
   BANK.newChar = () => {
     const c = load(), place = PLACES.find((p) => p[0] === c.place) || PLACES[0], done = c.done || {};
     const nm = String(c.name || '').trim(), mine = HAVE.includes(nm.toLowerCase()) ? `perso_${nm.toLowerCase()}.webp` : null;
-    const step = (n, title, ok, body) => `<div class="ncStep${ok ? ' ok' : ''}"><b><i>${ok ? '✓' : n}</i>${title}</b>${body}</div>`;
-    const sheets = place[2].filter((id) => id !== 'photo');
-    const one = mine ? pic(mine, `Image 1 · ${nm}`) : '<div class="ncPic mine"><span>Image 1 · ton perso (étape 2)</span></div>';
-    return step(1, 'Qui', !!nm, `<input data-nc="name" placeholder="Son nom" value="${esc(nm)}"><div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div>`)
-      + step(2, 'Son image', !!mine || !!done.photo, mine ? '<p>Déjà dans le jeu.</p>'
-        : `<p>Joins sa photo + l’image de style, colle le prompt.</p><div class="ncPics"><div class="ncPic mine"><span>Image 1 · sa photo</span></div>${pic('style.webp', 'Image 2 · le style')}</div>`
-          + `<textarea data-nc="locked" rows="3" placeholder="Ce qu’il faut garder (facultatif) : ex. cheveux roux bouclés, cicatrice à la joue, veste de cuir">${esc(c.locked || '')}</textarea>`
-          + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="photo">Copier le prompt</button><button type="button" class="ncDone${done.photo ? ' on' : ''}" data-ncdone="photo">${done.photo ? 'Fait ✓' : 'Fait'}</button></div>`)
-      + step(3, `Ses feuilles · ${sheets.filter((id) => done[id]).length}/${sheets.length}`, sheets.every((id) => done[id]),
-        `<p>Debout et Accoudé : tout le monde. Ensuite, selon l’histoire.</p>`
-        + sheets.map((id) => { const [t, why, guides] = SHEETS[id], open = c.open === id;
-          return `<div class="ncSheet${open ? ' open' : ''}${done[id] ? ' done' : ''}"><button type="button" class="ncHead" data-ncopen="${id}"><i>${done[id] ? '✓' : ''}</i>${esc(t)}<em>${open ? '−' : '+'}</em></button>`
-            + (open ? `<div class="ncBody"><p>${esc(why)}</p><div class="ncPics">${one}${guides.map((f, k) => pic(f, `Image ${k + 2} · ${f === 'chope.webp' ? 'la chope' : f === 'style.webp' ? 'le style' : 'le guide'}`)).join('')}</div>`
-              + `<div class="ncRow"><button type="button" class="bkCopy" data-nccopy="${id}">Copier le prompt</button><button type="button" class="ncDone${done[id] ? ' on' : ''}" data-ncdone="${id}">${done[id] ? 'Fait ✓' : 'Fait'}</button></div>`
-              + (window.IMPORT && IMPORT.KINDS[id] ? importBox(id) : '') + '</div>' : '') + '</div>'; }).join(''));
+    const sheets = place[2].filter((id) => id !== 'photo'), hasPic = !!mine || !!done.photo, n = sheets.filter((id) => done[id]).length;
+    const step = c.step || 1, me = mine ? `ref/${mine}` : null;
+    const dots = `<div class="ncDots">${[[1, IC.who, !!nm], [2, IC.pic, hasPic], [3, IC.poses, n === sheets.length]].map(([k, ic, ok]) =>
+      `<button type="button" data-ncstep="${k}" class="${k === step ? 'on' : ''}${ok ? ' ok' : ''}" aria-label="Étape ${k}">${ok && k !== step ? '<b>✓</b>' : ic}</button>`).join('<i></i>')}</div>`;
+    let body = '';
+    if (step === 1) {
+      body = `<div class="ncWho"><span class="ncAv">${me ? `<img src="${me}" alt="">` : nm ? esc([...nm][0].toUpperCase()) : IC.who}</span>
+        <input data-nc="name" placeholder="Son nom" value="${esc(nm)}" autocomplete="off">
+        <div class="ncChips">${[['', 'Il'], ['1', 'Elle']].map(([v, l]) => `<button type="button" data-ncshe="${v}" class="${(c.she ? '1' : '') === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`
+        + big('data-ncstep="2"', '', 'Suivant →', 'main');
+    } else if (step === 2) {
+      body = mine
+        ? `<div class="ncEq one">${shot(me, '✓')}</div>` + big('data-ncstep="3"', '', 'Suivant →', 'main')
+        : `<div class="ncEq">${slot(1, 'Sa photo')}<em>+</em>${shot('ref/style.webp', 2)}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
+          + big('data-nccopy="photo"', IC.copy, 'Copier le prompt', 'main')
+          + `<div class="ncSmall"><button type="button" class="ncBtn" data-cimg="ref/style.webp">Copier l’image 2</button><a class="ncBtn" href="ref/style.webp" download="style.webp">Enregistrer l’image 2</a></div>`
+          + `<details class="ncMore"${c.locked ? ' open' : ''}><summary>⋯</summary><textarea data-nc="locked" rows="3" placeholder="À garder : cheveux roux bouclés, cicatrice, veste de cuir…">${esc(c.locked || '')}</textarea></details>`
+          + big(`data-ncdone="photo" data-ncnext="3"`, '', done.photo ? 'Fait ✓ · Suivant →' : 'C’est fait →', done.photo ? 'ok' : '');
+    } else if (!c.open || !sheets.includes(c.open)) {
+      body = `<div class="ncTiles">${sheets.map((id) => { const [t, , guides] = SHEETS[id], g = guides.find((f) => f !== 'style.webp') || guides[0] || 'style.webp';
+        return `<button type="button" class="ncTile${done[id] ? ' done' : ''}" data-ncopen="${id}"><span><img loading="lazy" src="ref/${g}" alt=""></span><b>${esc(t.replace(/ \(base\)/, ''))}</b>${done[id] ? '<i>✓</i>' : ''}</button>`; }).join('')}</div>`;
+    } else {
+      const id = c.open, [t, , guides] = SHEETS[id], one = me ? shot(me, 1) : slot(1, nm || 'Le perso');
+      body = `<div class="ncSheetTop"><button type="button" class="ncBack" data-ncopen="${id}">‹</button><b>${esc(t)}</b>${done[id] ? '<i>✓</i>' : ''}</div>`
+        + `<div class="ncEq">${one}${guides.map((f, k) => `<em>+</em>${shot(`ref/${f}`, k + 2)}`).join('')}<em>→</em><span class="ncGpt">${IC.chat}<b>ChatGPT</b></span></div>`
+        + big(`data-nccopy="${id}"`, IC.copy, 'Copier le prompt', 'main')
+        + `<div class="ncSmall">${guides.map((f, k) => `<button type="button" class="ncBtn" data-cimg="ref/${f}">Copier l’image ${k + 2}</button>`).join('')}</div>`
+        + (window.IMPORT && IMPORT.KINDS[id] ? importBox(id) : big(`data-ncdone="${id}"`, '', done[id] ? 'Fait ✓' : 'C’est fait', done[id] ? 'ok' : ''));
+    }
+    return dots + `<div class="ncPane">${body}</div>`;
   };
   // the generated sheet -> into the game (importer.js): pick it, see the 6 poses cut, « Ajouter au jeu »
   let shown = null;   // { kind, imgs, msg }
-  const importBox = (id) => { const s = shown && shown.kind === id ? shown : null;
-    return `<div class="ncImport"><label class="ncBtn ncPick">${s && s.imgs ? 'Refaire avec une autre image' : 'Importer la feuille générée'}<input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
-      + (s && s.imgs ? `${s.imgs.some((m) => m.grip) ? '<p>Le point jaune = où le jeu met l’objet. Touche la main pour le déplacer.</p>' : ''}<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>${s.moved ? `<button type="button" class="bkCopy" data-ncadd="${id}">Enregistrer la prise</button>` : ''}` : '')
+  const importBox = (id) => { const s = shown && shown.kind === id ? shown : null, done = (load().done || {})[id];
+    return `<div class="ncImport"><label class="ncGo${done ? ' ok' : ''}">${IC.up}<span>${done ? 'Fait ✓ · Importer une autre' : s && s.imgs ? 'Importer une autre' : 'Importer le résultat'}</span><input type="file" accept="image/*" data-ncfile="${id}" hidden></label>`
       + (s && s.msg ? `<p class="ncMsg">${esc(s.msg)}</p>` : '')
-      // an object drawn by hand where it goes, on a layer the size of the sheet (the rest transparent)
-      + `<div class="ncLayer"><p>Un objet placé à la main : une couche de la taille de la feuille, l’objet seul là où il va, le reste transparent.</p><div class="ncRow"><select data-ncobj="${id}">${BANK.props.map(([n]) => `<option${n === layerObj ? ' selected' : ''}>${n}</option>`).join('')}</select><label class="ncBtn ncPick">Ajouter une couche d’objet<input type="file" accept="image/*" data-nclayer="${id}" hidden></label></div>`
-      + (L && L.kind === id ? `${L.imgs ? `<div class="ncCuts">${L.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>` : ''}<p class="ncMsg">${esc(L.msg)}</p>` : '') + '</div></div>'; };
+      + (s && s.imgs ? `<div class="ncCuts">${s.imgs.map((m) => `<figure><span class="ncGrip"${m.grip ? ` data-ncgrip="${m.pose}"` : ''}><img src="${m.src}" alt="">${m.grip ? `<i style="left:${m.grip[0] * 100}%;top:${m.grip[1] * 100}%"></i>` : ''}</span><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>${s.moved ? `<button type="button" class="bkCopy" data-ncadd="${id}">Enregistrer la prise</button>` : ''}` : '')
+      // what's rarely needed: tick it by hand, an object drawn by hand where it goes (a layer the size of the sheet)
+      + `<details class="ncMore"${L && L.kind === id ? ' open' : ''}><summary>⋯</summary><button type="button" class="ncDone${done ? ' on' : ''}" data-ncdone="${id}">${done ? 'Fait ✓' : 'Marquer fait'}</button>`
+      + `<div class="ncLayer"><p>Objet placé à la main (une couche de la taille de la feuille)</p><div class="ncRow"><select data-ncobj="${id}">${BANK.props.map(([n]) => `<option${n === layerObj ? ' selected' : ''}>${n}</option>`).join('')}</select><label class="ncBtn ncPick">Ajouter la couche<input type="file" accept="image/*" data-nclayer="${id}" hidden></label></div>`
+      + (L && L.kind === id ? `${L.imgs ? `<div class="ncCuts">${L.imgs.map((m) => `<figure><img src="${m.src}" alt=""><figcaption>${esc(m.pose)}</figcaption></figure>`).join('')}</div>` : ''}<p class="ncMsg">${esc(L.msg)}</p>` : '') + '</div></details></div>'; };
   let layerObj = 'chope', L = null;   // the object chosen for a layer, and the last layer cut
   BANK.newCharLayerObj = (o) => { layerObj = o; };
   BANK.newCharLayer = async (kind, file, redraw) => {
@@ -389,7 +420,7 @@ Example:
   };
   // imported = cut, then added to the game and ticked at once (a hand moved afterwards: « Enregistrer la prise »)
   BANK.newCharFile = async (kind, file, redraw) => {
-    if (!String(load().name || '').trim()) { shown = { kind, msg: 'Donne-lui un nom d’abord (étape 1).' }; redraw(); return; }
+    if (!String(load().name || '').trim()) { shown = { kind, msg: 'Un nom d’abord (étape 1).' }; redraw(); return; }
     shown = { kind, msg: 'Découpe…' }; redraw();
     const tell = (t) => { const m = document.querySelector('.ncMsg'); if (m) m.textContent = t; };
     try { shown = { kind, imgs: await IMPORT.cut(file, kind, load().name, tell), msg: 'Ajout au jeu…' }; }
@@ -409,4 +440,5 @@ Example:
   BANK.newCharIsOpen = () => !!load().shown;
   BANK.newCharTick = (id) => { const c = load(); c.done = c.done || {}; c.done[id] = !c.done[id]; keep(c); };
   BANK.newCharOpen = (id) => { const c = load(); c.open = c.open === id ? null : id; keep(c); };
+  BANK.newCharStep = (n) => { const c = load(); c.step = n; c.open = null; keep(c); };
 })();

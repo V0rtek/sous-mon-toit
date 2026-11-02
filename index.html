@@ -276,7 +276,7 @@ body.uitop #ui { top: auto; bottom: 3%; }
 .ncToggle b { font-size: 1.9em; }
 .ncToggle em { font-style: normal; margin-left: auto; font-size: 1.4em; color: #8e8e93; }
 .ncTop.open .ncToggle { margin-bottom: 1em; }
-.ncImport { display: flex; flex-direction: column; gap: .6em; margin-top: .4em; padding-top: .8em; border-top: .08em solid #3a3a3c; }
+.ncImport { display: flex; flex-direction: column; gap: 1em; }
 .ncPick { display: block; flex: none; padding: .6em; font-size: 1.4em; }
 .ncCuts { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5em; }
 .ncCuts figure { margin: 0; background: repeating-conic-gradient(#3a3a3c 0 25%, #2c2c2e 0 50%) 0 0 / 1.6em 1.6em; border-radius: .6em; padding: .3em; }
@@ -286,6 +286,58 @@ body.uitop #ui { top: auto; bottom: 3%; }
 .ncGrip i { position: absolute; width: .9em; height: .9em; margin: -.45em 0 0 -.45em; border-radius: 50%; background: #ffd60a; box-shadow: 0 0 0 .15em #000; pointer-events: none; }
 .ncCuts figcaption { font-size: 1.1em; color: #c7c7cc; text-align: center; }
 .ncMsg { font-size: 1.4em; color: #ffd60a; margin: 0; }
+/* Nouveau perso, one step at a time (02/11): 3 dots, a pane, one big button */
+.ncDots { display: flex; align-items: center; justify-content: center; gap: .6em; margin: .4em 0 2.4em; }
+.ncDots > i { width: 3em; height: .2em; border-radius: .1em; background: #3a3a3c; }
+.ncDots button { font: inherit; width: 5.4em; height: 5.4em; border-radius: 50%; border: 0; background: #1c1c1e; color: #8e8e93; display: grid; place-items: center; cursor: pointer; font-size: 1em; padding: 0; }
+.ncDots button svg { width: 2.6em; height: 2.6em; }
+.ncDots button.ok { background: #30d158; color: #000; }
+.ncDots button b { font-size: 2.4em; font-weight: 900; }
+.ncDots button.on { background: #f5f5f7; color: #000; font-size: 1em; box-shadow: 0 0 0 .35em rgba(245,245,247,.25); }
+.ncPane { display: flex; flex-direction: column; gap: 1.6em; }
+.ncWho { display: flex; flex-direction: column; align-items: center; gap: 1.6em; padding: 1em 0 1.4em; }
+.ncAv { width: 16em; height: 16em; border-radius: 50%; background: #1c1c1e; display: grid; place-items: center; overflow: hidden; color: #f5f5f7; font-size: 1em; }
+.ncAv svg { width: 7em; height: 7em; color: #48484a; }
+.ncAv:not(:has(svg)):not(:has(img)) { font-size: 7em; font-weight: 900; }
+.ncAv img { width: 100%; height: 300%; object-fit: cover; object-position: 50% 0; align-self: start; }
+.ncWho input { font: inherit; width: 100%; box-sizing: border-box; text-align: center; font-size: 3em; font-weight: 800; padding: .4em .6em; border: 0; border-radius: .6em; background: #1c1c1e; color: #f5f5f7; outline: none; user-select: text; }
+.ncWho .ncChips button { font-size: 2.2em; padding: .45em 1.4em; }
+.ncGo { font: inherit; display: flex; align-items: center; justify-content: center; gap: .6em; width: 100%; box-sizing: border-box; padding: 1em; border: 0; border-radius: 1.2em; background: #2c2c2e; color: #f5f5f7; font-size: 2.2em; font-weight: 800; cursor: pointer; text-align: center; }
+.ncGo svg { width: 1.2em; height: 1.2em; flex: none; }
+.ncGo.main { background: #f5f5f7; color: #000; }
+.ncGo.ok { background: #30d158; color: #000; }
+/* the equation: image 1 + image 2 → ChatGPT */
+.ncEq { display: flex; align-items: center; justify-content: center; gap: .8em; flex-wrap: wrap; }
+.ncEq em { font-style: normal; font-size: 3em; font-weight: 300; color: #636366; }
+.ncShot { position: relative; width: 13em; height: 17em; border-radius: 1em; background: #111; display: block; flex: none; }
+.ncEq.one .ncShot { width: 22em; height: 30em; }
+.ncShot img { width: 100%; height: 100%; object-fit: contain; border-radius: 1em; cursor: zoom-in; display: block; }
+.ncShot i { position: absolute; left: -.5em; top: -.5em; width: 1.6em; height: 1.6em; border-radius: 50%; background: #f5f5f7; color: #000; display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: 1.6em; }
+.ncSlot { border: .2em dashed #636366; background: none; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6em; color: #8e8e93; }
+.ncSlot svg { width: 5em; height: 5em; }
+.ncSlot b { font-size: 1.6em; font-weight: 700; text-align: center; padding: 0 .4em; }
+.ncGpt { display: flex; flex-direction: column; align-items: center; gap: .3em; color: #10a37f; }
+.ncGpt svg { width: 6em; height: 6em; }
+.ncGpt b { font-size: 1.5em; }
+.ncSmall { display: flex; gap: .6em; justify-content: center; flex-wrap: wrap; }
+.ncSmall .ncBtn { flex: 0 1 auto; background: #1c1c1e; color: #c7c7cc; font-size: 1.4em; padding: .5em 1em; }
+.ncMore summary { list-style: none; cursor: pointer; text-align: center; font-size: 2.4em; color: #636366; line-height: 1; }
+.ncMore summary::-webkit-details-marker { display: none; }
+.ncMore[open] { display: flex; flex-direction: column; gap: .8em; }
+.ncMore textarea { font: inherit; font-size: 1.6em; padding: .6em .8em; border-radius: .8em; border: 0; background: #1c1c1e; color: #f5f5f7; outline: none; user-select: text; resize: vertical; }
+/* step 3: the poses, as tiles */
+.ncTiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+.ncTile { font: inherit; position: relative; display: flex; flex-direction: column; gap: .6em; padding: .8em; border: 0; border-radius: 1.2em; background: #1c1c1e; color: #f5f5f7; cursor: pointer; text-align: left; }
+.ncTile span { display: block; height: 14em; border-radius: .7em; overflow: hidden; background: #0b0b0d; }
+.ncTile img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
+.ncTile b { font-size: 1.7em; padding: 0 .2em; }
+.ncTile > i { position: absolute; right: .5em; top: .5em; width: 1.6em; height: 1.6em; border-radius: 50%; background: #30d158; color: #000; display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: 1.8em; }
+.ncTile.done span { opacity: .55; }
+.ncSheetTop { display: flex; align-items: center; gap: .8em; }
+.ncSheetTop b { font-size: 2.2em; }
+.ncSheetTop > i { font-style: normal; color: #30d158; font-weight: 900; font-size: 2.2em; }
+.ncBack { font: inherit; width: 2em; height: 2em; border-radius: 50%; border: 0; background: #1c1c1e; color: #f5f5f7; font-size: 2em; cursor: pointer; display: grid; place-items: center; padding: 0 0 .1em; }
+.ncImport label.ncGo { margin: 0; }
 .ncLayer { display: flex; flex-direction: column; gap: .5em; margin-top: .4em; padding-top: .8em; border-top: .08em solid #3a3a3c; }
 .ncLayer select { font: inherit; font-size: 1.5em; padding: .4em .6em; border-radius: .8em; border: 0; background: #2c2c2e; color: #f5f5f7; }
 .ncStep { background: #1c1c1e; border-radius: 1.4em; padding: 1.2em 1.4em; margin-bottom: 1em; display: flex; flex-direction: column; gap: .8em; }
@@ -1941,7 +1993,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <script src="importer.js?v=20261033100000"></script>
 <script src="deck.js?v=20261034500000"></script>
-<script src="bank.js?v=20261032900000"></script>
+<script src="bank.js?v=20261102150000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
