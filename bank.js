@@ -490,9 +490,9 @@ Example:
   const KEYS = [['smt-key', 'Clé Haiku', 'sk-ant-…'], ['smt-gh-token', 'Jeton GitHub', 'github_pat_…']];
   BANK.keysHtml = () => { const ok = KEYS.map(([k]) => !!lsGet(k)), all = ok.every(Boolean);
     return `<details class="bkKeys"${all ? '' : ' open'}><summary>🔑 Clés <small>${KEYS.map(([, l], i) => `${l} ${ok[i] ? '✓' : '—'}`).join(' · ')}</small></summary>`
-      + KEYS.map(([k, l, ph], i) => `<label class="bkKey"><span>${l}</span><input type="password" data-bkkey="${k}" placeholder="${ph}" value="${ok[i] ? '••••••••' : ''}" autocomplete="off"></label>`).join('')
+      + KEYS.map(([k, l, ph], i) => `<label class="bkKey"><span>${l}</span><input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-bkkey="${k}" placeholder="${ph}" value="${ok[i] ? '••••••••' : ''}"></label>`).join('')
       + `<p class="bkNote">Gardées dans ce navigateur seulement. Le jeton GitHub partage tes persos et leurs feuilles sur tous les appareils.</p></details>`; };
-  BANK.keySave = (k, v) => { v = v.trim(); if (/^•+$/.test(v)) return; try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch { /* private window */ } if (k === 'smt-gh-token' && v) { pulled = false; syncDrafts(); } };
+  BANK.keySave = (k, v) => { v = v.trim(); if (/^•+$/.test(v) || (v && !(k === 'smt-key' ? /^sk-ant-/ : /^(github_pat_|ghp_)/).test(v))) return;   /* a browser's autofill (the code, a password) never replaces a key */ try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch { /* private window */ } if (k === 'smt-gh-token' && v) { pulled = false; syncDrafts(); } };
   BANK.draftsHtml = draftsHtml; BANK.draftsRefresh = refreshDrafts;   // the tabs are drawn in the other block
   BANK.draftOpen = (k) => { const d = drafts()[k]; if (!d) return; const c = { id: k, name: d.name, she: !!d.she, locked: d.locked || '', place: d.place || undefined, done: d.done || {}, step: d.done && d.done.debout ? 3 : 1, shown: true };
     try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* private window */ } };

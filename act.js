@@ -254,7 +254,7 @@ window.ACT = (() => {
       + `<small>Une fois jouée</small>${ep === 4 ? `<div class="aPick">${pickBtns()}</div>` : `<input class="aNote" data-note="${ep}" value="${esc(A.picks[ep] || '')}" placeholder="Ce que Justin a choisi">`}`
       + (ep < 5 ? `<div class="aBtns"><button type="button" data-s="next">Épisode ${ep + 1} →</button></div>` : '') + '</section>'
       + `<section class="aStep"><h3><i>✓</i>Garder pour Claude</h3><p class="pD">${ls('smt-gh-token') ? 'Activé : chaque acte, plan, histoire et avis va dans le repo (essais/auto), où Claude peut les lire.' : 'Pas activé. Une fois : sur github.com, Settings › Developer settings › Fine-grained tokens › Generate : seulement le repo sous-mon-toit, Contents : Read and write. Colle le jeton ici (il reste sur ce téléphone).'}</p>`
-      + `<input class="aNote" type="password" data-token="1" placeholder="Jeton GitHub (github_pat_…)" value="${ls('smt-gh-token') ? '••••••••' : ''}">`
+      + `<input class="aNote secret" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-token="1" placeholder="Jeton GitHub (github_pat_…)" value="${ls('smt-gh-token') ? '••••••••' : ''}">`
       + '<div class="aBtns"><button type="button" data-s="saveToken">Enregistrer le jeton</button><button type="button" data-s="bundle">Copier pour Claude</button></div></section>';
   }
 
@@ -484,7 +484,7 @@ ${n < 5 ? `Box "later" = 1 to 3 rectangles of episode ${n + 1}: ${next}` : 'Box 
         try { j = LOOSE_JSON(draft.story); } catch { return say('story', 'Ce n’est pas une histoire (JSON).'); }
         try { keep(`histoire-ep${ep}`, { ep, plan: PLAN.get().title, story: j }); window.PLAN_PLAY(j, PLAN.get().title); draft.story = ''; } catch (err) { say('story', err.message && !/JSON|Unexpected/.test(err.message) ? err.message : 'Ce n’est pas une histoire (JSON).'); }
         return; }
-      case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && !/^•+$/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
+      case 'saveToken': { const v = el.querySelector('[data-token]').value.trim(); if (v && /^(github_pat_|ghp_)/.test(v)) ls('smt-gh-token', v); else if (!v) { try { localStorage.removeItem('smt-gh-token'); } catch { /* private window */ } } render(); note(ls('smt-gh-token') ? 'Jeton enregistré.' : 'Jeton retiré.'); return; }
       case 'bundle': return copy(JSON.stringify(bundle()), btn);
       case 'next': ep = Math.min(5, ep + 1); render(); el.querySelector('.aView').scrollTop = 0; return;
     }

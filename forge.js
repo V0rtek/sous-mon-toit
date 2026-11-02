@@ -8,7 +8,14 @@ window.FORGE = (() => {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cap = (s) => String(s || '?').charAt(0).toUpperCase() + String(s || '?').slice(1);
   const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { /* private window */ } return null; };
-  const sprite = (id) => (id === 'isa' && typeof ISA_LOOKS !== 'undefined' ? ISA_LOOKS[0].sprite : id);
+  const sprite = (id) => (id === 'isa' && typeof ISA_LOOKS !== 'undefined' ? ISA_LOOKS[0].sprite : (window.CAST && CAST[id] && CAST[id].sprite) || id);
+  // who can be cast: every character of the game (CAST) whose sheet has the 6 base poses (Banque › the base sheet:
+  // listen, surprised, thinking, explaining, angry, holding), whatever the place; one per picture (rocco is amare's)
+  const NOT_CAST = ['justin', 'kai', 'leo', 'twin', 'lily2', 'redtest'];
+  const POOL = () => { const need = (window.IMPORT && IMPORT.KINDS.base.poses) || ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'], seen = new Set();
+    return Object.keys(window.CAST || {}).filter((id) => { const sp = sprite(id), S = window.SPRITES && SPRITES[sp];
+      if (NOT_CAST.includes(id) || seen.has(sp) || !S || !need.every((p) => S.poses[p])) return false; seen.add(sp); return true; }); };
+  const nameOf = (id) => (window.CAST && CAST[id] && CAST[id].name) || cap(id);
   const pose = (id) => { const S = window.SPRITES && SPRITES[sprite(id)]; return S ? (S.poses.listen ? 'listen' : Object.keys(S.poses)[0]) : null; };
   const img = (id) => { const p = pose(id); return p ? `chars/${sprite(id)}/${p}.webp` : ''; };
   const face = (id) => { const p = pose(id); return `<span class="pFace">${p ? `<img src="chars/${sprite(id)}/${p}.webp" alt="">` : ''}</span>`; };
@@ -74,45 +81,49 @@ window.FORGE = (() => {
         'Anger: fierce, stepping forward, one arm out as if shielding someone behind.', 'Sadness: tired, heavy shoulders, one hand rubbing the face.',
         'Fear: fear for someone else: eyes searching, one hand reaching out.', 'Signature: standing firm, one arm out to the side, shielding someone off-frame.'] },
   ];
+  const PFR = { chef: 'Respect, charisme : on le suit.', charmeur: 'Désir : on le regarde, il le sait.', dangereux: 'Peur : la salle se tait quand il entre.',
+    genie: 'Compétence : il rend facile ce qui est dur.', clown: 'Chaleur : il fait rire, et ça cache autre chose.', mysterieux: 'Mystère : on ne sait pas ce qu’il veut.',
+    outsider: 'Empathie : il veut très fort, tout est contre lui.', protecteur: 'Loyauté : il paie pour un autre.' };
+  PILLARS.forEach((p) => { p.d = `${p.e} ${p.n} · ${p.ex}\n${PFR[p.id]}\n💥 Son entrée : ${p.sur}.\n1er tap = son pilier, 2e = le mélange.`; });
   const P = Object.fromEntries(PILLARS.map((p) => [p.id, p]));
   // a flaw: the crack that makes the pillar human (the Mentalist: charmer + genius, but a coward when danger comes)
   const FLAWS = [
-    { id: 'lache', e: '🐔', n: 'Lâche', en: 'bold and sure of themselves, until real danger comes: then a coward' },
-    { id: 'vice', e: '🍷', n: 'Un vice', en: 'a vice they cannot stop (drink, gambling) that costs them at the worst moment' },
-    { id: 'colere', e: '🌋', n: 'Colère', en: 'a temper that breaks at the worst moment' },
-    { id: 'menteur', e: '🎭', n: 'Menteur', en: 'lies by reflex, even when the truth would help' },
-    { id: 'orgueil', e: '🦚', n: 'Orgueil', en: 'too proud to ask for help or say sorry' },
+    { id: 'lache', e: '🐔', n: 'Lâche', d: 'Culotté et sûr de lui, jusqu’au vrai danger : là, il se cache (le Mentalist).', en: 'bold and sure of themselves, until real danger comes: then a coward' },
+    { id: 'vice', e: '🍷', n: 'Un vice', d: 'Boire, jouer : un vice qui lui coûte au pire moment.', en: 'a vice they cannot stop (drink, gambling) that costs them at the worst moment' },
+    { id: 'colere', e: '🌋', n: 'Colère', d: 'Il explose au pire moment.', en: 'a temper that breaks at the worst moment' },
+    { id: 'menteur', e: '🎭', n: 'Menteur', d: 'Il ment par réflexe, même quand la vérité l’aiderait.', en: 'lies by reflex, even when the truth would help' },
+    { id: 'orgueil', e: '🦚', n: 'Orgueil', d: 'Trop fier pour demander de l’aide ou s’excuser.', en: 'too proud to ask for help or say sorry' },
   ];
   const F = Object.fromEntries(FLAWS.map((f) => [f.id, f]));
 
-  // ---- the decors of the act (act.js DECORS) and who lives there ----
-  const DECORS = [{ id: 'taverne', e: '🍺', n: 'Taverne', who: ['melissa', 'candy', 'ruby'] }, { id: 'maison', e: '🏠', n: 'Maison', who: ['ruby', 'james'] },
-    { id: 'salon', e: '🛋️', n: 'Salon', who: ['isa', 'amare', 'james'] }];
+  // ---- the decors of the act (act.js DECORS): only the place; anyone can be there ----
+  const DECORS = [{ id: 'taverne', e: '🍺', n: 'Taverne', d: 'La terrasse d’une taverne au-dessus d’une ville fantasy' }, { id: 'maison', e: '🏠', n: 'Maison', d: 'L’intérieur d’une maison' },
+    { id: 'salon', e: '🛋️', n: 'Salon', d: 'Un salon' }];
   const D = Object.fromEntries(DECORS.map((d) => [d.id, d]));
 
   // ---- inciting incident -> quest -> conflict. X = the one the incident is about, Y = the other one ----
   const INC = [
-    { id: 'shift', e: '⚡', n: 'Arrive, tout change', q: 'rival', en: (X) => `${X} arrives, and their arrival shifts everything for justin`, enter: true },
-    { id: 'arrive', e: '🚪', n: 'Débarque sans prévenir', q: 'love', en: (X) => `${X} shows up without warning, with something at stake attached to them`, enter: true },
-    { id: 'gone', e: '👻', n: 'Disparaît', q: 'find', en: (X) => `${X} disappears: on screen in the first lines, then gone`, enter: false },
+    { id: 'shift', e: '⚡', n: 'Arrive, tout change', d: 'Quelqu’un arrive et change l’équilibre. On le présente en 3 temps.', q: 'rival', en: (X) => `${X} arrives, and their arrival shifts everything for justin`, enter: true },
+    { id: 'arrive', e: '🚪', n: 'Débarque sans prévenir', d: 'Quelqu’un avec un enjeu attaché débarque sans prévenir. On le présente en 3 temps.', q: 'love', en: (X) => `${X} shows up without warning, with something at stake attached to them`, enter: true },
+    { id: 'gone', e: '👻', n: 'Disparaît', d: 'On le voit dans les premières répliques, puis il n’est plus là. Où est-il ?', q: 'find', en: (X) => `${X} disappears: on screen in the first lines, then gone`, enter: false },
   ];
   const QUEST = [
-    { id: 'rival', e: '😤', n: 'Chasser le rival', c: 'liked', en: (X, Y) => `get rid of ${X}, the rival who flirts with ${Y}, the one justin loves` },
-    { id: 'love', e: '❤️', n: 'Séduire', c: 'taken', en: (X) => `start a romance with ${X}` },
-    { id: 'find', e: '🔦', n: 'Retrouver', c: 'danger', en: (X) => `find ${X} back` },
+    { id: 'rival', e: '😤', n: 'Chasser le rival', d: 'Se débarrasser du rival qui flirte avec celle (celui) que Justin aime.', c: 'liked', en: (X, Y) => `get rid of ${X}, the rival who flirts with ${Y}, the one justin loves` },
+    { id: 'love', e: '❤️', n: 'Séduire', d: 'Une romance avec le nouveau perso.', c: 'taken', en: (X) => `start a romance with ${X}` },
+    { id: 'find', e: '🔦', n: 'Retrouver', d: 'Retrouver celui qui a disparu.', c: 'danger', en: (X) => `find ${X} back` },
   ];
   const CONF = [
-    { id: 'liked', e: '😇', n: 'Tout le monde l’adore', en: (X) => `everyone thinks ${X} is a great person: justin is alone against them` },
-    { id: 'taken', e: '💍', n: 'Déjà pris', en: (X, Y, love) => `${love} already has someone else` },
-    { id: 'danger', e: '🌲', n: 'Lieu dangereux', en: () => 'to get there, justin must go through a dangerous place of this world' },
+    { id: 'liked', e: '😇', n: 'Tout le monde l’adore', d: 'Tout le monde trouve l’antagoniste génial : Justin est seul contre lui.', en: (X) => `everyone thinks ${X} is a great person: justin is alone against them` },
+    { id: 'taken', e: '💍', n: 'Déjà pris', d: 'La personne qu’il veut a déjà quelqu’un.', en: (X, Y, love) => `${love} already has someone else` },
+    { id: 'danger', e: '🌲', n: 'Lieu dangereux', d: 'Pour y arriver, il faut passer par un endroit dangereux (une forêt la nuit).', en: () => 'to get there, justin must go through a dangerous place of this world' },
   ];
   // the first seconds: give everything at once
   const HOOKS = [
-    { id: 'sexy', e: '🔥', n: 'Attirance', en: () => 'Attraction from the first line: hot characters, a look that lasts too long, a flirty double meaning, the others noticing them.' },
-    { id: 'where', e: '🔍', n: 'Où ?', en: (X, gone) => (gone ? `Where is ${X}? Their seat is empty, nobody says where they went; the question lasts.` : 'Where is someone? A person who should be there is not; the question lasts.') },
-    { id: 'who', e: '👤', n: 'Qui ?', en: (X, gone, enter) => (enter ? `Who is ${X}? The others talk about them before we see them (a precise promise), and say we will meet them soon.` : 'Who is someone? The others talk about a person we do not see, and say we will meet them soon.') },
-    { id: 'what', e: '📦', n: 'Quoi ?', en: () => 'What is in it? An object, a room or a letter someone knows the content of and will not tell.' },
-    { id: 'stakes', e: '⏳', n: 'Enjeu', en: () => 'Big stakes coming: someone is stressed right before going on stage (walking in, opening a door); we feel the weight before the action.' },
+    { id: 'sexy', e: '🔥', n: 'Attirance', d: 'Persos hot, regards qui durent, répliques à double sens, dès la 1re ligne.', en: () => 'Attraction from the first line: hot characters, a look that lasts too long, a flirty double meaning, the others noticing them.' },
+    { id: 'where', e: '🔍', n: 'Où ?', d: 'Où est X ? Quelqu’un devrait être là et n’y est pas.', en: (X, gone) => (gone ? `Where is ${X}? Their seat is empty, nobody says where they went; the question lasts.` : 'Where is someone? A person who should be there is not; the question lasts.') },
+    { id: 'who', e: '👤', n: 'Qui ?', d: 'Qui est X ? On parle de lui sans le voir, et on annonce qu’on va le rencontrer.', en: (X, gone, enter) => (enter ? `Who is ${X}? The others talk about them before we see them (a precise promise), and say we will meet them soon.` : 'Who is someone? The others talk about a person we do not see, and say we will meet them soon.') },
+    { id: 'what', e: '📦', n: 'Quoi ?', d: 'Qu’y a-t-il dans X ? Une lettre, une porte : quelqu’un sait et ne dit rien.', en: () => 'What is in it? An object, a room or a letter someone knows the content of and will not tell.' },
+    { id: 'stakes', e: '⏳', n: 'Enjeu', d: 'Un gros enjeu approche : quelqu’un est stressé juste avant d’entrer en scène.', en: () => 'Big stakes coming: someone is stressed right before going on stage (walking in, opening a door); we feel the weight before the action.' },
   ];
   const by = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -178,42 +189,42 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   // ---- 🎲 everything drawn: a decor, two of its people, pillars, the chain ----
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   function dice() {
-    const d = pick(DECORS), w = [...d.who].sort(() => Math.random() - 0.5).slice(0, 2), inc = pick(INC), q = Math.random() < 0.7 ? inc.q : pick(QUEST).id;
+    const d = pick(DECORS), w = [...POOL()].sort(() => Math.random() - 0.5).slice(0, 2), inc = pick(INC), q = Math.random() < 0.7 ? inc.q : pick(QUEST).id;
     const pl = () => { const a = pick(PILLARS).id; if (Math.random() < 0.5) return [a]; let b; do b = pick(PILLARS).id; while (b === a); return [a, b]; };
     S = { decor: d.id, cast: w, pil: { justin: pl(), [w[0]]: pl(), [w[1]]: pl() }, flaw: { justin: Math.random() < 0.6 ? pick(FLAWS).id : null }, inc: inc.id, who: Math.round(Math.random()),
       quest: q, conf: Math.random() < 0.7 ? by(QUEST, q).c : pick(CONF).id, hooks: { sexy: 1, [inc.id === 'gone' ? 'where' : 'who']: 1, stakes: Math.random() < 0.6 ? 1 : 0, what: Math.random() < 0.3 ? 1 : 0 } };
   }
 
   // ---- the screen ----
-  const chip = (attrs, e, n, on, c) => `<button type="button" class="fChip${on ? ' on' : ''}" ${attrs}${c ? ` style="--c:${c}"` : ''}><span>${e}</span><small>${esc(n)}</small></button>`;
-  const row = (icon, inner) => `<section class="fRow"><i class="fI">${icon}</i><div class="fChips">${inner}</div></section>`;
+  const chip = (attrs, e, n, on, c, tip) => `<button type="button" class="fChip${on ? ' on' : ''}" ${attrs}${c ? ` style="--c:${c}"` : ''}${tip ? ` data-tip="${esc(tip)}"` : ''}><span>${e}</span><small>${esc(n)}</small></button>`;
+  const row = (icon, inner, tip) => `<section class="fRow"><i class="fI"${tip ? ` data-tip="${esc(tip)}"` : ''}>${icon}</i><div class="fChips">${inner}</div></section>`;
   function person(id) {
     const ps = pillarsOf(id), c = (P[ps[0]] || { c: '#3a3a3c' }).c;
-    return `<section class="fWho" style="--c:${c}">${face(id)}<div class="fWhoR"><b>${id === 'justin' ? '🎮 Justin' : cap(id)}<em>${esc(tag(id))}</em></b>`
-      + `<div class="fPs">${PILLARS.map((p) => { const k = ps.indexOf(p.id); return `<button type="button" class="fP${k === 0 ? ' on' : k === 1 ? ' mix' : ''}" style="--c:${p.c}" data-pil="${id}:${p.id}" title="${esc(p.n)} · ${esc(p.ex)}">${p.e}</button>`; }).join('')}</div>`
-      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" title="${esc(f.n)}">${f.e}</button>`).join('')}</div></div></section>`;
+    return `<section class="fWho" style="--c:${c}">${face(id)}<div class="fWhoR"><b>${id === 'justin' ? '🎮 Justin' : esc(nameOf(id))}<em>${esc(tag(id))}</em></b>`
+      + `<div class="fPs">${PILLARS.map((p) => { const k = ps.indexOf(p.id); return `<button type="button" class="fP${k === 0 ? ' on' : k === 1 ? ' mix' : ''}" style="--c:${p.c}" data-pil="${id}:${p.id}" data-tip="${esc(p.d)}">${p.e}</button>`; }).join('')}</div>`
+      + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" data-tip="${esc(`${f.e} ${f.n} (faille)\n${f.d}`)}">${f.e}</button>`).join('')}</div></div></section>`;
   }
   function render() {
     if (!el) return;
-    const d = D[S.decor] || DECORS[0], inc = by(INC, S.inc), x = X(), pX = P[pillarsOf(x)[0]], hasKey = !!ls('smt-key');
-    el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fDice" data-x="dice" aria-label="Au hasard">🎲</button></div>`
-      + row('📍', DECORS.map((o) => chip(`data-decor="${o.id}"`, o.e, o.n, o.id === S.decor, '#8e8e93')).join(''))
-      + row('👥', d.who.map((id) => { const k = S.cast.indexOf(id); return `<button type="button" class="fFace${k >= 0 ? ' on' : ''}" data-cast="${id}">${face(id)}${k >= 0 ? `<i>${'AB'[k]}</i>` : ''}<small>${cap(id)}</small></button>`; }).join(''))
+    const inc = by(INC, S.inc), x = X(), pX = P[pillarsOf(x)[0]], hasKey = !!ls('smt-key');
+    el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fDice" data-x="dice" aria-label="Au hasard" data-tip="Tout au hasard">🎲</button></div>`
+      + row('📍', DECORS.map((o) => chip(`data-decor="${o.id}"`, o.e, o.n, o.id === S.decor, '#8e8e93', o.d)).join(''), 'Le lieu')
+      + row('👥', POOL().map((id) => { const k = S.cast.indexOf(id); return `<button type="button" class="fFace${k >= 0 ? ' on' : ''}" data-cast="${id}" data-tip="${esc(nameOf(id))}\n1er choisi = A (celui qui demande), 2e = B">${face(id)}${k >= 0 ? `<i>${'AB'[k]}</i>` : ''}<small>${esc(nameOf(id))}</small></button>`; }).join(''), 'Les deux persos avec Justin (tous ceux qui ont la feuille de base)')
       + people().map(person).join('')
-      + row('💥', INC.map((o) => chip(`data-inc="${o.id}"`, o.e, o.n, o.id === S.inc, '#ff453a')).join('')
-        + `<span class="fSub">${S.cast.map((id, i) => `<button type="button" class="fFace sm${i === S.who ? ' on' : ''}" data-who="${i}">${face(id)}</button>`).join('')}</span>`)
-      + row('🎯', QUEST.map((o) => chip(`data-quest="${o.id}"`, o.e, o.n, o.id === S.quest, '#ff9f0a')).join(''))
-      + row('⚔️', CONF.map((o) => chip(`data-conf="${o.id}"`, o.e, o.n, o.id === S.conf, '#bf5af2')).join(''))
-      + row('⏱️', HOOKS.map((o) => chip(`data-hook="${o.id}"`, o.e, o.n, !!S.hooks[o.id], '#ffd60a')).join(''))
-      + (inc.enter && pX ? `<section class="fIntro" style="--c:${pX.c}">${face(x)}<span class="fSt">🗣️</span><span class="fSt">⏰</span><span class="fSt">💥</span><b>${esc(pX.sur)}</b></section>` : '')
-      + `<section class="fGo">${hasKey ? '' : '<input type="password" data-key="1" placeholder="Clé API (sk-ant-…)" autocomplete="off">'}`
-      + '<button type="button" class="go" data-x="play">▶ Jouer</button><button type="button" data-x="copy">📋 Prompt</button><button type="button" data-x="acte">Acte ›</button></section>'
+      + row('💥', INC.map((o) => chip(`data-inc="${o.id}"`, o.e, o.n, o.id === S.inc, '#ff453a', o.d)).join('')
+        + `<span class="fSub">${S.cast.map((id, i) => `<button type="button" class="fFace sm${i === S.who ? ' on' : ''}" data-who="${i}" data-tip="C’est ${esc(nameOf(id))} qui ${esc(by(INC, S.inc).n.toLowerCase())}">${face(id)}</button>`).join('')}</span>`, 'L’élément déclencheur : il lance la quête')
+      + row('🎯', QUEST.map((o) => chip(`data-quest="${o.id}"`, o.e, o.n, o.id === S.quest, '#ff9f0a', o.d)).join(''), 'La quête : ce que Justin poursuit')
+      + row('⚔️', CONF.map((o) => chip(`data-conf="${o.id}"`, o.e, o.n, o.id === S.conf, '#bf5af2', o.d)).join(''), 'Le conflit : ce qui bloque')
+      + row('⏱️', HOOKS.map((o) => chip(`data-hook="${o.id}"`, o.e, o.n, !!S.hooks[o.id], '#ffd60a', o.d)).join(''), 'Les premières secondes : le max de valeur tout de suite (2 ou plus)')
+      + (inc.enter && pX ? `<section class="fIntro" style="--c:${pX.c}">${face(x)}<span class="fSt" data-tip="1. Créer l’attente : ${esc(pX.exp ? 'les autres parlent de lui, une promesse précise' : '')}">🗣️</span><span class="fSt" data-tip="2. Teaser l’arrivée : on annonce qu’il arrive bientôt">⏰</span><span class="fSt" data-tip="3. La surprise de son pilier, devant tout le monde">💥</span><b>${esc(pX.sur)}</b></section>` : '')
+      + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
+      + '<button type="button" class="go" data-x="play" data-tip="Haiku écrit l’acte, le plan de l’épisode 1 et l’histoire, puis ça joue">▶ Jouer</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat ; la réponse se colle dans Acte › Générer › 1">📋 Prompt</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
       + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
       + people().map((id) => { const src = img(id), ps = pillarsOf(id);
         return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
-          + `<div class="fSheetR"><b>${id === 'justin' ? 'Justin' : cap(id)}<em>${esc(tag(id))}</em></b>`
-          + `<div class="fBtns"><button type="button" data-pose="${id}">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp">⬇</a>` : ''}</div></div></section>`; }).join('');
+          + `<div class="fSheetR"><b>${id === 'justin' ? 'Justin' : esc(nameOf(id))}<em>${esc(tag(id))}</em></b>`
+          + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div></div></section>`; }).join('');
   }
   const copy = (text, then) => (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { msg = then; render(); }, () => { msg = 'Copie impossible'; render(); });
   // an image into the clipboard, as png (ChatGPT takes a paste); where it can't, it opens to save it
@@ -230,7 +241,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     const t = e.target.closest('button'); if (!t || !el.contains(t)) return;   // ⬇ is a link: it downloads by itself
     e.stopPropagation();
     const d = t.dataset; msg = '';
-    if (d.decor) { S.decor = d.decor; const w = D[d.decor].who; S.cast = S.cast.filter((id) => w.includes(id)); for (const id of w) if (S.cast.length < 2 && !S.cast.includes(id)) S.cast.push(id); }
+    if (d.decor) S.decor = d.decor;
     else if (d.cast) { const k = S.cast.indexOf(d.cast); if (k >= 0) S.cast.splice(k, 1); else { if (S.cast.length >= 2) S.cast.shift(); S.cast.push(d.cast); } if (S.who >= S.cast.length) S.who = 0; }
     else if (d.pil) { const [id, p] = d.pil.split(':'), a = (S.pil[id] = pillarsOf(id)), k = a.indexOf(p); if (k >= 0) a.splice(k, 1); else { if (a.length >= 2) a.pop(); a.push(p); } }
     else if (d.flaw) { const [id, f] = d.flaw.split(':'); S.flaw[id] = S.flaw[id] === f ? null : f; }
@@ -250,13 +261,30 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   }
   async function play(btn) {
     if (S.cast.length < 2) { msg = '👥 ×2'; return render(); }
-    const inp = el.querySelector('[data-key]'); if (inp && inp.value.trim()) { ls('smt-key', inp.value.trim()); if (window.KEY_SYNC) KEY_SYNC(); }
+    const inp = el.querySelector('[data-key]'); if (inp && /^sk-ant-/.test(inp.value.trim())) { ls('smt-key', inp.value.trim()); if (window.KEY_SYNC) KEY_SYNC(); }
     const key = ls('smt-key'); if (!key) { if (inp) inp.focus(); return; }
     save(); btn.disabled = true;
     const tell = (t) => { const m = el.querySelector('.fMsg'); if (m) m.textContent = t; };
     try { if (window.COUNTER) COUNTER.on = false; const u = await ACT.auto(key, { n: 1, newAct: true, seed: seed() }, tell); if (window.GEN_USED) GEN_USED(u); msg = ''; }
     catch (err) { msg = err.message || 'Ça n’a pas marché.'; btn.disabled = false; render(); }
   }
-  function mount(root) { el = root; root.onclick = onClick; msg = ''; render(); }
+  // ---- details: hover (a mouse), or hold a finger half a second (a phone; that tap then does nothing) ----
+  let tipEl = null, holdT = 0, held = false;
+  const tipShow = (t) => { const s = t && t.dataset.tip; if (!s) return tipHide();
+    if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'fTip'; document.body.appendChild(tipEl); }
+    tipEl.textContent = s; tipEl.hidden = false; const r = t.getBoundingClientRect(), w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+    tipEl.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+    tipEl.style.top = (r.top - h - 8 > 8 ? r.top - h - 8 : r.bottom + 8) + 'px'; };
+  const tipHide = () => { if (tipEl) tipEl.hidden = true; };
+  function mount(root) {
+    el = root; root.onclick = (e) => { if (held) { held = false; e.stopPropagation(); return; } tipHide(); onClick(e); }; msg = ''; render();
+    root.onmouseover = (e) => { if (e.pointerType === 'touch') return; const t = e.target.closest('[data-tip]'); if (t && el.contains(t)) tipShow(t); else tipHide(); };
+    root.onmouseleave = tipHide;
+    root.onpointerdown = (e) => { if (e.pointerType !== 'touch') return; held = false; clearTimeout(holdT); const t = e.target.closest('[data-tip]');
+      if (t) holdT = setTimeout(() => { held = true; tipShow(t); }, 450); };
+    root.onpointerup = root.onpointercancel = () => { clearTimeout(holdT); if (held) setTimeout(tipHide, 1800); };
+    root.oncontextmenu = (e) => { if (e.target.closest('[data-tip]')) e.preventDefault(); };
+    const sc = root.closest('#forge'); if (sc) sc.onscroll = tipHide;
+  }
   return { mount, PILLARS, FLAWS, sheet, seed };
 })();
