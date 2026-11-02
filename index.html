@@ -1323,6 +1323,12 @@ body.tvpaused .tv-side:hover .fig { transform: scale(1.04); filter: drop-shadow(
 /* while it plays, the only thing on the TV besides the story: the badge of whom it waits on (his turn: it pulses),
    in his corner; a player whose phone dropped: his badge, greyed, with a cut-off sign */
 #tvWho { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+/* the two players are in different places (a split): the TV shows only the closed eye, each phone shows its own scene */
+#apart { position: absolute; inset: 0; z-index: 45; background: #000; display: none; place-items: center; }
+body.tv.apart.instory #apart { display: grid; }
+#apart svg { width: 24em; height: 24em; opacity: .4; animation: apartIn .8s ease-out; }
+@keyframes apartIn { from { opacity: 0; transform: scale(.9); } }
+body.apart #viewBtn { display: none !important; }
 #tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 2.1em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
 #tvWho > .l { left: 3%; } #tvWho > .r { right: 3%; flex-direction: row-reverse; }
 #tvWho .pbadge { font-size: 1.3em; margin: 0; }
@@ -1962,6 +1968,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="qrCard" hidden><div id="qrBox"></div></div>
   <div id="tvIntro" hidden></div>
   <div id="tvWho"></div>
+  <div id="apart"></div>
   <div id="absentBar" hidden></div>
   <div id="minView"></div>
   <button id="viewBtn" type="button" aria-label="Voir l'histoire"></button>
@@ -2986,13 +2993,23 @@ const EYE = { on: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none"
   off: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/><path stroke="#fff" stroke-width="2.4" stroke-linecap="round" d="M4 4l16 16"/></svg>' };
 let seeStory = (() => { try { return localStorage.getItem('smt-see') === '1'; } catch { return false; } })();
 function minView() {
-  const on = ROLE === 'watch' && hostTv && !seeStory;
+  const on = ROLE === 'watch' && hostTv && !seeStory && !split;   // apart (a split): the phone shows its scene, whatever the eye says
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
   $('#minView').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
 }
 // the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
 $('#minView').onclick = (e) => { e.stopPropagation(); if (document.body.classList.contains('privline')) advance(); else if (hostTv && !paused) sendIn('pause'); };
+// a TV's story, the two players apart (a split): the TV goes black with the closed eye and falls silent, each phone
+// opens on its own scene, with its sound; back together, the TV takes the picture and the sound back
+function apart() {
+  const on = !!split && (TV || hostTv);
+  document.body.classList.toggle('apart', on);
+  if (TV) { $('#apart').innerHTML = on ? EYE.off : ''; hushed = on; }
+  else if (hostTv && !MIRROR) hushed = !on;
+  if (master) master.gain.value = muted || hushed ? 0 : 1;
+  minView();
+}
 $('#viewBtn').onclick = (e) => { e.stopPropagation(); seeStory = !seeStory; try { localStorage.setItem('smt-see', seeStory ? '1' : '0'); } catch { /* private window */ } minView(); };
 // the TV, for a demo on stage: a click on its screen pauses (the cursor comes back), the big button goes on
 const TV_PAUSE = '·tv';
@@ -3232,6 +3249,7 @@ function startSplit(s) {
   const view = mine.length === 1 ? mine[0] : mine.length ? null : s.watch ? s.watch(state.f) : seats[0];
   const shown = view ? [view] : seats;
   split = { view, ghosts: {}, hold: s.hold ? s.hold(state.f) : {}, marks: new Set(), waitOn: null, shots: {} };
+  apart();
   q.unshift(...(view ? [{ lane: view }, ...lanes[view]] : soloOrder(lanes)), { join: true });
   for (const k of seats) if (!shown.includes(k)) split.ghosts[k] = { seat: k, q: lanes[k].slice(), waiting: null, options: null, done: false };
   for (const g of Object.values(split.ghosts)) ghostRun(g);
@@ -3468,7 +3486,8 @@ function halt() {
 }
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
-  split = null; laneNow = null; texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
+  const was = !!split;
+  split = null; laneNow = null; if (was) apart(); texts = {}; textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx();
   asides.clear(); $('#todoCard').hidden = true; $('#ringCard').hidden = true; ringTone(false); onlyNow = null;
   clearInterval(callNow && callNow.tick); callNow = null; $('#callBar').hidden = true;
 }
