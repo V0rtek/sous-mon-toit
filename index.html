@@ -602,6 +602,12 @@ html.locked #keyBtn { display: grid; place-items: center; }
 #deck .dkPics2 .dkPic { width: 42%; height: 58em; }
 #deck .dkPics2 .dkArrow { width: 6em; }
 #deck .dkPics2 .dkPic[style] { background-size: contain; background-repeat: no-repeat; background-position: center; background-color: transparent; box-shadow: none; }
+.dkRefs { display: flex; gap: 6em; }
+.dkRefs figure { margin: 0; display: flex; align-items: center; gap: 2em; }
+.dkRefs img { width: 16em; height: 16em; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 .3em color-mix(in srgb, var(--c) 60%, transparent); }
+.dkRefs b { display: block; font-size: 3.6em; font-weight: 700; }
+.dkRefs span { display: block; font-size: 2.6em; color: #aeaeb2; }
+.dkSlide:has(.dkRefs) h1 { font-size: 7.5em; }
 .dkSkills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3em; }
 .dkSkills div { padding: 3em 2.6em; border-radius: 2.4em; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 .15em color-mix(in srgb, var(--c) 50%, transparent); }
 .dkSkills b { display: block; font-family: var(--display); font-weight: 400; font-size: 5.2em; line-height: 1; color: var(--c); }
@@ -1639,7 +1645,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
             <li><b>« J'y reviens plus tard. »</b><small>Le speech : bâtir l'attente, le contexte, expliquer le problème</small></li>
             <li><b>Le problème, un maillon par tap</b><small>L'IA rend le contenu abondant → il perd sa rareté, sa valeur → chacun regarde des histoires différentes → les expériences partagées deviennent rares → les moments qui nous lient disparaissent (GoT : tout le monde en parlait) → des histoires multijoueurs et personnalisées recréent ce moment</small><span class="sp-chip">Slide</span></li>
             <li><b>Les deux images : seul dans le tunnel d'écrans → les amis autour du cell</b><small>Je les laisse parler</small><span class="sp-chip">Slide · 2 images</span></li>
-            <li><b>Maria Valenzuela (ex-SVP Sony Pictures)</b><small>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. » Puis : « Je vous montre. »</small><span class="sp-chip">Slide</span></li>
+            <li><b>Mes 2 références : Maria Valenzuela (ex-SVP Sony Pictures) et Doug Shapiro (analyste média)</b><small>« Les gens ne veulent pas créer leur divertissement. Ils veulent qu'on le crée pour eux. » Puis : « Je vous montre. »</small><span class="sp-chip">Slide</span></li>
             <li><b>Son selfie, une flèche vers son perso</b><span class="sp-chip">Slide</span></li>
             <li><b>Le catalogue d'histoires : je clique sur une histoire de pirates immersive</b><span class="sp-chip">Démo · télé</span></li>
             <li><b>Démo 1 · J'introduis l'histoire</b><small>Les impressionner et les accrocher dès le début</small><span class="sp-chip">Démo · télé</span></li>
