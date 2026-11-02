@@ -108,8 +108,15 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 .mx .a-l { left: 30%; }
 .mx .a-me { left: var(--jx); }
 .mx .vig { display: none; }
-.mx.t-vig .vig { display: block; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 34% 30% at var(--jx) 26%, transparent 0, rgba(0,0,0,.35) 45%, rgba(0,0,0,.9) 100%); }
-.mx.t-vig .a-l { filter: brightness(.6) saturate(.7); }
+.mx.t-vig .vig { display: block; position: absolute; inset: 0; pointer-events: none; }
+/* the light on the one choosing (Justin: 4% to 62% of the height, his head around 10%); picked in the header */
+body.lt-soft .mx.t-vig .vig { background: radial-gradient(ellipse 30% 36% at var(--jx) 28%, transparent 40%, rgba(0,0,0,.72) 100%); }
+body.lt-hard .mx.t-vig .vig { background: radial-gradient(circle 17cqh at var(--jx) 22%, transparent 98%, rgba(0,0,0,.7) 100%); }
+body.lt-head .mx.t-vig .vig { background: radial-gradient(circle 8cqh at var(--jx) 10%, transparent 90%, rgba(255,255,255,.95) 91%, rgba(255,255,255,.95) 96%, rgba(0,0,0,.45) 97%); }
+body.lt-chars .mx.t-vig .scene, body.lt-him .mx.t-vig .scene { filter: brightness(.28) saturate(.5) blur(.2em); }
+body.lt-him .mx.t-vig .a-l { filter: brightness(.3) saturate(.5); }
+body.lt-off .mx.t-vig .vig { display: none; }
+#light[hidden] { display: none; }
 .mx .ch { gap: .9em; }
 .mx .ch button { gap: .7em; padding: .55em .9em; border-radius: 1.2em; background: rgba(20,16,28,.94); box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1), 0 .3em 1em rgba(0,0,0,.4); }
 .mx .ch .tx { display: flex; flex-direction: column; gap: .15em; min-width: 0; }
@@ -120,12 +127,15 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 .mx.t-white .ch button { background: #fff; color: #000; box-shadow: 0 .3em 1em rgba(0,0,0,.5); }
 .mx.t-white .ch .face { background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--m) 55%, #fff), #e5e5ea 95%); }
 .mx.t-edge .ch button { box-shadow: inset .55em 0 0 var(--m), 0 .3em 1em rgba(0,0,0,.5); padding-left: 1.2em; }
-.mx .ch .tyb { align-self: flex-start; font-size: 1.3em; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; padding: .2em .6em; border-radius: .5em; margin-bottom: .2em; }
+.mx .ch .tyb { position: absolute; right: .6em; top: 50%; transform: translateY(-50%); width: 3.2em; height: 3.2em; border-radius: 50%; display: grid; place-items: center; }
+.mx .ch .tyb svg { width: 1.9em; height: 1.9em; }
+.mx .ch .ty-do, .mx .ch .ty-sms { padding-right: 4.4em; }
 .mx .ch .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
 .mx .ch .ty-do .tyb { background: #ffd60a; color: #000; }
 .mx .ch .ty-do .t { font-style: italic; }
 .mx .ch .ty-sms .tyb { background: #30d158; color: #00210a; }
-.mx .ch .ty-sms { border-radius: 1.2em 1.2em .3em 1.2em; outline: .18em solid #30d158; outline-offset: -.18em; }
+.mx .ch .ty-sms { border-radius: 1.2em 1.2em .2em 1.2em; outline: .18em solid #30d158; outline-offset: -.18em; overflow: visible !important; }
+.mx .ch .ty-sms::after { content: ''; position: absolute; right: -.1em; bottom: -.8em; border: .5em solid transparent; border-top: .6em solid #30d158; border-right: 0; }
 .mx.t-white .ch .ty-do { background: #fff8d6; }
 .mx.t-white .ch .ty-sms { background: #e3fbe9; }
 .mx .ch button.pv { outline: .25em solid #ffd60a; outline-offset: .15em; }
@@ -137,13 +147,28 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 .mx .rm .ch .t { font-size: 2.8em; }
 .mx.t-word .rm .ch .k { font-size: 5.4em; }
 .mx.t-word .rm .ch .t { font-size: 2.2em; }
-.mx .rm .ch .tyb { font-size: 1.6em; }
+.mx .rm .ch .tyb { font-size: 1.5em; }
+.mx .rm .ch .ty-do, .mx .rm .ch .ty-sms { padding-right: 6em; }
 .mx.t-edge .rm .ch button { box-shadow: inset .8em 0 0 var(--m); padding-left: .8em; }
 .mx .rm .q { flex: none; display: flex; gap: 1em; align-items: center; padding: 1em; border-radius: .9em; background: #1c1c1e; color: #f5f5f7; }
 .mx .rm .q .face { flex: none; position: relative; overflow: hidden; width: 8em; height: 8em; border-radius: 50%; background: #2c2c2e; }
 .mx .rm .q .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
 .mx .rm .q b { display: block; font-size: 2.2em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
 .mx .rm .q span { display: block; font-size: 3.2em; font-weight: 700; line-height: 1.25; }
+/* ---- tour 3 ---- */
+.mx .qc { display: flex; align-items: center; gap: 1em; padding: .9em 1.1em .9em .9em; border-radius: 1.2em; background: rgba(20,16,28,.94); color: #f5f5f7; box-shadow: inset 0 0 0 .12em rgba(255,255,255,.1); }
+.mx .qc .face { flex: none; position: relative; overflow: hidden; width: 9em; height: 9em; border-radius: 50%; background: #2c2c2e; box-shadow: 0 0 0 .3em var(--c); }
+.mx .qc .face img { position: absolute; left: 50%; top: 4%; height: 400%; transform: translateX(-50%); }
+.mx .qc b { display: block; font-size: 1.9em; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; color: var(--c); }
+.mx .qc span:not(.face) { display: block; font-size: 2.6em; font-weight: 700; line-height: 1.25; }
+.mx.t-tall .ch button { min-height: 8.5em; padding: 0 .9em 0 0; overflow: hidden; border-radius: 1em; }
+.mx.t-tall .ch .face { width: 7.8em; height: auto; align-self: stretch; border-radius: 0; }
+.mx.t-tall .ch .face img { height: 330%; top: 5%; }
+.mx.t-bigface .ch .face { width: 7.6em; height: 7.6em; box-shadow: 0 0 0 .25em var(--m); }
+.mx.t-glow .ch button { background: linear-gradient(90deg, color-mix(in srgb, var(--m) 55%, #000), #141217 72%); }
+.mx .rm .q.qbig { flex-direction: column; text-align: center; gap: .6em; padding: 1.4em 1em; }
+.mx .rm .q.qbig .face { width: 17em; height: 17em; box-shadow: 0 0 0 .35em var(--c); }
+.mx .rm .q .face { box-shadow: 0 0 0 .3em var(--c, #2c2c2e); }
 /* big view */
 #big { position: fixed; inset: 0; z-index: 9; background: rgba(0,0,0,.85); display: grid; place-items: center; cursor: zoom-out; }
 #big[hidden] { display: none; }
@@ -154,12 +179,13 @@ header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size
 <body>
 <header>
   <h1>Écran de choix · variantes</h1>
-  <div class="seg" id="mode"><button type="button" data-v="mixc" class="on">Mix · Cell</button><button type="button" data-v="mixr">Mix · Télécommande</button><button type="button" data-v="cell">Tour 1 · Cell</button><button type="button" data-v="remote">Tour 1 · Télé</button></div>
+  <div class="seg" id="mode"><button type="button" data-v="t3c" class="on">Tour 3 · Cell</button><button type="button" data-v="t3r">Tour 3 · Télé</button><button type="button" data-v="mixc">Mix · Cell</button><button type="button" data-v="mixr">Mix · Télé</button><button type="button" data-v="cell">Tour 1 · Cell</button><button type="button" data-v="remote">Tour 1 · Télé</button></div>
   <div class="seg" id="mom"></div>
+  <div class="seg" id="light" title="La lumière sur celui qui choisit"></div>
   <button type="button" class="flash" id="flash">Test éclair 1,5 s</button>
   <a href="index.html">‹ Accueil</a>
 </header>
-<div class="intro"><b>Mix</b> = tour 2, des mélanges de P2, P3, P4, P6 et une vignette autour de celui qui choisit (le type de message ne s’affiche que si les choix sont de types différents : essaie <b>Le mensonge</b> et <b>L’étage</b>). Chaque variante est une hypothèse sur ce qui fait comprendre <b>l'intention</b> le plus vite : la couleur du mood, le visage, un seul mot, le contraste, le type de message. Touche un écran pour l'agrandir, ♥ pour garder tes préférées (gardées sur cet appareil). <b>Test éclair</b> : tout s'affiche 1,5 s puis disparaît : demande à quelqu'un ce qu'il a retenu, et laquelle il aurait choisie.</div>
+<div class="intro"><b>Tour 3</b> : N4, N1 et M4 mélangés. La lumière sur celui qui choisit se règle en haut (<b>Persos seuls</b>, <b>Lui seul</b>, <b>Bord net</b>, <b>Sa tête</b>, <b>Douce</b>). Faire ou texter : une icône (main, cell) et une forme (pointillé, bulle verte), seulement quand les choix ne sont pas tous du même type : essaie <b>Le mensonge</b> et <b>L’étage</b>. ♥ tes préférées, <b>Test éclair</b> pour voir ce qui reste en 1,5 s.</div>
 <div class="grid" id="grid"></div>
 <div id="big" hidden></div>
 <script>
@@ -240,15 +266,40 @@ const VARIANTS = {
     ['N5', 'Blanc + visage + bord de mood', 'Cartes blanches, visage, liseré du mood.', ['white', 'face', 'edge', 'type']],
   ],
 };
-const TRAITS = Object.fromEntries([...VARIANTS.mixc, ...VARIANTS.mixr].map(([v, , , t]) => [v, new Set(t)]));
-let mode = 'mixc', mom = 0;
-try { mode = localStorage.getItem('choix-mode2') || 'mixc'; } catch { /* private window */ }
-if (!VARIANTS[mode]) mode = 'mixc';
+// tour 3 (02/11): the favourites, N4 (only with the big face of who spoke), N1, M4; the type as an icon, never a word;
+// the light on the one choosing is its own setting (the header), on every cell variant
+VARIANTS.t3c = [
+  ['T1', 'M4', 'Les cartes sombres avec sa tête. La base.', ['vig', 'face', 'type']],
+  ['T2', 'M4 + mot', 'Sa tête et le mot en gros.', ['vig', 'face', 'word', 'type']],
+  ['T3', 'La question en grand', 'N4 dans le cell : la tête de qui t’a parlé, en grand, à la place de la bulle; tes réponses avec ta tête.', ['vig', 'qc', 'face', 'type']],
+  ['T4', 'N1 dans le cell', 'Cartes hautes, ta tête pleine hauteur, le mot énorme.', ['vig', 'tall', 'face', 'word', 'type']],
+  ['T5', 'La question + N1', 'T3 + T4 : sa tête à lui en haut, les tiennes en grand dessous.', ['vig', 'qc', 'tall', 'face', 'word', 'type']],
+  ['T6', 'Grande tête cerclée', 'Ta tête plus grande, cerclée de la couleur du mood. Pas de mot.', ['vig', 'bigface', 'face', 'type']],
+  ['T7', 'Lueur du mood', 'M4 + le mood qui déborde de ta tête dans la carte.', ['vig', 'glow', 'face', 'word', 'type']],
+];
+VARIANTS.t3r = [
+  ['U1', 'N4 + N1', 'Sa tête en grand en haut (seulement si quelqu’un t’a parlé), puis N1.', ['q3', 'face', 'word', 'type']],
+  ['U2', 'N4 + N1, sans mot', 'Les têtes et les répliques, rien d’autre.', ['q3', 'face', 'type']],
+  ['U3', 'Gros cercle centré', 'Sa tête énorme, centrée, en haut; tes choix N1 dessous.', ['q3', 'qbig', 'face', 'word', 'type']],
+  ['U4', 'N1 + lueur du mood', 'N1, le mood qui déborde de ta tête dans la carte.', ['q3', 'glow', 'face', 'word', 'type']],
+  ['U5', 'N1 seul', 'Le N1 d’avant, avec les icônes de type.', ['face', 'word', 'type']],
+];
+const TRAITS = Object.fromEntries([...VARIANTS.mixc, ...VARIANTS.mixr, ...VARIANTS.t3c, ...VARIANTS.t3r].map(([v, , , t]) => [v, new Set(t)]));
+const LIGHTS = [['chars', 'Persos seuls'], ['him', 'Lui seul'], ['hard', 'Bord net'], ['head', 'Sa tête'], ['soft', 'Douce'], ['off', 'Rien']];
+let light = 'chars';
+try { light = localStorage.getItem('choix-light') || 'chars'; } catch { /* private window */ }
+let mode = 't3c', mom = 0;
+try { mode = localStorage.getItem('choix-mode3') || 't3c'; } catch { /* private window */ }
+if (!VARIANTS[mode]) mode = 't3c';
 const favs = (() => { try { return new Set(JSON.parse(localStorage.getItem('choix-favs') || '[]')); } catch { return new Set(); } })();
 const saveFavs = () => { try { localStorage.setItem('choix-favs', JSON.stringify([...favs])); } catch { /* private window */ } };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const img = (p) => `chars/${p}.webp`;
 const TY = { say: ['💬', 'Parler'], do: ['✋', 'Faire'], sms: ['📱', 'Texter'] };
+const TYI = {
+  do: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V5.5a1.5 1.5 0 0 1 3 0V13M17 9.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.6-2.2L5 15.5a1.5 1.5 0 0 1 2.3-2L8 14.5"/></svg>',
+  sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>',
+};
 function opt(v, o, i) {
   const m = MOOD[o.m], st = `--m:${m.c};${m.i ? `--mi:${m.i}` : ''}`, face = `<span class="face"><img src="${img(o.f)}" alt=""></span>`, t = `<span class="t">${esc(o.t)}</span>`, k = `<span class="k">${esc(o.k)}</span>`;
   const inner = {
@@ -257,7 +308,7 @@ function opt(v, o, i) {
   }[v] || t;
   const T = TRAITS[v];
   if (T) {   // a mix: its traits, in that order; the type shows only when the options aren't all the same kind
-    const mixed = new Set(MOMENTS[mom].opts.map((x) => x.ty)).size > 1, ty = T.has('type') && mixed && o.ty !== 'say' ? `<span class="tyb">${TY[o.ty][0]} ${TY[o.ty][1]}</span>` : '';
+    const mixed = new Set(MOMENTS[mom].opts.map((x) => x.ty)).size > 1, ty = T.has('type') && mixed && o.ty !== 'say' ? `<span class="tyb">${TYI[o.ty]}</span>` : '';
     const txt = `<span class="tx">${ty}${T.has('word') ? k : ''}${t}</span>`;
     return `<button type="button" class="${mixed ? `ty-${o.ty}` : ''}" style="${st}" data-f="${o.f}">${T.has('face') ? face : ''}${txt}</button>`;
   }
@@ -267,13 +318,15 @@ function screenHtml(v) {
   const M = MOMENTS[mom], opts = M.opts.map((o, i) => opt(v, o, i)).join(''), T = TRAITS[v];
   if (T) {
     const tc = 'mx ' + [...T].map((x) => 't-' + x).join(' ');
-    if (mode === 'mixr') {
-      const q = T.has('q') ? `<div class="q">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
+    if (mode === 'mixr' || mode === 't3r') {
+      const qOn = T.has('q') || (T.has('q3') && M.who);   // tour 3: the question only with the face of who spoke
+      const q = qOn ? `<div class="q${T.has('qbig') ? ' qbig' : ''}" style="--c:${M.col || '#2c2c2e'}">${M.sp ? `<span class="face"><img src="${img(M.sp)}" alt=""></span>` : ''}<div><b style="color:${M.col || '#8e8e93'}">${esc(M.who || 'Narration')}</b><span>${esc(M.line)}</span></div></div>` : '';
       return `<div class="st ${tc}"><div class="rm">${q}<div class="ch">${opts}</div></div></div>`;
     }
     // the scene with both: who speaks on the left, the one choosing (Justin) on the right; the vignette is on him
     const two = !!M.sp, jx = two ? 70 : 50;
-    const bub = M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
+    const bub = T.has('qc') && M.who ? `<div class="qc" style="--c:${M.col}"><span class="face"><img src="${img(M.sp)}" alt=""></span><div><b>${esc(M.who)}</b><span>${esc(M.line)}</span></div></div>`
+      : M.who ? `<div class="bub"><span class="tag" style="background:${M.col}">${esc(M.who)}</span>${esc(M.line)}</div>` : `<div class="bub narr">${esc(M.line)}</div>`;
     return `<div class="st ${tc}" style="--jx:${jx}%"><div class="scene" style="background-image:url(${M.bg})"></div>${two ? `<img class="actor a-l" src="${img(M.sp)}" alt="">` : ''}<img class="actor a-me${two ? '' : ' solo'}" src="${img(M.me || 'justin_bar/drunk_listen')}" data-rest="${img(M.me || 'justin_bar/drunk_listen')}" alt=""><div class="vig"></div><div class="ui">${bub}<div class="ch">${opts}</div></div></div>`;
   }
   if (mode === 'remote') {
@@ -298,6 +351,10 @@ function wire(ph) {
 }
 function paint() {
   document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
+  document.body.className = 'lt-' + light;
+  $('#light').hidden = !['t3c', 'mixc'].includes(mode);
+  $('#light').innerHTML = LIGHTS.map(([k, n]) => `<button type="button" class="${k === light ? 'on' : ''}" data-l="${k}">${n}</button>`).join('');
+  $('#light').querySelectorAll('button').forEach((b) => b.onclick = () => { light = b.dataset.l; try { localStorage.setItem('choix-light', light); } catch { /* private window */ } paint(); });
   $('#mom').innerHTML = MOMENTS.map((m, i) => `<button type="button" class="${i === mom ? 'on' : ''}" data-i="${i}">${esc(m.name)}</button>`).join('');
   $('#mom').querySelectorAll('button').forEach((b) => b.onclick = () => { mom = +b.dataset.i; paint(); });
   $('#grid').innerHTML = VARIANTS[mode].map(([v, n, h]) => `<div class="card${favs.has(v) ? ' faved' : ''}" data-v="${v}"><h2><i>${v}</i>${esc(n)}<button type="button" class="fav${favs.has(v) ? ' on' : ''}" aria-label="Préférée">♥</button></h2><div class="ph">${screenHtml(v)}</div><p>${esc(h)}</p></div>`).join('');
@@ -308,7 +365,7 @@ function paint() {
   });
 }
 $('#big').onclick = () => { $('#big').hidden = true; };
-document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { mode = b.dataset.v; try { localStorage.setItem('choix-mode2', mode); } catch { /* private window */ } paint(); });
+document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { mode = b.dataset.v; try { localStorage.setItem('choix-mode3', mode); } catch { /* private window */ } paint(); });
 let flashT = null;
 $('#flash').onclick = () => {
   clearTimeout(flashT);
