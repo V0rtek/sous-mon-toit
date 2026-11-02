@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sous-titres · variantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;0,900;1,700;1,900&family=Yeseva+One&display=swap">
+<style>
+/* Les paroles (la boîte de dialogue / les sous-titres), en plusieurs hypothèses côte à côte, sur le cell (9:16, dans la
+   main) et sur la télé (16:9, à 3 m). Un moment = une réplique, une réplique longue, une narration, une pensée, un
+   chuchotement. « Taille » multiplie tout le texte pour juger la lisibilité. Même règle que le jeu : 1em = 1 % de la
+   hauteur de l'écran. Les favoris (cœur) restent dans ce navigateur. */
+:root { --bg: #0b0a0f; --fg: #f5f5f7; --dim: #8e8e93; --line: #2c2c2e; --ui: 'Nunito', 'Segoe UI', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px 20px; background: rgba(11,10,15,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: var(--dim); text-decoration: none; font-weight: 800; font-size: 14px; }
+.seg { display: flex; flex-wrap: wrap; background: #1c1c1e; border-radius: 20px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 800; color: var(--dim); background: none; border: 0; border-radius: 99px; padding: 7px 14px; cursor: pointer; }
+.seg button.on { background: #f5f5f7; color: #000; }
+.again { font: inherit; font-size: 14px; font-weight: 900; border: 0; border-radius: 99px; padding: 9px 16px; background: #ffd60a; color: #000; cursor: pointer; }
+.intro { max-width: 980px; padding: 18px 20px 0; color: #d1d1d6; font-size: 15px; line-height: 1.5; }
+.intro b { color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px 22px; padding: 22px 20px 60px; }
+.grid.tv { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); }
+.card { display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+.card h2 i { font-style: normal; font-size: 12px; font-weight: 900; color: #000; background: #f5f5f7; border-radius: 6px; padding: 2px 6px; }
+.card p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--dim); min-height: 4.4em; }
+.fav { margin-left: auto; font: inherit; font-size: 18px; background: none; border: 0; color: #48484a; cursor: pointer; padding: 0 2px; }
+.fav.on { color: #ff375f; }
+.card.faved .ph { box-shadow: 0 0 0 3px #ff375f; }
+
+/* ===== the screen: a phone (9:16) or the TV (16:9); 1em = 1% of its height ===== */
+.ph { position: relative; width: 100%; aspect-ratio: 9 / 16; border-radius: 18px; overflow: hidden; background: #000; container-type: size; box-shadow: 0 0 0 1px var(--line); }
+.tv .ph { aspect-ratio: 16 / 9; border-radius: 10px; }
+.st { position: absolute; inset: 0; font-size: 1cqh; font-family: var(--ui); color: #fff; overflow: hidden; --k: 1; }
+.st * { box-sizing: border-box; }
+.bgi { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.7); }
+.pc { position: absolute; bottom: 0; height: 74%; left: 50%; transform: translateX(-50%); }
+.tv .pc { height: 92%; left: 66%; }
+.fc { position: relative; flex: none; overflow: hidden; border-radius: 50%; background: linear-gradient(#a5a5aa, #6e6e73); width: 9em; height: 9em; }
+.fc img { position: absolute; height: 560%; width: auto; max-width: none; left: 50%; transform: translateX(-50%); top: 0; }   /* --fy: where his face sits in his picture */
+.nm { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: .04em; color: var(--c); }
+.tx { font-weight: 600; line-height: 1.32; }
+/* the kinds: a line, the narrator, a thought, a whisper */
+.k-narr .tx { font-style: italic; text-align: center; }
+.k-think .tx { font-style: italic; }
+.k-whisper .tx { font-style: italic; font-size: .9em !important; opacity: .92; }
+.k-narr .nm, .k-narr .fc { display: none; }
+.k-think .tx::before { content: "💭 "; font-style: normal; }
+.k-whisper .tx::before { content: "🤫 "; font-style: normal; }
+
+/* P1 / T1: the box as it is in the game, bigger */
+.box { position: absolute; left: 5%; right: 5%; top: 53%; background: #fffdf9; color: #1d1a24; border: .3em solid var(--c); border-radius: 1.4em; padding: 1.6em 1.4em 1.1em; box-shadow: 0 .6em 1.6em rgba(0,0,0,.35); }
+.box .nm { position: absolute; left: 1.6em; top: -1.55em; padding: .32em 1.1em; border-radius: 1em; background: var(--c); color: #fff; font-size: calc(2.2em * var(--k)); line-height: 1; }
+.box .tx { font-size: calc(2.2em * var(--k)); }
+.k-narr .box { background: rgba(22,18,30,.9); color: #f4eefc; border-color: rgba(255,255,255,.14); }
+.k-think .box { border-style: dashed; background: #f6f2ff; }
+.tv .box { left: 50%; right: auto; width: 72em; transform: translateX(-50%); top: auto; bottom: 5%; }
+.tv .box .nm { font-size: calc(3em * var(--k)); }
+.tv .box .tx { font-size: calc(2.9em * var(--k)); }
+
+/* P2 / T2: cinema subtitles, no box, a heavy shadow */
+.cine { position: absolute; left: 5%; right: 5%; bottom: 8%; text-align: center; text-shadow: 0 0 .3em #000, 0 .08em .25em #000, 0 0 .7em rgba(0,0,0,.9); }
+.cine .nm, .kar .nm { color: color-mix(in srgb, var(--c) 45%, #fff); }
+.cine .nm { display: block; font-size: calc(1.8em * var(--k)); margin-bottom: .2em; }
+.cine .tx { font-size: calc(2.7em * var(--k)); font-weight: 800; }
+.tv .cine { left: 14%; right: 14%; bottom: 6%; }
+.tv .cine .nm { font-size: calc(2.4em * var(--k)); }
+.tv .cine .tx { font-size: calc(3.5em * var(--k)); }
+
+/* P3 / T4: a band across the bottom, his face, his name */
+.band { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 1.6em; padding: 3em 4% 5em; background: linear-gradient(transparent, rgba(8,6,12,.9) 28%); }
+.band .fc { width: 12em; height: 12em; box-shadow: 0 0 0 .4em var(--c); }
+.band .nm { display: block; font-size: calc(1.8em * var(--k)); }
+.band .tx { font-size: calc(2.4em * var(--k)); }
+.tv .band { padding: 6em 9% 5em; gap: 2.6em; }
+.tv .band .fc { width: 18em; height: 18em; }
+.tv .band .nm { font-size: calc(2.4em * var(--k)); }
+.tv .band .tx { font-size: calc(3.2em * var(--k)); }
+
+/* P4 / T6: a bubble right over his head, with a tail */
+.bub { position: absolute; left: 6%; right: 6%; top: 11%; background: #fffdf9; color: #1d1a24; border-radius: 1.6em; padding: 1em 1.2em; box-shadow: 0 .4em 1.2em rgba(0,0,0,.4); }
+.bub::after { content: ""; position: absolute; left: 50%; bottom: -1.4em; margin-left: -1.1em; border: 1.1em solid transparent; border-bottom: 0; border-top: 1.5em solid #fffdf9; }
+.bub .nm { font-size: calc(1.5em * var(--k)); }
+.bub .tx { font-size: calc(2.2em * var(--k)); }
+.tv .bub { left: 34%; right: auto; width: 50em; transform: translateX(-50%); top: 22%; }
+.tv .bub::after { left: auto; right: -1.5em; bottom: auto; top: 40%; margin: 0; border: 1.1em solid transparent; border-right: 0; border-left: 1.5em solid #fffdf9; }
+.tv .bub .nm { font-size: calc(2em * var(--k)); }
+.tv .bub .tx { font-size: calc(2.9em * var(--k)); }
+.k-narr .bub { background: rgba(22,18,30,.92); color: #f4eefc; left: 6%; right: 6%; width: auto; transform: none; }
+.k-narr .bub::after { display: none; }
+
+/* P5: his big face, his words on a dark card (phone only) */
+.fat { position: absolute; left: 4%; right: 4%; bottom: 4%; top: 46%; display: flex; flex-direction: column; align-items: center; gap: 1.2em; padding: 0 1em; }
+.fat .fc { width: 22em; height: 22em; transform: translateY(-11em); margin-bottom: -11em; box-shadow: 0 0 0 .5em var(--c), 0 .6em 1.6em rgba(0,0,0,.5); }
+.fat .nm { font-size: calc(2.4em * var(--k)); }
+.fat .tx { font-size: calc(2.9em * var(--k)); text-align: center; background: rgba(15,12,20,.82); border-radius: .6em; padding: .7em .8em; width: 100%; }
+
+/* P6 / T5: word by word, the word said now lights up */
+.kar { position: absolute; left: 5%; right: 5%; bottom: 9%; text-align: center; text-shadow: 0 0 .3em #000, 0 .08em .3em #000; }
+.kar .nm { display: block; font-size: calc(1.8em * var(--k)); margin-bottom: .3em; }
+.kar .tx { font-size: calc(3.4em * var(--k)); font-weight: 900; }
+.kar .tx b { font-weight: 900; color: rgba(255,255,255,.55); animation: say .01s linear forwards; animation-delay: var(--d); }
+@keyframes say { to { color: #ffd60a; } }
+.tv .kar { left: 12%; right: 12%; bottom: 8%; }
+.tv .kar .nm { font-size: calc(2.4em * var(--k)); }
+.tv .kar .tx { font-size: calc(4.4em * var(--k)); }
+
+/* P7: on top, the whole scene below stays visible */
+.top { position: absolute; left: 4%; right: 4%; top: 3.5%; background: rgba(15,12,20,.86); border-radius: 1.2em; padding: 1em 1.2em; border-left: .5em solid var(--c); }
+.top .nm { display: block; font-size: calc(1.5em * var(--k)); }
+.top .tx { font-size: calc(2.4em * var(--k)); }
+
+/* T3: next to him, a card on his side, his face on it */
+.side { position: absolute; left: 4%; bottom: 8%; width: 58em; display: flex; gap: 2em; align-items: center; background: rgba(15,12,20,.88); border-radius: 1.4em; padding: 1.8em 2.2em; border-left: .6em solid var(--c); }
+.side .fc { width: 14em; height: 14em; }
+.side .nm { display: block; font-size: calc(2.2em * var(--k)); }
+.side .tx { font-size: calc(3em * var(--k)); }
+.k-narr .side { left: 50%; transform: translateX(-50%); }
+
+#big { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.9); display: grid; place-items: center; cursor: zoom-out; }
+#big[hidden] { display: none; }
+#big .ph { width: min(94vw, 150vh * 9 / 16 * 1.2); max-height: 94vh; }
+#big .tv .ph, #big.tv .ph { width: min(94vw, 94vh * 16 / 9); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sous-titres · variantes</h1>
+  <div class="seg" id="mode"><button type="button" data-v="p" class="on">Cell</button><button type="button" data-v="t">Télé</button></div>
+  <div class="seg" id="mom"></div>
+  <div class="seg" id="size" title="Multiplie la taille de tous les textes"></div>
+  <button type="button" class="again" id="again">Rejouer</button>
+  <a href="index.html">‹ Accueil</a>
+</header>
+<div class="intro"><b>Les paroles trop petites</b> : ici, 7 façons de les montrer sur le cell et 6 sur la télé, avec les mêmes textes. Changez le <b>moment</b> (réplique, réplique longue, narration, pensée, chuchoté) et la <b>taille</b> (× 1 à × 1,5) pour voir ce qui tient. Un clic sur un écran l'agrandit; le cœur garde vos favorites. <b>Mot par mot</b> se rejoue avec « Rejouer ».</div>
+<div class="grid" id="grid"></div>
+<div id="big" hidden></div>
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// real faces and places of Last call; who speaks, the line, and its kind (say / narr / think / whisper)
+const MOMENTS = {
+  rep:     { name: 'Réplique', k: 'say', who: 'Cam', col: '#e2557a', img: 'cam/worried', bg: 'bg/taverne_bar.webp', line: 'Why do you keep paying his rent?' },
+  long:    { name: 'Réplique longue', k: 'say', who: 'Julian', col: '#5b6b8c', img: 'julian/talk', bg: 'bg/galerie.webp', line: 'I told you I’d handle it. I told you ten times, and every time you looked at me like I was the one who’d broken something.' },
+  narr:    { name: 'Narration', k: 'narr', who: '', col: '#8e8e93', img: '', bg: 'bg/taverne_bar.webp', line: '3 a.m. The last train is long gone, and nobody at the bar has said a word in ten minutes.' },
+  think:   { name: 'Pensée', k: 'think', who: 'Justin', col: '#4f7fe0', img: 'justin_bar/drunk_listen', bg: 'bg/taverne_bar.webp', line: 'He’s lying. He’s been lying all night.' },
+  whisper: { name: 'Chuchoté', k: 'whisper', who: 'Cam', col: '#e2557a', img: 'cam/awkward', bg: 'bg/taverne_bar.webp', line: 'Don’t turn around. He’s watching us.' },
+};
+const SIZES = [1, 1.25, 1.5];
+// a variant: its name, what it tries, which text layout; mode p = cell, t = TV
+const VARS = [
+  { id: 'P1', m: 'p', n: 'Boîte agrandie', d: 'Comme dans le jeu, mais le texte passe de 1,45 à 2,2 : la même boîte, étiquette du nom en haut.', f: 'box' },
+  { id: 'P2', m: 'p', n: 'Cinéma', d: 'Pas de boîte : le texte blanc, gras et très ombré, au bas de l'+'écran. Le décor reste vu; le nom au-dessus, en couleur.', f: 'cine' },
+  { id: 'P3', m: 'p', n: 'Bande + visage', d: 'Une bande sombre sur toute la largeur : son visage dans un rond de sa couleur, son nom, sa réplique.', f: 'band' },
+  { id: 'P4', m: 'p', n: 'Bulle sur la tête', d: 'Une bulle blanche près de lui, avec la queue qui pointe vers lui : on voit tout de suite qui parle.', f: 'bub' },
+  { id: 'P5', m: 'p', n: 'Visage géant', d: 'Son visage en grand, à cheval sur la carte sombre qui porte la réplique : très lisible, mais cache le bas du décor.', f: 'fat' },
+  { id: 'P6', m: 'p', n: 'Mot par mot', d: 'Gros texte au centre-bas; le mot dit en ce moment s'+'allume en jaune. Aide à suivre une réplique longue.', f: 'kar' },
+  { id: 'P7', m: 'p', n: 'En haut', d: 'Le texte tout en haut, une barre de sa couleur à gauche : le bas de l'+'écran reste libre pour les choix et les persos.', f: 'top' },
+  { id: 'T1', m: 't', n: 'Colonne agrandie', d: 'Comme à la télé aujourd'+'hui (colonne de 72 em en bas), texte 2,9 au lieu de 1,45.', f: 'box' },
+  { id: 'T2', m: 't', n: 'Cinéma', d: 'Deux lignes larges, texte blanc ombré, sans boîte : comme un film sous-titré.', f: 'cine' },
+  { id: 'T3', m: 't', n: 'Du côté du perso', d: 'Une carte sombre qui porte son visage et sa réplique, du côté de l'+'écran opposé à lui.', f: 'side' },
+  { id: 'T4', m: 't', n: 'Bande large', d: 'Un dégradé sur le bas : le gros visage, le nom, la réplique alignés à gauche.', f: 'band' },
+  { id: 'T5', m: 't', n: 'Mot par mot', d: 'Très gros (4,4); le mot dit s'+'allume en jaune. Pour lire de loin sans effort.', f: 'kar' },
+  { id: 'T6', m: 't', n: 'Bulle sur la tête', d: 'Une bulle au-dessus de lui avec la queue vers sa tête; la narration reste en bandeau.', f: 'bub' },
+];
+const state = { mode: 'p', mom: 'rep', size: 1 };
+const favs = (() => { try { return JSON.parse(localStorage.getItem('paroles.favs') || '[]'); } catch (e) { return []; } })();
+const saveFavs = () => { try { localStorage.setItem('paroles.favs', JSON.stringify(favs)); } catch (e) {} };
+
+const face = (m) => m.img ? `<span class="fc"><img src="chars/${m.img}.webp" alt=""></span>` : '';
+const name = (m) => m.who ? `<span class="nm">${esc(m.who)}</span>` : '';
+const words = (m) => esc(m.line).split(' ').map((w, i) => `<b style="--d:${(0.25 + i * 0.28).toFixed(2)}s">${w}</b>`).join(' ');
+const LAYERS = {
+  box:  (m) => `<div class="box">${name(m)}<div class="tx">${esc(m.line)}</div></div>`,
+  cine: (m) => `<div class="cine">${name(m)}<div class="tx">${esc(m.line)}</div></div>`,
+  band: (m) => `<div class="band">${face(m)}<div>${name(m)}<div class="tx">${esc(m.line)}</div></div></div>`,
+  bub:  (m) => `<div class="bub">${name(m)}<div class="tx">${esc(m.line)}</div></div>`,
+  fat:  (m) => `<div class="fat">${face(m)}${name(m)}<div class="tx">${esc(m.line)}</div></div>`,
+  kar:  (m) => `<div class="kar">${name(m)}<div class="tx">${words(m)}</div></div>`,
+  top:  (m) => `<div class="top">${name(m)}<div class="tx">${esc(m.line)}</div></div>`,
+  side: (m) => `<div class="side">${face(m)}<div>${name(m)}<div class="tx">${esc(m.line)}</div></div></div>`,
+};
+function screen(v) {
+  const m = MOMENTS[state.mom];
+  return `<div class="st k-${m.k}" style="--c:${m.col};--k:${state.size};--k2:1"><img class="bgi" src="${m.bg}" alt="">${m.img ? `<img class="pc" src="chars/${m.img}.webp" alt="">` : ''}${LAYERS[v.f](m)}</div>`;
+}
+function render() {
+  const g = $('#grid'); g.className = 'grid' + (state.mode === 't' ? ' tv' : '');
+  g.innerHTML = VARS.filter((v) => v.m === state.mode).map((v) => `<div class="card${favs.includes(v.id) ? ' faved' : ''}" data-id="${v.id}">
+    <h2><i>${v.id}</i>${esc(v.n)}<button type="button" class="fav${favs.includes(v.id) ? ' on' : ''}" data-fav="${v.id}" aria-label="Favori">♥</button></h2>
+    <div class="ph" data-big="${v.id}">${screen(v)}</div><p>${esc(v.d)}</p></div>`).join('');
+}
+function seg(el, items, key, cur) {
+  el.innerHTML = items.map(([v, l]) => `<button type="button" data-v="${v}" class="${String(v) === String(cur) ? 'on' : ''}">${l}</button>`).join('');
+  el.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; state[key] = key === 'size' ? +b.dataset.v : b.dataset.v; [...el.children].forEach((x) => x.classList.toggle('on', x === b)); render(); };
+}
+seg($('#mode'), [['p', 'Cell'], ['t', 'Télé']], 'mode', state.mode);
+seg($('#mom'), Object.entries(MOMENTS).map(([k, m]) => [k, m.name]), 'mom', state.mom);
+seg($('#size'), SIZES.map((s) => [s, '× ' + String(s).replace('.', ',')]), 'size', state.size);
+$('#again').onclick = render;
+$('#grid').onclick = (e) => {
+  const f = e.target.closest('[data-fav]');
+  if (f) { const id = f.dataset.fav, i = favs.indexOf(id); if (i < 0) favs.push(id); else favs.splice(i, 1); saveFavs(); f.classList.toggle('on'); f.closest('.card').classList.toggle('faved'); return; }
+  const p = e.target.closest('[data-big]');
+  if (p) { const v = VARS.find((x) => x.id === p.dataset.big); const big = $('#big'); big.className = v.m === 't' ? 'tv' : ''; big.innerHTML = `<div class="${v.m === 't' ? 'tv' : ''}"><div class="ph">${screen(v)}</div></div>`; big.hidden = false; }
+};
+$('#big').onclick = () => { $('#big').hidden = true; };
+render();
+</script>
+</body>
+</html>
