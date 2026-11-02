@@ -125,7 +125,7 @@ window.DECK = (() => {
     { c: '#ff375f', h: () => `<h1>« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine de nos jours. »</h1><p>Étrangement, non.</p>` },
     { c: '#0a84ff', h: () => `<small>Pourquoi moi</small><div class="dkSkills"><div><b>Jeux</b><span>50+ depuis 14 ans</span></div><div><b>Procédural</b><span>Des arbres de choix qui tiennent</span></div><div><b>Récit</b><span>100+ histoires</span></div></div><p>Il faut les trois en même temps.</p>` },
     { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div><p class="dkZeroP">Un nouveau perso : 24 poses, avec 4 images gratuites sur ChatGPT.</p>` },
-    { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Un cofounder</li><li>Du feedback</li><li>Du financement</li><li>Du mentorat</li></ul>` },
+    { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Des groupes de 2-3 pour tester<span>10 minutes, je me déplace. Si vous dites oui : accès gratuit au produit et à toutes les histoires.</span></li><li>Un cofounder</li></ul>` },
     { c: '#0a84ff', h: () => `<small>Questions</small><div class="dkQA"><div class="dkQs">${QA.map(([q], n) => `<button type="button" data-qa="${n}"${n === qa ? ' class="on"' : ''}>${esc(q)}</button>`).join('')}</div><div class="dkAns"><h2>${esc(QA[qa][0])}</h2><ul>${QA[qa][1].map((l) => `<li>${esc(l)}</li>`).join('')}</ul></div></div>` },
   ];
   // what I say on each slide (mine to edit, kept on this device); behind the corner button
@@ -153,7 +153,7 @@ window.DECK = (() => {
     "« Ok mais Justin, n'importe qui peut recréer ça en 1 semaine. » Étrangement, non : je montre le concept de monde, d'histoires et mon système d'histoire.",
     "Il faut 3 choses en même temps : faire des jeux (l'interactif, le visuel), le procédural (des arbres de choix qui tiennent), la théorie du récit (des épisodes qui accrochent). Je fais les trois depuis 14 ans : 50+ jeux, un générateur de villages, 100+ histoires.",
     "Ce que coûte un nouveau perso : 0 $. 4 images gratuites par jour sur ChatGPT × 6 poses = 24 poses et expressions. Les décors sont faits d'avance pour les poses. La vidéo IA : environ 30 $ la minute.",
-    "Je me cherche un cofounder, du feedback, du financement, du mentorat.",
+    "Je suis en phase de validation. Je cherche des groupes de 2-3 personnes prêts à prendre 10 minutes pour essayer le produit : je fais le déplacement. Si vous êtes curieux d'essayer les autres histoires, venez me voir : si vous dites oui, je vous donne accès au produit et aux histoires gratuitement. Et je cherche un cofounder.",
     "Les questions : je tape celle qu'on me pose, la réponse s'affiche. Les mêmes sont dans le plan (slide 0, étape 3).",
   ];
   let noteOpen = false;
