@@ -97,10 +97,13 @@ body.uitop #ui { top: auto; bottom: 3%; }
 #bubble.narr #text { font-style: italic; font-weight: 600; text-align: center; }
 #bubble.think { border-style: dashed; background: #f6f2ff; }
 #bubble.think #text, #bubble.whisper #text { font-style: italic; }
-#bubble.whisper #text { font-size: 1.3em; }
-#tag { position: absolute; left: 1.6em; top: -1.55em; padding: .32em 1.1em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: 2em; letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
+#bubble.whisper #text { font-size: calc(var(--tx) * .9); }
+#tag { position: absolute; left: 1.6em; top: -1.55em; padding: .32em 1.1em; border-radius: 1em; color: #fff; font-weight: 900; font-style: italic; font-size: var(--tagsz); letter-spacing: .04em; text-transform: uppercase; line-height: 1; box-shadow: 0 .2em .5em rgba(0,0,0,.25); }
 #tag small { font-size: .62em; font-weight: 700; letter-spacing: .02em; text-transform: none; opacity: .85; margin-left: .4em; }
-#text { font-size: 1.45em; line-height: 1.32; font-weight: 600; min-height: 1.32em; }
+/* the words' size, per screen (1em = 1% of the stage's height): phone in the hand, TV across the room */
+body { --tx: 2.2em; --cap: 2.5em; --tagsz: 2.2em; }
+body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
+#text { font-size: var(--tx); line-height: 1.32; font-weight: 600; min-height: 1.32em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
@@ -111,7 +114,7 @@ body.uitop #ui { top: auto; bottom: 3%; }
 #choices button:focus-visible { box-shadow: 0 0 0 .2em #fff; }
 @keyframes rise { from { opacity: 0; transform: translateY(1em); } }
 
-#caption { position: absolute; left: 5%; top: 4%; padding: .7em 1.4em; border-radius: 1em; background: rgba(15,12,20,.72); color: #fff; font-size: 1.9em; font-weight: 800; letter-spacing: .02em; opacity: 0; transition: opacity .6s; pointer-events: none; }
+#caption { position: absolute; left: 5%; top: 4%; padding: .7em 1.4em; border-radius: 1em; background: rgba(15,12,20,.72); color: #fff; font-size: var(--cap); font-weight: 800; letter-spacing: .02em; opacity: 0; transition: opacity .6s; pointer-events: none; }
 #caption.on { opacity: 1; }
 #hint { position: absolute; left: 0; right: 0; bottom: 3.5%; text-align: center; color: rgba(255,255,255,.85); font-size: 1.8em; font-weight: 800; text-shadow: 0 .1em .4em rgba(0,0,0,.6); pointer-events: none; animation: blink 1.6s ease-in-out infinite; }
 @keyframes blink { 50% { opacity: .35; } }
