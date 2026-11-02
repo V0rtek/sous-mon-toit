@@ -91,7 +91,7 @@ window.DECK = (() => {
     ['Tu travailles seul?', [
       'Oui, je fais tout. Je me cherche un cofounder, mais j’avance sans attendre.']],
   ];
-  let qa = 0;
+  let qa = -1;   // the question open on the last slide (-1 = none; a tap on the open one closes it)
   // the problem, one link at a time (a tap = the next one); the last one is the answer
   const CHAIN = [
     ['L’IA rend le contenu abondant.'],
@@ -126,7 +126,7 @@ window.DECK = (() => {
     { c: '#0a84ff', h: () => `<small>Pourquoi moi</small><div class="dkSkills"><div><b>Jeux</b><span>50+ depuis 14 ans</span></div><div><b>Procédural</b><span>Des arbres de choix qui tiennent</span></div><div><b>Récit</b><span>100+ histoires</span></div></div><p>Il faut les trois en même temps.</p>` },
     { c: '#ffd60a', h: () => `<div class="dkZero">0 $</div><p class="dkZeroP">Un nouveau perso : 24 poses, avec 4 images gratuites sur ChatGPT.</p>` },
     { c: '#30d158', h: () => `<small>Je cherche</small><ul class="dkAsk"><li>Des groupes de 2-3 pour tester<span>10 minutes, je me déplace. Si vous dites oui : accès gratuit au produit et à toutes les histoires.</span></li><li>Un cofounder</li></ul>` },
-    { c: '#0a84ff', h: () => `<small>Questions</small><div class="dkQA"><div class="dkQs">${QA.map(([q], n) => `<button type="button" data-qa="${n}"${n === qa ? ' class="on"' : ''}>${esc(q)}</button>`).join('')}</div><div class="dkAns"><h2>${esc(QA[qa][0])}</h2><ul>${QA[qa][1].map((l) => `<li>${esc(l)}</li>`).join('')}</ul></div></div>` },
+    { c: '#0a84ff', h: () => `<small>Questions</small><div class="dkQA"><div class="dkQs">${QA.map(([q], n) => `<button type="button" data-qa="${n}"${n === qa ? ' class="on"' : ''}>${esc(q)}</button>`).join('')}</div><div class="dkAns">${qa < 0 ? '' : `<h2>${esc(QA[qa][0])}</h2><ul>${QA[qa][1].map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`}</div></div>` },
   ];
   // what I say on each slide (mine to edit, kept on this device); behind the corner button
   const NOTES = [
@@ -243,13 +243,13 @@ window.DECK = (() => {
   };
   return {
     mount(el) {
-      root = el; i = -1; sub = 0;
+      root = el; i = -1; sub = 0; qa = -1;
       el.innerHTML = '<div class="dkPrep"><div class="pnHost"></div><div class="dkPlan"></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
         if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const q = e.target.closest('[data-qa]');
-        if (q) { qa = +q.dataset.qa; draw(); return; }
+        if (q) { qa = qa === +q.dataset.qa ? -1 : +q.dataset.qa; draw(); return; }
         if (e.target.closest('.dkAns')) return;
         const p = e.target.closest('.dkPic');
         if (p || e.target.closest('.dkTyped, .dkNote')) return;
