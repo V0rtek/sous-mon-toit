@@ -558,6 +558,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
 #hub .strips { flex: 1 1 auto; min-height: 0; justify-content: center; margin: 0; }
 #hub .strips > * { height: auto; flex: 0 1 24em; min-height: 0; }
+#fullDemo .oldTag { position: absolute; top: .8em; right: .8em; z-index: 2; font-size: 1.6em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #f5f5f7; background: rgba(0,0,0,.6); padding: .2em .6em; border-radius: .4em; }
 .sub .strips > *, #infos .strips > *, #cosmo .strips > * { height: 13em; }
 .sub .strips b, #infos .strips b, #cosmo .strips b { font-size: 3.2em; }
 /* Infos: the test pages as a 2-column grid of tiles, all in view (not one tall row each) */
@@ -1633,7 +1634,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
-      <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b></a>
+      <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b><span class="oldTag">old</span></a>
       <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
       <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
