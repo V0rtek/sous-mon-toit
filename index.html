@@ -802,6 +802,12 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .pCanvas { position: relative; }
 .pHeadBox, .pBox { position: absolute; width: 34em; box-sizing: border-box; }
 .pHeadBox { padding-top: 2em; }
+.pCarry { display: flex; flex-direction: column; gap: .2em; margin-top: .4em; }
+.pCarry span { font-size: 1.45em; color: #30d158; } .pCarry i { color: #636366; font-style: normal; }
+.pFiche { margin: .6em 0; padding: .9em 1.1em; border-radius: 1em; background: #141416; }
+.pFiche small { display: block; margin-top: .5em; font-size: 1.35em; letter-spacing: .05em; text-transform: uppercase; color: #8e8e93; }
+.pFiche ul, .pFiche ol { margin: .2em 0 0; padding-left: 1.4em; } .pFiche li, .pFiche p { margin: .15em 0; font-size: 1.6em; line-height: 1.35; color: #d1d1d6; }
+.pFiche i { color: #30d158; font-style: normal; }
 .pBar { display: flex; gap: .6em; flex-wrap: wrap; }
 .pBar button, .pAdd button { font: inherit; font-size: 1.7em; padding: .45em .9em; border-radius: 2em; border: 0; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
 .pTurn, .pInfos { padding: 1.5em 1.7em; border-radius: 1.6em; background: #141416; margin-bottom: 1.2em; cursor: pointer; }
@@ -1019,6 +1025,9 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .fRowEv { display: inline-flex; align-items: flex-start; gap: .3em; }
 .fLk { font-style: normal; font-size: 1.25em; font-weight: 700; color: #636366; margin-top: .45em; }
 .fLk.mais { color: #ff9f0a; }
+.fTn { display: block; font-style: normal; font-size: .78em; color: #636366; }
+.fDetG { margin: 6px 0 0; font-size: 13px; font-weight: 700; }
+.fDet ul, .fDet ol { margin: 0; padding-left: 20px; } .fDet li { margin: 2px 0; }
 .fEv.cq { color: #64d2ff; cursor: default; }
 .fInfo { font: inherit; font-size: 1.4em; padding: .15em .2em; border: 0; background: none; color: #48484a; cursor: pointer; }
 .fOpts { display: flex; flex-wrap: wrap; gap: .5em; width: 100%; }
@@ -2420,9 +2429,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="test.js?v=20261102220000"></script>
 <script src="techniques.js?v=20261102330000"></script>
 <script src="ep1.js?v=20261030030000"></script>
-<script src="plan.js?v=20261031490000"></script>
+<script src="plan.js?v=20261103040000"></script>
 <script src="act.js?v=20261102370000"></script>
-<script src="forge.js?v=20261103030000"></script>
+<script src="forge.js?v=20261103050000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031580000"></script>

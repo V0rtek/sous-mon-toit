@@ -310,7 +310,7 @@ window.FORGE = (() => {
     put('want', 'want', 'setup', W[jWant.v].e);
     if (inc.enter) {
       put('expect', 'expect', 'setup', '🗣️', { glue: true }); put('tease', 'tease', 'setup', '⏰', { glue: true });
-      put('inc', 'enter', 'setup', '💥', { def: Math.max(0, PILLARS.findIndex((p) => p.id === base.px)), scene: true });
+      put('inc', 'enter', 'setup', '💥', { scene: true });
     } else put('inc', 'gone', 'setup', '👻', { scene: true });
     if (cs[0]) put('c0', 'conflict', 'setup', cs[0].e, { c: { o: cs[0].fr, oE: cs[0].en } });
     if (pasts[0]) put('past0', 'past', 'setup', '🕰️', { c: ic(pasts[0]), info: pasts[0] });
@@ -321,7 +321,7 @@ window.FORGE = (() => {
     if (H('danger')) put('danger', 'danger', 'setup', '🌲');
     pasts.slice(1).forEach((i, k) => put(`past${k + 1}`, 'past', 'setup', '🕰️', { c: ic(i), info: i, def: 1 }));
     put('easy', 'easy', 'setup', '↘️');
-    if (hidden.length) put('plant2', 'plant', 'setup', '🌱', { c: ic(hidden[hidden.length - 1]), info: hidden[hidden.length - 1], hint: true, def: 1 });
+    if (hidden.length) put('plant2', 'plant', 'setup', '🌱', { c: ic(hidden[hidden.length - 1]), info: hidden[hidden.length - 1], hint: true });
     if (H('gag') && secs[0]) put('gag', 'gag', 'setup', '🤐', { c: ic(secs[0]) });
     hidden.forEach((i, k) => put(`rev${k}`, 'reveal', 'reveal', IN[i.id].e, { c: ic(i), info: i, scene: !k }));
     objs.forEach((i, k) => put(`open${k}`, 'open', 'reveal', IN[i.id].e, { c: ic(i), info: i, scene: !k && !hidden.length }));
@@ -332,10 +332,41 @@ window.FORGE = (() => {
     return L.map(withTech);
   }
   // its technique: the one picked (a tap = the next), else its default
-  function withTech(ev) {
-    const list = TQ[ev.kind], k = ((S.tq[ev.id] ?? ev.def ?? 0) % list.length + list.length) % list.length, [n, g, fr, enF] = list[k];
-    return { ...ev, k, n, g, fr: fr(ev.c), en: enF(ev.c) };
+  // ---- one catalogue (03/11): an event that has a goal of Plan de scène takes its techniques from there (its leaves:
+  // « La surprise de son pilier » gives its 8), with their sheets and moments; the others keep theirs (TQ). K = what the
+  // event IS (fr, en) and which goals; def = its technique by default ----
+  const K = {
+    want: { g: ['desire'], def: 'Un rêve et sa raison', fr: (c) => `Justin veut ${c.w}`, en: (c) => `justin shows what he wants: ${c.wE}` },
+    enter: { g: ['char'], def: (c) => (PILLARS.find((p) => p.id === c.px) ? ['Le chef reprend le contrôle', 'Le charmeur désarme', 'Le dangereux ne fait rien', 'Le génie règle tout', 'Le clown couvre une douleur', 'Le mystérieux répond à côté', 'L’outsider se relève', 'Le protecteur prend le coup'][PILLARS.findIndex((p) => p.id === c.px)] : 'Coincé devant tous, il s’en sort'), fr: (c) => `${c.x} arrive`, en: (c) => `${c.xE} arrives` },
+    conflict: { g: ['stakes'], def: 'Show character positioning', fr: (c) => c.o, en: (c) => c.oE },
+    liked: { g: ['stakes'], def: 'Show character positioning', fr: (c) => `${c.a} est adoré de tous`, en: (c) => `everyone loves ${c.aE}: justin is alone against them` },
+    danger: { g: ['stakes'], def: 'Mention consequences', fr: () => 'Un lieu dangereux à traverser', en: () => 'a dangerous place to cross' },
+    easy: { g: ['stakes'], def: 'Mention consequences', fr: (c) => `Justin tente la facilité ; ça rate devant ${c.t}`, en: (c) => `justin tries the easy way; it fails in front of ${c.tE}` },
+    gag: { g: ['stakes'], def: 'Aveu vulnérable', fr: (c) => `Le secret ${de(c.s)} le bloque`, en: (c) => `${c.sE}'s secret binds him` },
+    clock: { g: ['stakes'], def: 'Mention consequences', fr: () => 'Il faut trancher maintenant', en: () => 'it must be decided now' },
+    past: { g: ['rel', 'info'], def: 'Shared memory', fr: (c) => c.i, en: (c) => c.iE },
+    seen: { g: ['callback'], def: 'Objet planté', fr: (c) => `${c.i} : vu, pas ouvert`, en: (c) => `${c.iE}: seen, not opened` },
+    plant: { g: ['callback'], def: 'Seed & payoff (surprise)', fr: (c) => `Indice semé → ${c.i}`, en: (c) => `a hint, unnoticed (it will give away: ${c.iE})` },
+    reveal: { g: ['info', 'callback'], def: 'Demande qui révèle', fr: (c) => c.i, en: (c) => `it comes out: ${c.iE}` },
+    open: { g: ['info'], def: 'Demande qui révèle', fr: (c) => `${c.i} : ouvert`, en: (c) => `${c.iE}: opened at last` },
+    twist: { g: ['callback'], def: 'Écho', fr: () => 'Tout prend un autre sens', en: () => 'everything seen before means something else' },
+  };
+  const leaves = (list) => (list || []).flatMap((t) => (t.s && t.s.length ? leaves(t.s) : [t]));
+  // the ways an event can be done: [{ n, d, g, ex, need, see, give, parts, carrier }]
+  function optsOf(ev) {
+    const k = K[ev.kind], GS = (window.PLAN && PLAN.GOALS) || [];
+    if (k && GS.length) return k.g.flatMap((g) => { const G2 = GS.find((x) => x.id === g); return G2 ? leaves(G2.tech).map((t) => ({ ...t, g })) : []; });
+    return (TQ[ev.kind] || []).map(([n, g]) => ({ n, g, d: '' }));
   }
+  function withTech(ev) {
+    const list = optsOf(ev), k0 = K[ev.kind], defN = k0 && (typeof k0.def === 'function' ? k0.def(ev.c) : k0.def);
+    const def = ev.def ?? Math.max(0, list.findIndex((t) => t.n === defN));
+    const k = ((S.tq[ev.id] ?? def) % list.length + list.length) % list.length, t = list[k];
+    if (k0 && window.PLAN) return { ...ev, k, n: t.n, g: t.g, tech: t, fr: k0.fr(ev.c), en: `${k0.en(ev.c)}; done with "${t.n}": ${t.d}` };
+    const [, , fr, enF] = TQ[ev.kind][k];
+    return { ...ev, k, n: t.n, g: t.g, tech: t, fr: fr(ev.c), en: enF(ev.c) };
+  }
+
   // the automatic cuts (after index i): the setup in chunks of about 4 (never inside a glued group), then a cut after the
   // setup, after the reveals, after the impossible choice
   function autoCuts(L) {
@@ -380,7 +411,7 @@ window.FORGE = (() => {
     const add = (key, fr, en2) => { (g[key] = g[key] || []).push([fr, en2]); };
     const onJ = (o) => /Justin|justin/.test(o);
     if (k === 'want') add('eng', `Désir de Justin (${c.w}) : ${ev.n.toLowerCase()}`, `justin's desire (${c.wE}), shown by: ${ev.n}`);
-    if (k === 'enter') { const pl = PILLARS[ev.k] || {}; add('eng', `${c.x}, ${(pl.n || '').replace(/^L[ea’] ?/, '')} : ${ev.n.toLowerCase()}`, `${c.xE} as ${(pl.en || '').split(' (')[0]}: ${(pl.surEn || '')}`); add('moved', `${c.x} arrive`, `${c.xE} arrives`); }
+    if (k === 'enter') { const pl = P[c.px] || {}; add('eng', `${c.x}, ${(pl.n || '').replace(/^L[ea’] ?/, '')} : ${ev.n.toLowerCase()}`, `${c.xE} as ${(pl.en || '').split(' (')[0]}: ${(pl.surEn || '')}`); add('moved', `${c.x} arrive`, `${c.xE} arrives`); }
     if (k === 'gone') { add('cur', `Où est ${c.x} ?`, `where is ${c.xE}?`); add('moved', `${c.x} disparaît`, `${c.xE} disappears`); }
     if (k === 'expect') add('cur', `Qui est ${c.x} ?`, `who is ${c.xE}?`);
     if (k === 'tease') add('cur', `${c.x} arrive : que va-t-il faire ?`, `${c.xE} is coming: what will they do?`);
@@ -477,12 +508,18 @@ window.FORGE = (() => {
         if (b.dataset.close != null) { detEl.hidden = true; return; }
         if (b.dataset.card && window.TECH_OPEN) { detEl.hidden = true; TECH_OPEN(b.dataset.card); return; }
         if (b.dataset.way != null) { S.tq[b.dataset.ev] = +b.dataset.way; save(); render(); const ev2 = [...line(), ...events().flat()].find((x) => x.id === b.dataset.ev); if (ev2) details(ev2); } }; }
-    const others = TQ[ev.kind].map((t, i) => `<button type="button" class="${i === ev.k ? 'on' : ''}" data-ev="${ev.id}" data-way="${i}">${esc(t[0])}</button>`).join('');
+    const OL = optsOf(ev), t0 = ev.tech || {}, others = OL.map((t, i) => `<button type="button" class="${i === ev.k ? 'on' : ''}" data-ev="${ev.id}" data-way="${i}">${esc(t.n)}</button>`).join('');
+    const GN = ((window.PLAN && PLAN.GOALS) || []).find((x) => x.id === ev.g);
     detEl.innerHTML = `<div class="fDetTop"><b>${ev.e} ${esc(ev.n)}</b><button type="button" data-close>OK</button></div>`
       + `<div class="fChain">${chain.map(([l, id]) => `<button type="button" ${id ? `data-card="${id}"` : 'disabled'}>${esc(l)}</button>`).join('<span>›</span>')}<span>›</span><b>${esc(ev.n)}</b></div>`
       + `<p class="fDetFr">${esc(ev.fr)}</p>`
-      + `<h4>Instructions</h4><p class="${d.ins ? '' : 'fTodo'}">${esc(d.ins || 'À compléter.')}</p><h4>Exemple</h4><p class="${d.ex ? '' : 'fTodo'}">${esc(d.ex || 'À compléter.')}</p>`
-      + (TQ[ev.kind].length > 1 ? `<h4>Les autres façons</h4><div class="fWays">${others}</div>` : '');
+      + (GN ? `<p class="fDetG" style="color:${GN.c}">${esc(GN.name)}</p>` : '')
+      + `<h4>Instructions</h4><p class="${d.ins || t0.d ? '' : 'fTodo'}">${esc(d.ins || t0.d || 'À compléter.')}</p>`
+      + (t0.need ? `<h4>A besoin de</h4><ul>${t0.need.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '') + (t0.see ? `<h4>On voit</h4><p>${esc(t0.see)}</p>` : '')
+      + (t0.give ? `<h4>Produit</h4><ul>${t0.give.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '')
+      + (t0.parts ? `<h4>Ses moments (placés dans le plan)</h4><ol>${t0.parts.map((x) => `<li><b>${esc(x.n)}</b> · ${esc(x.d)}</li>`).join('')}</ol>` : '')
+      + `<h4>Exemple</h4>${(d.ex || (t0.ex && t0.ex.length)) ? (d.ex ? `<p>${esc(d.ex)}</p>` : t0.ex.map((x) => `<p>${esc(x)}</p>`).join('')) : '<p class="fTodo">À compléter.</p>'}`
+      + (OL.length > 1 ? `<h4>Les autres façons</h4><div class="fWays">${others}</div>` : '');
     detEl.hidden = false;
   }
 
@@ -498,13 +535,37 @@ window.FORGE = (() => {
       if (ch) { b.kind = 'choice'; b.opts = (ev.opts || chOpts()).map((o) => (Array.isArray(o) ? o[0] : o)); b.what = ev.choice ? `Choix : ${ev.opts.map((o) => `${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr; }
       if (ev.info) b[ev.hint ? 'hints' : 'reveals'] = [iid(ev.info)];
       return b; };
-    const epBeats = ep.list.map((ev) => beat(ev, 'r')); k = 0;
+    const orig = ep.list.slice(), epBeats = ep.list.map((ev) => beat(ev, 'r')); k = 0;
     epBeats.forEach((b, j) => { if (j && !b.kind) b.what = (link(ep.list[j])[0] === 'mais' ? 'Mais : ' : 'Donc : ') + b.what; });
+    // one line, two jobs (03/11): a moment that can ride in another (a seed, a planted question) climbs into the latest
+    // carrier before it (Tell a story, Shared memory, Show contrast...) instead of having its own rectangle
+    const evOf = (b) => ep.list[epBeats.indexOf(b)], carrierBefore = (b) => { for (let q = epBeats.indexOf(b) - 1; q >= 0; q--) { const e2 = ep.list[q]; if (e2 && e2.tech && e2.tech.carrier && !epBeats[q].kind) return epBeats[q]; } return null; };
+    for (const b of epBeats.slice()) { const ev = evOf(b); if (!ev || ev.kind !== 'plant') continue; const cr = carrierBefore(b); if (!cr) continue;
+      (cr.carries = cr.carries || []).push({ tech: ev.n, part: `Le seed : ${ev.c.i}` }); cr.hints = [...new Set([...(cr.hints || []), ...(b.hints || [])])];
+      ids[ev.id] = cr.id; epBeats.splice(epBeats.indexOf(b), 1); ep.list = ep.list.filter((x) => x !== ev); }
     const laterEvs = next ? next.list.filter((ev) => !ev.choice).slice(0, 2) : [], laterBeats = laterEvs.map((ev) => beat(ev, 'f'));
-    const all = [...ep.list, ...laterEvs], links = [], ln = (a, b, label) => { if (ids[a] && ids[b]) links.push({ from: ids[a], to: ids[b], label }); };
+    const all = [...orig, ...laterEvs], links = [], ln = (a, b, label) => { if (ids[a] && ids[b]) links.push({ from: ids[a], to: ids[b], label }); };
     ln('expect', 'inc', 'La promesse : on l’attend'); ln('tease', 'inc', 'Annoncé : il arrive');
     ep.list.forEach((ev, j) => { const prev = ep.list[j - 1]; if ((ev.choice || ev.kind === 'pick') && prev && prev.g === 'stakes') ln(prev.id, ev.id, 'L’enjeu du choix'); });
     for (const ev of all) if (ev.kind === 'plant' || ev.kind === 'seen') { const to = all.find((x) => (x.kind === 'reveal' || x.kind === 'open') && x.info === ev.info); if (to) ln(ev.id, to.id, ev.kind === 'plant' ? 'Planté → révélé' : 'Vu → ouvert'); }
+    // a technique with moments (Coincé devant tous, Seed & payoff): its « now » is the event; the others are placed before
+    // it by rule (early: as early as possible, in a carrier if it can ride; mid: between; before: right before), linked
+    let t = 0; const planted = line().some((x) => x.kind === 'plant');
+    for (const ev of ep.list.slice()) {
+      const parts = ev.tech && ev.tech.parts; if (!parts || !ids[ev.id]) continue;
+      const at = () => epBeats.findIndex((b) => b.id === ids[ev.id]), chain = [];
+      const mk = (pt) => ({ id: 't' + (++t), goals: ev.g ? [ev.g] : [], tech: ev.n, lines: 2, what: `${pt.n}${ev.c && ev.c.x && ev.kind === 'enter' ? ` (sur ${ev.c.x})` : ''} : ${pt.d}` });
+      for (const pt of parts) {
+        if (pt.at === 'now') continue;
+        if (pt.at === 'early' && ev.kind === 'reveal' && planted) continue;   // its seed is already a 🌱
+        if (pt.at === 'early') { const cr = pt.carry ? epBeats.slice(0, at()).find((b) => { const e2 = evOf(b); return e2 && e2.tech && e2.tech.carrier && !b.kind; }) : null;
+          if (cr) { (cr.carries = cr.carries || []).push({ tech: ev.n, part: pt.n }); chain.push(cr.id); } else { const nb = mk(pt); epBeats.splice(Math.min(1, at()), 0, nb); chain.push(nb.id); } }
+        if (pt.at === 'mid') { const from = chain.length ? epBeats.findIndex((b) => b.id === chain[chain.length - 1]) + 1 : 0, nb = mk(pt); epBeats.splice(Math.max(from, Math.floor((from + at()) / 2)), 0, nb); chain.push(nb.id); }
+        if (pt.at === 'before') { const nb = mk(pt); epBeats.splice(at(), 0, nb); chain.push(nb.id); }
+      }
+      chain.push(ids[ev.id]);
+      for (let q = 0; q < chain.length - 1; q++) if (chain[q] !== chain[q + 1]) links.push({ from: chain[q], to: chain[q + 1], label: `${ev.n} : ${(parts.filter((pt) => pt.at !== 'now')[q] || parts[parts.length - 1]).n}` });
+    }
     const title = `${(ACT.get && ACT.get().seed && ACT.get().title) || 'Créer'} · épisode ${n + 1}`;
     return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [],
       chars: S.cast.map((id) => ({ id, name: nm(id), sprite: sprite(id), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
@@ -621,7 +682,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     const ch = ev.choice || ev.kind === 'pick', lk = k ? `<i class="fLk ${link(ev)[0]}" data-tip="${link(ev)[0] === 'mais' ? 'Mais : ça se complique' : 'Donc : la conséquence'}">${link(ev)[0]}</i>` : '';
     const opts = ev.choice ? `<span class="fOpts">${ev.opts.map((o, i) => `<button type="button" class="${S.picked[ev.id] === i ? 'on' : ''}" data-pickopt="${ev.id}:${i}" data-tip="${esc(`${o[0]}\n→ ${o[1]}\nUn tap = c’est ce qu’il a choisi`)}">${esc(o[0])}<small>→ ${esc(o[1])}</small></button>`).join('')}</span>` : '';
     const built = ev.built ? `<small class="fBuilt">Pèse : ${esc(ev.built.join(' · '))}</small>` : '';
-    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${TQ[ev.kind] && TQ[ev.kind].length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${TQ[ev.kind].length})` : ''}`)}"><b>${ev.e}</b>${esc(ev.choice ? 'Choix' : ev.fr)}</button>${PATHS[ev.kind] ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${opts}${built}`;
+    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${optsOf(ev).length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${optsOf(ev).length})` : ''}`)}"><b>${ev.e}</b>${esc(ev.choice ? 'Choix' : ev.fr)}${K[ev.kind] ? `<em class="fTn">${esc(ev.n)}</em>` : ''}</button>${PATHS[ev.kind] ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${opts}${built}`;
   }
   function render() {
     if (!el) return;

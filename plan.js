@@ -20,13 +20,30 @@ window.PLAN = (() => {
   const GOALS = [
     // icon: a person / two people / a target / a rising arrow / an eye / a loop back
     { id: 'char', name: 'Create char engagingness', c: '#0a84ff', d: 'Faire aimer un perso : on veut passer du temps avec lui.',
-      tech: [{ n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', ex: ['She counts her coins twice. He tips with money he doesn’t have.', '« Man… I think we’re getting too old for this. » / « Man… I think it’s the best night of my life. »'], s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
-        { n: 'Share personal internal conflict', d: 'Un perso dit tout haut ce qui se bat en lui, maintenant : il veut une chose et son contraire. Pas de passé, pas de nom absent : on le comprend sans rien savoir, et on s’y attache. Bon pour ouvrir.', ex: ['« Man… I think we’re getting too old for this shit. »', '« I should go home. Order me another. »', '« I love this place. I hate who I am in it. »'] },
-        { n: 'Tell a story', d: 'Un moment du passé, à voix haute : une ligne (un perso), ou un échange à deux sur un passé commun. Dit qui ils sont (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', '« Hey, you remember what you lost at the McGill bet club? » / « Fuck, man. I still miss those pants. »', '« Remember who paid the first round here? » / « You did. With my wallet. »'] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
+      tech: [{ carrier: 1, n: 'Show contrast', d: 'Deux persos réagissent à la même chose de façons opposées : on les connaît par la différence.', ex: ['She counts her coins twice. He tips with money he doesn’t have.', '« Man… I think we’re getting too old for this. » / « Man… I think it’s the best night of my life. »'], s: [{ n: 'Même début de phrase, fins opposées', d: 'Les deux commencent pareil et finissent à l’opposé (« Man… I think… we’re too old » / « …I’m having my best life »).' }] },
+        { carrier: 1, n: 'Share personal internal conflict', d: 'Un perso dit tout haut ce qui se bat en lui, maintenant : il veut une chose et son contraire. Pas de passé, pas de nom absent : on le comprend sans rien savoir, et on s’y attache. Bon pour ouvrir.', ex: ['« Man… I think we’re getting too old for this shit. »', '« I should go home. Order me another. »', '« I love this place. I hate who I am in it. »'] },
+        { n: 'Tell a story', d: 'Un moment du passé, à voix haute : une ligne (un perso), ou un échange à deux sur un passé commun. Dit qui ils sont (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', '« Hey, you remember what you lost at the McGill bet club? » / « Fuck, man. I still miss those pants. »', '« Remember who paid the first round here? » / « You did. With my wallet. »'], carrier: 1 },
+        { n: 'Coincé devant tous, il s’en sort', d: 'Une question difficile pèse sur lui ; tout le monde a essayé d’y répondre ; quelqu’un la lui pose devant tous ; sa réponse est ce qu’on n’attendait pas, et il reprend le contrôle. Souvent mêlé à un seed & payoff (la réponse explique des détails semés avant).',
+          need: ['Une question difficile, plantée avant : que le groupe n’arrive pas à résoudre, ou une chose qui semble impardonnable', 'Chacun a essayé d’y répondre et a échoué (l’enjeu monte)', 'Quelqu’un la lui pose à la fin, devant tous : toute l’attention sur lui', 'Une réponse qui compte pour eux (pas « resto ou bar »)'],
+          see: 'Il répond, et ce n’est pas ce qu’on attendait.', give: ['Son trait (contrôle, respect, autodérision…)', 'La question fermée', 'Souvent une info nouvelle, un enjeu déplacé'],
+          ex: ['« Pourquoi t’étais chez Marco à minuit ? » … « Personne m’a demandé ma nouvelle job. Je distribue des dépliants d’assurance. La nuit, pour pas me faire envoyer chier. »'],
+          parts: [{ id: 'q', n: 'La question difficile', at: 'early', carry: 1, d: 'Une question que le groupe n’arrive pas à résoudre, ou une chose qui semble impardonnable (« il était chez Marco à minuit »).' },
+            { id: 'try', n: 'Chacun essaie, échoue', at: 'mid', d: 'Les autres essaient d’expliquer et échouent ; les accusations montent.' },
+            { id: 'ask', n: 'On lui pose la question', at: 'before', d: 'Quelqu’un la lui pose devant tous ; toute l’attention sur lui ; la réponse compte.' },
+            { id: 'answer', n: 'Sa réponse', at: 'now', d: 'Ce qu’on n’attendait pas : il reprend le contrôle.' }] },
+        { n: 'La surprise de son pilier', d: 'Quand il paraît, il prouve ce pour quoi on le suit en faisant ce qu’on n’attendait pas, devant tout le monde.', s: [
+          { n: 'Le chef reprend le contrôle', d: 'Coincé devant tous, dans une situation impossible, il reprend la salle sans élever la voix.' },
+          { n: 'Le charmeur désarme', d: 'Quelqu’un d’hostile vient vers lui ; une réplique plus tard, il sourit.' },
+          { n: 'Le dangereux ne fait rien', d: 'Il ne fait rien, dit une phrase calme, et la salle plie.' },
+          { n: 'Le génie règle tout', d: 'En dix secondes, il règle ce qui bloquait tout le monde, comme si c’était évident.' },
+          { n: 'Le clown couvre une douleur', d: 'Il fait rire toute la salle pour couvrir la douleur de quelqu’un ; seul le joueur voit pourquoi.' },
+          { n: 'Le mystérieux répond à côté', d: 'Il répond à côté de la question, et c’est exactement juste.' },
+          { n: 'L’outsider se relève', d: 'Il se plante devant tous, se relève, et personne ne veut le lâcher.' },
+          { n: 'Le protecteur prend le coup', d: 'Il prend le coup (un blâme, une menace) à la place d’un autre, sans un mot.' }] }], icon: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c0-4 3.1-6.3 7-6.3s7 2.3 7 6.3"/>' },
     { id: 'rel', name: 'Create relationship engagingness', c: '#64d2ff', d: 'Faire aimer le lien entre deux persos, pas seulement chacun.',
       tech: [{ n: 'Show contrast', d: 'Deux persos opposés qui s’entendent : leur différence montre leur lien.', ex: ['He plans every step, she improvises, and she still finishes his sentences.'] },
-        { n: 'Shared memory', d: 'Ils se rappellent ensemble un moment vécu à deux, chacun avec sa version, en se répondant.', ex: ['« I loved that dog. » / « I hated her, she was so loud. » / « You cried so much when it happened. »', '« Remember the night the roof leaked? » / « You mean the night you blamed me for the roof. »'] },
-        { n: 'Show care', d: 'L’un prend soin de l’autre, concrètement, sans le dire.', ex: ['She pushes her plate toward him without a word.', '« You didn’t eat. » / « I’m fine. » / « Eat. »'] }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
+        { carrier: 1, n: 'Shared memory', d: 'Ils se rappellent ensemble un moment vécu à deux, chacun avec sa version, en se répondant.', ex: ['« I loved that dog. » / « I hated her, she was so loud. » / « You cried so much when it happened. »', '« Remember the night the roof leaked? » / « You mean the night you blamed me for the roof. »'] },
+        { carrier: 1, n: 'Show care', d: 'L’un prend soin de l’autre, concrètement, sans le dire.', ex: ['She pushes her plate toward him without a word.', '« You didn’t eat. » / « I’m fine. » / « Eat. »'] }], icon: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19.5c0-3.2 2.4-5.2 5.5-5.2 1.6 0 3 .5 4 1.4 1-.9 2.4-1.4 4-1.4 3.1 0 5.5 2 5.5 5.2"/>' },
     { id: 'desire', name: 'Show desire / goal', c: '#ff375f', d: 'Montrer clairement ce qu’un perso veut.',
       tech: [{ n: 'Direct confession', d: 'Le perso dit tout haut, à quelqu’un en face de lui, ce qu’il veut ou ressent, sans sous-entendu (jamais dans sa tête).', ex: ['« I don’t think I could survive someone taking Cam away from me. »', '« I want out. Tonight. »'] },
         { n: 'Un rêve et sa raison', d: 'Le héros dit à quelqu’un, à voix haute, ce qu’il veut pour lui depuis longtemps, et pourquoi ; l’autre réagit (une blague, un doute). On le comprend et on le veut avec lui. Avant la demande qui va tomber dessus.', ex: ['« One day I’m opening my own place. Not pouring for someone else. » / « You say that every year. »', '« I want my name on that wall. Just once. » / « Then stop pouring drinks for the guys already on it. »'] },
@@ -37,14 +54,19 @@ window.PLAN = (() => {
         { n: 'Menace : si tu X, je Y', d: 'Juste avant le choix principal, quelqu’un dit ce qu’il fera selon le choix : le joueur sait ce que coûte chaque bouton avant de toucher, et le voit arriver après.', ex: ['« If you walk out that door with her, I’m not here when you come back. »', '« Say no, and I go see Marco alone tonight. You know what he’s like. »'] },
         { n: 'Aveu vulnérable', d: 'Juste avant le choix principal, quelqu’un avoue ce qu’il ressent, lié à une issue du choix : le joueur sent qui il va blesser ou rendre heureux.', ex: ['« If you stay… I think I’d finally stop being scared. »', '« I’ve never asked anyone for anything. I’m asking you. »'] }], icon: '<path d="M3.5 17.5l6-6 4 4 7-7.5"/><path d="M15 8h5.5v5.5"/>' },
     { id: 'info', name: 'Reveal info', c: '#bf5af2', d: 'Faire découvrir une info de l’intrigue, une à la fois, après celle dont elle dépend, et après l’engagingness.',
-      tech: [{ n: 'Demande qui révèle', d: 'Quelqu’un réclame quelque chose à un autre ; en le réclamant, il révèle le fait. L’info arrive par un conflit, jamais expliquée.', ex: ['« Rent’s due Monday, man. I’m not covering you again. » (ils vivent ensemble, l’un paie pour l’autre)', '« If you keep borrowing my car, at least fill it up. »', '« Give me back the ring. You’re not marrying him. »'] },
-        { n: 'Tell a story', d: 'Un moment du passé, à voix haute : une ligne (un perso), ou un échange à deux sur un passé commun. Dit qui ils sont (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', '« Hey, you remember what you lost at the McGill bet club? » / « Fuck, man. I still miss those pants. »', '« Remember who paid the first round here? » / « You did. With my wallet. »'] }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+      tech: [{ carrier: 1, n: 'Demande qui révèle', d: 'Quelqu’un réclame quelque chose à un autre ; en le réclamant, il révèle le fait. L’info arrive par un conflit, jamais expliquée.', ex: ['« Rent’s due Monday, man. I’m not covering you again. » (ils vivent ensemble, l’un paie pour l’autre)', '« If you keep borrowing my car, at least fill it up. »', '« Give me back the ring. You’re not marrying him. »'] },
+        { carrier: 1, n: 'Tell a story', d: 'Un moment du passé, à voix haute : une ligne (un perso), ou un échange à deux sur un passé commun. Dit qui ils sont (ou l’info). Une forme, jamais la même phrase deux fois.', ex: ['I used to draw for money. Now nobody pays for paper.', 'Last time I trusted a guy in a suit, I lost my car.', 'My brother tried that once. We still don’t talk.', '« Hey, you remember what you lost at the McGill bet club? » / « Fuck, man. I still miss those pants. »', '« Remember who paid the first round here? » / « You did. With my wallet. »'] }], icon: '<path d="M2 12s3.7-6.5 10-6.5S22 12 22 12s-3.7 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
     { id: 'callback', name: 'Callback', c: '#30d158', d: 'Une chose plantée tôt revient plus tard avec un autre sens.',
       tech: [{ n: 'Devise retournée', d: 'La phrase fétiche d’un perso revient, et la réalité y répond de travers.', ex: ['Early: « Something will come up. » Later the money comes from the wrong man: « …Something came up. »'] },
         { n: 'Écho', d: 'Les mots d’un perso reviennent dans la bouche d’un autre.', ex: ['Early, his friend: « Rent’s due Monday. » Later, the enemy: « Rent’s due Monday, Brooke. »'] },
         { n: 'Objet planté', d: 'Un détail anodin au début devient important plus tard.', ex: ['Early: « What do you drink? » « Red. » Later: « Don’t drink the red wine. »'] },
         { n: 'Phrase pas finie reprise', d: 'Quelqu’un demande plus tard la fin d’une phrase pas finie.', ex: ['Early: « You’re just… » Later: « What was he gonna say? »'] },
         { n: 'Question esquivée', d: 'Quelqu’un pose une question, l’autre l’esquive (une blague, un changement de sujet, « plus tard ») : la réponse est retenue, la curiosité reste. Le rectangle soulève l’info sans la révéler, et il est lié à la Question qui revient.', ex: ['« Where were you last night? » / « Out. Pass the salt. »', '« Who gave you that ring? » / « You want another drink? »'] },
+        { n: 'Seed & payoff (surprise)', d: 'Un indice glissé tôt dans autre chose, que personne ne relève ; plus tard il revient et explique tout d’un coup. Plus les seeds sont loin et nombreux, plus la surprise est forte.',
+          need: ['Un porteur pour cacher le seed (une histoire, une blague, une demande)', 'Du temps entre le seed et le payoff'], see: 'Le détail revient ; le public relie tout.', give: ['Surprise', 'Ce qu’on a vu avant prend un autre sens'],
+          ex: ['Tôt : « J’ai un nouveau truc, je vous raconterai. » Plus tard : « Personne m’a demandé ma nouvelle job. »'],
+          parts: [{ id: 'seed', n: 'Le seed', at: 'early', carry: 1, d: 'Un indice glissé dans un autre moment (une histoire, une blague), que personne ne relève.' },
+            { id: 'payoff', n: 'Le payoff', at: 'now', d: 'Le détail revient et explique tout d’un coup.' }] },
         { n: 'Question qui revient', d: 'La question esquivée revient, cette fois sans porte de sortie, juste avant un choix (lié à lui) : le joueur doit y répondre.', ex: ['« I’ll ask one more time. Where were you? »', '« No jokes this time. Who gave you the ring? »'] }], icon: '<path d="M19.5 13a7.5 7.5 0 1 1-2.2-6.3"/><path d="M19.5 3.5v5h-5"/>' },
   ];
   // a goal: d = what it's for; its techniques: { n: name, d: what it is, s: [the techniques under it] } (a category opens
@@ -52,6 +74,7 @@ window.PLAN = (() => {
   const G = Object.fromEntries(GOALS.map((g) => [g.id, g]));
   const flat = (list) => (list || []).flatMap((t) => [t.n, ...flat(t.s)]);
   const flatT = (list) => (list || []).flatMap((t) => [t, ...flatT(t.s)]);
+  const techT = (n) => { for (const g of GOALS) { const t = flatT(g.tech).find((x) => x.n === n); if (t) return t; } return null; };
   const techD = (n) => { for (const g of GOALS) { const t = flatT(g.tech).find((x) => x.n === n); if (t) return t.d; } return ''; };
   // a character's face: its sheet in a circle, head and shoulders
   const face = (sp) => { const S = window.SPRITES && SPRITES[sp]; const pose = S ? (S.poses.listen ? 'listen' : Object.keys(S.poses)[0]) : null;
@@ -166,6 +189,7 @@ window.PLAN = (() => {
       + `<div class="pTop"><span class="pN">${num(b.id)}</span><b>${b.kind === 'choice' ? 'Choix' : esc(b.tech) || '…'}</b><em>${b.lines || 1} répl.</em></div>`
       + (b.kind === 'choice' && b.tech ? `<div class="pTech">${esc(b.tech)}</div>` : '')
       + (b.what ? `<p>${esc(b.what)}</p>` : '')
+      + ((b.carries || []).length ? `<div class="pCarry">${b.carries.map((c) => `<span>porte : ${esc(c.part)} <i>(${esc(c.tech)})</i></span>`).join('')}</div>` : '')
       + (b.kind === 'choice' && b.opts && b.opts.length ? `<div class="pCh">${b.opts.map((o) => `<span>${esc(o)}</span>`).join('')}</div>` : '')
       + (infos.length ? `<div class="pInfo">${infos.map((x) => `<span>révèle : ${esc(x.text)}</span>`).join('')}</div>` : '')
       + ((b.hints || []).length ? `<div class="pInfo hint">${b.hints.map((r) => P.infos.find((x) => x.id === r)).filter(Boolean).map((x) => `<span>soulève : ${esc(x.text)}</span>`).join('')}</div>` : '')
@@ -198,8 +222,8 @@ window.PLAN = (() => {
     const g = G[pal.g]; let list = g.tech, d = g.d; const crumbs = [`<button type="button" data-crumb="-1">${esc(g.name)}</button>`];
     pal.path.forEach((i, k) => { crumbs.push(`<button type="button" data-crumb="${k}">${esc(list[i].n)}</button>`); d = list[i].d; list = list[i].s || []; });
     let ex = [];
-    if (pal.sel != null && list[pal.sel]) { d = list[pal.sel].d; ex = list[pal.sel].ex || []; }   // a technique tapped: what it is, its examples
-    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><p class="pD">${esc(d)}</p>${ex.length ? `<ul class="pEx">${ex.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}<div class="pChips">`
+    let fi = ''; if (pal.sel != null && list[pal.sel]) { d = list[pal.sel].d; ex = list[pal.sel].ex || []; fi = fiche(list[pal.sel]); }   // a technique tapped: what it is, its examples
+    return `<div class="pPal" style="--c:${g.c}"><div class="pCrumbs">${crumbs.join('<span>›</span>')}</div><p class="pD">${esc(d)}</p>${fi}${ex.length ? `<ul class="pEx">${ex.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}<div class="pChips">`
       + (list.length ? list.map((t, i) => `<b data-tn="${i}" class="${pal.sel === i ? 'on' : ''}" title="${esc(t.d)}">${esc(t.n)}${t.s && t.s.length ? ' <i>›</i>' : ''}</b>`).join('') : '<em>Aucune technique encore.</em>')
       + '</div><small>Touche une technique pour la voir ; glisse-la sur un rectangle, ou dans une boîte pour en créer un.</small></div>';
   }
@@ -281,6 +305,8 @@ window.PLAN = (() => {
     if (focusId) for (const n of cv.querySelectorAll('.pBeat')) n.classList.toggle('on', n.dataset.b === focusId || P.links.some((l) => (l.from === focusId && l.to === n.dataset.b) || (l.to === focusId && l.from === n.dataset.b)));
   }
 
+  // a technique's sheet (02/11): what it needs, what we see, what it gives, its moments (each one placed in the plan)
+  const fiche = (t) => (t && (t.need || t.parts) ? `<div class="pFiche">${t.need ? `<small>A besoin de</small><ul>${t.need.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${t.see ? `<small>On voit</small><p>${esc(t.see)}</p>` : ''}${t.give ? `<small>Produit</small><ul>${t.give.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${t.parts ? `<small>Ses moments</small><ol>${t.parts.map((x) => `<li><b>${esc(x.n)}</b> · ${esc(x.d)}${x.carry ? ' <i>(peut monter dans un autre moment)</i>' : ''}</li>`).join('')}</ol>` : ''}</div>` : '');
   // ---- the edit sheet: a rectangle, a box, or a plain text (the title, the turn, an info) ----
   const sheet = () => document.getElementById('planSheet');
   function closeSheet() { editing = null; const s = sheet(); if (s) s.hidden = true; }
@@ -289,7 +315,7 @@ window.PLAN = (() => {
     const sug = [...new Set((b.goals || []).flatMap((g) => (G[g] ? flat(G[g].tech) : [])))];
     s.innerHTML = `<div class="pSh"><div class="pShTop"><b>${b.kind === 'choice' ? 'Choix' : 'Rectangle'} ${num(id)}</b><button type="button" data-s="close">OK</button></div>`
       + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}</div>`
-      + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">${techD(b.tech) ? `<p class="pD">${esc(techD(b.tech))}</p>` : ''}`
+      + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">${techD(b.tech) ? `<p class="pD">${esc(techD(b.tech))}</p>` : ''}${fiche(techT(b.tech))}`
       + (sug.length ? `<div class="pSug">${sug.map((t) => `<button type="button" data-tech="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : '')
       + `<small>Ce qui se passe (pas de dialogue)</small><textarea data-f="what" rows="3">${esc(b.what)}</textarea>`
       + `<small>Répliques</small><div class="pStep"><button type="button" data-s="minus">−</button><b>${b.lines || 1}</b><button type="button" data-s="plus">+</button></div>`
@@ -496,6 +522,7 @@ HOW TO TRANSLATE THE PLAN:
 - A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
 - An info comes out exactly in the rectangle of "ep" that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice). An info revealed in "later" is never said in this episode: where a rectangle "hints" it, only its question is raised (something seen or said that makes the player wonder), never its answer.
 - A link is a promise: what the "from" rectangle plants comes back, recognizably, in the "to" rectangle. A link to "later" is only planted.
+- A rectangle's "carries" are moments of other techniques it ALSO does, inside its own lines (a seed slipped into a story, a question planted in a joke): they get no line of their own, and nobody points at them.
 - The characters talk with their traits: you know who speaks without the name.
 - The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If he ..., ...").
 
