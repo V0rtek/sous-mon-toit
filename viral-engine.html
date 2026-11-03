@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viral engine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* Viral engine (03/11): how a story spreads by itself. Five levers + the one that feeds the others (a decision people
+   read differently). Each card = the idea, what to build in a story, and a check list kept on this device. */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; }
+main { max-width: 760px; margin: 0 auto; padding: 20px 20px 80px; display: grid; gap: 22px; }
+.intro { color: #c7c7cc; font-size: 17px; line-height: 1.5; margin: 0; }
+.intro b { color: #fff; }
+.loop { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-weight: 900; font-size: 14px; color: #8e8e93; }
+.loop span { background: #17161c; border-radius: 99px; padding: 6px 12px; color: #f5f5f7; }
+.m { background: #17161c; border-radius: 18px; padding: 20px 22px; border-left: 6px solid var(--c); }
+.m .k { font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--c); }
+.m h2 { margin: 4px 0 6px; font-family: var(--display); font-weight: 400; font-size: 28px; }
+.m .lead { margin: 0 0 12px; font-size: 16px; line-height: 1.5; color: #e5e5ea; }
+.m h3 { margin: 16px 0 6px; font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #8e8e93; }
+.m ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.m li label { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; line-height: 1.45; color: #e5e5ea; cursor: pointer; padding: 4px 0; }
+.m li input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--c); flex: none; }
+.m li input:checked + span { color: #8e8e93; text-decoration: line-through; }
+.ex { border-left: 3px solid var(--c); padding-left: 12px; margin: 8px 0 0; font-weight: 800; color: #fff; line-height: 1.45; }
+.big { border: 2px solid #ffd60a; }
+.opts { display: grid; gap: 8px; margin-top: 10px; }
+.opt { position: relative; overflow: hidden; text-align: left; font: inherit; font-weight: 800; font-size: 16px; color: #fff; background: #0b0a0f; border: 1px solid #2c2c2e; border-radius: 12px; padding: 12px 14px; cursor: pointer; }
+.opt i { position: absolute; inset: 0 auto 0 0; width: 0; background: #ffd60a33; transition: width .5s; }
+.opt span { position: relative; display: flex; justify-content: space-between; gap: 12px; }
+.opt.mine { border-color: #ffd60a; }
+.note { color: #8e8e93; font-size: 13px; margin: 8px 0 0; }
+.tools { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+button.b { font: inherit; font-weight: 900; font-size: 14px; border: 0; border-radius: 99px; padding: 9px 16px; background: #1c1c1e; color: #f5f5f7; cursor: pointer; }
+</style>
+</head>
+<body>
+<header><h1>Viral engine</h1><a href="index.html">‹ Home</a></header>
+<main>
+  <p class="intro">A story spreads when people have <b>something to do with it</b>: guess, make, share, argue. Each lever below turns a viewer into a carrier. Pull them together and each one feeds the next.</p>
+  <div class="loop"><span>Mystery</span>→<span>Theories</span>→<span>Clips &amp; art</span>→<span>Community</span>→<span>Next episode</span>→<span>Mystery</span></div>
+  <div id="list"></div>
+</main>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LEVERS = [
+  { id: 'theories', c: '#bf5af2', k: '1 · Theories', t: 'Create theories',
+    lead: 'Leave clues and mysteries that audiences can investigate together. A question nobody can close is a conversation nobody can stop.',
+    do: ['Plant an unexplained detail in the first episode (an object, a name, a lie) and pay it off two or three episodes later.', 'Give a clue to each side of a scene, so no one viewer has the whole picture.', 'Hide one tiny detail in the background that only a second watch finds.', 'Let a character say something that is true and misleading at once.', 'Never confirm a theory early: answer only the question the viewers stopped asking.'],
+    ex: '« Why did Léa keep the key? » stays open for three episodes. Everyone has a theory; the answer pays something.' },
+  { id: 'fans', c: '#ff9f0a', k: '2 · Participation', t: 'Encourage fan participation',
+    lead: 'Fan art, predictions, polls, alternate endings. Make the easiest thing to do the thing that spreads the story.',
+    do: ['End every episode on a poll: « What will she do? » Show the result at the start of the next one.', 'Ask for predictions before a reveal; keep them and read the best out loud afterwards.', 'Offer a blank to fill: a caption, a title for the episode, a line for the character.', 'Open an « alternate ending » slot: one choice, a different last scene, shared by the people who picked it.', 'Reshare the best fan art inside the story gallery: being seen is the reward.'],
+    ex: '« 62% of you said Cam would lie. Let’s see. »' },
+  { id: 'clips', c: '#ff453a', k: '3 · Short form', t: 'Make short-form content',
+    lead: 'Clips that work alone on TikTok, Instagram and YouTube Shorts. A clip is an ad for the whole story and must make sense with no context.',
+    do: ['Cut 15–45 seconds: a full beat (setup, turn, hit) inside the clip.', 'The first second is the hook: a face, a line, a question. No logo, no intro.', 'Vertical 9:16, subtitles burned in (most people watch muted).', 'End each clip on a loose thread, not a conclusion: the comments should ask « what happens next? ».', 'One clip per big choice, per twist and per funniest line of the episode.', 'Put the episode name or a short code in the clip so viewers can find the source.'],
+    ex: 'Clip: Brooke reads the text, looks up. Cut. No answer. 22 seconds.' },
+  { id: 'community', c: '#30d158', k: '4 · Community', t: 'Create a community',
+    lead: 'A place to discuss episodes and share discoveries. People stay for each other, not only for the story.',
+    do: ['One thread per episode, opened the moment it ends.', 'A « discoveries » board: clues found, details spotted, with the minute they appear.', 'Spoiler rules from day one: tag the episode, hide what comes after.', 'Give names to the camps (« Team Cam », « Team Léa ») so people can belong.', 'The team joins in, but never settles the argument.'],
+    ex: 'Thread ep. 2: « Found it at 03:14, the bottle is back on the shelf. »' },
+  { id: 'episodes', c: '#0a84ff', k: '5 · Release rhythm', t: 'Use episodic releases strategically',
+    lead: 'Leave audiences with something to anticipate and discuss. The gap between episodes is when the conversation happens.',
+    do: ['Release on a fixed day and hour: a habit is an appointment.', 'End on the question, not the answer (a cliffhanger, a choice, a door that opens).', 'Leave two to four days between episodes: enough to theorize, not enough to forget.', 'Drop a teaser clip halfway through the wait.', 'Save one big reveal per season for the moment the community peaks.'],
+    ex: 'Every Thursday, 8 pm. Ep. 3 ends: « Who opened the door? »' },
+];
+const store = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem('viral.' + k) || 'null'); localStorage.setItem('viral.' + k, JSON.stringify(v)); } catch (e) { return null; } };
+const done = () => store('done') || {};
+const card = (l) => `<article class="m" style="--c:${l.c};margin-bottom:22px"><div class="k">${esc(l.k)}</div><h2>${esc(l.t)}</h2><p class="lead">${esc(l.lead)}</p>
+  <h3>What to build</h3><ul>${l.do.map((x, i) => `<li><label><input type="checkbox" data-k="${l.id}.${i}" ${done()[l.id + '.' + i] ? 'checked' : ''}><span>${esc(x)}</span></label></li>`).join('')}</ul>
+  <h3>Example</h3><p class="ex">${esc(l.ex)}</p></article>`;
+// the one that feeds the others: a decision people read differently
+const SCENE = { q: 'Brooke burns the letter without reading it. Why?', o: ['She already knows what it says', 'She is protecting someone', 'She is afraid of what she would feel', 'She is hiding it from everyone, even from us'] };
+const votes = () => store('vote') || { n: [0, 0, 0, 0], mine: -1 };
+function big() {
+  const v = votes(), tot = v.n.reduce((a, b) => a + b, 0);
+  return `<article class="m big" style="--c:#ffd60a;margin-bottom:22px"><div class="k">The engine inside the engine</div><h2>Design a show people disagree about</h2>
+  <p class="lead">If everyone interprets a character’s decision differently, you get conversations for free. Every viewer saw the same scene and walks away with a different story. They have to tell each other.</p>
+  <h3>Try it · tap your reading</h3><p class="ex">${esc(SCENE.q)}</p>
+  <div class="opts">${SCENE.o.map((t, i) => `<button type="button" class="opt ${v.mine === i ? 'mine' : ''}" data-v="${i}"><i style="width:${v.mine < 0 ? 0 : tot ? Math.round(v.n[i] / tot * 100) : 0}%"></i><span>${esc(t)}<b>${v.mine < 0 ? '' : tot ? Math.round(v.n[i] / tot * 100) + '%' : ''}</b></span></button>`).join('')}</div>
+  <p class="note">Local demo: the votes stay on this device. In a story, the same poll lives under the episode.</p>
+  <div class="tools"><button type="button" class="b" id="rv">Reset vote</button></div>
+  <h3>How to write it</h3><ul>
+  <li><label><span>• Show the act, hide the reason. The decision is on screen; the why never is.</span></label></li>
+  <li><label><span>• Make every reading fit the facts. If one reading is wrong, the argument ends.</span></label></li>
+  <li><label><span>• Seed at least two clues per reading, so each camp can « prove » it.</span></label></li>
+  <li><label><span>• Pick decisions with a moral edge (loyalty, lie, sacrifice): people defend what they think is right.</span></label></li>
+  <li><label><span>• Pay it off late, and only partly: the answer should confirm one reading and still honour the others.</span></label></li></ul>
+  <h3>Why it works</h3><p class="lead">Theories, fan art, clips, threads and the wait for the next episode all need something to say. A decision with several readings gives everyone a position, and a position is the start of every post.</p></article>`;
+}
+function draw() { $('#list').innerHTML = LEVERS.slice(0, 1).map(card).join('') + big() + LEVERS.slice(1).map(card).join(''); }
+document.addEventListener('change', (e) => { const k = e.target.dataset && e.target.dataset.k; if (!k) return; const d = done(); d[k] = e.target.checked; store('done', d); });
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('.opt'), r = e.target.closest('#rv');
+  if (o) { const v = votes(); if (v.mine >= 0) return; v.n[+o.dataset.v]++; v.mine = +o.dataset.v; store('vote', v); draw(); }
+  if (r) { store('vote', { n: [0, 0, 0, 0], mine: -1 }); draw(); }
+});
+draw();
+</script>
+</body>
+</html>
