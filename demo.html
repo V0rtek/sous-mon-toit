@@ -9,12 +9,7 @@
 <script>
 // ?tv belongs to the game: the TV's own screen (index.html?tv), never Full demo's previews
 if (new URLSearchParams(location.search).has('tv')) location.replace('index.html?tv');
-// a brand-new profile (first visit, or just reset in the settings) starts with the onboarding: what you're in the mood for,
-// then that taste's opening; it comes back here after, with the taste kept (smtDemo.onb)
-else try {
-  if (!Object.keys(localStorage).some((k) => k === 'smt-name' || (k.startsWith('smtDemo.') && k !== 'smtDemo.opts')))
-    location.replace('onboarding.html?v=4&new=1&back=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
-} catch { /* no storage: straight in */ }
+// the onboarding no longer opens by itself: it's in the settings (« See the onboarding »)
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Yeseva+One&display=swap">
@@ -2217,6 +2212,7 @@ function options() {
     `<button class="btn" id="wipe" style="width:100%;color:#ff453a">Reset my profile</button>
     <p class="lead" id="wipeWhat" style="margin:1em 0 0;text-align:center" hidden>Your created and unlocked characters, your name, your progress, your saved stories.</p>
     ${SERIES.onb() ? `<button class="btn" id="allOpen" style="width:100%;margin-top:1em">${SERIES.get('all', false) ? 'Step-by-step unlocks' : 'Everything unlocked (demo)'}</button>` : ''}
+    <button class="btn" id="seeOnb" style="width:100%;margin-top:1em">See the onboarding</button>
     <button class="btn" id="toGame" style="width:100%;margin-top:1em">Game menu</button>`);
   box.onclick = (e) => {
     const ls = e.target.closest('[data-ls]');
@@ -2224,6 +2220,7 @@ function options() {
     const c = e.target.closest('[data-k]');
     if (c) { O[c.dataset.k] = c.dataset.v; keep.set('opts', O); $$(`[data-k="${c.dataset.k}"]`, box).forEach((x) => x.classList.toggle('on', x === c)); render(); }
     if (e.target.id === 'reset') { keep.set('opts', {}); location.reload(); }
+    if (e.target.id === 'seeOnb') { location.href = 'onboarding.html?v=4&new=1&back=' + encodeURIComponent(location.pathname.split('/').pop() + location.search); return; }
     if (e.target.id === 'toGame') { closeSheet(leave); return; }
     if (e.target.id === 'allOpen') { SERIES.set('all', !SERIES.get('all', false)); location.reload(); }   // show everything (a demo), or back to opening up
     // two taps: the first says what goes, the second wipes
