@@ -243,7 +243,7 @@ window.FORGE = (() => {
     infos: [{ id: 'villain', x: 'amare' }, { id: 'exes', x: 'justin', y: 'ruby' }], inc: { k: 'shift', who: 'amare' }, hard: { liked: 1 }, tq: {}, picked: {} });
   let S = (() => { try { const s = JSON.parse(ls(KEY)); if (s && Array.isArray(s.cast)) { if (!Array.isArray(s.infos)) s.infos = []; if (!s.tq) s.tq = {}; if (!s.picked) s.picked = {}; return { ...BASE(), ...s }; } } catch { /* none yet */ } return BASE(); })();
   const save = () => ls(KEY, JSON.stringify(S));
-  let el = null, msg = '', openK = null;
+  let el = null, msg = '', openK = null; const sbOpen = new Set();
 
   const J = 'justin';
   const people = () => [J, ...S.cast];
@@ -295,6 +295,10 @@ window.FORGE = (() => {
   // once its technique is applied: n (the technique), g (its goal), fr, en. The cuts: automatic (each episode about 4
   // events, the reveals together, the impossible choice, then what it cost), or moved by hand; every episode but the
   // crisis and the end closes on a ⚖️ choice ----
+  // ---- the causal chain (03/11, again): not an order of kinds. Each move has what it NEEDS (facts already true: Justin's
+  // desire is shown, Ruby is with Amare, Amare is here...) and what it MAKES true; the next move is the one that follows
+  // from the LAST (it needs what the last one made: « parce que… »), else the earliest one possible. A move whose needs
+  // never come true is left out. setup → reveal → crisis → end stays in that order. Each event keeps its cause ----
   function line() {
     const r = roles(), x = incWho(), inc = by(INC, S.inc.k), jw = wantOf(J), cs = conflicts();
     const secs = kinds('secret'), masks = kinds('mask'), pasts = kinds('past'), objs = kinds('object'), hidden = [...secs, ...masks];
@@ -303,33 +307,65 @@ window.FORGE = (() => {
     const wFr = W[jWant.v].t ? `${W[jWant.v].n.toLowerCase()} ${nm(jWant.t)}` : W[jWant.v].n.toLowerCase();
     const base = { x: nm(x), xE: en(x), t: nm(r.target), tE: en(r.target), a: nm(r.against || x), aE: en(r.against || x), d: nm(r.b), dE: en(r.b),
       w: wFr, wE: W[jWant.v].en(en(jWant.t)).replace(/^wants /, ''), px: pillarsOf(x)[0], pxEn: (P[pillarsOf(x)[0]] || {}).exp };
-    const L = [], put = (id, kind, part, e, extra = {}) => L.push({ id, kind, part, e, glue: false, ...extra, c: { ...base, ...(extra.c || {}) } });
     const ic = (i) => ({ i: infoFr(i), iE: infoEn(i), s: nm(i.x), sE: en(i.x) });
-    put('hook1', 'hook', 'setup', '🎬', { defN: S.inc.k === 'gone' ? 'Place vide' : 'Entrée qui fait taire' });
-    put('hook2', 'hook', 'setup', '🎬', { defN: inc.enter ? 'Un nom chuchoté' : 'Avant d’entrer' });
-    put('want', 'want', 'setup', W[jWant.v].e);
+    const M = [], FR = {};
+    // mv(id, kind, part, emoji, needs (all), makes, { any: one of these, ... })
+    const mv = (id, kind, part, e, needs, makes, extra = {}) => M.push({ id, kind, part, e, needs, makes, glue: false, ...extra, c: { ...base, ...(extra.c || {}) } });
+    const fact = (f, fr, en2) => { FR[f] = [fr, en2]; };
+    const jC = cs.filter((c) => c.a === J || c.b === J), taken = jC.find((c) => c.e === '💍'), main = jC.find((c) => c !== taken), rest = cs.filter((c) => c !== taken && c !== main);
+    mv('hook1', 'hook', 'setup', '🎬', [], ['open'], { defN: S.inc.k === 'gone' ? 'Place vide' : 'Entrée qui fait taire' });
+    fact('open', 'la scène s’ouvre', 'the scene opens');
+    mv('want', 'want', 'setup', W[jWant.v].e, ['open'], ['desire']); fact('desire', `Justin veut ${wFr}`, `justin wants ${base.wE}`);
+    const pJ = pasts.find((i) => [i.x, i.y].includes(J) && [i.x, i.y].includes(r.target)) || null;
+    if (pJ) { mv('past0', 'past', 'setup', '🕰️', ['desire'], ['past'], { c: ic(pJ), info: pJ, side: 1 }); fact('past', infoFr(pJ), infoEn(pJ)); }
+    if (taken) { mv('taken', 'conflict', 'setup', '💍', ['desire'], ['taken'], { c: { o: taken.fr, oE: taken.en }, but: 1, defN: 'Mention consequences' }); fact('taken', taken.fr, taken.en); }
     if (inc.enter) {
-      put('expect', 'expect', 'setup', '🗣️', { glue: true }); put('tease', 'tease', 'setup', '⏰', { glue: true });
-      put('inc', 'enter', 'setup', '💥', { scene: true });
-    } else put('inc', 'gone', 'setup', '👻', { scene: true });
-    if (cs[0]) put('c0', 'conflict', 'setup', cs[0].e, { c: { o: cs[0].fr, oE: cs[0].en } });
-    if (pasts[0]) put('past0', 'past', 'setup', '🕰️', { c: ic(pasts[0]), info: pasts[0] });
-    objs.forEach((i, k) => put(`obj${k}`, 'seen', 'setup', IN[i.id].e, { c: ic(i), info: i, hint: true }));
-    if (hidden.length) put('plant1', 'plant', 'setup', '🌱', { c: ic(hidden[0]), info: hidden[0], hint: true });
-    cs.slice(1).forEach((o, k) => put(`c${k + 1}`, 'conflict', 'setup', o.e, { c: { o: o.fr, oE: o.en }, defN: ['Menace : si tu X, je Y', 'Aveu vulnérable', 'Mention consequences'][k % 3] }));
-    if (H('liked') && r.against) put('liked', 'liked', 'setup', '😇');
-    if (H('danger')) put('danger', 'danger', 'setup', '🌲');
-    pasts.slice(1).forEach((i, k) => put(`past${k + 1}`, 'past', 'setup', '🕰️', { c: ic(i), info: i, defN: 'Tell a story' }));
-    put('easy', 'easy', 'setup', '↘️');
-    if (hidden.length) put('plant2', 'plant', 'setup', '🌱', { c: ic(hidden[hidden.length - 1]), info: hidden[hidden.length - 1], hint: true });
-    if (H('gag') && secs[0]) put('gag', 'gag', 'setup', '🤐', { c: ic(secs[0]) });
-    hidden.forEach((i, k) => put(`rev${k}`, 'reveal', 'reveal', IN[i.id].e, { c: ic(i), info: i, scene: !k }));
-    objs.forEach((i, k) => put(`open${k}`, 'open', 'reveal', IN[i.id].e, { c: ic(i), info: i, scene: !k && !hidden.length }));
-    if (hidden.length || objs.length) put('twist', 'twist', 'reveal', '🔄');
-    if (H('clock')) put('clock', 'clock', 'crisis', '⏳', { glue: true });
-    put('pick', 'pick', 'crisis', '⚖️', { opts: [nm(r.a), nm(r.b)] });
-    put('cost', 'cost', 'end', '💔', { scene: true }); put('end', 'end', 'end', '❔');
-    return L.map(withTech);
+      mv('hook2', 'hook', 'setup', '🎬', ['open'], ['whisper'], { defN: 'Un nom chuchoté', side: 1 }); fact('whisper', 'on chuchote qu’il arrive ce soir', 'people whisper someone arrives tonight');
+      mv('expect', 'expect', 'setup', '🗣️', [], ['expect'], { any: ['taken', 'whisper', 'desire'] }); fact('expect', `on parle ${de(base.x)}`, `everyone talks about ${base.xE}`);
+      if (H('liked') && r.against) { mv('liked', 'liked', 'setup', '😇', [], ['liked'], { any: ['expect', 'arrived'], but: 1, side: 1 }); fact('liked', `tout le monde adore ${base.a}`, `everyone loves ${base.aE}`); }
+      mv('tease', 'tease', 'setup', '⏰', ['expect'], ['tease'], { glue: true }); fact('tease', `${base.x} arrive bientôt`, `${base.xE} is coming`);
+      mv('inc', 'enter', 'setup', '💥', ['tease'], ['arrived'], { scene: true }); fact('arrived', `${base.x} est là`, `${base.xE} is here`);
+    } else {
+      mv('hook2', 'hook', 'setup', '🎬', ['open'], ['dread'], { defN: 'Avant d’entrer', side: 1 }); fact('dread', 'quelqu’un redoute ce qui vient', 'someone dreads what is coming');
+      mv('inc', 'gone', 'setup', '👻', ['desire'], ['gone'], { scene: true, but: 1 }); fact('gone', `${base.x} a disparu`, `${base.xE} is gone`);
+      if (H('danger')) { mv('danger', 'danger', 'setup', '🌲', ['gone'], ['danger'], { but: 1 }); fact('danger', 'la seule piste mène à un lieu dangereux', 'the only lead goes to a dangerous place'); }
+    }
+    if (main) { mv('c0', 'conflict', 'setup', main.e, ['desire'], ['conflict'], { any: ['arrived', 'gone', 'taken'], c: { o: main.fr, oE: main.en }, but: 1 }); fact('conflict', main.fr, main.en); }
+    rest.forEach((o, k) => { mv(`c${k + 1}`, 'conflict', 'setup', o.e, [], ['conflict2'], { any: ['conflict', 'taken'], c: { o: o.fr, oE: o.en }, but: 1, side: 1, defN: ['Menace : si tu X, je Y', 'Aveu vulnérable', 'Mention consequences'][k % 3] }); fact('conflict2', o.fr, o.en); });
+    pasts.filter((i) => i !== pJ).forEach((i, k) => { mv(`past${k + 1}`, 'past', 'setup', '🕰️', [], ['past'], { any: ['conflict', 'taken', 'arrived', 'gone'], c: ic(i), info: i, defN: 'Tell a story', side: 1 }); fact('past', infoFr(i), infoEn(i)); });
+    objs.forEach((i, k) => { mv(`obj${k}`, 'seen', 'setup', IN[i.id].e, [], ['seen'], { any: ['arrived', 'gone', 'desire'], c: ic(i), info: i, hint: true, side: 1 }); fact('seen', `${infoFr(i)}, que personne n’ouvre`, `${infoEn(i)}, unopened`); });
+    if (hidden.length) mv('plant1', 'plant', 'setup', '🌱', [], ['planted'], { any: ['past', 'expect', 'conflict', 'gone'], c: ic(hidden[0]), info: hidden[0], hint: true, side: 1 });
+    if (main || taken) { mv('easy', 'easy', 'setup', '↘️', [], ['lie'], { any: ['conflict', 'taken', 'liked'], but: 1 }); fact('lie', `le mensonge de Justin a éclaté devant ${base.t}`, `justin's lie blew up in front of ${base.tE}`); }
+    if (hidden.length) mv('plant2', 'plant', 'setup', '🌱', ['lie'], ['planted2'], { c: ic(hidden[hidden.length - 1]), info: hidden[hidden.length - 1], hint: true, side: 1 });
+    if (H('gag') && secs[0]) { mv('gag', 'gag', 'setup', '🤐', [], ['gag'], { any: ['lie', 'conflict'], c: ic(secs[0]), but: 1, side: 1 }); fact('gag', `le secret ${de(nm(secs[0].x))} le tient`, `${en(secs[0].x)}'s secret binds him`); }
+    hidden.forEach((i, k) => { mv(`rev${k}`, 'reveal', 'reveal', IN[i.id].e, ['planted'], ['revealed'], { c: ic(i), info: i, scene: !k, but: 1 }); fact('revealed', infoFr(i), infoEn(i)); });
+    objs.forEach((i, k) => { mv(`open${k}`, 'open', 'reveal', IN[i.id].e, ['seen'], ['opened'], { c: ic(i), info: i, scene: !k && !hidden.length }); fact('opened', `${infoFr(i)} est ouvert`, `${infoEn(i)} is opened`); });
+    if (hidden.length || objs.length) { mv('twist', 'twist', 'reveal', '🔄', [], ['twist'], { any: ['revealed', 'opened'] }); fact('twist', 'tout ce qu’on a vu change de sens', 'everything seen means something else'); }
+    if (H('clock')) { mv('clock', 'clock', 'crisis', '⏳', [], ['clock'], { any: ['twist', 'lie', 'conflict', 'gone', 'desire'], glue: true, but: 1 }); fact('clock', 'il faut trancher maintenant', 'it must be decided now'); }
+    mv('pick', 'pick', 'crisis', '⚖️', [], ['picked'], { any: ['clock', 'twist', 'lie', 'conflict', 'gone', 'desire'], opts: [nm(r.a), nm(r.b)] }); fact('picked', `il a choisi entre ${nm(r.a)} et ${nm(r.b)}`, `he chose between ${en(r.a)} and ${en(r.b)}`);
+    mv('cost', 'cost', 'end', '💔', ['picked'], ['cost'], { scene: true }); fact('cost', 'il a perdu quelqu’un', 'he lost someone');
+    mv('end', 'end', 'end', '❔', ['cost'], ['end']);
+    // the planner
+    const RANK = { setup: 0, reveal: 1, crisis: 2, end: 3 }, st = new Set(), out = []; let last = [];
+    const can = (m) => !m.done && m.needs.every((f) => st.has(f)) && (!m.any || m.any.some((f) => st.has(f)));
+    const from = (m) => [...m.needs, ...(m.any || [])].find((f) => last.includes(f));
+    // the spine first (what moves the story), side moves (a past, a seed, an object, a crowd) ride in the event they
+    // follow from: one line, two jobs. A side move with nothing to ride stands alone
+    const score = (m) => (from(m) ? 2 : 0) + (m.side ? 0 : 1);
+    for (;;) {
+      // a side move that follows from the last event always rides in it
+      if (out.length) for (const sd of M.filter((x) => x.side && can(x) && from(x))) {
+        sd.done = true; out[out.length - 1].rides.push({ ...sd, cause: FR[from(sd)] || null }); sd.makes.forEach((f) => st.add(f)); last = [...last, ...sd.makes]; }
+      const ok = M.filter(can); if (!ok.length) break;
+      const lo = Math.min(...ok.map((m) => RANK[m.part])), pool = ok.filter((m) => RANK[m.part] === lo);
+      pool.sort((a, b) => score(b) - score(a) || M.indexOf(a) - M.indexOf(b));
+      const m = pool[0];
+      m.done = true;
+      const cf = from(m) || [...m.needs, ...(m.any || [])].filter((f) => st.has(f)).pop();
+      out.push({ ...m, rides: [], cause: cf && cf !== 'open' && FR[cf] ? FR[cf] : null, causal: !!from(m) });
+      m.makes.forEach((f) => st.add(f)); last = m.makes;
+    }
+    return out.map((ev) => ({ ...withTech(ev), rides: ev.rides.map(withTech) }));
   }
   // its technique: the one picked (a tap = the next), else its default
   // ---- one catalogue (03/11): an event that has a goal of Plan de scène takes its techniques from there (its leaves:
@@ -384,7 +420,9 @@ window.FORGE = (() => {
   function autoCuts(L) {
     const cuts = [], last = (part) => L.map((x) => x.part).lastIndexOf(part), su = last('setup');
     const n = su + 1, k = Math.max(1, Math.round(n / 4)), size = n / k;
-    for (let c = 1; c < k; c++) { let i = Math.round(c * size) - 1; while (i < su && L[i].glue) i++; if (i < su && !cuts.includes(i)) cuts.push(i); }
+    // the first episode holds the inciting incident: no cut before it
+    const incAt = Math.max(0, L.findIndex((x) => x.id === 'inc'));
+    for (let c = 1; c < k; c++) { let i = Math.max(Math.round(c * size) - 1, incAt); while (i < su && L[i].glue) i++; if (i < su && !cuts.includes(i)) cuts.push(i); }
     const lone = L.filter((x) => x.part === 'crisis').length < 2;   // the impossible choice alone: it closes the reveal's episode
     for (const i of [su, lone ? -1 : last('reveal'), last('crisis')]) if (i >= 0 && i < L.length - 1 && !cuts.includes(i)) cuts.push(i);
     return cuts.sort((a, b) => a - b);
@@ -399,7 +437,7 @@ window.FORGE = (() => {
   // both). The choices made weigh on the final one ----
   const ISSUE = ['conflict', 'liked', 'easy', 'gag', 'danger', 'reveal', 'enter', 'gone', 'past', 'want', 'seen', 'plant'];
   const BUT = new Set(['stake', 'conflict', 'liked', 'danger', 'easy', 'gag', 'reveal', 'clock', 'gone', 'pick']);
-  const link = (ev) => (BUT.has(ev.kind) ? ['mais', 'But'] : ['donc', 'So']);
+  const link = (ev) => ((ev.but != null ? ev.but : BUT.has(ev.kind)) ? ['mais', 'But'] : ['donc', 'So']);
   // [option, what it causes (fr), (en)] × 2, from the issue's people
   const OPT = {
     conflict: (c) => [[`Défier ${c.a} devant tous`, `${c.a} le prend mal : c’est la guerre ouverte`, `${c.aE} takes it badly: open war`], [`Laisser ${c.t} choisir`, `${c.t} se rapproche ${de(c.a)}`, `${c.tE} grows closer to ${c.aE}`]],
@@ -482,13 +520,14 @@ window.FORGE = (() => {
         list.push(stk(0, 'Show character positioning'), stk(1, 'Menace : si tu X, je Y'), chEv); prev = chEv; }
       // what the episode leaves the audience with
       const led = { eng: [], cur: [], stake: [], moved: [] };
-      for (const ev of list) { const g = gives(ev); for (const [key] of LED) if (g[key]) led[key].push(...g[key]); }
+      for (const ev of list) for (const e3 of [ev, ...(ev.rides || [])]) { const g = gives(e3); for (const [key] of LED) if (g[key]) led[key].push(...g[key]); }
       return { list, stage, led }; });
   }
   const events = () => episodes().map((x) => x.list);
+  const allEv = () => events().flat().flatMap((ev) => [ev, ...(ev.rides || [])]);
   const chOpts = () => { const r = roles(); return [`Aller vers ${nm(r.target)}`, `Garder ${nm(r.b)}`]; };
   // an event as the prompts say it: its link to the one before (So / But), then what happens
-  const evEn = (ev, i) => `${i ? `${link(ev)[1]}, ` : ''}${ev.kind === 'enter' || ev.kind === 'gone' ? 'INCITING INCIDENT: ' : ev.kind === 'pick' ? 'the impossible choice, the last of the episode: ' : ev.kind === 'choice' ? 'the main choice of the episode, its last: ' : ev.kind === 'conseq' ? 'what the last choice caused: ' : ''}${ev.en}.`;
+  const evEn = (ev, i) => `${i ? `${link(ev)[1]}${ev.cause ? ` (because ${ev.cause[1]})` : ''}, ` : ''}${ev.kind === 'enter' || ev.kind === 'gone' ? 'INCITING INCIDENT: ' : ev.kind === 'pick' ? 'the impossible choice, the last of the episode: ' : ev.kind === 'choice' ? 'the main choice of the episode, its last: ' : ev.kind === 'conseq' ? 'what the last choice caused: ' : ''}${ev.en}.`;
 
   // ---- ⓘ the details of a technique: where it comes from (objective › general way › tactic, the chain changes from one
   // to another), its instructions and its example (empty for now: Justin will fill them), the other ways. [label, id of
@@ -528,7 +567,7 @@ window.FORGE = (() => {
       detEl.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation();
         if (b.dataset.close != null) { detEl.hidden = true; return; }
         if (b.dataset.card && window.TECH_OPEN) { detEl.hidden = true; TECH_OPEN(b.dataset.card); return; }
-        if (b.dataset.way != null) { S.tq[b.dataset.ev] = +b.dataset.way; save(); render(); const ev2 = [...line(), ...events().flat()].find((x) => x.id === b.dataset.ev); if (ev2) details(ev2); } }; }
+        if (b.dataset.way != null) { S.tq[b.dataset.ev] = +b.dataset.way; save(); render(); const ev2 = allEv().find((x) => x.id === b.dataset.ev); if (ev2) details(ev2); } }; }
     const OL = optsOf(ev), t0 = ev.tech || {}, others = OL.map((t, i) => `<button type="button" class="${i === ev.k ? 'on' : ''}" data-ev="${ev.id}" data-way="${i}">${esc(t.n)}</button>`).join('');
     const GN = ((window.PLAN && PLAN.GOALS) || []).find((x) => x.id === ev.g);
     detEl.innerHTML = `<div class="fDetTop"><b>${ev.e} ${esc(ev.n)}</b><button type="button" data-close>OK</button></div>`
@@ -555,9 +594,10 @@ window.FORGE = (() => {
       const b = { id, goals: ch || !ev.g ? [] : [ev.g], tech: ch ? '' : ev.n, lines: ch ? 2 : 3, what: (ev.scene && pre === 'r' && k > 1 ? 'Nouvelle scène. ' : '') + ev.fr };
       if (ch) { b.kind = 'choice'; b.opts = (ev.opts || chOpts()).map((o) => (Array.isArray(o) ? o[0] : o)); b.what = ev.choice ? `Choix : ${ev.opts.map((o) => `${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr; }
       if (ev.info) b[ev.hint ? 'hints' : 'reveals'] = [iid(ev.info)];
+      for (const rd of ev.rides || []) { (b.carries = b.carries || []).push({ tech: rd.n, part: rd.fr }); if (rd.info) b[rd.hint ? 'hints' : 'reveals'] = [...(b[rd.hint ? 'hints' : 'reveals'] || []), iid(rd.info)]; ids[rd.id] = id; b.lines = Math.min(5, (b.lines || 3) + 1); }
       return b; };
     const orig = ep.list.slice(), epBeats = ep.list.map((ev) => beat(ev, 'r')); k = 0;
-    epBeats.forEach((b, j) => { if (j && !b.kind && ep.list[j].kind !== 'stake') b.what = (link(ep.list[j])[0] === 'mais' ? 'Mais : ' : 'Donc : ') + b.what; });
+    epBeats.forEach((b, j) => { const e2 = ep.list[j]; if (j && !b.kind && e2.kind !== 'stake') b.what = (link(e2)[0] === 'mais' ? `Mais${e2.cause ? ` (${e2.cause[0]})` : ''} : ` : e2.cause ? `Parce que ${e2.cause[0]} : ` : 'Donc : ') + b.what; });
     // one line, two jobs (03/11): a moment that can ride in another (a seed, a planted question) climbs into the latest
     // carrier before it (Tell a story, Shared memory, Show contrast...) instead of having its own rectangle
     const evOf = (b) => ep.list[epBeats.indexOf(b)], carrierBefore = (b) => { for (let q = epBeats.indexOf(b) - 1; q >= 0; q--) { const e2 = ep.list[q]; if (e2 && e2.tech && e2.tech.carrier && !epBeats[q].kind) return epBeats[q]; } return null; };
@@ -573,7 +613,7 @@ window.FORGE = (() => {
     // it by rule (early: as early as possible, in a carrier if it can ride; mid: between; before: right before), linked
     let t = 0; const planted = line().some((x) => x.kind === 'plant');
     for (const ev of ep.list.slice()) {
-      const parts = ev.tech && ev.tech.parts; if (!parts || !ids[ev.id]) continue;
+      const parts = ev.tech && ev.tech.parts; if (!parts || !ids[ev.id] || ev.kind === 'plant') continue;
       const at = () => epBeats.findIndex((b) => b.id === ids[ev.id]), chain = [];
       // what each moment says here, with the people: the hard question is where the newcomer was
       // (never his hidden info: it comes out later, the question must not spoil it)
@@ -613,7 +653,7 @@ window.FORGE = (() => {
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)); if (hard.length) L.push('Pourquoi c’est dur : ' + hard.map((h) => `${h.e} ${h.n}`).join(' · '));
     L.push('', 'CE QUI ARRIVE');
     episodes().forEach(({ list, led }, n) => { L.push(`Épisode ${n + 1}`);
-      list.forEach((ev, k) => { L.push(`  ${k ? link(ev)[0] + ' ' : ''}${ev.e} ${ev.choice ? `Choix : ${ev.opts.map((o, i) => `${S.picked[ev.id] === i ? '✓ ' : ''}${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr}  (${ev.n})`); });
+      list.forEach((ev, k) => { L.push(`  ${k ? link(ev)[0] + (ev.cause ? ` (← ${ev.cause[0]})` : '') + ' ' : ''}${ev.e} ${ev.choice ? `Choix : ${ev.opts.map((o, i) => `${S.picked[ev.id] === i ? '✓ ' : ''}${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr}  (${ev.n})`); for (const rd of ev.rides || []) L.push(`      ↳ ${rd.e} ${rd.fr}  (${rd.n})`); });
       for (const [key, e2] of LED) if (led[key].length) L.push(`  ${e2} ${led[key].map((x) => x[0]).join(' · ')}`); });
     return L.join('\n');
   }
@@ -626,7 +666,7 @@ window.FORGE = (() => {
     const rels = Object.entries(S.rel).filter(([k, v]) => v && k.split('|').every(live)).map(([k, v]) => `- ${k.split('|').map(en).join(' and ')}: ${R[v].en}`);
     const facts = infos().map((i) => `- ${infoEn(i)}`);
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
-    const EP = episodes(), E = EP.map((x) => x.list), epText = EP.map(({ list, led }) => list.map((ev, i) => `- ${evEn(ev, i)}`).join('\n') + `\n- WHAT THIS EPISODE MUST DO: ${[led.eng.length ? `engage the audience in: ${led.eng.map((x) => x[1]).join('; ')}` : '', led.cur.length ? `open the questions: ${led.cur.map((x) => x[1]).join('; ')}` : '', led.stake.length ? `raise the stakes: ${led.stake.map((x) => x[1]).join('; ')}` : '', led.moved.length ? `move the story: ${led.moved.map((x) => x[1]).join('; ')}` : ''].filter(Boolean).join(' / ')}.`);
+    const EP = episodes(), E = EP.map((x) => x.list), epText = EP.map(({ list, led }) => list.map((ev, i) => `- ${evEn(ev, i)}${(ev.rides || []).map((rd) => `\n  + in the same lines, also: ${rd.en}`).join('')}`).join('\n') + `\n- WHAT THIS EPISODE MUST DO: ${[led.eng.length ? `engage the audience in: ${led.eng.map((x) => x[1]).join('; ')}` : '', led.cur.length ? `open the questions: ${led.cur.map((x) => x[1]).join('; ')}` : '', led.stake.length ? `raise the stakes: ${led.stake.map((x) => x[1]).join('; ')}` : '', led.moved.length ? `move the story: ${led.moved.map((x) => x[1]).join('; ')}` : ''].filter(Boolean).join(' / ')}.`);
     const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
       ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(facts.length ? ['THE FACTS OF THE STORY (use exactly these; never invent another secret or past):', ...facts] : []),
       `THE INCITING INCIDENT: ${by(INC, S.inc.k).en(en(x))}.`,
@@ -707,10 +747,20 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   // an event: its link to the one before (donc / mais), itself (a tap = another way), ⓘ (its details); a choice shows its
   // two options (a tap = the one played: its consequence opens the next episode); then the ✂ to cut after it
   function evHtml(ev, k, list) {
-    const ch = ev.choice || ev.kind === 'pick', lk = k ? `<i class="fLk ${link(ev)[0]}" data-tip="${link(ev)[0] === 'mais' ? 'Mais : ça se complique' : 'Donc : la conséquence'}">${link(ev)[0]}</i>` : '';
+    const ch = ev.choice || ev.kind === 'pick', lk = k ? `<i class="fLk ${link(ev)[0]}" data-tip="${esc(`${link(ev)[0] === 'mais' ? 'Mais : ça se complique' : 'Donc : la conséquence'}${ev.cause ? `\nParce que ${ev.cause[0]}` : ''}`)}">${link(ev)[0]}</i>` : '';
     const opts = ev.choice ? `<span class="fOpts">${ev.opts.map((o, i) => `<button type="button" class="${S.picked[ev.id] === i ? 'on' : ''}" data-pickopt="${ev.id}:${i}" data-tip="${esc(`${o[0]}\n→ ${o[1]}\nUn tap = c’est ce qu’il a choisi`)}">${esc(o[0])}<small>→ ${esc(o[1])}</small></button>`).join('')}</span>` : '';
     const built = ev.built ? `<small class="fBuilt">Pèse : ${esc(ev.built.join(' · '))}</small>` : '';
-    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' || ch ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${optsOf(ev).length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${optsOf(ev).length})` : ''}`)}"><b>${ev.e}</b><span>${esc(ev.choice ? 'Choix' : ev.fr)}${optsOf(ev).length && !ch ? `<em class="fTn">${esc(ev.n)}</em>` : ''}</span></button>${PATHS[ev.kind] && !ch ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${opts}${built}`;
+    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' || ch ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${optsOf(ev).length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${optsOf(ev).length})` : ''}`)}"><b>${ev.e}</b><span>${ev.cause && k ? `<em class="fCause">← ${esc(ev.cause[0])}</em>` : ''}${esc(ev.choice ? 'Choix' : ev.fr)}${optsOf(ev).length && !ch ? `<em class="fTn">${esc(ev.n)}</em>` : ''}</span></button>${PATHS[ev.kind] && !ch ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${(ev.rides || []).map((rd) => `<span class="fRide"><i class="fRideI" data-tip="Monte dans le moment d’au-dessus : une réplique, deux rôles">↳</i><button type="button" class="fEv" data-tq="${rd.id}" data-tip="${esc(`${rd.n}${optsOf(rd).length > 1 ? `\nUn tap = une autre façon (${rd.k + 1}/${optsOf(rd).length})` : ''}`)}"><b>${rd.e}</b><span>${esc(rd.fr)}<em class="fTn">${esc(rd.n)}</em></span></button>${PATHS[rd.kind] ? `<button type="button" class="fInfo" data-det="${rd.id}" data-tip="Plus de détails">ⓘ</button>` : ''}</span>`).join('')}${opts}${built}`;
+  }
+  // 🎞️ the storyboard of an episode: its plan (the one 🎬 opens), card after card: the technique (its goal's colour), what
+  // happens, what it carries of other techniques (one line, two jobs), where its links go
+  function storyboard(n) {
+    const pl = planOf(n), G2 = (id) => ((window.PLAN && PLAN.GOALS) || []).find((g) => g.id === id), beats = pl.boxes[0].beats, num = (id) => beats.findIndex((b) => b.id === id) + 1;
+    return `<div class="fSb">${beats.map((b, i) => { const g = G2((b.goals || [])[0]), out = pl.links.filter((l) => l.from === b.id && num(l.to));
+      return `<div class="fCard${b.kind === 'choice' ? ' ch' : ''}" style="--c:${g ? g.c : '#ffd60a'}"><div class="fCardT"><i>${i + 1}</i><b>${esc(b.kind === 'choice' ? 'Choix' : b.tech || '…')}</b></div><p>${esc(b.what)}</p>`
+        + (b.kind === 'choice' ? `<div class="fCardO">${b.opts.map((o) => `<span>${esc(o)}</span>`).join('')}</div>` : '')
+        + (b.carries || []).map((c) => `<div class="fCardC"><b>↳ ${esc(c.tech)}</b>${esc(c.part)}</div>`).join('')
+        + (out.length ? `<div class="fCardL">${out.map((l) => `→ ${num(l.to)} · ${esc(l.label)}`).join('<br>')}</div>` : '') + '</div>'; }).join('')}</div>`;
   }
   function render() {
     if (!el) return;
@@ -733,7 +783,8 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + row('🧱', HARD.map((h) => { const ok = hardOk(h.id); return chip(`data-hard="${h.id}"`, h.e, h.n, ok && !!S.hard[h.id], '#bf5af2', ok ? h.d : `${h.d}\n${h.need}`, !ok); }).join(''), 'Pourquoi c’est dur (plusieurs à la fois)')
       // OUTPUT
       + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
-      + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
+      + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button><button type="button" class="${sbOpen.has(n) ? 'on' : ''}" data-sb="${n}" data-tip="Storyboard : les moments de l’épisode dans l’ordre, ce que chacun porte en plus, les liens">🎞️</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
+        + (sbOpen.has(n) ? storyboard(n) : '')
         + `<div class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
@@ -775,11 +826,12 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else if (d.inc) S.inc.k = d.inc;
     else if (d.incwho) S.inc.who = d.incwho;
     else if (d.hard) { if (!hardOk(d.hard)) return; S.hard[d.hard] = S.hard[d.hard] ? 0 : 1; }
-    else if (d.tq) { const ev = line().concat(events().flat()).find((x) => x.id === d.tq); if (ev) S.tq[d.tq] = ev.k + 1; }
+    else if (d.tq) { const ev = allEv().find((x) => x.id === d.tq); if (ev) S.tq[d.tq] = ev.k + 1; }
     else if (d.plan) { save(); const pl = planOf(+d.plan); PLAN.add(pl); return window.FORGE_TO_PLAN && FORGE_TO_PLAN(); }
     else if (d.playep) return play(t, +d.playep);
+    else if (d.sb) { const k2 = +d.sb; if (sbOpen.has(k2)) sbOpen.delete(k2); else sbOpen.add(k2); }
     else if (d.pickopt) { const [id, i] = d.pickopt.split(':'); S.picked[id] = S.picked[id] === +i ? null : +i; }
-    else if (d.det) { const ev = [...line(), ...events().flat()].find((x) => x.id === d.det); if (ev) details(ev); return; }
+    else if (d.det) { const ev = allEv().find((x) => x.id === d.det); if (ev) details(ev); return; }
     else if (d.x === 'plot') return copy(plotText(), '📄 Plot copié');
     else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
     else if (d.cimg) return copyImg(d.cimg, t);
