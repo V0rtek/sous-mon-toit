@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Double It · choice sync test</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* Test bench: what should the music do while a choice is waiting, and how should it land once the player picks?
+   The 4 Double It loops play 1 → 2 → 3 → 4. "Choice appears" starts the waiting effect (slowly, as long as the player takes);
+   picking A/B kills it and the next level starts from its first bar right away (no waiting for the bar line). */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; --c: #ff9f0a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 16px; padding: 14px 20px; background: rgba(11,10,15,.94); border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a, header button { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; background: none; border: 0; cursor: pointer; font-family: inherit; }
+main { max-width: 520px; margin: 0 auto; padding: 22px 20px 60px; display: grid; gap: 14px; }
+.panel { border-radius: 16px; padding: 16px; background: #17161c; border-left: 6px solid var(--c); display: grid; gap: 10px; }
+.n { font-size: 11px; font-weight: 900; color: var(--c); letter-spacing: .1em; }
+p { margin: 0; font-size: 13.5px; line-height: 1.45; color: #aeaeb2; }
+.pips { display: flex; gap: 6px; }
+.pips i { flex: 1; text-align: center; font-style: normal; font-size: 12px; font-weight: 900; color: #8e8e93; background: #2a2931; border-radius: 6px; padding: 9px 0; transition: background .2s, color .2s; }
+.pips i.on { background: var(--c); color: #000; }
+.vars { display: grid; gap: 6px; }
+.vars label { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #1f1e25; cursor: pointer; border: 2px solid transparent; }
+.vars label:has(input:checked) { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, #1f1e25); }
+.vars input { grid-row: span 2; accent-color: var(--c); }
+.vars b { font-size: 14px; font-weight: 900; }
+.vars span { font-size: 12.5px; color: #8e8e93; line-height: 1.35; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { flex: 1; min-width: 120px; font: inherit; font-size: 14px; font-weight: 900; color: #000; background: var(--c); border: 0; border-radius: 10px; padding: 14px 10px; cursor: pointer; }
+.btn.alt { color: #f5f5f7; background: #2a2931; }
+.btn:disabled { opacity: .3; cursor: default; }
+.choice { display: flex; gap: 8px; }
+.choice .btn { background: #5e5ce6; color: #fff; }
+.choice .btn + .btn { background: #ff375f; }
+.hint { font-size: 12px; font-weight: 800; color: var(--c); letter-spacing: .04em; min-height: 1.3em; }
+.meter { height: 8px; border-radius: 4px; background: #2a2931; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--c); }
+.slide { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-size: 13px; color: #aeaeb2; }
+.slide input { accent-color: var(--c); }
+</style>
+</head>
+<body>
+<header><h1>Double It · choice sync</h1><button type="button" id="stop">Stop</button><a href="double-it.html">‹ Double It</a></header>
+<main>
+  <div class="panel">
+    <span class="n">1 · PICK WHAT THE MUSIC DOES WHILE A CHOICE WAITS</span>
+    <div class="vars" id="vars"></div>
+    <div class="slide"><span>Ramp</span><input type="range" id="ramp" min="2" max="14" step="1" value="7"><b id="rampv">7 s</b></div>
+  </div>
+  <div class="panel">
+    <span class="n">2 · PLAY IT</span>
+    <div class="pips" id="pips"><i>1</i><i>2</i><i>3</i><i>4</i></div>
+    <div class="meter"><i id="fx"></i></div>
+    <div class="hint" id="hint"></div>
+    <div class="row">
+      <button type="button" class="btn" id="go">▶ Start level 1</button>
+      <button type="button" class="btn alt" id="ask" disabled>❓ Choice appears</button>
+    </div>
+    <div class="choice"><button type="button" class="btn" id="a" disabled>A</button><button type="button" class="btn" id="b" disabled>B</button></div>
+    <p>Wait as long (or short) as you like before picking: the effect keeps building until you do. Pick right away, then try again after 10 s, to feel how it behaves both ways.</p>
+  </div>
+</main>
+<script>
+const $ = (s) => document.querySelector(s);
+const LEVELS = ['double it loop 1 intro', 'double it loop 2 drop', 'double it loop 3 drop2', 'double it loop 4 peak'];
+const BAR = 60 / 140 * 4, LOOP = BAR * 8;
+// rate = playback speed reached at the end of the ramp, lp = lowpass cutoff reached (Hz), vol = gain reached
+const VARIANTS = [
+  { id: 'tape',   name: 'Tape slow-down',     d: 'Speed and pitch glide down to ~45%, like a record winding down.', rate: .45, lp: 20000, vol: 1 },
+  { id: 'muffle', name: 'Muffle',             d: 'Tempo stays; the sound closes behind a door (low-pass sweeps down).', rate: 1, lp: 260, vol: .8 },
+  { id: 'both',   name: 'Slow + muffle',      d: 'Both at once: winds down and goes underwater.', rate: .55, lp: 380, vol: .85 },
+  { id: 'fade',   name: 'Fade to hush',       d: 'Same beat, volume sinks to a whisper so the choice is alone.', rate: 1, lp: 20000, vol: .12 },
+  { id: 'half',   name: 'Half-time + muffle', d: 'Drops to exactly half speed fast (first quarter of the ramp), then muffles slowly.', rate: .5, lp: 500, vol: .9, snap: .25 },
+];
+let ac, master, bufs = null, cur = null, lv = -1, pending = false, v = VARIANTS[0], raf;
+const load = (n) => fetch('sfx/' + encodeURIComponent(n) + '.mp3').then((r) => r.arrayBuffer()).then((b) => ac.decodeAudioData(b));
+async function boot() {
+  if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); const c = ac.createDynamicsCompressor(); master = ac.createGain(); master.gain.value = .85; master.connect(c); c.connect(ac.destination); }
+  await ac.resume();
+  if (!bufs) bufs = await Promise.all(LEVELS.map(load));
+}
+// one voice = looping source → lowpass → gain; its effect parameters are what the waiting ramp moves
+function voice(L, when) {
+  const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+  s.buffer = bufs[L]; s.loop = true; s.loopStart = 0; s.loopEnd = LOOP;
+  f.type = 'lowpass'; f.frequency.value = 20000; f.Q.value = .7; g.gain.value = 1;
+  s.connect(f); f.connect(g); g.connect(master); s.start(when, 0);
+  return { s, f, g, L, t0: when };
+}
+function kill(o, t) { if (!o) return; o.g.gain.cancelScheduledValues(t); o.g.gain.setValueAtTime(o.g.gain.value, t); o.g.gain.linearRampToValueAtTime(0, t + .03); try { o.s.stop(t + .05); } catch (e) {} }
+function level(L) {
+  const t = ac.currentTime + .03;
+  kill(cur, t); cur = voice(L, t + .0); lv = L; pending = false; fxStart = 0; paint();
+}
+let fxStart = 0, fxLen = 7;
+function ask() {
+  if (!cur || pending) return;
+  pending = true; fxStart = ac.currentTime; fxLen = +$('#ramp').value;
+  const t = ac.currentTime, e = t + fxLen, snapE = t + fxLen * (v.snap || 1);
+  const { f, g, s } = cur;
+  s.playbackRate.cancelScheduledValues(t); s.playbackRate.setValueAtTime(s.playbackRate.value, t);
+  s.playbackRate.exponentialRampToValueAtTime(v.rate, snapE);
+  f.frequency.cancelScheduledValues(t); f.frequency.setValueAtTime(20000, t);
+  f.frequency.exponentialRampToValueAtTime(v.lp, e);
+  g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(1, t); g.gain.linearRampToValueAtTime(v.vol, e);
+  paint();
+}
+function pick() { if (pending) level(lv + 1); }
+function stop() { cancelAnimationFrame(raf); if (ac) { kill(cur, ac.currentTime); } cur = null; lv = -1; pending = false; paint(); }
+function paint() {
+  document.querySelectorAll('#pips i').forEach((p, k) => p.classList.toggle('on', k <= lv));
+  $('#go').textContent = lv < 0 ? '▶ Start level 1' : '↺ Restart level 1';
+  $('#ask').disabled = !cur || pending || lv >= 3;
+  $('#a').disabled = $('#b').disabled = !pending;
+  $('#a').textContent = lv >= 3 ? 'A · the end' : 'A';
+  $('#b').textContent = lv >= 3 ? 'B · the end' : 'B';
+  $('#hint').textContent = lv < 0 ? 'Press Start' : pending ? 'Choice waiting… take your time, then pick' : lv >= 3 ? 'Level 4 is the last: restart to try again' : 'Level ' + (lv + 1) + ' loops. Press "Choice appears"';
+  cancelAnimationFrame(raf); const tick = () => { $('#fx').style.width = pending ? Math.min(100, (ac.currentTime - fxStart) / fxLen * 100) + '%' : '0'; raf = requestAnimationFrame(tick); }; tick();
+}
+$('#vars').innerHTML = VARIANTS.map((x, k) => `<label><input type="radio" name="v" value="${k}"${k ? '' : ' checked'}><b>${x.name}</b><span>${x.d}</span></label>`).join('');
+$('#vars').onchange = (e) => { v = VARIANTS[+e.target.value]; };
+$('#ramp').oninput = (e) => { $('#rampv').textContent = e.target.value + ' s'; };
+$('#go').onclick = async () => { await boot(); level(0); };
+$('#ask').onclick = ask;
+$('#a').onclick = $('#b').onclick = () => { if (lv >= 3) stop(); else pick(); };
+$('#stop').onclick = stop; paint();
+</script>
+</body>
+</html>
