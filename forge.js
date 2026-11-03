@@ -372,30 +372,40 @@ window.FORGE = (() => {
     reveal: (c) => [['Le dire à tous', `${c.s} est exposé, et Justin aussi`, `${c.sE} is exposed, and so is justin`], ['Le garder pour lui', 'Justin a un moyen de pression… et un secret de plus', 'justin has leverage... and one more secret']],
     want: (c) => [[`Tenter sa chance avec ${c.t}`, `${c.t} est touché·e… et ${c.a} l’a vu`, `${c.tE} is touched... and ${c.aE} saw it`], ['Garder ça pour lui', `${c.d} le pousse : « Si tu dis rien, c’est fini. »`, `${c.dE} pushes him: "Say nothing and it's over."`]],
   };
-  // what an event gives the audience: 🧠 what they now know, ❤️ who they're now hooked on and through what (or ❓ the
-  // question they now have), ⚔️ what's now at stake. [fr, en] each
+  // what an event does for the story (03/11), in 4 kinds: eng = engaged in a character or a bond (by which technique),
+  // cur = a question now open, stake = an obstacle or conflict added (to which desire), moved = what changed (revealed,
+  // chosen, arrived, gone...). [fr, en] each
   function gives(ev) {
-    const c = ev.c, p = (P[c.px] || {}), g = {};
-    const k = ev.kind;
-    if (k === 'want') { g.know = [`Justin veut ${c.w}`, `justin wants ${c.wE}`]; g.hook = ['Justin, par son désir', 'justin, through his desire']; }
-    if (k === 'expect') g.hook = [`❓ Qui est ${c.x} ?`, `the question: who is ${c.xE}?`];
-    if (k === 'tease') g.stake = [`L’arrivée ${de(c.x)}`, `${c.xE}'s arrival`];
-    if (k === 'enter') { g.know = [`${c.x} est arrivé`, `${c.xE} has arrived`]; g.hook = [`${c.x}, par son côté ${(PILLARS[ev.k] || p).n ? (PILLARS[ev.k] || p).n.replace(/^L[ea’] ?/, '') : '…'}`, `${c.xE}, through being ${((PILLARS[ev.k] || p).en || '').split(' (')[0]}`]; }
-    if (k === 'gone') { g.know = [`${c.x} a disparu`, `${c.xE} is gone`]; g.hook = [`❓ Où est ${c.x} ?`, `the question: where is ${c.xE}?`]; }
-    if (k === 'hook') { const h = ev.k; if (h === 0) g.hook = [`${c.t}, par l’attirance`, `${c.tE}, through attraction`]; if (h === 5) g.hook = [`Justin et ${c.t}, par l’attirance`, `justin and ${c.tE}, through attraction`];
-      if (h === 1) g.hook = ['❓ Qui manque ?', 'the question: who is missing?']; if (h === 2) g.hook = ['❓ Qui arrive ce soir ?', 'the question: who arrives tonight?']; if (h === 3) g.hook = ['❓ Que dit la lettre ?', 'the question: what does the letter say?']; if (h === 4) g.stake = ['Une entrée qui fait peur', 'an entrance everyone dreads']; }
-    if (k === 'conflict') g.stake = [c.o, c.oE];
-    if (k === 'past') { g.know = [c.i, c.iE]; g.hook = ['Leur lien, par leur passé', 'their bond, through their past']; }
-    if (k === 'seen') g.hook = [`❓ Qu’y a-t-il dans ${c.i.replace(/^(Une|Un|La|Le) /, (m) => m.toLowerCase())} ?`, `the question: what is in ${c.iE}?`];
-    if (k === 'liked') g.stake = [`${c.a}, adoré de tous : Justin seul contre lui`, `${c.aE}, loved by all: justin alone against them`];
-    if (k === 'danger') g.stake = ['Un lieu dangereux à traverser', 'a dangerous place to cross'];
-    if (k === 'easy') g.stake = [`La confiance ${de(c.t)}`, `${c.tE}'s trust`];
-    if (k === 'gag') g.stake = [`Le secret ${de(c.s)}`, `${c.sE}'s secret`];
-    if (k === 'reveal' || k === 'open') g.know = [c.i, c.iE];
-    if (k === 'clock') g.stake = ['Le temps : il faut trancher maintenant', 'time: it must be decided now'];
-    if (k === 'conseq' && ev.c.picked) g.know = [ev.fr, ev.en];
+    const c = ev.c, g = {}, k = ev.kind, J2 = 'Justin';
+    const add = (key, fr, en2) => { (g[key] = g[key] || []).push([fr, en2]); };
+    const onJ = (o) => /Justin|justin/.test(o);
+    if (k === 'want') add('eng', `Désir de Justin (${c.w}) : ${ev.n.toLowerCase()}`, `justin's desire (${c.wE}), shown by: ${ev.n}`);
+    if (k === 'enter') { const pl = PILLARS[ev.k] || {}; add('eng', `${c.x}, ${(pl.n || '').replace(/^L[ea’] ?/, '')} : ${ev.n.toLowerCase()}`, `${c.xE} as ${(pl.en || '').split(' (')[0]}: ${(pl.surEn || '')}`); add('moved', `${c.x} arrive`, `${c.xE} arrives`); }
+    if (k === 'gone') { add('cur', `Où est ${c.x} ?`, `where is ${c.xE}?`); add('moved', `${c.x} disparaît`, `${c.xE} disappears`); }
+    if (k === 'expect') add('cur', `Qui est ${c.x} ?`, `who is ${c.xE}?`);
+    if (k === 'tease') add('cur', `${c.x} arrive : que va-t-il faire ?`, `${c.xE} is coming: what will they do?`);
+    if (k === 'hook') { const h = ev.k;
+      if (h === 0) add('eng', `${c.t}, attirance : entrée qui fait taire`, `${c.tE}, attraction: the room goes quiet`);
+      if (h === 5) add('eng', `${J2} × ${c.t}, attirance : taquinerie de trop`, `justin and ${c.tE}, attraction: a tease too long`);
+      if (h === 1) add('cur', 'Qui manque ?', 'who is missing?'); if (h === 2) add('cur', 'Qui arrive ce soir ?', 'who arrives tonight?');
+      if (h === 3) add('cur', 'Que dit la lettre ?', 'what does the letter say?'); if (h === 4) add('stake', 'Une entrée que tout le monde redoute', 'an entrance everyone dreads'); }
+    if (k === 'conflict') add('stake', onJ(c.o) ? `Obstacle au désir de Justin (${c.w}) : ${c.o}` : c.o, onJ(c.oE) ? `obstacle to justin's desire (${c.wE}): ${c.oE}` : c.oE);
+    if (k === 'past') { add('eng', `Leur lien : ${ev.n.toLowerCase()}`, `their bond: ${ev.n}`); add('moved', `Révélé : ${c.i}`, `revealed: ${c.iE}`); }
+    if (k === 'seen') add('cur', `Qu’y a-t-il dans ${c.i.replace(/^(Une|Un|La|Le) /, (m) => m.toLowerCase())} ?`, `what is in ${c.iE}?`);
+    if (k === 'liked') add('stake', `Obstacle au désir de Justin : ${c.a}, adoré de tous`, `obstacle to justin's desire: ${c.aE}, loved by everyone`);
+    if (k === 'danger') add('stake', 'Obstacle : un lieu dangereux à traverser', 'obstacle: a dangerous place to cross');
+    if (k === 'easy') { add('stake', `La confiance ${de(c.t)}`, `${c.tE}'s trust`); add('moved', 'Le mensonge de Justin éclate', 'justin\'s lie blows up'); }
+    if (k === 'gag') add('stake', `Le secret ${de(c.s)} le bloque`, `${c.sE}'s secret binds him`);
+    if (k === 'reveal' || k === 'open') add('moved', `Révélé : ${c.i}`, `revealed: ${c.iE}`);
+    if (k === 'clock') add('stake', 'Le temps : trancher maintenant', 'time: it must be decided now');
+    if (k === 'choice') { const pk2 = S.picked[ev.id]; add('moved', pk2 != null ? `Choix : ${ev.opts[pk2][0]}` : `Choix : ${ev.opts[0][0]} ou ${ev.opts[1][0]}`, pk2 != null ? `chose: ${ev.opts[pk2][0]}` : `a choice: ${ev.opts[0][0]} or ${ev.opts[1][0]}`); }
+    if (k === 'conseq' && c.picked) add('moved', ev.fr, ev.en);
+    if (k === 'pick') add('moved', `Choix final : ${c.t} ou ${c.d}`, `the final choice: ${c.tE} or ${c.dE}`);
+    if (k === 'cost') add('moved', 'Ce que le choix a coûté', 'what the choice cost');
     return g;
   }
+  const LED = [['eng', '❤️', 'Engagé dans les persos et les liens : quoi, et par quelle technique'], ['cur', '❓', 'Curiosité : les questions ouvertes'],
+    ['stake', '⚔️', 'Enjeux : l’obstacle ou le conflit ajouté, et à quel désir'], ['moved', '➡️', 'L’histoire avance : ce qui a changé']];
   function episodes() {
     const L = line(), cuts = cutsOf(L), eps = []; let cur = [];
     L.forEach((ev, i) => { cur.push({ ...ev, i }); if (cuts.includes(i)) { eps.push(cur); cur = []; } }); if (cur.length) eps.push(cur);
@@ -420,8 +430,8 @@ window.FORGE = (() => {
         chEv.fr = `${opts[0][0]} / ${opts[1][0]}`; chEv.en = `"${opts[0][0]}" (then ${opts[0][2]}) or "${opts[1][0]}" (then ${opts[1][2]}); ${chEv.en}`;
         list.push(chEv); prev = chEv; }
       // what the episode leaves the audience with
-      const led = { know: [], hook: [], stake: [] };
-      for (const ev of list) { const g = gives(ev); for (const key of ['know', 'hook', 'stake']) if (g[key]) led[key].push(g[key]); }
+      const led = { eng: [], cur: [], stake: [], moved: [] };
+      for (const ev of list) { const g = gives(ev); for (const [key] of LED) if (g[key]) led[key].push(...g[key]); }
       return { list, stage, led }; });
   }
   const events = () => episodes().map((x) => x.list);
@@ -515,7 +525,7 @@ window.FORGE = (() => {
     L.push('', 'CE QUI ARRIVE');
     episodes().forEach(({ list, led }, n) => { L.push(`Épisode ${n + 1}`);
       list.forEach((ev, k) => { L.push(`  ${k ? link(ev)[0] + ' ' : ''}${ev.e} ${ev.choice ? `Choix : ${ev.opts.map((o, i) => `${S.picked[ev.id] === i ? '✓ ' : ''}${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr}  (${ev.n})`); });
-      if (led.know.length) L.push(`  🧠 Sait : ${led.know.map((x) => x[0]).join(' · ')}`); if (led.hook.length) L.push(`  ❤️ Accroché : ${led.hook.map((x) => x[0]).join(' · ')}`); if (led.stake.length) L.push(`  ⚔️ En jeu : ${led.stake.map((x) => x[0]).join(' · ')}`); });
+      for (const [key, e2] of LED) if (led[key].length) L.push(`  ${e2} ${led[key].map((x) => x[0]).join(' · ')}`); });
     return L.join('\n');
   }
 
@@ -527,7 +537,7 @@ window.FORGE = (() => {
     const rels = Object.entries(S.rel).filter(([k, v]) => v && k.split('|').every(live)).map(([k, v]) => `- ${k.split('|').map(en).join(' and ')}: ${R[v].en}`);
     const facts = infos().map((i) => `- ${infoEn(i)}`);
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
-    const EP = episodes(), E = EP.map((x) => x.list), epText = EP.map(({ list, led }) => list.map((ev, i) => `- ${evEn(ev, i)}`).join('\n') + `\n- BY THE END OF THIS EPISODE the audience ${[led.know.length ? `knows: ${led.know.map((x) => x[1]).join('; ')}` : '', led.hook.length ? `is hooked on: ${led.hook.map((x) => x[1]).join('; ')}` : '', led.stake.length ? `feels at stake: ${led.stake.map((x) => x[1]).join('; ')}` : ''].filter(Boolean).join(' / ')}.`);
+    const EP = episodes(), E = EP.map((x) => x.list), epText = EP.map(({ list, led }) => list.map((ev, i) => `- ${evEn(ev, i)}`).join('\n') + `\n- WHAT THIS EPISODE MUST DO: ${[led.eng.length ? `engage the audience in: ${led.eng.map((x) => x[1]).join('; ')}` : '', led.cur.length ? `open the questions: ${led.cur.map((x) => x[1]).join('; ')}` : '', led.stake.length ? `raise the stakes: ${led.stake.map((x) => x[1]).join('; ')}` : '', led.moved.length ? `move the story: ${led.moved.map((x) => x[1]).join('; ')}` : ''].filter(Boolean).join(' / ')}.`);
     const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
       ...(rels.length ? ['THEIR RELATIONS:', ...rels] : []), ...(facts.length ? ['THE FACTS OF THE STORY (use exactly these; never invent another secret or past):', ...facts] : []),
       `THE INCITING INCIDENT: ${by(INC, S.inc.k).en(en(x))}.`,
@@ -635,7 +645,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       // OUTPUT
       + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
       + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
-        + `<div class="fLed${led.know.length + led.hook.length + led.stake.length ? '' : ' none'}">${[['🧠', 'Sait', led.know, 'Ce que le public sait maintenant'], ['❤️', 'Accroché', led.hook, 'À qui le public s’attache, et par quoi (❓ = la question qu’il se pose)'], ['⚔️', 'En jeu', led.stake, 'Ce qui est en jeu maintenant (ça nourrit le choix final)']].filter(([, , a]) => a.length).map(([e2, nn, a, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${a.map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
+        + `<div class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
