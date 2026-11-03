@@ -1365,6 +1365,8 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .sp-steps li::before { content: counter(sp); position: absolute; left: 1em; top: 1em; width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center; font-size: 1.7em; font-weight: 800; color: #000; background: var(--g); box-shadow: 0 0 1em var(--g); }
 .sp-chip { display: inline-block; margin-top: .7em; padding: .3em .8em; border-radius: 1em; font-size: 1.6em; font-weight: 800; color: var(--g); background: color-mix(in srgb, var(--g) 16%, transparent); }
 #validate .inv li { padding-left: 1em; }
+#showrunner .srLink, #deck .dkLink { align-self: flex-start; margin: 0 0 1.4em; padding: .5em 1.1em; border: 0; border-radius: 99em; background: #ff375f; color: #fff; font: inherit; font-size: 2.4em; font-weight: 800; cursor: pointer; }
+#deck .dkLink { display: block; margin-bottom: 1em; background: #8a2f1f; }
 #showrunner .srP { margin: 0 0 1.4em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
 #investors .inv, #brainstorm .inv, #validate .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
 #investors .inv li, #showrunner .inv li, #brainstorm .inv li, #validate .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
@@ -2345,6 +2347,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="showrunner" class="card menu" hidden>
     <div class="step"><h2>Showrunner</h2>
+      <button type="button" class="srLink">Pitch Spark →</button>
       <p class="srP">So I inputed and idea and it took 6 minutes to build it.</p>
       <p class="srP">--</p>
       <p class="srP">I got into showrunner and I felt exactly this sense of hopelessness Maria described.</p>
@@ -2369,6 +2372,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <p class="srP">Cest au user a pensé au<br>Setup<br>Payoffs<br>Plotline qui fait du sens sur 10 episodes<br>Climax</p>
       <p class="srP">La plupart des gens on zero idée comment faire ça.</p>
       <p class="srP">Et la preuve meme les plus grand studios, marvel, dc, universal font des flops. [Slide avc joker 2 et justice league et leur rating] + mentionné qui ont des excellents graphiques</p>
+      <button type="button" class="srLink">Pitch Spark →</button>
     </div>
   </div>
   <div id="brainstorm" class="card menu" hidden>
@@ -2510,7 +2514,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="roadmap.js?v=20261031270000"></script>
 <div id="warn" hidden role="alert"><div class="wIcon">🚨</div><p class="wBig">TU DOIS AVOIR UNE DEMO AU PLUS SACRANT</p><p class="wSub">pour le pitch Spark ET pour valider l’idée</p><button class="wOk" type="button">OK, J’Y VAIS</button></div>
 <script src="importer.js?v=20261102260000"></script>
-<script src="deck.js?v=20261034500000"></script>
+<script src="deck.js?v=20261103600000"></script>
 <script src="bank.js?v=20261102320000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
@@ -4659,9 +4663,12 @@ $('#vdCopy').onclick = async (e) => {
   setTimeout(() => { b.textContent = 'Copier'; b.classList.remove('done'); }, 1500);
 };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
-$('#srBtn').onclick = (e) => { e.stopPropagation(); $('#showrunner').scrollTop = 0; show('#showrunner'); };   // field notes on Showrunner (03/11)
+$('#srBtn').onclick = (e) => { e.stopPropagation(); UP['#showrunner'] = '#secRef'; $('#showrunner').scrollTop = 0; show('#showrunner'); };   // field notes on Showrunner (03/11)
+// Showrunner ↔ Pitch Spark (03/11): each links to the other; ‹ goes back to where you came from
+$('#showrunner').onclick = (e) => { if (!e.target.closest('.srLink')) return; e.stopPropagation(); UP['#deck'] = '#showrunner'; show('#deck'); DECK.mount($('#deck')); };
+window.SPARK_TO_SHOWRUNNER = () => { UP['#showrunner'] = '#deck'; $('#showrunner').scrollTop = 0; show('#showrunner'); };
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
-$('#sparkBtn').onclick = (e) => { e.stopPropagation(); show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
+$('#sparkBtn').onclick = (e) => { e.stopPropagation(); UP['#deck'] = '#secSell'; show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
 $('#keyBtn').onclick = (e) => { e.stopPropagation(); $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
 $('#keyForm').onclick = (e) => e.stopPropagation();
 $('#keyForm').onsubmit = (e) => {

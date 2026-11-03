@@ -255,9 +255,9 @@ window.DECK = (() => {
   return {
     mount(el) {
       root = el; i = -1; sub = 0; qa = -1;
-      el.innerHTML = '<div class="dkPrep"><div class="pnHost"></div><div class="dkPlan"></div><div class="dkPad"><b>Bloc-notes</b><div class="dkPadTx" contenteditable="true" spellcheck="false"></div></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
+      el.innerHTML = '<div class="dkPrep"><button type="button" class="dkLink">Showrunner →</button><div class="pnHost"></div><div class="dkPlan"></div><div class="dkPad"><b>Bloc-notes</b><div class="dkPadTx" contenteditable="true" spellcheck="false"></div></div></div><div class="dkSlide"></div><div class="dkBar"><i></i></div><span class="dkN"></span><div class="dkNote" contenteditable="true" spellcheck="false" hidden></div><button type="button" class="dkNoteBtn" aria-label="Mes notes">✎</button>';
       el.onclick = (e) => {
-        if (i < 0) { if (!e.target.closest('.pnIcon, .pnBtn, .dkPad')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
+        if (i < 0) { const l = e.target.closest('.dkLink'); if (l) { window.SPARK_TO_SHOWRUNNER(); return; } if (!e.target.closest('.pnIcon, .pnBtn, .dkPad')) go(1); return; }   // slide 0: the files and prompts, anywhere else = next
         if (e.target.closest('.dkNoteBtn')) { noteOpen = !noteOpen; root.querySelector('.dkNote').hidden = !noteOpen; return; }
         const q = e.target.closest('[data-qa]');
         if (q) { qa = qa === +q.dataset.qa ? -1 : +q.dataset.qa; draw(); return; }
