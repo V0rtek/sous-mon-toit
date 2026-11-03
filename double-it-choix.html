@@ -8,7 +8,7 @@
 <style>
 /* Test bench for a choice in Double It. The 4 loops play 1 → 2 → 3 → 4. "Choice appears" starts the waiting effect over 5 s:
    half-time (drops to half speed in the first 1.25 s), muffle (low-pass closes), a little hush. If the player takes too long
-   (TOO_LONG after the choice appears) the reverse cinematic boom (sfx/reverse cinematic boom.mp3, 5.15 s, its hit at 4.8 s) swells under it, once. Picking A/B kills it all and
+   (TOO_LONG after the choice appears) the reverse cinematic boom (sfx/reverse cinematic boom.mp3, slowed to half speed so the rise is ~10 s) swells under it, and on its hit (the drop) the choice is made for the player. Picking A/B kills it all and
    the next level starts from its first bar right away (no waiting for the bar line). */
 :root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; --c: #ff9f0a; }
 * { box-sizing: border-box; }
@@ -48,7 +48,7 @@ p { margin: 0; font-size: 13.5px; line-height: 1.45; color: #aeaeb2; }
       <button type="button" class="btn alt" id="ask" disabled>❓ Choice appears</button>
     </div>
     <div class="choice"><button type="button" class="btn" id="a" disabled>A</button><button type="button" class="btn" id="b" disabled>B</button></div>
-    <p>Pick right away, then try again and wait about 15 s: after ~7 s the reverse boom starts swelling.</p>
+    <p>Pick right away, then try again and wait about 15 s: after ~7 s the reverse boom starts a ~10 s swell and the drop picks for you.</p>
   </div>
 </main>
 <script>
@@ -56,7 +56,8 @@ const $ = (s) => document.querySelector(s);
 const LEVELS = ['double it loop 1 intro', 'double it loop 2 drop', 'double it loop 3 drop2', 'double it loop 4 peak'], TENSION = 'reverse cinematic boom';
 const BAR = 60 / 140 * 4, LOOP = BAR * 8;
 let fxStart = 0;
-const RAMP = 5, TOO_LONG = 7, RISE = 5.15;   // seconds: effect ramp, delay before the reverse boom starts, its length
+const RAMP = 5, TOO_LONG = 7, BOOM_AT = 4.8, BOOM_RATE = .5;   // seconds: effect ramp, delay before the reverse boom starts; the boom's hit is 4.8 s into it, played at half speed so the rise lasts twice as long
+const DROP = BOOM_AT / BOOM_RATE;   // the rise lasts this long; its hit (the drop) is when the choice is made for the player
 const FX = { rate: .5, lp: 500, vol: .7, snap: .25, tension: .9 };   // half speed in the first quarter of the ramp, muffled cutoff (Hz), hush gain, reverse boom gain
 let ac, master, bufs = null, tens = null, cur = null, lv = -1, pending = false, raf;
 const load = (n) => fetch('sfx/' + encodeURIComponent(n) + '.mp3').then((r) => r.arrayBuffer()).then((b) => ac.decodeAudioData(b));
@@ -73,10 +74,14 @@ function voice(L, when) {
   s.connect(f); f.connect(g); g.connect(master); s.start(when, 0);
   return { s, f, g, L, t0: when, rise: null };
 }
-function kill(o, t) { if (!o) return; if (o.rise) kill(o.rise, t); o.g.gain.cancelScheduledValues(t); o.g.gain.setValueAtTime(o.g.gain.value, t); o.g.gain.linearRampToValueAtTime(0, t + .03); try { o.s.stop(t + .05); } catch (e) {} }
-function level(L) {
-  const t = ac.currentTime + .03;
-  kill(cur, t); cur = voice(L, t + .0); lv = L; pending = false; fxStart = 0; paint();
+function kill(o, t, keepRise) { if (!o) return; if (o.rise && !keepRise) kill(o.rise, t); clearTimeout(o.auto); o.g.gain.cancelScheduledValues(t); o.g.gain.setValueAtTime(o.g.gain.value, t); o.g.gain.linearRampToValueAtTime(0, t + .03); try { o.s.stop(t + .05); } catch (e) {} }
+function level(L, when, keepRise) {   // when = exact audio time (the drop); keepRise lets the boom ring through its hit
+  const t = when || ac.currentTime + .03;
+  kill(cur, t, keepRise); cur = voice(L, t); lv = L; pending = false; fxStart = 0; paint();
+}
+// the drop: the choice is made for the player on the boom's hit, the next level (or the end) lands exactly there
+function drop(at) {
+  if (lv >= 3) { kill(cur, at, true); cur = null; lv = -1; pending = false; paint(); } else level(lv + 1, at, true);
 }
 
 function ask() {
@@ -89,10 +94,12 @@ function ask() {
   f.frequency.exponentialRampToValueAtTime(FX.lp, e);
   g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(1, t); g.gain.linearRampToValueAtTime(FX.vol, e);
   // too long: the reverse boom swells under the held beat, once (kept on the voice so picking kills it too)
-  const r = ac.createBufferSource(), rg = ac.createGain(), at = t + TOO_LONG;
-  r.buffer = tens; rg.gain.value = FX.tension;
+  const r = ac.createBufferSource(), rg = ac.createGain(), at = t + TOO_LONG, hit = at + DROP;
+  r.buffer = tens; r.playbackRate.value = BOOM_RATE; rg.gain.value = FX.tension;
   r.connect(rg); rg.connect(master); r.start(at);
-  cur.rise = { s: r, g: rg }; paint();
+  cur.rise = { s: r, g: rg };
+  cur.auto = setTimeout(() => drop(hit), Math.max(0, (hit - ac.currentTime - .3) * 1000));   // scheduled on the audio clock, so it lands on the hit
+  paint();
 }
 function pick() { if (pending) level(lv + 1); }
 function stop() { cancelAnimationFrame(raf); if (ac) { kill(cur, ac.currentTime); } cur = null; lv = -1; pending = false; paint(); }
@@ -103,8 +110,8 @@ function paint() {
   $('#a').disabled = $('#b').disabled = !pending;
   $('#a').textContent = lv >= 3 ? 'A · the end' : 'A';
   $('#b').textContent = lv >= 3 ? 'B · the end' : 'B';
-  $('#hint').textContent = lv < 0 ? 'Press Start' : pending ? 'Choice waiting… take your time, then pick' : lv >= 3 ? 'Level 4 is the last: restart to try again' : 'Level ' + (lv + 1) + ' loops. Press "Choice appears"';
-  cancelAnimationFrame(raf); const tick = () => { $('#fx').style.width = pending ? Math.min(100, (ac.currentTime - fxStart) / (TOO_LONG + RISE) * 100) + '%' : '0'; raf = requestAnimationFrame(tick); }; tick();
+  $('#hint').textContent = lv < 0 ? 'Press Start' : pending ? 'Choice waiting… pick, or the drop picks for you' : lv >= 3 ? 'Level 4 is the last: restart to try again' : 'Level ' + (lv + 1) + ' loops. Press "Choice appears"';
+  cancelAnimationFrame(raf); const tick = () => { $('#fx').style.width = pending ? Math.min(100, (ac.currentTime - fxStart) / (TOO_LONG + DROP) * 100) + '%' : '0'; raf = requestAnimationFrame(tick); }; tick();
 }
 $('#go').onclick = async () => { await boot(); level(0); };
 $('#ask').onclick = ask;
