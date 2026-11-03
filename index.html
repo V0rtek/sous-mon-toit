@@ -1806,6 +1806,17 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 .ep-go { background: #fff; color: #000; margin-top: auto; }   /* the buttons at the bottom, with or without a next episode */
 .ep-home { background: rgba(255,255,255,.12); color: #fff; margin-bottom: 9% !important; }
 @media (prefers-reduced-motion: reduce) { .actor.talk, #choices button, #hint, .sms.fresh, .ping.fresh { animation: none; } }
+/* Warning (03/11): once unlocked by the code, every visit opens on this: red, huge, blinking, shaking. A tap closes it. */
+#warn { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vmin; padding: 6vmin; box-sizing: border-box; text-align: center; background: #d00000; color: #fff; font-family: inherit; animation: warnBg .45s steps(1) infinite; cursor: pointer; overflow: hidden; }
+#warn[hidden] { display: none; }
+#warn .wIcon { font-size: 22vmin; line-height: 1; animation: warnPulse .5s ease-in-out infinite alternate; }
+#warn .wBig { margin: 0; font-size: 11vmin; font-weight: 900; line-height: 1.02; text-transform: uppercase; letter-spacing: -.01em; text-shadow: 0 .06em 0 #000, 0 0 .5em rgba(0,0,0,.6); animation: warnShake .6s linear infinite, warnPulse .5s ease-in-out infinite alternate; }
+#warn .wSub { margin: 0; padding: 2.5vmin 4vmin; border-radius: 3vmin; background: #fff; color: #d00000; font-size: 5.6vmin; font-weight: 900; line-height: 1.15; text-transform: uppercase; animation: warnPulse .5s ease-in-out infinite alternate-reverse; }
+#warn .wOk { margin-top: 2vmin; padding: 2.2vmin 5vmin; border: .8vmin solid #fff; border-radius: 99em; background: #000; color: #fff; font: inherit; font-size: 4.4vmin; font-weight: 900; }
+@keyframes warnBg { 0% { background: #d00000; } 50% { background: #ff1a1a; } }
+@keyframes warnPulse { from { transform: scale(.94); } to { transform: scale(1.08); } }
+@keyframes warnShake { 0%, 100% { translate: 0 0; rotate: 0deg; } 20% { translate: -1.4vmin 0; rotate: -1.5deg; } 40% { translate: 1.4vmin .8vmin; rotate: 1.5deg; } 60% { translate: -1vmin -.8vmin; rotate: -1deg; } 80% { translate: 1vmin 0; rotate: 1deg; } }
+@media (prefers-reduced-motion: reduce) { #warn, #warn .wIcon, #warn .wBig, #warn .wSub { animation: none; } }
 </style>
 
 <div id="stage">
@@ -2491,6 +2502,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031580000"></script>
 <script src="roadmap.js?v=20261031270000"></script>
+<div id="warn" hidden role="alert"><div class="wIcon">🚨</div><p class="wBig">TU DOIS AVOIR UNE DEMO AU PLUS SACRANT</p><p class="wSub">pour le pitch Spark ET pour valider l’idée</p><button class="wOk" type="button">OK, J’Y VAIS</button></div>
 <script src="importer.js?v=20261102260000"></script>
 <script src="deck.js?v=20261034500000"></script>
 <script src="bank.js?v=20261102320000"></script>
@@ -2506,6 +2518,9 @@ try { if (+localStorage.getItem('smt-key') === KEY_HASH) { localStorage.setItem(
 const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-open') === KEY_HASH; } catch { return false; } };
 const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#investors', '#brainstorm', '#showrunner', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
 document.documentElement.classList.toggle('locked', !unlocked());
+// the warning: unlocked = every visit opens on it (and right after the code); a tap closes it
+const warnEl = $('#warn'); warnEl.onclick = () => { warnEl.hidden = true; };
+if (unlocked()) warnEl.hidden = false;
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
   black = $('#black'), caption = $('#caption'), hint = $('#hint'), textsEl = $('#texts'), slateEl = $('#slate'), farEl = $('#far');
@@ -4647,7 +4662,7 @@ $('#keyForm').onsubmit = (e) => {
   e.preventDefault(); const f = $('#keyForm');
   if (keyHash($('#keyIn').value) !== KEY_HASH) { f.classList.remove('no'); void f.offsetWidth; f.classList.add('no'); $('#keyIn').select(); return; }
   try { localStorage.setItem('smt-open', String(KEY_HASH)); } catch { /* private window: open for this visit only */ }
-  keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; $('#keyIn').value = '';
+  keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; warnEl.hidden = false; $('#keyIn').value = '';
 };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#secWriteBtn').onclick = (e) => { e.stopPropagation(); show('#secWrite'); };
