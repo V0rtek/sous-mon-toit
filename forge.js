@@ -236,6 +236,88 @@ window.FORGE = (() => {
     end: [['Qui, quand, où', 'info', () => 'Une dernière ligne : qui, quand, où', () => 'a last line that announces who, when, where'], ['Nouvelle question', 'info', () => 'Une nouvelle question, sans réponse', () => 'a new question, unanswered']],
   };
 
+  // ---- 📖 the example (03/11, « scarcity »): ONE story, concrete end to end, to see the whole chain work. Amare stole
+  // Melissa's mother's ring to ask Ruby to marry him; his lie « chez ma mère, elle est malade » (Melissa: « il ne parle
+  // jamais de sa famille »), the jasmine on his boots, the ring on Ruby's finger. Each beat's words: txt[id] = [fr, en];
+  // each choice's options: opt[id]. Episode 1 is also written line by line (EX_EP1) and plays as it is ----
+  const PRESET = () => ({ decor: 'taverne', cast: ['ruby', 'amare', 'melissa'], pil: { justin: ['charmeur', 'genie'], ruby: ['mysterieux'], amare: ['chef', 'charmeur'], melissa: ['protecteur'] },
+    flaw: { justin: 'lache' }, want: { justin: { v: 'love', t: 'ruby' }, amare: { v: 'love', t: 'ruby' } }, rel: { 'amare|ruby': 'couple', 'justin|melissa': 'friend' }, infos: [],
+    ev: [{ k: 'arrive', x: 'amare' }, { k: 'theft', x: 'amare', v: 'melissa', s: null, h: 1 }], hard: { liked: 1 }, tq: { inc: 3 }, picked: {}, ex: 1,
+    txt: {
+      hook1: ['Ruby entre sur la terrasse. Les conversations s’arrêtent ; Justin oublie la chope qu’il essuyait.', 'Ruby walks onto the terrace. Talk stops; justin forgets the mug he was drying.'],
+      hook2: ['Melissa, qui arrose le jasmin sous sa fenêtre, baisse la voix : « Amare rentre ce soir. »', 'Melissa, watering the jasmine under her window, lowers her voice: "Amare is back tonight."'],
+      d1: ['Justin, à Melissa : « Un jour je lui dis. Ruby me regarde comme si j’étais pas juste le barman. » Melissa : « Tu dis ça chaque été. »', 'justin to Melissa: "One day I tell her. Ruby looks at me like I\'m not just the barman." Melissa: "You say that every summer."'],
+      expect: ['On parle d’Amare : il a sauvé le port cet hiver, personne ne lui a jamais dit non.', 'They talk about Amare: he saved the harbour this winter, nobody has ever told him no.'],
+      incq: ['Melissa, plus bas : « Sa chambre était vide, hier soir. Il était où ? » Personne ne sait.', 'Melissa, lower: "His room was empty last night. Where was he?" Nobody knows.'],
+      tease: ['Une cloche au portail : « Il monte ! » Ruby replace ses cheveux.', 'A bell at the gate: "He\'s coming up!" Ruby fixes her hair.'],
+      inct: ['Chacun sa théorie : une dette, une autre femme. Melissa : « Il parle jamais de sa famille. Jamais. »', 'Everyone has a theory: a debt, another woman. Melissa: "He never talks about his family. Never."'],
+      inc: ['Amare entre, salué comme un héros. Melissa : « T’étais où, hier soir ? » Silence. Amare : « Chez ma mère. Elle est malade. » On lui pardonne tout. C’est faux.', 'Amare walks in, greeted like a hero. Melissa: "Where were you last night?" Silence. Amare: "At my mother\'s. She\'s sick." Everyone forgives him. It is a lie.'],
+      m2: ['Amare embrasse Ruby devant Justin : « Justin a toujours eu un faible pour ce qui n’est pas à lui. » Rires.', 'Amare kisses Ruby in front of justin: "justin always had a thing for what isn\'t his." Laughter.'],
+      liked: ['Toute la terrasse rit avec lui ; même Melissa lui sert sa meilleure bouteille.', 'The whole terrace laughs with him; even Melissa pours him her best bottle.'],
+      m3: ['Ruby, en passant derrière le comptoir, frôle la main de Justin : « Tu m’as manqué, toi. »', 'Ruby, passing behind the counter, brushes justin\'s hand: "I missed you."'],
+      ch1b: ['Melissa, débordée, la salle pleine pour Amare : « Reste, ce soir. J’ai besoin de toi. »', 'Melissa, swamped, the room full for Amare: "Stay tonight. I need you."'],
+      d4: ['Justin, à part : « Chez sa mère ? Melissa dit qu’il n’en parle jamais. »', 'justin, aside: "His mother\'s? Melissa says he never talks about her."'],
+      ev5: ['Soudain, un cri : la bague de la mère de Melissa a disparu de sa chambre.', 'Suddenly, a scream: Melissa\'s mother\'s ring is gone from her room.'],
+      m6: ['Amare, à Ruby, devant tous : « Bientôt, je te demande quelque chose. »', 'Amare to Ruby, in front of everyone: "Soon I\'ll ask you something."'],
+      clue0: ['Ruby, pour rire : « Il est rentré à trois heures. Il sentait le jasmin. »', 'Ruby, laughing: "He came home at three. He smelled of jasmine."'],
+      m7: ['Ruby se met devant Amare : « Tu l’accuses de quoi, exactement, Justin ? »', 'Ruby steps in front of Amare: "Accusing him of what, exactly, justin?"'],
+      m8: ['Justin insiste ; Amare balaie : « Cherche plutôt du côté des clients d’hier. »', 'justin insists; Amare brushes it off: "Look at yesterday\'s customers instead."'],
+      p9: ['Pendant ce temps, Amare glisse quelque chose dans sa poche quand Melissa passe.', 'Meanwhile, Amare slips something into his pocket as Melissa walks by.'],
+      p10: ['Melissa, les yeux rouges : « C’était tout ce qui me restait d’elle. Je trouverai qui. »', 'Melissa, red-eyed: "It was all I had left of her. I\'ll find who."'],
+      m11: ['Justin comprend : s’il accuse Amare, Ruby le déteste ; s’il se tait, Melissa reste seule.', 'justin sees it: if he accuses Amare, Ruby hates him; if he stays quiet, Melissa is alone.'],
+      ch2a: ['Justin remarque de la terre et des pétales de jasmin sur les bottes d’Amare.', 'justin notices soil and jasmine petals on Amare\'s boots.'],
+      ch2b: ['Melissa : « Toi, au moins, t’es de mon côté. Hein ? »', 'Melissa: "You, at least, are on my side. Right?"'],
+      m12: ['Justin, à Ruby : « J’ai rien contre lui. » Ruby : « Menteur. Je t’ai entendu. »', 'justin to Ruby: "I\'ve got nothing against him." Ruby: "Liar. I heard you."'],
+      m13: ['Melissa trouve l’écrin vide sous l’escalier qui monte chez Amare.', 'Melissa finds the empty ring box under the stairs to Amare\'s room.'],
+      m14: ['Amare, à Ruby : « Ce soir, sur la terrasse. Mets ta plus belle robe. »', 'Amare to Ruby: "Tonight, on the terrace. Wear your best dress."'],
+      p15: ['Melissa fouille les chambres une à une ; celle d’Amare reste fermée.', 'Melissa searches the rooms one by one; Amare\'s stays locked.'],
+      p16: ['Ruby bloque la porte d’Amare : « Personne ne fouille chez lui. »', 'Ruby blocks Amare\'s door: "Nobody searches his room."'],
+      ch3a: ['Ruby, seule avec Justin : « Si tu me demandais de partir avec toi… je dirais peut-être oui. »', 'Ruby, alone with justin: "If you asked me to leave with you... I might say yes."'],
+      ch3b: ['Melissa : « Ce soir j’entre chez lui. J’ai besoin que tu sois là. »', 'Melissa: "Tonight I go into his room. I need you there."'],
+      who0: ['Sur la terrasse, Amare s’agenouille devant Ruby et ouvre la main : la bague de la mère de Melissa. Melissa la reconnaît.', 'On the terrace, Amare kneels before Ruby and opens his hand: Melissa\'s mother\'s ring. Melissa recognizes it.'],
+      twist: ['Tout revient : « chez ma mère », le jasmin, la chambre fermée. Personne n’explique.', 'It all comes back: "at my mother\'s", the jasmine, the locked room. Nobody explains.'],
+      picka: ['Si Justin prend la main de Ruby maintenant, Melissa affronte Amare seule.', 'If justin takes Ruby\'s hand now, Melissa faces Amare alone.'],
+      pickb: ['S’il se range près de Melissa, Ruby dit oui à Amare, la bague volée au doigt.', 'If he stands by Melissa, Ruby says yes to Amare, the stolen ring on her finger.'],
+      cost: ['Une chaise vide au comptoir, là où l’autre s’asseyait.', 'An empty stool at the counter, where the other one used to sit.'],
+      end: ['« Demain, au port, à l’aube. On règle ça. »', '"Tomorrow, at the harbour, at dawn. We settle this."'],
+    },
+    opt: {
+      ch1: [['La suivre dehors', 'Au clair de lune, Ruby attend qu’il parle ; Melissa sert seule la salle d’Amare, et Amare les a vus', 'under the moon Ruby waits for him to speak; Melissa serves Amare\'s crowd alone, and Amare saw them'], ['Rester avec Melissa', 'Il tient le comptoir avec elle ; Ruby rentre sans un regard pour lui', 'he holds the counter with her; Ruby goes in without a look at him']],
+      ch2: [['Accuser Amare devant tous', 'La terrasse défend Amare, Justin passe pour un jaloux ; seule Melissa le croit', 'the terrace defends Amare, justin looks jealous; only Melissa believes him'], ['Rester avec Melissa', 'Il la serre contre lui ; Amare s’éclipse, tranquille', 'he holds her; Amare slips away, calm']],
+      ch3: [['Partir avec Ruby', 'Ils descendent vers le port ; Melissa entre seule chez Amare', 'they go down to the harbour; Melissa enters Amare\'s room alone'], ['Aller avec Melissa', 'Ruby attend au port, puis remonte vers Amare', 'Ruby waits at the harbour, then goes back up to Amare']],
+    } });
+  // episode 1 of the example, written line by line (what Haiku should reach from its plan): plays as it is
+  const EX_EP1 = { episode: 1, title: 'Le voleur de la taverne · épisode 1', scene: 'taverne', steps: [
+    { who: 'ruby', pose: 'listen', to: 'justin', text: 'Tu essuies cette chope depuis que je suis entrée.' },
+    { who: 'justin', pose: 'surprised', to: 'ruby', text: 'Elle était… très sale.' },
+    { who: 'melissa', pose: 'thinking', to: 'justin', text: 'Amare rentre ce soir.' },
+    { who: 'justin', pose: 'explaining', to: 'melissa', text: 'Un jour je lui dis. Elle me regarde comme si j’étais pas juste le barman.' },
+    { who: 'melissa', pose: 'listen', to: 'justin', text: 'Tu dis ça chaque été.' },
+    { who: 'melissa', pose: 'explaining', to: 'justin', text: 'Toute la ville l’attend. Il a sauvé le port cet hiver.' },
+    { who: 'justin', pose: 'thinking', to: 'melissa', text: 'Et personne lui a jamais dit non.' },
+    { who: 'melissa', pose: 'thinking', to: 'justin', text: 'Sa chambre était vide, hier soir. Il était où ?' },
+    { who: 'ruby', pose: 'surprised', to: 'melissa', text: 'Il monte. Je l’entends.' },
+    { who: 'justin', pose: 'thinking', to: 'melissa', text: 'Une dette. Une autre femme.' },
+    { who: 'melissa', pose: 'holding', to: 'justin', text: 'Il parle jamais de sa famille. Jamais.' },
+    { hush: true },
+    { who: 'amare', pose: 'explaining', to: 'ruby', text: 'Vous m’attendiez ?' },
+    { who: 'melissa', pose: 'angry', to: 'amare', text: 'T’étais où, hier soir ?' },
+    { who: 'amare', pose: 'listen', to: 'melissa', text: 'Chez ma mère. Elle est malade.' },
+    { who: 'ruby', pose: 'surprised', to: 'amare', text: 'Oh, Amare…' },
+    { who: 'amare', pose: 'explaining', to: 'justin', text: 'Justin a toujours eu un faible pour ce qui est pas à lui.' },
+    { who: 'melissa', pose: 'holding', to: 'amare', text: 'La meilleure bouteille. Pour le héros du port.' },
+    { who: 'ruby', pose: 'listen', to: 'justin', text: 'Tu m’as manqué, toi.' },
+    { who: 'melissa', pose: 'holding', to: 'justin', text: 'Reste, ce soir. J’ai besoin de toi.' },
+    { choice: [
+      { t: 'La suivre dehors', say: 'Ruby. Attends.', tone: 'audacieux', then: [
+        { who: 'ruby', pose: 'listen', to: 'justin', text: 'Alors ? Tu voulais me dire quelque chose ?' },
+        { who: 'amare', pose: 'angry', to: 'justin', text: 'Je t’ai vu.' }] },
+      { t: 'Rester avec Melissa', say: 'Je reste. Passe-moi les chopes.', tone: 'loyal', then: [
+        { who: 'melissa', pose: 'listen', to: 'justin', text: 'Merci.' },
+        { who: 'ruby', pose: 'thinking', to: 'justin', text: '… Bonne nuit, Justin.' }] }] },
+    { who: 'melissa', pose: 'surprised', to: 'justin', text: 'Justin… la bague de ma mère. Elle est plus dans ma chambre.' },
+  ], next: ['Si tu l’as suivie : Amare t’a vu avec Ruby, et Melissa découvre que la bague de sa mère a disparu.', 'Si tu es resté avec Melissa : Ruby t’en veut, et Melissa découvre que la bague de sa mère a disparu.'] };
+
   // ---- the state, kept on this phone ----
   const KEY = 'smt-forge2';
   const BASE = () => ({ decor: 'taverne', cast: ['ruby', 'amare', 'melissa'], pil: { justin: ['charmeur', 'genie'], ruby: ['mysterieux'], amare: ['chef', 'charmeur'], melissa: ['protecteur'] },
@@ -326,8 +408,8 @@ window.FORGE = (() => {
   const lab = (d) => DK[d.k].lab(tName(d)), labE = (d) => DK[d.k].labE(tNameE(d));
   function desires() {
     const D = [], ps = people();
-    const add = (who, k, t, s, src) => { if (!live(who) || (t && (!live(t) || t === who))) return null; const id = `${who}:${k}${t ? ':' + t : ''}`;
-      const o = D.find((d) => d.id === id); if (o) { if (s > o.s) { o.s = s; o.src = src; } return o; } const d = { id, who, k, t: t || null, s, src }; D.push(d); return d; };
+    const add = (who, k, t, s, src, from) => { if (!live(who) || (t && (!live(t) || t === who))) return null; const id = `${who}:${k}${t ? ':' + t : ''}`;
+      const o = D.find((d) => d.id === id); if (o) { if (s > o.s) { o.s = s; o.src = src; o.from = from || null; } return o; } const d = { id, who, k, t: t || null, s, src, from: from || null }; D.push(d); return d; };
     for (const p of ps) { add(p, 'alive', null, 1, 'base'); add(p, 'respect', null, 1, 'base'); }
     for (const [key, r] of Object.entries(S.rel)) { const [a, b] = key.split('|'); if (!r || !live(a) || !live(b)) continue;
       if (['friend', 'family', 'mentor', 'couple'].includes(r)) { add(a, 'protect', b, 2, 'lien'); add(b, 'protect', a, 2, 'lien'); }
@@ -348,10 +430,10 @@ window.FORGE = (() => {
     }
     for (const e of evs()) {
       const near = (v) => D.filter((d) => ['protect', 'love'].includes(d.k) && d.t === v).map((d) => d.who);
-      if (e.k === 'gone') { add(e.x, 'free', null, 2, 'événement'); for (const p of near(e.x)) add(p, 'find', e.x, 3, 'événement'); }
-      if (EK[e.k].crime) { add(e.x, 'hide', null, 3, 'événement'); const seekers = [...new Set([...(e.s && live(e.s) ? [e.s] : []), ...(e.v && live(e.v) ? [e.v, ...near(e.v)] : [])])];
-        for (const p of seekers) add(p, 'justice', e.x, 3, 'événement'); if (e.k === 'murder') { add(e.x, 'alive', null, 3, 'événement'); if (e.h) for (const p of ps) if (p !== e.x) add(p, 'alive', null, 2, 'événement'); } }
-      if (e.k === 'threat' && e.v && live(e.v)) { add(e.v, 'alive', null, 3, 'événement'); add(e.x, 'oust', e.v, 3, 'événement'); for (const p of near(e.v)) add(p, 'protect', e.v, 3, 'événement'); }
+      if (e.k === 'gone') { add(e.x, 'free', null, 2, 'événement', e); for (const p of near(e.x)) add(p, 'find', e.x, 3, 'événement', e); }
+      if (EK[e.k].crime) { add(e.x, 'hide', null, 3, 'événement', e); const seekers = [...new Set([...(e.s && live(e.s) ? [e.s] : []), ...(e.v && live(e.v) ? [e.v, ...near(e.v)] : [])])];
+        for (const p of seekers) add(p, 'justice', e.x, 3, 'événement', e); if (e.k === 'murder') { add(e.x, 'alive', null, 3, 'événement', e); if (e.h) for (const p of ps) if (p !== e.x) add(p, 'alive', null, 2, 'événement', e); } }
+      if (e.k === 'threat' && e.v && live(e.v)) { add(e.v, 'alive', null, 3, 'événement', e); add(e.x, 'oust', e.v, 3, 'événement', e); for (const p of near(e.v)) add(p, 'protect', e.v, 3, 'événement', e); }
     }
     return D;
   }
@@ -515,6 +597,8 @@ window.FORGE = (() => {
       }
       b.answers = Q;
     }
+    // the example's concrete words, when there are some for this beat
+    const T2 = S.txt || {}; for (const b of out) for (const x of [b, ...b.rides]) if (T2[x.id]) { x.fr = T2[x.id][0]; x.en = T2[x.id][1]; x.concrete = 1; }
     return out;
   }
   // its technique: the one picked (a tap = the next), else its default
@@ -660,6 +744,7 @@ window.FORGE = (() => {
           const sides = [d1, d2].map((d, i) => { const old = list.find((b) => b.kind === 'stake' && b.c.st === raise(d) && !b.choiceOf);
             if (old) { list.splice(list.indexOf(old), 1); return { ...old, e: ['🅰️', '🅱️'][i], choiceOf: chEv.id, lk: 'mais' }; } return stk(i, d, i ? 'Menace : si tu X, je Y' : 'Show character positioning'); });
           list.push(...sides, chEv); prev = chEv; } }
+      const T2 = S.txt || {}; for (const x of list) { if (T2[x.id] && !x.concrete) { x.fr = T2[x.id][0]; x.en = T2[x.id][1]; x.concrete = 1; } if (x.choice && S.opt && S.opt[x.id]) { x.opts = S.opt[x.id]; x.fr = x.opts.map((o) => o[0]).join(' / '); x.en = `"${x.opts[0][0]}" (then ${x.opts[0][2]}) or "${x.opts[1][0]}" (then ${x.opts[1][2]})`; } }
       const led = { eng: [], cur: [], stake: [], moved: [] };
       for (const ev of list) for (const e3 of [ev, ...(ev.rides || [])]) { const g = gives(e3); for (const [key] of LED) if (g[key]) led[key].push(...g[key].map((x) => [...x, e3])); }
       return { list, stage, led }; });
@@ -767,16 +852,23 @@ window.FORGE = (() => {
   // options; box "later" = the start of the next episode; the links: a promise to its arrival, a stake to its choice, a
   // plant to its reveal, an object seen to its opening. Then the plan's prompt 2 writes the lines ----
   function planOf(n) {
-    const EP = episodes(), ep = EP[n] || EP[0], next = EP[n + 1], IL = infos(), iid = (i) => 'i' + (IL.indexOf(i) + 1);
+    const EP = episodes(), ep = EP[n] || EP[0], next = EP[n + 1], IL = infos(), iid = (i) => 'i' + (IL.indexOf(i) + 1), STq = story();
+    const happened = new Set(EP.slice(0, n + 1).flatMap((x) => x.list).map((x) => x.ev).filter(Boolean));
     const ids = {}; let k = 0;
     const beat = (ev, pre) => { const id = pre + (++k); ids[ev.id] = id; const ch = ev.choice || ev.kind === 'pick';
       const b = { id, goals: ch || !ev.g ? [] : [ev.g], tech: ch ? '' : ev.n, lines: ch ? 2 : 3, what: (ev.scene && pre === 'r' && k > 1 ? 'Nouvelle scène. ' : '') + ev.fr };
       if (ch) { b.kind = 'choice'; b.opts = (ev.opts || chOpts()).map((o) => (Array.isArray(o) ? o[0] : o)); b.what = ev.choice ? `Choix : ${ev.opts.map((o) => `${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr; }
       if (ev.info) b[ev.hint ? 'hints' : 'reveals'] = [iid(ev.info)];
+      // who is on screen and what each one wants right now (their stake in this moment): Justin always, the people of the
+      // moment and of what rides in it; each one's want: the desire this moment is about, else his line's, else his strongest
+      const here = [...new Set([J, ...(ev.who || []), ...(ev.rides || []).flatMap((r) => r.who || [])].filter((w) => w && live(w)))].slice(0, 4);
+      const ok2 = (x) => !x.from || happened.has(x.from);
+      b.present = here.map((p2) => { const d = (ev.desires || []).find((x) => x.who === p2) || STq.D.find((x) => x.id === ev.line && x.who === p2) || STq.D.filter((x) => x.who === p2 && x.s >= 2 && ok2(x)).sort((a2, b2) => b2.s - a2.s)[0];
+        return { id: p2, name: nm(p2), wants: d ? `${DK[d.k].n}${d.t ? ' ' + tName(d) : ''}` : 'observer' }; });
       for (const rd of ev.rides || []) { (b.carries = b.carries || []).push({ tech: rd.n, part: rd.fr }); if (rd.info) b[rd.hint ? 'hints' : 'reveals'] = [...(b[rd.hint ? 'hints' : 'reveals'] || []), iid(rd.info)]; ids[rd.id] = id; b.lines = Math.min(5, (b.lines || 3) + 1); }
       return b; };
     const orig = ep.list.slice(), epBeats = ep.list.map((ev) => beat(ev, 'r')); k = 0;
-    epBeats.forEach((b, j) => { const e2 = ep.list[j]; if (j && !b.kind && e2.kind !== 'stake') b.what = ({ mais: `Mais${e2.cause ? `, alors que ${e2.cause[0]}` : ''} : `, soudain: 'Soudain : ', 'pendant ce temps': 'Pendant ce temps : ' }[link(e2)[0]] || (e2.cause ? `Parce que ${e2.cause[0]} : ` : 'Donc : ')) + b.what; });
+    epBeats.forEach((b, j) => { const e2 = ep.list[j]; if (j && !b.kind && e2.kind !== 'stake' && !e2.concrete) b.what = ({ mais: `Mais${e2.cause ? `, alors que ${e2.cause[0]}` : ''} : `, soudain: 'Soudain : ', 'pendant ce temps': 'Pendant ce temps : ' }[link(e2)[0]] || (e2.cause ? `Parce que ${e2.cause[0]} : ` : 'Donc : ')) + b.what; });
     // one line, two jobs (03/11): a moment that can ride in another (a seed, a planted question) climbs into the latest
     // carrier before it (Tell a story, Shared memory, Show contrast...) instead of having its own rectangle
     const evOf = (b) => ep.list[epBeats.indexOf(b)], carrierBefore = (b) => { for (let q = epBeats.indexOf(b) - 1; q >= 0; q--) { const e2 = ep.list[q]; if (e2 && e2.tech && e2.tech.carrier && !epBeats[q].kind) return epBeats[q]; } return null; };
@@ -815,7 +907,7 @@ window.FORGE = (() => {
     }
     const title = `${(ACT.get && ACT.get().seed && ACT.get().title) || 'Créer'} · épisode ${n + 1}`;
     return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [],
-      chars: S.cast.map((id) => ({ id, name: nm(id), sprite: sprite(id), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
+      chars: S.cast.map((id) => ({ id, name: nm(id), sprite: sprite(id), poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'].filter((p2) => window.SPRITES && SPRITES[sprite(id)] && SPRITES[sprite(id)].poses[p2]), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
       infos: IL.map((i) => ({ id: iid(i), text: infoFr(i) })),
       boxes: [{ id: 'ep', title: `Épisode ${n + 1}`, col: 0, beats: epBeats }, { id: 'later', title: 'Plus tard', col: 1, beats: laterBeats }], links };
   }
@@ -982,18 +1074,38 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     + ((b.rides || []).length ? `<span class="fSbRs">${b.rides.map((r) => `<i data-sid="${r.id}" data-tip="${esc(`${r.fr}${r.n ? `\n${r.n}` : ''}`)}">${r.e}</i>`).join('')}</span>` : '') + '</div>';
   let sbL = [];
   function sbHtml(EPS) {
-    sbL = sbLinks(EPS);
-    return `<div class="fSbWrap"><div class="fSbIn">${EPS.map(({ list }, n) => `<div class="fSbCol"><div class="fSbH">${n + 1}</div>${list.map(sbCard).join('')}</div>`).join('')}<svg class="fSbSvg"></svg></div>`
+    const was = sbSel != null && sbL[sbSel] ? `${sbL[sbSel].from}>${sbL[sbSel].to}` : null; sbL = sbLinks(EPS); sbSel = was ? (sbL.findIndex((l) => `${l.from}>${l.to}` === was) >= 0 ? sbL.findIndex((l) => `${l.from}>${l.to}` === was) : null) : null;
+    return `<div class="fSbWrap"><div class="fSbExp" hidden></div><div class="fSbIn">${EPS.map(({ list }, n) => `<div class="fSbCol"><div class="fSbH">${n + 1}</div>${list.map(sbCard).join('')}</div>`).join('')}<svg class="fSbSvg"></svg></div>`
       + `<div class="fSbLeg"><span style="--c:${SBC.setup}">🌱 → 🎯</span><span style="--c:${SBC.qa}">❓ → 💡</span><span style="--c:${SBC.stake}">📈 → ⚖️</span><span style="--c:${SBC.cons}">⚖️ → ↪️</span></div></div>`;
   }
+  // a link tapped: it stays alone (the others fade), its two ends are named next to their cards, and a box says what
+  // this kind of link is. Tapped again (or ✕) = all the links back
+  const SBT = { setup: ['🌱 Setup → payoff', 'Planté ici sans qu’on le remarque ; ça revient là et prend son sens.', 'Setup', 'Payoff'],
+    qa: ['❓ Question → réponse', 'Le public se pose la question ici ; elle trouve sa réponse là.', 'Question', 'Réponse'],
+    stake: ['📈 Enjeu → choix', 'Ici, un désir pèse plus ; c’est ce qui donne du poids au choix, là.', 'Enjeu', 'Choix'],
+    future: ['📈 Enjeu → climax', 'Ce conflit nourrit le choix final de l’acte, plus tard.', 'Enjeu', 'Climax'],
+    cons: ['⚖️ Choix → conséquence', 'Ce qu’il choisit ici ouvre l’épisode suivant.', 'Choix', 'Conséquence'] };
+  let sbSel = null;
   function sbDraw() {
     const wrap = el && el.querySelector('.fSbIn'); if (!wrap) return; const svg = wrap.querySelector('svg'), r0 = wrap.getBoundingClientRect();
     svg.setAttribute('width', wrap.scrollWidth); svg.setAttribute('height', wrap.scrollHeight);
-    const pos = (id2) => { const nd = wrap.querySelector(`[data-sid="${CSS.escape(id2)}"]`); if (!nd) return null; const r = nd.getBoundingClientRect(); return { x: r.left - r0.left, y: r.top - r0.top, w: r.width, h: r.height }; };
-    svg.innerHTML = sbL.map((l) => { const a = pos(l.from), b = pos(l.to); if (!a || !b) return '';
+    wrap.querySelectorAll('.fSbTag').forEach((x) => x.remove());
+    const pos = (id2) => { const nd = wrap.querySelector(`[data-sid="${CSS.escape(id2)}"]`); if (!nd) return null; const r = nd.getBoundingClientRect(); return { x: r.left - r0.left + wrap.scrollLeft, y: r.top - r0.top, w: r.width, h: r.height }; };
+    const sel = sbSel != null ? sbL[sbSel] : null;
+    wrap.classList.toggle('sel', !!sel);
+    wrap.querySelectorAll('[data-sid]').forEach((nd) => nd.classList.toggle('hl', !!sel && (nd.dataset.sid === sel.from || nd.dataset.sid === sel.to)));
+    svg.innerHTML = sbL.map((l, i) => { const a = pos(l.from), b = pos(l.to); if (!a || !b) return '';
       const same = Math.abs(a.x - b.x) < 20, x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = same ? b.x + b.w : b.x, y2 = b.y + b.h / 2, bend = same ? 26 + Math.abs(y2 - y1) * 0.08 : Math.max(20, (x2 - x1) / 2);
       const d = same ? `M${x1},${y1} C${x1 + bend},${y1} ${x2 + bend},${y2} ${x2},${y2}` : `M${x1},${y1} C${x1 + bend},${y1} ${x2 - bend},${y2} ${x2},${y2}`;
-      return `<path d="${d}" stroke="${SBC[l.t]}" stroke-width="1.6" fill="none" opacity=".85"${l.t === 'future' ? ' stroke-dasharray="4 3"' : ''}/><circle cx="${x2}" cy="${y2}" r="2.6" fill="${SBC[l.t]}"/>`; }).join('');
+      const on = !sel || sel === l, op = on ? (sel ? 1 : 0.85) : 0.07, w = sel === l ? 3 : 1.6;
+      return `<path d="${d}" stroke="${SBC[l.t]}" stroke-width="${w}" fill="none" opacity="${op}"${l.t === 'future' ? ' stroke-dasharray="4 3"' : ''}/><circle cx="${x2}" cy="${y2}" r="${sel === l ? 4 : 2.6}" fill="${SBC[l.t]}" opacity="${op}"/>`
+        + `<path class="fSbHit" data-li="${i}" d="${d}" stroke="transparent" stroke-width="14" fill="none"/>`; }).join('');
+    if (sel) { const a = pos(sel.from), b = pos(sel.to), T = SBT[sel.t], txt = (id2) => { const ev = allEv().find((x) => x.id === id2); return ev ? (ev.choice ? ev.opts.map((o) => o[0]).join(' / ') : ev.fr) : ''; };
+      const tag = (p2, side, label, text) => { if (!p2) return; const t2 = document.createElement('div'); t2.className = `fSbTag ${side}`; t2.style.setProperty('--c', SBC[sel.t]);
+        t2.innerHTML = `<b>${label}</b>${esc(text)}`; t2.style.top = `${p2.y + p2.h + 4}px`; t2.style.left = `${Math.max(4, side === 'from' ? p2.x : p2.x + p2.w - 150)}px`; wrap.appendChild(t2); };
+      tag(a, 'from', T[2], txt(sel.from)); tag(b, 'to', T[3], txt(sel.to));
+      const box = el.querySelector('.fSbExp'); if (box) { box.hidden = false; box.style.setProperty('--c', SBC[sel.t]); box.innerHTML = `<b>${T[0]}</b>${T[1]}<button type="button" data-sbclear="1">✕</button>`; } }
+    else { const box = el.querySelector('.fSbExp'); if (box) box.hidden = true; }
   }
   // 🧵 the braid: a lane per plotline (and one for the events), the episodes in columns, each beat a dot (its emoji)
   function braidHtml(ST, EPS) {
@@ -1005,7 +1117,8 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   function render() {
     if (!el) return;
     const ST = story(), cs = ST.C, EPS = episodes(), hasKey = !!ls('smt-key');
-    el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fDice" data-x="dice" aria-label="Au hasard" data-tip="Tout au hasard">🎲</button></div>`
+    el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fEx" data-x="example" data-tip="L’exemple : une histoire concrète de bout en bout (le voleur de la taverne)">📖</button><button type="button" class="fDice" data-x="dice" aria-label="Au hasard" data-tip="Tout au hasard">🎲</button></div>`
+      + (S.ex ? `<div class="fExBar"><b>📖 Le voleur de la taverne</b><span>L’exemple concret : chaque moment a ses vrais mots.</span><button type="button" data-x="exep1" data-tip="Joue l’épisode 1 tel qu’il est écrit (sans IA)">▶ Épisode 1 écrit</button></div>` : '')
       // WHAT
       + layer('1', 'Quoi', 'Le lieu, les persos, ce qu’ils veulent, leurs liens, les infos')
       + row('📍', DECORS.map((o) => chip(`data-decor="${o.id}"`, o.e, o.n, o.id === S.decor, '#8e8e93', o.d)).join(''), 'Le lieu')
@@ -1054,6 +1167,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     } catch { window.open(src, '_blank'); }
   }
   function onClick(e) {
+    const hit = e.target.closest('[data-li]'); if (hit && el.contains(hit)) { e.stopPropagation(); const i2 = +hit.dataset.li; sbSel = sbSel === i2 ? null : i2; sbDraw(); return; }
     const zone = e.target.closest('[data-ledger], [data-braidbig], [data-desof], .fSbCard, .fSbRs i');
     if (zone && el.contains(zone) && !e.target.closest('button')) { e.stopPropagation();
       if (zone.dataset.ledger != null) return bigLedger(+zone.dataset.ledger); if (zone.dataset.braidbig) return bigBraid(); if (zone.dataset.desof) return bigDesires(zone.dataset.desof);
@@ -1081,6 +1195,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else if (d.clim) { const st2 = story(), jd = st2.D.filter((x3) => x3.who === J && x3.s >= 2).concat(st2.D.filter((x3) => x3.who === J && x3.s < 2)), cur2 = st2.X.map((x3) => x3 && x3.id), i2 = +d.clim;
       let at3 = jd.findIndex((x3) => x3.id === cur2[i2]); do at3 = (at3 + 1) % jd.length; while (jd[at3].id === cur2[1 - i2] && jd.length > 1); cur2[i2] = jd[at3].id; S.climax = cur2; }
     else if (d.braid) braid = !braid;
+    else if (d.sbclear) { sbSel = null; return sbDraw(); }
     else if (d.climauto) S.climax = null;
     else if (d.sbact) sbAct = !sbAct;
     else if (d.hard) { if (!hardOk(d.hard)) return; S.hard[d.hard] = S.hard[d.hard] ? 0 : 1; }
@@ -1097,6 +1212,8 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       S.cut = { sig: sigOf(L), at: [...at].sort((a, b) => a - b) }; }
     else if (d.x === 'autocut') S.cut = null;
     else if (d.x === 'dice') dice();
+    else if (d.x === 'example') { S = PRESET(); sbSel = null; }
+    else if (d.x === 'exep1') { save(); PLAN.add(planOf(0)); return window.PLAN_PLAY(JSON.parse(JSON.stringify(EX_EP1)), EX_EP1.title); }
     else if (d.x === 'copy') { if (!S.cast.length) { msg = '👥 ?'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
       return copy(ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
     else if (d.x === 'acte') { save(); return window.FORGE_TO_ACT && FORGE_TO_ACT(); }

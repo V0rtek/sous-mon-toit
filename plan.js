@@ -215,12 +215,13 @@ window.PLAN = (() => {
     return `<div class="pBeat${b.kind === 'choice' ? ' ch' : ''}" data-b="${b.id}" style="min-height:${(b.lines || 1) * NL}em">`
       + `<div class="pTabs">${tabs}</div><div class="pTicks">${ticks}</div><div class="pIn">`
       + `<div class="pTop"><span class="pN">${num(b.id)}</span><b>${b.kind === 'choice' ? 'Choix' : esc(b.tech) || '…'}</b><em>${b.lines || 1} répl.</em></div>`
+      + ((b.present || []).length ? `<div class="pHere">${b.present.map((x) => { const c = P.chars.find((y) => y.id === x.id); return `<span title="${esc(`${x.name} veut ${x.wants}`)}">${c ? face(c.sprite) : (x.id === 'justin' ? face('justin') : '')}<i>${esc(x.wants)}</i></span>`; }).join('')}</div>` : '')
       + (b.kind === 'choice' && b.tech ? `<div class="pTech">${esc(b.tech)}</div>` : '')
-      + (b.what ? `<p>${esc(b.what)}</p>` : '')
-      + ((b.carries || []).length ? `<div class="pCarry">${b.carries.map((c) => `<span>porte : ${esc(c.part)} <i>(${esc(c.tech)})</i></span>`).join('')}</div>` : '')
+      + (b.what ? `<p class="pWhat">${esc(b.what)}</p>` : '')
+      + ((b.carries || []).length ? `<div class="pCarry">${b.carries.map((c) => `<span title="${esc(`${c.part} (${c.tech})`)}">↳ ${esc(c.tech)}</span>`).join('')}</div>` : '')
       + (b.kind === 'choice' && b.opts && b.opts.length ? `<div class="pCh">${b.opts.map((o) => `<span>${esc(o)}</span>`).join('')}</div>` : '')
-      + (infos.length ? `<div class="pInfo">${infos.map((x) => `<span>révèle : ${esc(x.text)}</span>`).join('')}</div>` : '')
-      + ((b.hints || []).length ? `<div class="pInfo hint">${b.hints.map((r) => P.infos.find((x) => x.id === r)).filter(Boolean).map((x) => `<span>soulève : ${esc(x.text)}</span>`).join('')}</div>` : '')
+      + (infos.length ? `<div class="pInfo">${infos.map((x) => `<span title="révèle : ${esc(x.text)}">👁 ${esc(x.text)}</span>`).join('')}</div>` : '')
+      + ((b.hints || []).length ? `<div class="pInfo hint">${b.hints.map((r) => P.infos.find((x) => x.id === r)).filter(Boolean).map((x) => `<span title="soulève : ${esc(x.text)}">❓ ${esc(x.text)}</span>`).join('')}</div>` : '')
       + back.map((l) => `<div class="pLoop in">↰ ${num(l.from)}${l.label ? ' · ' + esc(l.label) : ''}</div>`).join('')
       + out.map((l) => `<div class="pLoop">↳ ${num(l.to)}${l.label ? ' · ' + esc(l.label) : ''}</div>`).join('')
       + '</div></div>';
@@ -345,6 +346,7 @@ window.PLAN = (() => {
       + `<small>Buts</small><div class="pPick">${GOALS.map((g) => `<button type="button" data-g="${g.id}" class="${(b.goals || []).includes(g.id) ? 'on' : ''}" style="--c:${g.c}">${ico(g)}${esc(g.name)}</button>`).join('')}</div>`
       + `<small>Technique</small><input data-f="tech" value="${esc(b.tech)}" placeholder="Ex. Show contrast">${techD(b.tech) ? `<p class="pD">${esc(techD(b.tech))}</p>` : ''}${fiche(techT(b.tech))}`
       + (sug.length ? `<div class="pSug">${sug.map((t) => `<button type="button" data-tech="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : '')
+      + ((b.present || []).length ? `<small>Sur place, et ce que chacun veut</small><p class="pD">${b.present.map((x) => `${esc(x.name)} : ${esc(x.wants)}`).join('<br>')}</p>` : '')
       + `<small>Ce qui se passe (pas de dialogue)</small><textarea data-f="what" rows="3">${esc(b.what)}</textarea>`
       + `<small>Répliques</small><div class="pStep"><button type="button" data-s="minus">−</button><b>${b.lines || 1}</b><button type="button" data-s="plus">+</button></div>`
       + (b.kind === 'choice' ? `<small>Options : des attitudes (une par ligne)</small><textarea data-f="opts" rows="3">${esc((b.opts || []).join('\n'))}</textarea>` : '')
@@ -550,6 +552,7 @@ HOW TO TRANSLATE THE PLAN:
 - A choice becomes a "choice" step: one option per attitude in "opts". Each option's "then" = 1 to 3 lines where the others react; the two branches really differ. The lines after a choice are seen by both branches: they must hold whatever was picked.
 - An info comes out exactly in the rectangle of "ep" that reveals it, never before, with that rectangle's technique (Tell a story: see its examples, never the same shape twice). An info revealed in "later" is never said in this episode: where a rectangle "hints" it, only its question is raised (something seen or said that makes the player wonder), never its answer.
 - A link is a promise: what the "from" rectangle plants comes back, recognizably, in the "to" rectangle. A link to "later" is only planted.
+- A rectangle's "present" says who is on screen and what each one wants right now: only they speak, and each line comes from that want (it is what they fight for in this moment).
 - A rectangle's "carries" are moments of other techniques it ALSO does, inside its own lines (a seed slipped into a story, a question planted in a joke): they get no line of their own, and nobody points at them.
 - The characters talk with their traits: you know who speaks without the name.
 - The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If he ..., ...").
