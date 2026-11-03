@@ -1055,6 +1055,18 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .fBrL { display: flex; align-items: center; gap: .3em; border-left: .4em solid var(--c); padding-left: .3em; } .fBrL b { font-size: 1.6em; }
 .fBrC { display: flex; flex-wrap: wrap; gap: .15em; align-content: center; justify-content: center; min-height: 3.2em; border-radius: .6em; background: color-mix(in srgb, var(--c) 12%, transparent); }
 .fBrC span { font-size: 1.5em; }
+.fSbWrap { display: flex; flex-direction: column; gap: .6em; }
+.fSbIn { position: relative; display: flex; gap: 3.2em; overflow-x: auto; padding: .8em 2.4em .8em .8em; border-radius: 1.4em; background: #0e0e10; -webkit-overflow-scrolling: touch; }
+.fSbCol { flex: none; width: 8.6em; display: flex; flex-direction: column; gap: .5em; position: relative; z-index: 1; }
+.fSbH { align-self: center; width: 1.9em; height: 1.9em; border-radius: 50%; background: #30d158; color: #000; display: grid; place-items: center; font-size: 1.4em; font-weight: 800; }
+.fSbCard { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: .25em; padding: .4em .5em; border-radius: .8em; background: #1c1c1e; cursor: default; }
+.fSbCard.ch { box-shadow: inset 0 0 0 .12em #ffd60a; }
+.fSbCard > b { font-size: 1.6em; line-height: 1; }
+.fSbFs { display: inline-flex; } .fSbFs .pFace { width: 1.9em; height: 1.9em; margin-left: -.35em; border: .1em solid #1c1c1e; } .fSbFs .pFace:first-child { margin-left: 0; }
+.fSbCard small { flex-basis: 100%; font-size: 1.1em; color: #8e8e93; line-height: 1.15; }
+.fSbRs { display: flex; gap: .2em; flex-basis: 100%; } .fSbRs i { font-style: normal; font-size: 1.2em; padding: 0 .2em; border-radius: .5em; background: #0f2a17; }
+.fSbSvg { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 2; overflow: visible; }
+.fSbLeg { display: flex; flex-wrap: wrap; gap: .5em; } .fSbLeg span { font-size: 1.3em; padding: .2em .6em; border-radius: 1em; border: .12em solid var(--c); color: var(--c); }
 .fCause { display: block; font-style: normal; font-size: .78em; color: #8e6a3a; }
 .fTn { display: block; font-style: normal; font-size: .78em; color: #636366; }
 .fDetG { margin: 6px 0 0; font-size: 13px; font-weight: 700; }
@@ -2507,7 +2519,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="ep1.js?v=20261030030000"></script>
 <script src="plan.js?v=20261103060000"></script>
 <script src="act.js?v=20261102370000"></script>
-<script src="forge.js?v=20261103130000"></script>
+<script src="forge.js?v=20261103150000"></script>
 <script src="people.js?v=20261028143259"></script>
 <script src="usage.js?v=20261028143259"></script>
 <script src="tests.js?v=20261031580000"></script>
