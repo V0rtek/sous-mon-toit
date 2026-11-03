@@ -37,14 +37,15 @@ Ce qui suit vient des échanges avec Justin du 02 au 03/11 : ce sont ses princip
 - **Épisodes** (`episodes()`) : coupes auto entre épisodes de la tresse (déplaçables ✂) ; chaque épisode finit sur un choix entre deux désirs de Justin (`chooseFor`), avec 🅰️ 🅱️ juste avant ; ↪️ la conséquence ouvre l'épisode suivant (l'option jouée se coche à la main) ; bilan ❤️ ❓ ⚔️ ➡️.
 - **Techniques** : chaque moment prend ses techniques dans `PLAN.GOALS` (`K`, `optsOf`, `withTech`) ; un tap = une autre façon ; ⓘ = sa fiche (chaîne objectif › manière › tactique liée aux cartes de Techniques, a besoin de / on voit / produit / ses moments, instructions et exemple dans `DETAIL`, vides).
 - **Vues** : 🎞️ storyboard de l'acte (cartes + liens tracés : setup → payoff, question → réponse, enjeu → choix, choix → conséquence) · 🧵 tresse · liste des épisodes · 📄 copier le plot · 🧍 prompts des pose sheets.
-- **Sortie** : 🎬 = le plan de l'épisode dans Plan de scène, **sans IA** (`planOf`) ; ▶ = ce plan + Haiku écrit seulement les répliques (prompt 2 de plan.js) ; 📋 = la route par l'Acte (prompt de l'acte + graine).
+- **Sortie** : 🎬 = le plan de l'épisode dans Plan de scène, **sans IA** (`planOf`) ; ▶ = ce plan + Haiku écrit seulement les répliques (prompt 2 de plan.js) ; 📋 = la route par l'Acte (prompt de l'acte + graine). Chaque rectangle porte `present` : qui est sur place et ce que chacun veut maintenant (un désir d'événement seulement après l'événement).
+- **Storyboard** : un tap sur un lien l'isole, nomme ses deux bouts à côté des cartes et dit ce que c'est.
+- **📖 L'exemple (mode rareté)** : « Le voleur de la taverne », une seule histoire concrète de bout en bout (`PRESET` : `txt[id]` = les vrais mots de chaque moment, `opt[id]` = les vraies issues des choix) et son épisode 1 écrit réplique par réplique (`EX_EP1`, jouable sans IA). C'est la référence de ce que Haiku doit atteindre. Les ids des moments dépendent de l'état : si on change le moteur, revérifier que `txt` tombe encore sur les bons moments.
 
 ## Pas fait (discuté, à reprendre)
-- **Ce que Haiku reçoit par rectangle** : la cause et la technique, mais pas *qui est sur place* ni *ce que chacun veut dans cette scène*. Aucune génération de bout en bout n'a été testée ici (pas de clé dans l'environnement).
-- **Les textes de montée d'enjeu et de conséquence sont des formules** (« un regard qui dure trop », « la porte se referme ») : à rendre concrets et propres à l'histoire.
-- **Le contenu des payoffs** (la vraie réponse surprise, les dépliants) : le système donne la structure, pas le contenu.
+- **Aucune génération Haiku de bout en bout n'a été testée ici** (pas de clé dans l'environnement) : comparer ce que ▶ donne sur l'exemple avec `EX_EP1`.
+- **Hors de l'exemple, les montées d'enjeu, les conséquences et les payoffs restent des formules** : l'exemple montre le niveau visé ; le moteur ne sait pas encore écrire ces mots lui-même.
 - **Les fiches de techniques** : seule « Coincé devant tous » est complète. À écrire **avec Justin**, une à la fois (il ne veut pas que je les rédige seul) ; suivantes proposées : Show character positioning, Tell a story. `DETAIL` (instructions, exemple) est vide.
-- **Plan de scène a trop de texte** : à rendre aussi visuel que le storyboard.
+- **Plan de scène** : allégé (visages, texte sur 2 lignes, icônes), encore loin du storyboard.
 - **Plusieurs scènes par épisode** : le prompt 2 ne suit que la boîte « ep ». Le changer touche à l'IA : demander à Justin d'abord (il doutait du découpage des rôles de l'IA).
 - **Le jeu ne retient pas l'option choisie en jouant** : la conséquence de l'épisode suivant se règle à la main (S.picked).
 - **Les choix passés ne changent pas les côtés du climax** (seulement « Pèse : … »). Quelques vraies branches pour les gros choix : à discuter.
