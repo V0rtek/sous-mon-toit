@@ -984,6 +984,66 @@ Row 2, left to right:
 The face says what they feel; the mouth is open only where a cell says so. Keep it natural, like the reference.`;
   }
 
+  // ---- 🎬 the sheets THE STORY asks for: what the script needs that the 6 base poses can't show ----
+  // Always tied to a thing in the story (an event, a relation, a want, an object): never a generic list.
+  // A sheet is 2×2 (4 cells): a duo (two characters, images 1 and 2) or an object (one character + the object, image 1).
+  const OBJ = {   // object info id → [what it is, 4 cells: what the character does with it]
+    ring: ['a ring', ['holds the ring up between two fingers and looks at it', 'turns the ring on their finger, lost in thought', 'hides the ring in a closed fist behind their back', 'looks at their empty hand, the ring gone, shocked']],
+    key: ['an old key', ['holds the key up at eye level, studying it', 'grips the key tight in a fist against their chest', 'slides the key into a pocket, glancing around', 'holds the key out toward someone, offering it']],
+    letter: ['a sealed letter', ['holds the sealed letter in both hands, reading the envelope', 'opens the letter, eyes moving across it', 'holds the letter against their chest, moved', 'crumples the letter in a fist, angry']],
+    photo: ['an old photo', ['holds the photo in both hands, looking at it tenderly', 'holds the photo out toward someone, showing it', 'presses the photo against their chest, eyes closed', 'drops the photo, staring at it on the ground']],
+    map: ['a folded map', ['holds the map open in both hands, studying it', 'points a finger at a spot on the map', 'folds the map quickly and hides it under their coat', 'holds the map out to someone, tense']],
+  };
+  function needs() {
+    const out = [], seen = new Set(), arch = (id) => { const ps = pillarsOf(id); return (P[ps[0]] || P.chef).en; };
+    const duo = (key, e, a, b, title, why, cells) => { if (a === b || !live(a) || !live(b) || seen.has(key + ':' + a + '|' + b)) return; seen.add(key + ':' + a + '|' + b);
+      out.push({ key: `${key}:${a}:${b}`, e, who: [a, b], title, why, cells, A: en(a), B: en(b), look: [arch(a), arch(b)] }); };
+    for (const ev of evs()) {
+      const a = ev.x, b = ev.v;
+      if (!b || !live(b)) continue;
+      if (ev.k === 'murder') duo('fight', '🗡️', a, b, `${nm(a)} × ${nm(b)} : la bagarre`, `Meurtre : ${evFr(ev)}`,
+        ['A and B face to face; A grabs B by the collar, B grabs A by the wrists', 'A swings a punch at B\'s face; B reels back, hit', 'B on the floor, hurt, looking up; A standing over B, breathing hard', 'A kneeling next to B who lies motionless; A stares at their own hands, horrified']);
+      else if (ev.k === 'threat') duo('threat', '☠️', a, b, `${nm(a)} × ${nm(b)} : la menace`, `Menace : ${evFr(ev)}`,
+        ['A stands close behind B and grips B\'s shoulder; B frozen', 'A holds a small blade at B\'s throat from behind; B\'s eyes wide', 'B backs away with both hands raised; A advances slowly', 'A whispers into B\'s ear; B stares straight ahead, terrified']);
+      else if (ev.k === 'theft') duo('theft', '💰', a, b, `${nm(a)} × ${nm(b)} : le vol`, `Vol : ${evFr(ev)}`,
+        ['B talks, not looking; A slips a hand into B\'s pocket', 'A slides something into their own sleeve, looking innocent', 'B turns and notices; A looks away, whistling', 'B grabs A\'s wrist, accusing; A pulls back, caught']);
+      else if (ev.k === 'betray') duo('betray', '🐍', a, b, `${nm(a)} × ${nm(b)} : la trahison`, `Trahison : ${evFr(ev)}`,
+        ['A smiles with a hand on B\'s shoulder; B trusts, smiling back', 'A turns away; B\'s hand is still held out toward A', 'B has understood; hurt, B stares at A; A avoids B\'s eyes', 'A and B back to back, each looking away in a different direction']);
+    }
+    const love = ['A and B face to face, almost touching, about to kiss', 'A and B kiss, eyes closed', 'A and B foreheads together, eyes closed, just after the kiss', 'A pulls away from B\'s kiss, turning the face aside; B left hurt'];
+    for (const [k, r] of Object.entries(S.rel || {})) { const [a, b] = k.split('|'); if (r === 'couple' || r === 'crush' || r === 'ex') duo('love', '💋', a, b, `${nm(a)} × ${nm(b)} : le baiser`, `${R[r].e} ${R[r].n} : ${nm(a)} et ${nm(b)}`, love); }
+    for (const [x, w] of Object.entries(S.want || {})) if (w && w.v === 'love' && w.t) duo('love', '💋', x, w.t, `${nm(x)} × ${nm(w.t)} : le baiser`, `❤️ ${nm(x)} veut ${nm(w.t)}`, love);
+    for (const i of infos()) if (IN[i.id].k === 'object' && OBJ[i.id]) out.push({ key: `obj:${i.id}:${i.x}`, e: IN[i.id].e, obj: 1, who: [i.x], title: `${nm(i.x)} + ${infoFr(i)}`, why: `📦 Objet de l’histoire : ${infoFr(i)}`, thing: OBJ[i.id][0], cells: OBJ[i.id][1], look: [arch(i.x)] });
+    return out;
+  }
+  function needSheet(n) {
+    const cell = (c) => c.replace(/\bA\b/g, n.A || '').replace(/\bB\b/g, n.B || '');
+    const who = n.obj ? `Image 1 is the character (and the art style). The object is ${n.thing}: draw it simply, in the same art style, the same in every cell.`
+      : `Image 1 is character A (${n.A}) and image 2 is character B (${n.B}). They are the characters AND the art style. Copy both exactly: face, hair, body, outfit, colors, line, shading.`;
+    const style = n.obj ? `HOW THEY ACT (their archetype): ${n.look[0]}.` : `HOW THEY ACT (their archetype): ${n.A} is ${n.look[0]}; ${n.B} is ${n.look[1]}. Each shows every gesture THEIR way: the two must not move alike.`;
+    return `Create a ${n.obj ? 'character + object' : 'two-character'} pose sheet, full body. ${who}
+
+${style}
+
+Format: square image, 1:1. An invisible grid of 4 equal cells, 2 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames between them.
+
+Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no shadow, no glow. Nobody wears anything green.
+
+In every cell: ${n.obj ? 'the same character' : 'the same two characters'}, full body from head to feet, same size, feet at the same height, with a clear margin of green on all sides. No text, no labels.
+
+Angle, the same in all 4 cells: three-quarter view, like image 1. Camera at chest height.
+
+Row 1, left to right:
+1. ${n.obj ? 'The character ' : ''}${cell(n.cells[0])}
+2. ${n.obj ? 'The character ' : ''}${cell(n.cells[1])}
+
+Row 2, left to right:
+3. ${n.obj ? 'The character ' : ''}${cell(n.cells[2])}
+4. ${n.obj ? 'The character ' : ''}${cell(n.cells[3])}
+
+Keep it natural, like the reference.`;
+  }
+
   // ---- 🎲 everything drawn: a place, 2 to 4 people, wants that collide, relations, the rest ----
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const coin = (p) => Math.random() < p;
@@ -1151,7 +1211,13 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + people().map((id) => { const src = img(id), ps = pillarsOf(id);
         return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
           + `<div class="fSheetR"><b>${esc(nm(id))}<em>${esc(tag(id))}</em></b>`
-          + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div></div></section>`; }).join('');
+          + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div></div></section>`; }).join('')
+      + `<h3 class="fH">🎬 Ce que l’histoire demande</h3><p class="fWhy">Des gestes que le script joue et que les 6 poses de base ne montrent pas. Une feuille de 4 cases (2×2) par besoin.</p>`
+      + (needs().map((n) => { const imgs = n.who.map((w, k) => ({ w, src: img(w), k }));
+        return `<section class="fSheet fNeed" style="--c:#ff9f0a"><div class="fPics">${imgs.map((m) => `<div class="fPic">${m.src ? `<img src="${m.src}" alt="">` : ''}<i>${m.k + 1}</i></div>`).join('')}</div>`
+          + `<div class="fSheetR"><b>${n.e} ${esc(n.title)}</b><p class="fWhy">${esc(n.why)}</p>`
+          + `<div class="fBtns"><button type="button" data-need="${esc(n.key)}" data-tip="Copie le prompt de cette feuille 2×2">📋 Prompt</button>${imgs.map((m) => m.src ? `<button type="button" data-cimg="${m.src}" data-tip="Copie l’image ${m.k + 1} (${esc(nm(m.w))}), à coller dans ChatGPT avant le prompt">🖼️ ${imgs.length > 1 ? m.k + 1 : 'Image'}</button>` : '').join('')}</div></div></section>`; }).join('')
+        || '<p class="fWhy">Rien : l’histoire n’a ni meurtre, vol, trahison, menace, couple/attirance ni objet qui demande une pose de plus.</p>');
     // the storyboard's links are drawn once the cards are laid out (and again when the faces have loaded)
     requestAnimationFrame(sbDraw); setTimeout(sbDraw, 500);
   }
@@ -1207,6 +1273,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else if (d.det) { const ev = allEv().find((x) => x.id === d.det); if (ev) details(ev); return; }
     else if (d.x === 'plot') return copy(plotText(), '📄 Plot copié');
     else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
+    else if (d.need) { const n = needs().find((x) => x.key === d.need); if (n) { save(); return copy(needSheet(n), `${n.e} ${n.title} : prompt copié. Dans ChatGPT : ${n.obj ? 'l’image 1' : 'les images 1 et 2'} + le prompt.`); } }
     else if (d.cimg) return copyImg(d.cimg, t);
     else if (d.cut || d.uncut) { const L = line(), at = new Set(cutsOf(L)), i = +(d.cut || d.uncut); if (d.cut) at.add(i); else at.delete(i);
       S.cut = { sig: sigOf(L), at: [...at].sort((a, b) => a - b) }; }
