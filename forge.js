@@ -661,7 +661,7 @@ window.FORGE = (() => {
             if (old) { list.splice(list.indexOf(old), 1); return { ...old, e: ['🅰️', '🅱️'][i], choiceOf: chEv.id, lk: 'mais' }; } return stk(i, d, i ? 'Menace : si tu X, je Y' : 'Show character positioning'); });
           list.push(...sides, chEv); prev = chEv; } }
       const led = { eng: [], cur: [], stake: [], moved: [] };
-      for (const ev of list) for (const e3 of [ev, ...(ev.rides || [])]) { const g = gives(e3); for (const [key] of LED) if (g[key]) led[key].push(...g[key]); }
+      for (const ev of list) for (const e3 of [ev, ...(ev.rides || [])]) { const g = gives(e3); for (const [key] of LED) if (g[key]) led[key].push(...g[key].map((x) => [...x, e3])); }
       return { list, stage, led }; });
   }
   const events = () => episodes().map((x) => x.list);
@@ -724,6 +724,42 @@ window.FORGE = (() => {
       + `<h4>Exemple</h4>${(d.ex || (t0.ex && t0.ex.length)) ? (d.ex ? `<p>${esc(d.ex)}</p>` : t0.ex.map((x) => `<p>${esc(x)}</p>`).join('')) : '<p class="fTodo">À compléter.</p>'}`
       + (OL.length > 1 ? `<h4>Les autres façons</h4><div class="fWays">${others}</div>` : '');
     detEl.hidden = false;
+  }
+
+  // ---- the big window (03/11): the compact views stay compact; a tap opens the full one, with words to understand it ----
+  function big(html) { details({ kind: '·', id: '', e: '', n: '', fr: '' }); detEl.innerHTML = html; detEl.hidden = false; detEl.scrollTop = 0; }
+  const bigTop = (t) => `<div class="fDetTop"><b>${t}</b><button type="button" data-close>OK</button></div>`;
+  const faces2 = (ids) => `<span class="fBigF">${(ids || []).filter((w) => w && live(w)).slice(0, 3).map((w) => face(w)).join('')}</span>`;
+  const SRC = { base: 'de base', lien: 'd’un lien', choisi: 'choisi', faille: 'de sa faille', 'événement': 'd’un événement', info: 'd’une info' };
+  const LEDX = { eng: 'À qui le public s’attache, et par quelle technique. On fait aimer ceux qu’un choix pourra coûter.', cur: 'Les questions que le public se pose maintenant, sans réponse encore.',
+    stake: 'Ce qui pèse plus : un désir renforcé, ou un obstacle qui s’ajoute. C’est ce qui donne du poids au choix.', moved: 'Ce qui a changé dans l’histoire : arrivé, révélé, choisi.' };
+  const LEDN = { eng: 'Engagé dans les persos et les liens', cur: 'Curiosité', stake: 'Enjeux', moved: 'L’histoire avance' };
+  function bigLedger(n) {
+    const ep = episodes()[n]; if (!ep) return; const ch = ep.list.find((x) => x.kind === 'choice' || x.kind === 'pick');
+    big(bigTop(`Épisode ${n + 1} · ce qu’il accomplit`)
+      + (ch ? `<div class="fBigQ"><small>La question de l’épisode</small><b>${ch.kind === 'pick' ? `🏁 ${esc(ch.fr)}` : `⚖️ ${esc(ch.opts.map((o) => o[0]).join(' ou '))} ?`}</b>${ch.opts ? `<p>${ch.opts.map((o) => `${esc(o[0])} → ${esc(o[1])}`).join('<br>')}</p>` : ''}</div>` : '')
+      + LED.filter(([key]) => ep.led[key].length).map(([key, e2]) => `<h4>${e2} ${LEDN[key]}</h4><p class="fBigX">${LEDX[key]}</p>`
+        + ep.led[key].map(([fr, , ev]) => `<div class="fBigI">${faces2(ev && ev.who)}<div><b>${esc(fr)}</b>${ev && ev.n && ev.n !== 'Choix' ? `<small>par : ${esc(ev.n)}${ev.fr && ev.fr !== fr ? ` · ${esc(ev.fr)}` : ''}</small>` : ''}</div></div>`).join('')).join(''));
+  }
+  function bigBraid() {
+    const ST2 = story(), EPS2 = episodes(), lanes = ST2.PL.map((p2, k) => ({ p: p2, c: LANE[k % LANE.length] }));
+    big(bigTop('🧵 La tresse : les lignes de l’histoire') + '<p class="fBigX">Chaque ligne est un désir fort et ce qui s’y oppose. Celles de Justin sont les lignes principales ; les autres courent « pendant ce temps ». Elles avancent d’un cran par épisode et convergent vers le climax.</p>'
+      + lanes.map(({ p: p2, c }) => `<div class="fBigL" style="--c:${c}"><div class="fBigLH">${faces2([p2.d.who, p2.d.t])}<b>${DK[p2.d.k].e} ${esc(dSay(p2.d))}</b><em>${p2.main ? 'ligne principale' : 'pendant ce temps'}</em></div>`
+        + `<div class="fBigC">${p2.cs.map((c2) => `<span>${c2.e} ${esc(c2.fr)}</span>`).join('')}</div>`
+        + EPS2.map(({ list }, n) => { const its = list.filter((ev) => ev.line === p2.id); return its.length ? `<div class="fBigE"><i>${n + 1}</i><div>${its.map((ev) => `<p>${ev.e} ${esc(ev.fr)}</p>`).join('')}</div></div>` : ''; }).join('') + '</div>').join('')
+      + `<div class="fBigL" style="--c:#8e8e93"><div class="fBigLH"><b>💥 Événements, révélations, choix</b></div>${EPS2.map(({ list }, n) => { const its = list.filter((ev) => !ev.line && !['hook', 'expect', 'tease', 'conseq', 'stake'].includes(ev.kind)); return its.length ? `<div class="fBigE"><i>${n + 1}</i><div>${its.map((ev) => `<p>${ev.e} ${esc(ev.choice ? ev.opts.map((o) => o[0]).join(' / ') : ev.fr)}</p>`).join('')}</div></div>` : ''; }).join('')}</div>`
+      + (ST2.X[0] && ST2.X[1] ? `<div class="fBigQ"><small>Le climax, où elles convergent</small><b>🏁 ${esc(cap(lab(ST2.X[0])))} ou ${esc(lab(ST2.X[1]))} ?</b><p>${esc(dSay(ST2.X[0]))}<br>${esc(dSay(ST2.X[1]))}</p></div>` : ''));
+  }
+  function bigDesires(id) {
+    const ST2 = story(), mine = ST2.D.filter((d) => d.who === id).sort((a, b) => b.s - a.s);
+    big(bigTop(`${esc(nm(id))} · ses désirs`) + '<p class="fBigX">Déduits de ce qu’il est : de base (rester en vie, le respect), de ses liens, de ce que tu choisis, de sa faille, des événements et des infos. Les enjeux menacent ces désirs ; deux désirs opposés font un conflit.</p>'
+      + mine.map((d) => { const cs = ST2.C.filter((c) => c.da === d || c.db === d);
+        return `<div class="fBigI s${d.s}">${faces2([d.t])}<div><b>${DK[d.k].e} ${esc(dSay(d))}</b><small>${SRC[d.src] || d.src} · ${['', 'faible', 'moyen', 'fort'][d.s]}${cs.length ? ' · ' + cs.map((c) => `${c.e} ${esc(c.fr)}`).join(' · ') : ''}</small></div></div>`; }).join(''));
+  }
+  function bigBeat(id2) {
+    const ev = allEv().find((x) => x.id === id2); if (!ev) return;
+    if (PATHS[ev.kind] && ev.tech) return details(ev);
+    big(bigTop(`${ev.e} ${esc(ev.n && ev.n !== 'Choix' ? ev.n : SBW[ev.kind] ? SBW[ev.kind](ev) : '')}`) + `<div class="fBigI">${faces2(ev.who)}<div><b>${esc(ev.choice ? ev.opts.map((o) => `${o[0]} → ${o[1]}`).join(' / ') : ev.fr)}</b>${ev.cause ? `<small>parce que ${esc(ev.cause[0])}</small>` : ''}</div></div>`);
   }
 
   // ---- 🎬 an episode's plan for Plan de scène, made here (no AI): its events = the rectangles of box "ep", in order,
@@ -884,7 +920,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + `<div class="fPs fFl">${FLAWS.map((f) => `<button type="button" class="fP fl${S.flaw[id] === f.id ? ' on' : ''}" data-flaw="${id}:${f.id}" data-tip="${esc(`${f.e} ${f.n} (faille)\n${f.d}`)}">${f.e}</button>`).join('')}</div>`
       + `<div class="fPs fWant"><i class="fWi" data-tip="Ce qu’il veut (et de qui). Des désirs qui se croisent = l’histoire">🎯</i>${WANTS.map((x) => `<button type="button" class="fP${w.v === x.id ? ' on' : ''}" style="--c:#ff375f" data-want="${id}:${x.id}" data-tip="${esc(`${x.e} ${x.n}\n${x.d}`)}">${x.e}</button>`).join('')}</div>`
       + (wv && wv.t ? `<div class="fPs">${people().filter((o) => o !== id).map((o) => `<button type="button" class="fFace sm${w.t === o ? ' on' : ''}" style="--c:#ff375f" data-wt="${id}:${o}" data-tip="${esc(`${wv.n} ${nm(o)}`)}">${face(o)}</button>`).join('')}</div>` : '')
-      + `<div class="fDes" data-tip="Ses désirs, déduits : de base (pâle), d’un lien, choisis, de sa faille, d’un événement ou d’une info (fort). Les enjeux menacent ces désirs">${desires().filter((d) => d.who === id).sort((a, b) => b.s - a.s).map((d) => `<span class="s${d.s}" data-tip="${esc(`${DK[d.k].e} ${dFr(d)} (${d.src})`)}">${DK[d.k].e}${d.t ? `<small>${esc(tName(d))}</small>` : ''}</span>`).join('')}</div>`
+      + `<div class="fDes" data-desof="${id}" data-tip="Ses désirs, déduits : de base (pâle), d’un lien, choisis, de sa faille, d’un événement ou d’une info (fort). Les enjeux menacent ces désirs">${desires().filter((d) => d.who === id).sort((a, b) => b.s - a.s).map((d) => `<span class="s${d.s}" data-tip="${esc(`${DK[d.k].e} ${dFr(d)} (${d.src})`)}">${DK[d.k].e}${d.t ? `<small>${esc(tName(d))}</small>` : ''}</span>`).join('')}</div>`
       + '</div></section>';
   }
   function relRows() {
@@ -963,7 +999,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
   function braidHtml(ST, EPS) {
     const lanes = [...ST.PL.map((p2, k) => ({ id: p2.id, c: LANE[k % LANE.length], who: p2.d.who, e: DK[p2.d.k].e, n: `${DK[p2.d.k].n}${p2.d.t ? ' ' + tName(p2.d) : ''}` })), { id: '·', c: '#8e8e93', e: '💥', n: 'Événements, révélations, choix' }];
     const inLane = (ev, ln) => (ln.id === '·' ? !ev.line : ev.line === ln.id);
-    return `<div class="fBraid" style="--n:${EPS.length}"><div class="fBrH"></div>${EPS.map((_, n) => `<div class="fBrH">${n + 1}</div>`).join('')}`
+    return `<div class="fBraid" data-braidbig="1" style="--n:${EPS.length}"><div class="fBrH"></div>${EPS.map((_, n) => `<div class="fBrH">${n + 1}</div>`).join('')}`
       + lanes.map((ln) => `<div class="fBrL" style="--c:${ln.c}" data-tip="${esc(ln.n)}">${ln.who ? mini(ln.who) : ''}<b>${ln.e}</b></div>` + EPS.map(({ list }) => `<div class="fBrC" style="--c:${ln.c}">${list.filter((ev) => inLane(ev, ln)).map((ev) => `<span data-tip="${esc(`${ev.fr}${ev.n ? ` (${ev.n})` : ''}`)}">${ev.e}</span>`).join('')}</div>`).join('')).join('') + '</div>';
   }
   function render() {
@@ -994,7 +1030,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
       + `<div class="fViews"><button type="button" class="${sbAct ? 'on' : ''}" data-sbact="1" data-tip="Le storyboard de l’acte : une carte par moment, les liens setup → payoff, question → réponse, enjeu → choix, choix → conséquence">🎞️ Storyboard</button><button type="button" class="${braid ? 'on' : ''}" data-braid="1" data-tip="La tresse : une ligne par plotline, les épisodes en colonnes">🧵 Tresse</button></div>` + (sbAct ? sbHtml(EPS) : '') + (braid ? braidHtml(ST, EPS) : '')
       + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
-        + `<div class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
+        + `<div data-ledger="${n}" class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
@@ -1018,6 +1054,10 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     } catch { window.open(src, '_blank'); }
   }
   function onClick(e) {
+    const zone = e.target.closest('[data-ledger], [data-braidbig], [data-desof], .fSbCard, .fSbRs i');
+    if (zone && el.contains(zone) && !e.target.closest('button')) { e.stopPropagation();
+      if (zone.dataset.ledger != null) return bigLedger(+zone.dataset.ledger); if (zone.dataset.braidbig) return bigBraid(); if (zone.dataset.desof) return bigDesires(zone.dataset.desof);
+      return bigBeat(zone.dataset.sid); }
     const t = e.target.closest('button'); if (!t || !el.contains(t)) return;   // ⬇ is a link: it downloads by itself
     e.stopPropagation();
     const d = t.dataset; msg = '';
