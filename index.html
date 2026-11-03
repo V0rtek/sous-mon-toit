@@ -579,8 +579,8 @@ html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
 @keyframes valPing { 0% { transform: scale(1); opacity: 1; } 12% { transform: scale(1.08); opacity: 1; } 25% { opacity: .25; } 38% { opacity: 1; } 51% { opacity: .25; } 64% { opacity: 1; } 77% { transform: scale(1.08); opacity: .25; } 90% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes valPoint { 50% { transform: translateX(-.4em); } }
 /* Marketing: one screen per promise, its world then its line */
-#marketing, #validate, #investors { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
-#validate, #investors, #brainstorm, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
+#marketing, #validate, #investors, #showrunner { justify-content: flex-start; padding: 0; overflow-y: auto; scroll-snap-type: y mandatory; }
+#validate, #investors, #showrunner, #brainstorm, #system, #cosmoOP, #cosmoCites { padding: 13em 7% 6em; scroll-snap-type: none; }
 /* the Spark control panel: [X] and [Y] side by side, each with its photo, name, prompts and sheets to paste */
 .pnLead { margin: 0 0 2em; font-size: 2.2em; color: #aeaeb2; }
 .pnCols { display: grid; grid-template-columns: 1fr 1fr; gap: 3em; align-items: start; }
@@ -1365,9 +1365,9 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .sp-steps li::before { content: counter(sp); position: absolute; left: 1em; top: 1em; width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center; font-size: 1.7em; font-weight: 800; color: #000; background: var(--g); box-shadow: 0 0 1em var(--g); }
 .sp-chip { display: inline-block; margin-top: .7em; padding: .3em .8em; border-radius: 1em; font-size: 1.6em; font-weight: 800; color: var(--g); background: color-mix(in srgb, var(--g) 16%, transparent); }
 #validate .inv li { padding-left: 1em; }
-#investors .inv, #brainstorm .inv, #validate .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
-#investors .inv li, #brainstorm .inv li, #validate .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
-#investors .inv li::before, #brainstorm .inv li::before, #validate .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
+#investors .inv, #showrunner .inv, #brainstorm .inv, #validate .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
+#investors .inv li, #showrunner .inv li, #brainstorm .inv li, #validate .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
+#investors .inv li::before, #showrunner .inv li::before, #brainstorm .inv li::before, #validate .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
 #back svg { width: 3.6em; height: 3.6em; }
 /* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
@@ -1896,6 +1896,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="sysBtn"><span class="art" style="--g:#3a4a8a"><img src="chars/james/thinking.webp" alt=""></span><b>System</b></button>
       <button type="button" id="cosmoBtn"><span class="art" style="--g:#1f6f8b"><img src="chars/diane/thinking.webp" alt=""></span><b>Cosmograph</b></button>
       <button type="button" id="roadBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/justin/thinking.webp" alt=""></span><b>Roadmap</b></button>
+      <button type="button" id="srBtn"><span class="art" style="--g:#8a2f1f"><img src="chars/cam/worried.webp" alt=""></span><b>Showrunner</b></button>
       <button type="button" id="t3d"><span class="art photo" style="left:40%;background-image:url(ref/tease_3d.webp);background-position:60% 22%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%)"></span><b>3D</b></button>
     </div>
   </div>
@@ -2330,6 +2331,18 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <li>Banque avec + de 200 techniques complexes pour hook les viewers. Éviter la redondance, créer des personnages engageants.</li>
       </ul></div>
   </div>
+  <div id="showrunner" class="card menu" hidden>
+    <div class="step"><h2>Showrunner</h2>
+      <p class="lead">Mon essai, le 03/11 :</p>
+      <ul class="inv">
+        <li>J’ai entré une idée : 6 minutes pour la construire (lancé à 23 h 43, show prêt à 23 h 51). Ensuite il fallait générer un épisode : 23 h 51, début de la génération.</li>
+        <li>Une qualité incroyable, indéniable.</li>
+        <li>Mais la plupart des shows ne sont pas bons : dirigés par des randoms, pas des gens bons en storytelling.</li>
+        <li>Longue attente : j’ai navigué en attendant. Les gens pourraient arrêter de consommer des shows. Arrêter de s’en soucier.</li>
+        <li>J’ai ressenti exactement le sentiment d’impuissance que Maria décrivait.</li>
+        <li>Parcours : choisir le show → persos, décors, accessoires → mode / orientation / résolution / durée (15 crédits, 50 de départ) → description (@ perso, # décor, + accessoire) → Create Scene.</li>
+      </ul></div>
+  </div>
   <div id="brainstorm" class="card menu" hidden>
     <div class="step"><h2>Brainstorming</h2>
       <img class="brainImg" src="ref/brainstorm_couch.webp" alt="Deux amis sur un divan, chacun son cell avec son perso, l'histoire sur la télé">
@@ -2480,7 +2493,7 @@ let keyOk = false;   // entered this visit (a private window can't remember it)
 // its own slot (smt-open): smt-key is the Haiku key. A code kept in smt-key before (02/11) moves there
 try { if (+localStorage.getItem('smt-key') === KEY_HASH) { localStorage.setItem('smt-open', String(KEY_HASH)); localStorage.removeItem('smt-key'); } } catch { /* private window */ }
 const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-open') === KEY_HASH; } catch { return false; } };
-const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#investors', '#brainstorm', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
+const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#investors', '#brainstorm', '#showrunner', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
 document.documentElement.classList.toggle('locked', !unlocked());
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
@@ -4087,8 +4100,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
-const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell',
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
+const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
   '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
@@ -4614,6 +4627,7 @@ $('#vdCopy').onclick = async (e) => {
   setTimeout(() => { b.textContent = 'Copier'; b.classList.remove('done'); }, 1500);
 };
 $('#invBtn').onclick = (e) => { e.stopPropagation(); $('#investors').scrollTop = 0; show('#investors'); };   // Justin's notes for investors, his words
+$('#srBtn').onclick = (e) => { e.stopPropagation(); $('#showrunner').scrollTop = 0; show('#showrunner'); };   // field notes on Showrunner (03/11)
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#sparkBtn').onclick = (e) => { e.stopPropagation(); show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
 $('#keyBtn').onclick = (e) => { e.stopPropagation(); $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
