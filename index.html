@@ -1365,7 +1365,8 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .sp-steps li::before { content: counter(sp); position: absolute; left: 1em; top: 1em; width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center; font-size: 1.7em; font-weight: 800; color: #000; background: var(--g); box-shadow: 0 0 1em var(--g); }
 .sp-chip { display: inline-block; margin-top: .7em; padding: .3em .8em; border-radius: 1em; font-size: 1.6em; font-weight: 800; color: var(--g); background: color-mix(in srgb, var(--g) 16%, transparent); }
 #validate .inv li { padding-left: 1em; }
-#investors .inv, #showrunner .inv, #brainstorm .inv, #validate .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
+#showrunner .srP { margin: 0 0 1.4em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
+#investors .inv, #brainstorm .inv, #validate .inv { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.4em; }
 #investors .inv li, #showrunner .inv li, #brainstorm .inv li, #validate .inv li { position: relative; padding-left: 1em; font-size: 2.4em; line-height: 1.35; color: #f5f5f7; }
 #investors .inv li::before, #showrunner .inv li::before, #brainstorm .inv li::before, #validate .inv li::before { content: ''; position: absolute; left: 0; top: .55em; width: .35em; height: .35em; border-radius: 50%; background: #86868b; }
 #back { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(15,12,20,.6); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -2333,15 +2334,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="showrunner" class="card menu" hidden>
     <div class="step"><h2>Showrunner</h2>
-      <p class="lead">Mon essai, le 03/11 :</p>
-      <ul class="inv">
-        <li>J’ai entré une idée : 6 minutes pour la construire (lancé à 23 h 43, show prêt à 23 h 51). Ensuite il fallait générer un épisode : 23 h 51, début de la génération.</li>
-        <li>Une qualité incroyable, indéniable.</li>
-        <li>Mais la plupart des shows ne sont pas bons : dirigés par des randoms, pas des gens bons en storytelling.</li>
-        <li>Longue attente : j’ai navigué en attendant. Les gens pourraient arrêter de consommer des shows. Arrêter de s’en soucier.</li>
-        <li>J’ai ressenti exactement le sentiment d’impuissance que Maria décrivait.</li>
-        <li>Parcours : choisir le show → persos, décors, accessoires → mode / orientation / résolution / durée (15 crédits, 50 de départ) → description (@ perso, # décor, + accessoire) → Create Scene.</li>
-      </ul></div>
+      <p class="srP">So I inputed and idea and it took 6 minutes to build it.</p>
+      <p class="srP">--</p>
+      <p class="srP">I got into showrunner and I felt exactly this sense of hopelessness Maria described.</p>
+      <p class="srP">I launched generation of a show. It was a long wait so I started browsing.</p>
+      <p class="srP">It has an incredible undeniable quality.</p>
+      <p class="srP">But most shows are not good. They are directed by randoms, not people good with storytelling.</p>
+      <p class="srP">People may stop consuming shows. They may stop caring.</p>
+      <p class="srP">After 6 minutes. I got back to see my show. Had to generate an episode so<br>23h51 began generating episode.</p>
+    </div>
   </div>
   <div id="brainstorm" class="card menu" hidden>
     <div class="step"><h2>Brainstorming</h2>
