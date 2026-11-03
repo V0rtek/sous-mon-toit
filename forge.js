@@ -189,7 +189,7 @@ window.FORGE = (() => {
       ['Une heure précise', 'stakes', (c) => `« À minuit, ${c.x} sera là. »`, (c) => `"At midnight, ${c.xE} will be here."`]],
     enter: PILLARS.map((p) => [p.sur, 'char', (c) => `${c.x} : ${p.sur.charAt(0).toLowerCase() + p.sur.slice(1)}`, (c) => `${c.xE} appears and proves they are ${p.en.split(' (')[0]}: ${p.surEn}`]),
     gone: [['Sort et ne revient pas', 'info', (c) => `${c.x} sort « deux minutes » et ne revient pas`, (c) => `${c.xE} steps out "for two minutes" and never comes back`],
-      ['Sa cape sur la chaise', 'info', (c) => `La cape ${de(c.x)} sur sa chaise, ${c.x} n’est plus là`, (c) => `${c.xE}'s cloak is still on the chair; ${c.xE} is gone`],
+      ['Ses affaires sont encore là', 'info', (c) => `La cape ${de(c.x)} sur sa chaise, ${c.x} n’est plus là`, (c) => `${c.xE}'s cloak is still on the chair; ${c.xE} is gone`],
       ['Un mot à moitié écrit', 'info', (c) => `${c.x} laisse un mot à moitié écrit`, (c) => `${c.xE} left a note, half written`]],
     conflict: [['Prise de position', 'stakes', (c) => `${c.o} : quelqu’un prend position devant tous`, (c) => `${c.oE}; someone takes a side in front of everyone`],
       ['Menace « si tu…, je… »', 'stakes', (c) => `${c.o} : « Si tu…, je… »`, (c) => `${c.oE}; a threat: "if you..., I..."`],
@@ -305,8 +305,8 @@ window.FORGE = (() => {
       w: wFr, wE: W[jWant.v].en(en(jWant.t)).replace(/^wants /, ''), px: pillarsOf(x)[0], pxEn: (P[pillarsOf(x)[0]] || {}).exp };
     const L = [], put = (id, kind, part, e, extra = {}) => L.push({ id, kind, part, e, glue: false, ...extra, c: { ...base, ...(extra.c || {}) } });
     const ic = (i) => ({ i: infoFr(i), iE: infoEn(i), s: nm(i.x), sE: en(i.x) });
-    put('hook1', 'hook', 'setup', '🎬', { def: S.inc.k === 'gone' ? 1 : 0 });
-    put('hook2', 'hook', 'setup', '🎬', { def: inc.enter ? 2 : 4 });
+    put('hook1', 'hook', 'setup', '🎬', { defN: S.inc.k === 'gone' ? 'Place vide' : 'Entrée qui fait taire' });
+    put('hook2', 'hook', 'setup', '🎬', { defN: inc.enter ? 'Un nom chuchoté' : 'Avant d’entrer' });
     put('want', 'want', 'setup', W[jWant.v].e);
     if (inc.enter) {
       put('expect', 'expect', 'setup', '🗣️', { glue: true }); put('tease', 'tease', 'setup', '⏰', { glue: true });
@@ -316,10 +316,10 @@ window.FORGE = (() => {
     if (pasts[0]) put('past0', 'past', 'setup', '🕰️', { c: ic(pasts[0]), info: pasts[0] });
     objs.forEach((i, k) => put(`obj${k}`, 'seen', 'setup', IN[i.id].e, { c: ic(i), info: i, hint: true }));
     if (hidden.length) put('plant1', 'plant', 'setup', '🌱', { c: ic(hidden[0]), info: hidden[0], hint: true });
-    cs.slice(1).forEach((o, k) => put(`c${k + 1}`, 'conflict', 'setup', o.e, { c: { o: o.fr, oE: o.en }, def: (k + 1) % 4 }));
+    cs.slice(1).forEach((o, k) => put(`c${k + 1}`, 'conflict', 'setup', o.e, { c: { o: o.fr, oE: o.en }, defN: ['Menace : si tu X, je Y', 'Aveu vulnérable', 'Mention consequences'][k % 3] }));
     if (H('liked') && r.against) put('liked', 'liked', 'setup', '😇');
     if (H('danger')) put('danger', 'danger', 'setup', '🌲');
-    pasts.slice(1).forEach((i, k) => put(`past${k + 1}`, 'past', 'setup', '🕰️', { c: ic(i), info: i, def: 1 }));
+    pasts.slice(1).forEach((i, k) => put(`past${k + 1}`, 'past', 'setup', '🕰️', { c: ic(i), info: i, defN: 'Tell a story' }));
     put('easy', 'easy', 'setup', '↘️');
     if (hidden.length) put('plant2', 'plant', 'setup', '🌱', { c: ic(hidden[hidden.length - 1]), info: hidden[hidden.length - 1], hint: true });
     if (H('gag') && secs[0]) put('gag', 'gag', 'setup', '🤐', { c: ic(secs[0]) });
@@ -351,18 +351,30 @@ window.FORGE = (() => {
     open: { g: ['info'], def: 'Demande qui révèle', fr: (c) => `${c.i} : ouvert`, en: (c) => `${c.iE}: opened at last` },
     twist: { g: ['callback'], def: 'Écho', fr: () => 'Tout prend un autre sens', en: () => 'everything seen before means something else' },
   };
+  Object.assign(K, {
+    hook: { g: ['char', 'rel', 'curiosity', 'stakes'], only: 'hook', fr: () => '…', en: () => '' },
+    expect: { g: ['curiosity'], only: 'expect', def: 'Sa réputation', fr: (c) => `On parle ${de(c.x)}`, en: (c) => `the others talk about ${c.xE} before they appear` },
+    tease: { g: ['curiosity'], only: 'tease', def: 'Dans cinq minutes', fr: (c) => `${c.x} arrive bientôt`, en: (c) => `${c.xE} is coming soon` },
+    gone: { g: ['curiosity'], only: 'gone', def: 'Sort et ne revient pas', fr: (c) => `${c.x} disparaît`, en: (c) => `${c.xE} disappears` },
+    end: { g: ['curiosity'], only: 'end', def: 'Qui, quand, où', fr: () => 'La fin promet la suite', en: () => 'the last line promises what comes next' },
+    cost: { g: ['conseq'], only: 'cost', def: 'Chaise vide', fr: () => 'Ce que ça a coûté', en: () => 'what it cost' },
+    stake: { g: ['stakes'], fr: (c) => c.st, en: (c) => c.stE },
+  });
+  // the concrete way a technique plays here (its words, with the people): the ones Créer knew before (TQ), by name
+  const CT = {}; for (const kd of ['hook', 'expect', 'tease', 'gone', 'cost', 'end']) for (const [n, , fr, en2] of TQ[kd]) CT[n] = [fr, en2];
   const leaves = (list) => (list || []).flatMap((t) => (t.s && t.s.length ? leaves(t.s) : [t]));
   // the ways an event can be done: [{ n, d, g, ex, need, see, give, parts, carrier }]
   function optsOf(ev) {
     const k = K[ev.kind], GS = (window.PLAN && PLAN.GOALS) || [];
-    if (k && GS.length) return k.g.flatMap((g) => { const G2 = GS.find((x) => x.id === g); return G2 ? leaves(G2.tech).map((t) => ({ ...t, g })) : []; });
+    if (k && GS.length) { const L2 = k.g.flatMap((g) => { const G2 = GS.find((x) => x.id === g); return G2 ? leaves(G2.tech).map((t) => ({ ...t, g })) : []; }).filter((t) => (k.only ? t[k.only] : !['hook', 'expect', 'tease', 'gone', 'end', 'cost', 'conseq'].some((f) => t[f]))); if (L2.length) return L2; }
     return (TQ[ev.kind] || []).map(([n, g]) => ({ n, g, d: '' }));
   }
   function withTech(ev) {
-    const list = optsOf(ev), k0 = K[ev.kind], defN = k0 && (typeof k0.def === 'function' ? k0.def(ev.c) : k0.def);
-    const def = ev.def ?? Math.max(0, list.findIndex((t) => t.n === defN));
+    if (ev.kind === 'choice' || ev.kind === 'pick') return { ...ev, k: 0, n: 'Choix', g: '', tech: null, fr: ev.fr || (ev.kind === 'pick' ? `${ev.c.t} ou ${ev.c.d}` : ''), en: ev.en || (ev.kind === 'pick' ? `${ev.c.tE} or ${ev.c.dE}, each side painful to lose` : 'two outcomes the player reads before tapping') };
+    const list = optsOf(ev), k0 = K[ev.kind], defN = k0 && (typeof (ev.defN || k0.def) === 'function' ? k0.def(ev.c) : ev.defN || k0.def);
+    const def = Math.max(0, list.findIndex((t) => t.n === defN));
     const k = ((S.tq[ev.id] ?? def) % list.length + list.length) % list.length, t = list[k];
-    if (k0 && window.PLAN) return { ...ev, k, n: t.n, g: t.g, tech: t, fr: k0.fr(ev.c), en: `${k0.en(ev.c)}; done with "${t.n}": ${t.d}` };
+    if (k0 && window.PLAN) return { ...ev, k, n: t.n, g: t.g, tech: t, fr: CT[t.n] ? CT[t.n][0](ev.c) : k0.fr(ev.c), en: CT[t.n] ? CT[t.n][1](ev.c) : `${k0.en(ev.c)}; done with "${t.n}": ${t.d}` };
     const [, , fr, enF] = TQ[ev.kind][k];
     return { ...ev, k, n: t.n, g: t.g, tech: t, fr: fr(ev.c), en: enF(ev.c) };
   }
@@ -386,7 +398,7 @@ window.FORGE = (() => {
   // two options, each with what it causes; that consequence opens the next episode (the one played, once it's marked, or
   // both). The choices made weigh on the final one ----
   const ISSUE = ['conflict', 'liked', 'easy', 'gag', 'danger', 'reveal', 'enter', 'gone', 'past', 'want', 'seen', 'plant'];
-  const BUT = new Set(['conflict', 'liked', 'danger', 'easy', 'gag', 'reveal', 'clock', 'gone', 'pick']);
+  const BUT = new Set(['stake', 'conflict', 'liked', 'danger', 'easy', 'gag', 'reveal', 'clock', 'gone', 'pick']);
   const link = (ev) => (BUT.has(ev.kind) ? ['mais', 'But'] : ['donc', 'So']);
   // [option, what it causes (fr), (en)] × 2, from the issue's people
   const OPT = {
@@ -415,7 +427,7 @@ window.FORGE = (() => {
     if (k === 'gone') { add('cur', `Où est ${c.x} ?`, `where is ${c.xE}?`); add('moved', `${c.x} disparaît`, `${c.xE} disappears`); }
     if (k === 'expect') add('cur', `Qui est ${c.x} ?`, `who is ${c.xE}?`);
     if (k === 'tease') add('cur', `${c.x} arrive : que va-t-il faire ?`, `${c.xE} is coming: what will they do?`);
-    if (k === 'hook') { const h = ev.k;
+    if (k === 'hook') { const h = ['Entrée qui fait taire', 'Place vide', 'Un nom chuchoté', 'Lettre cachée', 'Avant d’entrer', 'Taquinerie de trop'].indexOf(ev.n);
       if (h === 0) add('eng', `${c.t}, attirance : entrée qui fait taire`, `${c.tE}, attraction: the room goes quiet`);
       if (h === 5) add('eng', `${J2} × ${c.t}, attirance : taquinerie de trop`, `justin and ${c.tE}, attraction: a tease too long`);
       if (h === 1) add('cur', 'Qui manque ?', 'who is missing?'); if (h === 2) add('cur', 'Qui arrive ce soir ?', 'who arrives tonight?');
@@ -433,6 +445,7 @@ window.FORGE = (() => {
     if (k === 'conseq' && c.picked) add('moved', ev.fr, ev.en);
     if (k === 'pick') add('moved', `Choix final : ${c.t} ou ${c.d}`, `the final choice: ${c.tE} or ${c.dE}`);
     if (k === 'cost') add('moved', 'Ce que le choix a coûté', 'what the choice cost');
+    if (k === 'stake') add('stake', c.st, c.stE);
     return g;
   }
   const LED = [['eng', '❤️', 'Engagé dans les persos et les liens : quoi, et par quelle technique'], ['cur', '❓', 'Curiosité : les questions ouvertes'],
@@ -449,8 +462,12 @@ window.FORGE = (() => {
         const fr = pk2 != null ? o[pk2][1] : `Si « ${o[0][0]} » : ${o[0][1]} · Si « ${o[1][0]} » : ${o[1][1]}`;
         const en2 = pk2 != null ? `because justin chose "${o[pk2][0]}": ${o[pk2][2]}` : `depending on the last choice: if "${o[0][0]}", ${o[0][2]}; if "${o[1][0]}", ${o[1][2]}`;
         if (pk2 != null) built.push([`« ${o[pk2][0]} »`, o[pk2][0]]);
-        list.unshift({ id: `cq${n}`, kind: 'conseq', part: 'setup', e: '↪️', fr, en: en2, n: 'La conséquence du choix', g: 'stakes', k: 0, c: { picked: pk2 != null } }); prev = null; }
+        list.unshift({ id: `cq${n}`, kind: 'conseq', part: 'setup', e: '↪️', fr, en: en2, n: 'La conséquence, tout de suite', g: 'conseq', k: 0, c: { picked: pk2 != null } }); prev = null; }
       const pick = list.find((x) => x.kind === 'pick');
+      if (pick) { const c = pick.c, at = list.indexOf(pick);
+        const side = (i, defN, st, stE) => withTech({ id: `pick${'ab'[i]}`, kind: 'stake', part: 'crisis', e: ['🅰️', '🅱️'][i], defN, choiceOf: 'pick', c: { ...c, st, stE } });
+        list.splice(at, 0, side(0, 'Aveu vulnérable', `Si ${c.t} : ${c.d} est perdu·e pour lui`, `the stake if he chooses ${c.tE}: he loses ${c.dE}`),
+          side(1, 'Menace : si tu X, je Y', `Si ${c.d} : ${c.t} s’éloigne${c.a && c.a !== c.t ? ` avec ${c.a}` : ''}`, `the stake if he chooses ${c.dE}: ${c.tE} drifts away${c.aE && c.a !== c.t ? ` with ${c.aE}` : ''}`)); }
       if (pick && built.length) { pick.en += `; what his earlier choices built weighs on it (${built.map((b) => b[1]).join(', ')})`; pick.built = built.map((b) => b[0]); }
       if (!has('crisis') && !has('end')) { ch++;
         // the issue: the strongest one of the episode (a conflict before a lie before a secret...), not the last choice's again
@@ -459,7 +476,10 @@ window.FORGE = (() => {
         const opts = (OPT[issue.kind] || OPT.want)(issue.c);
         const chEv = withTech({ id: `ch${ch}`, kind: 'choice', part: 'choice', e: '⚖️', choice: 1, c: {}, opts, issue: issue.id });
         chEv.fr = `${opts[0][0]} / ${opts[1][0]}`; chEv.en = `"${opts[0][0]}" (then ${opts[0][2]}) or "${opts[1][0]}" (then ${opts[1][2]}); ${chEv.en}`;
-        list.push(chEv); prev = chEv; }
+        // the stakes of each side, shown right before the choice (03/11): the more each side weighs, the stronger the choice
+        const stk = (i, defN) => withTech({ id: `${chEv.id}${'ab'[i]}`, kind: 'stake', part: 'setup', e: ['🅰️', '🅱️'][i], defN, choiceOf: chEv.id,
+          c: { ...issue.c, st: `Si « ${opts[i][0]} » : ${opts[i][1]}`, stE: `the stake if he chooses "${opts[i][0]}": ${opts[i][2]} (shown before the choice: the player knows what this side costs)` } });
+        list.push(stk(0, 'Show character positioning'), stk(1, 'Menace : si tu X, je Y'), chEv); prev = chEv; }
       // what the episode leaves the audience with
       const led = { eng: [], cur: [], stake: [], moved: [] };
       for (const ev of list) { const g = gives(ev); for (const [key] of LED) if (g[key]) led[key].push(...g[key]); }
@@ -495,6 +515,7 @@ window.FORGE = (() => {
     pick: { base: [['Impossible choice', 'impossibleChoice']], by: [[['Conflicting desire / goals', 'conflictingDesire']], [['Threat', 'threat']], [['Stakes by relationship', 'stakesRel']]] },
     choice: { base: [['Impossible choice', 'impossibleChoice']], by: [[['Show relational consequence', 'relConsequence']], [['Threat', 'threat']], [['Direct confession / threat', 'directConfession']]] },
     conseq: { base: [['Show consequences', 'showConsequences']] },
+    stake: { base: [['Raise stakes', 'raiseStakes'], ['Impossible choice', 'impossibleChoice']], by: [] },
     cost: { base: [['Show painful consequences', 'painfulConsequences']] },
     end: { base: [['Open loop', 'openLoop']] },
   };
@@ -536,7 +557,7 @@ window.FORGE = (() => {
       if (ev.info) b[ev.hint ? 'hints' : 'reveals'] = [iid(ev.info)];
       return b; };
     const orig = ep.list.slice(), epBeats = ep.list.map((ev) => beat(ev, 'r')); k = 0;
-    epBeats.forEach((b, j) => { if (j && !b.kind) b.what = (link(ep.list[j])[0] === 'mais' ? 'Mais : ' : 'Donc : ') + b.what; });
+    epBeats.forEach((b, j) => { if (j && !b.kind && ep.list[j].kind !== 'stake') b.what = (link(ep.list[j])[0] === 'mais' ? 'Mais : ' : 'Donc : ') + b.what; });
     // one line, two jobs (03/11): a moment that can ride in another (a seed, a planted question) climbs into the latest
     // carrier before it (Tell a story, Shared memory, Show contrast...) instead of having its own rectangle
     const evOf = (b) => ep.list[epBeats.indexOf(b)], carrierBefore = (b) => { for (let q = epBeats.indexOf(b) - 1; q >= 0; q--) { const e2 = ep.list[q]; if (e2 && e2.tech && e2.tech.carrier && !epBeats[q].kind) return epBeats[q]; } return null; };
@@ -546,7 +567,7 @@ window.FORGE = (() => {
     const laterEvs = next ? next.list.filter((ev) => !ev.choice).slice(0, 2) : [], laterBeats = laterEvs.map((ev) => beat(ev, 'f'));
     const all = [...orig, ...laterEvs], links = [], ln = (a, b, label) => { if (ids[a] && ids[b]) links.push({ from: ids[a], to: ids[b], label }); };
     ln('expect', 'inc', 'La promesse : on l’attend'); ln('tease', 'inc', 'Annoncé : il arrive');
-    ep.list.forEach((ev, j) => { const prev = ep.list[j - 1]; if ((ev.choice || ev.kind === 'pick') && prev && prev.g === 'stakes') ln(prev.id, ev.id, 'L’enjeu du choix'); });
+    for (const ev of orig) if (ev.kind === 'stake') ln(ev.id, ev.choiceOf, `L’enjeu ${ev.id.endsWith('a') ? 'A' : 'B'}`);
     for (const ev of all) if (ev.kind === 'plant' || ev.kind === 'seen') { const to = all.find((x) => (x.kind === 'reveal' || x.kind === 'open') && x.info === ev.info); if (to) ln(ev.id, to.id, ev.kind === 'plant' ? 'Planté → révélé' : 'Vu → ouvert'); }
     // a technique with moments (Coincé devant tous, Seed & payoff): its « now » is the event; the others are placed before
     // it by rule (early: as early as possible, in a carrier if it can ride; mid: between; before: right before), linked
@@ -554,14 +575,21 @@ window.FORGE = (() => {
     for (const ev of ep.list.slice()) {
       const parts = ev.tech && ev.tech.parts; if (!parts || !ids[ev.id]) continue;
       const at = () => epBeats.findIndex((b) => b.id === ids[ev.id]), chain = [];
-      const mk = (pt) => ({ id: 't' + (++t), goals: ev.g ? [ev.g] : [], tech: ev.n, lines: 2, what: `${pt.n}${ev.c && ev.c.x && ev.kind === 'enter' ? ` (sur ${ev.c.x})` : ''} : ${pt.d}` });
+      // what each moment says here, with the people: the hard question is where the newcomer was
+      // (never his hidden info: it comes out later, the question must not spoil it)
+      const c = ev.c || {}, Q = `Où était ${c.x} cette nuit ?`;
+      const say = { q: `La question difficile : « ${Q} » Personne n’a la réponse`, try: `Chacun essaie d’y répondre : ${c.d} le défend, ${c.t} doute ; aucune réponse ne tient, ça monte`,
+        ask: `${c.d} lui pose la question devant tous : « ${Q} » Tout le monde attend` };
+      const mk = (pt) => ({ id: 't' + (++t), goals: ev.g ? [ev.g] : [], tech: ev.n, lines: 2, what: ev.kind === 'enter' && say[pt.id] ? say[pt.id] : `${pt.n} : ${pt.d}` });
+      // an arrival: the question is asked once he's there, and his answer is the moment (one rectangle)
+      if (ev.kind === 'enter' && parts.some((pt) => pt.id === 'ask')) { const nb = epBeats.find((b) => b.id === ids[ev.id]); nb.what += ` ; ${c.d} lui demande devant tous : « ${Q} » ; sa réponse, inattendue, lui rend le contrôle`; nb.lines = 4; }
       for (const pt of parts) {
         if (pt.at === 'now') continue;
         if (pt.at === 'early' && ev.kind === 'reveal' && planted) continue;   // its seed is already a 🌱
         if (pt.at === 'early') { const cr = pt.carry ? epBeats.slice(0, at()).find((b) => { const e2 = evOf(b); return e2 && e2.tech && e2.tech.carrier && !b.kind; }) : null;
           if (cr) { (cr.carries = cr.carries || []).push({ tech: ev.n, part: pt.n }); chain.push(cr.id); } else { const nb = mk(pt); epBeats.splice(Math.min(1, at()), 0, nb); chain.push(nb.id); } }
         if (pt.at === 'mid') { const from = chain.length ? epBeats.findIndex((b) => b.id === chain[chain.length - 1]) + 1 : 0, nb = mk(pt); epBeats.splice(Math.max(from, Math.floor((from + at()) / 2)), 0, nb); chain.push(nb.id); }
-        if (pt.at === 'before') { const nb = mk(pt); epBeats.splice(at(), 0, nb); chain.push(nb.id); }
+        if (pt.at === 'before' && !(ev.kind === 'enter' && pt.id === 'ask')) { const nb = mk(pt); epBeats.splice(at(), 0, nb); chain.push(nb.id); }
       }
       chain.push(ids[ev.id]);
       for (let q = 0; q < chain.length - 1; q++) if (chain[q] !== chain[q + 1]) links.push({ from: chain[q], to: chain[q + 1], label: `${ev.n} : ${(parts.filter((pt) => pt.at !== 'now')[q] || parts[parts.length - 1]).n}` });
@@ -682,7 +710,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     const ch = ev.choice || ev.kind === 'pick', lk = k ? `<i class="fLk ${link(ev)[0]}" data-tip="${link(ev)[0] === 'mais' ? 'Mais : ça se complique' : 'Donc : la conséquence'}">${link(ev)[0]}</i>` : '';
     const opts = ev.choice ? `<span class="fOpts">${ev.opts.map((o, i) => `<button type="button" class="${S.picked[ev.id] === i ? 'on' : ''}" data-pickopt="${ev.id}:${i}" data-tip="${esc(`${o[0]}\n→ ${o[1]}\nUn tap = c’est ce qu’il a choisi`)}">${esc(o[0])}<small>→ ${esc(o[1])}</small></button>`).join('')}</span>` : '';
     const built = ev.built ? `<small class="fBuilt">Pèse : ${esc(ev.built.join(' · '))}</small>` : '';
-    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${optsOf(ev).length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${optsOf(ev).length})` : ''}`)}"><b>${ev.e}</b>${esc(ev.choice ? 'Choix' : ev.fr)}${K[ev.kind] ? `<em class="fTn">${esc(ev.n)}</em>` : ''}</button>${PATHS[ev.kind] ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${opts}${built}`;
+    return `<span class="fRowEv">${lk}<button type="button" class="fEv${ch ? ' ch' : ''}${ev.kind === 'conseq' ? ' cq' : ''}" ${ev.kind === 'conseq' || ch ? '' : `data-tq="${ev.id}"`} data-tip="${esc(`${ev.n}${optsOf(ev).length > 1 ? `\nUn tap = une autre façon (${ev.k + 1}/${optsOf(ev).length})` : ''}`)}"><b>${ev.e}</b><span>${esc(ev.choice ? 'Choix' : ev.fr)}${optsOf(ev).length && !ch ? `<em class="fTn">${esc(ev.n)}</em>` : ''}</span></button>${PATHS[ev.kind] && !ch ? `<button type="button" class="fInfo" data-det="${ev.id}" data-tip="Plus de détails : d’où vient la technique, instructions, exemple">ⓘ</button>` : ''}${ev.i != null && list[k + 1] && list[k + 1].i != null ? `<button type="button" class="fGap" data-cut="${ev.i}" data-tip="Couper l’épisode ici">✂</button>` : ''}</span>${opts}${built}`;
   }
   function render() {
     if (!el) return;
