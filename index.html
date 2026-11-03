@@ -1123,6 +1123,9 @@ html.locked #keyBtn { display: grid; place-items: center; }
 .fPic img { width: 100%; height: 100%; object-fit: contain; }
 .fPic i { position: absolute; left: .4em; top: .4em; width: 1.6em; height: 1.6em; border-radius: 50%; background: #000; color: #fff; display: grid; place-items: center; font-style: normal; font-size: 1.3em; font-weight: 800; }
 .fPics { display: flex; gap: .5em; flex: none; }
+.fCells { display: flex; gap: .4em; }
+.fCells img { height: 7em; background: #00c853; border-radius: .6em; object-fit: contain; }
+.fUp { font: inherit; font-size: 1.7em; padding: .5em .9em; border-radius: 2em; background: #ff9f0a; color: #000; font-weight: 700; cursor: pointer; }
 .fWhy { margin: 0; font-size: 1.5em; color: #98989d; }
 .fSheetR { display: flex; flex-direction: column; gap: .8em; min-width: 0; }
 .fSheetR b { font-size: 2em; display: flex; flex-wrap: wrap; gap: .2em .6em; align-items: baseline; }
@@ -4841,6 +4844,9 @@ window.PLAN_PLAY = (json, title) => {
     const ids = mine.slice(0, slots.length).map((c) => c.id);
     SCENES.plan = { ...base, spots: { justin: base.spots.justin }, face: { justin: base.face.justin } };
     ids.forEach((id, i) => { SCENES.plan.spots[id] = base.spots[slots[i]]; SCENES.plan.face[id] = base.face[slots[i]]; });
+    // a duo sheet (Créer): the picture of two of them, standing between their two spots, as it was drawn (never turned)
+    for (const [sid, sp] of Object.entries(SPRITES)) if (sp.duo) { const A = SCENES.plan.spots[sp.duo[0]], B = SCENES.plan.spots[sp.duo[1]];
+      if (A && B) { SCENES.plan.spots[sid] = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2]; SCENES.plan.face[sid] = 'r'; } }
     json = { ...json, scene: 'plan', cast: ids, poses: Object.fromEntries(mine.map((c) => [c.id, c.poses])) };
     cast = { justin: CAST.justin, ...Object.fromEntries(mine.map((c, i) => [c.id, { name: c.name, sprite: c.sprite, color: ['#7a3fb0', '#2c6fb3', '#b3261e'][i % 3] }])) };
   }

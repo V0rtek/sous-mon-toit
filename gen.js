@@ -137,10 +137,25 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
       const obj = s.hold !== undefined ? [{ hold: { [s.who]: s.hold || null } }] : [], put = s.put ? [{ put: { [s.who]: s.put } }] : [];
       return [...out, ...obj, ...put, say(s.who, posesOf(s.who).includes(s.pose) ? s.pose : (j.rest || 'listen'), clip(s.text, 160), to)];
     };
+    // a duo (forge's uploaded sheets: two characters in ONE picture): on screen it takes their place, nobody speaks, a narration
+    // says what happens; they come back for the next line. Anything that doesn't fit (no such sheet, no spot) is just skipped
+    const speaks = new Set(), walkS = (list) => (list || []).forEach((s) => { if (s && s.who) speaks.add(s.who); if (s && Array.isArray(s.choice)) s.choice.forEach((o) => walkS(o && o.then)); });
+    walkS(j.steps);
+    let inDuo = null;   // the duo on screen now: { sid, who: [a, b] }
+    const back = () => { if (!inDuo) return []; const d = inDuo, r = [{ exit: d.sid }, { enter: Object.fromEntries(d.who.filter((x) => speaks.has(x) || x === 'justin').map((x) => [x, j.rest || 'listen'])) }]; inDuo = null; last = null; return r; };
+    const duoStep = (s) => {
+      const sp = window.SPRITES && SPRITES[s.duo], at = window.SCENES && SCENES[sc] && SCENES[sc].spots;
+      if (!own || !sp || !sp.duo || !sp.poses[s.pose] || !at || !at[s.duo] || !clip(s.text, 200)) return [];
+      const out = inDuo && inDuo.sid !== s.duo ? back() : [];
+      if (!inDuo) { out.push(...sp.duo.map((x) => ({ exit: x })), { enter: { [s.duo]: s.pose } }); inDuo = { sid: s.duo, who: sp.duo }; }
+      else out.push({ poses: { [s.duo]: s.pose } });
+      last = null; return [...out, cam('one', s.duo), narr(clip(s.text, 160))];
+    };
     const steps = [], saysN = { n: 0 }, choices = { n: 0 }, most = j.seed || j.episode ? 3 : 2;   // an episode (ep1.js has a seed, the scene plan's prompt 2 says episode): 3 choices
     for (const s of j.steps) {
       if (choices.n >= most) break;   // nothing after the last choice: the story stops on its hook
       if (s && Array.isArray(s.choice)) {
+        steps.push(...back());
         const prev = last && last !== 'justin' ? last : undefined;   // who justin answers
         const opts = s.choice.map((o) => {
           const full = clip(o && o.t, 200), then = [], pre = prev;
@@ -148,18 +163,17 @@ Test before you reply: count the characters of every "t". Over 27 = say it short
           const t = shorten(full);
           last = null;
           then.push(cam('one', 'justin'), say('justin', j.rest || 'explaining', clip(o.say, 160) || full, pre ? { to: pre } : undefined)); last = 'justin';
-          inChoice = true; for (const l of o.then) then.push(...line(l, [...cast, 'justin'])); inChoice = false;
+          inChoice = true; for (const l of o.then) then.push(...(l && l.duo ? duoStep(l) : line(l, [...cast, 'justin']))); then.push(...back()); inChoice = false;
           return then.length > 2 ? { t, intent: clip(o.tone, 20), then } : null;
         }).filter(Boolean);
         if (opts.length >= 2) { steps.push({ choice: opts.slice(0, 3) }); choices.n++; last = null; }
-      } else { const l = line(s, [...cast, 'justin']); steps.push(...l); if (!choices.n) saysN.n += l.some((x) => x.say || x.think) ? 1 : 0; }
+      } else if (s && s.duo) steps.push(...duoStep(s));
+      else { const l = line(s, [...cast, 'justin']); if (l.length) steps.push(...back()); steps.push(...l); if (!choices.n) saysN.n += l.some((x) => x.say || x.think) ? 1 : 0; }
     }
     if (saysN.n < 3) throw new Error('Taps 1-4 come before the first choice: justin (inner voice), the threat, justin (the stakes), the ultimatum.');
     if (!choices.n) throw new Error('There must be 2 "choice" steps (tap 5 and tap 10), each with 2 options and a "then" list.');
     const est = window.SCENES && SCENES[sc] && SCENES[sc].establish;   // a decor seen from afar: it opens the scene and closes it
     // only who speaks is in the scene: nobody stands there without a word
-    const speaks = new Set(), walk = (list) => (list || []).forEach((s) => { if (s && s.who) speaks.add(s.who); if (s && Array.isArray(s.choice)) s.choice.forEach((o) => walk(o && o.then)); });
-    walk(j.steps);
     return [
       scene(sc, Object.fromEntries([...cast.filter((id) => speaks.has(id)), 'justin'].map((id) => [id, j.rest || 'listen']))),
       cam('wide'), est ? { establish: est, ms: 3400 } : { fade: 'in', ms: 700 },

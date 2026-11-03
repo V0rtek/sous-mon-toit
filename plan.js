@@ -577,7 +577,7 @@ D. No line that only carries information, greets or explains a feeling: show it 
 E. No line talks to the player or comments on the story ("You're wondering what this is about").
 H. Never more than 2 lines in a row from the same character: what comes out, comes out in an exchange (a question, a reproach, a disagreement), never in a speech.
 I. When a line hurts the main character (the past, a reproach), he answers it: a line or a choice, never silence.
-G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate). If something matters, a line says what it is, plainly, the first time.
+G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate), except what an EXTRA SHOT below shows. If something matters, a line says what it is, plainly, the first time.
 
 THE FIRST AND THE LAST LINE:
 - The first line is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen. The player asks "why?". Flat: "The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?" -> works: Nora: "If he sits at this table, I'm leaving it." / "You kept my seat. Even after what I did?"
@@ -585,7 +585,7 @@ THE FIRST AND THE LAST LINE:
 THE MAIN CHARACTER'S DESIRE: in the rectangle that shows it, justin says it himself, out loud, to someone, with its reason ("One day I'll play a real stage. Not this bar."), and someone reacts. Never in his head, never "tonight".
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
 CHOICES: before tapping, the player knows what each option means: an option makes sense on its own, and a lie or a secret is only an option if the player knows the truth. "t" = the button, a short line in his voice (what he says, never the plan's attitude copied), 27 characters max with spaces; "say" = what he actually says after the tap, under 70 characters, not a copy of "t"; "tone" = one word; "then" = the lines after he speaks.
-${window.COUNTER && COUNTER.on ? COUNTER.posesText() : 'POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those.'} Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.
+${window.COUNTER && COUNTER.on ? COUNTER.posesText() : 'POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those.'} Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.${window.EXTRAS ? EXTRAS.text((plan.characters || []).map((c) => c.id)) : ''}
 
 THE JSON (exactly this shape):
 {"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",

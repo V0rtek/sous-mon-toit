@@ -73,15 +73,15 @@
     return { W, H, d, alpha, cx };
   }
   // a sheet: its 6 cells, left to right, top row first
-  async function cut(file, kind, tell = () => {}) {
-    const K = KINDS[kind], P = await key(file), out = [];
-    for (let n = 0; n < 6; n++) {
-      tell(`Découpe ${n + 1}/6…`); await breathe();
-      const c = n % 3, r = (n / 3) | 0, cw = P.W / 3, ch = P.H / 2;
+  async function cut(file, kind, tell = () => {}, spec) {
+    const K = spec || KINDS[kind], P = await key(file), out = [], [gc, gr] = K.grid || [3, 2], N = K.poses.length;   // spec: a sheet of its own (Créer: 2×2, two people or a person and an object)
+    for (let n = 0; n < N; n++) {
+      tell(`Découpe ${n + 1}/${N}…`); await breathe();
+      const c = n % gc, r = (n / gc) | 0, cw = P.W / gc, ch = P.H / gr;
       // a figure can lean past its cell (a raised mug): search a little wider, keep the blobs of this cell's figure
       const x0 = Math.max(0, Math.round(c * cw - cw * 0.05)), x1 = Math.min(P.W, Math.round((c + 1) * cw + cw * 0.05));
       const cell = pick(P, x0, Math.round(r * ch), x1, Math.round((r + 1) * ch), c * cw, (c + 1) * cw, K.poses[n]);
-      if (!cell) throw new Error(`Personne dans la case ${n + 1} : 3 colonnes × 2 rangées sur fond vert.`);
+      if (!cell) throw new Error(`Personne dans la case ${n + 1} : ${gc} colonnes × ${gr} rangées sur fond vert.`);
       out.push(cell);
     }
     return out;
@@ -189,6 +189,9 @@
     // placed by hand (Mini-jeux › Placer un objet, sent to Claude): per object, per pose, {x, y, w, r}
     for (const [o, poses] of Object.entries(data.place || {})) { sp.place = sp.place || {}; sp.place[o] = { ...(sp.place[o] || {}), ...poses }; }
     if (data.slots) sp.slots = { ...(sp.slots || {}), ...data.slots };
+    // Créer's sheets (2×2): duo = a picture of TWO characters (it takes their place on screen); extra = what each sheet shows, cell by cell
+    if (data.duo) sp.duo = data.duo;
+    if (data.extra) sp.extra = { ...(sp.extra || {}), ...data.extra };
     // an object layer drawn by hand on the sheet: per object, per pose, its picture (the pose's size, over it)
     // layers[obj][pose] = { src, box: [left, top, width, height] as fractions of the pose's picture }
     for (const [obj, boxes] of Object.entries(data.layers || {})) { sp.layers = sp.layers || {}; sp.layers[obj] = sp.layers[obj] || {};
@@ -222,6 +225,8 @@
     const list = (await read('chars/imports.json')) || [];
     const data = { ...old, v: Date.now(), name: name || old.name, ext: 'png', grip: { ...(old.grip || {}), ...(sp.grip || {}) }, rects: { ...(old.rects || {}), ...(sp.rects || {}) }, slots: { ...(old.slots || {}), ...(sp.slots || {}) }, sheets: [...new Set([...(old.sheets || []), ...(KINDS[kind] ? [kind] : [])])], poses: { ...old.poses, ...sp.poses } };
     if (sp.refH) data.refH = sp.refH;
+    if (sp.duo) data.duo = sp.duo;
+    if (sp.extra) data.extra = { ...(old.extra || {}), ...sp.extra };
     if (Object.keys(sp.half.poses).length) data.half = { unit: sp.half.poses[cells[0].pose][3], belt: sp.half.belt, poses: { ...(old.half || {}).poses, ...sp.half.poses }, full: { ...(old.half || {}).full, ...sp.half.full } };
     const files = [];
     for (const c of cells) {
@@ -274,6 +279,22 @@
       const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o; c.src = o.toDataURL('image/png');
       last = { id, name: (window.CAST && CAST[id] && CAST[id].name) || id, kind: null, cells: [c], sp, from: 'la Banque' };
       return [{ pose, src: c.src, grip: c.grip && [c.grip[0] / c.w, c.grip[1] / c.h] }];
+    },
+    // a sheet Créer asks for (2×2, names per cell): two characters in one picture (spec.duo = [a, b], its own sprite), or one
+    // character with an object (spec.solo: its poses join his own, at the height of his listen). spec.extra = what it shows
+    async extra(file, spec, tell) {
+      const cells = await cut(file, null, tell, { cut: 'full', grid: [2, 2], poses: spec.poses }), sp = measure('full', cells);
+      if (spec.solo) {   // his own scale: the cells' median height = his listen's
+        const ref = SPRITES[spec.id] && SPRITES[spec.id].poses.listen && SPRITES[spec.id].poses.listen[1];
+        if (ref) { const k = ref / median(cells.map((c) => c.h)); for (const c of cells) { c.scale = k; sp.poses[c.pose] = [Math.round(c.w * k), Math.round(c.h * k)]; } }
+        delete sp.refH;
+      }
+      for (const c of cells) { await breathe(); const o = document.createElement('canvas'); o.width = Math.round(c.w * c.scale); o.height = Math.round(c.h * c.scale);
+        const ox = o.getContext('2d'); ox.imageSmoothingQuality = 'high'; ox.drawImage(c.canvas, 0, 0, o.width, o.height); c.out = o; c.src = o.toDataURL('image/png'); }
+      if (spec.duo) sp.duo = spec.duo;
+      sp.extra = spec.extra;
+      last = { id: spec.id, name: spec.name, kind: null, cells, sp, from: 'Créer' };
+      return cells.map((c) => ({ pose: c.pose, src: c.src }));
     },
     lastRects: () => last && last.sp.rects,
     // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)

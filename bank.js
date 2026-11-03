@@ -133,7 +133,7 @@ window.BANK = {
       if (open) return `<div class="ncTop open"><button type="button" class="ncToggle" data-nctoggle="1"><b>Nouveau perso</b><em>✕</em></button><div class="ncIn">${BANK.newChar()}</div></div>`;
       return `<div class="ncTop"><button type="button" class="ncToggle" data-nctoggle="1"><b>＋ Nouveau perso</b></button></div>${BANK.keysHtml()}<div id="bankDrafts">${BANK.draftsHtml()}</div>`
         // the newest imported first, then the others
-        + Object.entries(window.SPRITES || {}).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
+        + Object.entries(window.SPRITES || {}).filter(([, sp0]) => !sp0.duo).sort(([a], [b]) => { const r = (id) => { const k = (window.IMPORTED || []).indexOf(id); return k < 0 ? -1 : k; }; return r(b) - r(a); }).map(([id, sp]) => {
         const half = (sp.half || {}).poses || {}, poses = Object.keys(sp.poses);
         return `<section class="bkChar"><h3>${esc(nameOf(id))} <small>${poses.length} poses</small><button type="button" class="bkEdit" data-edit="${id}">Modifier</button></h3><div class="bkRow">${poses.map((p) =>
           `<button type="button" class="bkPose${half[p] ? ' cut' : ''}" data-img="${src(id, p)}"><img loading="lazy" src="${src(id, p)}" alt=""><span>${esc(p)}${half[p] ? '<i>coupée</i>' : ''}</span></button>`).join('')}</div></section>`;

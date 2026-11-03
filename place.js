@@ -14,7 +14,7 @@
 
   const src = (id, p) => (typeof MADE !== 'undefined' && MADE[id] && MADE[id][p]) || `chars/${id}/${p}.webp`;
   let st = { id: null, pose: null, obj: 'biere', x: 0.7, y: 0.4, w: 0.18, r: 0 };
-  const chars = () => Object.keys(SPRITES).filter((id) => !['kai', 'leo'].includes(id) && Object.keys(SPRITES[id].poses).length);
+  const chars = () => Object.keys(SPRITES).filter((id) => !['kai', 'leo'].includes(id) && !SPRITES[id].duo && Object.keys(SPRITES[id].poses).length);
   const posesOf = (id) => Object.keys((SPRITES[id] || {}).poses || {}).sort((a, b) => (/^hold_/.test(b) - /^hold_/.test(a)));
   // where it was placed already (this phone, else the character's own), or a fair start
   function recall() {
