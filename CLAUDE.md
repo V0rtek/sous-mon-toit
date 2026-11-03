@@ -6,3 +6,6 @@ Pas de validateur qui bloque ou liste des erreurs (demandé par Justin le 30/10)
 
 # Façade
 Par défaut le lien montre seulement Full demo (Infos, Plus et leurs écrans cachés). Le cadenas en bas du menu demande le code ; le navigateur s'en souvient. Code : `j` (demandé par Justin le 02/11). Dans `index.html` il n'y a que son hash (`KEY_HASH`) : pour changer le code, recalculer le hash avec `keyHash`. Le repo est public : c'est un mur pour les visiteurs, pas une vraie sécurité.
+
+# Créer (le moteur d'histoire)
+Avant de toucher à `forge.js`, aux techniques de `plan.js` ou à la graine dans `act.js` : lire `CREER.md` (les principes de Justin, ce que fait le code, ce qui n'est pas fait).

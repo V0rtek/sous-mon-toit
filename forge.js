@@ -411,7 +411,7 @@ window.FORGE = (() => {
     const { C, X } = story(), [ca, cb] = X, tgt = [ca, cb].find((d) => d && d.t) || null;
     const target = tgt ? tgt.t : S.cast[0], vs = C.filter((c) => c.a === J || c.b === J).map((c) => (c.a === J ? c.b : c.a)).find((id) => id !== J && id !== target) || null;
     const dear = [ca, cb].map((d) => d && d.k === 'protect' && d.t).find(Boolean) || S.cast.find((id) => id !== target && id !== vs && (R[rel(J, id)] || {}).good) || null;
-    return { target, against: vs, dear, a: target, b: dear || vs || S.cast.find((id) => id !== target) || target };
+    return { target, against: vs, dear, a: target, b: [dear, vs, ...S.cast].find((id) => id && id !== target) || target };
   }
   const hardOk = (h) => (h === 'liked' ? !!roles().against : h === 'danger' ? desires().some((d) => ['find', 'free', 'alive'].includes(d.k) && d.s >= 2) : h === 'gag' ? kinds('secret').length > 0 : true);
 
@@ -1024,7 +1024,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
       + layer('2', 'Comment', '1. Le moteur : ce qui lance et bloque l’histoire. 2. Les techniques de plot.')
       + `<section class="fConf" data-tip="Les conflits : deux désirs qui ne peuvent pas gagner tous les deux (déduits des désirs, des liens, des événements)">${cs.length ? cs.map((c) => `<div>${mini(c.a)}<b>${c.e}</b>${mini(c.b)}<span class="fCt">${esc(c.fr)}</span></div>`).join('') : '<div class="none">⚠️ <span class="fCt">Pas de conflit : donne des 🎯 qui se croisent</span></div>'}</section>`
       + (ST.PL.length ? `<section class="fPls" data-tip="Les plotlines : un désir fort et ses conflits. Celles de Justin sont les lignes principales ; les autres courent « pendant ce temps »">${ST.PL.map((p2, k) => `<div class="${p2.main ? 'main' : ''}" style="--c:${LANE[k % LANE.length]}"><i></i>${mini(p2.d.who)}<b>${DK[p2.d.k].e}</b><span class="fCt">${esc(`${DK[p2.d.k].n}${p2.d.t ? ' ' + tName(p2.d) : ''}`)}</span><em>${p2.cs.map((c) => c.e).join('')}</em></div>`).join('')}</section>` : '')
-      + (ST.X[0] && ST.X[1] ? `<section class="fClim" data-tip="Le climax : Justin choisit entre deux de ses désirs. Tous les épisodes y mènent. Un tap sur un côté = un autre désir"><b>🏁</b><button type="button" data-clim="0">${DK[ST.X[0].k].e} ${esc(cap(lab(ST.X[0])))}</button><span>ou</span><button type="button" data-clim="1">${DK[ST.X[1].k].e} ${esc(lab(ST.X[1]))}</button><span>?</span></section>` : '')
+      + (ST.X[0] && ST.X[1] ? `<section class="fClim" data-tip="Le climax : Justin choisit entre deux de ses désirs. Tous les épisodes y mènent. Un tap sur un côté = un autre désir ; un tap sur 🏁 = le climax automatique"><button type="button" class="fClimR" data-climauto="1">🏁${S.climax ? '↺' : ''}</button><button type="button" data-clim="0">${DK[ST.X[0].k].e} ${esc(cap(lab(ST.X[0])))}</button><span>ou</span><button type="button" data-clim="1">${DK[ST.X[1].k].e} ${esc(lab(ST.X[1]))}</button><span>?</span></section>` : '')
       + row('🧱', HARD.map((h) => { const ok = hardOk(h.id); return chip(`data-hard="${h.id}"`, h.e, h.n, ok && !!S.hard[h.id], '#bf5af2', ok ? h.d : `${h.d}\n${h.need}`, !ok); }).join(''), 'Pourquoi c’est dur (plusieurs à la fois)')
       // OUTPUT
       + layer('3', 'Ce qui arrive', 'Les événements des 5 épisodes, tirés du reste. Ils vont dans le prompt de chaque épisode.')
@@ -1081,6 +1081,7 @@ The face says what they feel; the mouth is open only where a cell says so. Keep 
     else if (d.clim) { const st2 = story(), jd = st2.D.filter((x3) => x3.who === J && x3.s >= 2).concat(st2.D.filter((x3) => x3.who === J && x3.s < 2)), cur2 = st2.X.map((x3) => x3 && x3.id), i2 = +d.clim;
       let at3 = jd.findIndex((x3) => x3.id === cur2[i2]); do at3 = (at3 + 1) % jd.length; while (jd[at3].id === cur2[1 - i2] && jd.length > 1); cur2[i2] = jd[at3].id; S.climax = cur2; }
     else if (d.braid) braid = !braid;
+    else if (d.climauto) S.climax = null;
     else if (d.sbact) sbAct = !sbAct;
     else if (d.hard) { if (!hardOk(d.hard)) return; S.hard[d.hard] = S.hard[d.hard] ? 0 : 1; }
     else if (d.tq) { const ev = allEv().find((x) => x.id === d.tq); if (ev) S.tq[d.tq] = ev.k + 1; }
