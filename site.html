@@ -54,6 +54,8 @@ a.btn.main[href="demo.html"]:hover::before, a.btn.main[href="demo.html"]:focus-v
 .dm a::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(transparent 45%, rgba(0,0,0,.85)); }
 .dm a:hover, .dm a:focus-visible { transform: translateY(-2px); }
 .dm a:hover::before, .dm a:focus-visible::before { opacity: 1; transform: none; }
+.dm i { position: absolute; top: 8px; right: 8px; z-index: 2; padding: 3px 8px; border-radius: 99px; font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(11,11,13,.7); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); opacity: 0; transform: translateY(-4px); transition: opacity .25s, transform .25s; }
+.dm a:hover i, .dm a:focus-visible i { opacity: 1; transform: none; }
 .dm img { position: absolute; bottom: 0; left: 50%; height: 86%; transform: translateX(-50%); object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
 .dm b { position: relative; z-index: 1; padding: 0 8px 10px; font-size: 14px; line-height: 1.2; text-align: center; text-shadow: 0 1px 6px rgba(0,0,0,.8); }
 .demos .all { display: block; padding: 10px 16px; border-radius: 0 0 22px 22px; background: rgba(11,11,13,.92); font-size: 14px; font-weight: 800; text-decoration: none; color: var(--gold); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
@@ -151,9 +153,9 @@ footer.end .wrap { display: flex; flex-wrap: wrap; justify-content: space-betwee
 </head>
 <body>
 <header class="top"><div class="wrap"><a class="brand" href="#">UNWRITTEN</a><div class="topR"><button type="button" class="lang" id="lang" aria-label="Langue">FR</button><div class="demo r"><a class="btn main sm" href="demo.html"><span data-t="0">Try a demo</span></a><div class="demos"><div class="dm">
-<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
-<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall.jpg)"><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
-<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
+<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><i>Adventure</i><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
+<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall_deck.jpg)"><i>Thriller</i><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
+<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><i>Romance</i><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
 </div><a class="all" href="demo.html" data-t="51">All stories →</a></div></div></div></div></header>
 
 <section class="hero">
@@ -163,9 +165,9 @@ footer.end .wrap { display: flex; flex-wrap: wrap; justify-content: space-betwee
     <h1><span data-t="2">A show made for <em>your group.</em> Starring you.</span></h1>
     <p class="lead"><span data-t="3">You and your friends become the characters. The story plays like an episode, and at every choice, one of you decides what happens next.</span></p>
     <div class="ctas"><div class="demo"><a class="btn main" href="demo.html"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg><span data-t="0">Try a demo</span></a><div class="demos"><div class="dm">
-<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
-<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall.jpg)"><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
-<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
+<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><i>Adventure</i><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
+<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall_deck.jpg)"><i>Thriller</i><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
+<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><i>Romance</i><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
 </div><a class="all" href="demo.html" data-t="51">All stories →</a></div></div><a class="btn ghost" href="#tester"><span data-t="4">Test it with my group</span></a></div>
   </div>
 </section>
@@ -250,9 +252,9 @@ footer.end .wrap { display: flex; flex-wrap: wrap; justify-content: space-betwee
       <h2><span data-t="44">I'm looking for groups of 2-3 people to try it.</span></h2>
       <ul><li><span data-t="45">10 minutes, that's it.</span></li><li><span data-t="46">I come to you.</span></li><li><span data-t="47">Then, free access to the product and every story.</span></li></ul>
       <div class="ctas"><div class="demo"><a class="btn main" href="demo.html"><span data-t="0">Try a demo</span></a><div class="demos"><div class="dm">
-<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
-<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall.jpg)"><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
-<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
+<a href="index.html?play=tpirate&amp;back=site.html" style="--img:url(bg/taverne.webp)"><i>Adventure</i><img src="chars/pirate/bar_smile.webp" alt=""><b data-t="49">The pirate's oath</b></a>
+<a href="index.html?play=bar&amp;back=site.html" style="--img:url(covers/lastcall_deck.jpg)"><i>Thriller</i><img src="chars/brooke/texting.webp" alt=""><b>Last call</b></a>
+<a href="index.html?play=d_ete&amp;back=site.html" style="--img:url(bg/chalet.jpg)"><i>Romance</i><img src="chars/plage/hip.webp" alt=""><b data-t="50">One summer too many</b></a>
 </div><a class="all" href="demo.html" data-t="51">All stories →</a></div></div></div>
     </div>
   </div>
