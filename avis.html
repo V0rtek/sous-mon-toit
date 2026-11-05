@@ -55,104 +55,151 @@ header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 1
 .st:not(.remote) .eye { display: none; }
 .st.go .eye { opacity: .08 !important; }
 
-/* A: the countdown pill, up top */
-.a .cue { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); white-space: nowrap; padding: .5em 1.3em; border-radius: 2em; background: hsl(var(--hue) 100% 55%); color: #000; font-size: 2.6em; font-weight: 900; box-shadow: 0 .3em 1em rgba(0,0,0,.5); animation: pop .35s cubic-bezier(.3,1.6,.5,1); }
-.a.remote .cue { top: 45%; font-size: 3.4em; transform: translate(-50%, -50%); }
+
+/* stages: .pre = the subtle early cue (5 s ahead), .go = the real one (3 s ahead, with the sound and the buzz), .show = the choices.
+   --e = progress of the early stage, --p = progress of the real one */
+.st { --e: 0; }
+.lay { display: none; }
+/* A: the pill (phone) */
+.pillA { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); white-space: nowrap; padding: .5em 1.3em; border-radius: 2em; background: hsl(var(--hue) 100% 55%); color: #000; font-size: 2.6em; font-weight: 900; box-shadow: 0 .3em 1em rgba(0,0,0,.5); animation: pop .35s cubic-bezier(.3,1.6,.5,1); }
 @keyframes pop { from { transform: translateX(-50%) scale(.6); opacity: 0; } }
-/* B: the edges glow, brighter and faster as it nears */
-.b .cue { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 calc(3em + var(--p) * 7em) calc(.5em + var(--p) * 1.6em) hsl(var(--hue) 100% 55% / .9); animation: beat calc(1.1s - var(--p) * .7s) ease-in-out infinite; }
-@keyframes beat { 50% { opacity: .35; } }
-/* C: it buzzes: the phone shakes, a big "!" in the middle (the real phone vibrates too) */
-.c.go { animation: buzz .25s linear infinite; }
+.pillS { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); white-space: nowrap; padding: .4em 1em; border-radius: 2em; background: rgba(255,255,255,.18); color: #fff; font-size: 2em; font-weight: 800; animation: soft 1.6s ease-in-out infinite; }
+@keyframes soft { 50% { opacity: .45; } }
+.st.pre.e-A .pillS, .st.go.r-A .pillA { display: block; }
+/* C: the buzz. Early: only a small dot breathing; real: the phone shakes, a big number */
+.dotC { position: absolute; right: 5%; top: 3.5%; width: 2.4em; height: 2.4em; border-radius: 50%; background: #ffd60a; animation: soft 1.6s ease-in-out infinite; }
+.st.pre.e-C .dotC { display: block; }
+.st.go.r-C { animation: buzz .25s linear infinite; }
 @keyframes buzz { 20% { transform: translate(.5em, -.3em); } 40% { transform: translate(-.5em, .3em); } 60% { transform: translate(.4em, .4em); } 80% { transform: translate(-.4em, -.4em); } }
-.c .cue { position: absolute; left: 50%; top: 40%; width: 14em; height: 14em; margin: -7em 0 0 -7em; border-radius: 50%; background: hsl(var(--hue) 100% 55%); color: #000; display: grid; place-items: center; font-weight: 900; box-shadow: 0 0 0 1.2em hsl(var(--hue) 100% 55% / .3); }
-.c .cue span { font-size: 9em; line-height: 1; }
-/* D: the choices are already there, ghosts, and they rise into place (you see the shape: three choices) */
-.d .cue { position: absolute; left: 5%; right: 5%; bottom: 7%; display: flex; flex-direction: column; gap: 1.1em; transform: translateY(calc((1 - var(--p)) * 14em)); opacity: calc(.15 + var(--p) * .5); filter: blur(calc((1 - var(--p)) * .5em)); }
-.d .cue i { display: block; height: 4.6em; border-radius: 1.2em; background: rgba(255,255,255,.3); border: .2em dashed rgba(255,255,255,.7); }
-.d.remote .cue { inset: 2.5% 3%; gap: 1.4em; }
-.d.remote .cue i { flex: 1; height: auto; border-radius: .7em; }
-.d .lbl2 { position: absolute; left: 0; right: 0; bottom: calc(7% + 15.5em); text-align: center; font-size: 2.2em; font-weight: 900; text-shadow: 0 .1em .4em #000; z-index: 2; display: none; }
-.d.go .lbl2 { display: block; } .d.show .lbl2 { display: none; }
-.d.remote .lbl2 { bottom: auto; top: 6%; }
-/* E: your turn: big numbers, your face */
-.e .cue { position: absolute; inset: 0; background: rgba(8,6,12,.82); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5em; animation: fade .3s; }
-@keyframes fade { from { opacity: 0; } }
-.e .face { position: relative; width: 12em; height: 12em; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 30%, #4a4458, #000 95%); box-shadow: 0 0 0 .5em hsl(var(--hue) 100% 55%); }
-.e .face img { position: absolute; left: 50%; top: 4%; height: 400%; max-width: none; transform: translateX(-50%); }
-.e .big { font-size: 14em; line-height: 1; }
-.e .t { font-size: 2.8em; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }
-/* F: the screen goes cinema: two bars close in, "Brooke decides next" */
-.f .cue { position: absolute; inset: 0; pointer-events: none; }
-.f .cue::before, .f .cue::after { content: ""; position: absolute; left: 0; right: 0; height: calc(var(--p) * 20% + 4%); background: #000; }
-.f .cue::before { top: 0; } .f .cue::after { bottom: 0; }
-.f .cue > span { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: .2em; text-align: center; font-family: var(--display); font-size: 3.4em; text-shadow: 0 .1em .5em #000; }
-.f .cue > span small { display: block; font-family: var(--ui); font-size: .55em; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #ffd60a; margin-bottom: .3em; }
-.f.remote .cue > span { font-size: 4em; }
-/* G: a bar fills the bottom (like a load), "Get ready" */
-.g .cue { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.2em 1.2em 1.4em; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
-.g .cue div { font-size: 2.4em; font-weight: 900; margin-bottom: .45em; display: flex; justify-content: space-between; }
-.g .cue u { display: block; height: 1.1em; border-radius: .55em; background: rgba(255,255,255,.18); overflow: hidden; text-decoration: none; }
-.g .cue u::after { content: ""; display: block; height: 100%; width: calc(var(--p) * 100%); border-radius: .55em; background: hsl(var(--hue) 100% 55%); }
-.g.remote .cue { bottom: auto; top: 50%; transform: translateY(-50%); background: none; }
-/* H: almost nothing: a dot that pulses, and the sound does the work (ticks 3·2·1, chime) */
-.h .cue { position: absolute; right: 5%; top: 3.5%; width: 3.2em; height: 3.2em; border-radius: 50%; background: hsl(var(--hue) 100% 55%); animation: dot calc(1s - var(--p) * .55s) ease-in-out infinite; }
-.h .cue span { position: absolute; right: 4.2em; top: .7em; white-space: nowrap; font-size: 2em; font-weight: 800; color: #fff; opacity: .9; text-shadow: 0 .1em .4em #000; }
-.h.remote .cue { right: 50%; top: 40%; margin-right: -3.2em; width: 6.4em; height: 6.4em; }
-.h.remote .cue span { right: auto; left: 50%; top: 8em; transform: translateX(-50%); font-size: 3em; }
-@keyframes dot { 50% { transform: scale(1.5); opacity: .5; } }
+.bigC { position: absolute; left: 50%; top: 38%; width: 14em; height: 14em; margin: -7em 0 0 -7em; border-radius: 50%; background: hsl(var(--hue) 100% 55%); color: #000; place-items: center; box-shadow: 0 0 0 1.2em hsl(var(--hue) 100% 55% / .3); font-weight: 900; }
+.bigC .num { font-size: 9em; line-height: 1; }
+.st.go.r-C .bigC { display: grid; }
+.st.go.r-C.r-F .bigC { top: 32%; }
+/* D: the three choices, ghosts. Early: faint, low; real: they rise and fill in */
+.ghD { position: absolute; left: 5%; right: 5%; bottom: 7%; gap: 1.1em; flex-direction: column; }
+.ghD i { display: block; height: 4.6em; border-radius: 1.2em; background: rgba(255,255,255,.3); border: .2em dashed rgba(255,255,255,.7); }
+.remote .ghD { inset: 2.5% 3%; gap: 1.4em; }
+.remote .ghD i { flex: 1; height: auto; border-radius: .7em; }
+.st.pre.e-D .ghD { display: flex; transform: translateY(calc(18em - var(--e) * 3em)); opacity: calc(.06 + var(--e) * .14); }
+.st.go.r-D .ghD { display: flex; transform: translateY(calc((1 - var(--p)) * 14em)); opacity: calc(.2 + var(--p) * .45); filter: blur(calc((1 - var(--p)) * .5em)); }
+.st.go.r-D:not(.e-D) .ghD { transform: translateY(calc((1 - var(--p)) * 16em + 2em)); opacity: calc(.12 + var(--p) * .5); }
+/* F: cinema bars. Early: thin bars; real: they close in, with or without the line "Brooke decides next" */
+.barF { position: absolute; inset: 0; pointer-events: none; }
+.barF::before, .barF::after { content: ""; position: absolute; left: 0; right: 0; background: #000; }
+.barF::before { top: 0; } .barF::after { bottom: 0; }
+.st.pre.e-F .barF { display: block; }
+.st.pre.e-F .barF::before, .st.pre.e-F .barF::after { height: calc(1.5% + var(--e) * 3.5%); }
+.st.go.r-F .barF { display: block; }
+.st.go.r-F .barF::before, .st.go.r-F .barF::after { height: calc(5% + var(--p) * 17%); }
+.barF span { display: none; position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); flex-direction: column; align-items: center; gap: .2em; text-align: center; font-family: var(--display); font-size: 3.4em; text-shadow: 0 .1em .5em #000; }
+.remote .barF span { font-size: 3.2em; }
+.barF span small { display: block; font-family: var(--ui); font-size: .55em; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #ffd60a; }
+.st.go.r-Ft .barF span { display: flex; }
+.st.go.r-Ft.r-C .barF span { top: 66%; }
+.st.go.r-Ft.r-C .barF span .num { display: none; }
+/* the buzz, seen (a real phone shakes; here a tag lights up) */
+.vibtag { position: absolute; left: 4%; top: 3.5%; z-index: 6; padding: .3em .8em; border-radius: 1em; background: #ffd60a; color: #000; font-size: 1.8em; font-weight: 900; letter-spacing: .08em; opacity: 0; transition: opacity .15s; }
+.st.go .vibtag { opacity: 1; animation: soft .3s linear 3; }
+.sec { grid-column: 1 / -1; font-size: 13px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: #ffd60a; border-top: 1px solid #2c2c2e; padding-top: 16px; }
+.sec:first-child { border: 0; padding: 0; }
+.sec small { font-weight: 600; letter-spacing: 0; text-transform: none; color: #8e8e93; font-size: 13px; margin-left: 8px; }
+.btn { font: inherit; font-size: 14px; font-weight: 900; border: 0; border-radius: 99px; padding: 9px 16px; background: #ffd60a; color: #000; cursor: pointer; }
+.snd { max-width: 900px; padding: 12px 20px 0; color: #8e8e93; font-size: 14px; line-height: 1.5; }
+.snd b { color: #fff; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Choice heads-up</h1>
-  <span class="lbl">Mode</span><div class="seg" id="modeSeg"></div>
-  <span class="lbl">Ahead</span><div class="seg" id="leadSeg"></div>
+  <h1>Choice heads-up · 2</h1>
+  <span class="lbl">Sound</span><div class="seg" id="sndSeg"></div>
+  <span class="lbl">Buzz</span><div class="seg" id="vibSeg"></div>
+  <button class="btn" id="hear" type="button">▶ Hear it</button>
   <a href="index.html">‹ Home</a>
 </header>
-<div class="intro">Eight ways to say “a choice is coming” a few seconds <b>before</b> it shows, so the one who has to choose is ready (eyes on the phone, thumb up) and the other player isn’t left waiting. <b>Phone</b> = the story is on the phone. <b>Remote</b> = the phone is black, the story is on the TV, so the cue has to reach someone who isn’t looking at it. <b>Tap a phone</b> to replay it with sound and buzz.</div>
+<div class="intro">Two stages. At <b>5 s</b> a subtle sign (the phone may be looking elsewhere, this is just “something’s coming”). At <b>3 s</b> the real one: the picture cue, <b>the sound and the phone’s buzz all start together</b>. Phone = A. Remote = mixes of C (buzz), D (the choices rise), F (cinema bars), with or without the words over F. <b>Tap a phone</b> to replay it with the sound and buzz; <b>▶ Hear it</b> plays just the sound.</div>
+<div class="snd" id="snd"></div>
 <div class="grid" id="grid"></div>
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const EYE = '<svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg>';
-const FACE = '<span class="face"><img src="chars/brooke/texting.webp" alt=""></span>';
-const NUM = '<span class="num"></span>';
-const CUES = [
-  ['A', 'The pill', 'A countdown pill: “Your choice in 3”, yellow to red. Plain and readable; on the remote it sits in the middle.', 'Your choice in ' + NUM],
-  ['B', 'Glowing edges', 'The frame glows and beats faster as it nears. No words: you feel it at the corner of your eye.', ''],
-  ['C', 'The buzz', 'The phone shakes and buzzes (vibration) with a big !. The best one for a phone lying face-down in your hand while you watch the TV.', '<span>!</span>'],
-  ['D', 'The choices rise', 'The three choices are already there as ghosts and rise into place. You see the shape of what’s coming.', '<i></i><i></i><i></i>'],
-  ['E', 'Your turn', 'Takes the screen: your face, “Your turn”, a big 3·2·1. Impossible to miss; interrupts the line.', FACE + '<div class="t">Your turn</div><div class="big num hot"></div>'],
-  ['F', 'Cinema bars', 'Black bars close in and “Brooke decides next” appears. It feels like the story holds its breath.', '<span><small>Brooke decides next</small>' + NUM + '</span>'],
-  ['G', 'Get ready bar', 'A bar fills along the bottom: “Get ready…” and the seconds. Quiet, doesn’t cover the picture.', '<div><span>Get ready…</span>' + NUM + '</div><u></u>'],
-  ['H', 'Sound + dot', 'Just a pulsing dot and three ticks then a chime. The sound does the work (needs the sound on).', NUM],
+const EARLY = 2, REAL = 3;   // seconds: subtle at 5 (= 2 + 3 before), real at 3
+// [id, title, text, mode, early layers, real layers]
+const CARDS = [
+  ['sec', 'Phone', 'A, the pill'],
+  ['P1', 'A', 'The pill at 3 s, nothing before.', 'phone', [], ['A']],
+  ['P2', 'A + early sign', 'A small grey “soon” pill at 5 s, then the real pill at 3 s.', 'phone', ['A'], ['A']],
+  ['sec', 'Remote', 'C buzz · D the choices rise · F cinema bars · each with a faint sign 5 s ahead'],
+  ['R1', 'C + D', '5 s: ghosts barely there. 3 s: buzz + big number, the choices rise.', 'remote', ['D'], ['C', 'D']],
+  ['R2', 'C + F, with words', '5 s: thin bars. 3 s: buzz, bars close in, “Brooke decides next”.', 'remote', ['F'], ['C', 'F', 'Ft']],
+  ['R3', 'C + F, no words', 'Same, bars only. The number is the only text.', 'remote', ['F'], ['C', 'F']],
+  ['R4', 'D + F, with words', '5 s: ghosts. 3 s: bars + “Brooke decides next”, the choices rise. No shake.', 'remote', ['D'], ['D', 'F', 'Ft']],
+  ['R5', 'D + F, no words', 'Same without any text at all: pure picture.', 'remote', ['D'], ['D', 'F']],
+  ['R6', 'C + D + F, with words', 'Everything at 3 s. 5 s: bars and ghosts.', 'remote', ['F', 'D'], ['C', 'D', 'F', 'Ft']],
+  ['R7', 'C + D + F, no words', 'Everything at 3 s, no words over the bars.', 'remote', ['F', 'D'], ['C', 'D', 'F']],
+  ['R8', 'F alone, no words', 'Just the bars: thin at 5 s, closing at 3 s. Sound and buzz do the rest.', 'remote', ['F'], ['F']],
+  ['R9', 'dot → D + C', '5 s: a yellow dot in the corner. 3 s: buzz and the choices rise.', 'remote', ['C'], ['C', 'D']],
 ];
-const state = { mode: 'phone', lead: 3, hear: null };
-const OPTS = ['Why’d you lie?', 'Probably a debt collector.', '[Look at the bathroom door]'];
-let ctx;
-const beep = (f, d = .1, v = .12) => { try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f; o.type = 'sine';
-  g.gain.setValueAtTime(v, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + d); } catch (_) {} };
-function mk(c, i) {
-  const el = document.createElement('div'); el.className = 'card';
-  el.innerHTML = `<h2><i>${c[0]}</i>${c[1]}</h2><div class="ph"><div class="st ${c[0].toLowerCase()}"><i class="tvtag" style="font-style:normal">On the TV</i>${EYE}<div class="q"><b>Cam</b>That I didn’t.</div>
-    ${c[0] === 'D' ? '<div class="lbl2">Your choice is coming…</div>' : ''}<div class="cue">${c[3]}</div><div class="ch">${OPTS.map((o) => `<button type="button">${o}</button>`).join('')}</div></div></div><p>${c[2]}</p>`;
-  const ph = $('.ph', el), st = $('.st', el), nums = el.querySelectorAll('.num'); let t0, raf, hold, lastN;
-  const set = (cls) => { st.className = `st ${c[0].toLowerCase()}${state.mode === 'remote' ? ' remote' : ''} ${cls}`; };
-  const run = () => { cancelAnimationFrame(raf); clearTimeout(hold); set(''); st.style.setProperty('--p', 0); lastN = null;
-    hold = setTimeout(() => { t0 = performance.now(); set('go'); tick(); }, 1800); };   // 1.8 s: the line the story is on
+const SOUNDS = [
+  ['ticks', 'Ticks', 'Clean beeps 3·2·1, a bright chime at the end. The light one.'],
+  ['heart', 'Heartbeat', 'A soft thump at 5 s, then a double heartbeat each second that speeds up, a big thud at the end. Deep, nervous.'],
+  ['riser', 'Riser', 'A low drone at 5 s, then one sweep that climbs for 3 s and lands on a boom. Cinematic.'],
+  ['drum', 'Taiko', 'A far drum at 5 s, three deep hits climbing a little, a double hit at the end.'],
+  ['sonar', 'Sonar', 'A faint ping at 5 s, then pings with echoes; the end is a low ping. Submarine thriller.'],
+  ['bell', 'Dark bell', 'A quiet low bell at 5 s, then three falling notes, a deep cluster at the end. Gothic.'],
+  ['clock', 'Clock + sting', 'A click at 5 s, then a tick-tock that speeds up, a dissonant sting and thud at the end.'],
+];
+const VIBES = [['off', 'Off', []], ['short', 'Short', [150]], ['double', 'Double', [120, 70, 120]], ['heart', 'Heartbeat', [70, 90, 110, 450, 70, 90, 110]], ['long', 'Long', [500]]];
+const state = { snd: 'heart', vib: 'double', hear: null };
+let ctx, nbuf;
+const AC = () => { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); return ctx; };
+function tone(t, f, dur, vol, o = {}) { const c = AC(), os = c.createOscillator(), g = c.createGain(); os.type = o.type || 'sine'; os.frequency.setValueAtTime(f, t); if (o.to) os.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+  const at = o.attack || .006; g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol, t + at); g.gain.exponentialRampToValueAtTime(.0001, t + dur); os.connect(g); g.connect(c.destination); os.start(t); os.stop(t + dur + .05); }
+function noise(t, dur, vol, f = 800, q = 1) { const c = AC(); if (!nbuf) { nbuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain(); s.buffer = nbuf; fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = q;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(c.destination); s.start(t); s.stop(t + dur + .05); }
+const thump = (t, v, f = 70) => { tone(t, f, .28, v, { to: f * .5 }); noise(t, .05, v * .25, 180, 1); };
+const ping = (t, f, v) => { tone(t, f, 1.1, v); tone(t + .3, f, .9, v * .4); tone(t + .6, f, .7, v * .16); };
+const bell = (t, f, v) => [[1, 1], [2.76, .5], [5.4, .25]].forEach(([m, a]) => tone(t, f * m, 1.8 / m ** .3, v * a, { attack: .004 }));
+const SND = {   // early(t): the subtle one at 5 s; real(t): 3 s of it, the last one at t + 3 (the choices)
+  ticks: { early: (t) => tone(t, 330, .14, .05), real: (t) => { [0, 1, 2].forEach((i) => tone(t + i, 660, .09, .12)); tone(t + 3, 990, .35, .16); tone(t + 3, 1320, .35, .08); } },
+  heart: { early: (t) => thump(t, .13), real: (t) => { [[0, .26], [1, .22], [2, .17]].forEach(([i, g]) => { thump(t + i, .55); thump(t + i + g, .38, 60); }); thump(t + 3, .95, 55); noise(t + 3, .4, .15, 150); } },
+  riser: { early: (t) => tone(t, 80, 2, .09, { attack: 1.2 }), real: (t) => { tone(t, 110, 3, .14, { type: 'sawtooth', to: 880, attack: 2.9 }); noise(t, 3, .05, 1200, .5); tone(t + 3, 55, 1.3, .55, { to: 28 }); noise(t + 3, .5, .3, 220); } },
+  drum: { early: (t) => tone(t, 100, .35, .1, { to: 60 }), real: (t) => { [80, 90, 105].forEach((f, i) => { tone(t + i, f, .4, .5, { to: f * .5 }); noise(t + i, .07, .15, 300); }); tone(t + 3, 52, .6, .7, { to: 30 }); tone(t + 3.16, 52, .7, .7, { to: 28 }); noise(t + 3, .1, .2, 250); } },
+  sonar: { early: (t) => ping(t, 1200, .05), real: (t) => { [0, 1, 2].forEach((i) => ping(t + i, 1500, .1)); ping(t + 3, 700, .22); tone(t + 3, 90, .8, .25, { to: 50 }); } },
+  bell: { early: (t) => bell(t, 220, .05), real: (t) => { [165, 147, 131].forEach((f, i) => bell(t + i, f, .12)); bell(t + 3, 82, .3); bell(t + 3, 116, .2); } },
+  clock: { early: (t) => noise(t, .04, .12, 2500, 3), real: (t) => { [0, .5, 1, 1.5, 2, 2.35, 2.7].forEach((d, i) => { noise(t + d, .03, .22, i % 2 ? 1800 : 2800, 3); tone(t + d, i % 2 ? 900 : 1100, .03, .06); });
+      tone(t + 3, 185, .9, .13, { type: 'sawtooth' }); tone(t + 3, 262, .9, .13, { type: 'sawtooth' }); thump(t + 3, .8, 60); } },
+};
+const vibrate = () => { const v = VIBES.find((x) => x[0] === state.vib)[2]; try { v.length && navigator.vibrate && navigator.vibrate(v); } catch (_) {} };
+function mk(c) {
+  const [id, title, text, mode, early, real] = c, el = document.createElement('div'); el.className = 'card';
+  const cls = (mode === 'remote' ? 'remote ' : '') + early.map((x) => 'e-' + x).join(' ') + ' ' + real.map((x) => 'r-' + x).join(' ');
+  el.innerHTML = `<h2><i>${id}</i>${title}</h2><div class="ph"><div class="st ${cls}"><span class="tvtag">On the TV</span>${EYE}<div class="q"><b>Cam</b>That I didn’t.</div>
+    <div class="lay pillS">Choice soon…</div><div class="lay pillA">Your choice in <span class="num"></span></div><div class="lay dotC"></div>
+    <div class="lay ghD"><i></i><i></i><i></i></div><div class="lay barF"><span><small>Brooke decides next</small><b class="num"></b></span></div><div class="lay bigC"><span class="num"></span></div><div class="vibtag">BZZZ</div>
+    <div class="ch">${['Why’d you lie?', 'Probably a debt collector.', '[Look at the bathroom door]'].map((o) => `<button type="button">${o}</button>`).join('')}</div></div></div><p>${text}</p>`;
+  const ph = $('.ph', el), st = $('.st', el), nums = el.querySelectorAll('.num'); let t0, raf, hold, stage, lastN;
+  const set = (x) => { stage = x; st.className = st.className.replace(/\b(pre|go|show)\b/g, '').trim() + (x ? ' ' + x : ''); };
+  const run = () => { cancelAnimationFrame(raf); clearTimeout(hold); set(''); st.style.setProperty('--p', 0); st.style.setProperty('--e', 0); lastN = null;
+    hold = setTimeout(() => { t0 = performance.now(); set('pre'); tick(); }, 1800); };
   const loud = () => state.hear === el;
-  const tick = () => { const p = Math.min(1, (performance.now() - t0) / (state.lead * 1000)), n = Math.ceil((1 - p) * state.lead) || 0; st.style.setProperty('--p', p);
-    if (n !== lastN) { lastN = n; nums.forEach((x) => { x.textContent = n; });
-      if (loud()) { if (n > 0 || p < 1) beep(660, .09); if (c[0] === 'C') try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (_) {} } }
-    if (p >= 1) { set('show'); if (loud()) beep(990, .35, .16); hold = setTimeout(run, 2600); return; } raf = requestAnimationFrame(tick); };
-  ph.onclick = () => { state.hear = el; document.querySelectorAll('.card').forEach((x) => x.classList.toggle('hear', x === el)); run(); };
+  const tick = () => { const ms = performance.now() - t0, e = Math.min(1, ms / (EARLY * 1000)), p = Math.max(0, Math.min(1, (ms - EARLY * 1000) / (REAL * 1000)));
+    st.style.setProperty('--e', e); st.style.setProperty('--p', p);
+    if (stage === 'pre' && ms === ms && ms >= 0 && !st._e) { st._e = 1; if (loud()) SND[state.snd].early(AC().currentTime + .02); }
+    if (ms >= EARLY * 1000 && stage === 'pre') { set('go'); if (loud()) { SND[state.snd].real(AC().currentTime + .02); vibrate(); } }
+    const n = Math.ceil((1 - p) * REAL) || 0; if (n !== lastN) { lastN = n; nums.forEach((x) => { x.textContent = n; }); }
+    if (ms >= (EARLY + REAL) * 1000) { set('show'); st._e = 0; hold = setTimeout(run, 2600); return; } raf = requestAnimationFrame(tick); };
+  ph.onclick = () => { state.hear = el; document.querySelectorAll('.card').forEach((x) => x.classList.toggle('hear', x === el)); st._e = 0; run(); };
   el.run = run; run(); return el;
 }
-function render() { const g = $('#grid'); g.innerHTML = ''; CUES.forEach((c, i) => g.append(mk(c, i))); }
-function seg(el, items, key) { el.innerHTML = items.map(([v, l]) => `<button type="button" data-v="${v}" class="${String(v) === String(state[key]) ? 'on' : ''}">${l}</button>`).join('');
-  el.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; state[key] = key === 'lead' ? +b.dataset.v : b.dataset.v; [...el.children].forEach((x) => x.classList.toggle('on', x === b)); document.querySelectorAll('.card').forEach((c) => c.run()); }; }
-seg($('#modeSeg'), [['phone', 'Phone'], ['remote', 'Remote']], 'mode'); seg($('#leadSeg'), [[2, '2 s'], [3, '3 s'], [5, '5 s']], 'lead');
-render();
+function render() { const g = $('#grid'); g.innerHTML = ''; CARDS.forEach((c) => { if (c[0] === 'sec') { const d = document.createElement('div'); d.className = 'sec'; d.innerHTML = `${c[1]}<small>${c[2]}</small>`; g.append(d); } else g.append(mk(c)); }); }
+function seg(el, items, key, after) { el.innerHTML = items.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === state[key] ? 'on' : ''}">${l}</button>`).join('');
+  el.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; state[key] = b.dataset.v; [...el.children].forEach((x) => x.classList.toggle('on', x === b)); after && after(); }; }
+const note = () => { const s = SOUNDS.find((x) => x[0] === state.snd); $('#snd').innerHTML = `<b>${s[1]}</b>: ${s[2]}`; };
+seg($('#sndSeg'), SOUNDS, 'snd', () => { note(); playSound(); }); seg($('#vibSeg'), VIBES, 'vib', () => { vibrate(); });
+function playSound() { const t = AC().currentTime + .05; SND[state.snd].early(t); SND[state.snd].real(t + EARLY); setTimeout(vibrate, EARLY * 1000 + 50); }
+$('#hear').onclick = playSound;
+note(); render();
 </script>
 </body>
 </html>
