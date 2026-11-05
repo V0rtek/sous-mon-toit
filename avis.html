@@ -110,13 +110,13 @@ header a { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 1
 </head>
 <body>
 <header>
-  <h1>Choice heads-up · 2</h1>
+  <h1>Choice heads-up · 3</h1>
   <span class="lbl">Sound</span><div class="seg" id="sndSeg"></div>
   <span class="lbl">Buzz</span><div class="seg" id="vibSeg"></div>
   <button class="btn" id="hear" type="button">▶ Hear it</button>
   <a href="index.html">‹ Home</a>
 </header>
-<div class="intro">Two stages. At <b>5 s</b> a subtle sign (the phone may be looking elsewhere, this is just “something’s coming”). At <b>3 s</b> the real one: the picture cue, <b>the sound and the phone’s buzz all start together</b>. Phone = A. Remote = mixes of C (buzz), D (the choices rise), F (cinema bars), with or without the words over F. <b>Tap a phone</b> to replay it with the sound and buzz; <b>▶ Hear it</b> plays just the sound.</div>
+<div class="intro">Chosen: <b>P2</b> on the phone, <b>the dot → C + D</b> on the remote. What’s left is the sound: Ticks, and seven takes on the dark bell (the “coming soon” pop at 5 s stays the same bell). Pick one above, it plays; <b>tap a phone</b> to see it with the sound and buzz.</div>
 <div class="snd" id="snd"></div>
 <div class="grid" id="grid"></div>
 <script>
@@ -125,31 +125,23 @@ const EYE = '<svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path fill=
 const EARLY = 2, REAL = 3;   // seconds: subtle at 5 (= 2 + 3 before), real at 3
 // [id, title, text, mode, early layers, real layers]
 const CARDS = [
-  ['sec', 'Phone', 'A, the pill'],
-  ['P1', 'A', 'The pill at 3 s, nothing before.', 'phone', [], ['A']],
+  ['sec', 'Phone', 'P2 chosen: a small “Choice soon…” at 5 s, the real pill at 3 s'],
   ['P2', 'A + early sign', 'A small grey “soon” pill at 5 s, then the real pill at 3 s.', 'phone', ['A'], ['A']],
-  ['sec', 'Remote', 'C buzz · D the choices rise · F cinema bars · each with a faint sign 5 s ahead'],
-  ['R1', 'C + D', '5 s: ghosts barely there. 3 s: buzz + big number, the choices rise.', 'remote', ['D'], ['C', 'D']],
-  ['R2', 'C + F, with words', '5 s: thin bars. 3 s: buzz, bars close in, “Brooke decides next”.', 'remote', ['F'], ['C', 'F', 'Ft']],
-  ['R3', 'C + F, no words', 'Same, bars only. The number is the only text.', 'remote', ['F'], ['C', 'F']],
-  ['R4', 'D + F, with words', '5 s: ghosts. 3 s: bars + “Brooke decides next”, the choices rise. No shake.', 'remote', ['D'], ['D', 'F', 'Ft']],
-  ['R5', 'D + F, no words', 'Same without any text at all: pure picture.', 'remote', ['D'], ['D', 'F']],
-  ['R6', 'C + D + F, with words', 'Everything at 3 s. 5 s: bars and ghosts.', 'remote', ['F', 'D'], ['C', 'D', 'F', 'Ft']],
-  ['R7', 'C + D + F, no words', 'Everything at 3 s, no words over the bars.', 'remote', ['F', 'D'], ['C', 'D', 'F']],
-  ['R8', 'F alone, no words', 'Just the bars: thin at 5 s, closing at 3 s. Sound and buzz do the rest.', 'remote', ['F'], ['F']],
-  ['R9', 'dot → D + C', '5 s: a yellow dot in the corner. 3 s: buzz and the choices rise.', 'remote', ['C'], ['C', 'D']],
+  ['sec', 'Remote', 'The dot at 5 s, then C + D at 3 s'],
+  ['R9', 'Dot → C + D', '5 s: a yellow dot in the corner. 3 s: buzz + big number, the choices rise.', 'remote', ['C'], ['C', 'D']],
 ];
 const SOUNDS = [
-  ['ticks', 'Ticks', 'Clean beeps 3·2·1, a bright chime at the end. The light one.'],
-  ['heart', 'Heartbeat', 'A soft thump at 5 s, then a double heartbeat each second that speeds up, a big thud at the end. Deep, nervous.'],
-  ['riser', 'Riser', 'A low drone at 5 s, then one sweep that climbs for 3 s and lands on a boom. Cinematic.'],
-  ['drum', 'Taiko', 'A far drum at 5 s, three deep hits climbing a little, a double hit at the end.'],
-  ['sonar', 'Sonar', 'A faint ping at 5 s, then pings with echoes; the end is a low ping. Submarine thriller.'],
-  ['bell', 'Dark bell', 'A quiet low bell at 5 s, then three falling notes, a deep cluster at the end. Gothic.'],
-  ['clock', 'Clock + sting', 'A click at 5 s, then a tick-tock that speeds up, a dissonant sting and thud at the end.'],
+  ['ticks', 'Ticks', 'Clean beeps 3·2·1, a bright chime at the end; a soft tick for the 5 s sign.'],
+  ['b1', 'Bell · falling', 'The “coming soon” bell at 5 s, then three falling notes (E D C) and a deep cluster at the end.'],
+  ['b2', 'Bell · rising', 'The same bell at 5 s, then three notes climbing in A minor (A C E), a low cluster at the end. Tension.'],
+  ['b3', 'Bell · music box', 'High, small bells: an E minor arpeggio (E G B) like a music box, a low toll at the end. Creepy-sweet.'],
+  ['b4', 'Bell · tolling', 'One low bell tolling at 3, 2, 1, each louder, a double toll at the end. Funeral.'],
+  ['b5', 'Bell · tritone', 'Two notes a tritone apart (C, F♯) alternating, the clash resolves into a deep cluster. Uneasy.'],
+  ['b6', 'Bell · chromatic', 'Three notes sliding down by semitones (E E♭ D), a low cluster. Sinking feeling.'],
+  ['b7', 'Ticks + bell', 'The “coming soon” bell at 5 s, the clean ticks 3·2·1, a dark bell to land. The two together.'],
 ];
 const VIBES = [['off', 'Off', []], ['short', 'Short', [150]], ['double', 'Double', [120, 70, 120]], ['heart', 'Heartbeat', [70, 90, 110, 450, 70, 90, 110]], ['long', 'Long', [500]]];
-const state = { snd: 'heart', vib: 'double', hear: null };
+const state = { snd: 'b1', vib: 'double', hear: null };
 let ctx, nbuf;
 const AC = () => { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); return ctx; };
 function tone(t, f, dur, vol, o = {}) { const c = AC(), os = c.createOscillator(), g = c.createGain(); os.type = o.type || 'sine'; os.frequency.setValueAtTime(f, t); if (o.to) os.frequency.exponentialRampToValueAtTime(o.to, t + dur);
@@ -160,16 +152,19 @@ function noise(t, dur, vol, f = 800, q = 1) { const c = AC(); if (!nbuf) { nbuf 
 const thump = (t, v, f = 70) => { tone(t, f, .28, v, { to: f * .5 }); noise(t, .05, v * .25, 180, 1); };
 const ping = (t, f, v) => { tone(t, f, 1.1, v); tone(t + .3, f, .9, v * .4); tone(t + .6, f, .7, v * .16); };
 const bell = (t, f, v) => [[1, 1], [2.76, .5], [5.4, .25]].forEach(([m, a]) => tone(t, f * m, 1.8 / m ** .3, v * a, { attack: .004 }));
+const bellSeq = (notes, end, vs = [.12, .12, .12]) => (t) => { notes.forEach((f, i) => bell(t + i, f, vs[i])); end.forEach(([f, v]) => bell(t + 3, f, v)); };
+const popBell = (t) => bell(t, 220, .06);   // the “coming soon” pop
 const SND = {   // early(t): the subtle one at 5 s; real(t): 3 s of it, the last one at t + 3 (the choices)
   ticks: { early: (t) => tone(t, 330, .14, .05), real: (t) => { [0, 1, 2].forEach((i) => tone(t + i, 660, .09, .12)); tone(t + 3, 990, .35, .16); tone(t + 3, 1320, .35, .08); } },
-  heart: { early: (t) => thump(t, .13), real: (t) => { [[0, .26], [1, .22], [2, .17]].forEach(([i, g]) => { thump(t + i, .55); thump(t + i + g, .38, 60); }); thump(t + 3, .95, 55); noise(t + 3, .4, .15, 150); } },
-  riser: { early: (t) => tone(t, 80, 2, .09, { attack: 1.2 }), real: (t) => { tone(t, 110, 3, .14, { type: 'sawtooth', to: 880, attack: 2.9 }); noise(t, 3, .05, 1200, .5); tone(t + 3, 55, 1.3, .55, { to: 28 }); noise(t + 3, .5, .3, 220); } },
-  drum: { early: (t) => tone(t, 100, .35, .1, { to: 60 }), real: (t) => { [80, 90, 105].forEach((f, i) => { tone(t + i, f, .4, .5, { to: f * .5 }); noise(t + i, .07, .15, 300); }); tone(t + 3, 52, .6, .7, { to: 30 }); tone(t + 3.16, 52, .7, .7, { to: 28 }); noise(t + 3, .1, .2, 250); } },
-  sonar: { early: (t) => ping(t, 1200, .05), real: (t) => { [0, 1, 2].forEach((i) => ping(t + i, 1500, .1)); ping(t + 3, 700, .22); tone(t + 3, 90, .8, .25, { to: 50 }); } },
-  bell: { early: (t) => bell(t, 220, .05), real: (t) => { [165, 147, 131].forEach((f, i) => bell(t + i, f, .12)); bell(t + 3, 82, .3); bell(t + 3, 116, .2); } },
-  clock: { early: (t) => noise(t, .04, .12, 2500, 3), real: (t) => { [0, .5, 1, 1.5, 2, 2.35, 2.7].forEach((d, i) => { noise(t + d, .03, .22, i % 2 ? 1800 : 2800, 3); tone(t + d, i % 2 ? 900 : 1100, .03, .06); });
-      tone(t + 3, 185, .9, .13, { type: 'sawtooth' }); tone(t + 3, 262, .9, .13, { type: 'sawtooth' }); thump(t + 3, .8, 60); } },
+  b1: { early: popBell, real: bellSeq([165, 147, 131], [[82, .3], [116, .2]]) },
+  b2: { early: popBell, real: bellSeq([220, 262, 330], [[110, .3], [156, .2]], [.1, .12, .14]) },
+  b3: { early: (t) => bell(t, 659, .05), real: bellSeq([659, 784, 988], [[165, .3], [247, .15]], [.09, .09, .1]) },
+  b4: { early: popBell, real: (t) => { [.12, .2, .3].forEach((v, i) => bell(t + i, 147, v)); bell(t + 3, 98, .35); bell(t + 3.35, 98, .3); } },
+  b5: { early: popBell, real: bellSeq([262, 370, 262], [[92, .3], [130, .2]], [.11, .12, .13]) },
+  b6: { early: popBell, real: bellSeq([330, 311, 294], [[82, .3], [123, .2]]) },
+  b7: { early: popBell, real: (t) => { [0, 1, 2].forEach((i) => tone(t + i, 660, .09, .1)); bell(t + 3, 82, .3); bell(t + 3, 116, .2); } },
 };
+
 const vibrate = () => { const v = VIBES.find((x) => x[0] === state.vib)[2]; try { v.length && navigator.vibrate && navigator.vibrate(v); } catch (_) {} };
 function mk(c) {
   const [id, title, text, mode, early, real] = c, el = document.createElement('div'); el.className = 'card';
