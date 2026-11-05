@@ -1444,6 +1444,27 @@ body.tv #waitOther { font-size: 3em; bottom: 8%; }
 /* the clock of a choice someone else is making (the TV, the other player's phone): the same line, quiet, at the bottom */
 #waitClock { position: absolute; left: 50%; bottom: 2.2%; width: 16em; transform: translateX(-50%); height: .45em; border-radius: .25em; background: rgba(255,255,255,.12); z-index: 19; pointer-events: none; }
 #waitClock[hidden] { display: none; }
+/* the heads-up before a choice (04/11, from avis.html): at 5 s a subtle sign, at 3 s the real one with ticks and a long buzz.
+   Phone: « Choice soon… » then « Your choice in 3 ». Remote (black phone): a dot, then a shake, a big number, the choices rising */
+#hu { position: absolute; inset: 0; z-index: 30; pointer-events: none; --p: 0; --hue: calc(50 - var(--p) * 50); }
+#hu[hidden], body:not(.instory) #hu { display: none; }
+#hu > * { display: none; }
+#hu .hu-soon { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); white-space: nowrap; padding: .4em 1em; border-radius: 2em; background: rgba(255,255,255,.18); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; font-size: 2em; font-weight: 800; animation: huSoon 1.6s ease-in-out infinite, huPop .35s cubic-bezier(.3,1.6,.5,1); }
+#hu .hu-pill { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); white-space: nowrap; padding: .5em 1.3em; border-radius: 2em; background: hsl(var(--hue) 100% 55%); color: #000; font-size: 2.6em; font-weight: 900; box-shadow: 0 .3em 1em rgba(0,0,0,.5); animation: huPop .35s cubic-bezier(.3,1.6,.5,1); }
+@keyframes huPop { from { transform: translateX(-50%) scale(.6); opacity: 0; } }
+@keyframes huSoon { 50% { opacity: .5; } }
+#hu .hu-dot { position: absolute; right: 5%; top: 3.5%; width: 2.4em; height: 2.4em; border-radius: 50%; background: #ffd60a; animation: huSoon 1.6s ease-in-out infinite; }
+#hu .hu-ghosts { position: absolute; inset: 2.5% 3%; flex-direction: column; gap: 1.4em; transform: translateY(calc((1 - var(--p)) * 16em + 2em)); opacity: calc(.12 + var(--p) * .5); filter: blur(calc((1 - var(--p)) * .5em)); }
+#hu .hu-ghosts i { flex: 1; border-radius: .7em; background: rgba(255,255,255,.3); border: .2em dashed rgba(255,255,255,.7); }
+#hu .hu-big { position: absolute; left: 50%; top: 38%; width: 14em; height: 14em; margin: -7em 0 0 -7em; border-radius: 50%; background: hsl(var(--hue) 100% 55%); color: #000; place-items: center; box-shadow: 0 0 0 1.2em hsl(var(--hue) 100% 55% / .3); font-weight: 900; }
+#hu .hu-big b { font-size: 9em; line-height: 1; }
+body:not(.phonemin) #hu.hu-pre .hu-soon, body:not(.phonemin) #hu.hu-go .hu-pill { display: block; }
+body.phonemin #hu.hu-pre .hu-dot { display: block; }
+body.phonemin #hu.hu-go .hu-ghosts { display: flex; }
+body.phonemin #hu.hu-go .hu-big { display: grid; }
+body.phonemin #hu.hu-go { animation: huBuzz .25s linear infinite; }
+@keyframes huBuzz { 20% { transform: translate(.5em, -.3em); } 40% { transform: translate(-.5em, .3em); } 60% { transform: translate(.4em, .4em); } 80% { transform: translate(-.4em, -.4em); } }
+@media (prefers-reduced-motion: reduce) { #hu, #hu * { animation: none !important; } }
 #waitClock i { display: block; height: 100%; width: 100%; border-radius: .25em; opacity: .7; }
 body.tv #waitClock { left: 0; right: 0; bottom: 0; width: auto; transform: none; height: .7em; border-radius: 0; }
 body.tv #waitClock i { border-radius: 0; opacity: .55; }
@@ -1874,6 +1895,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="caption"></div>
   <div id="hint" hidden>Touche pour continuer</div>
   <div id="waitClock" hidden><i></i></div>
+  <div id="hu" hidden><div class="hu-soon"></div><div class="hu-pill"><span></span> <b></b></div><div class="hu-dot"></div><div class="hu-ghosts"><i></i><i></i><i></i></div><div class="hu-big"><b></b></div></div>
   <div id="waitOther" hidden><span id="waitFace" hidden><img alt=""></span><span id="waitText"></span><i>.</i><i>.</i><i>.</i></div>
   <div id="ringCard" hidden><div id="ringName"></div><div id="ringSub"></div><div id="ringBtns"></div></div>
   <div id="callBar" hidden><i></i><b id="callName"></b><span id="callTime"></span></div>
@@ -2607,7 +2629,7 @@ const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
 const seatName = (k) => (state.seats[k] ? state.seats[k].n : '');
 // the player's own words around a story (waiting on the other, the end card): French, or the story's own (story.ui)
-const UI = { you: 'You are', choosing: 'is choosing', reading: 'is reading something', calling: 'incoming call…', choices: 'Your choices', again: 'Replay', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended',
+const UI = { you: 'You are', choosing: 'is choosing', soon: 'Choice soon…', choiceIn: 'Your choice in', reading: 'is reading something', calling: 'incoming call…', choices: 'Your choices', again: 'Replay', delivered: 'Delivered', read: 'Read', callEnded: 'Call ended',
   newText: 'New message', epEnd: 'End of episode', finished: 'You finished', won: 'You win…', added: 'Added to your characters', episode: 'Episode', next: 'Continue', home: 'Back to home', finale: 'See the ending',
   mute: 'Mute', unmute: 'Unmute', restartEp: 'Restart the episode', restart: 'Start over', quit: 'Quit' };
 const ui = (k) => (story().ui && story().ui[k]) || UI[k];
@@ -3406,6 +3428,43 @@ $('#absentBar').onclick = (e) => {
   for (const k of absentSeats()) takenOver.add(k);
   showAbsent();
 };
+// the heads-up before a choice (04/11, from avis.html): the story shows it is coming so the one who chooses is ready. At 5 s
+// a subtle sign (phone: « Choice soon… », remote: a dot) from the last line on; the real one lasts 3 s (ticks 3·2·1, a long
+// buzz, « Your choice in 3 » or, on the remote, the shake + a big number + the choices rising), then the choices appear. A
+// tap on the last line before 2 s waits for the rest. Only the player who chooses; not a call, a bot, a TV, a preview, a jump
+const HU_EARLY = 2000, HU_REAL = 3000;
+let huAt = 0;
+const huBox = () => $('#hu');
+const huOn = (s) => !(FAST || PREVIEW || TV || MIRROR || jumpAll || jumpEp) && s && s.choice && !s.ring && mineFor(byOf(s)) && !isBot(byOf(s)) && !waitsFor(byOf(s));
+function huTone(f, d, v, to = 0) {
+  if (muted) return; const c = audio(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + .02; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
+  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + .05);   // straight to the speaker: it also sounds on a remote
+}
+function huOff() { huAt = 0; const b = huBox(); b.hidden = true; b.className = ''; }
+function huLine() {   // a line is on screen: if a choice follows, the early sign
+  huOff();
+  const s = q.find((x) => !(x.cam || x.poses || x.face || x.enter || x.exit || x.pan !== undefined));
+  if (!huOn(s)) return;
+  huAt = performance.now(); const b = huBox(); b.querySelector('.hu-soon').textContent = ui('soon'); b.className = 'hu-pre'; b.hidden = false; huTone(330, .14, .05);
+}
+async function headsUp(s, r) {   // the choice step is reached: wait out the early stage, then the real one
+  if (!huOn(s)) { huOff(); return true; }
+  const b = huBox(), wait = huAt ? Math.max(0, HU_EARLY - (performance.now() - huAt)) : 0;
+  waiting = 'headsup';
+  if (wait) { await sleep(wait); if (r !== run) { huOff(); return false; } }
+  b.querySelector('.hu-pill span').textContent = ui('choiceIn'); b.hidden = false; b.className = 'hu-go';
+  try { navigator.vibrate && navigator.vibrate([500]); } catch { /* no vibration here */ }
+  const t0 = performance.now(); let last = -1;
+  for (;;) {
+    const ms = performance.now() - t0, p = Math.min(1, ms / HU_REAL), n = Math.ceil((1 - p) * 3) || 0;
+    if (r !== run) { huOff(); return false; }
+    if (n !== last) { last = n; b.querySelectorAll('.hu-pill b, .hu-big b').forEach((x) => { x.textContent = n; }); if (n > 0) huTone(660, .09, .12); }
+    b.style.setProperty('--p', p);
+    if (p >= 1) break; await sleep(60);
+  }
+  huTone(990, .35, .16); huTone(1320, .35, .08); huOff(); return true;
+}
 // the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
 function botPick() {
   const at = run, n = options.length;
@@ -4136,11 +4195,11 @@ async function next() {
       onlyNow = s.only || null;
       document.body.classList.toggle('privline', !!onlyNow && sees(onlyNow));
       if (onlyNow && !sees(onlyNow)) { bubble.hidden = true; waitNote(`${seatName(onlyNow)} ${ui('reading')}`); } else line(s);
-      waiting = 'click';
+      waiting = 'click'; huLine();
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { if (!(await headsUp(s, r))) return; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
@@ -4219,7 +4278,7 @@ function show(id) {
 function halt() {
   document.body.classList.remove('choosing', 'privline'); litOff(); qCardOff();
   $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
-  run++; q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
+  run++; huOff(); q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
 }
 function endSplit() {
@@ -4262,7 +4321,7 @@ function begin(id = state.story) {
   // a play from Full demo was counted there, when Play was pressed
   if (!fromDemo && !PLAY_ONLY) bump((st) => { st.s = st.s || {}; const k = sid(id), r = (st.s[k] = st.s[k] || {}); if (storyName(id) !== id) r.n = storyName(id); r.plays = (r.plays || 0) + 1; });
   paused = null; showPause(); takenOver.clear();
-  run++; state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
+  run++; huOff(); state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
   firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
   q = STORIES[id].slice(); black.style.transition = 'none'; black.style.opacity = 1;
