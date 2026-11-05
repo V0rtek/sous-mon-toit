@@ -3429,42 +3429,41 @@ $('#absentBar').onclick = (e) => {
   for (const k of absentSeats()) takenOver.add(k);
   showAbsent();
 };
-// the heads-up before a choice (04/11, from avis.html): the story shows it is coming so the one who chooses is ready. At 5 s
-// a subtle sign (phone: « Choice soon… », remote: a dot) from the last line on; the real one lasts 3 s (ticks 3·2·1, a long
-// buzz, « Your choice in 3 » or, on the remote, the shake + a big number + the choices rising), then the choices appear. A
-// tap on the last line before 2 s waits for the rest. Only the player who chooses; not a call, a bot, a TV, a preview, a jump
-const HU_EARLY = 2000, HU_REAL = 3000;
-let huAt = 0;
+// the heads-up before a choice (04/11, from avis.html). It never delays the choice: the counter's 0 is the moment the choice shows.
+// That moment is known when the story moves by itself (a TV's story and its remote phones, an `auto` story): the last line
+// before the choice stays readMs(its text), so at 5 s before that a subtle sign (phone: « Choice soon… », remote: a dot), and
+// for the last 3 s the real one (ticks 3·2·1, a long buzz, « Your choice in 3 » or, on the remote, the shake + a big number +
+// the choices rising). When the players tap the story along, nobody knows when the choice comes (it is the tap): only the
+// subtle sign, while the last line is up. Only for the player who chooses; not a call, a bot, a TV, a preview, a jump
+const HU_PRE = 5000, HU_REAL = 3000;
+let huTok = 0;
 const huBox = () => $('#hu');
 const huOn = (s) => !(FAST || PREVIEW || TV || MIRROR || jumpAll || jumpEp) && s && s.choice && !s.ring && mineFor(byOf(s)) && !isBot(byOf(s)) && !waitsFor(byOf(s));
-function huTone(f, d, v, to = 0) {
+const huAuto = () => hostTv || !!(STORIES[state.story] || {}).auto;
+function huTone(f, d, v) {
   if (muted) return; const c = audio(); if (!c) return;
-  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + .02; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + .02; o.frequency.setValueAtTime(f, t);
   g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .006); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + .05);   // straight to the speaker: it also sounds on a remote
 }
-function huOff() { huAt = 0; const b = huBox(); b.hidden = true; b.className = ''; }
-function huLine() {   // a line is on screen: if a choice follows, the early sign
+function huOff() { huTok++; const b = huBox(); b.hidden = true; b.className = ''; }
+function huLine() {   // a line is on screen: if a choice follows, the sign
   huOff();
   const s = q.find((x) => !(x.cam || x.poses || x.face || x.enter || x.exit || x.pan !== undefined));
   if (!huOn(s)) return;
-  huAt = performance.now(); const b = huBox(); b.querySelector('.hu-soon').textContent = ui('soon'); b.className = 'hu-pre'; b.hidden = false; huTone(330, .14, .05);
-}
-async function headsUp(s, r) {   // the choice step is reached: wait out the early stage, then the real one
-  if (!huOn(s)) { huOff(); return true; }
-  const b = huBox(), wait = huAt ? Math.max(0, HU_EARLY - (performance.now() - huAt)) : 0;
-  waiting = 'headsup';
-  if (wait) { await sleep(wait); if (r !== run) { huOff(); return false; } }
-  b.querySelector('.hu-pill span').textContent = ui('choiceIn'); b.hidden = false; b.className = 'hu-go';
-  try { navigator.vibrate && navigator.vibrate([500]); } catch { /* no vibration here */ }
-  const t0 = performance.now(); let last = -1;
-  for (;;) {
-    const ms = performance.now() - t0, p = Math.min(1, ms / HU_REAL), n = Math.ceil((1 - p) * 3) || 0;
-    if (r !== run) { huOff(); return false; }
-    if (n !== last) { last = n; b.querySelectorAll('.hu-pill b, .hu-big b').forEach((x) => { x.textContent = n; }); if (n > 0) huTone(660, .09, .12); }
-    b.style.setProperty('--p', p);
-    if (p >= 1) break; await sleep(60);
-  }
-  huTone(990, .35, .16); huTone(1320, .35, .08); huOff(); return true;
+  const b = huBox(), tok = huTok; b.querySelector('.hu-soon').textContent = ui('soon'); b.querySelector('.hu-pill span').textContent = ui('choiceIn');
+  if (!huAuto()) { b.className = 'hu-pre'; b.hidden = false; huTone(330, .14, .05); return; }
+  const due = performance.now() + (onlyNow ? 5000 : readMs(typingFull)); let stage = '', last = -1;
+  const tick = () => {
+    if (tok !== huTok) return;
+    const left = due - performance.now(), n = Math.max(0, Math.ceil(left / 1000));
+    if (left <= HU_REAL) {
+      if (stage !== 'hu-go') { stage = 'hu-go'; b.className = 'hu-go'; b.hidden = false; try { navigator.vibrate && navigator.vibrate([500]); } catch { /* no vibration here */ } }
+      b.style.setProperty('--p', Math.min(1, Math.max(0, 1 - left / HU_REAL)));
+      if (n !== last) { last = n; b.querySelectorAll('.hu-pill b, .hu-big b').forEach((x) => { x.textContent = n; }); if (n > 0) huTone(660, .09, .12); else { huTone(990, .35, .16); huTone(1320, .35, .08); } }
+    } else if (left <= HU_PRE && stage !== 'hu-pre') { stage = 'hu-pre'; b.className = 'hu-pre'; b.hidden = false; huTone(330, .14, .05); }
+    setTimeout(tick, 60);
+  };
+  tick();
 }
 // the bot picks at random after a beat, and moves past its private lines after a beat (taps go on the tape as usual)
 function botPick() {
@@ -3584,6 +3583,7 @@ function qCardShow(k) {
 function qCardOff() { const q = $('#qCard'); if (q) q.remove(); }
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
+  huOff();
   options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; litFocus(seatFor(by));
   document.body.classList.toggle('choosing', mineFor(by)); $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
@@ -4200,7 +4200,7 @@ async function next() {
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { if (!(await headsUp(s, r))) return; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
