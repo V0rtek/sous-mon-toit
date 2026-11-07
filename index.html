@@ -3943,7 +3943,7 @@ $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sen
 const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
 let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
 function autoTick() {
-  if ((!TV && !(STORIES[state.story] || {}).auto) || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }   // the TV, or a story that plays itself (auto)
+  if ((!TV && !(STORIES[state.story] || {}).auto) || ROLE === 'watch' || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }   // the TV, or a story that plays itself (auto); a joined phone follows the host's tape, it never moves on by itself
   const now = Date.now(), due = (k, id, ms) => { if (autoKey[k] !== id) { autoKey[k] = id; autoKey[k + 't'] = now + ms; } return now >= autoKey[k + 't']; };
   if (waiting === 'click' && !typing) {
     const id = run + ':' + tape.length, ms = !slateEl.hidden ? 3500 : onlyNow ? 5000 : readMs(typingFull);
