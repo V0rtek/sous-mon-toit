@@ -3287,7 +3287,7 @@ function setMuted(m) {
 }
 function audio() {
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
-  if (actx.state === 'suspended' && !document.hidden) actx.resume();
+  if (actx.state !== 'running' && actx.state !== 'closed' && !document.hidden) actx.resume().catch(() => {});   // iOS: 'interrupted' too
   return actx;
 }
 // no sound while the phone is locked or the page is in another tab: everything pauses, then picks up where it was
@@ -3295,7 +3295,16 @@ const hearing = () => { if (!actx) return; if (document.hidden) actx.suspend(); 
 document.addEventListener('visibilitychange', hearing);
 addEventListener('pagehide', () => { if (actx) actx.suspend(); });
 addEventListener('pageshow', hearing);
-addEventListener('pointerdown', () => audio(), true);
+// a phone lets a page make sound only from a real tap: the finger lifted (touchend, pointerup, click), not when it lands
+// (pointerdown, a computer's mouse only). So the sound opens on all of them; the first one also plays a silent sample, which
+// is what unlocks it on an iPhone (07/11: a phone heard nothing in the game, Double It's page opens its sound on a click)
+let soundOpen = false;
+function unlockAudio() {
+  const c = audio(); if (!c) return;
+  try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch { /* older browsers */ }
+  if (!soundOpen) { try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); soundOpen = true; } catch { /* not yet */ } }
+}
+for (const ev of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) addEventListener(ev, unlockAudio, true);
 const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3`)
   .then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && audio().decodeAudioData(b)).catch(() => null));
 // how loud each file plays (the files are levelled alike, ~-21 LUFS): a room's sound stays under the voices, the campfire
