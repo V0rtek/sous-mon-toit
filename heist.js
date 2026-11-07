@@ -54,7 +54,7 @@
         narr('He locks the screen. It lights up again. He doesn’t look.') ] },
     ] },
     // ---- the masks: Double It comes in low; Ray picks for Marcus (the first clock, a long one) ----
-    { music: 'double it', lv: 0, vol: .22, ms: 5000 },
+    { music: 'double it', lv: 0, vol: .5, ms: 3000 },
     narr('Ray unzips a gym bag. Two masks: a pig and a clown. And something heavy, wrapped in a towel.'),
     { by: 'pb', clock: 20000, choice: [
       { t: 'Give him the pig.', intent: 'the pig', set: { mask: 'pig', mine: 'clown' }, then: [
@@ -63,14 +63,14 @@
         narr('Ray holds out the clown. Marcus looks at it. Ray keeps the pig.') ] },
     ] },
     // ---- the floors: a dot a bar, the music a little louder each time; nobody talks ----
-    { music: 'double it', vol: .35, ms: 1200 }, { bars: 1 }, ...at('h_elev1'),
-    { music: 'double it', vol: .48, ms: 1200 }, { bars: 1 }, ...at('h_elev2'),
+    { music: 'double it', vol: .6, ms: 1200 }, { bars: 1 }, ...at('h_elev1'),
+    { music: 'double it', vol: .7, ms: 1200 }, { bars: 1 }, ...at('h_elev2'),
     narr('Nobody talks anymore.'),
-    { music: 'double it', vol: .6, ms: 1200 }, { bars: 1 }, ...at('h_elev3'),
-    { music: 'double it', vol: .72, ms: 1200 }, { bars: 1 }, ...at('h_elev4'),
+    { music: 'double it', vol: .78, ms: 1200 }, { bars: 1 }, ...at('h_elev3'),
+    { music: 'double it', vol: .86, ms: 1200 }, { bars: 1 }, ...at('h_elev4'),
     { fn: (f) => [narr(f.wife === 'read' ? 'Marcus’s phone lights up again. He turns it over: the dinosaur and the bee. He puts it away.'
       : 'Marcus looks at his lock screen one last time. The dinosaur and the bee. He puts it away.')] },
-    { music: 'double it', vol: .85, ms: 1200 }, { bars: 1 }, ...at('h_elev5'),
+    { music: 'double it', vol: .93, ms: 1200 }, { bars: 1 }, ...at('h_elev5'),
     { fn: (f) => [narr(`Floor 30. They put the masks on. The ${f.mask} isn’t funny anymore.`)] },
     // ---- 31: the reverse boom swells over the last bars, the doors open on the drop ----
     { music: 'double it', lv: 1, vol: 1, ms: 2400, inBars: 2 }, { bars: 'drop' },
