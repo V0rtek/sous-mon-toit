@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In the End · loop levels</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Yeseva+One&display=swap">
+<style>
+/* In the End (Linkin Park, the instrumental, 105 BPM) cut in 4 loops of 8 bars, from calm to full, the same way as Double It
+   (double-it.html): a tap = the next level, it lands on the next bar, the reverse boom swells into it and the new loop starts
+   from its first bar. After level 4 a tap ends it. The cuts (07/11), bar = 4 beats from 0.915 s in the song: 1 the piano intro
+   (bars 1-7 then 4 again, without the gap before the drums), 2 the first 8 bars of verse 1 (the drums come in on bar 1),
+   3 the half-time bridge (its bars 1-7 then 4 again, without the silence before the last chorus), 4 the first 8 bars of the
+   last chorus (the impact on bar 1). */
+:root { --ui: 'Nunito', system-ui, sans-serif; --display: 'Yeseva One', Georgia, serif; --c: #5e9cff; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0b0a0f; color: #f5f5f7; font-family: var(--ui); }
+header { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 16px; padding: 14px 20px; background: rgba(11,10,15,.94); border-bottom: 1px solid #2c2c2e; }
+header h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; margin-right: auto; }
+header a, header button { color: #8e8e93; text-decoration: none; font-weight: 800; font-size: 14px; background: none; border: 0; cursor: pointer; font-family: inherit; }
+main { max-width: 520px; margin: 0 auto; padding: 22px 20px 60px; }
+.card { position: relative; border-radius: 16px; padding: 18px 18px 16px; cursor: pointer; background: #17161c; border-left: 6px solid var(--c); display: grid; gap: 8px; user-select: none; }
+.card.on { background: color-mix(in srgb, var(--c) 22%, #17161c); box-shadow: 0 0 40px -8px var(--c); }
+.n { font-size: 11px; font-weight: 900; color: var(--c); letter-spacing: .1em; }
+h2 { margin: 0; font-size: 22px; font-weight: 900; }
+p { margin: 0; font-size: 13.5px; line-height: 1.45; color: #aeaeb2; }
+.pips { display: flex; gap: 6px; }
+.pips button { flex: 1; font: inherit; font-size: 12px; font-weight: 900; color: #8e8e93; background: #2a2931; border: 0; border-radius: 6px; padding: 9px 0; cursor: pointer; transition: background .2s, color .2s; }
+.pips button.on { background: var(--c); color: #000; }
+.lv { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 4px; font-size: 13px; line-height: 1.35; color: #8e8e93; }
+.lv li { padding-left: 6px; border-left: 3px solid #2a2931; }
+.lv li.on { color: #f5f5f7; border-left-color: var(--c); }
+.lv li.past { color: #aeaeb2; }
+.hint { font-size: 12px; font-weight: 800; color: var(--c); letter-spacing: .04em; min-height: 1.3em; }
+.bars { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.bars i { height: 6px; border-radius: 3px; background: #2a2931; }
+.bars i.on { background: var(--c); }
+</style>
+</head>
+<body>
+<header><h1>In the End · loop levels</h1><button type="button" id="stop">Stop</button><a href="double-it.html">Double It ›</a><a href="boucles.html">Music loops ›</a><a href="index.html">‹ Home</a></header>
+<main>
+  <div class="card" id="card" role="button" tabindex="0">
+    <span class="n">ROCK · 105 BPM · 4 LEVELS · 8 BARS EACH</span><h2>In the End</h2>
+    <div class="pips" id="pips"></div><div class="bars" id="bars"></div><div class="hint" id="hint"></div>
+    <ol class="lv" id="lv" style="list-style:none;padding:0"></ol>
+    <p><b>Fits:</b> Something is lost → it sinks in → it gets worse → the breaking point. Levels change on a bar; the loops repeat as long as the scene lasts.</p>
+  </div>
+</main>
+<script>
+const $ = (s) => document.querySelector(s);
+const LEVELS = [
+  ['in the end loop 1 intro', 'Calm: the piano riff alone'],
+  ['in the end loop 2 verse', 'The beat comes in: drums, bass, the riff'],
+  ['in the end loop 3 bridge', 'Heavier: the half-time bridge, guitars'],
+  ['in the end loop 4 chorus', 'Full: the last chorus, everything at once'],
+];
+const BAR = 60 / 105.07 * 4, BOOM = 'reverse cinematic boom', BOOM_AT = 4.8;   // the boom's hit is 4.8 s into its 5.15 s
+let ac, master, bufs = null, boom = null, playing = false, L = 0, pend = null, nextT = 0, barI = 0, timer;
+const load = (n) => fetch('sfx/' + encodeURIComponent(n) + '.mp3').then((r) => r.arrayBuffer()).then((b) => ac.decodeAudioData(b));
+async function boot() {
+  if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); const c = ac.createDynamicsCompressor(); master = ac.createGain(); master.gain.value = .85; master.connect(c); c.connect(ac.destination); }
+  await ac.resume();
+  if (!bufs) { [bufs, boom] = await Promise.all([Promise.all(LEVELS.map((l) => load(l[0]))), load(BOOM)]); }
+}
+function src(buf, t, off, dur, vol = 1) { const s = ac.createBufferSource(), g = ac.createGain(); s.buffer = buf; g.gain.value = vol; s.connect(g); g.connect(master); s.start(t, off, dur); return s; }
+function sched() {
+  while (playing && nextT < ac.currentTime + .25) {
+    if (pend && nextT >= pend.at - .001) { L = pend.L; pend = null; barI = 0; paint(); }   // a new level starts from its first bar: the beat's own impact lands on the line
+    src(bufs[L], nextT, (barI % 8) * BAR, BAR); barI++; nextT += BAR; paint(true);
+  }
+}
+function goto(n) {
+  const now = ac.currentTime; let at = nextT; if (at - now < .45) at += BAR;
+  pend = { L: n, at }; const up = n > L;
+  if (up) { const lead = Math.min(at - now, 3.4); src(boom, at - lead, BOOM_AT - lead, lead + .6, .9); }   // the reverse boom swells right up to the bar line
+  paint();
+}
+async function start(lv) { await boot(); clearInterval(timer); playing = true; L = lv; pend = null; barI = 0; nextT = ac.currentTime + .08; timer = setInterval(sched, 25); sched(); paint(); }
+function stop() { clearInterval(timer); playing = false; pend = null; if (ac) ac.suspend().then(() => ac.resume()); paint(); }   // suspend/resume cuts what was already scheduled
+function tap() { if (!playing) return start(0); const at = pend ? pend.L : L; if (at >= 3) stop(); else goto(at + 1); }
+function paint(bar) {
+  const lv = playing ? (pend ? pend.L : L) : -1;
+  $('#card').classList.toggle('on', playing);
+  document.querySelectorAll('#pips button').forEach((b, k) => b.classList.toggle('on', k <= lv));
+  document.querySelectorAll('#lv li').forEach((li, k) => { li.classList.toggle('on', k === lv); li.classList.toggle('past', k < lv); });
+  document.querySelectorAll('#bars i').forEach((b, k) => b.classList.toggle('on', playing && k === (barI + 7) % 8));
+  if (!bar) $('#hint').textContent = !playing ? 'Tap to start' : lv >= 3 ? 'Tap: the end' : 'Tap: more intense';
+}
+$('#pips').innerHTML = LEVELS.map((_, k) => `<button type="button" data-lv="${k}">${k + 1}</button>`).join('');
+$('#lv').innerHTML = LEVELS.map((l) => `<li>${l[1]}</li>`).join('');
+$('#bars').innerHTML = '<i></i>'.repeat(8);
+$('#card').onclick = (e) => { const pb = e.target.closest('#pips button'); if (pb) { const n = +pb.dataset.lv; if (!playing) start(n); else if (n !== (pend ? pend.L : L)) goto(n); return; } tap(); };
+$('#stop').onclick = stop; paint();
+</script>
+</body>
+</html>
