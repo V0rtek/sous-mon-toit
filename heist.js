@@ -85,7 +85,7 @@
         `He walked out of the elevator in a ${f.mask} mask. Ray picked it.`,
       ].join(' '), art: null } }] },
   ], {
-    gaze: false, credits: '', title: 'Floor 31',
+    gaze: false, credits: '', title: 'Floor 31', auto: true,   // the story plays itself: each line moves on after its reading time, a tap moves it on sooner; choices still wait
     intro: ['Halden Tower, downtown. A Tuesday, just before noon.', 'Two men in suits are about to make 3.2 million dollars.'],
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
     pick: { pa: { pose: 'listen', line: 'Mia’s recital is at 6.' }, pb: { pose: 'listen', line: '3,200,000.' } },
