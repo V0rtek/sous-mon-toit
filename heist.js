@@ -59,7 +59,9 @@
   const TWO_BACK = [R(0, 0, 1920, 1080, '#1b2230'), ...[[300, .9], [1600, .85], [960, .8]].flatMap(([x, s]) => bust(x, 640, s, GREY, { blur: 8 })), R(0, 640, 1920, 440, '#141a24')];
   const two = (o = {}) => place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...bust(1300, 900, 1.7, P2),
     ...(o.p2phone ? [glow(1380, 860, 'pb')] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
-  SCENES.h_two = chairs([MARCUS, RAY]);
+  SCENES.h_two = chairs([MARCUS, RAY]);   // Marcus talks, Ray thinks
+  // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
+  SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
   SCENES.h_two_call = chairs([MARCUS, RAY], [R(1340, 545, 34, 56, '#e0f2fe', { r: 6, glow: '0 0 40px 16px rgba(186,230,253,.6)', who: 'pb' })]);   // his phone lights up
   SCENES.h_ots1 = place({ ambience: 'crowd', back: [   // over Marcus's shoulder: his phone, his kids on it, Leo's text on top
     R(0, 0, 1920, 1080, '#1b2230'), ...bust(1500, 820, 1.2, P2, { blur: 10 }),
@@ -175,16 +177,16 @@
     // ---- 4-7. the briefcase, the three lines ----
     ...at('h_case'), S('pb', 'We’re on in 8 minutes.'),
     ...at('h_two'), S('pa', 'Guess there’s no turning back now.'),
-    S('pb', 'Yeah…'),
+    ...at('h_two_r'), S('pb', 'Yeah…'),
     S('pb', 'Nothing to lose.'),
     // ---- 8. Marcus's phone: Leo, his kids behind ----
     BUZZ, ...at('h_ots1'), sms('leo', 'pa', 'dad r u coming to practice tonight?'),
     narr('Leo: “dad r u coming to practice tonight?”'),
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_ots2'), { hush: 1300 }, ...at('h_two'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
+    ...at('h_ots2'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
-      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got a lot to lose.')] },
-      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'I’ve got a lot to win.')] },
+      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to lose.')] },
+      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to win.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_two_call'), RING, { hush: 1200 },
