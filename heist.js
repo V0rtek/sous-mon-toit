@@ -8,7 +8,7 @@
 // 14 the elevator: the crowd comes back, Double It starts far and muffled, 15 the last text before going in (each his own),
 // 16 in, 17 up: a dot a bar, the briefcase, the masks; the doors open on the drop: Amy, at the loan counter. Then a fast
 // forward (the key moments, a tap on a phone moves on, the real choice screens and music): the robbery, Marcus sends one to
-// the vault, Amy takes the guard's gun and holds the other one; he shows his face or not; the one back from the vault picks
+// the vault (before: the guard, behind the restroom door: Marcus waits or talks him out), Amy takes the guard's gun and holds the other one; he shows his face or not; the one back from the vault picks
 // (Marcus: shoot her to save his friend, lower his gun, take the aim; Ray: show himself to her, shoot, drop the money).
 // Loaded after story.js and bar.js (scene, say, narr, R).
 (() => {
@@ -89,7 +89,8 @@
   const handsUp = (x, y, s, color, o = {}) => tagged([...stand(x, y, s, color, o), R(x - 70 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s }), R(x + 42 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s })], color, o);
   const COL = { pa: P1, pb: P2 };
   // (09/11) Justin's three: out of the elevator, guns up; the room, hands up; the alarm, red, everyone on the floor
-  for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
+  // (09/11) the guard: the restroom door, red; Marcus aiming at it; the door an inch open, the guard's gun first
+  for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red'], ['h_wc', 'wc_door'], ['h_wc_aim', 'wc_aim'], ['h_wc_gun', 'wc_gun']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
   SCENES.h_ray_sees = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(160, 600, 980, 210, AMY, { r: 105 }), C(1240, 640, 280, SKIN),
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
   const vault = (k) => place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1180, 520, 760, '#9ca3af', { line: '34px solid #6b7280' }), C(1180, 520, 120, '#6b7280'),
@@ -209,6 +210,39 @@
     ...at('h_rob_out'), { fade: 'in', ms: 1 }, { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
     ...at('h_rob_hands'), { hush: 1800 },
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), T('The alarm. Everyone on the floor. Amy too.'),
+    S('pb', 'Where’s the security guard??'),
+    // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
+    // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
+    ...at('h_wc'), { sfx: 'toilet flush', ms: 9000 }, { hush: 2800 },
+    ...at('h_wc_aim'),
+    { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
+      { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
+        { hush: 1800 }, ...at('h_wc_gun'), T('The door opens an inch. His gun first.'),
+        { by: 'pa', cue: 'Look at your phone', clock: 5000, choice: [
+          { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
+            { sfx: 'gun shot' }, T('The guard goes down, his hand on his shoulder. His gun skids across the floor.')] },
+          { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
+            S('pa', 'DROP IT!'), S('guard', 'Okay! Okay!'), T('The gun hits the floor. Marcus kicks it away. It stops among the hostages.')] },
+        ] },
+      ] },
+      { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
+        S('pa', 'I know you’re in there. Send over your weapon!'),
+        S('guard', 'Come and get it.'),
+        { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
+          { t: '“Ten seconds. Then someone out here pays for it.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
+            S('pa', 'Ten seconds. Then someone out here pays for it.'), S('guard', 'Don’t! Don’t touch them!')] },
+          { t: '“Nobody dies for the bank’s money. Come out.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
+            S('pa', 'Nobody dies for the bank’s money. Come out.'), S('guard', '…')] },
+        ] },
+        S('guard', 'Okay. I come out, I get down. But the gun stays in my holster.'),
+        { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
+          { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
+            S('pa', 'Fine. On the ground.'), ...at('h_wc_gun'), T('The door opens. Hands up, the guard lies down with the others. His gun still on his hip.')] },
+          { t: '“The gun first. Slide it.”', ic: 'tough', sh: 'The gun first', intent: 'wants the gun', set: { gun: 'floor' }, then: [
+            S('pa', 'The gun first. Slide it.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.')] },
+        ] },
+      ] },
+    ] },
     ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'I take the vault.', ic: 'vault', sh: 'I go', intent: 'the vault', set: { watch: 'pb' }, then: [] },
@@ -220,7 +254,7 @@
       const BANG = [{ music: null, ms: 0 }, { sfx: 'gun shot' }, ...at('h_black'), T('BANG.')];
       return [
         ...at('h_vault_' + O), T(`${nO} in the vault with the teller. ${nW} alone with the room.`),
-        ...at('h_holster'), T('On the floor, Amy’s hand slides to the guard’s holster.'),
+        ...at('h_holster'), T(f.gun === 'holster' ? 'On the floor, Amy’s hand slides to the guard’s holster.' : 'On the floor, Amy’s hand slides to the guard’s gun.'),
         { music: 'double it', lv: 3 }, { bars: 'drop' },
         ...at('h_aim_' + W), T(`Amy is up. The guard’s gun on ${nW}’s head.`),
         // the one she holds: show his face or not
@@ -262,11 +296,13 @@
       leo: { name: 'Leo', color: '#f59e0b' },
       sarah: { name: 'Sarah', color: '#22c55e' },
       amy: { name: 'Amy', color: AMY },
+      guard: { name: 'Guard', color: '#94a3b8' },
     },
     words: { LEDE: (f) => [
       f.p1 === 'lose' ? 'Marcus had everything to lose.' : 'Marcus had everything to win.',
       f.amy === 'call' ? `Ray picked up for Amy${f.told === 'lie' ? ', and lied to her' : ''}.` : 'Ray let Amy’s call go.',
       'She was at the loan counter on 31.',
+      ({ shot: 'Marcus shot the guard.', drop: 'Marcus made the guard drop his gun.', talk: 'Marcus talked the guard out.' })[f.guard] || '',
       f.watch ? `${N[f.watch]} stayed with the room, and Amy took the guard’s gun.` : '',
       f.mask === 'off' ? `${N[f.watch]} showed her his face.` : f.mask === 'on' ? `${N[f.watch]} kept his mask on.` : '',
       ({ shoot: 'Then a shot.', lower: 'Marcus put his gun down.', draw: 'Marcus took the aim for his friend.', me: 'Ray showed Amy who he was.', drop: 'Ray dropped the money.' })[f.last] || '',

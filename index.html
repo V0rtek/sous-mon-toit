@@ -2709,7 +2709,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109110000"></script>
+<script src="heist.js?v=20261109120000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2726,7 +2726,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <div id="warn" hidden role="alert"><div class="wIcon">🚨</div><p class="wBig">TU DOIS AVOIR UNE DEMO AU PLUS SACRANT</p><p class="wSub">pour le pitch Spark ET pour valider l’idée</p><button class="wOk" type="button">OK, J’Y VAIS</button></div>
 <script src="importer.js?v=20261102260000"></script>
 <script src="deck.js?v=20261103600000"></script>
-<script src="bank.js?v=20261109080000"></script>
+<script src="bank.js?v=20261109120000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -3435,7 +3435,7 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // 5 s: under the "You are" card that opens every story), dragon_arrive (a short epic roar, 3 s), dragon_fire (a long
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.4 };
 async function sfx(name, loop = false, rate = 1, ms = 0) {   // ms: only that much of it (a long file, a short moment)
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
