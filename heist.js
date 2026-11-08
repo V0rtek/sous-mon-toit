@@ -154,7 +154,7 @@
 
   const at = (id) => [scene(id, {}), { cam: 'wide', at: 960 }];   // a place, the camera on all of it
   const S = (who, text, o) => ({ say: who, text, ...o });          // a line (no pose: they're shapes)
-  const T = (text) => ({ narr: text, tap: true });                 // a key moment of the fast forward: it waits for a tap
+  const T = (text) => ({ narr: text });                            // a key moment of the fast forward (it goes on like the rest)
   const N = { pa: 'Marcus', pb: 'Ray' }, WHO = { leo: 'Leo', sarah: 'Sarah', amy: 'Amy' };
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
@@ -178,8 +178,8 @@
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
     ...at('h_ots2'), { hush: 1300 }, ...at('h_two'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
-      { t: '“I’ve got my kids at home.”', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got my kids at home.')] },
-      { t: '“If this works, I get the happy ending my family deserves.”', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
+      { t: '“I’ve got my kids at home.”', ic: 'say', sh: 'My kids', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got my kids at home.')] },
+      { t: '“If this works, I get the happy ending my family deserves.”', ic: 'say', sh: 'Happy ending', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_two_call'), RING, { hush: 1200 },
@@ -248,12 +248,12 @@
     { hush: 1400 },
     // ---- FAST FORWARD: the key moments one after the other, no transitions; a tap on a phone moves on. The choices are
     // the real ones (their screen, the music holding its breath) ----
-    { titleCard: 'Fast forward', sub: 'The key moments · tap a phone to go on' },
+    { titleCard: 'Fast forward', sub: 'The key moments' },
     ...at('h_rob'), { fade: 'in', ms: 1 }, T('“EVERYBODY DOWN.” The guard, the teller, Amy: on the floor.'),
     ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
-      { t: 'I take the vault.', intent: 'the vault', set: { watch: 'pb' }, then: [] },
-      { t: 'You take the vault.', intent: 'the room', set: { watch: 'pa' }, then: [] },
+      { t: 'I take the vault.', ic: 'vault', sh: 'I go', intent: 'the vault', set: { watch: 'pb' }, then: [] },
+      { t: 'You take the vault.', ic: 'send', sh: 'You go', intent: 'the room', set: { watch: 'pa' }, then: [] },
     ] },
     { music: 'double it', lv: 2 },
     { fn: (f) => {
@@ -266,22 +266,22 @@
         ...at('h_aim_' + W), T(`Amy is up. The guard’s gun on ${nW}’s head.`),
         // the one she holds: show his face or not
         { by: W, cue: 'Look at your phone', clock: 10000, choice: [
-          { t: 'Take off the mask.', intent: 'shows his face', set: { mask: 'off' }, then: [...at('h_face_' + W),
+          { t: 'Take off the mask.', ic: 'unmask', sh: 'Unmask', intent: 'shows his face', set: { mask: 'off' }, then: [...at('h_face_' + W),
             T(W === 'pb' ? 'Amy: “…Ray?” The gun shakes in her hand.' : 'Marcus shows his face. “I’ve got kids. Please.”')] },
-          { t: 'Keep it on.', intent: 'stays masked', idle: true, set: { mask: 'on' }, then: [
+          { t: 'Keep it on.', ic: 'mask', sh: 'Keep it on', intent: 'stays masked', idle: true, set: { mask: 'on' }, then: [
             T(W === 'pb' ? 'Amy: “Who are you?” Her finger on the trigger.' : 'Amy: “Take it off. Now.” Her finger on the trigger.')] },
         ] },
         // the other one, back from the vault: the gun on his friend's head
         { fn: (g) => [...at(`h_standoff_${W}${g.mask === 'off' ? '_off' : ''}`),
           T(`${nO} comes back from the vault, the bags on his shoulder. The gun on ${nW}’s head.`),
           { by: O, cue: 'Look at your phone', clock: 7000, choice: O === 'pa' ? [
-            { t: 'Shoot her.', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
-            { t: 'Lower your gun.', intent: 'lowers it', set: { last: 'lower' }, then: [T('Marcus puts his gun on the floor. Amy’s doesn’t move.')] },
-            { t: '“Hey! Over here!”', intent: 'takes the aim', set: { last: 'draw' }, then: [T('Amy turns. The gun on Marcus now.')] },
+            { t: 'Shoot her.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
+            { t: 'Lower your gun.', ic: 'lower', sh: 'Lower it', intent: 'lowers it', set: { last: 'lower' }, then: [T('Marcus puts his gun on the floor. Amy’s doesn’t move.')] },
+            { t: '“Hey! Over here!”', ic: 'hand', sh: 'Over here!', intent: 'takes the aim', set: { last: 'draw' }, then: [T('Amy turns. The gun on Marcus now.')] },
           ] : [
-            { t: 'Take off your mask: “Amy. It’s me.”', intent: 'shows himself', set: { last: 'me' }, then: [...at('h_face_pb'), T('Amy stares at him. The gun goes down an inch.')] },
-            { t: 'Shoot her.', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
-            { t: 'Drop the bags.', intent: 'drops the money', set: { last: 'drop' }, then: [T('The bags hit the floor. Three million dollars between them.')] },
+            { t: 'Take off your mask: “Amy. It’s me.”', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [...at('h_face_pb'), T('Amy stares at him. The gun goes down an inch.')] },
+            { t: 'Shoot her.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
+            { t: 'Drop the bags.', ic: 'bags', sh: 'Drop it', intent: 'drops the money', set: { last: 'drop' }, then: [T('The bags hit the floor. Three million dollars between them.')] },
           ] },
         ] },
       ];

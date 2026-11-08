@@ -1777,15 +1777,20 @@ body.tv #choices.tvpicked button:not(.picked) { opacity: .35; transition: opacit
 #choices.cx .tyb { position: absolute; right: -.6em; top: -.6em; width: 3em; height: 3em; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 .3em #0b0a0f; }
 #choices.cx .tyb svg { width: 1.8em; height: 1.8em; }
 /* a public choice: the TV, each option with its symbol and colour; the phone, just the symbols (big, to tap) */
-body.tv #choices button.pub { font-size: 2.4em !important; padding: .45em 1em .45em .5em !important; animation: none; }
-#choices button.pub { display: flex !important; align-items: center; gap: 1.2em; background: rgba(12,10,18,.9) !important; box-shadow: inset 0 0 0 .2em var(--sc) !important; outline: none !important; }
-#choices button.pub .sym { flex: none; width: 2.2em; height: 2.2em; display: grid; place-items: center; font-size: 1.6em; border-radius: .5em; background: var(--sc); color: #000; }
+/* (08/11) a public choice: its action drawn (white lines on the game's dark), the TV with the words, the phone with the words shortened */
+#choices .cic { flex: none; width: 2.6em; height: 2.6em; display: grid; place-items: center; border-radius: .7em; background: rgba(255,255,255,.08); color: #f5f5f7; }
+#choices .cic svg { width: 1.7em; height: 1.7em; }
+body.cellon #choices .cic { background: rgba(0,0,0,.07); color: #1c1c1e; width: 2.4em; height: 2.4em; }
+body.cellon #choices button.idle .cic { background: rgba(255,255,255,.08); color: rgba(255,255,255,.8); }
+body.tv #choices button.pub { font-size: 2.4em !important; padding: .4em 1em .4em .45em !important; animation: none; }
+#choices button.pub { display: flex !important; align-items: center; gap: 1em; background: rgba(14,12,20,.88) !important; box-shadow: inset 0 0 0 .1em rgba(255,255,255,.16) !important; outline: none !important; }
 #choices button.pub .ct { font-size: 1em; font-weight: 800; color: #fff; text-align: left; }
-#choices button.pub.picked { background: color-mix(in srgb, var(--sc) 40%, #000) !important; transform: scale(1.04); }
+#choices button.pub.picked { box-shadow: inset 0 0 0 .14em #fff !important; transform: scale(1.03); }
 body.tv.chpub #choices { pointer-events: none; }
-body.phonemin.chpub #choices.cx { flex-direction: column; }
-body.phonemin #choices button.pub { justify-content: center; padding: 0 !important; background: color-mix(in srgb, var(--sc) 85%, #000) !important; box-shadow: none !important; }
-body.phonemin #choices button.pub .sym { width: auto; height: auto; background: none; color: #000; font-size: 14em; line-height: 1; }
+body.phonemin #choices button.pub { flex-direction: column; justify-content: center; gap: .8em; padding: 0 !important; background: rgba(28,26,36,.95) !important; }
+body.phonemin #choices button.pub .cic { width: 9em; height: 9em; border-radius: 2em; background: rgba(255,255,255,.07); }
+body.phonemin #choices button.pub .cic svg { width: 5.5em; height: 5.5em; }
+body.phonemin #choices button.pub .csh { font-size: 3.2em; font-weight: 800; color: #f5f5f7; }
 #choices.cx button.idle, body.cellon #choices button.idle { background: transparent !important; color: rgba(255,255,255,.75) !important; box-shadow: none !important; outline: .22em dashed rgba(255,255,255,.55); outline-offset: -.22em; }   /* doing nothing */
 #choices.cx .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
 #choices.cx .ty-do .tyb { background: #ffd60a; color: #000; }
@@ -1858,7 +1863,7 @@ body.tv.apart.apart-show #apart { display: none; }   /* the TV keeps its own pic
 #apart .done .ap-ico { animation: none; }
 #apart .done > span { color: #34c759; }
 #apart .bar { width: 60%; height: 1.4em; border-radius: 1em; background: rgba(0,0,0,.45); overflow: hidden; }
-#apart .bar i { display: block; height: 100%; width: 0; border-radius: 1em; background: var(--c, #ff9a4d); transition: width .8s ease; }
+#apart .bar i { display: block; height: 100%; width: 0; border-radius: 1em; background: var(--c, #ff9a4d); transition: width .3s linear; }
 #apart .done { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 22%, #000), #000 80%) !important; }
 @keyframes apartIn { from { opacity: 0; transform: scale(.9); } }
 body.apart #viewBtn { display: none !important; }
@@ -2675,7 +2680,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108220000"></script>
+<script src="heist.js?v=20261108230000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3822,8 +3827,8 @@ function choiceCard(o, m, all, remote) {
   // (08/11, Justin) just the words: no big label, no face of the one choosing; a face only when the choice is between
   // people (each option toward someone else): that person's
   let to = ''; if (tos.size > 1 && m.to) { try { to = `<span class="cf"><img src="${poseSrc(m.to, 'listen')}" alt=""></span>`; } catch { to = ''; } }
-  const cls = [ty ? 'ty-' + ty : '', m.idle ? 'idle' : ''].filter(Boolean).join(' ');
-  return { cls, html: `${to}<span class="ctx"><span class="ct">${esc(fill(o.t))}</span></span>${ty ? `<span class="tyb">${CH_ICON[ty]}</span>` : ''}` };
+  const cls = [m.idle ? 'idle' : ''].filter(Boolean).join(' '), a = actOf(o, all.k);
+  return { cls, html: `${to || `<span class="cic">${ACT[a.ic] || ACT.act}</span>`}<span class="ctx"><span class="ct">${esc(fill(o.t))}</span></span>` };
 }
 // T3 (a phone) / N4+N1 (the remote): whom you answer, above the choices: his face in a big circle, his name, his line
 function qCardShow(k) {
@@ -3839,7 +3844,30 @@ function qCardShow(k) {
 }
 function qCardOff() { const q = $('#qCard'); if (q) q.remove(); }
 // a public choice ({secret} keeps it on the phone; a call, a scene apart, too): on the TV with its symbols, the phone a remote
-const SYM = ['▲', '●', '■', '◆'], SYM_C = ['#ffcc00', '#0a84ff', '#ff375f', '#30d158'];
+// (08/11) each option shows its action, drawn: a gun shooting, a text, the phone into the pocket… ({ic, sh} on an option, or
+// read from it: a text he sends = « text » and the text itself, shortened)
+const ACT_SVG = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ACT = {
+  gun: ACT_SVG('<path d="M3 9h12v3H9l-1 4H5l1-4H3z"/><path d="M15 10h2"/><path d="M19 8l2-1M19.5 10.5H22M19 13l2 1"/>'),
+  lower: ACT_SVG('<path d="M4 6h10v3H9l-1 3H5l1-3H4z"/><path d="M17 8v10M14 15l3 3 3-3"/>'),
+  text: ACT_SVG('<path d="M4 5h16v10H9l-4 4v-4H4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>'),
+  pocket: ACT_SVG('<rect x="8" y="2" width="8" height="11" rx="1.5"/><path d="M12 13v3"/><path d="M4 12h16v4a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/>'),
+  say: ACT_SVG('<path d="M4 5h16v10H10l-5 4v-4H4z"/><path d="M8 9h8M8 12h5"/>'),
+  vault: ACT_SVG('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M12 8v1M16 12h-1M12 16v-1M8 12h1"/>'),
+  send: ACT_SVG('<circle cx="7" cy="7" r="3"/><path d="M3 20c0-3 2-5 4-5s4 2 4 5"/><path d="M13 12h8M18 9l3 3-3 3"/>'),
+  mask: ACT_SVG('<path d="M3 9c3-2 15-2 18 0-1 5-4 7-6 6l-3-2-3 2c-2 1-5-1-6-6z"/><circle cx="8.5" cy="10.5" r="1.2"/><circle cx="15.5" cy="10.5" r="1.2"/>'),
+  unmask: ACT_SVG('<path d="M3 13c3-2 15-2 18 0-1 5-4 7-6 6l-3-2-3 2c-2 1-5-1-6-6z"/><path d="M12 9V2M9 5l3-3 3 3"/>'),
+  hand: ACT_SVG('<path d="M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V6a1.5 1.5 0 0 1 3 0v8c0 4-3 7-6 7-3 0-4-1-6-4l-2-3a1.5 1.5 0 0 1 2.5-1.5L8 15"/>'),
+  bags: ACT_SVG('<path d="M9 4h6l-1.5 3h-3z"/><path d="M10.5 7C6 9 4 13 5 17c.5 2 2 3 4 3h6c2 0 3.5-1 4-3 1-4-1-8-5.5-10"/><path d="M12 11v6M10 12.5c0-1 4-1 4 .5s-4 1-4 2.5 4 1 4 0"/>'),
+  act: ACT_SVG('<circle cx="12" cy="12" r="8"/><path d="M10 9l5 3-5 3z"/>'),
+};
+const shortOf = (t, n = 18) => { t = String(t).replace(/^[«“"\s]+|[»”"\s.!?…]+$/g, ''); if (t.length <= n) return t; const w = t.slice(0, n).replace(/\s+\S*$/, ''); return (w || t.slice(0, n)) + '…'; };
+function actOf(o, k) {   // the option's action: its icon and its words, shortened to the max (the phone shows only that)
+  const t = fill(o.t), sms = (o.then || []).find((x) => x.sms && x.sms.from === k);
+  const ic = o.ic || (sms ? 'text' : /\bshoot/i.test(t) ? 'gun' : /lower.*gun|gun.*down/i.test(t) ? 'lower' : /take off.*mask|unmask/i.test(t) ? 'unmask' : /mask/i.test(t) ? 'mask'
+    : /phone away|pocket/i.test(t) ? 'pocket' : /^[«“"]/.test(t) ? 'say' : 'act');
+  return { ic, sh: o.sh || shortOf(sms ? fill(sms.sms.text) : t) };
+}
 const chPublic = (ring) => !ring && !chSecret && !laneNow && duo() && (TV ? chTv : hostTv && !!(remote && remote.ct));
 let chSecret = false;
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
@@ -3859,12 +3887,12 @@ function choose(opts, by, ring) {
   } else choicesEl.hidden = false;
   const holder = ring && !waitsFor(by) ? $('#ringBtns') : choicesEl;
   const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
-  const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k));
+  const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k)); metas.k = k;
   choicesEl.classList.add('cx', 'slide');
   if (mine && holder === choicesEl && !choicesEl.hidden && !pub) qCardShow(k);
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
-    if (holder === choicesEl && pub) { b.innerHTML = `<span class="sym" style="--sc:${SYM_C[i % 4]}">${SYM[i % 4]}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : ''}`; b.classList.add('pub'); b.style.setProperty('--sc', SYM_C[i % 4]); }
+    if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : `<span class="csh">${esc(a.sh)}</span>`}`; b.classList.add('pub'); }
     else if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(...c.cls.split(' ')); }
     else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
     b.dataset.i = i;
