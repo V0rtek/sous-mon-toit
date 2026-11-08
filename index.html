@@ -240,7 +240,11 @@ body.pick-lean .wr-seat.taken img { opacity: .25; }
 body.pick-lean .wr-seat.open { border-color: var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); }
 body.pick-lean .wr-seat.me { border-color: var(--c); background: color-mix(in srgb, var(--c) 22%, transparent); }
 body.pick-lean .wr-seat.me b { display: block; }
-.wr-pick { margin-top: .6em; font-size: 2.4em; font-weight: 900; padding: .45em 1.6em; border-radius: 1em; background: var(--c); color: #fff; }
+.wr-pickrow { display: flex; flex-direction: column; align-items: center; gap: 1.2em; margin-top: 1.6em; }
+.wr-pick { font: inherit; font-size: 2.6em; font-weight: 900; padding: .5em 2.2em; border: 0; border-radius: 1em; background: var(--c); color: #fff; cursor: pointer; }
+.wr-sheet { display: flex; align-items: center; gap: .8em; padding: .8em 1.6em; border-radius: 1.2em; border: .2em dashed rgba(255,255,255,.35); color: #d1d1d6; font-size: 1.9em; font-weight: 700; cursor: pointer; }
+.wr-sheet.on { border-style: solid; border-color: var(--c); color: #fff; }
+.wr-sheet img { height: 3.2em; width: auto; }
 .wr-seat.me .wr-who, .wr-seat.taken .wr-who { color: #fff; }
 .wr-seat.me .wr-who i, .wr-seat.taken .wr-who i { background: #34c759; }
 .wr-seat.waiting img { opacity: .5; }
@@ -2705,7 +2709,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109060000"></script>
+<script src="heist.js?v=20261109070000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3118,7 +3122,7 @@ function setScene(id, cast) {
   // objects lying in the decor (props/): {src, x, y = where its bottom touches, w, all in decor px}; in front of whoever
   // stands further back than it (z = its y, like the people's feet)
   for (const p of sc.props || []) {
-    const i = new Image(); i.alt = ''; i.src = `props/${p.src}.webp`; i.className = 'prop';
+    const i = new Image(); i.alt = ''; i.src = POSE_OVR[p.src] || `props/${p.src}.webp`; i.className = 'prop'; i.dataset.src = p.src;
     i.onload = () => { const h = p.w * i.naturalHeight / i.naturalWidth; Object.assign(i.style, { top: p.y - h + 'px' }); };
     Object.assign(i.style, { position: 'absolute', left: p.x - p.w / 2 + 'px', top: p.y + 'px', width: p.w + 'px', zIndex: Math.round(p.z ?? p.y) });
     if (p.who) i.dataset.who = p.who;   // a character cut out and placed in the decor: he stays lit when he chooses
@@ -4807,7 +4811,42 @@ const myChar = () => { try { const c = JSON.parse(localStorage.getItem('smtDemo.
 const storyTitle = (id = state.story) => (STORIES[id] && STORIES[id].title) || { bar: 'Last call', play: 'Le café' }[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || '';
 const seatLabel = (k) => { const c = castOf(k); return c && c.name && !c.name.includes('{') ? c.name : (story().solo || {})[k] || k; };
 let chTv = (() => { try { return localStorage.getItem('smt-chtv') !== '0'; } catch { return true; } })();   // (08/11) public choices on the TV (the phones: just the symbols)
-let pickOpen = null;   // a TV's phone: the character opened (its name, its line, Pick)
+let pickOpen = null;
+// (09/11) a player's own poses: his pose sheet (story().posesheet: its columns, and which prop each one replaces for each
+// seat), keyed out of its green on his phone, shrunk, and sent to the room; every device uses them in place of the props
+const POSES = {}, POSE_OVR = {};
+function poseApply(k, name, url) {
+  const ps = story() && story().posesheet; if (!ps || !ps[k] || !url) return;
+  (POSES[k] = POSES[k] || {})[name] = url;
+  const src = ps[k][name]; if (src) { POSE_OVR[src] = url; document.querySelectorAll(`#cast img.prop[data-src="${src}"]`).forEach((i) => { i.src = url; }); }
+  if (name === ps.cols[0]) { const sp = spriteOf(k); MADE[sp] = { ...(MADE[sp] || {}), listen: url }; }   // his face on the pick
+  if (screen === '#wait') renderWait();
+}
+async function poseSheet(file, k) {
+  const ps = story().posesheet, img = new Image(); img.src = URL.createObjectURL(file);
+  try { await img.decode(); } catch { return; }
+  const W = Math.min(1800, img.naturalWidth), H = Math.round(img.naturalHeight * W / img.naturalWidth);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, W, H);
+  const d = cx.getImageData(0, 0, W, H), px = d.data;
+  for (let i = 0; i < px.length; i += 4) {   // the green out: how green a pixel is → how see-through; the edges despilled
+    const r = px[i], g = px[i + 1], b = px[i + 2], spill = g - Math.max(r, b), a = 1 - Math.min(1, Math.max(0, (spill - 22) / 50));
+    px[i + 3] = Math.round(a * 255); if (spill > 0) px[i + 1] = Math.max(r, b);   // the edges: no green left
+  }
+  cx.putImageData(d, 0, 0);
+  const cols = ps.cols.length, rows = H / W > .6 ? 2 : 1, row = rows === 2 ? Math.max(0, seatsOf().indexOf(k)) : 0, cw = W / cols, ch = H / rows;
+  for (let c = 0; c < cols; c++) {
+    const x0 = Math.round(c * cw), y0 = Math.round(row * ch), w = Math.round(cw), h = Math.round(ch), a = cx.getImageData(x0, y0, w, h).data;
+    let l = w, t = h, r = -1, bt = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 128) { if (x < l) l = x; if (x > r) r = x; if (y < t) t = y; if (y > bt) bt = y; }
+    if (r < 0) continue;
+    const bw = r - l + 1, bh = bt - t + 1, s = Math.min(1, 460 / bh), o = document.createElement('canvas'); o.width = Math.round(bw * s); o.height = Math.round(bh * s);
+    o.getContext('2d').drawImage(cv, x0 + l, y0 + t, bw, bh, 0, 0, o.width, o.height);
+    let url = o.toDataURL('image/webp', .8); if (!url.startsWith('data:image/webp')) url = o.toDataURL('image/png');
+    const name = ps.cols[c]; poseApply(k, name, url);
+    if (live && live.connected) live.publish(`${topic()}/pose/${k}/${name}`, url, { retain: true, qos: 1 });
+  }
+  URL.revokeObjectURL(img.src);
+}   // a TV's phone: the character opened (its name, its line, Pick)
 function renderWait() {
   show('#wait');
   const lean = ROLE === 'watch' && hostTv;   // (08/11) a phone on a TV: lean, the two characters and nothing else
@@ -4821,7 +4860,7 @@ function renderWait() {
       : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', 'Open'];
     const open = lean && pickOpen === k && cls === 'free';
     return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
-      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span>${open ? '<span class="wr-pick">Pick</span>' : ''}</button>`;
+      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   document.body.classList.toggle('roomfull', full);
@@ -4830,7 +4869,10 @@ function renderWait() {
     const sp = SPRITES[k], pose = sp && Object.keys(sp.poses)[0];
     return `<button type="button" class="${id === state.story ? 'on' : ''}" data-love="${id}"><span class="wr-head"><span><img src="${charUrl(k, pose)}" alt=""></span></span><b>${esc(n)}</b></button>`;
   }).join('')}</div>` : '';
-  $('#room').innerHTML = `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${lovers}
+  // (09/11) the character opened: your pose sheet (optional, just above), then Pick
+  const openK = lean && pickOpen && !(state.seats[pickOpen]) ? pickOpen : null, sheetOn = !!story().posesheet;
+  const pickRow = openK ? `<div class="wr-pickrow" style="--c:${(castOf(openK) || {}).color || '#ff9a4d'}">${sheetOn ? `<label class="wr-sheet${POSES[openK] ? ' on' : ''}"><input type="file" accept="image/*" hidden>${POSES[openK] ? `${['talk', 'listen', 'top'].map((n) => POSES[openK][n] ? `<img src="${POSES[openK][n]}" alt="">` : '').join('')}<span>✓ Your poses</span>` : '<span>Upload my pose sheet</span>'}</label>` : ''}<button type="button" class="wr-pick" data-pick="${openK}">Pick</button></div>` : '';
+  $('#room').innerHTML = `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${pickRow}${lovers}
     ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Open to the public</button>' : ''}<button type="button" data-o="alone">Play alone</button></div>` : ''}
     ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">The other plays at random</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Cancel</button></div>' : ''}
@@ -4842,12 +4884,14 @@ function renderWait() {
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
     if (ROLE !== 'host') {
-      if (lean && !b.classList.contains('open')) { if (b.classList.contains('free')) { pickOpen = k; renderWait(); } return; }   // the first tap opens it, Pick takes it
-      pickOpen = null; return sendIn('seat', { s: k });
+      if (lean) { if (b.classList.contains('free')) { pickOpen = k; renderWait(); } return; }   // a tap opens it; Pick (under) takes it
+      return sendIn('seat', { s: k });
     }
     if (TV) return;   // the TV plays nobody
     if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
   });
+  const pk = $('#room .wr-pick'); if (pk) pk.onclick = (e) => { e.stopPropagation(); const k = pk.dataset.pick; pickOpen = null; sendIn('seat', { s: k }); };
+  const sh = $('#room .wr-sheet input'); if (sh) { sh.onclick = (e) => e.stopPropagation(); sh.onchange = () => { const f = sh.files && sh.files[0]; if (f) poseSheet(f, openK); }; }
   document.querySelectorAll('#room .wr-lovers button').forEach((b) => b.onclick = (e) => {   // another love interest = the same story with them
     e.stopPropagation(); const id = b.dataset.love; if (id === state.story) return;
     try { localStorage.setItem('smtDemo.love', id === 'd_ete_alex' ? 'alex' : 'maya'); } catch { /* private window */ }
@@ -5740,6 +5784,12 @@ let myId = (() => {
   try { let c = localStorage.getItem('smt-id'); if (!c) { c = fresh(); localStorage.setItem('smt-id', c); } return c; } catch { return fresh(); }
 })();
 const topic = () => `${NS}/${room}`;
+function posePart(t, buf) {   // a player's pose, sent to the room: <room>/pose/<seat>/<name>
+  const pre = `${topic()}/pose/`; if (!t.startsWith(pre)) return false;
+  const [k, name] = t.slice(pre.length).split('/'), url = buf.toString();
+  if (/^data:image\/(webp|png);base64,/.test(url)) poseApply(k, name, url);
+  return true;
+}
 function loadScript(src) {
   return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
 }
@@ -5891,15 +5941,16 @@ async function goLive() {
   });
   addEventListener('online', () => { if (!live.connected) try { live.reconnect(); } catch { /* it reconnects by itself */ } });
   live.on('connect', () => {
-    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${OPEN}/+`, ...(TV ? [] : [`${TVS}/+`])]); if (waitRoom) announce(true); tvBeacon(true); }
-    else { live.subscribe(topic(), { qos: 1 }); here(); }
+    if (ROLE === 'host') { $('#qrBtn').hidden = false; share(); live.subscribe([`${topic()}/w/+`, `${topic()}/in`, `${topic()}/pose/#`, `${OPEN}/+`, ...(TV ? [] : [`${TVS}/+`])]); if (waitRoom) announce(true); tvBeacon(true); }
+    else { live.subscribe([topic(), `${topic()}/pose/#`], { qos: 1 }); here(); }
   });
   if (ROLE === 'watch') {
-    live.on('message', (t, buf) => { if (t !== topic()) return; try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
+    live.on('message', (t, buf) => { if (posePart(t, buf)) return; if (t !== topic()) return; try { follow(JSON.parse(buf.toString())); } catch { /* not ours */ } });
     setInterval(here, 10000);
     addEventListener('pagehide', () => { if (!MIRROR && live.connected) live.publish(seat, '', { retain: true }); });
   } else {
     live.on('message', (t, buf, packet) => {
+      if (posePart(t, buf)) return;
       if (t.startsWith(TVS + '/')) {
         const r = t.slice(TVS.length + 1);
         let v = null; try { v = buf.length ? JSON.parse(buf.toString()) : null; } catch { /* not ours */ }

@@ -62,8 +62,11 @@
   // seen from above: the two armchairs, the table, Marcus's phone on it, the briefcase by Ray (lit: the phone buzzing); his phone,
   // close: Leo on the lock screen, Leo's text on it (Justin's picture, its text changed)
   const pic = (image, front = []) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front });
-  SCENES.h_top = pic('bg/lobby_top.webp');
-  SCENES.h_top_buzz = pic('bg/lobby_top.webp', [R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
+  // (09/11) the top view: the empty armchairs + the two of them cut out, placed as in Justin's top view
+  const TOP = [{ src: 'marcus_top', x: 430.5, y: 860, w: 481, who: 'pa' }, { src: 'ray_top', x: 1247, y: 883, w: 534, who: 'pb' }];
+  const topv = (front = []) => ({ ...pic('bg/lobby_top.webp', front), props: TOP });
+  SCENES.h_top = topv();
+  SCENES.h_top_buzz = topv([R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
   SCENES.h_phone = pic('bg/phone_leo.webp');
   SCENES.h_two = chairs([MARCUS, RAY]);   // Marcus talks, Ray thinks
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
@@ -306,6 +309,9 @@
     gaze: false, credits: '', title: 'Floor 31', intro: [],
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
     phone: { time: '9:38', bat: { pa: 64, pb: 21 } },
+    // a player's own pose sheet (ref/posesheet_floor31.png: green screen, 3 columns: talking, listening, seen from above; Marcus's
+    // row then Ray's, or one row: his own), each pose in place of the drawn one
+    posesheet: { cols: ['talk', 'listen', 'top'], pa: { talk: 'marcus_sit', listen: 'marcus_listen', top: 'marcus_top' }, pb: { talk: 'ray_talk', listen: 'ray_sit', top: 'ray_top' } },
     pick: { pa: { pose: 'listen', line: 'Guess there’s no turning back now.' }, pb: { pose: 'listen', line: 'Nothing to lose.' } },
     cast: {
       pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
