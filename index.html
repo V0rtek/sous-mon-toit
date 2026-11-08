@@ -2709,7 +2709,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109140000"></script>
+<script src="heist.js?v=20261109150000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3226,6 +3226,13 @@ function checkTexts(id) {
 // false = the story restarted meanwhile
 async function sendText(m, r) {
   const hand = m.by || m.from;
+  // {sms: {…, dots: ms}}: someone off screen (Leo, Sarah) writing: the three dots in the thread for ms, then his text
+  if (m.dots && !FAST && !onScreen(hand)) {
+    const d = { t: '', draft: true, other: m.to }; (phoneLog[m.from] = phoneLog[m.from] || []).push(d);
+    if (cellOpen === m.to) drawCell();
+    await sleep(m.dots); const l = phoneLog[m.from], i = l.indexOf(d); if (i >= 0) l.splice(i, 1);
+    if (r !== run) return false;
+  }
   if (!onScreen(hand)) { textMsg(m); return true; }
   setPose(hand, 'texting');
   const t = fill(m.text), d = { t: '', out: true, fresh: true, draft: true };

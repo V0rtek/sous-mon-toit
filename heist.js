@@ -116,14 +116,16 @@
   const S = (who, text, o) => ({ say: who, text, ...o });          // a line (no pose: they're shapes)
   const T = (text) => ({ narr: text });                            // a key moment of the fast forward (it goes on like the rest)
   const N = { pa: 'Marcus', pb: 'Ray' }, WHO = { leo: 'Leo', sarah: 'Sarah', amy: 'Amy' };
-  const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
+  // o: 'pb' = only he reads it; {dots: ms} = the three dots of someone writing, that long, before it comes in
+  const sms = (from, to, text, o) => ({ sms: { from, to, text, ...(typeof o === 'string' ? { only: o } : o || {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
   const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
   // (09/11) a plant, no payoff yet: every moment they lose time. f.lost = minutes behind « We're on in 8 minutes »; each time,
   // the clock full screen, the minutes it ate on its hands, a few ticks. amb: the place's sound under it (the lobby's crowd, or none)
   const lose = (min, amb) => ({ fn: (f) => { const m = (f.lost || 0) + min, id = `h_clock_${m}_${amb || ''}`; SCENES[id] = SCENES[id] || clockAt(m, amb);
     return [{ set: { lost: m } }, ...at(id), { tick: true }, { hush: 2600 }, { tick: false }]; } });
-  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text, ic]) => ({ t, ...(ic ? { ic } : {}), intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
+  // a text answer: no timer (clock 0), you take your time
+  const reply = (k, to, opts, o = {}) => ({ by: k, clock: 0, ...o, choice: opts.map(([t, set, text, ic]) => ({ t, ...(ic ? { ic } : {}), intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
 
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
@@ -161,14 +163,16 @@
       // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines); the TV: the clock
       { split: () => ({
         pa: [{ when: () => TV, then: at('h_clock'), else: at('h_side_pa') }, { tick: true },
-          sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 2800 },
-          sms('leo', 'pa', 'ok'), { wait: 2600 },
-          sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
+          // slow: Leo's text first (there since the lock screen), let it be read; then each answer after his dots
+          { thread: ['pa', 'leo'] }, { wait: 3500 },
+          sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 3000 },
+          sms('leo', 'pa', 'ok', { dots: 3000 }), { wait: 3000 },
+          sms('leo', 'pa', 'mom says we wont have the money to do next season', { dots: 4500 }), { wait: 5000 },
           reply('pa', 'leo', [
             ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.', 'tough'],
             ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.', 'love'],
             ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.', 'calm'],
-          ], { clock: 15000 }),
+          ]),
           { tick: false }],
         pb: [...at('h_side_pb'), { tick: true },
           S('amy', 'Hey you. Are you still downtown?'),
@@ -190,11 +194,10 @@
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
-      pa: [{ thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?'), { wait: 1500 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
+      pa: [{ thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?', { dots: 2500 }), { wait: 3000 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]])],
       pb: [{ thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
         ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
-        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]],
-      { clock: 12000 })],
+        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]])],
     }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     { when: (f) => f.sarah !== 'none' || f.last !== 'none', then: [lose(1, 'crowd'), ...at('h_lift_hall')] },   // a text = a minute
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
