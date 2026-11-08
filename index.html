@@ -93,6 +93,7 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 @keyframes tcIn { to { opacity: 1; } }
 #gateCard { position: absolute; inset: 0; z-index: 13; background: rgba(0,0,0,.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5em; padding: 0 8%; text-align: center; color: #f5f5f7; pointer-events: none; animation: gcIn .35s ease-out; }
 #gateCard[hidden] { display: none; }
+body:has(#ringCard:not([hidden])) #viewBtn { display: none !important; }   /* a call: only the call */
 body.phonemin #gateCard { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }
 #gateCard .gc-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
 #gateCard b { font-size: 4.4em; font-weight: 800; color: #ffd60a; }
@@ -101,6 +102,14 @@ body.phonemin #gateCard { background: radial-gradient(circle at 50% 45%, color-m
 @keyframes gcIn { from { opacity: 0; } }
 body.tv #gateCard .gc-ico { font-size: 7em; }
 body.tv #gateCard b { font-size: 3.4em; }
+#gateCard.halves { flex-direction: row; gap: 0; padding: 0; background: rgba(0,0,0,.55); }
+#gateCard .gc-half { flex: 1; align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4em;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 45%, #000), color-mix(in srgb, var(--c) 12%, #000) 80%); border-right: .3em solid #000; transition: background .4s; }
+#gateCard .gc-half:last-child { border-right: 0; }
+#gateCard .gc-half b { color: #fff; }
+#gateCard .gc-half span { font-size: 2.6em; color: #ffd60a; font-weight: 800; }
+#gateCard .gc-half.ready { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 25%, #000), #000 80%); }
+#gateCard .gc-half.ready .gc-ico, #gateCard .gc-half.ready span { color: #34c759; animation: none; }
 body.phonemin.tapline #minView > * { visibility: hidden; }   /* not the pause: a tap moves on */
 body.phonemin.tapline #minView::after { content: '▶  Tap to go on'; position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 2.2em; font-weight: 800; letter-spacing: .06em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; pointer-events: none; }
 body.tapline #bubble::after { content: '▶ Tap a phone'; position: absolute; left: 0; right: 0; text-align: center; bottom: -1.7em; font-size: .9em; font-weight: 800; letter-spacing: .08em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; }
@@ -4057,10 +4066,15 @@ let tapNow = false, gateNow = null;   // gateNow: the seats a {gate} still waits
 function gateOn(s) {
   const el = $('#gateCard'), mine = [...gateNow].filter((k) => mineFor(k)), t = typeof s.text === 'object' ? (s.text || {})[mine[0]] : s.text;
   el.className = '';
-  el.innerHTML = TV ? '<div class="gc-ico">📱</div><b>Look at your phone</b>'
+  el.classList.toggle('halves', TV);
+  el.innerHTML = TV ? [...gateNow].map((k) => `<div class="gc-half" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="gc-ico">📱</div><b>${esc(seatName(k) || '')}</b><span>Look at your phone</span></div>`).join('')
     : mine.length ? `<div class="gc-ico">👆</div><b>Tap to start</b>${t ? `<span>${esc(fill(t))}</span>` : ''}`
     : `<span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}…</span>`;
   el.hidden = false; document.body.classList.add('gate');
+}
+function gateTv() {   // the TV: a player tapped, his half says so
+  if (!TV || !gateNow) return;
+  document.querySelectorAll('#gateCard .gc-half').forEach((h) => { if (!gateNow.has(h.dataset.k) && !h.classList.contains('ready')) { h.classList.add('ready'); h.innerHTML = `<div class="gc-ico">✓</div><b>${esc(seatName(h.dataset.k) || '')}</b><span>Ready</span>`; } });
 }
 function gateOff() { const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate'); }
 function gateTapped() {   // this phone tapped: ready, the others may still be reading
@@ -5687,7 +5701,7 @@ function fromJoiner(m) {
     if (g) { if (m.k === laneCount(tape, m.lane)) ghostTap(g); return; }
     if (m.lane ? m.lane !== laneNow || m.k !== laneCount(tape, m.lane) : m.k !== tape.length) return;
     if (onlyNow && ownerOf(onlyNow) !== m.id) return;   // a private line: only its owner moves past it
-    if (gateNow && waiting === 'click') { for (const k of [...gateNow]) if (ownerOf(k) === m.id) gateNow.delete(k); if (gateNow.size) return; }
+    if (gateNow && waiting === 'click') { for (const k of [...gateNow]) if (ownerOf(k) === m.id) gateNow.delete(k); gateTv(); if (gateNow.size) return; }
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
     if (waiting === 'click') { record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
   } else if (/^c\d$/.test(m.e)) {
