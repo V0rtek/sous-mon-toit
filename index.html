@@ -40,7 +40,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 body.lit-chars #litDim, body.lit-him #litDim { opacity: .68; }
 #front { transition: filter .6s; }
 body.lit-chars #front, body.lit-him #front { filter: brightness(.32) saturate(.5); }
-body.lit-shape #backdrop > div:not(.lit-me), body.lit-shape #front > div:not(.lit-me) { filter: brightness(.32) saturate(.5) !important; transition: filter .3s; }
+body.lit-shape #bgimg, body.lit-shape #cast .prop:not(.lit-me), body.lit-shape #backdrop > div:not(.lit-me), body.lit-shape #front > div:not(.lit-me) { filter: brightness(.32) saturate(.5) !important; transition: filter .3s; }
 body.lit-him #cast .actor:not(.lit-me) img { filter: brightness(.32) saturate(.5); }
 body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick hop when someone starts talking */
 @keyframes talk { 40% { transform: translateY(-.6%); } }
@@ -2054,7 +2054,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <a href="?play=d_mini_clic" id="miniClicBtn"><span class="art" style="--g:#2a4f8f"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Mini-histoire · au clic</b></a>
         <a href="?play=d_mini_auto" id="miniAutoBtn"><span class="art" style="--g:#3b1f6e"><img src="chars/cam/flirty.webp" alt=""></span><b>Mini-histoire · tout seul</b></a>
         <a href="?play=d_pirate" id="pirateBtn"><span class="art" style="--g:#8e1b1b"><img src="chars/pirate/bar_smile.webp" alt=""></span><b>Le serment du pirate</b></a>
-        <a href="?tv&amp;story=d_heist" id="heistBtn"><span class="art" style="--g:#9a3b3b"><img src="chars/james/listen.webp" alt=""></span><b>Floor 31 · le braquage (TV + cells)</b></a>
+        <a href="?tv&amp;story=d_heist" id="heistBtn"><span class="art" style="--g:#9a3b3b"><img src="chars/h_ray/listen.webp" alt=""></span><b>Floor 31 · le braquage (TV + cells)</b></a>
       </div>
     </div>
   </div>
@@ -2687,7 +2687,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109020000"></script>
+<script src="heist.js?v=20261109040000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3103,6 +3103,7 @@ function setScene(id, cast) {
     const i = new Image(); i.alt = ''; i.src = `props/${p.src}.webp`; i.className = 'prop';
     i.onload = () => { const h = p.w * i.naturalHeight / i.naturalWidth; Object.assign(i.style, { top: p.y - h + 'px' }); };
     Object.assign(i.style, { position: 'absolute', left: p.x - p.w / 2 + 'px', top: p.y + 'px', width: p.w + 'px', zIndex: Math.round(p.z ?? p.y) });
+    if (p.who) i.dataset.who = p.who;   // a character cut out and placed in the decor: he stays lit when he chooses
     castEl.appendChild(i);
   }
   rects(sc.front, frontEl);
@@ -3645,7 +3646,7 @@ function tvChevron(who, kind) {
   const a = actors[who];
   if (a && a.el) { const r = a.el.getBoundingClientRect(); cx = r.left + r.width / 2; }
   else {
-    const els = backEl.querySelectorAll(`[data-who="${who}"]`);
+    const els = world.querySelectorAll(`[data-who="${who}"]`);
     if (els.length) { let l = Infinity, r = -Infinity; els.forEach((e) => { const b = e.getBoundingClientRect(); l = Math.min(l, b.left); r = Math.max(r, b.right); }); cx = (l + r) / 2; }
     else { const i = seatsOf().indexOf(who), st = stage.getBoundingClientRect(); if (i >= 0) cx = st.left + st.width * (i === 0 ? .25 : .75); }
   }
@@ -3799,13 +3800,13 @@ function drawCall() {
 let litOn = null;
 function litFocus(k) {
   litOff(); litOn = k; if (FAST) return;
-  const a = actors[k], shapes = !a && k ? document.querySelectorAll(`#backdrop [data-who="${k}"], #front [data-who="${k}"]`) : [];
+  const a = actors[k], shapes = !a && k ? document.querySelectorAll(`#backdrop [data-who="${k}"], #front [data-who="${k}"], #cast [data-who="${k}"]`) : [];
   if (shapes.length) { document.body.classList.add('lit-shape'); shapes.forEach((x) => x.classList.add('lit-me')); return; }   // drawn in shapes: everything else goes dark
   document.body.classList.add(a ? 'lit-him' : 'lit-chars'); if (a) a.el.classList.add('lit-me');
 }
 function litOff() {
   document.body.classList.remove('lit-chars', 'lit-him', 'lit-shape');
-  document.querySelectorAll('#cast .lit-me, #backdrop .lit-me, #front .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;
+  document.querySelectorAll('#cast .lit-me, #backdrop .lit-me, #front .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;   // (and the cut-out people)
 }
 // ---- the choice cards: what each option shows, read from the story (02/11) ----
 const CH_ICON = {
@@ -4773,7 +4774,7 @@ function renderWait() {
     ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">The other plays at random</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Cancel</button></div>' : ''}
     ${host && mine && !full && !invite && social() ? `<div class="wr-friends">${friendsNow().map((f, i) => `<button type="button" data-f="${i}">${headOf(f)}<span>${esc(f.n)}</span></button>`).join('')}</div>` : ''}
-    ${TV && !full ? `<div class="wr-opts wr-set"><button type="button" data-o="chtv">Choices: ${chTv ? 'on the TV' : 'on the phones'}</button></div>` : ''}
+    ${TV && !full ? `<div class="wr-opts wr-set"><button type="button" data-o="chtv">Choices: ${chTv ? 'on the TV' : 'on the phones'}</button><button type="button" data-o="auto">Autoplay ▶</button></div>` : ''}
     ${full ? '<p class="wr-hint wr-go">Ça commence…</p>' : TV ? `<div class="tv-corner"><div class="qr"></div><b>${esc(room.toUpperCase())}</b></div>`
       : host && !mine ? '<p class="wr-hint">Tap the character you want to play.</p>' : ''}`;
   if (TV && !full) tvQr($('#room .tv-corner .qr'));
@@ -4792,6 +4793,10 @@ function renderWait() {
     state.story = id; renderWait(); share();
   });
   document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); if (b.dataset.o === 'bot') { sendIn('bot'); return; }
+    if (b.dataset.o === 'auto') {   // (09/11) the TV alone: both characters play themselves (random choices), to watch it through
+      for (const k of seatsOf()) if (!state.seats[k]) state.seats[k] = { id: BOT, n: seatLabel(k) };
+      renderWait(); share(); startWhenFull(); return;
+    }
     if (b.dataset.o === 'chtv') { chTv = !chTv; try { localStorage.setItem('smt-chtv', chTv ? '1' : '0'); } catch { /* private window */ } renderWait(); share(); return; } if (b.dataset.o !== 'cancel') feat(b.dataset.o === 'public' ? 'Ouvrir au public' : 'Jouer seul'); otherSeat(b.dataset.o); });
   const list = friendsNow(); friendsKey = list.map((f) => f.to || f.n).join('|');
   document.querySelectorAll('#room .wr-friends button').forEach((b) => b.onclick = (e) => {

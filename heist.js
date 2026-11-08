@@ -39,7 +39,14 @@
   const TABLE = [R(740, 700, 440, 34, '#5b4636', { r: 6 }), R(800, 734, 22, 80, '#3f3126'), R(1098, 734, 22, 80, '#3f3126')];
 
   // ---- the places ----
-  SCENES.h_lobby = place({ ambience: 'crowd', back: [...LOBBY, ...bust(840, 700, .9, P1), ...bust(1080, 700, .9, P2), ...TABLE] });
+  // (09/11) Justin's pictures: the lobby, wide; the two armchairs with Marcus and Ray cut out of the green screen and placed as in
+  // his reference (Marcus on the left, talking with his hands; Ray on the right, in the suit, thinking)
+  // the two of them as characters too (the pick screen, the choice cards): their cut-out, seated
+  SPRITES.h_marcus = { refH: 806, poses: { listen: [274, 806] } }; SPRITES.h_ray = { refH: 792, poses: { listen: [270, 792] } };
+  FACE.h_marcus = { listen: 'r' }; FACE.h_ray = { listen: 'l' };
+  const PIC = [1672, 941], MARCUS = { src: 'marcus_sit', x: 496, y: 883, w: 548, who: 'pa' }, RAY = { src: 'ray_sit', x: 1222.5, y: 876, w: 539, who: 'pb' };
+  SCENES.h_lobby = { image: 'bg/lobby_wide.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [] };
+  const chairs = (people, front = []) => ({ image: 'bg/lobby_chairs.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], props: people, front });
   const feet = (up) => place({ ambience: 'crowd', back: [
     R(0, 0, 1920, 1080, '#161c27'), R(0, 820, 1920, 260, '#11161e'),
     R(760, 0, 150, 760, '#1e3a8a'), R(1010, 0, 150, up ? 700 : 760, '#1e3a8a'),
@@ -56,7 +63,8 @@
   const TWO_BACK = [R(0, 0, 1920, 1080, '#1b2230'), ...[[300, .9], [1600, .85], [960, .8]].flatMap(([x, s]) => bust(x, 640, s, GREY, { blur: 8 })), R(0, 640, 1920, 440, '#141a24')];
   const two = (o = {}) => place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...bust(1300, 900, 1.7, P2),
     ...(o.p2phone ? [glow(1380, 860, 'pb')] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
-  SCENES.h_two = two(); SCENES.h_two_call = two({ p2phone: true });
+  SCENES.h_two = chairs([MARCUS, RAY]);
+  SCENES.h_two_call = chairs([MARCUS, RAY], [R(1340, 545, 34, 56, '#e0f2fe', { r: 6, glow: '0 0 40px 16px rgba(186,230,253,.6)', who: 'pb' })]);   // his phone lights up
   SCENES.h_ots1 = place({ ambience: 'crowd', back: [   // over Marcus's shoulder: his phone, his kids on it, Leo's text on top
     R(0, 0, 1920, 1080, '#1b2230'), ...bust(1500, 820, 1.2, P2, { blur: 10 }),
     R(820, 160, 360, 700, '#0b0b0d', { r: 48 }), R(840, 180, 320, 660, '#2a4a6b', { r: 36 }),
@@ -80,7 +88,7 @@
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
   SCENES.h_side_pb = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#22304a'), R(560, 100, 800, 640, '#3b5375'), ...stand(960, 1180, 2.6, P2), R(1040, 330, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), ...CLOCK(1700, 150)] });
   // Ray gets up, his phone at his ear, and walks off to take the call; the TV, while they're on their phones: a clock, full screen
-  SCENES.h_ray_up = place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...stand(1500, 1080, 2.3, P2), R(1565, 300, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
+  SCENES.h_ray_up = chairs([MARCUS]);   // Ray's armchair empty: he went to take the call
   SCENES.h_clock = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#0d0f14'), C(960, 540, 900, '#e5e7eb', { line: '26px solid #111827' }),
     ...Array.from({ length: 12 }, (_, i) => R(953, 112, 14, 60, '#111827', { r: 7, rot: i * 30, origin: '50% 428px' })),
     R(946, 230, 28, 310, '#111827', { r: 14, rot: -30, origin: '50% 100%' }), R(948, 330, 24, 210, '#111827', { r: 12, rot: -4, origin: '50% 100%' }),
@@ -152,7 +160,7 @@
     SCENES['h_standoff_' + k] = standoff(k); SCENES['h_standoff_' + k + '_off'] = standoff(k, true); }
   SCENES.h_black = place({ back: [R(0, 0, 1920, 1080, '#000')] });
 
-  const at = (id) => [scene(id, {}), { cam: 'wide', at: 960 }];   // a place, the camera on all of it
+  const at = (id) => [scene(id, {}), { cam: 'wide', at: SCENES[id].size[0] / 2 }];   // a place, the camera on all of it
   const S = (who, text, o) => ({ say: who, text, ...o });          // a line (no pose: they're shapes)
   const T = (text) => ({ narr: text });                            // a key moment of the fast forward (it goes on like the rest)
   const N = { pa: 'Marcus', pb: 'Ray' }, WHO = { leo: 'Leo', sarah: 'Sarah', amy: 'Amy' };
@@ -296,8 +304,8 @@
     phone: { time: '11:52', bat: { pa: 64, pb: 21 } },
     pick: { pa: { pose: 'listen', line: 'Guess there’s no turning back now.' }, pb: { pose: 'listen', line: 'Nothing to lose.' } },
     cast: {
-      pa: { name: 'Marcus', color: P1, sprite: 'justin' },
-      pb: { name: 'Ray', color: P2, sprite: 'james' },
+      pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
+      pb: { name: 'Ray', color: P2, sprite: 'h_ray' },
       leo: { name: 'Leo', color: '#f59e0b' },
       sarah: { name: 'Sarah', color: '#22c55e' },
       amy: { name: 'Amy', color: AMY },
