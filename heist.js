@@ -219,10 +219,10 @@
       ...at('h_two'), { hush: 900 },
     ] },
     // ---- 13. Ray takes the briefcase, stands up ----
-    ...at('h_stand'), { hush: 1500 },
+    ...at('h_stand'), { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 9000 }, { hush: 1500 },   // Double It far away, very low and muffled, as he gets up
     // ---- 14. the elevator: the crowd back, Double It far and muffled ----
     ...at('h_lift'), { room: { lp: 20000, vol: 1, ms: 1000 } },
-    { music: 'double it', lv: 0, vol: .35, lp: 380, ms: 6000 }, { hush: 1600 },
+    { music: 'double it', vol: .32, lp: 420, ms: 14000 }, { hush: 1600 },   // it keeps coming up, slowly, while they wait
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
@@ -231,10 +231,10 @@
         ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
         : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]],
       { clock: 12000 })],
-    }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
+    }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_open'), { hush: 1200 },
-    ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 3000 }, { bars: 1 },
+    ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 1 },
     // ---- 17. up: a dot a bar; the briefcase; the masks; the doors open on the drop ----
     ...at('h_elev1'), { music: 'double it', vol: .65 }, { bars: 1 },
     ...at('h_elev2'), { music: 'double it', vol: .72 },
