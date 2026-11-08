@@ -4657,6 +4657,10 @@ function myCharacter(id) {
   return mine.length === 1 ? mine[0] : null;
 }
 async function introCard(who, at, keep = null, lean = false) {   // keep: it stays while that says so (a TV's opening); lean: a TV's phone (the TV shows who's who: here only your colour)
+  if (lean) {   // (09/11) a TV's phone: nothing over its colour (« Look at the TV » is already there); just wait out the TV's opening
+    await new Promise((ok) => { const t0 = Date.now(), t = setInterval(() => { if (run !== at || (Date.now() - t0 >= 3200 && !(keep && keep()))) { clearInterval(t); ok(); } }, 100); });
+    return;
+  }
   const img = new Image(); img.src = poseSrc(who, 'listen'); img.className = 'in-fig';
   const name = fill(castOf(who).name || ''), box = $('#intro');
   box.className = ''; box.style.setProperty('--c', castOf(who).color || '#ff9a4d');
