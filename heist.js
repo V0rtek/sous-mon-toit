@@ -59,6 +59,12 @@
   const TWO_BACK = [R(0, 0, 1920, 1080, '#1b2230'), ...[[300, .9], [1600, .85], [960, .8]].flatMap(([x, s]) => bust(x, 640, s, GREY, { blur: 8 })), R(0, 640, 1920, 440, '#141a24')];
   const two = (o = {}) => place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...bust(1300, 900, 1.7, P2),
     ...(o.p2phone ? [glow(1380, 860, 'pb')] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
+  // seen from above: the two armchairs, the table, Marcus's phone on it, the briefcase by Ray (lit: the phone buzzing); his phone,
+  // close: Leo on the lock screen, Leo's text on it (Justin's picture, its text changed)
+  const pic = (image, front = []) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front });
+  SCENES.h_top = pic('bg/lobby_top.webp');
+  SCENES.h_top_buzz = pic('bg/lobby_top.webp', [R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
+  SCENES.h_phone = pic('bg/phone_leo.webp');
   SCENES.h_two = chairs([MARCUS, RAY]);   // Marcus talks, Ray thinks
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
   SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
@@ -170,20 +176,20 @@
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
     { sfx: 'crowd', loop: true },   // the lobby's crowd from the black card on: we hear the place before we see it
-    { titleCard: 'Union Trust Tower', sub: '11:52 AM' },
+    { titleCard: 'Union Trust Tower', sub: '9:38 AM' },
     ...at('h_lobby'), { fade: 'in', ms: 900 }, { hush: 1800 },
     // ---- 3. his feet won't stop ----
     ...Array.from({ length: 5 }, () => [...at('h_feet_a'), { wait: 320 }, ...at('h_feet_b'), { wait: 320 }]).flat(), ...at('h_feet_a'), { hush: 700 },
     // ---- 4-7. the briefcase, the three lines ----
-    ...at('h_case'), S('pb', 'We’re on in 8 minutes.'),
+    ...at('h_top'), S('pb', 'We’re on in 8 minutes.'),
     ...at('h_two'), S('pa', 'Guess there’s no turning back now.'),
     ...at('h_two_r'), S('pb', 'Yeah…'),
     S('pb', 'Nothing to lose.'),
     // ---- 8. Marcus's phone: Leo, his kids behind ----
-    BUZZ, ...at('h_ots1'), sms('leo', 'pa', 'dad r u coming to practice tonight?'),
-    narr('Leo: “dad r u coming to practice tonight?”'),
+    ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
+    ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?'), { hush: 3400 },   // Leo, on the lock screen, and his text
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_ots2'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
+    ...at('h_top'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
       { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to lose.')] },
       { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to win.')] },
@@ -299,7 +305,7 @@
   ], {
     gaze: false, credits: '', title: 'Floor 31', intro: [],
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
-    phone: { time: '11:52', bat: { pa: 64, pb: 21 } },
+    phone: { time: '9:38', bat: { pa: 64, pb: 21 } },
     pick: { pa: { pose: 'listen', line: 'Guess there’s no turning back now.' }, pb: { pose: 'listen', line: 'Nothing to lose.' } },
     cast: {
       pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
