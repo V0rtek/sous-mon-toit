@@ -87,6 +87,14 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 .far i:nth-child(2) { animation-delay: .2s; }
 .far i:nth-child(3) { animation-delay: .4s; }
 /* a slate: one sentence on black between two scenes ("You leave Justin and Cam and head to the bathroom.") */
+#slate .tc b { display: block; font-size: 1.25em; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+#slate .tc small { display: block; margin-top: .5em; font-size: .6em; font-weight: 600; letter-spacing: .3em; color: #aeaeb2; opacity: 0; animation: tcIn 0s 1.1s forwards; }
+@keyframes tcIn { to { opacity: 1; } }
+body.phonemin.tapline #minView > * { visibility: hidden; }   /* not the pause: a tap moves on */
+body.phonemin.tapline #minView::after { content: '▶  Tap to go on'; position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 2.2em; font-weight: 800; letter-spacing: .06em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; pointer-events: none; }
+body.tapline #bubble::after { content: '▶ Tap a phone'; position: absolute; left: 0; right: 0; text-align: center; bottom: -1.7em; font-size: .9em; font-weight: 800; letter-spacing: .08em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; }
+.tv-cue { display: block; font-style: normal; font-size: .62em; font-weight: 700; color: #ffd60a; margin-top: .15em; animation: cuePulse 1.2s ease-in-out infinite; }
+@keyframes cuePulse { 50% { opacity: .45; } }
 #slate { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 12%; text-align: center; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; font-size: 3em; font-weight: 600; line-height: 1.35; letter-spacing: -.01em; pointer-events: none; }
 
 #ui { position: absolute; left: 7%; right: 7%; top: 53%; display: flex; flex-direction: column; gap: 1.4em; }
@@ -1962,7 +1970,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
         <a href="?play=d_mini_clic" id="miniClicBtn"><span class="art" style="--g:#2a4f8f"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Mini-histoire · au clic</b></a>
         <a href="?play=d_mini_auto" id="miniAutoBtn"><span class="art" style="--g:#3b1f6e"><img src="chars/cam/flirty.webp" alt=""></span><b>Mini-histoire · tout seul</b></a>
         <a href="?play=d_pirate" id="pirateBtn"><span class="art" style="--g:#8e1b1b"><img src="chars/pirate/bar_smile.webp" alt=""></span><b>Le serment du pirate</b></a>
-        <a href="?play=d_heist" id="heistBtn"><span class="art" style="--g:#9a3b3b"><img src="chars/james/listen.webp" alt=""></span><b>Floor 31 · le début du braquage (texte)</b></a>
+        <a href="?tv&amp;story=d_heist" id="heistBtn"><span class="art" style="--g:#9a3b3b"><img src="chars/james/listen.webp" alt=""></span><b>Floor 31 · le braquage (TV + cells)</b></a>
       </div>
     </div>
   </div>
@@ -2593,7 +2601,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261107200000"></script>
+<script src="heist.js?v=20261108140000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2610,7 +2618,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <div id="warn" hidden role="alert"><div class="wIcon">🚨</div><p class="wBig">TU DOIS AVOIR UNE DEMO AU PLUS SACRANT</p><p class="wSub">pour le pitch Spark ET pour valider l’idée</p><button class="wOk" type="button">OK, J’Y VAIS</button></div>
 <script src="importer.js?v=20261102260000"></script>
 <script src="deck.js?v=20261103600000"></script>
-<script src="bank.js?v=20261102320000"></script>
+<script src="bank.js?v=20261108130000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 const $ = (s) => document.querySelector(s);
@@ -2985,6 +2993,7 @@ function rects(list, el) {
     Object.assign(d.style, { position: 'absolute', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px', boxSizing: 'border-box',
       background: r.color, borderRadius: typeof r.r === 'string' ? r.r : (r.r || 0) + 'px', border: r.line || '', boxShadow: r.glow || '',
       filter: r.blur ? `blur(${r.blur}px)` : '' });
+    if (r.rot) Object.assign(d.style, { transform: `rotate(${r.rot}deg)`, transformOrigin: r.origin || '50% 50%' });   // a clock's hand
     el.appendChild(d);
   }
 }
@@ -2992,6 +3001,7 @@ function setScene(id, cast) {
   if (cellOpen) closeCell();   // a new place: he put his phone away
   if (sc && sc.ambience && sc.ambience !== SCENES[id].ambience) stopSfx(sc.ambience);
   sc = SCENES[id]; actors = {}; castEl.innerHTML = ''; frontEl.innerHTML = ''; backEl.innerHTML = '';
+  textEl.textContent = ''; typingFull = '';   // a new place: the last line stays behind (a TV shows no old line under a choice)
   if (sc.ambience && !sfxLoops[sc.ambience]) sfx(sc.ambience, 'scene');   // the room's sound, looping (scene.ambience)
   const [bw, bh] = sc.size;
   bgImg.hidden = !sc.image;
@@ -3314,7 +3324,7 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // 5 s: under the "You are" card that opens every story), dragon_arrive (a short epic roar, 3 s), dragon_fire (a long
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6 };
 async function sfx(name, loop = false, rate = 1) {
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -3322,12 +3332,37 @@ async function sfx(name, loop = false, rate = 1) {
   if (loop === 'card' && $('#epCard').hidden) return;   // the episode's end card closed while the file loaded
   if (loop) stopSfx(name);
   const src = actx.createBufferSource(), g = actx.createGain(), vol = SFX_VOL[name] ?? 1;
-  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(out());
+  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(loop ? roomBus() : out());
   // a loop fades in, so a room's sound arrives with the room instead of cutting in
   if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
   else g.gain.value = vol;
   src.start(); src.gain = g;
   if (loop) sfxLoops[name] = src;
+}
+// the room's sounds (the loops) go through one more filter and gain: {room: {lp, vol, ms}} muffles the room or brings it
+// back (a phone call takes him away from the crowd: lp 600, vol .5; back to normal: lp 20000, vol 1). A new story: normal
+let roomLp = null, roomG = null;
+function roomBus() {
+  if (!roomLp) { roomLp = actx.createBiquadFilter(); roomLp.type = 'lowpass'; roomLp.frequency.value = 20000; roomG = actx.createGain(); roomLp.connect(roomG).connect(out()); }
+  return roomLp;
+}
+function roomSound(o = {}) {
+  if (!audio()) return; roomBus(); const t = actx.currentTime, d = (FAST ? 0 : o.ms ?? 1200) / 1000 + .02;
+  for (const [p, v] of [[roomLp.frequency, o.lp ?? 20000], [roomG.gain, Math.max(o.vol ?? 1, .0001)]]) {
+    p.cancelScheduledValues(t); p.setValueAtTime(Math.max(p.value, .0001), t); p.exponentialRampToValueAtTime(v, t + d);
+  }
+}
+// {tick: true}: a clock ticking, once a second, until {tick: false}
+let tickT = 0;
+function ticking(on) {
+  clearInterval(tickT); if (!on || FAST || PREVIEW) return;
+  const one = () => {
+    const c = audio(); if (!c) return; const t = c.currentTime + .01, n = c.createBufferSource(), b = c.createBuffer(1, 900, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / 90);
+    const f = c.createBiquadFilter(), g = c.createGain(); f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 4; g.gain.value = .5;
+    n.buffer = b; n.connect(f).connect(g).connect(out()); n.start(t);
+  };
+  one(); tickT = setInterval(one, 1000);
 }
 function stopSfx(name) {
   for (const k of name ? [name] : Object.keys(sfxLoops)) {
@@ -3341,7 +3376,8 @@ function stopSfx(name) {
 // {music: 'double it', lv, vol, ms}: starts it at level lv (0 = the first), its volume rising to vol (1 = full) over ms; already
 // playing, lv moves to that level on a bar line (inBars: that many bar lines away), the reverse boom swelling up to it, the
 // new loop from its first bar; vol alone moves the volume. {music: null, ms}: fades it out. {bars: n}: waits for the n-th bar
-// line (to land a line, a sound or a picture on the beat), {bars: 'drop'} for the moment the level asked for lands. While a choice is open the music closes (a low-pass), as if
+// line (to land a line, a sound or a picture on the beat), {bars: 'drop'} for the moment the level asked for lands. {lp: Hz}:
+// the music heard from far (through a wall, a muffled lobby), 20000 = right here. While a choice is open the music closes (a low-pass), as if
 // holding its breath; it opens again on the pick. Through the same gain as every sound: a TV's phones stay silent
 const TRACKS = {
   'double it': { bpm: 140, loops: ['double it loop 1 intro', 'double it loop 2 drop', 'double it loop 3 drop2', 'double it loop 4 peak'] },
@@ -3359,8 +3395,8 @@ function music(s) {
   const tr = TRACKS[s.music]; if (!tr) return;
   if (!mus || mus.name !== s.music) {
     musStop(400);
-    const m = mus = { name: s.music, bar: 60 / tr.bpm * 4, L: s.lv || 0, pend: null, barI: 0 };
-    m.g = actx.createGain(); m.lp = actx.createBiquadFilter(); m.lp.type = 'lowpass'; m.lp.frequency.value = 20000;
+    const m = mus = { name: s.music, bar: 60 / tr.bpm * 4, L: s.lv || 0, pend: null, barI: 0, base: s.lp || 20000 };
+    m.g = actx.createGain(); m.lp = actx.createBiquadFilter(); m.lp.type = 'lowpass'; m.lp.frequency.value = m.base;
     m.g.gain.value = 0.0001; m.g.connect(m.lp).connect(out());
     m.ready = Promise.all([Promise.all(tr.loops.map(loadSfx)), loadSfx(MUS_BOOM)]).then(([bufs, boom]) => {
       if (mus !== m) return;   // stopped while it loaded
@@ -3376,6 +3412,7 @@ function musMove(s) {   // already playing: another level, another volume
     if (!mus || !mus.bufs) return;
     if (s.lv !== undefined && s.lv !== (mus.pend ? mus.pend.L : mus.L)) musGo(s.lv, s.inBars || 1);
     if (s.vol !== undefined) musVol(s.vol, s.ms ?? 1500);
+    if (s.lp !== undefined) { mus.base = s.lp; musHold(document.body.classList.contains('choosing'), s.ms ?? 1500); }
   });
 }
 function musPlay(m, buf, t, off, dur, vol = 1) {
@@ -3400,9 +3437,9 @@ function musVol(v, ms) {
   const g = mus.g.gain, t = actx.currentTime;
   g.cancelScheduledValues(t); g.setValueAtTime(Math.max(g.value, .0001), t); g.exponentialRampToValueAtTime(Math.max(v * MUS_VOL, .0001), t + Math.max(ms, 30) / 1000);
 }
-function musHold(on) {   // a choice is open: the music holds its breath
+function musHold(on, ms) {   // a choice is open: the music holds its breath (it goes back to its own filter, {lp}, after)
   if (!mus || !mus.lp) return; const f = mus.lp.frequency, t = actx.currentTime;
-  f.cancelScheduledValues(t); f.setValueAtTime(f.value, t); f.exponentialRampToValueAtTime(on ? 1400 : 20000, t + (on ? .6 : .25));
+  f.cancelScheduledValues(t); f.setValueAtTime(f.value, t); f.exponentialRampToValueAtTime(on ? Math.min(1400, mus.base) : mus.base, t + (ms ?? (on ? 600 : 250)) / 1000);
 }
 function musStop(ms = 1200) {
   const m = mus; mus = null; if (!m) return;
@@ -3497,6 +3534,7 @@ function line(s) {
   if (!tail.hidden) tail.style.left = Math.min(86, Math.max(14, (sx - .07) / .86 * 100)) + '%';
   if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
   bubble.hidden = false; choicesEl.hidden = true;
+  document.body.classList.toggle('tapline', !!s.tap);
   // the name tag never sits on the tail: if they meet, the tag moves just past the tail (still on the speaker's side)
   tagEl.style.left = '';
   if (who && !tail.hidden) {
@@ -3741,7 +3779,7 @@ function choose(opts, by, ring) {
 }
 // the clock on a choice (smt-timer: off, 6, 10 default, 20 seconds): a line that shrinks above the choices; it stops while the
 // story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
-let clockT = 0, chClock;   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
+let clockT = 0, chClock, chCue = '';   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
 const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
 function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); $('#waitClock').hidden = true; }
 function clockStart(opts, watching = false) {   // watching: someone else's choice (the TV, the other phone): the line only shows, never picks
@@ -3893,7 +3931,7 @@ function minView() {
   $('#minView').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
 }
 // the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
-$('#minView').onclick = (e) => { e.stopPropagation(); if (document.body.classList.contains('privline')) advance(); else if (hostTv && !paused) sendIn('pause'); };
+$('#minView').onclick = (e) => { e.stopPropagation(); if (document.body.classList.contains('privline') || document.body.classList.contains('tapline')) advance(); else if (hostTv && !paused) sendIn('pause'); };   // a line that waits for a tap ({tap}): the black moves it on
 // a TV's story, the two players apart (a split): the TV goes black with the closed eye and falls silent, each phone
 // opens on its own scene, with its sound; back together, the TV takes the picture and the sound back
 function apart() {
@@ -3940,12 +3978,13 @@ $('#pauseCard').onclick = (e) => { e.stopPropagation(); if (TV) tvPause(false); 
 $('#pauseCard .pc-go').onclick = (e) => { e.stopPropagation(); if (hostTv && paused) sendIn('pause'); };
 $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sendIn('menu'); };
 // how long a line stays: time to read it (a private one: time for its owner to read it on their phone)
+let tapNow = false;   // {tap: true} on a line: it waits for a tap (a TV: a player's phone), never moves on by itself
 const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
 let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
 function autoTick() {
   if ((!TV && !(STORIES[state.story] || {}).auto) || paused || screen !== null || FAST || absentSeats().length) { autoKey = {}; return; }   // the TV, or a story that plays itself (auto)
   const now = Date.now(), due = (k, id, ms) => { if (autoKey[k] !== id) { autoKey[k] = id; autoKey[k + 't'] = now + ms; } return now >= autoKey[k + 't']; };
-  if (waiting === 'click' && !typing) {
+  if (waiting === 'click' && !typing && !tapNow) {
     const id = run + ':' + tape.length, ms = !slateEl.hidden ? 3500 : onlyNow ? 5000 : readMs(typingFull);
     if (due('m', id, ms)) { autoKey.m = null; record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
   } else autoKey.m = null;
@@ -3962,10 +4001,11 @@ function tvWho() {
   const on = TV && screen === null && game && duo() && !paused && $('#tvIntro').hidden;
   const turn = on && (waiting === 'choice' ? seatFor(optionsBy) : waiting === 'click' && onlyNow ? onlyNow : null);
   const list = on ? seats.filter((k) => k === turn || gone.includes(k)) : [];
-  const key = list.map((k) => `${k}${k === turn ? '+' : ''}${gone.includes(k) ? '-' : ''}${seatName(k)}`).join('|');
+  const cue = waiting === 'choice' && chCue ? chCue : '';   // the first choices: the TV says where to look
+  const key = list.map((k) => `${k}${k === turn ? '+' : ''}${gone.includes(k) ? '-' : ''}${seatName(k)}`).join('|') + cue;
   if (key === tvWhoKey) return; tvWhoKey = key;
   $('#tvWho').innerHTML = list.map((k) => `<div class="${seats.indexOf(k) ? 'r' : 'l'} ${k === turn ? 'turn' : ''} ${gone.includes(k) ? 'gone' : ''}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">
-    ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${esc(seatName(k))}</span></div>`).join('');
+    ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${esc(seatName(k))}${k === turn && cue ? `<em class="tv-cue">📱 ${esc(fill(cue))}</em>` : ''}</span></div>`).join('');
 }
 if (TV) setInterval(tvWho, 250);
 
@@ -4264,7 +4304,7 @@ async function next() {
   const r = run;
   slateEl.hidden = true;   // a slate stays until the tap that moves past it (black stays until the next fade in)
   if (onlyNow) { onlyNow = null; waitNote(''); }
-  document.body.classList.remove('privline');
+  tapNow = false; document.body.classList.remove('privline', 'tapline');
   const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
   if (k > 0 && q[k].choice && waitsFor(byOf(q[k]))) held = q.splice(0, k);
   while (q.length && r === run) {
@@ -4286,6 +4326,13 @@ async function next() {
     else if (s.check) { if (!(await readTexts(s.check, r))) return; }
     else if (s.sfx) sfx(s.sfx, s.loop);
     else if (s.music !== undefined) music(s);
+    else if (s.room) roomSound(s.room);
+    else if (s.tick !== undefined) ticking(s.tick);
+    else if (s.titleCard) {   // black, the place appears at once (no fade), the hour under it a beat later
+      black.style.transition = 'none'; black.style.opacity = 1; bubble.hidden = true;
+      slateEl.innerHTML = `<div class="tc"><b>${esc(fill(s.titleCard))}</b>${s.sub ? `<small>${esc(fill(s.sub))}</small>` : ''}</div>`;
+      slateEl.hidden = false; waiting = 'click'; return;
+    }
     else if (s.bars) { if (FAST) continue; await musBars(s.bars); if (r !== run) return; }
     else if (s.stop) stopSfx(s.stop);
     else if (s.hush) { bubble.hidden = true; await sleep(silence(s.hush)); }   // a silence: no bubble, the shot holds
@@ -4313,14 +4360,14 @@ async function next() {
     else if (s.say || s.narr || s.think) {
       // {only: seat}: a line only that player sees (a secret, his own version of the facts); the other one gets
       // "<name> is reading…" until that player taps on
-      onlyNow = s.only || null;
+      onlyNow = s.only || null; tapNow = !!s.tap;
       document.body.classList.toggle('privline', !!onlyNow && sees(onlyNow));
       if (onlyNow && !sees(onlyNow)) { bubble.hidden = true; waitNote(`${seatName(onlyNow)} ${ui('reading')}`); } else line(s);
       waiting = 'click'; huLine();
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { chClock = s.clock; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
@@ -4405,7 +4452,7 @@ function halt() {
 function endSplit() {
   if (split) for (const g of Object.values(split.ghosts)) clearTimeout(g.t);
   const was = !!split;
-  split = null; laneNow = null; if (was) apart(); texts = {}; phoneLog = {}; closeCell(); storyAt = Date.now(); textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx(); musStop(500); musLate = null;
+  split = null; laneNow = null; if (was) apart(); texts = {}; phoneLog = {}; closeCell(); storyAt = Date.now(); textsEl.innerHTML = ''; farEl.innerHTML = ''; slateEl.hidden = true; stopSfx(); musStop(500); musLate = null; ticking(false); if (roomLp) roomSound({ ms: 0 });
   asides.clear(); $('#todoCard').hidden = true; $('#ringCard').hidden = true; ringTone(false); onlyNow = null;
   clearInterval(callNow && callNow.tick); callNow = null; $('#callBar').hidden = true;
 }
