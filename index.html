@@ -9,7 +9,7 @@
 <title>UNWRITTEN</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&family=Playfair+Display+SC:wght@900&display=swap" media="print" onload="this.media='all'">
 <style>
 /* Layout: one 9:16 phone stage, centred on black. 1em inside the stage = 1% of its height, so it scales as a whole.
    Inside, one "world" in decor pixels (photo + people + foreground); the camera is a transform on it. */
@@ -1703,6 +1703,22 @@ body.watch.hosttv #again { display: block !important; }
 #tvIntro .ti-c i { font-style: normal; font-weight: 800; color: var(--c, #ff9a4d); }
 #tvIntro .ti-h { font-size: 4.4em; font-weight: 600; color: #e5e5ea; }
 body.tv:has(#tvIntro:not([hidden])) #tvSides, body:has(#mirrorCard:not([hidden])) #tvSides { display: none; }
+/* (07/11) la marque : U_ = le logo (Playfair SC, le trait rouge qui clignote). Il apparaît avec son son avant le nom de la
+   série dans l'intro de la TV, et c'est l'écran d'attente (un cell qui attend la TV, un cell qui attend les autres) */
+.u-logo, .u-mark { font-family: 'Playfair Display SC', Georgia, serif; font-weight: 900; line-height: 1; white-space: nowrap; display: inline-flex; align-items: baseline; color: #e8e4dc; }
+.u-logo { letter-spacing: .14em; filter: url(#uInk); }
+.u-mark > span:first-child { filter: url(#uInk); }
+.u-c { color: #c8262f; margin-left: .05em; animation: uBlink 1.06s steps(1) infinite; }
+@keyframes uBlink { 50% { opacity: 0; } }
+#tvIntro .ti-logo { font-size: 15em; transition: opacity 1.2s ease; }
+#tvIntro .ti-logo .lt { display: inline-block; opacity: 0; }
+#tvIntro .ti-logo.run .lt { animation: uBleed 1.3s cubic-bezier(.16,.9,.24,1) both; animation-delay: calc(.45s + var(--i) * .07s); }
+#tvIntro .ti-logo.out { opacity: 0; }
+@keyframes uBleed { 0% { opacity: 0; filter: blur(18px); transform: scale(1.25); } 60% { opacity: 1; } 100% { opacity: 1; filter: none; transform: none; } }
+#uWait { position: absolute; inset: 0; z-index: 14; display: grid; place-items: center; background: #000; pointer-events: none; font-size: 14em; }
+#uWait[hidden] { display: none; }
+#gateCard .gc-u { font-size: 9em; margin-bottom: .15em; }
+@media (prefers-reduced-motion: reduce) { .u-c { animation: none; } #tvIntro .ti-logo.run .lt { animation: none; opacity: 1; } }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
 #absentBar { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); z-index: 55; padding: .8em 1.5em; border-radius: 2em; background: rgba(255,159,10,.92); color: #1d1d1f; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; text-align: center; }
 #absentBar small { display: block; font-size: .75em; font-weight: 700; opacity: .75; }
@@ -2674,6 +2690,8 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     <div class="pc-grid"><div class="pc-players"></div></div>
     <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
   <div id="gateCard" hidden></div>
+  <div id="uWait" hidden><span class="u-mark"><span>U</span><span class="u-c">_</span></span></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="uInk" x="-4%" y="-12%" width="108%" height="124%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
   <div id="attn" aria-hidden="true"></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
 </div>
@@ -4022,7 +4040,15 @@ async function tvIntro(at) {
     return hold(1700);
   };
   box.innerHTML = ''; box.className = ''; box.hidden = false; skipVotes.clear(); introSkip = false;
-  if (!(await hold(1800))) return false;
+  if (!(await hold(700))) return false;
+  // (07/11) avant le nom de la série : le logo U_, son apparition (l'encre qui prend) et son coup de basse
+  if (!introSkip) {
+    box.innerHTML = `<div class="ti-s"><div class="u-logo ti-logo">${[...'Unwritten'].map((ch, i) => `<span class="lt" style="--i:${i}">${ch}</span>`).join('')}<span class="u-c">_</span></div></div>`;
+    const lg = box.querySelector('.ti-logo'); void lg.offsetWidth; lg.classList.add('run'); logoSound();
+    if (!(await hold(3600))) return false;
+    lg.classList.add('out');
+    if (!(await hold(1300))) return false;
+  }
   if (!(await slide(`<div class="ti ti-k">UNWRITTEN</div><div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;
   for (const x of st.intro || []) if (!(await slide(`<div class="ti ti-p">${esc(fill(x))}</div>`, Math.max(4000, 1800 + 55 * x.length)))) return false;
   // who plays whom: each character (the pose of the waiting room), facing the other, and its player — the phones show
@@ -4038,6 +4064,40 @@ async function tvIntro(at) {
   tvPhase = null; skipVotes.clear(); skipTv(); share(); box.classList.add('out');
   if (!(await hold(1900))) return false;
   box.hidden = true; return true;
+}
+// (07/11) le son du logo U_ : un sub-bass en Sol (49 Hz). Un souffle qui monte, 0,15 s de silence, l'impact (la grave + une
+// harmonique saturée pour les petits haut-parleurs), la cloche et le bourdon (« Encre »), l'orchestre et le piano 3x moins
+// fort (« Affiche »). Synthétisé ici, par la sortie du jeu (le son coupé le coupe aussi)
+function logoSound() {
+  const c = audio(); if (!c) return;
+  const dst = out(), E = 0.0001, f = 49, AFF = 1 / 3, t0 = c.currentTime + 0.05, hit = t0 + 0.45;
+  const len = c.sampleRate * 2, nb = c.createBuffer(1, len, c.sampleRate), d = nb.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const G = (t, a, p, dec) => { const g = c.createGain(); g.gain.setValueAtTime(E, t); g.gain.exponentialRampToValueAtTime(Math.max(p, 2 * E), t + a); g.gain.exponentialRampToValueAtTime(E, t + a + dec); g.connect(dst); return g; };
+  const F = (type, fr, q, to) => { const x = c.createBiquadFilter(); x.type = type; x.frequency.value = fr; x.Q.value = q; x.connect(to); return x; };
+  const O = (type, fr, t, end) => { const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(fr, t); o.start(t); o.stop(end); return o; };
+  const N = (t, end) => { const s = c.createBufferSource(); s.buffer = nb; s.loop = true; s.start(t, Math.random() * 1.5); s.stop(end); return s; };
+  const beep = (fr, t, dec, p, type = 'sine', a = 0.004) => O(type, fr, t, t + a + dec + 0.05).connect(G(t, a, p, dec));
+  // the breath that rises, cut dead
+  { const g = c.createGain(); g.gain.setValueAtTime(E, t0); g.gain.exponentialRampToValueAtTime(0.16, t0 + 0.3); g.gain.setValueAtTime(E, t0 + 0.3); g.connect(dst);
+    const bp = F('bandpass', 180, 1.2, g); bp.frequency.setValueAtTime(180, t0); bp.frequency.exponentialRampToValueAtTime(2600, t0 + 0.3); N(t0, t0 + 0.32).connect(bp); }
+  // the orchestra swell (Affiche, 3x softer), cut at the hit
+  { const g = c.createGain(); g.gain.setValueAtTime(E, t0); g.gain.exponentialRampToValueAtTime(0.2 * AFF, t0 + 0.42); g.gain.setValueAtTime(E, t0 + 0.43); g.connect(dst);
+    const lp = F('lowpass', 200, 2, g); lp.frequency.setValueAtTime(200, t0); lp.frequency.exponentialRampToValueAtTime(2200, t0 + 0.42); [1, 1.005, 0.5, 2].forEach((r) => O('sawtooth', f * 4 * r, t0, t0 + 0.47).connect(lp)); }
+  // the impact: the sub falls onto Sol, its saturated harmonic, the click, the air
+  { const o = O('sine', f * 3.2, hit, hit + 2.5); o.frequency.exponentialRampToValueAtTime(f, hit + 0.09);
+    const g = c.createGain(); g.gain.setValueAtTime(E, hit); g.gain.exponentialRampToValueAtTime(1, hit + 0.006); g.gain.setValueAtTime(1, hit + 0.14); g.gain.exponentialRampToValueAtTime(E, hit + 2.3); g.connect(dst); o.connect(g);
+    const o2 = O('triangle', f * 6, hit, hit + 2.5); o2.frequency.exponentialRampToValueAtTime(f * 2, hit + 0.09);
+    const sh = c.createWaveShaper(), cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) cv[i] = Math.tanh(3 * (i / 1023 * 2 - 1)); sh.curve = cv; sh.oversample = '4x';
+    sh.connect(F('lowpass', 260, 0.7, G(hit, 0.006, 0.5, 1.3))); o2.connect(sh);
+    N(hit, hit + 0.08).connect(F('highpass', 1800, 0.7, G(hit, 0.001, 0.4, 0.03)));
+    N(hit, hit + 0.7).connect(F('lowpass', 380, 0.7, G(hit, 0.004, 0.22, 0.5))); }
+  // the bell (Encre) and the piano (Affiche, 3x softer), on Sol
+  [[1, 1, 2.6], [2, 0.5, 1.8], [2.76, 0.35, 1.4], [5.4, 0.2, 0.9], [8.93, 0.12, 0.5]].forEach(([r, p, dec]) => beep(f * 4 * r, hit, dec, p * 0.22));
+  beep(f * 4, hit, 1.6, 0.28 * AFF, 'triangle', 0.003); beep(f * 8, hit, 1.1, 0.12 * AFF, 'sine', 0.003); beep(f * 12, hit, 0.6, 0.05 * AFF, 'sine', 0.003);
+  // the drone (Encre) rising under it
+  { const g = c.createGain(); g.gain.setValueAtTime(E, hit); g.gain.exponentialRampToValueAtTime(0.12, hit + 0.6); g.gain.exponentialRampToValueAtTime(E, hit + 2.8); g.connect(dst);
+    const lp = F('lowpass', 420, 0.8, g); [1, 1.006, 1.5].forEach((r) => O('sawtooth', f * 2 * r, hit, hit + 2.85).connect(lp)); }
 }
 // a player's phone, while the TV opens: a skip button; it skips once every player tapped it (one dot per player)
 function skipPaint() {
@@ -4057,10 +4117,10 @@ function skipTv() {
 $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 // a player's phone: black until the TV says who's who, then its "Tu es …" card, then the story with the TV
 function tvOpenStep() {
-  const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; return; }
+  const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; $('#uWait').hidden = true; return; }
   const ip = remote && remote.ip;
-  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
-  if (!ip && o.cardDone) { tvOpen = null; next(); }
+  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; $('#uWait').hidden = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
+  if (!ip && o.cardDone) { tvOpen = null; $('#uWait').hidden = true; next(); }
 }
 // the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
 let pauseDucked = false;
@@ -4152,7 +4212,7 @@ function gateOn(s) {
   el.classList.toggle('halves', TV);
   el.innerHTML = TV ? [...gateNow].map((k) => `<div class="gc-half" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="gc-ico">📱</div><b>${esc(seatName(k) || '')}</b><span>Look at your phone</span></div>`).join('')
     : mine.length ? `<div class="gc-ico">👆</div><b>Tap to start</b>${t ? `<span>${esc(fill(t))}</span>` : ''}`
-    : `<span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}…</span>`;
+    : `<div class="gc-u u-mark"><span>U</span><span class="u-c">_</span></div><span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}</span>`;   // (07/11) waiting on the others: U_
   el.hidden = false; document.body.classList.add('gate'); document.body.classList.toggle('gate-me', !TV && mine.length > 0);
 }
 function gateTv() {   // the TV: a player tapped, his half says so
@@ -4638,7 +4698,7 @@ function show(id) {
 }
 function halt() {
   document.body.classList.remove('choosing', 'privline'); litOff(); qCardOff();
-  $('#tvIntro').hidden = true; tvOpen = null; if (TV) tvPhase = null;
+  $('#tvIntro').hidden = true; tvOpen = null; $('#uWait').hidden = true; if (TV) tvPhase = null;
   run++; huOff(); q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
   waitNote(''); $('#looks').hidden = true; endSplit();
 }
@@ -4697,7 +4757,7 @@ function begin(id = state.story) {
   if (TV) tvSides();
   const me = FAST || replay || PREVIEW ? null : myCharacter(id), at = run;
   if (TV && tvPhase) { tvIntro(at).then((ok) => { if (ok) next(); }); return; }
-  if (ROLE === 'watch' && hostTv && !FAST) { tvOpen = { at, me: MIRROR ? null : me, shown: false, cardDone: !me || !!MIRROR }; tvOpenStep(); return; }
+  if (ROLE === 'watch' && hostTv && !FAST) { tvOpen = { at, me: MIRROR ? null : me, shown: false, cardDone: !me || !!MIRROR }; $('#uWait').hidden = false; tvOpenStep(); return; }   // (07/11) the phone waits on the TV: U_
   if (me) introCard(me, at).then(() => { if (run === at) next(); }); else next();
 }
 // leaving a story or the waiting room sends the joiners back to the lobby (one that came from its menu: to its menu)
