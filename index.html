@@ -93,6 +93,7 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 @keyframes tcIn { to { opacity: 1; } }
 #gateCard { position: absolute; inset: 0; z-index: 13; background: rgba(0,0,0,.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5em; padding: 0 8%; text-align: center; color: #f5f5f7; pointer-events: none; animation: gcIn .35s ease-out; }
 #gateCard[hidden] { display: none; }
+body.phonemin #gateCard { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }
 #gateCard .gc-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
 #gateCard b { font-size: 4.4em; font-weight: 800; color: #ffd60a; }
 #gateCard span { font-size: 2.6em; font-weight: 600; color: #d1d1d6; }
@@ -123,6 +124,13 @@ body { --tx: 2.2em; --cap: 2.5em; --tagsz: 2.2em; }
 body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
 #text { font-size: var(--tx); line-height: 1.32; font-weight: 600; min-height: 1.32em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
+body.tv #bubble { background: rgba(8,8,12,.62); border: .16em solid color-mix(in srgb, var(--spk, #8e8e93) 85%, #fff); box-shadow: none; padding: 1em 1.6em; backdrop-filter: blur(.3em); -webkit-backdrop-filter: blur(.3em); }
+body.tv #bubble #text { color: color-mix(in srgb, var(--spk, #f5f5f7) 40%, #fff); text-align: center; font-weight: 700; }
+body.tv #bubble.narr { border-color: rgba(255,255,255,.18); }
+body.tv #bubble.narr #text { color: #e5e5ea; }
+body.tv #tag { display: none !important; }
+body.tv #tail { top: -2.6em; width: 2.6em; height: 2.6em; margin-left: -1.3em; border: 0; border-left: .55em solid var(--spk, #fff); border-top: .55em solid var(--spk, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .4em rgba(0,0,0,.6)); }   /* a chevron: ^ over the one speaking */
+body.tv #tail::after { display: none; }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
 #choices button { font: inherit; font-size: 2.3em; font-weight: 800; color: #fff; text-align: left; background: var(--choice); border: 0; border-radius: 1.4em; padding: .85em 1.2em; cursor: pointer; box-shadow: 0 .25em .7em rgba(0,0,0,.3); animation: rise .28s ease-out backwards; }
@@ -138,6 +146,7 @@ body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
 @keyframes blink { 50% { opacity: .35; } }
 #intro { position: absolute; inset: 0; z-index: 36; --c: #ff9a4d; background: radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--c) 28%, #000), #000 72%); color: #fff; overflow: hidden; opacity: 1; transition: opacity .9s; cursor: pointer; }
 #intro[hidden] { display: none; }
+#intro .in-lean { position: absolute; inset: 0; display: grid; place-items: center; font-size: 5.5em; font-weight: 900; color: #fff; text-align: center; padding: 0 8%; }
 /* who you play: shown, not won. No rays, flash or silhouette (those are the episode's "you won" reveal) */
 .in-kick { position: absolute; left: 0; right: 0; top: 11%; text-align: center; font-size: 2.2em; font-weight: 800; text-transform: uppercase; letter-spacing: .32em; text-indent: .32em; color: rgba(255,255,255,.8); opacity: 0; transition: opacity .8s; }
 .in .in-kick { opacity: 1; }
@@ -206,6 +215,15 @@ body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
 .wr-who { display: flex; align-items: center; gap: .45em; font-size: 1.6em; font-weight: 700; color: #8e8e93; margin-top: .3em; text-align: center; }
 .wr-who i { flex: none; width: .7em; height: .7em; border-radius: 50%; background: #48484a; }
 .wr-seat.me { border-color: #34c759; background: rgba(52,199,89,.08); }
+/* a phone on a TV: the two characters, « Pick your character », nothing else; a tap opens one */
+body.pick-lean #room .wr-title, body.pick-lean #room .wr-who, body.pick-lean #room .wr-hint { display: none; }
+body.pick-lean .wr-seat { background: none; padding: 1em .5em; }
+body.pick-lean .wr-seat:not(.open) b, body.pick-lean .wr-seat:not(.open) q { display: none; }
+body.pick-lean .wr-seat.taken img { opacity: .25; }
+body.pick-lean .wr-seat.open { border-color: var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); }
+body.pick-lean .wr-seat.me { border-color: var(--c); background: color-mix(in srgb, var(--c) 22%, transparent); }
+body.pick-lean .wr-seat.me b { display: block; }
+.wr-pick { margin-top: .6em; font-size: 2.4em; font-weight: 900; padding: .45em 1.6em; border-radius: 1em; background: var(--c); color: #fff; }
 .wr-seat.me .wr-who, .wr-seat.taken .wr-who { color: #fff; }
 .wr-seat.me .wr-who i, .wr-seat.taken .wr-who i { background: #34c759; }
 .wr-seat.waiting img { opacity: .5; }
@@ -1576,11 +1594,11 @@ body.hosttv.instory #viewBtn { display: grid; }
 body.watch.hosttv.instory #back { display: none !important; }
 #minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; place-items: center; cursor: pointer; }
 body.phonemin.instory #minView { display: grid; }
-#minView .mv-tv { display: flex; flex-direction: column; align-items: center; gap: .6em; text-align: center; }
-#minView .mv-tv svg { width: 16em; height: 16em; opacity: .5; }
-#minView .mv-tv b { font-size: 4em; font-weight: 800; color: #f5f5f7; opacity: .75; }
-#minView .mv-tv.waiting b { color: #ffd60a; opacity: 1; }
-#minView .mv-tv small { font-size: 2em; font-weight: 700; color: #8e8e93; opacity: .7; }
+body.phonemin #minView { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }   /* your colour: which one you are */
+#minView .mv-tv { text-align: center; padding: 0 8%; }
+#minView .mv-tv b { font-size: 5.5em; font-weight: 900; color: #fff; }
+#minView .mv-pause { position: absolute; right: 7%; bottom: 5%; width: 5em; height: 5em; opacity: .55; }
+body.phonemin.privline #minView .mv-pause, body.phonemin.choosing #minView .mv-pause, body.phonemin.gate #minView .mv-pause, body.phonemin.tapline #minView .mv-pause { display: none; }
 body.phonemin.privline #minView .mv-tv, body.phonemin.choosing #minView .mv-tv, body.phonemin.cellon #minView .mv-tv, body.phonemin.gate #minView .mv-tv { display: none; }
 body.phonemin #pauseBtn, body.phonemin #menuPop, body.phonemin.instory #menuPop[hidden] { display: none !important; }   /* Quitter is in the pause */
 body.phonemin #ui { z-index: 14; inset: 2.5% 3%; top: 2.5%; pointer-events: none; justify-content: center; }
@@ -2607,7 +2625,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="skipBtn" type="button" hidden aria-label="Skip the intro"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
-    <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">What just happened</div><ol></ol></div></div>
+    <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><ol></ol></div></div>
     <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
   <div id="gateCard" hidden></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
@@ -3550,6 +3568,7 @@ function line(s) {
   }
   // the bubble's rim (and its tail) in the speaker's colour, lighter
   bubble.style.setProperty('--rim', who ? `color-mix(in srgb, ${castOf(who).color} 45%, #fff)` : '');
+  bubble.style.setProperty('--spk', who ? castOf(who).color : '');
   // the tail points at the speaker if the camera sees them
   const a = who && actors[who], f = camNow && camNow.frame;
   const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : -1;
@@ -3558,6 +3577,7 @@ function line(s) {
   if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
   bubble.hidden = false; choicesEl.hidden = true;
   document.body.classList.toggle('tapline', !!s.tap);
+  if (TV) tvChevron(who, kind);
   // the name tag never sits on the tail: if they meet, the tag moves just past the tail (still on the speaker's side)
   tagEl.style.left = '';
   if (who && !tail.hidden) {
@@ -3568,6 +3588,20 @@ function line(s) {
   }
   typeText(fill(s.text || s.narr));
   if (firstLine) { hint.hidden = false; firstLine = false; }
+}
+// a TV's subtitle: the chevron over it on the speaker's side (his drawn person, his shapes, or his seat's side of the screen)
+function tvChevron(who, kind) {
+  if (!who || kind === 'narr') { tail.hidden = true; return; }
+  const box = bubble.getBoundingClientRect(); let cx = null;
+  const a = actors[who];
+  if (a && a.el) { const r = a.el.getBoundingClientRect(); cx = r.left + r.width / 2; }
+  else {
+    const els = backEl.querySelectorAll(`[data-who="${who}"]`);
+    if (els.length) { let l = Infinity, r = -Infinity; els.forEach((e) => { const b = e.getBoundingClientRect(); l = Math.min(l, b.left); r = Math.max(r, b.right); }); cx = (l + r) / 2; }
+    else { const i = seatsOf().indexOf(who), st = stage.getBoundingClientRect(); if (i >= 0) cx = st.left + st.width * (i === 0 ? .25 : .75); }
+  }
+  if (cx === null) { tail.hidden = true; return; }
+  tail.hidden = false; tail.style.left = Math.min(92, Math.max(8, (cx - box.left) / box.width * 100)) + '%';
 }
 let options = null, optionsBy = 'p1', optionsLane = null, optionsRing = null;
 // each choice belongs to a character (by = its seat; none = the host's, as in chapter 1, or in a split the seat whose
@@ -3930,7 +3964,7 @@ $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; return; }
   const ip = remote && remote.ip;
-  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip)).then(() => { o.cardDone = true; tvOpenStep(); }); }
+  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
   if (!ip && o.cardDone) { tvOpen = null; next(); }
 }
 // the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
@@ -3949,7 +3983,7 @@ function showPause() {
   $('#pauseCard ol').innerHTML = last.length ? last.map((p, i) => {
     const k = p.who || p.by, c = (k && castOf(k)) || {}, side = seats.indexOf(seatFor(k)) === 1 ? 'r' : 'l';
     return `<li class="${side}" style="--c:${c.color || '#ff9a4d'};--d:${i * .14}s"><b>${esc(fill(p.t))}</b></li>`;
-  }).join('') : '<li class="none">No choices yet: the story just started.</li>';
+  }).join('') : '';
 }
 $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
 // a phone on a TV's story: black with its character, its choices and its private lines (the story is on the TV);
@@ -3957,11 +3991,16 @@ $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) se
 const EYE = { on: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg>',
   off: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="#fff" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="#fff"/><path stroke="#fff" stroke-width="2.4" stroke-linecap="round" d="M4 4l16 16"/></svg>' };
 let seeStory = (() => { try { return localStorage.getItem('smt-see') === '1'; } catch { return false; } })();
+function meColor() {   // a phone: its player's colour (the black, the gate)
+  const seats = (remote && remote.seats) || state.seats || {}, k = seatsOf().find((j) => seats[j] && seats[j].id === myId);
+  const c = (k && castOf(k) && castOf(k).color) || ''; if (document.body.style.getPropertyValue('--me') !== c) document.body.style.setProperty('--me', c);
+}
+setInterval(meColor, 700);
 function minView() {
   const on = ROLE === 'watch' && hostTv && !seeStory && !split;   // apart (a split): the phone shows its scene, whatever the eye says
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
-  $('#minView').innerHTML = '<div class="mv-tv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><b>Look at the TV</b><small>Tap to pause</small></div>';
+  $('#minView').innerHTML = '<div class="mv-tv"><b>Look at the TV</b></div><svg class="mv-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
 }
 // the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
 $('#minView').onclick = (e) => { e.stopPropagation(); const b = document.body.classList; if (b.contains('gate')) { advance(); gateTapped(); } else if (b.contains('privline') || b.contains('tapline')) advance(); else if (hostTv && !paused) sendIn('pause'); };   // a line that waits for a tap ({tap}): the black moves it on
@@ -4520,13 +4559,12 @@ function myCharacter(id) {
   const mine = seats.filter((k) => state.seats[k] && state.seats[k].id === myId);
   return mine.length === 1 ? mine[0] : null;
 }
-async function introCard(who, at, keep = null) {   // keep: it stays while that says so (a TV's opening)
+async function introCard(who, at, keep = null, lean = false) {   // keep: it stays while that says so (a TV's opening); lean: a TV's phone (the TV shows who's who: here only your colour)
   const img = new Image(); img.src = poseSrc(who, 'listen'); img.className = 'in-fig';
   const name = fill(castOf(who).name || ''), box = $('#intro');
   box.className = ''; box.style.setProperty('--c', castOf(who).color || '#ff9a4d');
-  box.innerHTML = `<div class="in-kick">${ui('you')}</div><div class="in-name">${name}</div>`;
-  box.insertBefore(img, $('.in-name', box));
-  await Promise.race([img.decode().catch(() => {}), sleep(1500)]);
+  box.innerHTML = lean ? '<div class="in-lean">Look at the TV</div>' : `<div class="in-kick">${ui('you')}</div><div class="in-name">${name}</div>`;
+  if (!lean) { box.insertBefore(img, $('.in-name', box)); await Promise.race([img.decode().catch(() => {}), sleep(1500)]); }
   if (run !== at) return;
   box.style.transition = 'none'; box.style.opacity = 1; box.hidden = false;
   const timers = [[150, 'in'], [500, 'in rise'], [1100, 'in rise named']].map(([ms, c]) => setTimeout(() => { box.className = c; }, ms));
@@ -4605,8 +4643,11 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const myChar = () => { try { const c = JSON.parse(localStorage.getItem('smtDemo.me')) || 'justin'; return SPRITES[c] ? c : null; } catch { return 'justin'; } };
 const storyTitle = (id = state.story) => (STORIES[id] && STORIES[id].title) || { bar: 'Last call', play: 'Le café' }[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || '';
 const seatLabel = (k) => { const c = castOf(k); return c && c.name && !c.name.includes('{') ? c.name : (story().solo || {})[k] || k; };
+let pickOpen = null;   // a TV's phone: the character opened (its name, its line, Pick)
 function renderWait() {
   show('#wait');
+  const lean = ROLE === 'watch' && hostTv;   // (08/11) a phone on a TV: lean, the two characters and nothing else
+  document.body.classList.toggle('pick-lean', lean);
   $('#todoBtn').hidden = !story().todo;
   const seats = seatsOf(), mine = seats.find((k) => state.seats[k] && state.seats[k].id === myId), pick = story().pick || {};
   const card = (k, i) => {
@@ -4614,8 +4655,9 @@ function renderWait() {
     const nat = (FACE[spriteOf(k)] || {})[poseOf(k, p.pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');   // they face each other
     const [cls, who] = s && s.id === myId ? ['me', 'You'] : s ? ['taken', s.n]
       : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', 'Open'];
-    return `<button type="button" class="wr-seat ${cls}" data-seat="${k}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
-      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
+    const open = lean && pickOpen === k && cls === 'free';
+    return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
+      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span>${open ? '<span class="wr-pick">Pick</span>' : ''}</button>`;
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   document.body.classList.toggle('roomfull', full);
@@ -4634,7 +4676,10 @@ function renderWait() {
   if (TV && !full) tvQr($('#room .tv-corner .qr'));
   document.querySelectorAll('#room .wr-seat').forEach((b) => b.onclick = (e) => {
     e.stopPropagation(); const k = b.dataset.seat;
-    if (ROLE !== 'host') return sendIn('seat', { s: k });
+    if (ROLE !== 'host') {
+      if (lean && !b.classList.contains('open')) { if (b.classList.contains('free')) { pickOpen = k; renderWait(); } return; }   // the first tap opens it, Pick takes it
+      pickOpen = null; return sendIn('seat', { s: k });
+    }
     if (TV) return;   // the TV plays nobody
     if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
   });
