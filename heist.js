@@ -6,10 +6,11 @@
 // 10-11 Amy calls Ray (only he sees who), pick up or later (the crowd goes muffled), 12 picked up: the screen splits, a
 // clock ticks, Ray on the call, Marcus texting Leo (next season, the money), 13 Ray takes the briefcase and stands up,
 // 14 the elevator: the crowd comes back, Double It starts far and muffled, 15 the last text before going in (each his own),
-// 16 in, 17 up: a dot a bar, the briefcase, the masks; the doors open on the drop: Amy, at the loan counter. Then a fast
-// forward (the key moments, a tap on a phone moves on, the real choice screens and music): the robbery, Marcus sends one to
-// the vault (before: the guard, behind the restroom door: Marcus waits or talks him out), Amy takes the guard's gun and holds the other one; he shows his face or not; the one back from the vault picks
-// (Marcus: shoot her to save his friend, lower his gun, take the aim; Ray: show himself to her, shoot, drop the money).
+// 16 in, 17 up: a dot a bar, the briefcase, the masks; the doors open on the drop: Amy, at the loan counter. Then the key
+// moments one after the other (no card announcing it's later; the real choice screens and music): the robbery, the guard
+// behind the restroom door (Marcus waits or talks him out), Ray takes the vault (always), Amy takes the guard's gun and holds
+// Marcus; he shows his face or not; Ray, back from the vault, picks (show himself to her, shoot, drop the money).
+// Planted, no payoff yet: every moment they lose time (the call, the last texts, the guard) = the clock, full screen (f.lost).
 // Loaded after story.js and bar.js (scene, say, narr, R).
 (() => {
   const SKIN = '#d8c3ab', P1 = '#3b82f6', P2 = '#ef4444', AMY = '#c084fc', GREY = '#4b5563';
@@ -70,11 +71,12 @@
   const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
   SCENES.h_side_pb = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#22304a'), R(560, 100, 800, 640, '#3b5375'), ...stand(960, 1180, 2.6, P2), R(1040, 330, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), ...CLOCK(1700, 150)] });
-  // the TV, while they're on their phones: a clock, full screen
-  SCENES.h_clock = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#0d0f14'), C(960, 540, 900, '#e5e7eb', { line: '26px solid #111827' }),
+  // the TV, while they're on their phones: a clock, full screen, at its real time (9:38 + m minutes: the long hand the minutes)
+  const clockAt = (m, ambience) => { const t = 9 * 60 + 38 + m; return place({ ambience, back: [R(0, 0, 1920, 1080, '#0d0f14'), C(960, 540, 900, '#e5e7eb', { line: '26px solid #111827' }),
     ...Array.from({ length: 12 }, (_, i) => R(953, 112, 14, 60, '#111827', { r: 7, rot: i * 30, origin: '50% 428px' })),
-    R(946, 230, 28, 310, '#111827', { r: 14, rot: -30, origin: '50% 100%' }), R(948, 330, 24, 210, '#111827', { r: 12, rot: -4, origin: '50% 100%' }),
-    R(955, 140, 10, 400, '#dc2626', { r: 5, rot: 0, spin: 60, origin: '50% 100%' }), C(960, 540, 44, '#dc2626')] });
+    R(946, 230, 28, 310, '#111827', { r: 14, rot: (t % 60) * 6, origin: '50% 100%' }), R(948, 330, 24, 210, '#111827', { r: 12, rot: (t / 60 % 12) * 30, origin: '50% 100%' }),
+    R(955, 140, 10, 400, '#dc2626', { r: 5, rot: 0, spin: 60, origin: '50% 100%' }), C(960, 540, 44, '#dc2626')] }); };
+  SCENES.h_clock = clockAt(0, 'crowd');
 
   // ---- the fast forward (the key moments, no transitions): the robbery, Amy takes the guard's gun ----
   const BANK = [R(0, 0, 1920, 1080, '#e7e2d3'), R(0, 820, 1920, 260, '#cfc6b0'), R(300, 560, 1320, 200, '#5b4636'), R(300, 540, 1320, 30, '#7a5f48')];
@@ -96,7 +98,7 @@
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
   const vault = (k) => place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1180, 520, 760, '#9ca3af', { line: '34px solid #6b7280' }), C(1180, 520, 120, '#6b7280'),
     ...handsUp(560, 1060, 1.5, GREY), ...armed(260, 1080, 1.9, COL[k], 1, { face: MASK })] });
-  SCENES.h_vault_pa = vault('pa'); SCENES.h_vault_pb = vault('pb');
+  SCENES.h_vault_pb = vault('pb');   // the vault: always Ray
   SCENES.h_holster = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(0, 420, 1920, 420, GUARD, { r: 60 }), R(980, 470, 180, 260, '#1f2937', { r: 22 }),
     R(1020, 400, 80, 150, '#0b0b0d', { r: 10 }), R(0, 640, 980, 120, AMY, { r: 60 }), C(990, 690, 130, SKIN)] });
   const aim = (k, off) => place({ back: [...BANK, ...lie(1000, 1010, GUARD), ...lie(560, 960, GREY),
@@ -117,6 +119,10 @@
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
   const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
+  // (09/11) a plant, no payoff yet: every moment they lose time. f.lost = minutes behind « We're on in 8 minutes »; each time,
+  // the clock full screen, the minutes it ate on its hands, a few ticks. amb: the place's sound under it (the lobby's crowd, or none)
+  const lose = (min, amb) => ({ fn: (f) => { const m = (f.lost || 0) + min, id = `h_clock_${m}_${amb || ''}`; SCENES[id] = SCENES[id] || clockAt(m, amb);
+    return [{ set: { lost: m } }, ...at(id), { tick: true }, { hush: 2600 }, { tick: false }]; } });
   const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text, ic]) => ({ t, ...(ic ? { ic } : {}), intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
 
   const story = Object.assign([
@@ -174,6 +180,7 @@
           S('amy', 'Love you.'),
           { tick: false }],
       }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
+      lose(4, 'crowd'),   // the call and the texts ate 4 minutes
       ...at('h_two'), { hush: 1800 },
     ] },
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
@@ -189,6 +196,7 @@
         : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]],
       { clock: 12000 })],
     }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
+    { when: (f) => f.sarah !== 'none' || f.last !== 'none', then: [lose(1, 'crowd'), ...at('h_lift_hall')] },   // a text = a minute
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
     ...at('h_in_02'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 2 },
@@ -205,10 +213,9 @@
     ...at('h_bank'),
     narr('At the loan counter, a pen in her hand: Amy.'),
     { hush: 1400 },
-    // ---- FAST FORWARD: the key moments one after the other, no transitions; a tap on a phone moves on. The choices are
+    // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
-    { titleCard: 'Fast forward', sub: 'The key moments' },
-    ...at('h_rob_out'), { fade: 'in', ms: 1 }, { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
+    ...at('h_rob_out'), { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
     ...at('h_rob_hands'), { hush: 1800 },
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), T('The alarm. Everyone on the floor. Amy too.'),
     S('pb', 'Where’s the security guard??'),
@@ -226,6 +233,7 @@
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
             S('pa', 'DROP IT!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), T('His gun hits the floor. Marcus kicks it away: it stops among the hostages.')] },
         ] },
+        lose(1),   // the wait at the door
       ] },
       { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
         S('pa', 'I know you’re in there. Send over your weapon!'),
@@ -244,19 +252,20 @@
             S('pa', 'The gun first. Slide it.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.'),
             ...at('h_wc_hands'), { hush: 1600 }] },
         ] },
+        { fn: (f) => [lose(f.talk === 'reason' ? 3 : 2)] },   // the talk through the door (reasoning: longer)
       ] },
     ] },
     ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
-    { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
-      { t: 'I take the vault.', ic: 'vault', sh: 'I go', intent: 'the vault', set: { watch: 'pb' }, then: [] },
-      { t: 'You take the vault.', ic: 'send', sh: 'You go', intent: 'the room', set: { watch: 'pa' }, then: [] },
-    ] },
+    S('pb', 'Hold the room. I’ve got the vault.'), { set: { watch: 'pa' } },   // the vault: always Ray (Marcus stays with the room, and Amy)
     { music: 'double it', lv: 2 },
     { fn: (f) => {
       const W = f.watch, O = W === 'pa' ? 'pb' : 'pa', nW = N[W], nO = N[O];
       const BANG = [{ music: null, ms: 0 }, { sfx: 'gun shot' }, ...at('h_black'), T('BANG.')];
       return [
+        // the vault: behind the steel, no crowd, the alarm far away; back in the room, all of it again
+        { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },
         ...at('h_vault_' + O), T(`${nO} in the vault with the teller. ${nW} alone with the room.`),
+        { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
         ...at('h_holster'), T(f.gun === 'holster' ? 'On the floor, Amy’s hand slides to the guard’s holster.' : 'On the floor, Amy’s hand slides to the guard’s gun.'),
         { music: 'double it', lv: 3 }, { bars: 'drop' },
         ...at('h_aim_' + W), T(`Amy is up. The guard’s gun on ${nW}’s head.`),
@@ -306,7 +315,7 @@
       f.amy === 'call' ? `Ray picked up for Amy${f.told === 'lie' ? ', and lied to her' : ''}.` : 'Ray let Amy’s call go.',
       'She was at the loan counter on 31.',
       ({ shot: 'Marcus shot the guard.', drop: 'Marcus made the guard drop his gun.', talk: 'Marcus talked the guard out.' })[f.guard] || '',
-      f.watch ? `${N[f.watch]} stayed with the room, and Amy took the guard’s gun.` : '',
+      f.watch ? 'Ray took the vault. Marcus stayed with the room, and Amy took the guard’s gun.' : '',
       f.mask === 'off' ? `${N[f.watch]} showed her his face.` : f.mask === 'on' ? `${N[f.watch]} kept his mask on.` : '',
       ({ shoot: 'Then a shot.', lower: 'Marcus put his gun down.', draw: 'Marcus took the aim for his friend.', me: 'Ray showed Amy who he was.', drop: 'Ray dropped the money.' })[f.last] || '',
     ].filter(Boolean).join(' ') },
