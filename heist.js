@@ -47,13 +47,9 @@
   const PIC = [1672, 941], MARCUS = { src: 'marcus_sit', x: 496, y: 883, w: 548, who: 'pa' }, RAY = { src: 'ray_sit', x: 1222.5, y: 876, w: 539, who: 'pb' };
   SCENES.h_lobby = { image: 'bg/lobby_wide.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [] };
   const chairs = (people, front = []) => ({ image: 'bg/lobby_chairs.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], props: people, front });
-  const feet = (up) => place({ ambience: 'crowd', back: [
-    R(0, 0, 1920, 1080, '#161c27'), R(0, 820, 1920, 260, '#11161e'),
-    R(760, 0, 150, 760, '#1e3a8a'), R(1010, 0, 150, up ? 700 : 760, '#1e3a8a'),
-    R(730, 760, 210, 80, '#0b0b0d', { r: '40px 60px 8px 8px' }), R(980, up ? 700 : 760, 210, 80, '#0b0b0d', { r: '40px 60px 8px 8px' }),
-    R(1400, 0, 40, 840, '#3f3126'),   // the table's leg
-  ] });
-  SCENES.h_feet_a = feet(false); SCENES.h_feet_b = feet(true);
+  // (09/11) Justin's two frames: the same shot, the right foot flat (a) or turned out (b); they alternate = the foot that won't stop
+  SCENES.h_feet_a = { image: 'bg/feet_a.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [] };
+  SCENES.h_feet_b = { ...SCENES.h_feet_a, image: 'bg/feet_b.webp' };
   SCENES.h_case = place({ ambience: 'crowd', back: [
     R(0, 0, 1920, 1080, '#161c27'), R(0, 640, 1920, 440, '#5b4636'),
     R(600, 330, 720, 400, '#26201b', { r: 22, glow: '0 30px 60px rgba(0,0,0,.6)' }), R(850, 280, 220, 60, 'transparent', { r: '30px 30px 0 0', line: '22px solid #1a1612' }),
@@ -175,7 +171,7 @@
     { titleCard: 'Union Trust Tower', sub: '11:52 AM' },
     ...at('h_lobby'), { fade: 'in', ms: 900 }, { hush: 1800 },
     // ---- 3. his feet won't stop ----
-    ...Array.from({ length: 5 }, () => [...at('h_feet_a'), { wait: 170 }, ...at('h_feet_b'), { wait: 170 }]).flat(), ...at('h_feet_a'), { hush: 700 },
+    ...Array.from({ length: 5 }, () => [...at('h_feet_a'), { wait: 320 }, ...at('h_feet_b'), { wait: 320 }]).flat(), ...at('h_feet_a'), { hush: 700 },
     // ---- 4-7. the briefcase, the three lines ----
     ...at('h_case'), S('pb', 'We’re on in 8 minutes.'),
     ...at('h_two'), S('pa', 'Guess there’s no turning back now.'),
