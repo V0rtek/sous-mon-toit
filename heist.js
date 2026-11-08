@@ -30,13 +30,6 @@
   ], color, o);
   const glow = (x, y, who) => R(x - 18, y - 30, 36, 60, '#e0f2fe', { r: 6, glow: '0 0 40px 14px rgba(186,230,253,.55)', who });   // a phone, lit
   const SIZE = [1920, 1080], place = (o) => ({ size: SIZE, spots: {}, face: {}, front: [], ...o });
-  const LOBBY = [
-    R(0, 0, 1920, 1080, '#1b2230'), R(0, 760, 1920, 320, '#141a24'),
-    ...[90, 430, 770, 1110].map((x) => R(x, 110, 270, 520, '#2b3a52', { glow: '0 0 60px 6px rgba(120,160,220,.12)' })),
-    R(1560, 330, 300, 430, '#3a4250'), R(1572, 342, 136, 418, '#4b5563'), R(1712, 342, 136, 418, '#4b5563'),   // the elevator, far right
-    ...[[210, .62], [380, .7], [560, .58], [1250, .66], [1420, .6], [1500, .72]].flatMap(([x, s]) => stand(x, 790, s, GREY)),
-  ];
-  const TABLE = [R(740, 700, 440, 34, '#5b4636', { r: 6 }), R(800, 734, 22, 80, '#3f3126'), R(1098, 734, 22, 80, '#3f3126')];
 
   // ---- the places ----
   // (09/11) Justin's pictures: the lobby, wide; the two armchairs with Marcus and Ray cut out of the green screen and placed as in
@@ -50,15 +43,6 @@
   // (09/11) Justin's two frames: the same shot, the right foot flat (a) or turned out (b); they alternate = the foot that won't stop
   SCENES.h_feet_a = { image: 'bg/feet_a.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [] };
   SCENES.h_feet_b = { ...SCENES.h_feet_a, image: 'bg/feet_b.webp' };
-  SCENES.h_case = place({ ambience: 'crowd', back: [
-    R(0, 0, 1920, 1080, '#161c27'), R(0, 640, 1920, 440, '#5b4636'),
-    R(600, 330, 720, 400, '#26201b', { r: 22, glow: '0 30px 60px rgba(0,0,0,.6)' }), R(850, 280, 220, 60, 'transparent', { r: '30px 30px 0 0', line: '22px solid #1a1612' }),
-    R(700, 420, 50, 30, '#c9a227', { r: 6 }), R(1170, 420, 50, 30, '#c9a227', { r: 6 }),
-    R(1300, 500, 620, 110, P2, { r: '50px 0 0 50px' }), C(1290, 560, 120, SKIN),   // Ray's arm, his hand on it
-  ] });
-  const TWO_BACK = [R(0, 0, 1920, 1080, '#1b2230'), ...[[300, .9], [1600, .85], [960, .8]].flatMap(([x, s]) => bust(x, 640, s, GREY, { blur: 8 })), R(0, 640, 1920, 440, '#141a24')];
-  const two = (o = {}) => place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...bust(1300, 900, 1.7, P2),
-    ...(o.p2phone ? [glow(1380, 860, 'pb')] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
   // seen from above: the two armchairs, the table, Marcus's phone on it, the briefcase by Ray (lit: the phone buzzing); his phone,
   // close: Leo on the lock screen, Leo's text on it (Justin's picture, its text changed)
   const pic = (image, front = []) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front });
@@ -69,71 +53,28 @@
   SCENES.h_top_buzz = topv([R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
   SCENES.h_phone = pic('bg/phone_leo.webp');
   SCENES.h_two = chairs([MARCUS, RAY]);   // Marcus talks, Ray thinks
+  // (09/11) Justin's next pictures: Ray's pocket buzzing (Amy calls); Ray up, his phone in hand, Marcus still talking; the
+  // elevators (Ray pressing the button, Marcus hands in pockets, placed as in his reference); Marcus's pocket buzzing at the
+  // elevator; inside, from behind: the floors going up on the display (the « 31 » redrawn: 2, 8), Ray opening the briefcase (14),
+  // the gun handed over, the mask handed over (26), masks on (31), the doors cracking open, the doors open on the bank
+  SCENES.h_ray_pocket = pic('bg/ray_pocket.webp');
+  SCENES.h_ray_phone = chairs([{ src: 'marcus_sit2', x: 543, y: 907, w: 500, who: 'pa' }, { src: 'ray_phone', x: 1188, y: 892, w: 360, who: 'pb' }]);
+  SCENES.h_lift_hall = { image: 'bg/lift_hall.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [],
+    props: [{ src: 'marcus_stand', x: 546.5, y: 1468, w: 493, who: 'pa' }, { src: 'ray_point', x: 1072.5, y: 1470, w: 651, who: 'pb' }] };
+  SCENES.h_mpocket = pic('bg/marcus_pocket.webp');
+  const inside = (image) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'into the elevator', back: [], front: [] });
+  for (const [k, f] of [['h_in_02', 'elev_02'], ['h_in_08', 'elev_08'], ['h_case14', 'case_14'], ['h_gun', 'gun_handover'], ['h_mask26', 'mask_26'], ['h_masked', 'elev_masked'], ['h_crack', 'elev_crack']]) SCENES[k] = inside(`bg/${f}.webp`);
+  SCENES.h_bank = { image: 'bg/bank_open.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
   SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
-  SCENES.h_two_call = chairs([MARCUS, RAY], [R(1340, 545, 34, 56, '#e0f2fe', { r: 6, glow: '0 0 40px 16px rgba(186,230,253,.6)', who: 'pb' })]);   // his phone lights up
-  SCENES.h_ots1 = place({ ambience: 'crowd', back: [   // over Marcus's shoulder: his phone, his kids on it, Leo's text on top
-    R(0, 0, 1920, 1080, '#1b2230'), ...bust(1500, 820, 1.2, P2, { blur: 10 }),
-    R(820, 160, 360, 700, '#0b0b0d', { r: 48 }), R(840, 180, 320, 660, '#2a4a6b', { r: 36 }),
-    ...stand(930, 760, .95, '#f59e0b'), ...stand(1060, 760, .75, '#22c55e'),   // the kids, on the lock screen
-    R(860, 220, 280, 70, 'rgba(245,245,247,.92)', { r: 16 }),   // the notification
-    C(380, 760, 560, '#16233d'), R(0, 820, 760, 260, '#1e3a8a', { r: '200px 200px 0 0' }),   // his head and shoulder, from behind
-  ] });
-  SCENES.h_ots2 = place({ ambience: 'crowd', back: [   // over Ray's shoulder: Marcus looking at him
-    R(0, 0, 1920, 1080, '#1b2230'), ...bust(760, 1000, 2.2, P1),
-    C(1560, 760, 560, '#3a1717'), R(1160, 820, 760, 260, '#991b1b', { r: '200px 200px 0 0' }),
-  ] });
-  SCENES.h_split = place({ ambience: 'crowd', back: [   // Marcus at the table, texting | Ray at the window, on the call; a clock
-    R(0, 0, 956, 1080, '#1b2230'), R(964, 0, 956, 1080, '#22304a'), R(956, 0, 8, 1080, '#05070a'),
-    R(1080, 120, 700, 620, '#3b5375', { glow: '0 0 80px 10px rgba(150,190,240,.15)' }),
-    ...bust(470, 900, 1.6, P1), glow(560, 840, 'pa'), R(160, 880, 640, 50, '#5b4636', { r: 8 }),
-    ...stand(1430, 1040, 2.4, P2), R(1500, 270, 50, 110, '#0b0b0d', { r: 10, who: 'pb' }),   // his phone at his ear
-    C(960, 150, 190, '#e5e7eb', { line: '10px solid #111827' }),
-    R(954, 85, 12, 70, '#111827', { r: 6, rot: -30, origin: '50% 100%' }), R(955, 105, 10, 50, '#111827', { r: 5, rot: -2, origin: '50% 100%' }),
-  ] });
   const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
   SCENES.h_side_pb = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#22304a'), R(560, 100, 800, 640, '#3b5375'), ...stand(960, 1180, 2.6, P2), R(1040, 330, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), ...CLOCK(1700, 150)] });
-  // Ray gets up, his phone at his ear, and walks off to take the call; the TV, while they're on their phones: a clock, full screen
-  SCENES.h_ray_up = chairs([MARCUS]);   // Ray's armchair empty: he went to take the call
+  // the TV, while they're on their phones: a clock, full screen
   SCENES.h_clock = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#0d0f14'), C(960, 540, 900, '#e5e7eb', { line: '26px solid #111827' }),
     ...Array.from({ length: 12 }, (_, i) => R(953, 112, 14, 60, '#111827', { r: 7, rot: i * 30, origin: '50% 428px' })),
     R(946, 230, 28, 310, '#111827', { r: 14, rot: -30, origin: '50% 100%' }), R(948, 330, 24, 210, '#111827', { r: 12, rot: -4, origin: '50% 100%' }),
     R(955, 140, 10, 400, '#dc2626', { r: 5, rot: 0, spin: 60, origin: '50% 100%' }), C(960, 540, 44, '#dc2626')] });
-  SCENES.h_stand = place({ ambience: 'crowd', back: [...LOBBY, ...TABLE, ...stand(820, 900, 1.6, P1), ...stand(1120, 900, 1.6, P2),
-    R(1160, 600, 160, 110, '#26201b', { r: 12 })] });   // Ray, the briefcase in his hand
-  const wait = (open) => place({ ambience: 'crowd', back: [
-    R(0, 0, 1920, 1080, '#1b2230'), R(0, 840, 1920, 240, '#141a24'),
-    R(560, 120, 800, 760, '#3a4250'), R(590, 150, 366, 730, '#6b7280'), R(964, 150, 366, 730, '#6b7280'),
-    ...(open ? [R(590, 150, 740, 730, '#e7e2d3', { glow: '0 0 120px 30px rgba(255,240,200,.25)' })] : []),
-    C(1430, 520, 40, '#fbbf24', { glow: '0 0 20px 6px rgba(251,191,36,.6)' }),   // the call button, lit
-    ...stand(760, 1080, 2, P1, { r: '70px 70px 10px 10px' }), glow(820, 640, 'pa'), ...stand(1160, 1080, 2, P2), glow(1100, 640, 'pb'),
-  ] });
-  SCENES.h_lift = wait(false); SCENES.h_lift_open = wait(true);
-  // inside: the doors, the floor dots over them (n lit)
-  const DOTS = 6;
-  const elev = (n, o = {}) => place({ ambience: 'into the elevator', back: [
-    R(0, 0, 1920, 1080, '#101114'), R(560, 300, 800, 780, '#1a1c21'),
-    R(640, 360, 316, 720, '#24272d', { line: '6px solid #2e3239' }), R(964, 360, 316, 720, '#24272d', { line: '6px solid #2e3239' }),
-    R(760, 200, 400, 70, '#0a0b0d', { r: 35 }),
-    ...Array.from({ length: DOTS }, (_, i) => C(813 + i * 60, 235, 26, i < n ? '#ff3b30' : '#2a2c31', i < n ? { glow: '0 0 24px 6px rgba(255,59,48,.55)' } : {})),
-    ...(o.masks ? [...stand(520, 1180, 2.6, P1, { face: '#f5f5f4' }), ...stand(1400, 1180, 2.6, P2, { face: '#f5f5f4' })] : []),
-  ] });
-  for (let n = 0; n <= DOTS; n++) SCENES['h_elev' + n] = elev(n);
-  SCENES.h_masks = elev(DOTS - 1, { masks: true });
-  SCENES.h_case_open = place({ ambience: 'into the elevator', back: [   // the briefcase, open: two masks, two guns
-    R(0, 0, 1920, 1080, '#101114'), R(560, 160, 800, 300, '#1a1612', { r: '22px 22px 0 0' }), R(560, 460, 800, 420, '#26201b', { r: '0 0 22px 22px' }),
-    C(780, 600, 170, '#f5f5f4'), C(745, 580, 30, '#111'), C(815, 580, 30, '#111'),
-    C(1140, 600, 170, '#f5f5f4'), C(1105, 580, 30, '#111'), C(1175, 580, 30, '#111'),
-    R(680, 760, 220, 46, '#0b0b0d', { r: 8 }), R(680, 790, 50, 80, '#0b0b0d', { r: 8 }),
-    R(1020, 760, 220, 46, '#0b0b0d', { r: 8 }), R(1190, 790, 50, 80, '#0b0b0d', { r: 8 }),
-  ] });
-  SCENES.h_bank = place({ back: [   // the doors open on the bank: the loan counter, the teller, Amy signing
-    R(0, 0, 1920, 1080, '#e7e2d3'), R(0, 820, 1920, 260, '#cfc6b0'),
-    ...stand(960, 700, 1.2, GREY), R(300, 640, 1320, 200, '#5b4636'), R(300, 620, 1320, 30, '#7a5f48'),
-    ...stand(1240, 1080, 2.2, AMY, { r: '60px 60px 10px 10px' }), R(1040, 600, 180, 30, '#fafafa', { r: 4 }), R(1150, 560, 8, 60, '#111', { rot: 30 }),
-    R(0, 0, 220, 1080, '#24272d'), R(1700, 0, 220, 1080, '#24272d'),   // the doors, open
-  ] });
 
   // ---- the fast forward (the key moments, no transitions): the robbery, Amy takes the guard's gun ----
   const BANK = [R(0, 0, 1920, 1080, '#e7e2d3'), R(0, 820, 1920, 260, '#cfc6b0'), R(300, 560, 1320, 200, '#5b4636'), R(300, 540, 1320, 30, '#7a5f48')];
@@ -198,7 +139,7 @@
       { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to win.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
-    ...at('h_two_call'), RING, { hush: 1200 },
+    ...at('h_ray_pocket'), RING, { hush: 1200 },
     { when: (f) => f.p1 === 'lose', then: [S('pa', 'Seems like you’ve got someone to lose as well.')] },
     { by: 'pb', ring: 'Amy', cue: 'Look at your phone', choice: [
       { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
@@ -207,7 +148,7 @@
     HUNG, { room: { lp: 650, vol: .5, ms: 1500 } },   // the vibration stops; the crowd goes far
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
-      ...at('h_ray_up'), { hush: 1800 },   // he gets up and goes to take it
+      ...at('h_ray_phone'), { hush: 1800 },   // he gets up, his phone in hand, and goes to take it
       { gate: ['pa', 'pb'], text: { pa: 'Text Leo back', pb: 'Amy is on the line' } },
       // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines); the TV: the clock
       { split: () => ({
@@ -231,41 +172,41 @@
           S('amy', 'Love you.'),
           { tick: false }],
       }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
-      ...at('h_two'), { hush: 900 },
+      ...at('h_two'), { hush: 1800 },
     ] },
-    // ---- 13. Ray takes the briefcase, stands up ----
-    ...at('h_stand'), { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 9000 }, { hush: 1500 },   // Double It far away, very low and muffled, as he gets up
-    // ---- 14. the elevator: the crowd back, Double It far and muffled ----
-    ...at('h_lift'), { room: { lp: 20000, vol: 1, ms: 1000 } },
-    { music: 'double it', vol: .32, lp: 420, ms: 14000 }, { hush: 1600 },   // it keeps coming up, slowly, while they wait
+    // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
+    ...at('h_lift_hall'), { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
+    { music: 'double it', vol: .32, lp: 420, ms: 14000 },
+    ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
-      pa: [{ thread: ['pa', 'sarah'] }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
+      pa: [{ thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?'), { wait: 1500 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
       pb: [{ thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
         ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
         : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]],
       { clock: 12000 })],
     }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
-    { sfx: 'elevator ding' }, ...at('h_lift_open'), { hush: 1200 },
-    ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 1 },
-    // ---- 17. up: a dot a bar; the briefcase; the masks; the doors open on the drop ----
-    ...at('h_elev1'), { music: 'double it', vol: .65 }, { bars: 1 },
-    ...at('h_elev2'), { music: 'double it', vol: .72 },
+    { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
+    ...at('h_in_02'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 2 },
+    // ---- 17. up: a floor every 2 bars; the briefcase; the masks; the doors open on the drop ----
+    ...at('h_in_08'), { music: 'double it', vol: .65 },
     { when: (f) => f.amy === 'later', then: [BUZZ, sms('amy', 'pb', 'Call me back. It’s important.', 'pb')] },
-    { bars: 1 },
-    ...at('h_case_open'), { music: 'double it', vol: .8 }, { bars: 2 },
-    ...at('h_elev4'), { music: 'double it', vol: .88 }, { bars: 1 },
-    ...at('h_masks'), { music: 'double it', vol: .95 },
-    { music: 'double it', lv: 1, vol: 1, ms: 2400, inBars: 2 }, { bars: 'drop' },
-    { sfx: 'elevator ding' }, ...at('h_bank'),
+    { bars: 2 },
+    ...at('h_case14'), { music: 'double it', vol: .72 }, { bars: 2 },
+    ...at('h_gun'), { music: 'double it', vol: .8 }, { bars: 2 },
+    ...at('h_mask26'), { music: 'double it', vol: .88 }, { bars: 2 },
+    ...at('h_masked'), { music: 'double it', vol: .95 },
+    { music: 'double it', lv: 1, vol: 1, ms: 2400, inBars: 2 }, { bars: 1 },
+    { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' },   // the doors crack open, the drop: they open
+    ...at('h_bank'),
     narr('At the loan counter, a pen in her hand: Amy.'),
     { hush: 1400 },
     // ---- FAST FORWARD: the key moments one after the other, no transitions; a tap on a phone moves on. The choices are
     // the real ones (their screen, the music holding its breath) ----
     { titleCard: 'Fast forward', sub: 'The key moments' },
-    ...at('h_rob'), { fade: 'in', ms: 1 }, T('“EVERYBODY DOWN.” The guard, the teller, Amy: on the floor.'),
+    ...at('h_rob'), { fade: 'in', ms: 1 }, { sfx: 'crowd panic', loop: true }, { sfx: 'establishment alarm', loop: true }, T('“EVERYBODY DOWN.” The guard, the teller, Amy: on the floor.'),
     ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'I take the vault.', ic: 'vault', sh: 'I go', intent: 'the vault', set: { watch: 'pb' }, then: [] },
@@ -303,7 +244,7 @@
       ];
     } },
     T('Outside, the first siren.'),
-    { music: null, ms: 400 }, { fade: 'out', ms: 300 },
+    { music: null, ms: 400 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { fade: 'out', ms: 300 },
     { end: { kicker: 'To be continued', title: 'Floor 31', lede: '{LEDE}', art: null } },
   ], {
     gaze: false, credits: '', title: 'Floor 31', intro: [],
