@@ -2686,7 +2686,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108230000"></script>
+<script src="heist.js?v=20261109000000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3866,6 +3866,13 @@ const ACT = {
   hand: ACT_SVG('<path d="M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V6a1.5 1.5 0 0 1 3 0v8c0 4-3 7-6 7-3 0-4-1-6-4l-2-3a1.5 1.5 0 0 1 2.5-1.5L8 15"/>'),
   bags: ACT_SVG('<path d="M9 4h6l-1.5 3h-3z"/><path d="M10.5 7C6 9 4 13 5 17c.5 2 2 3 4 3h6c2 0 3.5-1 4-3 1-4-1-8-5.5-10"/><path d="M12 11v6M10 12.5c0-1 4-1 4 .5s-4 1-4 2.5 4 1 4 0"/>'),
   act: ACT_SVG('<circle cx="12" cy="12" r="8"/><path d="M10 9l5 3-5 3z"/>'),
+  // the tone of what's said (a face: worried, hopeful, calm, lying, hard) or love (a heart)
+  worried: ACT_SVG('<circle cx="12" cy="12" r="9"/><path d="M9 10.5h.01M15 10.5h.01"/><path d="M7.5 8.2l2.2-1M16.5 8.2l-2.2-1"/><path d="M8.5 16.5c1-1.4 2.2-2 3.5-2s2.5.6 3.5 2"/>'),
+  hope: ACT_SVG('<circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01"/><path d="M8 13.8c1 1.9 2.4 2.7 4 2.7s3-.8 4-2.7"/>'),
+  calm: ACT_SVG('<circle cx="12" cy="12" r="9"/><path d="M9 10.5h.01M15 10.5h.01"/><path d="M9 15.5h6"/>'),
+  lie: ACT_SVG('<circle cx="12" cy="12" r="9"/><path d="M8 10.5h2M14 10.5h2"/><path d="M9 15.8c2.2.8 4.2.5 6-1.3"/>'),
+  tough: ACT_SVG('<circle cx="12" cy="12" r="9"/><path d="M7.5 7.6l3 1.3M16.5 7.6l-3 1.3"/><path d="M9 11h.01M15 11h.01"/><path d="M9 16h6"/>'),
+  love: ACT_SVG('<path d="M12 20s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.5 4 4 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>'),
 };
 const shortOf = (t, n = 18) => { t = String(t).replace(/^[«“"\s]+|[»”"\s.!?…]+$/g, ''); if (t.length <= n) return t; const w = t.slice(0, n).replace(/\s+\S*$/, ''); return (w || t.slice(0, n)) + '…'; };
 function actOf(o, k) {   // the option's action: its icon and its words, shortened to the max (the phone shows only that)

@@ -159,7 +159,7 @@
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
   const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
-  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
+  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text, ic]) => ({ t, ...(ic ? { ic } : {}), intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
 
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
@@ -178,8 +178,8 @@
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
     ...at('h_ots2'), { hush: 1300 }, ...at('h_two'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
-      { t: '“I’ve got my kids at home.”', ic: 'say', sh: 'My kids', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got my kids at home.')] },
-      { t: '“If this works, I get the happy ending my family deserves.”', ic: 'say', sh: 'Happy ending', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
+      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got a lot to lose.')] },
+      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'I’ve got a lot to win.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_two_call'), RING, { hush: 1200 },
@@ -200,16 +200,16 @@
           sms('leo', 'pa', 'ok'), { wait: 2600 },
           sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
           reply('pa', 'leo', [
-            ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.'],
-            ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.'],
-            ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.'],
+            ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.', 'tough'],
+            ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.', 'love'],
+            ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.', 'calm'],
           ], { clock: 15000 }),
           { tick: false }],
         pb: [...at('h_side_pb'), { tick: true },
           S('amy', 'Hey you. Are you still downtown?'),
           { by: 'pb', clock: 15000, choice: [
-            { t: 'Yeah. Work thing.', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.')] },
-            { t: 'No. Home soon.', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.')] },
+            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.')] },
+            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.')] },
           ] },
           S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.'),
           S('amy', 'Love you.'),
@@ -225,10 +225,10 @@
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
-      pa: [{ thread: ['pa', 'sarah'] }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
+      pa: [{ thread: ['pa', 'sarah'] }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
       pb: [{ thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
-        ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]]
-        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]],
+        ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
+        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]],
       { clock: 12000 })],
     }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
