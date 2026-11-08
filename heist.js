@@ -145,7 +145,8 @@
   const T = (text) => ({ narr: text, tap: true });                 // a key moment of the fast forward: it waits for a tap
   const N = { pa: 'Marcus', pb: 'Ray' };
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
-  const BUZZ = { sfx: 'cellphone vibrating (sound off) type 1' };
+  // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
+  const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
   const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? 'text' : 'nothing', set, then: text ? [sms(k, to, text), { wait: 1600 }] : [] })) });
 
   const story = Object.assign([
@@ -169,13 +170,13 @@
       { t: 'Everything to win.', intent: 'to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
-    BUZZ, ...at('h_two_call'), { hush: 1200 },
+    ...at('h_two_call'), RING, { hush: 1200 },
     { when: (f) => f.p1 === 'lose', then: [S('pa', 'Seems like you’ve got someone to lose as well.')] },
     { by: 'pb', ring: 'Amy', cue: 'Look at your phone', choice: [
       { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
       { t: 'Later', intent: 'later', set: { amy: 'later' }, then: [] },
     ] },
-    { room: { lp: 650, vol: .5, ms: 1500 } },   // the crowd goes far
+    HUNG, { room: { lp: 650, vol: .5, ms: 1500 } },   // the vibration stops; the crowd goes far
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
       ...at('h_split'), { tick: true },

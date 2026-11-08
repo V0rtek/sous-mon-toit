@@ -2601,7 +2601,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108140000"></script>
+<script src="heist.js?v=20261108150000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3325,7 +3325,7 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
   boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6 };
-async function sfx(name, loop = false, rate = 1) {
+async function sfx(name, loop = false, rate = 1, ms = 0) {   // ms: only that much of it (a long file, a short moment)
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
   if (loop === 'scene' && (!sc || sc.ambience !== name)) return;   // the scene changed while the file loaded
@@ -3337,6 +3337,7 @@ async function sfx(name, loop = false, rate = 1) {
   if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
   else g.gain.value = vol;
   src.start(); src.gain = g;
+  if (ms && !loop) { const t = actx.currentTime + ms / 1000; g.gain.setValueAtTime(vol, t); g.gain.linearRampToValueAtTime(0.0001, t + .15); src.stop(t + .2); }
   if (loop) sfxLoops[name] = src;
 }
 // the room's sounds (the loops) go through one more filter and gain: {room: {lp, vol, ms}} muffles the room or brings it
@@ -4324,7 +4325,7 @@ async function next() {
     }
     else if (s.sms) { if (!(await sendText(s.sms, r))) return; }
     else if (s.check) { if (!(await readTexts(s.check, r))) return; }
-    else if (s.sfx) sfx(s.sfx, s.loop);
+    else if (s.sfx) sfx(s.sfx, s.loop, 1, s.ms);
     else if (s.music !== undefined) music(s);
     else if (s.room) roomSound(s.room);
     else if (s.tick !== undefined) ticking(s.tick);
