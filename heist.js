@@ -88,8 +88,8 @@
   };
   const handsUp = (x, y, s, color, o = {}) => tagged([...stand(x, y, s, color, o), R(x - 70 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s }), R(x + 42 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s })], color, o);
   const COL = { pa: P1, pb: P2 };
-  SCENES.h_rob = place({ back: [...BANK, ...lie(560, 960, GREY), ...lie(1000, 1010, GUARD), ...lie(1390, 960, AMY),
-    ...armed(380, 1080, 1.9, P1, 1, { face: MASK }), ...armed(1560, 1080, 1.9, P2, -1, { face: MASK })] });
+  // (09/11) Justin's three: out of the elevator, guns up; the room, hands up; the alarm, red, everyone on the floor
+  for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
   SCENES.h_ray_sees = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(160, 600, 980, 210, AMY, { r: 105 }), C(1240, 640, 280, SKIN),
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
   const vault = (k) => place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1180, 520, 760, '#9ca3af', { line: '34px solid #6b7280' }), C(1180, 520, 120, '#6b7280'),
@@ -206,7 +206,9 @@
     // ---- FAST FORWARD: the key moments one after the other, no transitions; a tap on a phone moves on. The choices are
     // the real ones (their screen, the music holding its breath) ----
     { titleCard: 'Fast forward', sub: 'The key moments' },
-    ...at('h_rob'), { fade: 'in', ms: 1 }, { sfx: 'crowd panic', loop: true }, { sfx: 'establishment alarm', loop: true }, T('“EVERYBODY DOWN.” The guard, the teller, Amy: on the floor.'),
+    ...at('h_rob_out'), { fade: 'in', ms: 1 }, { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
+    ...at('h_rob_hands'), { hush: 1800 },
+    { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), T('The alarm. Everyone on the floor. Amy too.'),
     ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'I take the vault.', ic: 'vault', sh: 'I go', intent: 'the vault', set: { watch: 'pb' }, then: [] },
