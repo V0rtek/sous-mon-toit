@@ -94,8 +94,8 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 #gateCard { position: absolute; inset: 0; z-index: 13; background: rgba(0,0,0,.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5em; padding: 0 8%; text-align: center; color: #f5f5f7; pointer-events: none; animation: gcIn .35s ease-out; }
 #gateCard[hidden] { display: none; }
 /* (08/11) a TV's phone that wants you: its rim goes white, fading in (2 s before a choice: no more 3-2-1) */
-#attn { position: absolute; inset: 0; z-index: 80; pointer-events: none; opacity: 0; transition: opacity .35s; box-shadow: inset 0 0 0 .55em rgba(255,255,255,.9), inset 0 0 4em 1.2em rgba(255,255,255,.35); }
-body.hosttv:not(.tv):is(.attn, .choosing, .privline, .gate-me, .apart, .cellon, .tapline) #attn, body.hosttv:not(.tv):has(#ringCard:not([hidden])) #attn { opacity: 1; transition: opacity 2s; }
+#attn { position: absolute; inset: 0; z-index: 80; pointer-events: none; opacity: 0; box-shadow: inset 0 0 0 .55em rgba(255,255,255,.9), inset 0 0 4em 1.2em rgba(255,255,255,.35); }
+body.hosttv:not(.tv):is(.attn, .choosing, .privline, .gate-me, .apart:not(.phonemin), .cellon, .tapline) #attn, body.hosttv:not(.tv):has(#ringCard:not([hidden])) #attn { opacity: 1; }
 #hu { display: none !important; }
 body:has(#ringCard:not([hidden])) #viewBtn { display: none !important; }   /* a call: only the call */
 body.hosttv:not(:has(#pauseCard:not([hidden]))) #viewBtn { display: none !important; }   /* the eye: only in the pause */
@@ -1611,6 +1611,7 @@ body.hosttv.instory #viewBtn { display: grid; }
 body.watch.hosttv.instory #back { display: none !important; }
 #minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; place-items: center; cursor: pointer; }
 body.phonemin.instory #minView { display: grid; }
+body.phonemin #waitOther { display: none !important; }
 body.phonemin #minView { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }   /* your colour: which one you are */
 #minView .mv-tv { text-align: center; padding: 0 8%; }
 #minView .mv-tv b { font-size: 5.5em; font-weight: 900; color: #fff; }
@@ -3737,7 +3738,7 @@ let held = [];   // the steps that lead into the other player's choice: they run
 function waitNote(t, who) {
   if (TV) { $('#waitOther').hidden = true; return; }   // a TV shows, never tells (its badges: tvWho)
   $('#waitText').textContent = t; $('#waitOther').hidden = !t;
-  const mb = $('#minView .mv-tv b'); if (mb) { mb.textContent = t ? `${t}…` : 'Look at the TV'; mb.parentElement.classList.toggle('waiting', !!t); }   // a TV's phone: who has the turn
+
   $('#waitFace').hidden = !who; if (who) $('#waitFace img').src = poseSrc(who, 'listen');
 }
 // {ring: 'Justin', choice: [answer, decline]}: the choice is an incoming call (the caller's name, a ringtone and the
@@ -3873,7 +3874,7 @@ let chSecret = false;
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
   huOff(); musHold(true);
-  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; litFocus(seatFor(by));
+  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; if (!(TV && split)) litFocus(seatFor(by));   // apart: the TV stays as it is
   document.body.classList.toggle('choosing', mineFor(by)); $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
@@ -3909,7 +3910,7 @@ function choose(opts, by, ring) {
   if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
   clockStop();
   if (mine && holder === choicesEl && !choicesEl.hidden && !isBot(by)) clockStart(opts);
-  else if ((waitsFor(by) || (TV && duo())) && !ring && !isBot(by)) clockStart(opts, true);
+  else if ((waitsFor(by) || (TV && duo())) && !ring && !isBot(by) && !(TV && split)) clockStart(opts, true);
   if (isBot(by) && ROLE === 'host') botPick();
   if (cellOpen) { clearTimeout(closeCell.t); drawCell(); }
 }
@@ -4065,7 +4066,7 @@ function meColor() {   // a phone: its player's colour (the black, the gate)
 }
 setInterval(meColor, 700);
 function minView() {
-  const on = ROLE === 'watch' && hostTv && !seeStory && !split;   // apart (a split): the phone shows its scene, whatever the eye says
+  const on = ROLE === 'watch' && hostTv && !seeStory && (!split || waiting === 'join');   // (08/11) its scene apart over: back to its colour, « Look at the TV »   // apart (a split): the phone shows its scene, whatever the eye says
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
   $('#minView').innerHTML = '<div class="mv-tv"><b>Look at the TV</b></div><svg class="mv-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
@@ -4161,7 +4162,7 @@ const OFF_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" 
 let tvWhoKey = '';
 function tvWho() {
   const seats = seatsOf(), gone = absentSeats();
-  const on = TV && screen === null && game && duo() && !paused && $('#tvIntro').hidden;
+  const on = TV && screen === null && game && duo() && !paused && $('#tvIntro').hidden && !split;   // apart: no badges over the TV's picture
   const turn = on && (waiting === 'choice' ? seatFor(optionsBy) : waiting === 'click' && onlyNow ? onlyNow : null);
   const list = on ? seats.filter((k) => k === turn || gone.includes(k)) : [];
   const cue = waiting === 'choice' && chCue ? chCue : '';   // the first choices: the TV says where to look
@@ -4479,7 +4480,7 @@ async function next() {
     else if (s.lane) { if (!(await toLane(s.lane, r))) return; }
     else if (s.join) {
       laneNow = null;
-      if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); return; }
+      if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); closeCell(); minView(); return; }
       split = null; apart();
     }
     else if (s.mark) markReached(s.mark);
