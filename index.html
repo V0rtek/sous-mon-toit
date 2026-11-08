@@ -1718,11 +1718,15 @@ body.tv:has(#tvIntro:not([hidden])) #tvSides, body:has(#mirrorCard:not([hidden])
 #tvIntro .ti-logo .lt { display: inline-block; opacity: 0; }
 #tvIntro .ti-logo.run .lt { animation: uBleed 1.3s cubic-bezier(.16,.9,.24,1) both; animation-delay: calc(.45s + var(--i) * .07s); }
 #tvIntro .ti-logo.out { opacity: 0; }
+/* the red bar shows up once the letters are in (the last one lands ~2.3 s), then it blinks */
+#tvIntro .ti-logo .u-c { opacity: 0; animation: none; }
+#tvIntro .ti-logo.run .u-c { animation: uBlinkOn 1.06s steps(1) 2.3s infinite; }
+@keyframes uBlinkOn { 0%, 49.9% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @keyframes uBleed { 0% { opacity: 0; filter: blur(18px); transform: scale(1.25); } 60% { opacity: 1; } 100% { opacity: 1; filter: none; transform: none; } }
 #uWait { position: absolute; inset: 0; z-index: 14; display: grid; place-items: center; background: #000; pointer-events: none; font-size: 14em; }
 #uWait[hidden] { display: none; }
 #gateCard .gc-u { font-size: 9em; margin-bottom: .15em; }
-@media (prefers-reduced-motion: reduce) { .u-c { animation: none; } #tvIntro .ti-logo.run .lt { animation: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .u-c { animation: none; } #tvIntro .ti-logo.run .lt { animation: none; opacity: 1; } #tvIntro .ti-logo.run .u-c { animation: none; opacity: 1; } }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
 #absentBar { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); z-index: 55; padding: .8em 1.5em; border-radius: 2em; background: rgba(255,159,10,.92); color: #1d1d1f; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; text-align: center; }
 #absentBar small { display: block; font-size: .75em; font-weight: 700; opacity: .75; }
