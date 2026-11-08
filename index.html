@@ -40,6 +40,7 @@ body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: t
 body.lit-chars #litDim, body.lit-him #litDim { opacity: .68; }
 #front { transition: filter .6s; }
 body.lit-chars #front, body.lit-him #front { filter: brightness(.32) saturate(.5); }
+body.lit-shape #backdrop > div:not(.lit-me), body.lit-shape #front > div:not(.lit-me) { filter: brightness(.32) saturate(.5) !important; transition: filter .3s; }
 body.lit-him #cast .actor:not(.lit-me) img { filter: brightness(.32) saturate(.5); }
 body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick hop when someone starts talking */
 @keyframes talk { 40% { transform: translateY(-.6%); } }
@@ -90,10 +91,19 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 #slate .tc b { display: block; font-size: 1.25em; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 #slate .tc small { display: block; margin-top: .5em; font-size: .6em; font-weight: 600; letter-spacing: .3em; color: #aeaeb2; opacity: 0; animation: tcIn 0s 1.1s forwards; }
 @keyframes tcIn { to { opacity: 1; } }
+#gateCard { position: absolute; inset: 0; z-index: 13; background: rgba(0,0,0,.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5em; padding: 0 8%; text-align: center; color: #f5f5f7; pointer-events: none; animation: gcIn .35s ease-out; }
+#gateCard[hidden] { display: none; }
+#gateCard .gc-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
+#gateCard b { font-size: 4.4em; font-weight: 800; color: #ffd60a; }
+#gateCard span { font-size: 2.6em; font-weight: 600; color: #d1d1d6; }
+#gateCard.ready b, #gateCard.ready .gc-ico { color: #34c759; animation: none; }
+@keyframes gcIn { from { opacity: 0; } }
+body.tv #gateCard .gc-ico { font-size: 7em; }
+body.tv #gateCard b { font-size: 3.4em; }
 body.phonemin.tapline #minView > * { visibility: hidden; }   /* not the pause: a tap moves on */
 body.phonemin.tapline #minView::after { content: '▶  Tap to go on'; position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 2.2em; font-weight: 800; letter-spacing: .06em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; pointer-events: none; }
 body.tapline #bubble::after { content: '▶ Tap a phone'; position: absolute; left: 0; right: 0; text-align: center; bottom: -1.7em; font-size: .9em; font-weight: 800; letter-spacing: .08em; color: #ffd60a; animation: cuePulse 1.2s ease-in-out infinite; }
-.tv-cue { display: block; font-style: normal; font-size: .62em; font-weight: 700; color: #ffd60a; margin-top: .15em; animation: cuePulse 1.2s ease-in-out infinite; }
+.tv-cue { display: block; font-style: normal; font-size: 1.15em; white-space: nowrap; font-weight: 700; color: #ffd60a; margin-top: .15em; animation: cuePulse 1.2s ease-in-out infinite; }
 @keyframes cuePulse { 50% { opacity: .45; } }
 #slate { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 12%; text-align: center; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; font-size: 3em; font-weight: 600; line-height: 1.35; letter-spacing: -.01em; pointer-events: none; }
 
@@ -1566,8 +1576,12 @@ body.hosttv.instory #viewBtn { display: grid; }
 body.watch.hosttv.instory #back { display: none !important; }
 #minView { position: absolute; inset: 0; z-index: 12; background: #000; display: none; place-items: center; cursor: pointer; }
 body.phonemin.instory #minView { display: grid; }
-#minView svg { width: 22em; height: 22em; opacity: .22; }
-body.phonemin.privline #minView svg, body.phonemin.choosing #minView svg { display: none; }
+#minView .mv-tv { display: flex; flex-direction: column; align-items: center; gap: .6em; text-align: center; }
+#minView .mv-tv svg { width: 16em; height: 16em; opacity: .5; }
+#minView .mv-tv b { font-size: 4em; font-weight: 800; color: #f5f5f7; opacity: .75; }
+#minView .mv-tv.waiting b { color: #ffd60a; opacity: 1; }
+#minView .mv-tv small { font-size: 2em; font-weight: 700; color: #8e8e93; opacity: .7; }
+body.phonemin.privline #minView .mv-tv, body.phonemin.choosing #minView .mv-tv, body.phonemin.cellon #minView .mv-tv, body.phonemin.gate #minView .mv-tv { display: none; }
 body.phonemin #pauseBtn, body.phonemin #menuPop, body.phonemin.instory #menuPop[hidden] { display: none !important; }   /* Quitter is in the pause */
 body.phonemin #ui { z-index: 14; inset: 2.5% 3%; top: 2.5%; pointer-events: none; justify-content: center; }
 body.phonemin #choices:not([hidden]) { flex: 1; height: 100%; gap: 1.4em; }
@@ -1659,11 +1673,13 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 #pauseCard .pc-who { text-align: center; font-size: 2em; font-weight: 700; color: #8e8e93; margin: .3em 0 1.6em; }
 #pauseCard .wr-kick { margin-bottom: 1em; }
 #pauseCard ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.2em; }
-#pauseCard li { background: rgba(255,255,255,.07); border-left: .35em solid var(--c, #ff9a4d); border-radius: .8em; padding: 1em 1.3em; }
-#pauseCard li b { display: block; font-size: 2.2em; font-weight: 800; }
-#pauseCard li b i { font-style: normal; color: var(--c, #ff9a4d); font-weight: 700; }
-#pauseCard li span { display: block; font-size: 1.9em; color: #d1d1d6; margin-top: .3em; font-style: italic; }
-#pauseCard li.none { border-left-color: #555; font-size: 2em; color: #8e8e93; }
+#pauseCard li { max-width: 72%; align-self: flex-start; background: var(--c, #ff9a4d); color: #fff; border-radius: 1.6em 1.6em 1.6em .35em; padding: .9em 1.4em; box-shadow: 0 .4em 1.2em rgba(0,0,0,.35); animation: pcInL .45s var(--d, 0s) cubic-bezier(.2, .9, .3, 1.2) both; }
+#pauseCard li.r { align-self: flex-end; border-radius: 1.6em 1.6em .35em 1.6em; animation-name: pcInR; }
+#pauseCard li b { display: block; font-size: 2.2em; font-weight: 700; }
+#pauseCard li span { display: block; font-size: 1.7em; color: rgba(255,255,255,.82); margin-top: .3em; font-style: italic; }
+#pauseCard li.none { align-self: center; background: rgba(255,255,255,.07); font-size: 2em; color: #8e8e93; animation: none; }
+@keyframes pcInL { from { opacity: 0; transform: translateX(-3em) scale(.92); } }
+@keyframes pcInR { from { opacity: 0; transform: translateX(3em) scale(.92); } }
 #pauseCard .pc-btns { display: flex; gap: 1.2em; margin-top: 2.4em; }
 #pauseCard .pc-btns button { flex: 1; font: inherit; font-size: 2.4em; font-weight: 800; border: 0; border-radius: 1em; padding: .8em; cursor: pointer; color: #fff; background: #34c759; }
 #pauseCard .pc-btns button + button { flex: 0 1 auto; background: rgba(255,255,255,.14); }
@@ -1723,6 +1739,7 @@ body.tv #choices.tvpicked button:not(.picked) { opacity: .35; transition: opacit
 #choices.cx .cf2 { width: 4.6em; height: 4.6em; background: #2c2c2e; box-shadow: 0 0 0 .2em rgba(255,255,255,.25); }
 #choices.cx .tyb { position: absolute; right: -.6em; top: -.6em; width: 3em; height: 3em; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 .3em #0b0a0f; }
 #choices.cx .tyb svg { width: 1.8em; height: 1.8em; }
+#choices.cx button.idle, body.cellon #choices button.idle { background: transparent !important; color: rgba(255,255,255,.75) !important; box-shadow: none !important; outline: .22em dashed rgba(255,255,255,.55); outline-offset: -.22em; }   /* doing nothing */
 #choices.cx .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
 #choices.cx .ty-do .tyb { background: #ffd60a; color: #000; }
 #choices.cx .ty-do .ct { font-style: italic; }
@@ -1737,7 +1754,10 @@ body.phonemin #ui:has(#qCard) #bubble { display: none; }
 body.phonemin #qCard { flex: none; margin-top: 8.5em; padding: 1.6em 2em 1.6em 1.6em; }
 body.phonemin #qCard .qf { width: 14em; height: 14em; }
 body.phonemin #qCard .qx > span { font-size: 3.2em; }
-body.phonemin #choices.cx button { display: flex; align-items: center; justify-items: normal; text-align: left; font-size: 1em; padding: 0 1.6em 0 0; gap: 1.6em; border-radius: .9em; overflow: visible; }
+body.phonemin #choices.cx button { display: flex; align-items: center; justify-items: normal; text-align: left; font-size: 1em; padding: 0 1.6em; gap: 1.6em; border-radius: .9em; overflow: visible; }
+body.phonemin #choices.cx button:has(.cf) { padding-left: 0; }
+body.phonemin #choices.cx button:not(:has(.cf)) { justify-content: center; text-align: center; }
+body.phonemin #choices.cx button:not(:has(.cf)) .ct { font-size: 3.6em; }   /* just the words: bigger, in the middle */
 body.phonemin #choices.cx .cf { width: 13em; height: auto; align-self: stretch; border-radius: .9em 0 0 .9em; }
 body.phonemin #choices.cx .cf img { height: 330%; top: 5%; }
 body.phonemin #choices.cx .ct { font-size: 2.8em; }
@@ -2589,6 +2609,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
     <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><div class="wr-kick">What just happened</div><ol></ol></div></div>
     <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
+  <div id="gateCard" hidden></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
 </div>
 
@@ -2601,7 +2622,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108170000"></script>
+<script src="heist.js?v=20261108200000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2994,6 +3015,7 @@ function rects(list, el) {
       background: r.color, borderRadius: typeof r.r === 'string' ? r.r : (r.r || 0) + 'px', border: r.line || '', boxShadow: r.glow || '',
       filter: r.blur ? `blur(${r.blur}px)` : '' });
     if (r.rot) Object.assign(d.style, { transform: `rotate(${r.rot}deg)`, transformOrigin: r.origin || '50% 50%' });   // a clock's hand
+    if (r.who) d.dataset.who = r.who;   // a character drawn in shapes: he stays lit when he chooses
     el.appendChild(d);
   }
 }
@@ -3639,6 +3661,7 @@ let held = [];   // the steps that lead into the other player's choice: they run
 function waitNote(t, who) {
   if (TV) { $('#waitOther').hidden = true; return; }   // a TV shows, never tells (its badges: tvWho)
   $('#waitText').textContent = t; $('#waitOther').hidden = !t;
+  const mb = $('#minView .mv-tv b'); if (mb) { mb.textContent = t ? `${t}…` : 'Look at the TV'; mb.parentElement.classList.toggle('waiting', !!t); }   // a TV's phone: who has the turn
   $('#waitFace').hidden = !who; if (who) $('#waitFace img').src = poseSrc(who, 'listen');
 }
 // {ring: 'Justin', choice: [answer, decline]}: the choice is an incoming call (the caller's name, a ringtone and the
@@ -3692,12 +3715,13 @@ function drawCall() {
 let litOn = null;
 function litFocus(k) {
   litOff(); litOn = k; if (FAST) return;
-  const a = actors[k];
+  const a = actors[k], shapes = !a && k ? document.querySelectorAll(`#backdrop [data-who="${k}"], #front [data-who="${k}"]`) : [];
+  if (shapes.length) { document.body.classList.add('lit-shape'); shapes.forEach((x) => x.classList.add('lit-me')); return; }   // drawn in shapes: everything else goes dark
   document.body.classList.add(a ? 'lit-him' : 'lit-chars'); if (a) a.el.classList.add('lit-me');
 }
 function litOff() {
-  document.body.classList.remove('lit-chars', 'lit-him');
-  document.querySelectorAll('#cast .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;
+  document.body.classList.remove('lit-chars', 'lit-him', 'lit-shape');
+  document.querySelectorAll('#cast .lit-me, #backdrop .lit-me, #front .lit-me').forEach((x) => x.classList.remove('lit-me')); litOn = null;
 }
 // ---- the choice cards: what each option shows, read from the story (02/11) ----
 const CH_ICON = {
@@ -3717,13 +3741,18 @@ function optMeta(o, k) {
   if (!to) to = [...new Set([...Object.keys(actors), ...seatsOf()])].find((id) => id !== k && castOf(id) && castOf(id).name && t.includes(fill(castOf(id).name))) || null;
   if (to && (!castOf(to) || !SPRITES[spriteOf(to)])) to = null;
   let face = null; try { face = SPRITES[spriteOf(k)] ? poseSrc(k, pose) : null; } catch { face = null; }
-  return { face, ty, to };
+  // doing nothing (an option {idle: true}, or one that says so: « Say nothing », « [Nothing] », « … »): a dotted button
+  const idle = !!o.idle || /^\[?\s*(nothing|do nothing|say nothing|stay silent|rien|ne rien (dire|faire)|…|\.\.\.)\s*\]?\.?$/i.test(t);
+  return { face, ty, to, idle };
 }
 function choiceCard(o, m, all, remote) {
   const tys = new Set(all.map((x) => x.ty)), tos = new Set(all.map((x) => x.to).filter(Boolean));
   const ty = tys.size > 1 && m.ty !== 'say' ? m.ty : null;
-  let to = ''; if (tos.size > 1 && m.to) { try { to = `<span class="cto"><i>›</i><span class="cf2"><img src="${poseSrc(m.to, 'listen')}" alt=""></span></span>`; } catch { to = ''; } }
-  return { cls: ty ? 'ty-' + ty : '', html: `${m.face ? `<span class="cf"><img src="${m.face}" alt=""></span>` : ''}<span class="ctx">${remote && o.intent ? `<b class="ck">${esc(o.intent)}</b>` : ''}<span class="ct">${esc(fill(o.t))}</span></span>${to}${ty ? `<span class="tyb">${CH_ICON[ty]}</span>` : ''}` };
+  // (08/11, Justin) just the words: no big label, no face of the one choosing; a face only when the choice is between
+  // people (each option toward someone else): that person's
+  let to = ''; if (tos.size > 1 && m.to) { try { to = `<span class="cf"><img src="${poseSrc(m.to, 'listen')}" alt=""></span>`; } catch { to = ''; } }
+  const cls = [ty ? 'ty-' + ty : '', m.idle ? 'idle' : ''].filter(Boolean).join(' ');
+  return { cls, html: `${to}<span class="ctx"><span class="ct">${esc(fill(o.t))}</span></span>${ty ? `<span class="tyb">${CH_ICON[ty]}</span>` : ''}` };
 }
 // T3 (a phone) / N4+N1 (the remote): whom you answer, above the choices: his face in a big circle, his name, his line
 function qCardShow(k) {
@@ -3758,7 +3787,7 @@ function choose(opts, by, ring) {
   if (mine && holder === choicesEl && !choicesEl.hidden) qCardShow(k);
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
-    if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(c.cls); }
+    if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(...c.cls.split(' ')); }
     else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
     b.dataset.i = i;
     if (mine && ROLE === 'watch') b.classList.add('mine');
@@ -3905,18 +3934,21 @@ function tvOpenStep() {
   if (!ip && o.cardDone) { tvOpen = null; next(); }
 }
 // the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
+let pauseDucked = false;
 function showPause() {
   const on = !!paused && screen === null && (TV || hostTv) && !MIRROR;
+  if (on !== pauseDucked) { pauseDucked = on; duck(on); }   // paused: the sound lower and muffled; back on resume
   document.body.classList.toggle('tvpaused', on && TV);
   if (!on) closeMirror();
   $('#pauseCard').hidden = !on;
   if (!on) return;
   $('#pauseCard .pc-who').textContent = paused === TV_PAUSE ? '' : `${paused} a mis pause`;
   if (TV) tvSides();   // the TV: the characters each side (a click on one = his phone's screen)
-  const last = state.picks.slice(-4);
-  $('#pauseCard ol').innerHTML = last.length ? last.map((p) => {
-    const k = p.who || p.by, c = (k && castOf(k)) || {};
-    return `<li style="--c:${c.color || '#ff9a4d'}"><b>${esc(seatName(k) || seatLabel(k) || '')} <i>a choisi</i> « ${esc(fill(p.t))} »</b>${p.after ? `<span>${esc(p.after)}</span>` : ''}</li>`;
+  // the last 3 choices, as texts: each player's from his side (the first seat on the left), in his colour, no name
+  const last = state.picks.slice(-3), seats = seatsOf();
+  $('#pauseCard ol').innerHTML = last.length ? last.map((p, i) => {
+    const k = p.who || p.by, c = (k && castOf(k)) || {}, side = seats.indexOf(seatFor(k)) === 1 ? 'r' : 'l';
+    return `<li class="${side}" style="--c:${c.color || '#ff9a4d'};--d:${i * .14}s"><b>${esc(fill(p.t))}</b></li>`;
   }).join('') : '<li class="none">No choices yet: the story just started.</li>';
 }
 $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
@@ -3929,10 +3961,10 @@ function minView() {
   const on = ROLE === 'watch' && hostTv && !seeStory && !split;   // apart (a split): the phone shows its scene, whatever the eye says
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
-  $('#minView').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
+  $('#minView').innerHTML = '<div class="mv-tv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><b>Look at the TV</b><small>Tap to pause</small></div>';
 }
 // the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
-$('#minView').onclick = (e) => { e.stopPropagation(); if (document.body.classList.contains('privline') || document.body.classList.contains('tapline')) advance(); else if (hostTv && !paused) sendIn('pause'); };   // a line that waits for a tap ({tap}): the black moves it on
+$('#minView').onclick = (e) => { e.stopPropagation(); const b = document.body.classList; if (b.contains('gate')) { advance(); gateTapped(); } else if (b.contains('privline') || b.contains('tapline')) advance(); else if (hostTv && !paused) sendIn('pause'); };   // a line that waits for a tap ({tap}): the black moves it on
 // a TV's story, the two players apart (a split): the TV goes black with the closed eye and falls silent, each phone
 // opens on its own scene, with its sound; back together, the TV takes the picture and the sound back
 function apart() {
@@ -3979,7 +4011,23 @@ $('#pauseCard').onclick = (e) => { e.stopPropagation(); if (TV) tvPause(false); 
 $('#pauseCard .pc-go').onclick = (e) => { e.stopPropagation(); if (hostTv && paused) sendIn('pause'); };
 $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sendIn('menu'); };
 // how long a line stays: time to read it (a private one: time for its owner to read it on their phone)
-let tapNow = false;   // {tap: true} on a line: it waits for a tap (a TV: a player's phone), never moves on by itself
+let tapNow = false, gateNow = null;   // gateNow: the seats a {gate} still waits for (a tap each)
+// {gate: [seats], text}: before a moment on the phones (a texting scene), the TV goes dark and says to look at your phone,
+// each of those players' phones goes dark and says to tap to start (text: what's coming, one string or one per seat); the
+// story goes on once each of them has tapped, and the TV lights up again
+function gateOn(s) {
+  const el = $('#gateCard'), mine = [...gateNow].filter((k) => mineFor(k)), t = typeof s.text === 'object' ? (s.text || {})[mine[0]] : s.text;
+  el.className = '';
+  el.innerHTML = TV ? '<div class="gc-ico">📱</div><b>Look at your phone</b>'
+    : mine.length ? `<div class="gc-ico">👆</div><b>Tap to start</b>${t ? `<span>${esc(fill(t))}</span>` : ''}`
+    : `<span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}…</span>`;
+  el.hidden = false; document.body.classList.add('gate');
+}
+function gateOff() { const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate'); }
+function gateTapped() {   // this phone tapped: ready, the others may still be reading
+  if (!gateNow || ![...gateNow].some((k) => mineFor(k))) return;
+  const el = $('#gateCard'); el.classList.add('ready'); el.innerHTML = '<div class="gc-ico">✓</div><b>Ready</b>';
+}   // {tap: true} on a line: it waits for a tap (a TV: a player's phone), never moves on by itself
 const readMs = (t) => Math.min(9000, Math.max(2600, 1200 + 55 * (t || '').length));
 let autoKey = {};   // what each wait is (the main scene's, each ghost scene's) and when it moves on
 function autoTick() {
@@ -4006,7 +4054,7 @@ function tvWho() {
   const key = list.map((k) => `${k}${k === turn ? '+' : ''}${gone.includes(k) ? '-' : ''}${seatName(k)}`).join('|') + cue;
   if (key === tvWhoKey) return; tvWhoKey = key;
   $('#tvWho').innerHTML = list.map((k) => `<div class="${seats.indexOf(k) ? 'r' : 'l'} ${k === turn ? 'turn' : ''} ${gone.includes(k) ? 'gone' : ''}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">
-    ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${esc(seatName(k))}${k === turn && cue ? `<em class="tv-cue">📱 ${esc(fill(cue))}</em>` : ''}</span></div>`).join('');
+    ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${esc(seatName(k))}${k === turn && cue ? `<em class="tv-cue">📱 ${esc(seatName(k))}, ${esc(fill(cue).replace(/^./, (c) => c.toLowerCase()))}</em>` : ''}</span></div>`).join('');
 }
 if (TV) setInterval(tvWho, 250);
 
@@ -4306,6 +4354,7 @@ async function next() {
   slateEl.hidden = true;   // a slate stays until the tap that moves past it (black stays until the next fade in)
   if (onlyNow) { onlyNow = null; waitNote(''); }
   tapNow = false; document.body.classList.remove('privline', 'tapline');
+  if (gateNow) { gateNow = null; gateOff(); }
   const k = q.findIndex((s) => !(s.cam || s.poses || s.face || s.enter || s.exit || s.pan !== undefined));
   if (k > 0 && q[k].choice && waitsFor(byOf(q[k]))) held = q.splice(0, k);
   while (q.length && r === run) {
@@ -4329,6 +4378,10 @@ async function next() {
     else if (s.music !== undefined) music(s);
     else if (s.room) roomSound(s.room);
     else if (s.tick !== undefined) ticking(s.tick);
+    else if (s.gate) {
+      gateNow = new Set([].concat(s.gate).filter((k) => !isBot(k) && state.seats[k])); if (!gateNow.size || FAST) { gateNow = null; continue; }
+      tapNow = true; gateOn(s); waiting = 'click'; return;
+    }
     else if (s.titleCard) {   // black, the place appears at once (no fade), the hour under it a beat later
       black.style.transition = 'none'; black.style.opacity = 1; bubble.hidden = true;
       slateEl.innerHTML = `<div class="tc"><b>${esc(fill(s.titleCard))}</b>${s.sub ? `<small>${esc(fill(s.sub))}</small>` : ''}</div>`;
@@ -4395,6 +4448,7 @@ function advance() {
   }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
   if (waiting !== 'click' || (laneNow && !mineFor(laneNow)) || (onlyNow && !mineFor(onlyNow))) return;
+  if (gateNow) { for (const k of [...gateNow]) if (mineFor(k)) gateNow.delete(k); if (gateNow.size) { gateTapped(); return; } }
   record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next();
 }
 stage.addEventListener('click', (e) => { if (!e.target.closest('.card')) advance(); });
@@ -5588,6 +5642,7 @@ function fromJoiner(m) {
     if (g) { if (m.k === laneCount(tape, m.lane)) ghostTap(g); return; }
     if (m.lane ? m.lane !== laneNow || m.k !== laneCount(tape, m.lane) : m.k !== tape.length) return;
     if (onlyNow && ownerOf(onlyNow) !== m.id) return;   // a private line: only its owner moves past it
+    if (gateNow && waiting === 'click') { for (const k of [...gateNow]) if (ownerOf(k) === m.id) gateNow.delete(k); if (gateNow.size) return; }
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
     if (waiting === 'click') { record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
   } else if (/^c\d$/.test(m.e)) {

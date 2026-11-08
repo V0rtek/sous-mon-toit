@@ -15,17 +15,20 @@
   const SKIN = '#d8c3ab', P1 = '#3b82f6', P2 = '#ef4444', AMY = '#c084fc', GREY = '#4b5563';
   const C = (x, y, d, color, o) => R(x - d / 2, y - d / 2, d, d, color, { r: d / 2, ...o });   // a circle, by its centre
   // someone, head and shoulders above y (a table's top, the frame's bottom): s = size; o.blur for the crowd behind
-  const bust = (x, y, s, color, o = {}) => [
+  // Marcus's and Ray's shapes carry who they are (by their colour): the one choosing stays lit
+  const whoOf = (color, o) => ({ who: o.who || (color === P1 ? 'pa' : color === P2 ? 'pb' : undefined) });
+  const tagged = (list, color, o) => { const w = whoOf(color, o); return w.who ? list.map((r) => ({ ...r, ...w })) : list; };
+  const bust = (x, y, s, color, o = {}) => tagged([
     R(x - 60 * s, y - 150 * s, 120 * s, 150 * s + 2, color, { r: `${50 * s}px ${50 * s}px 0 0`, ...o }),
     C(x, y - 195 * s, 78 * s, o.face || SKIN, o.blur ? { blur: o.blur } : {}),
-  ];
+  ], color, o);
   // someone standing, feet on y
-  const stand = (x, y, s, color, o = {}) => [
+  const stand = (x, y, s, color, o = {}) => tagged([
     R(x - 26 * s, y - 120 * s, 22 * s, 120 * s, '#1f2937'), R(x + 4 * s, y - 120 * s, 22 * s, 120 * s, '#1f2937'),
     R(x - 45 * s, y - 270 * s, 90 * s, 160 * s, color, { r: `${36 * s}px ${36 * s}px 8px 8px`, ...o }),
     C(x, y - 305 * s, 64 * s, o.face || SKIN, o.blur ? { blur: o.blur } : {}),
-  ];
-  const glow = (x, y) => R(x - 18, y - 30, 36, 60, '#e0f2fe', { r: 6, glow: '0 0 40px 14px rgba(186,230,253,.55)' });   // a phone, lit
+  ], color, o);
+  const glow = (x, y, who) => R(x - 18, y - 30, 36, 60, '#e0f2fe', { r: 6, glow: '0 0 40px 14px rgba(186,230,253,.55)', who });   // a phone, lit
   const SIZE = [1920, 1080], place = (o) => ({ size: SIZE, spots: {}, face: {}, front: [], ...o });
   const LOBBY = [
     R(0, 0, 1920, 1080, '#1b2230'), R(0, 760, 1920, 320, '#141a24'),
@@ -52,7 +55,7 @@
   ] });
   const TWO_BACK = [R(0, 0, 1920, 1080, '#1b2230'), ...[[300, .9], [1600, .85], [960, .8]].flatMap(([x, s]) => bust(x, 640, s, GREY, { blur: 8 })), R(0, 640, 1920, 440, '#141a24')];
   const two = (o = {}) => place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...bust(1300, 900, 1.7, P2),
-    ...(o.p2phone ? [glow(1380, 860)] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
+    ...(o.p2phone ? [glow(1380, 860, 'pb')] : []), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
   SCENES.h_two = two(); SCENES.h_two_call = two({ p2phone: true });
   SCENES.h_ots1 = place({ ambience: 'crowd', back: [   // over Marcus's shoulder: his phone, his kids on it, Leo's text on top
     R(0, 0, 1920, 1080, '#1b2230'), ...bust(1500, 820, 1.2, P2, { blur: 10 }),
@@ -68,8 +71,8 @@
   SCENES.h_split = place({ ambience: 'crowd', back: [   // Marcus at the table, texting | Ray at the window, on the call; a clock
     R(0, 0, 956, 1080, '#1b2230'), R(964, 0, 956, 1080, '#22304a'), R(956, 0, 8, 1080, '#05070a'),
     R(1080, 120, 700, 620, '#3b5375', { glow: '0 0 80px 10px rgba(150,190,240,.15)' }),
-    ...bust(470, 900, 1.6, P1), glow(560, 840), R(160, 880, 640, 50, '#5b4636', { r: 8 }),
-    ...stand(1430, 1040, 2.4, P2), R(1500, 270, 50, 110, '#0b0b0d', { r: 10 }),   // his phone at his ear
+    ...bust(470, 900, 1.6, P1), glow(560, 840, 'pa'), R(160, 880, 640, 50, '#5b4636', { r: 8 }),
+    ...stand(1430, 1040, 2.4, P2), R(1500, 270, 50, 110, '#0b0b0d', { r: 10, who: 'pb' }),   // his phone at his ear
     C(960, 150, 190, '#e5e7eb', { line: '10px solid #111827' }),
     R(954, 85, 12, 70, '#111827', { r: 6, rot: -30, origin: '50% 100%' }), R(955, 105, 10, 50, '#111827', { r: 5, rot: -2, origin: '50% 100%' }),
   ] });
@@ -80,7 +83,7 @@
     R(560, 120, 800, 760, '#3a4250'), R(590, 150, 366, 730, '#6b7280'), R(964, 150, 366, 730, '#6b7280'),
     ...(open ? [R(590, 150, 740, 730, '#e7e2d3', { glow: '0 0 120px 30px rgba(255,240,200,.25)' })] : []),
     C(1430, 520, 40, '#fbbf24', { glow: '0 0 20px 6px rgba(251,191,36,.6)' }),   // the call button, lit
-    ...stand(760, 1080, 2, P1, { r: '70px 70px 10px 10px' }), glow(820, 640), ...stand(1160, 1080, 2, P2), glow(1100, 640),
+    ...stand(760, 1080, 2, P1, { r: '70px 70px 10px 10px' }), glow(820, 640, 'pa'), ...stand(1160, 1080, 2, P2), glow(1100, 640, 'pb'),
   ] });
   SCENES.h_lift = wait(false); SCENES.h_lift_open = wait(true);
   // inside: the doors, the floor dots over them (n lit)
@@ -115,10 +118,10 @@
   // someone standing with a gun held out (dir 1: to the right), hands up (up), masked or not
   const armed = (x, y, s, color, dir, o = {}) => {
     const sy = y - 240 * s, len = 170 * s, ax = dir > 0 ? x + 30 * s : x - 30 * s - len;
-    return [...stand(x, y, s, color, { face: o.face || SKIN }),
-      R(ax, sy, len, 30 * s, color, { r: 15 * s }), R(dir > 0 ? ax + len : ax - 60 * s, sy - 12 * s, 60 * s, 34 * s, '#0b0b0d', { r: 6 })];
+    return tagged([...stand(x, y, s, color, { face: o.face || SKIN }),
+      R(ax, sy, len, 30 * s, color, { r: 15 * s }), R(dir > 0 ? ax + len : ax - 60 * s, sy - 12 * s, 60 * s, 34 * s, '#0b0b0d', { r: 6 })], color, o);
   };
-  const handsUp = (x, y, s, color, o = {}) => [...stand(x, y, s, color, o), R(x - 70 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s }), R(x + 42 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s })];
+  const handsUp = (x, y, s, color, o = {}) => tagged([...stand(x, y, s, color, o), R(x - 70 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s }), R(x + 42 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s })], color, o);
   const COL = { pa: P1, pb: P2 };
   SCENES.h_rob = place({ back: [...BANK, ...lie(560, 960, GREY), ...lie(1000, 1010, GUARD), ...lie(1390, 960, AMY),
     ...armed(380, 1080, 1.9, P1, 1, { face: MASK }), ...armed(1560, 1080, 1.9, P2, -1, { face: MASK })] });
@@ -147,7 +150,7 @@
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
   const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
-  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? `Text ${WHO[to]}` : 'No text', set, then: text ? [sms(k, to, text), { wait: 1600 }] : [] })) });
+  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
 
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
@@ -179,15 +182,16 @@
     HUNG, { room: { lp: 650, vol: .5, ms: 1500 } },   // the vibration stops; the crowd goes far
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
+      { gate: ['pa', 'pb'], text: { pa: 'Text Leo back', pb: 'Amy is on the line' } },
       ...at('h_split'), { tick: true },
-      sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 1800 },
+      sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 2800 },
       S('amy', 'Hey you. Are you still downtown?', { only: 'pb' }),
       { by: 'pb', clock: 15000, choice: [
         { t: 'Yeah. Work thing.', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.', { only: 'pb' })] },
         { t: 'No. Home soon.', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.', { only: 'pb' })] },
       ] },
-      sms('leo', 'pa', 'ok'), { wait: 1600 },
-      sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 2200 },
+      sms('leo', 'pa', 'ok'), { wait: 2600 },
+      sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
       reply('pa', 'leo', [
         ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.'],
         ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.'],
@@ -203,6 +207,7 @@
     ...at('h_lift'), { room: { lp: 20000, vol: 1, ms: 1000 } },
     { music: 'double it', lv: 0, vol: .35, lp: 380, ms: 4000 }, { hush: 1600 },
     // ---- 15. the last text before going in (each his own) ----
+    { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 }),
     { fn: (f) => [reply('pb', 'amy', f.amy === 'call'
       ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]]
@@ -245,7 +250,7 @@
         { by: W, cue: 'Look at your phone', clock: 10000, choice: [
           { t: 'Take off the mask.', intent: 'shows his face', set: { mask: 'off' }, then: [...at('h_face_' + W),
             T(W === 'pb' ? 'Amy: “…Ray?” The gun shakes in her hand.' : 'Marcus shows his face. “I’ve got kids. Please.”')] },
-          { t: 'Keep it on.', intent: 'stays masked', set: { mask: 'on' }, then: [
+          { t: 'Keep it on.', intent: 'stays masked', idle: true, set: { mask: 'on' }, then: [
             T(W === 'pb' ? 'Amy: “Who are you?” Her finger on the trigger.' : 'Amy: “Take it off. Now.” Her finger on the trigger.')] },
         ] },
         // the other one, back from the vault: the gun on his friend's head
