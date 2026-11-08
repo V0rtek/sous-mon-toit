@@ -4456,7 +4456,7 @@ addEventListener('paste', (e) => { if (screen === '#deck' && DECK.panel.paste(e)
 addEventListener('keydown', (e) => {
   if (screen === '#deck' && DECK.key(e)) { e.preventDefault(); return; }
   if (TV && (e.key === ' ' || e.key === 'p' || e.key === 'Escape')) { e.preventDefault(); if (!$('#mirrorCard').hidden) closeMirror(); else if (e.key !== 'Escape') tvPause(!paused); return; }
-  if ((e.key === ' ' || e.key === 'Enter') && !e.target.closest('input, textarea, button, [contenteditable]')) { e.preventDefault(); advance(); }
+  if ((e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') && !e.target.closest('input, textarea, button, [contenteditable]')) { e.preventDefault(); advance(); }
 });
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
