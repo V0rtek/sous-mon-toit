@@ -163,6 +163,7 @@
 
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
+    { sfx: 'crowd', loop: true },   // the lobby's crowd from the black card on: we hear the place before we see it
     { titleCard: 'Union Trust Tower', sub: '11:52 AM' },
     ...at('h_lobby'), { fade: 'in', ms: 900 }, { hush: 1800 },
     // ---- 3. his feet won't stop ----
@@ -221,7 +222,7 @@
     ...at('h_stand'), { hush: 1500 },
     // ---- 14. the elevator: the crowd back, Double It far and muffled ----
     ...at('h_lift'), { room: { lp: 20000, vol: 1, ms: 1000 } },
-    { music: 'double it', lv: 0, vol: .35, lp: 380, ms: 4000 }, { hush: 1600 },
+    { music: 'double it', lv: 0, vol: .35, lp: 380, ms: 6000 }, { hush: 1600 },
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
@@ -233,7 +234,7 @@
     }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_open'), { hush: 1200 },
-    ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 900 }, { bars: 1 },
+    ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 3000 }, { bars: 1 },
     // ---- 17. up: a dot a bar; the briefcase; the masks; the doors open on the drop ----
     ...at('h_elev1'), { music: 'double it', vol: .65 }, { bars: 1 },
     ...at('h_elev2'), { music: 'double it', vol: .72 },
