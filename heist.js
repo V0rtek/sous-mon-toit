@@ -143,11 +143,11 @@
   const at = (id) => [scene(id, {}), { cam: 'wide', at: 960 }];   // a place, the camera on all of it
   const S = (who, text, o) => ({ say: who, text, ...o });          // a line (no pose: they're shapes)
   const T = (text) => ({ narr: text, tap: true });                 // a key moment of the fast forward: it waits for a tap
-  const N = { pa: 'Marcus', pb: 'Ray' };
+  const N = { pa: 'Marcus', pb: 'Ray' }, WHO = { leo: 'Leo', sarah: 'Sarah', amy: 'Amy' };
   const sms = (from, to, text, only) => ({ sms: { from, to, text, ...(only ? { only } : {}) } });
   // a phone vibrating (the file is 15 s of it): a text = one double buzz; a call = it goes on until he picks (RING … HUNG)
   const VIB = 'cellphone vibrating (sound off) type 1', BUZZ = { sfx: VIB, ms: 1500 }, RING = { sfx: VIB, loop: true }, HUNG = { stop: VIB };
-  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? 'text' : 'nothing', set, then: text ? [sms(k, to, text), { wait: 1600 }] : [] })) });
+  const reply = (k, to, opts, o = {}) => ({ by: k, ...o, choice: opts.map(([t, set, text]) => ({ t, intent: text ? `Text ${WHO[to]}` : 'No text', set, then: text ? [sms(k, to, text), { wait: 1600 }] : [] })) });
 
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
@@ -164,10 +164,10 @@
     BUZZ, ...at('h_ots1'), sms('leo', 'pa', 'dad r u coming to practice tonight?'),
     narr('Leo: “dad r u coming to practice tonight?”'),
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_ots2'), { hush: 1300 }, ...at('h_two'),
-    { by: 'pa', clock: 0, cue: 'Look at your phone', choice: [
-      { t: 'Everything to lose.', intent: 'to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got my kids at home.')] },
-      { t: 'Everything to win.', intent: 'to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
+    ...at('h_ots2'), { hush: 1300 }, ...at('h_two'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
+    { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
+      { t: '“I’ve got my kids at home.”', intent: 'Everything to lose', set: { p1: 'lose' }, then: [S('pa', 'I’ve got my kids at home.')] },
+      { t: '“If this works, I get the happy ending my family deserves.”', intent: 'Everything to win', set: { p1: 'win' }, then: [S('pa', 'If this works, I get the happy ending my family deserves.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_two_call'), RING, { hush: 1200 },

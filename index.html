@@ -2601,7 +2601,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108150000"></script>
+<script src="heist.js?v=20261108170000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3729,7 +3729,7 @@ function choiceCard(o, m, all, remote) {
 function qCardShow(k) {
   qCardOff();
   const remote = document.body.classList.contains('phonemin'), st = chStyle(remote);
-  if (!(remote ? st === 'U1' : st === 'T3')) return;
+  if (!chAsk && !(remote ? st === 'U1' : st === 'T3')) return;   // {ask: true} on a choice: always (the question it answers)
   const who = lastSpeaker, said = (typingFull || textEl.textContent || '').trim();
   if (!who || who === k || !said || !castOf(who) || !SPRITES[spriteOf(who)]) return;
   const a = actors[who]; let src = null; try { src = poseSrc(who, a ? a.shown || a.pose : 'listen'); } catch { return; }
@@ -3780,7 +3780,7 @@ function choose(opts, by, ring) {
 }
 // the clock on a choice (smt-timer: off, 6, 10 default, 20 seconds): a line that shrinks above the choices; it stops while the
 // story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
-let clockT = 0, chClock, chCue = '';   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
+let clockT = 0, chClock, chCue = '', chAsk = false;   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
 const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
 function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); $('#waitClock').hidden = true; }
 function clockStart(opts, watching = false) {   // watching: someone else's choice (the TV, the other phone): the line only shows, never picks
@@ -4368,7 +4368,7 @@ async function next() {
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chAsk = !!s.ask; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
