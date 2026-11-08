@@ -89,8 +89,9 @@
   const handsUp = (x, y, s, color, o = {}) => tagged([...stand(x, y, s, color, o), R(x - 70 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s }), R(x + 42 * s, y - 380 * s, 28 * s, 130 * s, color, { r: 14 * s })], color, o);
   const COL = { pa: P1, pb: P2 };
   // (09/11) Justin's three: out of the elevator, guns up; the room, hands up; the alarm, red, everyone on the floor
-  // (09/11) the guard: the restroom door, red; Marcus aiming at it; the door an inch open, the guard's gun first
-  for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red'], ['h_wc', 'wc_door'], ['h_wc_aim', 'wc_aim'], ['h_wc_gun', 'wc_gun']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
+  // (09/11) the guard: the restroom door, red; Marcus aiming at it; the door an inch open, the guard's gun first; the guard
+  // out, aiming back; out, hands up (his gun on his hip); shot, against the wall, his gun on the floor
+  for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red'], ['h_wc', 'wc_door'], ['h_wc_aim', 'wc_aim'], ['h_wc_gun', 'wc_gun'], ['h_wc_out', 'wc_out'], ['h_wc_hands', 'wc_hands'], ['h_wc_shot', 'wc_shot']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
   SCENES.h_ray_sees = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(160, 600, 980, 210, AMY, { r: 105 }), C(1240, 640, 280, SKIN),
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
   const vault = (k) => place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1180, 520, 760, '#9ca3af', { line: '34px solid #6b7280' }), C(1180, 520, 120, '#6b7280'),
@@ -218,11 +219,12 @@
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
         { hush: 1800 }, ...at('h_wc_gun'), T('The door opens an inch. His gun first.'),
+        ...at('h_wc_out'), { hush: 700 },
         { by: 'pa', cue: 'Look at your phone', clock: 5000, choice: [
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
-            { sfx: 'gun shot' }, T('The guard goes down, his hand on his shoulder. His gun skids across the floor.')] },
+            { sfx: 'gun shot' }, ...at('h_wc_shot'), T('The guard slumps against the wall, his hand on his shoulder. His gun on the floor.')] },
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
-            S('pa', 'DROP IT!'), S('guard', 'Okay! Okay!'), T('The gun hits the floor. Marcus kicks it away. It stops among the hostages.')] },
+            S('pa', 'DROP IT!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), T('His gun hits the floor. Marcus kicks it away: it stops among the hostages.')] },
         ] },
       ] },
       { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
@@ -237,9 +239,10 @@
         S('guard', 'Okay. I come out, I get down. But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
-            S('pa', 'Fine. On the ground.'), ...at('h_wc_gun'), T('The door opens. Hands up, the guard lies down with the others. His gun still on his hip.')] },
+            S('pa', 'Fine. On the ground.'), ...at('h_wc_hands'), T('Hands up, the guard comes out and lies down with the others. His gun still on his hip.')] },
           { t: '“The gun first. Slide it.”', ic: 'tough', sh: 'The gun first', intent: 'wants the gun', set: { gun: 'floor' }, then: [
-            S('pa', 'The gun first. Slide it.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.')] },
+            S('pa', 'The gun first. Slide it.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.'),
+            ...at('h_wc_hands'), { hush: 1600 }] },
         ] },
       ] },
     ] },
