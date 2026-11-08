@@ -79,6 +79,12 @@
   const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
   SCENES.h_side_pb = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#22304a'), R(560, 100, 800, 640, '#3b5375'), ...stand(960, 1180, 2.6, P2), R(1040, 330, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), ...CLOCK(1700, 150)] });
+  // Ray gets up, his phone at his ear, and walks off to take the call; the TV, while they're on their phones: a clock, full screen
+  SCENES.h_ray_up = place({ ambience: 'crowd', back: [...TWO_BACK, ...bust(620, 900, 1.7, P1), ...stand(1500, 1080, 2.3, P2), R(1565, 300, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), R(380, 880, 1160, 60, '#5b4636', { r: 8 })] });
+  SCENES.h_clock = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#0d0f14'), C(960, 540, 900, '#e5e7eb', { line: '26px solid #111827' }),
+    ...Array.from({ length: 12 }, (_, i) => R(953, 112, 14, 60, '#111827', { r: 7, rot: i * 30, origin: '50% 428px' })),
+    R(946, 230, 28, 310, '#111827', { r: 14, rot: -30, origin: '50% 100%' }), R(948, 330, 24, 210, '#111827', { r: 12, rot: -4, origin: '50% 100%' }),
+    R(955, 140, 10, 400, '#dc2626', { r: 5, rot: 0, spin: 60, origin: '50% 100%' }), C(960, 540, 44, '#dc2626')] });
   SCENES.h_stand = place({ ambience: 'crowd', back: [...LOBBY, ...TABLE, ...stand(820, 900, 1.6, P1), ...stand(1120, 900, 1.6, P2),
     R(1160, 600, 160, 110, '#26201b', { r: 12 })] });   // Ray, the briefcase in his hand
   const wait = (open) => place({ ambience: 'crowd', back: [
@@ -185,10 +191,11 @@
     HUNG, { room: { lp: 650, vol: .5, ms: 1500 } },   // the vibration stops; the crowd goes far
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
+      ...at('h_ray_up'), { hush: 1800 },   // he gets up and goes to take it
       { gate: ['pa', 'pb'], text: { pa: 'Text Leo back', pb: 'Amy is on the line' } },
-      // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines)
+      // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines); the TV: the clock
       { split: () => ({
-        pa: [...at('h_side_pa'), { tick: true },
+        pa: [{ when: () => TV, then: at('h_clock'), else: at('h_side_pa') }, { tick: true },
           sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 2800 },
           sms('leo', 'pa', 'ok'), { wait: 2600 },
           sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
@@ -207,7 +214,7 @@
           S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.'),
           S('amy', 'Love you.'),
           { tick: false }],
-      }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
+      }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
       ...at('h_two'), { hush: 900 },
     ] },
     // ---- 13. Ray takes the briefcase, stands up ----
@@ -218,8 +225,8 @@
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
-      pa: [reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
-      pb: [reply('pb', 'amy', f.amy === 'call'
+      pa: [{ thread: ['pa', 'sarah'] }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
+      pb: [{ thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
         ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]]
         : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]],
       { clock: 12000 })],
