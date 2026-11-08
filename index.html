@@ -1828,13 +1828,17 @@ body.tvpaused .tv-side:hover .fig { transform: scale(1.04); filter: drop-shadow(
 #apart { position: absolute; inset: 0; z-index: 45; background: #000; display: none; grid-template-columns: 1fr 1fr; }
 body.tv.apart.instory #apart { display: grid; }
 /* one half per player: the closed eye, his name, and how far into his scene he is */
-#apart > div { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3em; animation: apartIn .8s ease-out; }
-#apart > div + div { box-shadow: inset .25em 0 0 #1c1c1e; }
-#apart svg { width: 20em; height: 20em; opacity: .35; }
+#apart > div { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6em; animation: apartIn .8s ease-out;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 45%, #000), color-mix(in srgb, var(--c) 12%, #000) 80%); }   /* each player's half, in his colour (as the gate) */
+#apart > div + div { box-shadow: inset .3em 0 0 #000; }
+#apart .ap-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
 #apart b { font-size: 4em; font-weight: 800; color: #f5f5f7; }
-#apart .bar { width: 60%; height: 1.4em; border-radius: 1em; background: #1c1c1e; overflow: hidden; }
+#apart > div > span { font-size: 2.6em; font-weight: 800; color: #ffd60a; }
+#apart .done .ap-ico { animation: none; }
+#apart .done > span { color: #34c759; }
+#apart .bar { width: 60%; height: 1.4em; border-radius: 1em; background: rgba(0,0,0,.45); overflow: hidden; }
 #apart .bar i { display: block; height: 100%; width: 0; border-radius: 1em; background: var(--c, #ff9a4d); transition: width .8s ease; }
-#apart .done b::after { content: ' ✓'; color: #30d158; }
+#apart .done { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 22%, #000), #000 80%) !important; }
 @keyframes apartIn { from { opacity: 0; transform: scale(.9); } }
 body.apart #viewBtn { display: none !important; }
 #tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 2.1em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
@@ -2634,7 +2638,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="skipBtn" type="button" hidden aria-label="Skip the intro"></button>
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
-    <div class="pc-grid"><div class="pc-players"></div><div class="pc-recap"><ol></ol></div></div>
+    <div class="pc-grid"><div class="pc-players"></div></div>
     <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
   <div id="gateCard" hidden></div>
   <div id="mirrorCard" hidden><div id="mirrorWho"></div><div id="mirrorPhone"></div></div>
@@ -2649,7 +2653,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261108200000"></script>
+<script src="heist.js?v=20261108210000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3987,12 +3991,7 @@ function showPause() {
   if (!on) return;
   $('#pauseCard .pc-who').textContent = paused === TV_PAUSE ? '' : `${paused} a mis pause`;
   if (TV) tvSides();   // the TV: the characters each side (a click on one = his phone's screen)
-  // the last 3 choices, as texts: each player's from his side (the first seat on the left), in his colour, no name
-  const last = state.picks.slice(-3), seats = seatsOf();
-  $('#pauseCard ol').innerHTML = last.length ? last.map((p, i) => {
-    const k = p.who || p.by, c = (k && castOf(k)) || {}, side = seats.indexOf(seatFor(k)) === 1 ? 'r' : 'l';
-    return `<li class="${side}" style="--c:${c.color || '#ff9a4d'};--d:${i * .14}s"><b>${esc(fill(p.t))}</b></li>`;
-  }).join('') : '';
+  // (08/11) no recap of the choices: the pause is just the pause
 }
 $('#pauseBtn').onclick = (e) => { e.stopPropagation(); if (hostTv && !paused) sendIn('pause'); };
 // a phone on a TV's story: black with its character, its choices and its private lines (the story is on the TV);
@@ -4018,7 +4017,7 @@ $('#minView').onclick = (e) => { e.stopPropagation(); const b = document.body.cl
 function apart() {
   const on = !!split && (TV || hostTv);
   document.body.classList.toggle('apart', on);
-  if (TV) { hushed = on; $('#apart').innerHTML = on ? Object.keys(split.len).map((k) => `<div data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">${EYE.off}<b>${esc(seatName(k) || seatLabel(k) || '')}</b><div class="bar"><i></i></div></div>`).join('') : ''; apartTick(); }
+  if (TV) { hushed = on; $('#apart').innerHTML = on ? Object.keys(split.len).map((k) => `<div data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="ap-ico">📱</div><b>${esc(seatName(k) || seatLabel(k) || '')}</b><span>Look at your phone</span><div class="bar"><i></i></div></div>`).join('') : ''; apartTick(); }
   else if (hostTv && !MIRROR) hushed = !on;
   if (master) master.gain.value = muted || hushed ? 0 : 1;
   minView();
@@ -4032,6 +4031,7 @@ function apartTick() {
     const p = done ? 1 : Math.min(.95, (laneCount(tape, k) - split.base[k]) / split.len[k]);
     split.best[k] = Math.max(split.best[k] || 0, p);
     el.querySelector('.bar i').style.width = (split.best[k] * 100).toFixed(1) + '%';
+    if (el.classList.contains('done') !== done) { const ic = el.querySelector('.ap-ico'), sp = el.querySelector(':scope > span'); if (ic) ic.textContent = done ? '✓' : '📱'; if (sp) sp.textContent = done ? 'Done' : 'Look at your phone'; }
     el.classList.toggle('done', done);
   }
 }

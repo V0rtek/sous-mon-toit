@@ -76,6 +76,9 @@
     C(960, 150, 190, '#e5e7eb', { line: '10px solid #111827' }),
     R(954, 85, 12, 70, '#111827', { r: 6, rot: -30, origin: '50% 100%' }), R(955, 105, 10, 50, '#111827', { r: 5, rot: -2, origin: '50% 100%' }),
   ] });
+  const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
+  SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
+  SCENES.h_side_pb = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#22304a'), R(560, 100, 800, 640, '#3b5375'), ...stand(960, 1180, 2.6, P2), R(1040, 330, 54, 120, '#0b0b0d', { r: 10, who: 'pb' }), ...CLOCK(1700, 150)] });
   SCENES.h_stand = place({ ambience: 'crowd', back: [...LOBBY, ...TABLE, ...stand(820, 900, 1.6, P1), ...stand(1120, 900, 1.6, P2),
     R(1160, 600, 160, 110, '#26201b', { r: 12 })] });   // Ray, the briefcase in his hand
   const wait = (open) => place({ ambience: 'crowd', back: [
@@ -183,23 +186,29 @@
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
       { gate: ['pa', 'pb'], text: { pa: 'Text Leo back', pb: 'Amy is on the line' } },
-      ...at('h_split'), { tick: true },
-      sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 2800 },
-      S('amy', 'Hey you. Are you still downtown?', { only: 'pb' }),
-      { by: 'pb', clock: 15000, choice: [
-        { t: 'Yeah. Work thing.', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.', { only: 'pb' })] },
-        { t: 'No. Home soon.', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.', { only: 'pb' })] },
-      ] },
-      sms('leo', 'pa', 'ok'), { wait: 2600 },
-      sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
-      reply('pa', 'leo', [
-        ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.'],
-        ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.'],
-        ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.'],
-      ], { clock: 15000 }),
-      S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.', { only: 'pb' }),
-      S('amy', 'Love you.', { only: 'pb' }),
-      { tick: false }, ...at('h_two'), { hush: 900 },
+      // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines)
+      { split: () => ({
+        pa: [...at('h_side_pa'), { tick: true },
+          sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 2800 },
+          sms('leo', 'pa', 'ok'), { wait: 2600 },
+          sms('leo', 'pa', 'mom says we wont have the money to do next season'), { wait: 3800 },
+          reply('pa', 'leo', [
+            ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.'],
+            ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.'],
+            ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.'],
+          ], { clock: 15000 }),
+          { tick: false }],
+        pb: [...at('h_side_pb'), { tick: true },
+          S('amy', 'Hey you. Are you still downtown?'),
+          { by: 'pb', clock: 15000, choice: [
+            { t: 'Yeah. Work thing.', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.')] },
+            { t: 'No. Home soon.', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.')] },
+          ] },
+          S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.'),
+          S('amy', 'Love you.'),
+          { tick: false }],
+      }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
+      ...at('h_two'), { hush: 900 },
     ] },
     // ---- 13. Ray takes the briefcase, stands up ----
     ...at('h_stand'), { hush: 1500 },
@@ -208,11 +217,13 @@
     { music: 'double it', lv: 0, vol: .35, lp: 380, ms: 4000 }, { hush: 1600 },
     // ---- 15. the last text before going in (each his own) ----
     { gate: ['pa', 'pb'], text: 'Your last text before going in' },
-    reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 }),
-    { fn: (f) => [reply('pb', 'amy', f.amy === 'call'
-      ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]]
-      : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]],
-    { clock: 12000 })] },
+    { split: (f) => ({
+      pa: [reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.'], ['Put the phone away.', { sarah: 'none' }]], { clock: 12000 })],
+      pb: [reply('pb', 'amy', f.amy === 'call'
+        ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]]
+        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.'], ['I love you.', { last: 'love' }, 'I love you.'], ['Put the phone away.', { last: 'none' }]],
+      { clock: 12000 })],
+    }), watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_open'), { hush: 1200 },
     ...at('h_elev0'), { music: 'double it', lp: 20000, vol: .55, ms: 900 }, { bars: 1 },
