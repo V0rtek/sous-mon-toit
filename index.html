@@ -1604,7 +1604,12 @@ body.tv #pauseCard h2, body.tv #pauseCard .pc-who { display: none; }
 #skipBtn svg { width: 4em; height: 4em; }
 #skipBtn i { width: 1.4em; height: 1.4em; border-radius: 50%; box-shadow: inset 0 0 0 .25em rgba(255,255,255,.5); }
 #skipBtn i.on { background: #fff; box-shadow: none; }
-#skipBtn.me { background: #fff; color: #000; }
+#skipBtn { background: none !important; padding: 1em !important; color: rgba(255,255,255,.55); }
+#skipBtn.me { color: #fff; }
+#skipBtn i { display: none; }
+#skipTv { position: absolute; right: 2.5%; bottom: 3%; z-index: 90; display: flex; gap: .8em; pointer-events: none; }
+#skipTv i { color: var(--c); }
+#skipTv svg { width: 2.6em; height: 2.6em; display: block; opacity: .85; }
 #skipBtn.me i { box-shadow: inset 0 0 0 .25em rgba(0,0,0,.35); }
 #skipBtn.me i.on { background: #000; }
 body.hosttv.instory #viewBtn { display: grid; }
@@ -4020,7 +4025,7 @@ async function tvIntro(at) {
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
   if (!(await slide('<div class="ti ti-h">Everyone makes their choices in secret on their phone.</div><div class="ti ti-h">Here, you\'ll see what comes of them.</div>', 5200))) return false;
-  tvPhase = null; skipVotes.clear(); share(); box.classList.add('out');
+  tvPhase = null; skipVotes.clear(); skipTv(); share(); box.classList.add('out');
   if (!(await hold(1900))) return false;
   box.hidden = true; return true;
 }
@@ -4031,7 +4036,13 @@ function skipPaint() {
   b.hidden = !on; if (!on) return;
   const votes = new Set(remote.sk || []), need = Object.values(seats).filter((x) => x.id !== BOT);
   b.classList.toggle('me', votes.has(myId));
-  b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg>' + need.map((x) => `<i class="${votes.has(x.id) ? 'on' : ''}"></i>`).join('');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg>';   // (08/11) just the icon; the TV shows who asked
+}
+// the TV, during its opening: one tiny skip icon per player who asked to skip, in his colour
+function skipTv() {
+  let el = $('#skipTv'); if (!el) { el = document.createElement('div'); el.id = 'skipTv'; $('#stage').appendChild(el); }
+  const seats = state.seats || {}, ks = seatsOf().filter((k) => seats[k] && skipVotes.has(seats[k].id));
+  el.innerHTML = tvPhase ? ks.map((k) => `<i style="--c:${(castOf(k) || {}).color || '#fff'}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg></i>`).join('') : '';
 }
 $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 // a player's phone: black until the TV says who's who, then its "Tu es …" card, then the story with the TV
@@ -4480,7 +4491,7 @@ async function next() {
     else if (s.lane) { if (!(await toLane(s.lane, r))) return; }
     else if (s.join) {
       laneNow = null;
-      if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); closeCell(); minView(); return; }
+      if (!joined()) { waiting = 'join'; waitNote(fill(split.hold[split.view] || '')); closeCell(); minView(); if (hostTv && !MIRROR && !TV) { hushed = true; if (master) master.gain.value = 0; } return; }   // back to its colour: no sound here
       split = null; apart();
     }
     else if (s.mark) markReached(s.mark);
@@ -5750,6 +5761,7 @@ function fromJoiner(m) {
     if (m.e === 'again' && screen === '#end') { begin(state.story); return; }
     if (m.e === 'skip' && tvPhase && Object.values(state.seats).some((x) => x.id === m.id)) {   // a vote to skip the opening (again = taken back)
       if (skipVotes.has(m.id)) skipVotes.delete(m.id); else skipVotes.add(m.id);
+      skipTv();
       const need = Object.values(state.seats).filter((x) => x.id !== BOT).map((x) => x.id);
       if (need.every((id) => skipVotes.has(id))) introSkip = true;
       share(); return;
