@@ -141,7 +141,7 @@
     S('pb', 'Nothing to lose.'),
     // ---- 8. Marcus's phone: Leo, his kids behind ----
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
-    ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?'), { hush: 3400 },   // Leo, on the lock screen, and his text
+    ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
     ...at('h_top'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
@@ -159,10 +159,10 @@
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
       ...at('h_ray_phone'), { hush: 1800 },   // he gets up, his phone in hand, and goes to take it
-      { gate: ['pa', 'pb'], text: { pa: 'Text Leo back', pb: 'Amy is on the line' } },
       // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines); the TV: the clock
       { split: () => ({
-        pa: [{ when: () => TV, then: at('h_clock'), else: at('h_side_pa') }, { tick: true },
+        // each one taps his phone and goes in at once (his own gate: nobody waits on the other)
+        pa: [{ when: () => TV, then: at('h_clock'), else: at('h_side_pa') }, { gate: 'pa', text: 'Text Leo back' }, { tick: true },
           // slow: Leo's text first (there since the lock screen), let it be read; then each answer after his dots
           { thread: ['pa', 'leo'] }, { wait: 3500 },
           sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 3000 },
@@ -174,7 +174,7 @@
             ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.', 'calm'],
           ]),
           { tick: false }],
-        pb: [...at('h_side_pb'), { tick: true },
+        pb: [...at('h_side_pb'), { gate: 'pb', text: 'Amy is on the line' }, { tick: true },
           S('amy', 'Hey you. Are you still downtown?'),
           { by: 'pb', clock: 15000, choice: [
             { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.')] },
@@ -192,10 +192,9 @@
     { music: 'double it', vol: .32, lp: 420, ms: 14000 },
     ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
     // ---- 15. the last text before going in (each his own) ----
-    { gate: ['pa', 'pb'], text: 'Your last text before going in' },
     { split: (f) => ({
-      pa: [{ thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?', { dots: 2500 }), { wait: 3000 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]])],
-      pb: [{ thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
+      pa: [{ gate: 'pa', text: 'Your last text before going in' }, { thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?', { dots: 2500 }), { wait: 3000 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]])],
+      pb: [{ gate: 'pb', text: 'Your last text before going in' }, { thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
         ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
         : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]])],
     }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },

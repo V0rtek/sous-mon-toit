@@ -2709,7 +2709,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109150000"></script>
+<script src="heist.js?v=20261109160000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3207,9 +3207,10 @@ function textMsg(m, sent) {
   // the one typing, the other end gets it from the phone's owner
   else { (texts[m.by || m.from] = texts[m.by || m.from] || []).push(sent = { t, out: true, fresh: true, status: 'delivered' }); logText(m.from, sent, m.to); }
   // {sms: {…, only: seat}}: a private text — the others see his phone buzz and him read it, never the words
-  const got = { t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from };
+  // {sms: {…, quiet: true}}: the TV shows it (his phone, close), your real phone doesn't open on it nor buzz; it's in the thread later
+  const got = { t, out: false, fresh: true, unread: true, sent, at: Date.now(), only: m.only, from: m.from, quiet: !!m.quiet };
   (texts[m.to] = texts[m.to] || []).push(got); logText(m.to, got, m.from);
-  if (!FAST && ((actors[m.to] && !afar(m.to)) || mineTo(m.to))) buzz();   // his phone on screen, or yours
+  if (!FAST && ((actors[m.to] && !afar(m.to)) || (mineTo(m.to) && !m.quiet))) buzz();   // his phone on screen, or yours
   drawTexts();
   setTimeout(() => drawTexts(), PING_MS + 50);   // the phone goes away
 }
@@ -3342,7 +3343,7 @@ const cellMode = () => ROLE === 'watch' && hostTv;
 function logText(owner, m, other) {
   m.other = other; m.at = m.at || Date.now(); if (cellOpen === owner && cellWith && cellWith !== other) cellWith = null;
   (phoneLog[owner] = phoneLog[owner] || []).push(m);
-  if (cellMode() && !FAST && mineTo(owner) && (!m.only || sees(m.only))) openCell(owner);
+  if (cellMode() && !FAST && mineTo(owner) && (!m.only || sees(m.only)) && !m.quiet) openCell(owner);
   else if (cellOpen && phoneLog[other] && cellOpen === other) drawCell();   // he's typing to you: the dots
 }
 function openCell(owner) { cellOpen = owner; clearTimeout(closeCell.t); drawCell(); cellIdle(); }
@@ -4213,7 +4214,7 @@ $('#pauseCard').onclick = (e) => { e.stopPropagation(); if (TV) tvPause(false); 
 $('#pauseCard .pc-go').onclick = (e) => { e.stopPropagation(); if (hostTv && paused) sendIn('pause'); };
 $('#pauseCard .pc-quit').onclick = (e) => { e.stopPropagation(); if (hostTv) sendIn('menu'); };
 // how long a line stays: time to read it (a private one: time for its owner to read it on their phone)
-let tapNow = false, gateNow = null;   // gateNow: the seats a {gate} still waits for (a tap each)
+let tapNow = false, gateNow = null, gateResend = 0;   // gateNow: the seats a {gate} still waits for (a tap each)
 // {gate: [seats], text}: before a moment on the phones (a texting scene), the TV goes dark and says to look at your phone,
 // each of those players' phones goes dark and says to tap to start (text: what's coming, one string or one per seat); the
 // story goes on once each of them has tapped, and the TV lights up again
@@ -4230,7 +4231,7 @@ function gateTv() {   // the TV: a player tapped, his half says so
   if (!TV || !gateNow) return;
   document.querySelectorAll('#gateCard .gc-half').forEach((h) => { if (!gateNow.has(h.dataset.k) && !h.classList.contains('ready')) { h.classList.add('ready'); h.innerHTML = `<div class="gc-ico">✓</div><b>${esc(seatName(h.dataset.k) || '')}</b><span>Ready</span>`; } });
 }
-function gateOff() { const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate', 'gate-me'); }
+function gateOff() { clearInterval(gateResend); const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate', 'gate-me'); }
 function gateTapped() {   // this phone tapped: ready, the others may still be reading
   if (!gateNow || ![...gateNow].some((k) => mineFor(k))) return;
   const el = $('#gateCard'); el.classList.add('ready'); el.innerHTML = '<div class="gc-ico">✓</div><b>Ready</b>'; document.body.classList.remove('gate-me');
@@ -4522,6 +4523,7 @@ function ghostRun(g) {
     else if (s.sms) textMsg(s.sms);
     else if (s.check) checkTexts(s.check);
     else if (s.mark) markReached(s.mark);
+    else if (s.gate) { if ([].concat(s.gate).some((k) => !isBot(k) && state.seats[k])) { g.waiting = 'click'; autoGhost(g); return; } }   // his gate: a tap of his
     else if (s.waitMark && !split.marks.has(s.waitMark)) { g.waiting = 'mark'; g.waitOn = s.waitMark; return; }
     else if (s.poses) { for (const [id, p] of Object.entries(s.poses)) if (actors[id]) setPose(id, p); }   // seen from afar
     else if (s.say || s.narr || s.think || s.slate) { if (s.say) farLine(s); g.waiting = 'click'; autoGhost(g); return; }
@@ -4587,8 +4589,12 @@ async function next() {
     else if (s.thread) { const [k, w] = s.thread; if (cellMode() && !FAST && mineTo(k)) { cellWith = w; openCell(k); } }   // the thread with w, open on k's phone
     else if (s.tick !== undefined) ticking(s.tick);
     else if (s.gate) {
-      gateNow = new Set([].concat(s.gate).filter((k) => !isBot(k) && state.seats[k])); if (!gateNow.size || FAST) { gateNow = null; continue; }
-      tapNow = true; gateOn(s); waiting = 'click'; return;
+      // (09/11) a gate inside a scene apart ({gate: seat}, first step of his lane): only his tap, and he goes in at once,
+      // nobody waits on anybody (no « Ready »). It counts as a tap of his scene everywhere (the ghosts too), even caught up fast
+      const own = !!(split && laneNow);
+      gateNow = new Set([].concat(s.gate).filter((k) => !isBot(k) && state.seats[k])); if (!gateNow.size || (FAST && !own)) { gateNow = null; continue; }
+      if (FAST) { gateNow = null; waiting = 'click'; return; }
+      tapNow = true; if (!(TV && own)) gateOn(s); waiting = 'click'; return;   // the TV keeps its picture (the split says who's on his phone)
     }
     else if (s.titleCard) {   // black, the place appears at once (no fade), the hour under it a beat later
       black.style.transition = 'none'; black.style.opacity = 1; bubble.hidden = true;
@@ -4652,6 +4658,9 @@ function advance() {
     if (waiting !== 'click' || !remote || applied !== remote.t.length || (laneNow && !mineFor(laneNow)) || (onlyNow && !mineFor(onlyNow))) return;
     const k = laneNow ? laneCount(remote.t, laneNow) : applied, key = tag(laneNow) + k;
     if (sentK !== key) { sentK = key; sendIn('a', laneNow ? { lane: laneNow, k } : {}); }
+    // a gate: this phone can be a second ahead of the TV, and a tap the TV isn't at yet is dropped: say it again until the
+    // TV takes it (it ignores a tap for a count it's past)
+    if (gateNow) { const more = laneNow ? { lane: laneNow, k } : {}; clearInterval(gateResend); gateResend = setInterval(() => { if (!gateNow || waiting !== 'click') clearInterval(gateResend); else sendIn('a', more); }, 700); }
     return;
   }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
