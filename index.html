@@ -1901,6 +1901,13 @@ body.tv.apart.apart-show #apart { display: none; }   /* the TV keeps its own pic
 #apart .done { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 22%, #000), #000 80%) !important; }
 @keyframes apartIn { from { opacity: 0; transform: scale(.9); } }
 body.apart #viewBtn { display: none !important; }
+#tvLook { position: absolute; inset: 0; z-index: 45; background: #000; display: grid; place-items: center; text-align: center; pointer-events: none; animation: tlIn .5s ease-out; }
+#tvLook[hidden] { display: none; }
+#tvLook .tl-ph { width: 18em; height: 18em; color: var(--c); animation: tlBuzz 1.2s ease-in-out infinite; }
+#tvLook b { display: block; font-family: var(--display); font-weight: 400; font-size: 9em; line-height: 1.1; color: var(--c); margin-top: .2em; }
+#tvLook span { display: block; font-size: 6.4em; font-weight: 800; color: #fff; margin-top: .25em; }
+@keyframes tlIn { from { opacity: 0; } }
+@keyframes tlBuzz { 0%, 30%, 100% { transform: none; } 5%, 15%, 25% { transform: rotate(-9deg); } 10%, 20% { transform: rotate(9deg); } }
 #tvWho > div { position: absolute; bottom: 5%; display: flex; align-items: center; gap: .5em; font-size: 2.1em; font-weight: 800; color: #fff; text-shadow: 0 .1em .5em rgba(0,0,0,.8); }
 #tvWho > .l { left: 3%; } #tvWho > .r { right: 3%; flex-direction: row-reverse; }
 #tvWho .pbadge { font-size: 1.3em; margin: 0; }
@@ -2716,7 +2723,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109160000"></script>
+<script src="heist.js?v=20261109170000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3450,7 +3457,7 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // 5 s: under the "You are" card that opens every story), dragon_arrive (a short epic roar, 3 s), dragon_fire (a long
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.4 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.4, 'lobby jazz': 0.07 };
 async function sfx(name, loop = false, rate = 1, ms = 0) {   // ms: only that much of it (a long file, a short moment)
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -3491,10 +3498,10 @@ function ticking(on) {
   };
   one(); tickT = setInterval(one, 1000);
 }
-function stopSfx(name) {
+function stopSfx(name, ms = 600) {   // ms: how long it fades out ({stop: name, ms})
   for (const k of name ? [name] : Object.keys(sfxLoops)) {
-    const src = sfxLoops[k], t = actx ? actx.currentTime : 0;
-    try { src.gain.gain.cancelScheduledValues(t); src.gain.gain.setValueAtTime(src.gain.gain.value, t); src.gain.gain.linearRampToValueAtTime(0, t + 0.6); src.stop(t + 0.65); }
+    const src = sfxLoops[k], t = actx ? actx.currentTime : 0, d = Math.max(ms, 30) / 1000;
+    try { src.gain.gain.cancelScheduledValues(t); src.gain.gain.setValueAtTime(src.gain.gain.value, t); src.gain.gain.linearRampToValueAtTime(0, t + d); src.stop(t + d + .05); }
     catch { /* not started */ }
     delete sfxLoops[k];
   }
@@ -3921,7 +3928,7 @@ function actOf(o, k) {   // the option's action: its icon and its words, shorten
     : /phone away|pocket/i.test(t) ? 'pocket' : /^[«“"]/.test(t) ? 'say' : 'act');
   return { ic, sh: o.sh || shortOf(sms ? fill(sms.sms.text) : t) };
 }
-const chPublic = (ring) => !ring && !chSecret && !laneNow && duo() && (TV ? chTv : hostTv && !!(remote && remote.ct));
+const chPublic = (ring) => !ring && !chSecret && !chCue && !laneNow && duo() && (TV ? chTv : hostTv && !!(remote && remote.ct));
 let chSecret = false;
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
@@ -3943,6 +3950,7 @@ function choose(opts, by, ring) {
   const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k)); metas.k = k;
   choicesEl.classList.add('cx', 'slide');
   if (mine && holder === choicesEl && !choicesEl.hidden && !pub) qCardShow(k);
+  if (mine && chCue && !TV) try { navigator.vibrate && navigator.vibrate([260, 120, 260]); } catch { /* no vibration */ }   // (09/11) the first choices: the phone buzzes too
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
     if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : `<span class="csh">${esc(a.sh)}</span>`}`; b.classList.add('pub'); b.style.setProperty('--pc', (castOf(k) || {}).color || '#ffffff'); }   // in the chooser's colour
@@ -4268,6 +4276,10 @@ function tvWho() {
   const cue = waiting === 'choice' && chCue ? chCue : '';   // the first choices: the TV says where to look
   const key = list.map((k) => `${k}${k === turn ? '+' : ''}${gone.includes(k) ? '-' : ''}${seatName(k)}`).join('|') + cue;
   if (key === tvWhoKey) return; tvWhoKey = key;
+  // (09/11) the first choices ({cue}): the TV goes black, only his name in his colour and « Look at your phone », huge
+  let lk = $('#tvLook'); if (!lk) { lk = document.createElement('div'); lk.id = 'tvLook'; $('#tvWho').after(lk); }
+  lk.hidden = !(turn && cue);
+  lk.innerHTML = turn && cue ? `<div style="--c:${(castOf(turn) || {}).color || '#ff9a4d'}"><svg class="tl-ph" viewBox="0 0 64 64" aria-hidden="true"><rect x="20" y="6" width="24" height="52" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><rect x="28" y="51" width="8" height="2.5" rx="1.2" fill="currentColor"/><path d="M12 22v20M6 26v12M52 22v20M58 26v12" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg><b>${esc(seatName(turn) || seatLabel(turn))}</b><span>${esc(fill(cue))}</span></div>` : '';
   $('#tvWho').innerHTML = list.map((k) => `<div class="${seats.indexOf(k) ? 'r' : 'l'} ${k === turn ? 'turn' : ''} ${gone.includes(k) ? 'gone' : ''}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">
     ${badge(k).replace('</span></span>', `</span>${gone.includes(k) ? `<span class="pb-off">${OFF_ICON}</span>` : ''}</span>`)}<span>${k === turn && cue ? `<em class="tv-cue">📱 ${esc(fill(cue))}</em>` : ''}</span></div>`).join('');   // (08/11) his icon, no name
 }
@@ -4609,7 +4621,7 @@ async function next() {
       slateEl.hidden = false; waiting = 'click'; return;
     }
     else if (s.bars) { if (FAST) continue; await musBars(s.bars); if (r !== run) return; }
-    else if (s.stop) stopSfx(s.stop);
+    else if (s.stop) stopSfx(s.stop, s.ms);
     else if (s.hush) { bubble.hidden = true; await sleep(silence(s.hush)); }   // a silence: no bubble, the shot holds
     else if (s.aside) for (const [id, on] of Object.entries(s.aside)) asides[on ? 'add' : 'delete'](id);
     else if (s.slate) { await fade('out', s.ms || 500); if (r !== run) return; slateEl.textContent = fill(s.slate); slateEl.hidden = false; waiting = 'click'; return; }

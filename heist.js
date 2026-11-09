@@ -130,6 +130,7 @@
   const story = Object.assign([
     // ---- 1-2. the black card, the place ----
     { sfx: 'crowd', loop: true },   // the lobby's crowd from the black card on: we hear the place before we see it
+    { sfx: 'lobby jazz', loop: true },   // (09/11) and the lobby's jazz, soft, from the black card until the elevators
     { titleCard: 'Union Trust Tower', sub: '9:38 AM' },
     ...at('h_lobby'), { fade: 'in', ms: 900 }, { hush: 1800 },
     // ---- 3. his feet won't stop ----
@@ -188,7 +189,7 @@
       ...at('h_two'), { hush: 1800 },
     ] },
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
-    ...at('h_lift_hall'), { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
+    ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
     { music: 'double it', vol: .32, lp: 420, ms: 14000 },
     ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
     // ---- 15. the last text before going in (each his own) ----
