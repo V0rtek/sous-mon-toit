@@ -2797,7 +2797,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109200000"></script>
+<script src="heist.js?v=20261109210000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3588,7 +3588,7 @@ function stopSfx(name, ms = 600) {   // ms: how long it fades out ({stop: name, 
 // the music heard from far (through a wall, a muffled lobby), 20000 = right here. While a choice is open the music closes (a low-pass), as if
 // holding its breath; it opens again on the pick. Through the same gain as every sound: a TV's phones stay silent
 const TRACKS = {
-  'double it': { bpm: 140, loops: ['double it loop 1 intro', 'double it loop 2 drop', 'double it loop 3 drop2', 'double it loop 4 peak'] },
+  'double it': { bpm: 140, gain: .78, loops: ['double it loop 1 intro', 'double it loop 2 drop', 'double it loop 3 drop2', 'double it loop 4 peak'] },
   'in the end': { bpm: 105.07, loops: ['in the end loop 1 piano', 'in the end loop 2 strings', 'in the end loop 3 halftime', 'in the end loop 4 verse',
     'in the end loop 5 verse full', 'in the end loop 6 chorus'] },
 };
@@ -3644,7 +3644,7 @@ function musGo(L, inBars) {
 function musVol(v, ms) {
   const g = mus.g.gain, t = actx.currentTime;
   // (09/11) linear, not exponential: from silence an exponential ramp stays silent, then jumps in at the end
-  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v * MUS_VOL, t + Math.max(ms, 30) / 1000);
+  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v * MUS_VOL * ((TRACKS[mus.name] || {}).gain ?? 1), t + Math.max(ms, 30) / 1000);   // gain: the track's own level
 }
 function musHold(on, ms) {   // a choice is open: the music holds its breath (it goes back to its own filter, {lp}, after)
   if (!mus || !mus.lp) return; const f = mus.lp.frequency, t = actx.currentTime;

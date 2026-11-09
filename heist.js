@@ -118,6 +118,8 @@
   SCENES.h_wc.spk = { guard: .5 };
   for (const k of ['h_wc_aim', 'h_wc_gun', 'h_wc_out', 'h_wc_hands', 'h_wc_shot']) SCENES[k].spk = { pa: .3, guard: .61 };
   for (const k of ['h_rob_hands', 'h_rob_red']) SCENES[k].spk = { pa: .36, pb: .78 };
+  // (09/11) Marcus's phone on the bank's floor, the screen smashed, Leo still smiling under the cracks (the alarm's red)
+  SCENES.h_phone_broken = { image: 'bg/phone_broken.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   SCENES.h_amy_eyes = { image: 'bg/amy_floor.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   SCENES.h_ray_sees = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(160, 600, 980, 210, AMY, { r: 105 }), C(1240, 640, 280, SKIN),
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
@@ -327,6 +329,7 @@
         ] },
       ];
     } },
+    ...at('h_phone_broken'), { hush: 3000 },   // (09/11) for now, the last picture before the siren (the roof is next)
     T('Outside, the first siren.'),
     { music: null, ms: 400 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { fade: 'out', ms: 300 },
     { end: { kicker: 'To be continued', title: 'Floor 31', lede: '{LEDE}', art: null } },
