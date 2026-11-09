@@ -1633,9 +1633,12 @@ body.watch.hosttv.instory #back { display: none !important; }
 body.phonemin.instory #minView { display: grid; }
 body.phonemin #waitOther { display: none !important; }
 body.phonemin #minView { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }   /* your colour: which one you are */
-#minView .mv-tv { text-align: center; padding: 0 8%; }
+#minView .mv-tv { text-align: center; padding: 0 8%; opacity: 0; transition: opacity .4s; }   /* (09/11) only as a warning: a tap where there's nothing to do */
+#minView.warn .mv-tv { opacity: 1; transition: none; animation: mvShake .45s ease-in-out; }
+@keyframes mvShake { 20%, 60% { transform: translateX(-.25em); } 40%, 80% { transform: translateX(.25em); } }
 #minView .mv-tv b { font-size: 5.5em; font-weight: 900; color: #fff; }
-#minView .mv-pause { position: absolute; right: 7%; bottom: 5%; width: 5em; height: 5em; opacity: .55; }
+#minView .mv-pause { position: absolute; right: 5%; bottom: 4%; width: 10em; height: 10em; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,.28); display: grid; place-items: center; cursor: pointer; }
+#minView .mv-pause svg { width: 5em; height: 5em; opacity: .8; }
 body.phonemin.privline #minView .mv-pause, body.phonemin.choosing #minView .mv-pause, body.phonemin.gate #minView .mv-pause, body.phonemin.tapline #minView .mv-pause { display: none; }
 body.phonemin.privline #minView .mv-tv, body.phonemin.choosing #minView .mv-tv, body.phonemin.cellon #minView .mv-tv, body.phonemin.gate #minView .mv-tv { display: none; }
 body.phonemin #pauseBtn, body.phonemin #menuPop, body.phonemin.instory #menuPop[hidden] { display: none !important; }   /* Quitter is in the pause */
@@ -4184,10 +4187,12 @@ function minView() {
   const on = ROLE === 'watch' && hostTv && !seeStory && (!split || waiting === 'join');   // (08/11) its scene apart over: back to its colour, « Look at the TV »   // apart (a split): the phone shows its scene, whatever the eye says
   document.body.classList.toggle('phonemin', on);
   $('#viewBtn').innerHTML = seeStory ? EYE.on : EYE.off;
-  $('#minView').innerHTML = '<div class="mv-tv"><b>Look at the TV</b></div><svg class="mv-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg>';
+  $('#minView').innerHTML = '<div class="mv-tv"><b>Look at the TV</b></div><button type="button" class="mv-pause" aria-label="Pause"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></button>';
 }
 // the black itself is the controller: a tap = pause (or, on a line only he reads, the next line)
-$('#minView').onclick = (e) => { e.stopPropagation(); const b = document.body.classList; if (b.contains('gate')) { advance(); gateTapped(); } else if (b.contains('privline') || b.contains('tapline')) advance(); else if (hostTv && !paused) sendIn('pause'); };   // a line that waits for a tap ({tap}): the black moves it on
+// (09/11) the pause is its button; a tap anywhere else (nothing to do here) flashes « Look at the TV »
+$('#minView').onclick = (e) => { e.stopPropagation(); const b = document.body.classList; if (b.contains('gate')) { advance(); gateTapped(); } else if (b.contains('privline') || b.contains('tapline')) advance(); else if (e.target.closest('.mv-pause')) { if (hostTv && !paused) sendIn('pause'); } else mvWarn(); };
+function mvWarn() { const v = $('#minView'); v.classList.remove('warn'); void v.offsetWidth; v.classList.add('warn'); clearTimeout(mvWarn.t); mvWarn.t = setTimeout(() => v.classList.remove('warn'), 2200); }   // a line that waits for a tap ({tap}): the black moves it on
 // a TV's story, the two players apart (a split): the TV goes black with the closed eye and falls silent, each phone
 // opens on its own scene, with its sound; back together, the TV takes the picture and the sound back
 function apart() {
