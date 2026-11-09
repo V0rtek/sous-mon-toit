@@ -323,9 +323,7 @@
           ['in', 'Leo’s coach asked about next season’s fees again'], ['out', 'I know. I’m on it.'],
           { day: 'Today', at: '7:05 AM' }, ['in', 'You left early. Everything ok?'], ['out', 'Yeah. Something downtown.'], ['in', 'Ok. Love you']] },   // their texts before (above the new ones)
       amy: { name: 'Amy', color: AMY, avatar: 'props/amy_face.webp',   // (09/11) her photo (her initial until the file is there)
-        past: [{ day: 'Yesterday', at: '11:48 PM' }, ['in', 'You up?'], ['out', 'Can’t sleep.'], ['in', 'Me neither. Big day tomorrow'],
-          ['out', 'Big day for me too.'], ['in', 'Dinner tomorrow night? You tell me yours, I tell you mine'], ['out', 'Deal.'],
-          { day: 'Today', at: '8:02 AM' }, ['in', 'Good luck today ❤️'], ['out', 'You too.']] },   // their texts before (her meeting, his day)
+        past: [{ day: 'Today', at: '8:02 AM' }, ['in', 'Good luck today ❤️'], ['out', 'You too.']] },   // (09/11) just this morning's: more was too much in your face
       guard: { name: 'Guard', color: '#94a3b8' },
     },
     words: { LEDE: (f) => [
