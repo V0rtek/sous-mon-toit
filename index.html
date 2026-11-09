@@ -232,7 +232,10 @@ body.tv #tail::after { display: none; }
 .wr-title.tv-t { font-size: 11em; line-height: 1; margin: 0; }
 .wr-soon { text-align: center; font-size: 4.6em; font-weight: 600; color: #c7c7cc; margin: .2em 0 1.4em; }
 .wr-kick.tv-k { margin-bottom: 1em; }
-body.tv #wait .wr-seats { width: 56%; margin: 0 auto; gap: 1em; }
+body.tv #wait .wr-seats { display: flex; justify-content: center; width: 56%; margin: 0 auto; gap: 1em; min-height: 26em; }
+body.tv #wait .wr-seat { width: calc(50% - .5em); }
+body.tv #wait .wr-seat.pull { animation: wrPull .7s cubic-bezier(.2,.9,.3,1.2) backwards; }
+@keyframes wrPull { from { opacity: 0; transform: translateY(2em) scale(.9); } }
 body.tv #wait .wr-seat { padding: 1em .6em .8em; }
 body.tv #wait .wr-seat img { height: 18em; }
 body.tv #wait .wr-seat b { font-size: 2.2em; }
@@ -2752,7 +2755,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109190000"></script>
+<script src="heist.js?v=20261109200000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3694,7 +3697,12 @@ function line(s) {
   bubble.style.setProperty('--spk', who ? castOf(who).color : '');
   // the tail points at the speaker if the camera sees them
   const a = who && actors[who], f = camNow && camNow.frame;
-  const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : -1;
+  // (09/11) a picture: where the scene says he is (spk: share of its width), else his cut-out, else his side (story.sides)
+  const toScr = (x) => (f ? (x - f.left) * (H / f.camH) / W : x / ((sc && sc.size && sc.size[0]) || W));
+  const pr = who && !a && sc && (sc.props || []).find((p) => p.who === who);
+  const sx = a && f ? (a.x - f.left) * (H / f.camH) / W : !who || a ? -1
+    : sc && sc.spk && sc.spk[who] != null ? toScr(sc.spk[who] * ((sc.size && sc.size[0]) || W))
+    : pr ? toScr(pr.x) : story() && story().sides && story().sides[who] != null ? story().sides[who] : -1;
   tail.hidden = kind === 'narr' || voice || sx < .05 || sx > .95;
   if (!tail.hidden) tail.style.left = Math.min(86, Math.max(14, (sx - .07) / .86 * 100)) + '%';
   if (a && kind === 'say') { a.el.classList.remove('talk'); void a.el.offsetWidth; a.el.classList.add('talk'); }
@@ -3718,7 +3726,10 @@ function tvChevron(who, kind) {
   const box = bubble.getBoundingClientRect(); let cx = null;
   const a = actors[who];
   if (a && a.el) { const r = a.el.getBoundingClientRect(); cx = r.left + r.width / 2; }
-  else {
+  else if (sc && sc.spk && sc.spk[who] != null) {   // (09/11) a picture: where the scene says he is (the stranger behind the door too)
+    const st = stage.getBoundingClientRect(), f = camNow && camNow.frame, x = sc.spk[who] * sc.size[0];
+    cx = st.left + st.width * (f ? (x - f.left) * (H / f.camH) / W : sc.spk[who]);
+  } else {
     const els = world.querySelectorAll(`[data-who="${who}"]`);
     if (els.length) { let l = Infinity, r = -Infinity; els.forEach((e) => { const b = e.getBoundingClientRect(); l = Math.min(l, b.left); r = Math.max(r, b.right); }); cx = (l + r) / 2; }
     else { const i = seatsOf().indexOf(who), st = stage.getBoundingClientRect(); if (i >= 0) cx = st.left + st.width * (i === 0 ? .25 : .75); }
@@ -4919,6 +4930,7 @@ async function poseSheet(file, k) {
   }
   URL.revokeObjectURL(img.src);
 }   // a TV's phone: the character opened (its name, its line, Pick)
+const tvSeen = new Set();   // the TV: the characters already up (they pull up once)
 function renderWait() {
   show('#wait');
   const lean = ROLE === 'watch' && hostTv;   // (08/11) a phone on a TV: lean, the two characters and nothing else
@@ -4931,7 +4943,9 @@ function renderWait() {
     const [cls, who] = s && s.id === myId ? ['me', 'You'] : s ? ['taken', s.n]
       : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', TV ? '' : 'Open'];   // (09/11) the TV: no « Open »
     const open = lean && pickOpen === k && cls === 'free';
-    return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
+    if (TV && cls !== 'taken') { tvSeen.delete(k); return ''; }   // (09/11) the TV: a character only once a player has taken him (he pulls up)
+    const fresh = TV && !tvSeen.has(k); if (TV) tvSeen.add(k);
+    return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}${fresh ? ' pull' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
       <b>${seatLabel(k)}</b>${p.line && !TV ? `<q>${fill(p.line)}</q>` : ''}${who ? `<span class="wr-who"><i></i>${who}</span>` : ''}</button>`;   // the TV: no line in quotes
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
@@ -4946,7 +4960,7 @@ function renderWait() {
   const openK = lean && pickOpen && !(state.seats[pickOpen]) ? pickOpen : null, sheetOn = !!story().posesheet;
   const pickRow = openK ? `<div class="wr-pickrow" style="--c:${(castOf(openK) || {}).color || '#ff9a4d'}">${sheetOn ? `<label class="wr-sheet${POSES[openK] ? ' on' : ''}"><input type="file" accept="image/*" hidden>${POSES[openK] ? `${['talk', 'listen', 'top'].map((n) => POSES[openK][n] ? `<img src="${POSES[openK][n]}" alt="">` : '').join('')}<span>✓ Your poses</span>` : '<span>Upload my pose sheet</span>'}</label>` : ''}<button type="button" class="wr-pick" data-pick="${openK}">Pick</button></div>` : '';
   // (09/11) the TV: « [name] / is about to start / PICK YOUR CHARACTER »
-  const head = TV ? `<h2 class="wr-title tv-t">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-soon">is about to start</div>${full ? '' : '<div class="wr-kick tv-k">Pick your character</div>'}`
+  const head = TV ? `<h2 class="wr-title tv-t">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-soon">is about to start</div>${full ? '' : '<div class="wr-kick tv-k">Pick your character on your phone</div>'}`
     : `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2>`;
   $('#room').innerHTML = `${head}<div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${pickRow}${lovers}
     ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Open to the public</button>' : ''}<button type="button" data-o="alone">Play alone</button></div>` : ''}

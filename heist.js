@@ -53,6 +53,9 @@
   SCENES.h_top = topv();
   SCENES.h_top_buzz = topv([R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
   SCENES.h_phone = pic('bg/phone_leo.webp');
+  // (09/11) Justin's over-the-shoulder shots (Ray's back on the left, Marcus on the right): Marcus reads Leo's text; then
+  // he looks up at Ray, the soft smile (a lot to win) or the serious face (a lot to lose)
+  for (const [k, f] of [['h_ots_phone', 'ots_phone'], ['h_ots_win', 'ots_win'], ['h_ots_lose', 'ots_lose']]) SCENES[k] = { ...pic(`bg/${f}.webp`), spk: { pb: .2, pa: .72 } };
   SCENES.h_two = chairs([MARCUS, RAY]);   // Marcus talks, Ray thinks
   // (09/11) Justin's next pictures: Ray's pocket buzzing (Amy calls); Ray up, his phone in hand, Marcus still talking; the
   // elevators (Ray pressing the button, Marcus hands in pockets, placed as in his reference); Marcus's pocket buzzing at the
@@ -94,6 +97,11 @@
   // (09/11) the guard: the restroom door, red; Marcus aiming at it; the door an inch open, the guard's gun first; the guard
   // out, aiming back; out, hands up (his gun on his hip); shot, against the wall, his gun on the floor
   for (const [k, f] of [['h_rob_out', 'rob_out'], ['h_rob_hands', 'rob_hands'], ['h_rob_red', 'rob_red'], ['h_wc', 'wc_door'], ['h_wc_aim', 'wc_aim'], ['h_wc_gun', 'wc_gun'], ['h_wc_out', 'wc_out'], ['h_wc_hands', 'wc_hands'], ['h_wc_shot', 'wc_shot']]) SCENES[k] = { image: `bg/${f}.webp`, size: PIC, spots: {}, face: {}, back: [], front: [] };
+  // (09/11) who is where in each picture (the subtitle's arrow points there): the gunman left, the restroom door right;
+  // the room: Marcus (the sweater) left, Ray (the suit) right
+  SCENES.h_wc.spk = { guard: .5 };
+  for (const k of ['h_wc_aim', 'h_wc_gun', 'h_wc_out', 'h_wc_hands', 'h_wc_shot']) SCENES[k].spk = { pa: .3, guard: .61 };
+  for (const k of ['h_rob_hands', 'h_rob_red']) SCENES[k].spk = { pa: .36, pb: .78 };
   SCENES.h_ray_sees = place({ back: [R(0, 0, 1920, 1080, '#cfc6b0'), R(160, 600, 980, 210, AMY, { r: 105 }), C(1240, 640, 280, SKIN),
     R(1540, 0, 380, 520, P2, { r: '0 0 0 160px' }), R(1420, 380, 220, 60, '#0b0b0d', { r: 8 })] });   // her face on the floor; his sleeve, his gun
   const vault = (k) => place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1180, 520, 760, '#9ca3af', { line: '34px solid #6b7280' }), C(1180, 520, 120, '#6b7280'),
@@ -144,10 +152,10 @@
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_top'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
+    ...at('h_ots_phone'), { hush: 1500 }, S('pb', 'Nothing to lose. Right?'),   // (09/11) over Ray's shoulder: Marcus on his phone. The line the choice answers
     { by: 'pa', clock: 0, cue: 'Look at your phone', big: true, ask: true, choice: [   // big: the TV all black (the first choices: so they get it)
-      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'Ray…'), S('pa', 'I have a son.')] },
-      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
+      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_ots_lose'), { hush: 700 }, S('pa', 'Ray…'), S('pa', 'I have a son.')] },
+      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_ots_win'), { hush: 700 }, S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_ray_pocket'), RING, { hush: 1200 },
@@ -220,7 +228,7 @@
     // the real ones (their screen, the music holding its breath) ----
     ...at('h_rob_out'), { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
     ...at('h_rob_hands'), { hush: 1800 },
-    { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), T('The alarm. Everyone on the floor. Amy too.'),
+    { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 2200 },
     S('pb', 'Where’s the security guard??'),
     // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
     // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
@@ -228,13 +236,13 @@
     ...at('h_wc_aim'),
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
-        { hush: 1800 }, ...at('h_wc_gun'), T('The door opens an inch. His gun first.'),
+        { hush: 1800 }, ...at('h_wc_gun'), { hush: 2400 },
         ...at('h_wc_out'), { hush: 700 },
         { by: 'pa', cue: 'Look at your phone', clock: 5000, choice: [
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
-            { sfx: 'gun shot' }, ...at('h_wc_shot'), T('The guard slumps against the wall, his hand on his shoulder. His gun on the floor.')] },
+            { sfx: 'gun shot' }, ...at('h_wc_shot'), { hush: 2600 }] },
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
-            S('pa', 'Gun on the floor! NOW!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), T('His gun hits the floor. Marcus kicks it away: it stops among the hostages.')] },
+            S('pa', 'Gun on the floor! NOW!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), { hush: 2400 }] },
         ] },
         lose(1),   // the wait at the door
       ] },
@@ -250,9 +258,9 @@
         S('guard', 'Okay. I come out, I get down. But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
-            S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), T('Hands up, the guard comes out and lies down with the others. His gun still on his hip.')] },
+            S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), { hush: 2400 }] },
           { t: '“The gun first. Slide it.”', ic: 'tough', sh: 'The gun first', intent: 'wants the gun', set: { gun: 'floor' }, then: [
-            S('pa', 'No. Gun first. Across the floor.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.'),
+            S('pa', 'No. Gun first. Across the floor.'), ...at('h_wc_gun'), { hush: 2000 },
             ...at('h_wc_hands'), { hush: 1600 }] },
         ] },
         { fn: (f) => [lose(f.talk === 'reason' ? 3 : 2)] },   // the talk through the door (reasoning: longer)
@@ -300,6 +308,7 @@
   ], {
     gaze: false, credits: '', title: 'Floor 31', intro: [],
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
+    sides: { pa: .3, pb: .7 },   // (09/11) no one placed in the picture: Marcus left, Ray right (the arrow)
     phone: { time: '9:38', bat: { pa: 64, pb: 21 } },
     // a player's own pose sheet (ref/posesheet_floor31.png: green screen, 3 columns: talking, listening, seen from above; Marcus's
     // row then Ray's, or one row: his own), each pose in place of the drawn one
