@@ -224,9 +224,16 @@ body.tv #tail::after { display: none; }
 #wait { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 12em 5% 0; }
 .wr-kick { text-align: center; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; }
 .wr-title { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .5em; }
-.wr-title.tv-t { margin-bottom: 0; }
-.wr-soon { text-align: center; font-size: 2.4em; font-weight: 600; color: #c7c7cc; margin-bottom: 1.2em; }
-.wr-kick.tv-k { margin-bottom: 1.4em; }
+/* (09/11) the TV waiting: « [name] / is about to start » takes the room, the characters smaller under it */
+.wr-title.tv-t { font-size: 11em; line-height: 1; margin: 0; }
+.wr-soon { text-align: center; font-size: 4.6em; font-weight: 600; color: #c7c7cc; margin: .2em 0 1.4em; }
+.wr-kick.tv-k { margin-bottom: 1em; }
+body.tv #wait .wr-seats { width: 56%; margin: 0 auto; gap: 1em; }
+body.tv #wait .wr-seat { padding: 1em .6em .8em; }
+body.tv #wait .wr-seat img { height: 18em; }
+body.tv #wait .wr-seat b { font-size: 2.2em; }
+body.tv #wait .wr-set { width: 56%; margin: 1.2em auto 0; }
+body.tv #wait .wr-set button { font-size: 1.4em; padding: .7em .3em; }
 .wr-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; }
 .wr-seats.one { grid-template-columns: 1fr; width: 55%; margin: 0 auto; }   /* a single character: centred, not left in a two-column grid */
 .wr-seat { font: inherit; color: inherit; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 2.4em; padding: 1.6em 1em 1.4em; display: flex; flex-direction: column; align-items: center; gap: .5em; cursor: pointer; transition: border-color .2s, background .2s; }
