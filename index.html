@@ -2797,7 +2797,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109190000"></script>
+<script src="heist.js?v=20261109200000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -4950,6 +4950,23 @@ function poseApply(k, name, url) {
   if (name === sh.poses[0]) { const sp = spriteOf(k); MADE[sp] = { ...(MADE[sp] || {}), listen: url }; }   // his face on the pick
   if (screen === '#wait') renderWait();
 }
+// (09/11) a pose sent to the room: its colours in a JPEG + its cut-out in a PNG mask (« jpeg|png »). An iPhone can't write
+// WebP, and a whole pose in PNG weighs 300 KB: too heavy for the relay, the TV never got it. ~40 + 15 KB this way
+function poseEncode(o) {
+  const w = o.width, h = o.height, d = o.getContext('2d').getImageData(0, 0, w, h), c = new ImageData(new Uint8ClampedArray(d.data), w, h), m = new ImageData(new Uint8ClampedArray(d.data), w, h);
+  for (let i = 0; i < d.data.length; i += 4) { c.data[i + 3] = 255; m.data[i] = m.data[i + 1] = m.data[i + 2] = 0; }   // the colours, solid; the mask, black
+  const cv = (img) => { const x = document.createElement('canvas'); x.width = w; x.height = h; x.getContext('2d').putImageData(img, 0, 0); return x; };
+  return cv(c).toDataURL('image/jpeg', .86) + '|' + cv(m).toDataURL('image/png');
+}
+async function poseDecode(v) {
+  if (!v.includes('|')) return v;
+  try {
+    const [a, b] = await Promise.all(v.split('|').map((u) => { const i = new Image(); i.src = u; return i.decode().then(() => i); }));
+    const c = document.createElement('canvas'); c.width = a.naturalWidth; c.height = a.naturalHeight; const x = c.getContext('2d');
+    x.drawImage(a, 0, 0); x.globalCompositeOperation = 'destination-in'; x.drawImage(b, 0, 0);
+    return c.toDataURL('image/png');
+  } catch { return null; }
+}
 async function poseSheet(file, k) {
   const sh = story().posesheet[k], img = new Image(); img.src = URL.createObjectURL(file);
   try { await img.decode(); } catch { return; }
@@ -4971,9 +4988,8 @@ async function poseSheet(file, k) {
     if (l < 0 || t < 0) return;
     const bw = r - l + 1, bh = bt - t + 1, s = Math.min(1, 640 / Math.max(bw, bh)), o = document.createElement('canvas'); o.width = Math.round(bw * s); o.height = Math.round(bh * s);
     o.getContext('2d').drawImage(cv, x0 + l, y0 + t, bw, bh, 0, 0, o.width, o.height);
-    let url = o.toDataURL('image/webp', .8); if (!url.startsWith('data:image/webp')) url = o.toDataURL('image/png');
-    poseApply(k, name, url);
-    if (live && live.connected) live.publish(`${topic()}/pose/${k}/${name}`, url, { retain: true, qos: 1 });
+    poseApply(k, name, o.toDataURL('image/png'));   // here: as it is
+    if (live && live.connected) live.publish(`${topic()}/pose/${k}/${name}`, poseEncode(o), { retain: true, qos: 1 });
   });
   URL.revokeObjectURL(img.src);
 }
@@ -5997,7 +6013,7 @@ const topic = () => `${NS}/${room}`;
 function posePart(t, buf) {   // a player's pose, sent to the room: <room>/pose/<seat>/<name>
   const pre = `${topic()}/pose/`; if (!t.startsWith(pre)) return false;
   const [k, name] = t.slice(pre.length).split('/'), url = buf.toString();
-  if (/^data:image\/(webp|png);base64,/.test(url)) poseApply(k, name, url);
+  if (/^data:image\/(webp|png|jpeg);base64,/.test(url)) poseDecode(url).then((u) => u && poseApply(k, name, u));
   return true;
 }
 function loadScript(src) {
