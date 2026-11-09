@@ -158,6 +158,21 @@ body.tv #tail::after { display: none; }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
 #choices button { font: inherit; font-size: 2.3em; font-weight: 800; color: #fff; text-align: left; background: var(--choice); border: 0; border-radius: 1.4em; padding: .85em 1.2em; cursor: pointer; box-shadow: 0 .25em .7em rgba(0,0,0,.3); animation: rise .28s ease-out backwards; }
 #choices button:nth-child(2) { animation-delay: .06s; }
+/* (09/11) a peak choice ({peak}): no buttons, the screen in two halves; behind each, faded into black, what's at stake (a face);
+   one word on it, what it's really about. The pick lights up, the other goes dark */
+#choices.peak { position: fixed; inset: 0; z-index: 30; flex-direction: row; gap: 0; background: #000; padding: 0; margin: 0; width: auto; height: auto; }
+#choices.peak > button.pk { flex: 1; position: relative; height: 100%; margin: 0; border-radius: 0; padding: 0; background: #000; box-shadow: none; overflow: hidden; display: grid; place-items: center; text-align: center; animation: pkIn .7s ease-out backwards; }
+#choices.peak > button.pk + button.pk { animation-delay: .15s; }
+#choices.peak > button.pk .pk-i { position: absolute; inset: 0; background: center 22% / cover no-repeat; opacity: .4; transition: opacity .5s, transform 3s ease-out; transform: scale(1.04); }
+#choices.peak > button.pk::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 25%, rgba(0,0,0,.85) 80%, #000 100%); }
+#choices.peak > button.pk + button.pk::before { content: ''; position: absolute; left: 0; top: 8%; bottom: 8%; width: 2px; z-index: 2; background: linear-gradient(transparent, rgba(255,255,255,.35), transparent); }
+#choices.peak > button.pk .pk-w { position: relative; z-index: 1; font-family: var(--display, Georgia, serif); font-weight: 400; font-size: min(9vw, 15vh); line-height: 1; color: #fff; letter-spacing: .01em; text-shadow: 0 .05em .6em rgba(0,0,0,.9); }
+#choices.peak > button.pk:hover .pk-i, #choices.peak > button.pk:focus-visible .pk-i { opacity: .55; outline: none; }
+#choices.peak > button.pk.picked .pk-i { opacity: .8; transform: scale(1.1); }
+#choices.peak:has(.picked) > button.pk:not(.picked) { opacity: .2; transition: opacity .5s; }
+#choices.peak > .clock { position: absolute; top: auto; bottom: 4%; left: 25%; right: 25%; z-index: 3; }
+@keyframes pkIn { from { opacity: 0; } }
+body.peakon #ui { transform: none !important; }   /* the TV moves the choices with a transform: the halves take the whole screen */
 #choices button:nth-child(3) { animation-delay: .12s; }
 #choices button:hover, #choices button:focus-visible { background: var(--choice-hi); outline: none; }
 #choices button:focus-visible { box-shadow: 0 0 0 .2em #fff; }
@@ -2797,7 +2812,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109210000"></script>
+<script src="heist.js?v=20261110000000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -4035,11 +4050,14 @@ function choose(opts, by, ring) {
   const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
   const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k)); metas.k = k;
   choicesEl.classList.add('cx', 'slide');
-  if (mine && holder === choicesEl && !choicesEl.hidden && (!pub || (remoteNow && hostTv)) && !document.body.classList.contains('cellon')) qCardShow(k);   // (09/11) a TV's phone: always what it's about
+  const peak = chPeak && holder === choicesEl; choicesEl.classList.toggle('peak', peak); document.body.classList.toggle('peakon', peak && !choicesEl.hidden);
+  if (!peak && mine && holder === choicesEl && !choicesEl.hidden && (!pub || (remoteNow && hostTv)) && !document.body.classList.contains('cellon')) qCardShow(k);   // (09/11) a TV's phone: always what it's about
   if (mine && chCue && !TV) try { navigator.vibrate && navigator.vibrate([260, 120, 260]); } catch { /* no vibration */ }   // (09/11) the first choices: the phone buzzes too
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
-    if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : `<span class="csh">${esc(a.sh)}</span>`}`; b.classList.add('pub'); b.style.setProperty('--pc', (castOf(k) || {}).color || '#ffffff'); }   // in the chooser's colour
+    // (09/11) a peak choice: a half each, no button; behind, faded, what's at stake (o.img); one word: what it's really about (o.w)
+    if (peak) { b.innerHTML = `<span class="pk-i"${o.img ? ` style="background-image:url('${o.img}')"` : ''}></span><b class="pk-w">${esc(fill(o.w || o.sh || o.t))}</b>`; b.classList.add('pk'); }
+    else if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : `<span class="csh">${esc(a.sh)}</span>`}`; b.classList.add('pub'); b.style.setProperty('--pc', (castOf(k) || {}).color || '#ffffff'); }   // in the chooser's colour
     else if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(...c.cls.split(' ')); }
     else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
     b.dataset.i = i;
@@ -4048,7 +4066,7 @@ function choose(opts, by, ring) {
       e.stopPropagation();
       if (!mine || waiting !== 'choice' || absentSeats().length) return;   // someone's gone: we wait for him
       if (ROLE === 'host') pickChoice(i);
-      else if (!holder.querySelector('.picked')) { b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
+      else if (!holder.querySelector('.picked')) { b.classList.add('picked'); sendPick(i); }
     };
     holder.appendChild(b);
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
@@ -4062,7 +4080,7 @@ function choose(opts, by, ring) {
 }
 // the clock on a choice (smt-timer: off, 6, 10 default, 20 seconds): a line that shrinks above the choices; it stops while the
 // story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
-let clockT = 0, chClock, chCue = '', chBig = false, chAsk = false;   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
+let clockT = 0, chClock, chCue = '', chBig = false, chAsk = false, chPeak = false;   // chPeak: a peak choice ({peak}): the two halves   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
 const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
 function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); $('#waitClock').hidden = true; }
 function clockStart(opts, watching = false) {   // watching: someone else's choice (the TV, the other phone): the line only shows, never picks
@@ -4080,8 +4098,17 @@ function clockStart(opts, watching = false) {   // watching: someone else's choi
     if (watching) return;   // the chooser's own phone picks; the line stays empty until the story goes on
     clearInterval(clockT); const i = Math.floor(Math.random() * opts.length);
     if (ROLE === 'host') pickChoice(i);
-    else { const b = [...optionButtons()].find((x) => +x.dataset.i === i); if (b) b.classList.add('picked'); sendIn('c' + i, optionsLane ? { lane: optionsLane } : {}); }
+    else { const b = [...optionButtons()].find((x) => +x.dataset.i === i); if (b) b.classList.add('picked'); sendPick(i); }
   }, 80);
+}
+// (09/11) a phone's pick, to the TV: with where it is (k: the taps so far, of its scene or of all), said again every 0.7 s
+// until the TV takes it (the phone is often a second ahead: a pick the TV isn't at yet was lost, and the phone, already
+// « picked », never said it again: stuck). The TV takes it only at that very choice
+let pickResend = 0;
+function sendPick(i) {
+  const lane = optionsLane, k = remote ? (lane ? laneCount(remote.t, lane) : remote.t.length) : 0, more = { ...(lane ? { lane } : {}), k }, opts = options;
+  sendIn('c' + i, more); clearInterval(pickResend);
+  pickResend = setInterval(() => { if (waiting !== 'choice' || options !== opts) { clearInterval(pickResend); pickResend = 0; } else sendIn('c' + i, more); }, 700);
 }
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
@@ -4095,7 +4122,7 @@ function pickChoice(i, afar = false) {
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
-    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing', 'chpub'); litOff(); qCardOff(); musHold(false);
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing', 'chpub', 'peakon'); litOff(); qCardOff(); musHold(false);
     if (cellOpen) { cellRoom(); clearTimeout(closeCell.t); closeCell.t = setTimeout(closeCell, 1600); }   // what he does next may be a text: it opens again
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
@@ -4336,7 +4363,7 @@ function gateTv() {   // the TV: a player tapped, his half says so
   if (!TV || !gateNow) return;
   document.querySelectorAll('#gateCard .gc-half').forEach((h) => { if (!gateNow.has(h.dataset.k) && !h.classList.contains('ready')) { h.classList.add('ready'); h.innerHTML = `<div class="gc-ico">✓</div><b>${esc(seatName(h.dataset.k) || '')}</b><span>Ready</span>`; } });
 }
-function gateOff() { clearInterval(gateResend); const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate', 'gate-me'); }
+function gateOff() { clearInterval(gateResend); gateResend = 0; const el = $('#gateCard'); if (el) el.hidden = true; document.body.classList.remove('gate', 'gate-me'); }
 function gateTapped() {   // this phone tapped: ready, the others may still be reading
   if (!gateNow || ![...gateNow].some((k) => mineFor(k))) return;
   const el = $('#gateCard'); el.classList.add('ready'); el.innerHTML = '<div class="gc-ico">✓</div><b>Ready</b>'; document.body.classList.remove('gate-me');
@@ -4745,7 +4772,7 @@ async function next() {
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chPeak = !!s.peak; chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
@@ -4767,10 +4794,10 @@ function advance() {
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
     if (waiting !== 'click' || !remote || applied !== remote.t.length || (laneNow && !mineFor(laneNow)) || (onlyNow && !mineFor(onlyNow))) return;
     const k = laneNow ? laneCount(remote.t, laneNow) : applied, key = tag(laneNow) + k;
-    if (sentK !== key) { sentK = key; sendIn('a', laneNow ? { lane: laneNow, k } : {}); }
+    if (sentK !== key || gateNow) { sentK = key; sendIn('a', laneNow ? { lane: laneNow, k } : {}); }
     // a gate: this phone can be a second ahead of the TV, and a tap the TV isn't at yet is dropped: say it again until the
-    // TV takes it (it ignores a tap for a count it's past)
-    if (gateNow) { const more = laneNow ? { lane: laneNow, k } : {}; clearInterval(gateResend); gateResend = setInterval(() => { if (!gateNow || waiting !== 'click') clearInterval(gateResend); else sendIn('a', more); }, 700); }
+    // TV takes it (it ignores a tap for a count it's past). Started once: tapping again doesn't restart it (it would never fire)
+    if (gateNow && !gateResend) { const more = laneNow ? { lane: laneNow, k } : {}; gateResend = setInterval(() => { if (!gateNow || waiting !== 'click') { clearInterval(gateResend); gateResend = 0; } else sendIn('a', more); }, 700); }
     return;
   }
   if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; return; }
@@ -6138,6 +6165,7 @@ function fromJoiner(m) {
     if (typing) { clearInterval(typing); textEl.textContent = typingFull; typing = null; }
     if (waiting === 'click') { record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next(); }
   } else if (/^c\d$/.test(m.e)) {
+    if (m.k != null && m.k !== (m.lane ? laneCount(tape, m.lane) : tape.length)) return;   // a pick for a choice this isn't at (said again too early, or too late)
     if (g) ghostPick(g, +m.e.slice(1));
     else if (ownerOf(optionsBy) === m.id) pickChoice(+m.e.slice(1), true);
   }
