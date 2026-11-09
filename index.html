@@ -3558,7 +3558,7 @@ const TRACKS = {
 const MUS_VOL = 0.75, MUS_BOOM = 'reverse cinematic boom', MUS_BOOM_AT = 4.8;   // the boom's hit is 4.8 s into its 5.15 s
 let mus = null, musLate = null;   // musLate: what was asked while the story ran fast (a phone catching up): played once it's caught up
 function music(s) {
-  if (PREVIEW || !audio()) return;
+  if (PREVIEW || (ROLE === 'watch' && hostTv) || !audio()) return;   // (09/11) a TV's phone: the music is the TV's (silent here anyway: nothing to load)
   if (FAST) { if (s.music === null) { musLate = null; musStop(300); } else musLate = { ...(musLate || {}), ...s, ms: 800 }; return; }
   if (s.music === null) { musStop(s.ms); return; }
   // an iPhone on silent plays no web sound at all, unless the page says it plays media (Safari 17+)
@@ -4673,7 +4673,7 @@ async function next() {
       slateEl.innerHTML = `<div class="tc"><b>${esc(fill(s.titleCard))}</b>${s.sub ? `<small>${esc(fill(s.sub))}</small>` : ''}</div>`;
       slateEl.hidden = false; waiting = 'click'; return;
     }
-    else if (s.bars) { if (FAST) continue; await musBars(s.bars); if (r !== run) return; }
+    else if (s.bars) { if (FAST || (ROLE === 'watch' && hostTv)) continue; await musBars(s.bars); if (r !== run) return; }   // (09/11) a TV's phone: no music, no waiting on its bars (it fell behind the TV: the choice's clock ran out on the TV before the phone had it)
     else if (s.stop) stopSfx(s.stop, s.ms);
     else if (s.hush) { bubble.hidden = true; await sleep(silence(s.hush)); }   // a silence: no bubble, the shot holds
     else if (s.aside) for (const [id, on] of Object.entries(s.aside)) asides[on ? 'add' : 'delete'](id);
