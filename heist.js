@@ -64,10 +64,26 @@
   SCENES.h_ray_pocket = pic('bg/ray_pocket.webp');
   SCENES.h_ray_phone = chairs([{ src: 'marcus_sit2', x: 543, y: 907, w: 500, who: 'pa' }, { src: 'ray_phone', x: 1188, y: 892, w: 360, who: 'pb' }]);
   SCENES.h_lift_hall = { image: 'bg/lift_hall.webp', size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front: [],
-    props: [{ src: 'marcus_stand', x: 546.5, y: 1468, w: 493, who: 'pa' }, { src: 'ray_point', x: 1072.5, y: 1470, w: 651, who: 'pb' }] };
+    props: [{ src: 'marcus_stand', x: 486, y: 1464.7, w: 363.1, who: 'pa' }, { src: 'ray_point', x: 1072.5, y: 1470, w: 651, who: 'pb' }] };
   SCENES.h_mpocket = pic('bg/marcus_pocket.webp');
   const inside = (image) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'into the elevator', back: [], front: [] });
   for (const [k, f] of [['h_in_02', 'elev_02'], ['h_in_08', 'elev_08'], ['h_case14', 'case_14'], ['h_gun', 'gun_handover'], ['h_mask26', 'mask_26'], ['h_masked', 'elev_masked'], ['h_crack', 'elev_crack']]) SCENES[k] = inside(`bg/${f}.webp`);
+  // (09/11) Justin's: the empty lobby over Ray's shoulder, Ray from behind (out of focus) and Marcus who looks up from his
+  // phone at him; the two cut out (props: a player's own pose takes their place)
+  SCENES.h_ots_look = { ...pic('bg/lobby_ots.webp'), spk: { pb: .2, pa: .72 },
+    props: [{ src: 'marcus_phone', x: 1144.5, y: 941, w: 747, who: 'pa' }, { src: 'ray_back', x: 395.5, y: 941, w: 791, z: 2000, who: 'pb' }] };
+  // (09/11) inside, Justin's decor (the doors, the display: 31 redrawn 2, 8, 14, 26) and the two of them cut out of his
+  // green screens: from behind, waiting; Ray opens the briefcase; Ray hands Marcus the mask
+  const lift = (n, people) => ({ ...inside(`bg/lift_in_${n}.webp`), props: people });
+  const M_BACK = { src: 'marcus_elev', x: 421.5, y: 941, w: 843, who: 'pa' }, R_BACK = { src: 'ray_elev', x: 1307.5, y: 941, w: 729, who: 'pb' };
+  SCENES.h_in_02 = lift('02', [M_BACK, R_BACK]); SCENES.h_in_08 = lift('08', [M_BACK, R_BACK]);
+  SCENES.h_case14 = lift('14', [{ src: 'marcus_elev2', x: 426.5, y: 941, w: 853, who: 'pa' }, { src: 'ray_case', x: 1261.5, y: 941, w: 811, who: 'pb' }]);
+  SCENES.h_mask26 = lift('26', [{ src: 'marcus_reach', x: 417.5, y: 941, w: 835, who: 'pa' }, { src: 'ray_mask', x: 1221, y: 941, w: 902, who: 'pb' }]);
+  // (09/11) the call, on Ray's phone (upright): Ray in the lobby, Amy… somewhere with marble (the bank: nobody knows yet);
+  // one or the other, whoever talks
+  const CALL = [941, 1671], call = (image, prop) => ({ image, size: CALL, spots: {}, face: {}, ambience: 'crowd', back: [], front: [], props: [prop] });
+  SCENES.h_call_ray = { ...call('bg/call_ray.webp', { src: 'ray_call', x: 470.5, y: 1671, w: 941, who: 'pb' }), spk: { pb: .4 } };
+  SCENES.h_call_amy = { ...call('bg/call_amy.webp', { src: 'amy_call', x: 488, y: 1671, w: 876 }), spk: { amy: .45 } };
   SCENES.h_bank = { image: 'bg/bank_open.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
   SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
@@ -152,7 +168,7 @@
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_ots_phone'), { hush: 1500 }, S('pb', 'Nothing to lose. Right?'),   // (09/11) over Ray's shoulder: Marcus on his phone. The line the choice answers
+    ...at('h_ots_phone'), { hush: 1500 }, ...at('h_ots_look'), S('pb', 'Nothing to lose. Right?'),   // he looks up at Ray   // (09/11) over Ray's shoulder: Marcus on his phone. The line the choice answers
     { by: 'pa', clock: 0, cue: 'Look at your phone', big: true, ask: true, choice: [   // big: the TV all black (the first choices: so they get it)
       { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_ots_lose'), { hush: 700 }, S('pa', 'Ray…'), S('pa', 'I have a son.')] },
       { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_ots_win'), { hush: 700 }, S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
@@ -183,14 +199,16 @@
             ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.', 'calm'],
           ]),
           { tick: false }],
-        pb: [...at('h_side_pb'), { gate: 'pb', text: 'Amy is on the line' }, { tick: true },
-          S('amy', 'Hey you. Are you still downtown?'),
-          { by: 'pb', clock: 15000, choice: [
-            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Still here, yeah. Something for work.')] },
-            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No, I’m on my way. Twenty minutes.')] },
+        // the call back and forth, on his phone: her, him, her
+        pb: [...at('h_call_ray'), { gate: 'pb', text: 'Amy is on the line' }, { tick: true },
+          ...at('h_call_amy'), S('amy', 'Hey you.'), S('amy', 'Are you still downtown?'),
+          ...at('h_call_ray'), { by: 'pb', clock: 15000, choice: [
+            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Still here, yeah.'), S('pb', 'Something for work.')] },
+            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No, I’m on my way.'), S('pb', 'Twenty minutes.')] },
           ] },
-          S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.'),
-          S('amy', 'Love you.'),
+          ...at('h_call_amy'), S('amy', 'I’ve got a meeting at noon.'), S('amy', 'A big one.'), S('amy', 'I’ll tell you tonight.'),
+          { hush: 700 }, S('amy', 'Love you.'),
+          ...at('h_call_ray'), { hush: 1500 },
           { tick: false }],
       }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
       lose(4, 'crowd'),   // the call and the texts ate 4 minutes
@@ -221,9 +239,7 @@
     ...at('h_masked'), { music: 'double it', vol: .95 },
     { music: 'double it', lv: 1, vol: 1, ms: 2400, inBars: 2 }, { bars: 1 },
     { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' },   // the doors crack open, the drop: they open
-    ...at('h_bank'),
-    narr('At the loan counter, a pen in her hand: Amy.'),
-    { hush: 1400 },
+    ...at('h_bank'), { hush: 1400 },
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
     ...at('h_rob_out'), { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
@@ -255,7 +271,7 @@
           { t: '“Nobody dies for the bank’s money. Come out.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
             S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
-        S('guard', 'Okay. I come out, I get down. But the gun stays in my holster.'),
+        S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
             S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), { hush: 2400 }] },
@@ -266,7 +282,7 @@
         { fn: (f) => [lose(f.talk === 'reason' ? 3 : 2)] },   // the talk through the door (reasoning: longer)
       ] },
     ] },
-    ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy. She doesn’t know the mask.'),
+    ...at('h_ray_sees'), T('Two meters from Ray’s boots: Amy.'), T('She doesn’t know the mask.'),
     S('pb', 'Hold the room. I’ve got the vault.'), { set: { watch: 'pa' } },   // the vault: always Ray (Marcus stays with the room, and Amy)
     { music: 'double it', lv: 2 },
     { fn: (f) => {
@@ -275,27 +291,33 @@
       return [
         // the vault: behind the steel, no crowd, the alarm far away; back in the room, all of it again
         { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },
-        ...at('h_vault_' + O), T(`${nO} in the vault with the teller. ${nW} alone with the room.`),
+        ...at('h_vault_' + O), T(`${nO} in the vault with the teller.`), T(`${nW} alone with the room.`),
         { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
-        ...at('h_holster'), T(f.gun === 'holster' ? 'On the floor, Amy’s hand slides to the guard’s holster.' : 'On the floor, Amy’s hand slides to the guard’s gun.'),
+        ...at('h_holster'), T('On the floor, Amy’s hand moves.'), T(f.gun === 'holster' ? 'To the guard’s holster.' : 'To the guard’s gun.'),
         { music: 'double it', lv: 3 }, { bars: 'drop' },
-        ...at('h_aim_' + W), T(`Amy is up. The guard’s gun on ${nW}’s head.`),
+        ...at('h_aim_' + W), T('Amy is up.'), T(`The guard’s gun on ${nW}’s head.`),
         // the one she holds: show his face or not
         { by: W, cue: 'Look at your phone', clock: 10000, choice: [
           { t: 'Take off the mask.', ic: 'unmask', sh: 'Unmask', intent: 'shows his face', set: { mask: 'off' }, then: [...at('h_face_' + W),
-            T(W === 'pb' ? 'Amy: “…Ray?” The gun shakes in her hand.' : 'Marcus shows his face. “I’ve got kids. Please.”')] },
+            ...(W === 'pb' ? [S('amy', '…Ray?'), T('The gun shakes in her hand.')] : [S('pa', 'I’ve got a kid.'), S('pa', 'Please.')])] },
           { t: 'Keep it on.', ic: 'mask', sh: 'Keep it on', intent: 'stays masked', idle: true, set: { mask: 'on' }, then: [
-            T(W === 'pb' ? 'Amy: “Who are you?” Her finger on the trigger.' : 'Amy: “Take it off. Now.” Her finger on the trigger.')] },
+            S('amy', W === 'pb' ? 'Who are you?' : 'Take it off.'), ...(W === 'pb' ? [] : [S('amy', 'Now.')]), T('Her finger on the trigger.')] },
         ] },
         // the other one, back from the vault: the gun on his friend's head
         { fn: (g) => [...at(`h_standoff_${W}${g.mask === 'off' ? '_off' : ''}`),
-          T(`${nO} comes back from the vault, the bags on his shoulder. The gun on ${nW}’s head.`),
+          T(`${nO} comes back from the vault.`), T('The bags on his shoulder.'), T(`The gun on ${nW}’s head.`),
           { by: O, cue: 'Look at your phone', clock: 7000, choice: O === 'pa' ? [
             { t: 'Shoot her.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
-            { t: 'Lower your gun.', ic: 'lower', sh: 'Lower it', intent: 'lowers it', set: { last: 'lower' }, then: [T('Marcus puts his gun on the floor. Amy’s doesn’t move.')] },
-            { t: '“Hey! Over here!”', ic: 'hand', sh: 'Over here!', intent: 'takes the aim', set: { last: 'draw' }, then: [T('Amy turns. The gun on Marcus now.')] },
+            { t: 'Lower your gun.', ic: 'lower', sh: 'Lower it', intent: 'lowers it', set: { last: 'lower' }, then: [T('Marcus puts his gun on the floor.'), T('Amy’s doesn’t move.')] },
+            { t: '“Hey! Over here!”', ic: 'hand', sh: 'Over here!', intent: 'takes the aim', set: { last: 'draw' }, then: [T('Amy turns.'), T('The gun on Marcus now.')] },
           ] : [
-            { t: 'Take off your mask: “Amy. It’s me.”', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [...at('h_face_pb'), T('Amy stares at him. The gun goes down an inch.')] },
+            { t: 'Take off your mask: “Amy. It’s me.”', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [...at('h_face_pb'), S('pb', 'Amy.'), S('pb', 'It’s me.'),
+              T('Amy stares at him.'), T('The gun goes down an inch.'),
+              // (09/11) the new choice: take her with them, or leave her here, safe
+              { by: 'pb', cue: 'Look at your phone', clock: 8000, choice: [
+                { t: '“Come with us.”', ic: 'hand', sh: 'Come with us', intent: 'takes her along', set: { amygo: 'come' }, then: [S('pb', 'Come with us.'), S('pb', 'Now.')] },
+                { t: '“Stay. You’ll be safe.”', ic: 'calm', sh: 'Stay safe', intent: 'leaves her safe', set: { amygo: 'stay' }, then: [S('pb', 'Stay here.'), S('pb', 'You’ll be safe.')] },
+              ] }] },
             { t: 'Shoot her.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { last: 'shoot' }, then: BANG },
             { t: 'Drop the bags.', ic: 'bags', sh: 'Drop it', intent: 'drops the money', set: { last: 'drop' }, then: [T('The bags hit the floor. Three million dollars between them.')] },
           ] },
@@ -310,10 +332,13 @@
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
     sides: { pa: .3, pb: .7 },   // (09/11) no one placed in the picture: Marcus left, Ray right (the arrow)
     phone: { time: '9:38', bat: { pa: 64, pb: 21 } },
-    // a player's own pose sheet (ref/posesheet_floor31.png: green screen, 3 columns: talking, listening, seen from above; Marcus's
-    // row then Ray's, or one row: his own), each pose in place of the drawn one
-    posesheet: { cols: ['talk', 'listen', 'top'], pa: { talk: 'marcus_sit', listen: 'marcus_listen', top: 'marcus_top' }, pb: { talk: 'ray_talk', listen: 'ray_sit', top: 'ray_top' } },
-    pick: { pa: { pose: 'listen', line: 'Guess there’s no turning back now.' }, pb: { pose: 'listen', line: 'Nothing to lose.' } },
+    // (09/11) a player's own pose sheet, one per character (ref/posesheet_<name>.jpg: every cut-out he has in the story, on green,
+    // in a grid read row by row): each cell takes the place of that prop. The first one is his face on the pick
+    posesheet: {
+      pa: { sheet: 'ref/posesheet_marcus.jpg', grid: [4, 3], poses: ['marcus_sit', 'marcus_listen', 'marcus_sit2', 'marcus_top', 'marcus_phone', 'marcus_stand', 'marcus_elev', 'marcus_elev2', 'marcus_reach'] },
+      pb: { sheet: 'ref/posesheet_ray.jpg', grid: [4, 3], poses: ['ray_sit', 'ray_talk', 'ray_phone', 'ray_top', 'ray_back', 'ray_point', 'ray_call', 'ray_elev', 'ray_case', 'ray_mask'] },
+    },
+    pick: { pa: { pose: 'listen', desc: '30-year-old dad with money problems' }, pb: { pose: 'listen', desc: '29, owes a lot of money' } },   // (09/11) who they are, instead of a line
     cast: {
       pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
       pb: { name: 'Ray', color: P2, sprite: 'h_ray' },
@@ -329,11 +354,12 @@
     words: { LEDE: (f) => [
       f.p1 === 'lose' ? 'Marcus had everything to lose.' : 'Marcus had everything to win.',
       f.amy === 'call' ? `Ray picked up for Amy${f.told === 'lie' ? ', and lied to her' : ''}.` : 'Ray let Amy’s call go.',
-      'She was at the loan counter on 31.',
+      'Amy was in the bank on 31.',
       ({ shot: 'Marcus shot the guard.', drop: 'Marcus made the guard drop his gun.', talk: 'Marcus talked the guard out.' })[f.guard] || '',
       f.watch ? 'Ray took the vault. Marcus stayed with the room, and Amy took the guard’s gun.' : '',
       f.mask === 'off' ? `${N[f.watch]} showed her his face.` : f.mask === 'on' ? `${N[f.watch]} kept his mask on.` : '',
       ({ shoot: 'Then a shot.', lower: 'Marcus put his gun down.', draw: 'Marcus took the aim for his friend.', me: 'Ray showed Amy who he was.', drop: 'Ray dropped the money.' })[f.last] || '',
+      ({ come: 'He asked her to come with them.', stay: 'He told her to stay, safe.' })[f.amygo] || '',
     ].filter(Boolean).join(' ') },
   });
   window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), d_heist: story };

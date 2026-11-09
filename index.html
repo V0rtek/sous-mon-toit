@@ -106,6 +106,7 @@ body.hosttv:not(:has(#pauseCard:not([hidden]))) #viewBtn { display: none !import
 body.hosttv:has(#pauseCard:not([hidden])) #viewBtn { z-index: 65; }
 body.phonemin #gateCard { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }
 #gateCard .gc-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
+#gateCard .gc-tap svg { width: 2.2em; height: 2.2em; display: block; }
 #gateCard b { font-size: 4.4em; font-weight: 800; color: #ffd60a; }
 #gateCard span { font-size: 2.6em; font-weight: 600; color: #d1d1d6; }
 #gateCard.ready b, #gateCard.ready .gc-ico { color: #34c759; animation: none; }
@@ -265,6 +266,24 @@ body.pick-lean .wr-seat.me b { display: block; }
 .wr-sheet { display: flex; align-items: center; gap: .8em; padding: .8em 1.6em; border-radius: 1.2em; border: .2em dashed rgba(255,255,255,.35); color: #d1d1d6; font-size: 1.9em; font-weight: 700; cursor: pointer; }
 .wr-sheet.on { border-style: solid; border-color: var(--c); color: #fff; }
 .wr-sheet img { height: 3.2em; width: auto; }
+.wr-sheet { font-family: inherit; background: none; }
+.wr-desc { font-size: 1.55em; line-height: 1.35; color: #c7c7cc; text-align: center; min-height: 2.7em; }   /* (09/11) who he is, instead of a line */
+body.pick-lean .wr-seat:not(.open) .wr-desc { display: none; }
+/* (09/11) « Upload my pose sheet »: Generate or Upload; Generate = the sheet to save, the prompt to copy */
+#sheetCard { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.82); display: grid; place-items: center; padding: 4%; font-size: calc(min(100vw, 56vh) / 60); }
+#sheetCard[hidden] { display: none; }
+#sheetCard .sc-box { position: relative; width: 100%; max-width: 46em; max-height: 92vh; overflow-y: auto; background: #17161c; border-radius: 2em; padding: 2.4em 2em 2em; display: flex; flex-direction: column; gap: 1.2em; color: #f5f5f7; border-top: .4em solid var(--c); }
+#sheetCard b { font-size: 2.4em; font-weight: 800; padding-right: 1.6em; }
+#sheetCard .sc-two { display: flex; gap: 1em; }
+#sheetCard .sc-two button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .5em; padding: 1.4em 1em; border: 0; border-radius: 1.2em; background: color-mix(in srgb, var(--c) 22%, #1c1c1e); color: #fff; font: inherit; font-size: 2em; font-weight: 800; cursor: pointer; }
+#sheetCard .sc-two svg { width: 2.2em; height: 2.2em; }
+#sheetCard .sc-step { display: flex; align-items: center; gap: .8em; font-size: 1.8em; font-weight: 700; color: #d1d1d6; }
+#sheetCard .sc-step i { flex: none; width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-style: normal; font-weight: 900; }
+#sheetCard .sc-ref img { display: block; width: 100%; border-radius: 1em; }
+#sheetCard .sc-prompt { background: #0b0a0f; border-radius: 1em; padding: 1.2em; display: flex; flex-direction: column; gap: 1em; }
+#sheetCard .sc-prompt p { margin: 0; font-size: 1.5em; line-height: 1.4; color: #c7c7cc; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }
+#sheetCard .sc-prompt button { align-self: flex-end; border: 0; border-radius: 99px; padding: .5em 1.4em; background: #fff; color: #000; font: inherit; font-size: 1.8em; font-weight: 800; cursor: pointer; }
+#sheetCard .sc-x { position: absolute; top: .8em; right: .8em; width: 2.2em; height: 2.2em; border: 0; border-radius: 50%; background: #2c2c2e; color: #fff; font-size: 1.6em; cursor: pointer; }
 .wr-seat.me .wr-who, .wr-seat.taken .wr-who { color: #fff; }
 .wr-seat.me .wr-who i, .wr-seat.taken .wr-who i { background: #34c759; }
 .wr-seat.waiting img { opacity: .5; }
@@ -1732,7 +1751,7 @@ body.watch.hosttv #again { display: block !important; }
 #tvIntro .ti-cast { display: flex; justify-content: center; gap: 8em; }
 #tvIntro .ti-c { display: flex; flex-direction: column; align-items: center; gap: .3em; padding: 2em 4em 3em; border-radius: 3em; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 42%, transparent), transparent 70%); }
 #tvIntro .ti-c .ti-pl { font-family: var(--display); font-weight: 400; font-size: 8em; line-height: 1.05; color: var(--c) !important; margin-top: .15em; }
-#tvIntro .ti-c .ti-bar { width: 60%; height: .9em; border-radius: 1em; background: var(--c); margin-top: 1.2em; box-shadow: 0 0 2em var(--c); }
+#tvIntro .ti-c .ti-bar { width: 30em; height: .9em; border-radius: 1em; background: var(--c); margin-top: 1.2em; box-shadow: 0 0 2em var(--c); }
 #tvIntro .ti-c img { height: 38em; filter: drop-shadow(0 0 2.2em color-mix(in srgb, var(--c, #ff9a4d) 55%, transparent)); }
 #tvIntro .ti-s { display: flex; flex-direction: column; align-items: center; gap: 1.4em; }
 #tvIntro .ti-c .ti-who { font-size: 4em; font-weight: 600; color: #d1d1d6; white-space: nowrap; }
@@ -2778,7 +2797,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109220000"></script>
+<script src="heist.js?v=20261109190000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -4303,12 +4322,13 @@ let tapNow = false, gateNow = null, gateResend = 0;   // gateNow: the seats a {g
 // {gate: [seats], text}: before a moment on the phones (a texting scene), the TV goes dark and says to look at your phone,
 // each of those players' phones goes dark and says to tap to start (text: what's coming, one string or one per seat); the
 // story goes on once each of them has tapped, and the TV lights up again
+const TAP_ICO = '<svg viewBox="0 0 64 64" aria-label="Tap"><circle cx="30" cy="22" r="10" fill="none" stroke="#fff" stroke-width="3" opacity=".55"/><circle cx="30" cy="22" r="17" fill="none" stroke="#fff" stroke-width="2.5" opacity=".25"/><path d="M26 22a4 4 0 0 1 8 0v14l9 2.6a5 5 0 0 1 3.6 5.6L45 54H27L18.5 42.5a3.6 3.6 0 0 1 5.4-4.7L26 40z" fill="#fff"/></svg>';
 function gateOn(s) {
   const el = $('#gateCard'), mine = [...gateNow].filter((k) => mineFor(k)), t = typeof s.text === 'object' ? (s.text || {})[mine[0]] : s.text;
   el.className = '';
   el.classList.toggle('halves', TV);
   el.innerHTML = TV ? [...gateNow].map((k) => `<div class="gc-half" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="gc-ico">📱</div><b>${esc(seatName(k) || '')}</b><span>Look at your phone</span></div>`).join('')
-    : mine.length ? `<div class="gc-ico">👆</div><b>Tap to start</b>${t ? `<span>${esc(fill(t))}</span>` : ''}`
+    : mine.length ? `<div class="gc-ico gc-tap">${TAP_ICO}</div>`   // (09/11) just the white « tap » icon, no words
     : `<div class="gc-u u-mark"><span>U</span><span class="u-c">_</span></div><span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}</span>`;   // (07/11) waiting on the others: U_
   el.hidden = false; document.body.classList.add('gate'); document.body.classList.toggle('gate-me', !TV && mine.length > 0);
 }
@@ -4919,20 +4939,21 @@ const storyTitle = (id = state.story) => (STORIES[id] && STORIES[id].title) || {
 const seatLabel = (k) => { const c = castOf(k); return c && c.name && !c.name.includes('{') ? c.name : (story().solo || {})[k] || k; };
 let chTv = (() => { try { return localStorage.getItem('smt-chtv') !== '0'; } catch { return true; } })();   // (08/11) public choices on the TV (the phones: just the symbols)
 let pickOpen = null;
-// (09/11) a player's own poses: his pose sheet (story().posesheet: its columns, and which prop each one replaces for each
-// seat), keyed out of its green on his phone, shrunk, and sent to the room; every device uses them in place of the props
+// (09/11) a player's own poses: one pose sheet per character (story().posesheet[seat]: {sheet: the reference, grid:
+// [cols, rows], poses: the props, in reading order}), keyed out of its green on his phone, each cell cut to what's in it,
+// shrunk, and sent to the room; every device puts them in place of those props. The first pose is his face on the pick
 const POSES = {}, POSE_OVR = {};
 function poseApply(k, name, url) {
-  const ps = story() && story().posesheet; if (!ps || !ps[k] || !url) return;
+  const sh = story() && story().posesheet && story().posesheet[k]; if (!sh || !sh.poses.includes(name) || !url) return;
   (POSES[k] = POSES[k] || {})[name] = url;
-  const src = ps[k][name]; if (src) { POSE_OVR[src] = url; document.querySelectorAll(`#cast img.prop[data-src="${src}"]`).forEach((i) => { i.src = url; }); }
-  if (name === ps.cols[0]) { const sp = spriteOf(k); MADE[sp] = { ...(MADE[sp] || {}), listen: url }; }   // his face on the pick
+  POSE_OVR[name] = url; document.querySelectorAll(`#cast img.prop[data-src="${name}"]`).forEach((i) => { i.src = url; });
+  if (name === sh.poses[0]) { const sp = spriteOf(k); MADE[sp] = { ...(MADE[sp] || {}), listen: url }; }   // his face on the pick
   if (screen === '#wait') renderWait();
 }
 async function poseSheet(file, k) {
-  const ps = story().posesheet, img = new Image(); img.src = URL.createObjectURL(file);
+  const sh = story().posesheet[k], img = new Image(); img.src = URL.createObjectURL(file);
   try { await img.decode(); } catch { return; }
-  const W = Math.min(1800, img.naturalWidth), H = Math.round(img.naturalHeight * W / img.naturalWidth);
+  const W = Math.min(2400, img.naturalWidth), H = Math.round(img.naturalHeight * W / img.naturalWidth);
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, W, H);
   const d = cx.getImageData(0, 0, W, H), px = d.data;
   for (let i = 0; i < px.length; i += 4) {   // the green out: how green a pixel is → how see-through; the edges despilled
@@ -4940,19 +4961,60 @@ async function poseSheet(file, k) {
     px[i + 3] = Math.round(a * 255); if (spill > 0) px[i + 1] = Math.max(r, b);   // the edges: no green left
   }
   cx.putImageData(d, 0, 0);
-  const cols = ps.cols.length, rows = H / W > .6 ? 2 : 1, row = rows === 2 ? Math.max(0, seatsOf().indexOf(k)) : 0, cw = W / cols, ch = H / rows;
-  for (let c = 0; c < cols; c++) {
-    const x0 = Math.round(c * cw), y0 = Math.round(row * ch), w = Math.round(cw), h = Math.round(ch), a = cx.getImageData(x0, y0, w, h).data;
-    let l = w, t = h, r = -1, bt = -1;
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 128) { if (x < l) l = x; if (x > r) r = x; if (y < t) t = y; if (y > bt) bt = y; }
-    if (r < 0) continue;
-    const bw = r - l + 1, bh = bt - t + 1, s = Math.min(1, 460 / bh), o = document.createElement('canvas'); o.width = Math.round(bw * s); o.height = Math.round(bh * s);
+  const [cols, rows] = sh.grid, cw = W / cols, ch = H / rows;
+  sh.poses.forEach((name, n) => {
+    const x0 = Math.round((n % cols) * cw), y0 = Math.round(Math.floor(n / cols) * ch), w = Math.round(cw), h = Math.round(ch), a = cx.getImageData(x0, y0, w, h).data;
+    // what's in the cell: the rows and columns with more than a few solid pixels (a stray speck doesn't count)
+    const colN = new Array(w).fill(0), rowN = new Array(h).fill(0);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (a[(y * w + x) * 4 + 3] > 128) { colN[x]++; rowN[y]++; }
+    const l = colN.findIndex((v) => v > 2), r = w - 1 - [...colN].reverse().findIndex((v) => v > 2), t = rowN.findIndex((v) => v > 2), bt = h - 1 - [...rowN].reverse().findIndex((v) => v > 2);
+    if (l < 0 || t < 0) return;
+    const bw = r - l + 1, bh = bt - t + 1, s = Math.min(1, 640 / Math.max(bw, bh)), o = document.createElement('canvas'); o.width = Math.round(bw * s); o.height = Math.round(bh * s);
     o.getContext('2d').drawImage(cv, x0 + l, y0 + t, bw, bh, 0, 0, o.width, o.height);
     let url = o.toDataURL('image/webp', .8); if (!url.startsWith('data:image/webp')) url = o.toDataURL('image/png');
-    const name = ps.cols[c]; poseApply(k, name, url);
+    poseApply(k, name, url);
     if (live && live.connected) live.publish(`${topic()}/pose/${k}/${name}`, url, { retain: true, qos: 1 });
-  }
+  });
   URL.revokeObjectURL(img.src);
+}
+// « Upload my pose sheet »: Generate (his reference sheet to save, the prompt to copy, for ChatGPT / Gemini with a picture
+// of his own character) or Upload (the sheet it made)
+function poseSheetPrompt(k) {
+  const sh = story().posesheet[k], n = sh.poses.length, [c, r] = sh.grid;
+  return `Image 1 is a pose sheet: ${n} poses of one character on a flat green background, in a grid of ${c} columns and ${r} rows. Image 2 is my character.\n`
+    + `Redraw image 1 with my character instead: same grid, same ${n} poses in the same cells, same size and framing in each cell, same camera angles, same clothes and objects (phone, briefcase, mask). Only the person changes: the face, hair, skin and body of image 2.\n`
+    + `Same anime style, clean dark outlines. Background: flat pure green (#00FF00) everywhere, no shadows, no floor, no text, no lines between the cells, nothing crossing into another cell. Same image ratio as image 1.`;
+}
+function sheetCard(k, step = 'pick') {
+  let el = $('#sheetCard'); if (!el) { el = document.createElement('div'); el.id = 'sheetCard'; document.body.appendChild(el); }
+  const sh = story().posesheet[k], c = (castOf(k) || {}).color || '#ff9a4d', name = esc(seatLabel(k) || '');
+  const UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 20h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const GEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor"/></svg>';
+  el.style.setProperty('--c', c);
+  el.innerHTML = `<div class="sc-box"><input type="file" accept="image/*" hidden>${step === 'pick'
+    ? `<b>${name} · your poses</b><div class="sc-two"><button type="button" data-a="gen">${GEN}<span>Generate</span></button><button type="button" data-a="up">${UP}<span>Upload</span></button></div>`
+    : `<b>Generate ${name}’s poses</b>
+      <div class="sc-step"><i>1</i><span>Save this sheet</span></div><a class="sc-ref" href="${sh.sheet}" download target="_blank"><img src="${sh.sheet}" alt=""></a>
+      <div class="sc-step"><i>2</i><span>ChatGPT or Gemini: this sheet + a picture of your character + this prompt</span></div>
+      <div class="sc-prompt"><p>${esc(poseSheetPrompt(k))}</p><button type="button" data-a="copy">Copy</button></div>
+      <div class="sc-step"><i>3</i><span>Upload what it made</span></div>
+      <div class="sc-two"><button type="button" data-a="up">${UP}<span>Upload</span></button></div>`}
+    <button type="button" class="sc-x" data-a="x" aria-label="Close">✕</button></div>`;
+  el.hidden = false;
+  const inp = el.querySelector('input');
+  inp.onchange = () => { const f = inp.files && inp.files[0]; if (f) { el.hidden = true; poseSheet(f, k); } };
+  el.onclick = (e) => {
+    e.stopPropagation(); const b = e.target.closest('[data-a]'); if (!b) { if (e.target === el) el.hidden = true; return; }
+    const a = b.dataset.a;
+    if (a === 'x') el.hidden = true;
+    else if (a === 'gen') sheetCard(k, 'gen');
+    else if (a === 'up') inp.click();
+    else if (a === 'copy') {
+      const t = poseSheetPrompt(k), done = () => { b.textContent = '✓ Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1800); };
+      const fallback = () => { const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch { /* nothing */ } ta.remove(); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback();
+    }
+  };
 }   // a TV's phone: the character opened (its name, its line, Pick)
 const tvSeen = new Set();   // the TV: the characters already up (they pull up once)
 function renderWait() {
@@ -4970,7 +5032,7 @@ function renderWait() {
     if (TV && cls !== 'taken') { tvSeen.delete(k); return ''; }   // (09/11) the TV: a character only once a player has taken him (he pulls up)
     const fresh = TV && !tvSeen.has(k); if (TV) tvSeen.add(k);
     return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}${fresh ? ' pull' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
-      <b>${seatLabel(k)}</b>${p.line && !TV ? `<q>${fill(p.line)}</q>` : ''}${who ? `<span class="wr-who"><i></i>${who}</span>` : ''}</button>`;   // the TV: no line in quotes
+      <b>${seatLabel(k)}</b>${p.desc && !TV ? `<span class="wr-desc">${fill(p.desc)}</span>` : p.line && !TV ? `<q>${fill(p.line)}</q>` : ''}${who ? `<span class="wr-who"><i></i>${who}</span>` : ''}</button>`;   // the TV: no line in quotes
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   document.body.classList.toggle('roomfull', full);
@@ -4981,8 +5043,9 @@ function renderWait() {
     return `<button type="button" class="${id === state.story ? 'on' : ''}" data-love="${id}"><span class="wr-head"><span><img src="${charUrl(k, pose)}" alt=""></span></span><b>${esc(n)}</b></button>`;
   }).join('')}</div>` : '';
   // (09/11) the character opened: your pose sheet (optional, just above), then Pick
-  const openK = lean && pickOpen && !(state.seats[pickOpen]) ? pickOpen : null, sheetOn = !!story().posesheet;
-  const pickRow = openK ? `<div class="wr-pickrow" style="--c:${(castOf(openK) || {}).color || '#ff9a4d'}">${sheetOn ? `<label class="wr-sheet${POSES[openK] ? ' on' : ''}"><input type="file" accept="image/*" hidden>${POSES[openK] ? `${['talk', 'listen', 'top'].map((n) => POSES[openK][n] ? `<img src="${POSES[openK][n]}" alt="">` : '').join('')}<span>✓ Your poses</span>` : '<span>Upload my pose sheet</span>'}</label>` : ''}<button type="button" class="wr-pick" data-pick="${openK}">Pick</button></div>` : '';
+  const openK = lean && pickOpen && !(state.seats[pickOpen]) ? pickOpen : null, sheetOn = !!(openK && story().posesheet && story().posesheet[openK]);
+  const mineP = openK && POSES[openK] ? story().posesheet[openK].poses.filter((n) => POSES[openK][n]).slice(0, 3) : [];
+  const pickRow = openK ? `<div class="wr-pickrow" style="--c:${(castOf(openK) || {}).color || '#ff9a4d'}">${sheetOn ? `<button type="button" class="wr-sheet${mineP.length ? ' on' : ''}">${mineP.length ? `${mineP.map((n) => `<img src="${POSES[openK][n]}" alt="">`).join('')}<span>✓ Your poses</span>` : '<span>Upload my pose sheet</span>'}</button>` : ''}<button type="button" class="wr-pick" data-pick="${openK}">Pick</button></div>` : '';
   // (09/11) the TV: « [name] / is about to start / PICK YOUR CHARACTER »
   const head = TV ? `<h2 class="wr-title tv-t">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-soon">is about to start</div>${full ? '' : '<div class="wr-kick tv-k">Pick your character on your phone</div>'}`
     : `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2>`;
@@ -5005,7 +5068,7 @@ function renderWait() {
     if (!(invite && invite.seat === k)) takeSeat(k, myId, state.name);
   });
   const pk = $('#room .wr-pick'); if (pk) pk.onclick = (e) => { e.stopPropagation(); const k = pk.dataset.pick; pickOpen = null; sendIn('seat', { s: k }); };
-  const sh = $('#room .wr-sheet input'); if (sh) { sh.onclick = (e) => e.stopPropagation(); sh.onchange = () => { const f = sh.files && sh.files[0]; if (f) poseSheet(f, openK); }; }
+  const sh = $('#room .wr-sheet'); if (sh) sh.onclick = (e) => { e.stopPropagation(); sheetCard(openK); };
   document.querySelectorAll('#room .wr-lovers button').forEach((b) => b.onclick = (e) => {   // another love interest = the same story with them
     e.stopPropagation(); const id = b.dataset.love; if (id === state.story) return;
     try { localStorage.setItem('smtDemo.love', id === 'd_ete_alex' ? 'alex' : 'maya'); } catch { /* private window */ }
