@@ -223,6 +223,9 @@ body.tv #tail::after { display: none; }
 #wait { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 12em 5% 0; }
 .wr-kick { text-align: center; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; }
 .wr-title { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .5em; }
+.wr-title.tv-t { margin-bottom: 0; }
+.wr-soon { text-align: center; font-size: 2.4em; font-weight: 600; color: #c7c7cc; margin-bottom: 1.2em; }
+.wr-kick.tv-k { margin-bottom: 1.4em; }
 .wr-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; }
 .wr-seats.one { grid-template-columns: 1fr; width: 55%; margin: 0 auto; }   /* a single character: centred, not left in a two-column grid */
 .wr-seat { font: inherit; color: inherit; background: rgba(255,255,255,.04); border: .25em solid transparent; border-radius: 2.4em; padding: 1.6em 1em 1.4em; display: flex; flex-direction: column; align-items: center; gap: .5em; cursor: pointer; transition: border-color .2s, background .2s; }
@@ -1547,7 +1550,7 @@ body.inwait.roomfull #qrBtn { display: none !important; }   /* everyone's in: no
 body.tv #qrBtn, body.tv #eyes, body.tv #galBtn { display: none !important; }
 /* the TV is only watched: no button, no cursor, nothing to tap (the players do it all on their phones) */
 body.tv #back, body.tv #menuBtn, body.tv #menuPop, body.tv #hint, body.tv .endRow, body.tv .ep-go, body.tv .ep-home, body.tv #pauseCard .pc-btns { display: none !important; }
-body.tv:not(.tvpaused), body.tv:not(.tvpaused) * { cursor: none !important; }   /* paused on stage: the cursor comes back */
+body.tv:not(.tvstart), body.tv:not(.tvstart) * { cursor: none !important; }   /* (09/11) the TV: no cursor, except on its first screens before the show starts */
 body.tvpaused #stage { cursor: default; }
 /* the mirror: a player's screen; it shows, never acts */
 body.mirror #pauseBtn, body.mirror #absentBar, body.mirror #pauseCard, body.mirror #back, body.mirror #menuBtn, body.mirror #menuPop { display: none !important; }
@@ -4711,6 +4714,7 @@ function show(id) {
   const wide = id === '#plan' || id === '#acte' || id === '#deck';
   if (document.body.classList.contains('wide') !== wide) { document.body.classList.toggle('wide', wide); fit(); }
   document.body.classList.toggle('inwait', id === '#wait');
+  document.body.classList.toggle('tvstart', TV && (id === '#tvPick' || id === '#wait'));   // the cursor: only there (renderWait takes it off once the room is full)
   document.body.classList.toggle('instory', id === null);
   keepAwake(TV || id === null || ['#wait', '#lobby', '#end', '#cover', '#tvPick'].includes(id));
   if (TV && id === '#tvPick') tvHome();
@@ -4877,13 +4881,14 @@ function renderWait() {
     const s = state.seats[k], p = pick[k] || { pose: 'listen' };
     const nat = (FACE[spriteOf(k)] || {})[poseOf(k, p.pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');   // they face each other
     const [cls, who] = s && s.id === myId ? ['me', 'You'] : s ? ['taken', s.n]
-      : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', 'Open'];
+      : invite && invite.seat === k ? ['waiting', invite.kind === 'friend' ? `Invite sent to ${invite.n}…` : 'Waiting for a player…'] : ['free', TV ? '' : 'Open'];   // (09/11) the TV: no « Open »
     const open = lean && pickOpen === k && cls === 'free';
     return `<button type="button" class="wr-seat ${cls}${open ? ' open' : ''}" data-seat="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><img src="${poseSrc(k, p.pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}>
-      <b>${seatLabel(k)}</b>${p.line ? `<q>${fill(p.line)}</q>` : ''}<span class="wr-who"><i></i>${who}</span></button>`;
+      <b>${seatLabel(k)}</b>${p.line && !TV ? `<q>${fill(p.line)}</q>` : ''}${who ? `<span class="wr-who"><i></i>${who}</span>` : ''}</button>`;   // the TV: no line in quotes
   };
   const full = seats.every((k) => state.seats[k]), host = ROLE === 'host';
   document.body.classList.toggle('roomfull', full);
+  document.body.classList.toggle('tvstart', TV && !full);
   // a story with a love interest to pick (Un été de trop: Maya or Alex), under your character
   const lovers = story().lovers && !full ? `<div class="wr-kick wr-lk">Pick your love interest</div><div class="wr-lovers">${story().lovers.map(([id, k, n]) => {
     const sp = SPRITES[k], pose = sp && Object.keys(sp.poses)[0];
@@ -4892,7 +4897,10 @@ function renderWait() {
   // (09/11) the character opened: your pose sheet (optional, just above), then Pick
   const openK = lean && pickOpen && !(state.seats[pickOpen]) ? pickOpen : null, sheetOn = !!story().posesheet;
   const pickRow = openK ? `<div class="wr-pickrow" style="--c:${(castOf(openK) || {}).color || '#ff9a4d'}">${sheetOn ? `<label class="wr-sheet${POSES[openK] ? ' on' : ''}"><input type="file" accept="image/*" hidden>${POSES[openK] ? `${['talk', 'listen', 'top'].map((n) => POSES[openK][n] ? `<img src="${POSES[openK][n]}" alt="">` : '').join('')}<span>✓ Your poses</span>` : '<span>Upload my pose sheet</span>'}</label>` : ''}<button type="button" class="wr-pick" data-pick="${openK}">Pick</button></div>` : '';
-  $('#room').innerHTML = `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${pickRow}${lovers}
+  // (09/11) the TV: « [name] / is about to start / PICK YOUR CHARACTER »
+  const head = TV ? `<h2 class="wr-title tv-t">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2><div class="wr-soon">is about to start</div>${full ? '' : '<div class="wr-kick tv-k">Pick your character</div>'}`
+    : `<div class="wr-kick">Pick your character</div><h2 class="wr-title">${storyTitle()}${resumeEp ? ` · Episode ${resumeEp}` : ''}</h2>`;
+  $('#room').innerHTML = `${head}<div class="wr-seats${seats.length === 1 ? ' one' : ''}">${seats.map(card).join('')}</div>${pickRow}${lovers}
     ${host && mine && !full && !invite ? `<div class="wr-opts">${social() ? '<button type="button" data-o="public">Open to the public</button>' : ''}<button type="button" data-o="alone">Play alone</button></div>` : ''}
     ${!host && hostTv && mine && !full ? '<div class="wr-opts"><button type="button" data-o="bot">The other plays at random</button></div>' : ''}
     ${host && !full && invite && invite.kind === 'public' ? '<div class="wr-opts"><button type="button" class="wr-cancel" data-o="cancel">Cancel</button></div>' : ''}
