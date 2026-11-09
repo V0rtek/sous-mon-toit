@@ -106,7 +106,8 @@ body.hosttv:not(:has(#pauseCard:not([hidden]))) #viewBtn { display: none !import
 body.hosttv:has(#pauseCard:not([hidden])) #viewBtn { z-index: 65; }
 body.phonemin #gateCard { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--me, #3a3a3c) 55%, #000), color-mix(in srgb, var(--me, #3a3a3c) 18%, #000) 75%); }
 #gateCard .gc-ico { font-size: 9em; line-height: 1; animation: cuePulse 1.2s ease-in-out infinite; }
-#gateCard .gc-tap svg { width: 2.2em; height: 2.2em; display: block; }
+#gateCard .gc-tap svg { width: 1.8em; height: 2em; display: block; }
+body.gate-me #gateCard { background: var(--me, #3a3a3c); }   /* (09/11) the phone waiting for a tap: solid in the player's colour */
 #gateCard b { font-size: 4.4em; font-weight: 800; color: #ffd60a; }
 #gateCard span { font-size: 2.6em; font-weight: 600; color: #d1d1d6; }
 #gateCard.ready b, #gateCard.ready .gc-ico { color: #34c759; animation: none; }
@@ -4356,13 +4357,14 @@ let tapNow = false, gateNow = null, gateResend = 0;   // gateNow: the seats a {g
 // story goes on once each of them has tapped, and the TV lights up again
 // (09/11) the « look at your phone » icon: a hand holding a phone, white; the screen is the player's colour (or white in the intro)
 const phoneIco = (screen = 'var(--c, #fff)', cls = 'ph-ico') => `<svg class="${cls}" viewBox="0 0 110 124" aria-hidden="true"><path fill="#fff" d="M3 110C8 101 9 94 9 80 9 62 19 52 27 40L31 30C34 25 41 28 40 35 39 41 35 45 35 51V96C35 104 40 108 46 108H58C50 114 40 118 28 124 17 122 8 117 3 110Z"/><rect x="30" y="2" width="52" height="100" rx="11" fill="#fff" stroke="#0a0a0a" stroke-width="4" paint-order="stroke"/><rect x="36" y="8" width="40" height="88" rx="5" fill="#0a0a0a"/><rect x="38.5" y="10.5" width="35" height="83" rx="3" fill="${screen}"/><g fill="#fff"><ellipse cx="92" cy="46" rx="7" ry="8.5"/><ellipse cx="92" cy="68" rx="7" ry="8.5"/><ellipse cx="92" cy="90" rx="7" ry="8.5"/></g><path d="M88 16L99 5M94 23L106 20" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/></svg>`;
-const TAP_ICO = '<svg viewBox="0 0 64 64" aria-label="Tap"><circle cx="30" cy="22" r="10" fill="none" stroke="#fff" stroke-width="3" opacity=".55"/><circle cx="30" cy="22" r="17" fill="none" stroke="#fff" stroke-width="2.5" opacity=".25"/><path d="M26 22a4 4 0 0 1 8 0v14l9 2.6a5 5 0 0 1 3.6 5.6L45 54H27L18.5 42.5a3.6 3.6 0 0 1 5.4-4.7L26 40z" fill="#fff"/></svg>';
+// (09/11) the « tap » icon of the real phone (waiting for a click): a hand holds the phone, a finger taps its screen; white on the player's solid colour
+const TAP_ICO = (bg = 'var(--me, #3a3a3c)') => `<svg viewBox="0 0 110 124" aria-label="Tap"><path fill="#fff" d="M3 110C8 101 9 94 9 80 9 62 19 52 27 40L31 30C34 25 41 28 40 35 39 41 35 45 35 51V96C35 104 40 108 46 108H58C50 114 40 118 28 124 17 122 8 117 3 110Z"/><rect x="30" y="2" width="52" height="100" rx="11" fill="#fff" stroke="${bg}" stroke-width="4" paint-order="stroke"/><rect x="36" y="8" width="40" height="88" rx="5" fill="${bg}"/><ellipse cx="92" cy="40" rx="7" ry="8.5" fill="#fff"/><path d="M88 14L99 3M94 21L106 18" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/><path d="M52 56L70 94" stroke="${bg}" stroke-width="16" stroke-linecap="round"/><ellipse cx="84" cy="103" rx="24" ry="19" fill="#fff" stroke="${bg}" stroke-width="4" paint-order="stroke"/><path d="M52 56L72 96" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>`;
 function gateOn(s) {
   const el = $('#gateCard'), mine = [...gateNow].filter((k) => mineFor(k)), t = typeof s.text === 'object' ? (s.text || {})[mine[0]] : s.text;
   el.className = '';
   el.classList.toggle('halves', TV);
   el.innerHTML = TV ? [...gateNow].map((k) => `<div class="gc-half" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="gc-ico">${phoneIco()}</div><b>${esc(seatName(k) || '')}</b><span>Look at your phone</span></div>`).join('')
-    : mine.length ? `<div class="gc-ico gc-tap">${TAP_ICO}</div>`   // (09/11) just the white « tap » icon, no words
+    : mine.length ? `<div class="gc-ico gc-tap">${TAP_ICO()}</div>`   // (09/11) just the white « tap » icon, no words
     : `<div class="gc-u u-mark"><span>U</span><span class="u-c">_</span></div><span>${esc([...gateNow].map((k) => seatName(k)).join(' · '))}</span>`;   // (07/11) waiting on the others: U_
   el.hidden = false; document.body.classList.add('gate'); document.body.classList.toggle('gate-me', !TV && mine.length > 0);
 }
