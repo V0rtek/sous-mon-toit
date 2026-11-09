@@ -151,7 +151,7 @@ body.tv #bubble #text { font-family: 'Atkinson Hyperlegible', Verdana, sans-seri
 body.tv #bubble.narr { border-color: rgba(255,255,255,.35); }
 body.tv #bubble.narr #text { color: #fff; }
 body.tv #tag { display: none !important; }
-body.tv #tail { top: -1.7em; width: 1.6em; height: 1.6em; margin-left: -.8em; border: 0; border-left: .4em solid var(--spk, #fff); border-top: .4em solid var(--spk, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .4em rgba(0,0,0,.6)); }   /* a chevron: ^ over the one speaking */
+body.tv #tail { top: -2em; width: 2em; height: 2em; margin-left: -1em; border: 0; border-left: .45em solid color-mix(in oklch, var(--spk, #fff) 50%, #fff); border-top: .45em solid color-mix(in oklch, var(--spk, #fff) 50%, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .35em var(--spk, #fff)) drop-shadow(0 0 .25em #000); }   /* (09/11) light, glowing: it shows on any picture */   /* a chevron: ^ over the one speaking */
 body.tv #tail::after { display: none; }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
@@ -228,17 +228,19 @@ body.tv #tail::after { display: none; }
 #wait { background: radial-gradient(circle at 50% 30%, #241a2e, #000 75%); color: #f5f5f7; justify-content: flex-start; padding: 12em 5% 0; }
 .wr-kick { text-align: center; font-size: 1.7em; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; color: #8e8e93; }
 .wr-title { text-align: center; font-family: var(--display); font-weight: 400; font-size: 4.4em; margin: .15em 0 .5em; }
-/* (09/11) the TV waiting: « [name] / is about to start » takes the room, the characters smaller under it */
-.wr-title.tv-t { font-size: 11em; line-height: 1; margin: 0; }
-.wr-soon { text-align: center; font-size: 4.6em; font-weight: 600; color: #c7c7cc; margin: .2em 0 1.4em; }
-.wr-kick.tv-k { margin-bottom: 1em; }
-body.tv #wait .wr-seats { display: flex; justify-content: center; width: 56%; margin: 0 auto; gap: 1em; min-height: 26em; }
-body.tv #wait .wr-seat { width: calc(50% - .5em); }
+/* (09/11) the TV waiting: « [name] / is about to start » takes the room, in the middle; the characters small under it */
+body.tv #wait { justify-content: center; padding-top: 0; }
+.wr-title.tv-t { font-size: 16em; line-height: 1; margin: 0; }
+.wr-soon { text-align: center; font-size: 6.4em; font-weight: 600; color: #c7c7cc; margin: .15em 0 1.6em; }
+.wr-kick.tv-k { margin-bottom: .8em; }
+body.tv #wait .wr-seats { display: flex; justify-content: center; width: 40%; margin: 0 auto; gap: 1em; min-height: 18em; }
+body.tv #wait .wr-seat { width: calc(50% - .5em); padding: .6em .4em .6em; }
+body.tv #wait .wr-set { display: none; }
 body.tv #wait .wr-seat.pull { animation: wrPull .7s cubic-bezier(.2,.9,.3,1.2) backwards; }
 @keyframes wrPull { from { opacity: 0; transform: translateY(2em) scale(.9); } }
 body.tv #wait .wr-seat { padding: 1em .6em .8em; }
-body.tv #wait .wr-seat img { height: 18em; }
-body.tv #wait .wr-seat b { font-size: 2.2em; }
+body.tv #wait .wr-seat img { height: 11em; }
+body.tv #wait .wr-seat b { font-size: 1.8em; }
 body.tv #wait .wr-set { width: 56%; margin: 1.2em auto 0; }
 body.tv #wait .wr-set button { font-size: 1.4em; padding: .7em .3em; }
 .wr-seats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; }
@@ -1719,7 +1721,9 @@ body.watch.hosttv #again { display: block !important; }
 #tvIntro .ti-t { font-family: var(--display); font-weight: 400; font-size: 10em; line-height: 1.05; margin-bottom: .2em; }
 #tvIntro .ti-p { font-size: 4.6em; font-weight: 600; line-height: 1.4; color: #e5e5ea; max-width: 26em; }
 #tvIntro .ti-cast { display: flex; justify-content: center; gap: 8em; }
-#tvIntro .ti-c { display: flex; flex-direction: column; align-items: center; gap: .6em; }
+#tvIntro .ti-c { display: flex; flex-direction: column; align-items: center; gap: .3em; padding: 2em 4em 3em; border-radius: 3em; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 42%, transparent), transparent 70%); }
+#tvIntro .ti-c .ti-pl { font-family: var(--display); font-weight: 400; font-size: 8em; line-height: 1.05; color: var(--c) !important; margin-top: .15em; }
+#tvIntro .ti-c .ti-bar { width: 60%; height: .9em; border-radius: 1em; background: var(--c); margin-top: 1.2em; box-shadow: 0 0 2em var(--c); }
 #tvIntro .ti-c img { height: 38em; filter: drop-shadow(0 0 2.2em color-mix(in srgb, var(--c, #ff9a4d) 55%, transparent)); }
 #tvIntro .ti-s { display: flex; flex-direction: column; align-items: center; gap: 1.4em; }
 #tvIntro .ti-c .ti-who { font-size: 4em; font-weight: 600; color: #d1d1d6; white-space: nowrap; }
@@ -1745,6 +1749,7 @@ body.tv:has(#tvIntro:not([hidden])) #tvSides, body:has(#mirrorCard:not([hidden])
 @keyframes uBleed { 0% { opacity: 0; filter: blur(18px); transform: scale(1.25); } 60% { opacity: 1; } 100% { opacity: 1; filter: none; transform: none; } }
 #uWait { position: absolute; inset: 0; z-index: 14; display: grid; place-items: center; background: #000; pointer-events: none; font-size: 14em; }
 #uWait[hidden] { display: none; }
+#uWait.me { background: radial-gradient(circle at 50% 45%, var(--me, #3a3a3c), color-mix(in srgb, var(--me, #3a3a3c) 30%, #000) 85%); transition: background .8s; }
 #gateCard .gc-u { font-size: 9em; margin-bottom: .15em; }
 @media (prefers-reduced-motion: reduce) { .u-c { animation: none; } #tvIntro .ti-logo.run .lt { animation: none; opacity: 1; } #tvIntro .ti-logo.run .u-c { animation: none; opacity: 1; } }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
@@ -2755,7 +2760,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109200000"></script>
+<script src="heist.js?v=20261109210000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -4120,14 +4125,14 @@ async function tvIntro(at) {
     lg.classList.add('out');
     if (!(await hold(1300))) return false;
   }
-  if (!(await slide(`<div class="ti ti-k">UNWRITTEN</div><div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;
+  if (!(await slide(`<div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;   // (09/11) the logo just said Unwritten: the title alone
   for (const x of st.intro || []) if (!(await slide(`<div class="ti ti-p">${esc(fill(x))}</div>`, Math.max(4000, 1800 + 55 * x.length)))) return false;
   // who plays whom: each character (the pose of the waiting room), facing the other, and its player — the phones show
   // "Tu es …" now, and keep it until the opening is over
   const pick = st.pick || {};
   const cast = seatsOf().map((s, i) => {
     const pose = (pick[s] || {}).pose || 'listen', nat = (FACE[spriteOf(s)] || {})[poseOf(s, pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');
-    return `<div class="ti ti-c" style="--c:${(castOf(s) || {}).color || '#ff9a4d'}"><img src="${poseSrc(s, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><span class="ti-who">${badge(s)}<b>${esc(seatName(s) || '…')}</b> joue <i>${esc(seatLabel(s))}</i></span></div>`;
+    return `<div class="ti ti-c" style="--c:${(castOf(s) || {}).color || '#ff9a4d'}"><img src="${poseSrc(s, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><b class="ti-pl">${esc(seatName(s) || '…')}</b><span class="ti-who">is <i>${esc(seatLabel(s))}</i></span><span class="ti-bar"></span></div>`;   // (09/11) the player's name in his colour: his colour for the whole story
   }).join('');
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
@@ -4190,6 +4195,7 @@ $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; $('#uWait').hidden = true; return; }
   const ip = remote && remote.ip;
+  $('#uWait').classList.toggle('me', ip === 'cast');   // (09/11) the TV says who's who: the phone turns his colour, as on the TV
   if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
   if (!ip && o.cardDone) { tvOpen = null; $('#uWait').hidden = true; next(); }
 }
