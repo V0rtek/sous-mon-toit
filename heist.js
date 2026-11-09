@@ -145,14 +145,14 @@
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
     ...at('h_top'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
-    { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
+    { by: 'pa', clock: 0, cue: 'Look at your phone', big: true, ask: true, choice: [   // big: the TV all black (the first choices: so they get it)
       { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'Ray…'), S('pa', 'I have a son.')] },
       { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_ray_pocket'), RING, { hush: 1200 },
     { when: (f) => f.p1 === 'lose', then: [S('pa', 'Seems like you’ve got someone to lose as well.')] },
-    { by: 'pb', ring: 'Amy', cue: 'Look at your phone', choice: [
+    { by: 'pb', ring: 'Amy', cue: 'Look at your phone', big: true, choice: [
       { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
       { t: 'Later', intent: 'later', set: { amy: 'later' }, then: [] },
     ] },
@@ -309,7 +309,10 @@
       pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
       pb: { name: 'Ray', color: P2, sprite: 'h_ray' },
       leo: { name: 'Leo', color: '#f59e0b', avatar: 'props/leo_face.webp' },   // (09/11) his photo, from the lock screen
-      sarah: { name: 'Sarah', color: '#22c55e' },
+      sarah: { name: 'Sarah', color: '#22c55e', avatar: 'props/sarah_face.webp',   // (09/11) her photo (her initial until the file is there)
+        past: [{ day: 'Yesterday', at: '6:12 PM' }, ['in', 'Did you call the bank about the loan?'], ['out', 'Tomorrow. I’ll handle it.'],
+          ['in', 'Leo’s coach asked about next season’s fees again'], ['out', 'I know. I’m on it.'],
+          { day: 'Today', at: '7:05 AM' }, ['in', 'You left early. Everything ok?'], ['out', 'Yeah. Something downtown.'], ['in', 'Ok. Love you']] },   // their texts before (above the new ones)
       amy: { name: 'Amy', color: AMY },
       guard: { name: 'Guard', color: '#94a3b8' },
     },
