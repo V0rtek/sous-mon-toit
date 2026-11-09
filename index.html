@@ -1509,10 +1509,19 @@ body.hosttv.instory #menuPop[hidden] { display: flex !important; bottom: 2.2%; }
 body.playonly #back, body.playonly #qrBtn, body.playonly #eyes, body.playonly #galBtn, body.playonly #menuBtn, body.playonly #menuPop { display: none !important; }
 #back:focus-visible, #galBtn:focus-visible { outline: .25em solid #fff; }
 #galBtn { position: absolute; top: 2.2%; left: 4%; z-index: 30; font: inherit; width: 8em; height: 8em; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; cursor: pointer; padding: 0; }
-#galBtn svg { width: 3.8em; height: 3.8em; }
+#galBtn svg { width: 4.2em; height: 4.2em; }
+#galBtn { overflow: hidden; }
+#galBtn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#galBtn img[hidden] { display: none; }
+/* the profile: a round photo to tap, the name under, Save */
+#profile .pfPic { width: 20em; height: 20em; margin: 0 auto 3em; border-radius: 50%; border: 0; background: #1c1c1e center / cover no-repeat; display: grid; place-items: center; cursor: pointer; padding: 0; overflow: hidden; position: relative; }
+#profile .pfPic svg { width: 12em; height: 12em; }
+#profile .pfPic small { position: absolute; bottom: 0; left: 0; right: 0; padding: .5em 0 .7em; background: rgba(0,0,0,.55); color: #fff; font-size: 1.4em; font-weight: 700; }
+#profile .pfLinks { display: flex; flex-direction: column; gap: 1.2em; margin-top: 2em; }
+#profile .pfLinks .pill { font-size: 2.2em; background: #1c1c1e; color: #f5f5f7; }
 /* the QR, the spectator count and the gallery live in the menu only (the QR in a waiting room too: Full demo's Play lands
    there, so a friend can scan in and take the other seat) */
-body:not(.home):not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
+body:not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
 /* two players: the one whose turn it is not waits on the last shot */
 #waitOther { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 20; padding: .7em 1.4em; border-radius: 2em; background: rgba(15,12,20,.75); color: #fff; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; }
 #waitOther i { font-style: normal; animation: blink 1.2s infinite; }
@@ -2075,6 +2084,15 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <input id="whoName" maxlength="16" autocomplete="off" placeholder="Your name" aria-label="Your name">
       <button class="pill" type="submit">Enter</button>
     </form>
+  </div>
+  <div id="profile" class="card menu" hidden>
+    <form id="pfForm" class="ask">
+      <button class="pfPic" id="pfPic" type="button" aria-label="Your picture"><svg viewBox="0 0 24 24" fill="#86868b" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21c0-4.4 3.8-7.2 8.5-7.2s8.5 2.8 8.5 7.2z"/></svg><small>Add your picture</small></button>
+      <input id="pfFile" type="file" accept="image/*" hidden>
+      <input id="pfName" maxlength="16" autocomplete="off" placeholder="Your name" aria-label="Your name">
+      <button class="pill" type="submit">Save</button>
+    </form>
+    <div class="pfLinks"><button class="pill" id="pfChars" type="button">Characters</button></div>
   </div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
@@ -2726,7 +2744,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="freshBtn" type="button" aria-label="Update"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
   <button id="qrBtn" type="button" hidden aria-label="Let someone watch"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm-6 2h2v2h-2zm4 0h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
   <div id="eyes" hidden aria-label="Viewers"><svg viewBox="0 0 24 24" fill="#fff" fill-rule="evenodd" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 2.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg><span></span></div>
-  <button id="galBtn" type="button" aria-label="Characters"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="9" cy="7.5" r="3.5"/><path d="M2 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6v.5H2z"/><circle cx="17" cy="8.5" r="2.8" opacity=".7"/><path d="M17.5 13.6c2.7.3 4.5 2.3 4.5 5.4v1h-4.6c0-2.6-.8-4.7-2.4-6.1.8-.3 1.6-.4 2.5-.3z" opacity=".7"/></svg></button>
+  <button id="galBtn" type="button" aria-label="Profile"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21c0-4.4 3.8-7.2 8.5-7.2s8.5 2.8 8.5 7.2z"/></svg><img id="galImg" alt="" hidden></button>
   <div id="poseCard" hidden><img id="poseImg" alt=""><span id="poseName"></span></div>
   <button id="back" type="button" hidden aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
@@ -4751,8 +4769,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
-const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
+const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#profile', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
+const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#profile': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
   '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
@@ -5617,10 +5635,43 @@ $('#watch3d').onclick = (e) => {
   $('#yt').src = `https://www.youtube-nocookie.com/embed/${VIDEO_3D}?autoplay=1&playsinline=1&rel=0`;
   show('#video3d');
 };
-$('#galBtn').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
+// ---- the profile (the user icon, top left): everyone picks a name and puts their own picture (this device only) ----
+const PHOTO = 'smt-photo';
+const getPhoto = () => { try { return localStorage.getItem(PHOTO) || ''; } catch { return ''; } };
+function paintMe() {
+  const ph = getPhoto(), g = $('#galImg'), pic = $('#pfPic');
+  g.hidden = !ph; if (ph) g.src = ph; $('#galBtn svg').style.display = ph ? 'none' : '';
+  pic.style.backgroundImage = ph ? `url(${ph})` : ''; pic.querySelector('svg').style.display = ph ? 'none' : ''; pic.querySelector('small').textContent = ph ? 'Change your picture' : 'Add your picture';
+}
+$('#galBtn').onclick = (e) => {
+  e.stopPropagation();
+  try { $('#pfName').value = localStorage.getItem('smt-name') || (ROLE === 'host' ? state.name : myName) || ''; } catch { /* private window */ }
+  if ($('#pfName').value === 'You') $('#pfName').value = '';
+  paintMe(); show('#profile');
+};
+$('#pfPic').onclick = (e) => { e.stopPropagation(); $('#pfFile').click(); };
+$('#pfFile').onchange = () => {
+  const f = $('#pfFile').files[0]; $('#pfFile').value = ''; if (!f) return;
+  const im = new Image(), u = URL.createObjectURL(f);
+  im.onload = () => {
+    const S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+    const m = Math.min(im.width, im.height), x = c.getContext('2d');   // a centred square
+    x.drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, S, S); URL.revokeObjectURL(u);
+    try { localStorage.setItem(PHOTO, c.toDataURL('image/jpeg', .85)); } catch { /* private window */ }
+    paintMe();
+  };
+  im.src = u;
+};
+$('#pfForm').addEventListener('submit', (e) => {
+  e.preventDefault(); const v = $('#pfName').value.trim().slice(0, 16); $('#pfName').blur();
+  if (v) { try { localStorage.setItem('smt-name', v); } catch { /* private window */ } if (ROLE === 'host') state.name = v; else myName = v; }
+  show('#hub');
+});
+$('#pfChars').onclick = (e) => { e.stopPropagation(); show('#gallery'); };
+paintMe();
 $('#back').onclick = (e) => {
   e.stopPropagation();
-  if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
+  if (fromDemo && ['#wait', '#end', '#genScreen', '#newChar', '#gallery', '#profile'].includes(screen)) { toHub(); history.back(); return; }   // opened from Full demo: back there
   if (screen === '#techCard' && techPath.length > 1) { techPath.pop(); techOpen(); return; }   // a card: back one step of the path
   if (screen === '#plan') PLAN.closeSheet();
   if (screen === '#bank' && window.BANK_BACK && BANK_BACK()) return;   // Nouveau perso open: back to the list
