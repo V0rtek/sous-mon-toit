@@ -5119,6 +5119,7 @@ function renderWait() {
   });
   document.querySelectorAll('#room .wr-opts button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); if (b.dataset.o === 'bot') { sendIn('bot'); return; }
     if (b.dataset.o === 'auto') {   // (09/11) the TV alone: both characters play themselves (random choices), to watch it through
+      if (e.detail > 0 && matchMedia('(pointer: coarse)').matches) return;   // a finger on the TV's screen (tv-sim on a phone) isn't a wish for Autoplay: only space (detail 0) or a mouse
       for (const k of seatsOf()) if (!state.seats[k]) state.seats[k] = { id: BOT, n: seatLabel(k) };
       renderWait(); share(); startWhenFull(); return;
     }
