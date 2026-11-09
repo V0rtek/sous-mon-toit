@@ -9,7 +9,7 @@
 <title>UNWRITTEN</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&family=Playfair+Display+SC:wght@900&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,800;1,700;1,900&family=Yeseva+One&family=Playfair+Display+SC:wght@900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" media="print" onload="this.media='all'">
 <style>
 /* Layout: one 9:16 phone stage, centred on black. 1em inside the stage = 1% of its height, so it scales as a whole.
    Inside, one "world" in decor pixels (photo + people + foreground); the camera is a transform on it. */
@@ -141,10 +141,11 @@ body { --tx: 2.2em; --cap: 2.5em; --tagsz: 2.2em; }
 body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
 #text { font-size: var(--tx); line-height: 1.32; font-weight: 600; min-height: 1.32em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
-body.tv #bubble { background: rgba(8,8,12,.62); border: .16em solid color-mix(in srgb, var(--spk, #8e8e93) 85%, #fff); box-shadow: none; padding: 1em 1.6em; backdrop-filter: blur(.3em); -webkit-backdrop-filter: blur(.3em); }
-body.tv #bubble #text { color: color-mix(in srgb, var(--spk, #f5f5f7) 40%, #fff); text-align: center; font-weight: 700; }
-body.tv #bubble.narr { border-color: rgba(255,255,255,.18); }
-body.tv #bubble.narr #text { color: #e5e5ea; }
+/* (09/11) the TV's subtitles: black, the speaker's colour strong, Atkinson Hyperlegible (made to be read), regular, airy */
+body.tv #bubble { background: #000; border: .16em solid var(--spk, #8e8e93); box-shadow: 0 0 2em rgba(0,0,0,.6); padding: .9em 1.6em; }
+body.tv #bubble #text { font-family: 'Atkinson Hyperlegible', Verdana, sans-serif; color: color-mix(in srgb, var(--spk, #f5f5f7) 88%, #fff); text-align: center; font-weight: 400; font-style: normal; font-size: calc(var(--tx) * 1.2); line-height: 1.45; letter-spacing: .02em; word-spacing: .1em; }
+body.tv #bubble.narr { border-color: rgba(255,255,255,.35); }
+body.tv #bubble.narr #text { color: #fff; }
 body.tv #tag { display: none !important; }
 body.tv #tail { top: -2.6em; width: 2.6em; height: 2.6em; margin-left: -1.3em; border: 0; border-left: .55em solid var(--spk, #fff); border-top: .55em solid var(--spk, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .4em rgba(0,0,0,.6)); }   /* a chevron: ^ over the one speaking */
 body.tv #tail::after { display: none; }
@@ -1639,11 +1640,10 @@ body.phonemin #ringBtns { flex: 1; width: 100%; gap: 0; margin: 0; }
 body.phonemin #ringBtns button { flex: 1; justify-content: center; }
 /* paused, on the phone: Reprendre is the whole screen, Quitter a strip at the bottom */
 body.phonemin #pauseCard { padding: 0 10%; justify-content: center; align-items: center; gap: 4em; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--me, #3a3a3c) 45%, #000), #000 78%); }
-body.phonemin #pauseCard > :not(.pc-btns):not(.pc-play) { display: none !important; }
-body.phonemin #pauseCard .pc-play { display: block; }
-body.phonemin #pauseCard .pc-play svg { width: 12em; height: 12em; display: block; opacity: .9; }
+body.phonemin #pauseCard > :not(.pc-btns) { display: none !important; }   /* (09/11) no pause symbol over Resume: one thing to tap */
 body.phonemin #pauseCard .pc-btns { flex-direction: column; align-items: center; gap: 1.6em; margin: 0; width: 100%; }
-body.phonemin #pauseCard .pc-go { flex: none; width: 100%; font-size: 3.4em; padding: .75em; border-radius: 2em; background: #fff; color: #000; }
+body.phonemin #pauseCard .pc-go { flex: none; width: 100%; font-size: 3.4em; padding: .75em; border-radius: 2em; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: .4em; }
+#pauseCard .pc-go svg { width: 1em; height: 1em; flex: none; }
 body.phonemin #pauseCard .pc-quit { flex: none; font-size: 2.4em; padding: .6em 1.4em; background: none; color: rgba(255,255,255,.7); }
 body.phonemin:not(.privline) #bubble, body.phonemin #waitOther, body.phonemin #caption, body.phonemin #callBar { visibility: hidden; }
 body.hosttv.instory #pauseBtn { display: grid; }
@@ -2699,7 +2699,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="pauseBtn" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   <div id="pauseCard" hidden><div class="pc-play" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="5" height="18" rx="1.2" fill="#fff"/><rect x="14" y="3" width="5" height="18" rx="1.2" fill="#fff"/></svg></div><h2>Pause</h2><div class="pc-who"></div>
     <div class="pc-grid"><div class="pc-players"></div></div>
-    <div class="pc-btns"><button type="button" class="pc-go">Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
+    <div class="pc-btns"><button type="button" class="pc-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>Resume</button><button type="button" class="pc-quit">Quit</button></div></div>
   <div id="gateCard" hidden></div>
   <div id="uWait" hidden><span class="u-mark"><span>U</span><span class="u-c">_</span></span></div>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="uInk" x="-4%" y="-12%" width="108%" height="124%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -4079,7 +4079,7 @@ async function tvIntro(at) {
   }).join('');
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
-  if (!(await slide('<div class="ti ti-h">Everyone makes their choices in secret on their phone.</div><div class="ti ti-h">Here, you\'ll see what comes of them.</div>', 5200))) return false;
+  if (!(await slide('<div class="ti ti-h">When it’s your turn, choose on your phone.</div>', 4200))) return false;   // (09/11) one line, true whatever the setting
   tvPhase = null; skipVotes.clear(); skipTv(); share(); box.classList.add('out');
   if (!(await hold(1900))) return false;
   box.hidden = true; return true;
@@ -4134,11 +4134,11 @@ function skipTv() {
   el.innerHTML = tvPhase ? ks.map((k) => `<i style="--c:${(castOf(k) || {}).color || '#fff'}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg></i>`).join('') : '';
 }
 $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
-// a player's phone: black until the TV says who's who, then its "Tu es …" card, then the story with the TV
+// a player's phone: U_ for the whole of the TV's opening (09/11: it went black from « who plays whom » on), then the story with the TV
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; $('#uWait').hidden = true; return; }
   const ip = remote && remote.ip;
-  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; $('#uWait').hidden = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
+  if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
   if (!ip && o.cardDone) { tvOpen = null; $('#uWait').hidden = true; next(); }
 }
 // the pause: who paused, the last 4 choices (who, which, what came of it); the phones get Reprendre / Quitter
