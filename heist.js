@@ -146,8 +146,8 @@
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
     ...at('h_top'), { hush: 1300 }, ...at('h_two_r'), S('pb', 'Nothing to lose. Right?'),   // the line the choice answers (on the TV during the choice)
     { by: 'pa', clock: 0, cue: 'Look at your phone', ask: true, choice: [
-      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to lose.')] },
-      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'I’ve got a lot to win.')] },
+      { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_two'), S('pa', 'Ray…'), S('pa', 'I have a son.')] },
+      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_two'), S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_ray_pocket'), RING, { hush: 1200 },
@@ -178,8 +178,8 @@
         pb: [...at('h_side_pb'), { gate: 'pb', text: 'Amy is on the line' }, { tick: true },
           S('amy', 'Hey you. Are you still downtown?'),
           { by: 'pb', clock: 15000, choice: [
-            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Yeah. Work thing.')] },
-            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No. Home soon.')] },
+            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Still here, yeah. Something for work.')] },
+            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No, I’m on my way. Twenty minutes.')] },
           ] },
           S('amy', 'I’ve got a meeting at noon. A big one. I’ll tell you tonight.'),
           S('amy', 'Love you.'),
@@ -234,25 +234,25 @@
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
             { sfx: 'gun shot' }, ...at('h_wc_shot'), T('The guard slumps against the wall, his hand on his shoulder. His gun on the floor.')] },
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
-            S('pa', 'DROP IT!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), T('His gun hits the floor. Marcus kicks it away: it stops among the hostages.')] },
+            S('pa', 'Gun on the floor! NOW!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), T('His gun hits the floor. Marcus kicks it away: it stops among the hostages.')] },
         ] },
         lose(1),   // the wait at the door
       ] },
       { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
-        S('pa', 'I know you’re in there. Send over your weapon!'),
+        S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'),
         S('guard', 'Come and get it.'),
         { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
           { t: '“Ten seconds. Then someone out here pays for it.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
-            S('pa', 'Ten seconds. Then someone out here pays for it.'), S('guard', 'Don’t! Don’t touch them!')] },
+            S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },
           { t: '“Nobody dies for the bank’s money. Come out.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
-            S('pa', 'Nobody dies for the bank’s money. Come out.'), S('guard', '…')] },
+            S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
         S('guard', 'Okay. I come out, I get down. But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
-            S('pa', 'Fine. On the ground.'), ...at('h_wc_hands'), T('Hands up, the guard comes out and lies down with the others. His gun still on his hip.')] },
+            S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), T('Hands up, the guard comes out and lies down with the others. His gun still on his hip.')] },
           { t: '“The gun first. Slide it.”', ic: 'tough', sh: 'The gun first', intent: 'wants the gun', set: { gun: 'floor' }, then: [
-            S('pa', 'The gun first. Slide it.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.'),
+            S('pa', 'No. Gun first. Across the floor.'), ...at('h_wc_gun'), T('The gun slides out across the marble. Too far: it stops among the hostages.'),
             ...at('h_wc_hands'), { hush: 1600 }] },
         ] },
         { fn: (f) => [lose(f.talk === 'reason' ? 3 : 2)] },   // the talk through the door (reasoning: longer)
@@ -308,7 +308,7 @@
     cast: {
       pa: { name: 'Marcus', color: P1, sprite: 'h_marcus' },
       pb: { name: 'Ray', color: P2, sprite: 'h_ray' },
-      leo: { name: 'Leo', color: '#f59e0b' },
+      leo: { name: 'Leo', color: '#f59e0b', avatar: 'props/leo_face.webp' },   // (09/11) his photo, from the lock screen
       sarah: { name: 'Sarah', color: '#22c55e' },
       amy: { name: 'Amy', color: AMY },
       guard: { name: 'Guard', color: '#94a3b8' },

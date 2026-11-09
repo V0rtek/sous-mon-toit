@@ -70,6 +70,7 @@ body.lit-soft .actor.talk { animation: talk .22s ease-out; }   /* a small, quick
 .sf { flex: none; width: 3.6em; height: 3.6em; border-radius: 50%; overflow: hidden; background: #c7c7cc; }
 .sf { position: relative; }
 .sf img { position: absolute; width: 100%; opacity: 0; }   /* placed on his head once loaded (headCrop) */
+.sf img.av { inset: 0; height: 100%; object-fit: cover; opacity: 1; }   /* (09/11) a contact's own photo (cast.avatar) */
 /* a text to the one you play while the camera is elsewhere: a banner up top, like the phone's own */
 .smsNote { position: absolute; left: 5%; right: 5%; top: 3%; display: flex; align-items: center; gap: 1.2em; padding: 1.1em 1.4em; border-radius: 2.4em; background: rgba(28,28,30,.88); backdrop-filter: blur(1em); -webkit-backdrop-filter: blur(1em); color: #fff; box-shadow: 0 .4em 1.4em rgba(0,0,0,.4); font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif; }
 .smsNote.fresh { animation: noteIn .35s ease-out; }
@@ -143,11 +144,11 @@ body.tv { --tx: 2.9em; --cap: 3.2em; --tagsz: 3em; }
 #tail { position: absolute; top: -1.7em; width: 0; height: 0; margin-left: -1.1em; border-left: 1.1em solid transparent; border-right: 1.1em solid transparent; border-bottom: 1.8em solid var(--rim); }
 /* (09/11) the TV's subtitles: black, the speaker's colour strong, Atkinson Hyperlegible (made to be read), regular, airy */
 body.tv #bubble { background: #000; border: .16em solid var(--spk, #8e8e93); box-shadow: 0 0 2em rgba(0,0,0,.6); padding: .9em 1.6em; }
-body.tv #bubble #text { font-family: 'Atkinson Hyperlegible', Verdana, sans-serif; color: color-mix(in srgb, var(--spk, #f5f5f7) 88%, #fff); text-align: center; font-weight: 400; font-style: normal; font-size: calc(var(--tx) * 1.2); line-height: 1.45; letter-spacing: .02em; word-spacing: .1em; }
+body.tv #bubble #text { font-family: 'Atkinson Hyperlegible', Verdana, sans-serif; color: color-mix(in oklch, var(--spk, #f5f5f7) 52%, #fff); text-align: center; font-weight: 400; font-style: normal; font-size: calc(var(--tx) * 1.2); line-height: 1.45; letter-spacing: .02em; word-spacing: .1em; }
 body.tv #bubble.narr { border-color: rgba(255,255,255,.35); }
 body.tv #bubble.narr #text { color: #fff; }
 body.tv #tag { display: none !important; }
-body.tv #tail { top: -2.6em; width: 2.6em; height: 2.6em; margin-left: -1.3em; border: 0; border-left: .55em solid var(--spk, #fff); border-top: .55em solid var(--spk, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .4em rgba(0,0,0,.6)); }   /* a chevron: ^ over the one speaking */
+body.tv #tail { top: -1.7em; width: 1.6em; height: 1.6em; margin-left: -.8em; border: 0; border-left: .4em solid var(--spk, #fff); border-top: .4em solid var(--spk, #fff); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: drop-shadow(0 0 .4em rgba(0,0,0,.6)); }   /* a chevron: ^ over the one speaking */
 body.tv #tail::after { display: none; }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
@@ -1832,8 +1833,8 @@ body.tv #choices button.pub { font-size: 2.4em !important; padding: .4em 1em .4e
 #choices button.pub.picked { background: color-mix(in srgb, var(--pc, #fff) 45%, #000) !important; box-shadow: inset 0 0 0 .16em #fff !important; transform: scale(1.03); }
 body.tv.chpub #choices { pointer-events: none; }
 body.phonemin #choices button.pub { flex-direction: column; justify-content: center; gap: .8em; padding: 0 !important; background: rgba(28,26,36,.95) !important; }
-body.phonemin #choices button.pub .cic { width: 9em; height: 9em; border-radius: 2em; background: rgba(255,255,255,.07); }
-body.phonemin #choices button.pub .cic svg { width: 5.5em; height: 5.5em; }
+body.phonemin #choices button.pub .cic { width: 14em; height: 14em; border-radius: 3em; background: rgba(255,255,255,.07); }
+body.phonemin #choices button.pub .cic svg { width: 9em; height: 9em; }
 body.phonemin #choices button.pub .csh { font-size: 3.2em; font-weight: 800; color: #f5f5f7; }
 #choices.cx button.idle, body.cellon #choices button.idle { background: transparent !important; color: rgba(255,255,255,.75) !important; box-shadow: none !important; outline: .22em dashed rgba(255,255,255,.55); outline-offset: -.22em; }   /* doing nothing */
 #choices.cx .ty-do { outline: .18em dashed #ffd60a; outline-offset: -.18em; }
@@ -1862,10 +1863,21 @@ body.phonemin #choices.cx .cf2 { width: 8em; height: 8em; }
 body.phonemin #choices.cx .cto i { font-size: 4em; }
 body.phonemin #choices.cx .tyb { right: .8em; top: .8em; width: 4em; height: 4em; box-shadow: none; }
 body.phonemin #choices.cx .tyb svg { width: 2.4em; height: 2.4em; }
+/* (09/11) the phone's choice: its icon big, above the words */
+body.phonemin #choices.cx button:has(> .cic) { flex-direction: column; justify-content: center; gap: 1.2em; padding: .6em 1.2em; }
+body.phonemin #choices.cx button > .cic { width: 12em; height: 12em; border-radius: 2.6em; }
+body.phonemin #choices.cx button > .cic svg { width: 7.5em; height: 7.5em; }
+body.phonemin #choices.cx button:has(> .cic) .ctx { flex: none; }
+body.phonemin #choices.cx button:has(> .cic) .ct { font-size: 3.2em; }
+/* texting: just the words */
+body.cellon #choices .cic { display: none !important; }
+/* the phone: what the choice is about, above it (his question, or « your move ») */
+#qCard.qk { justify-content: center; text-align: center; }
+#qCard.qk b { font-size: 2.6em; color: var(--c, #fff); }
 body.tv #choices.tvpicked button.picked { transform: scale(1.04); }
 /* the TV's screen is wide: the story fills it, the words and choices stay in a column at the bottom, the two players'
    panels in the bottom corners, over the scene */
-body.tv #ui { left: 50%; right: auto; width: 72em; transform: translateX(-50%); top: auto; bottom: 5%; }
+body.tv #ui { left: 50%; right: auto; width: 100em; transform: translateX(-50%); top: auto; bottom: 5%; }
 
 /* the talk box, other ways (02/11, from paroles.html): Cinéma = no box, the words heavy-shadowed at the bottom, the
    speaker's name above in his colour; Bande = a dark band across the bottom (no face circle); Mot par mot (TV) = big,
@@ -1896,7 +1908,11 @@ body.tvpaused .tv-side:hover .fig { transform: scale(1.04); filter: drop-shadow(
 /* the two players are in different places (a split): the TV shows only the closed eye, each phone shows its own scene */
 #apart { position: absolute; inset: 0; z-index: 45; background: #000; display: none; grid-template-columns: 1fr 1fr; }
 body.tv.apart.instory #apart { display: grid; }
-body.tv.apart.apart-show #apart { display: none; }   /* the TV keeps its own picture (a clock ticking) */
+body.tv.apart.apart-show #apart { display: grid; inset: auto 0 0 0; height: 36%; background: rgba(0,0,0,.86); }   /* (09/11) the TV keeps its own picture (a clock ticking), and says what to do under it */
+body.tv.apart.apart-show #apart > div { gap: .8em; background: none; }
+body.tv.apart.apart-show #apart .ap-ico { font-size: 5em; }
+body.tv.apart.apart-show #apart b { font-size: 3.4em; color: var(--c); }
+body.tv.apart.apart-show #apart > div > span { font-size: 3em; color: #fff; }
 /* one half per player: the closed eye, his name, and how far into his scene he is */
 #apart > div { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6em; animation: apartIn .8s ease-out;
   background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 45%, #000), color-mix(in srgb, var(--c) 12%, #000) 80%); }   /* each player's half, in his colour (as the gate) */
@@ -2733,7 +2749,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261109170000"></script>
+<script src="heist.js?v=20261109180000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -3286,7 +3302,7 @@ const PHONE = '<svg viewBox="0 0 24 24" fill="#1d1d1f" aria-hidden="true"><path 
 const nameOf = (id) => (id && castOf(id) && castOf(id).name) || '';
 const mineTo = (id) => seatsOf().includes(id) && sees(id);   // the one (one of those) you play
 // a sender with no picture (an unknown number) has an empty circle
-const faceOf = (id) => `<span class="sf">${id && castOf(id) && castOf(id).sprite ? `<img src="${poseSrc(id, 'listen')}" alt="" onload="headCrop(this)">` : ''}</span>`;
+const faceOf = (id) => id && castOf(id) && castOf(id).avatar ? `<span class="sf"><img class="av" src="${castOf(id).avatar}" alt=""></span>` : `<span class="sf">${id && castOf(id) && castOf(id).sprite ? `<img src="${poseSrc(id, 'listen')}" alt="" onload="headCrop(this)">` : ''}</span>`;
 // a round face from a whole-body sprite: finds his head in the picture (the top of the figure, wherever he leans) and
 // centres it in the circle
 const HEADS = {};
@@ -3389,7 +3405,7 @@ function drawCell() {
   const other = cellWith || last.other, list = all.filter((m) => m.other === other && !(m.only && !sees(m.only)));
   const c = castOf(other) || {}, p = (story() && story().phone) || {};
   // a contact he has (a name, a face), or a number he doesn't know
-  const known = !c.num && c.sprite, who = c.num || nameOf(other) || '?';
+  const known = !c.num && (c.sprite || c.avatar), who = c.num || nameOf(other) || '?';
   const bat = (p.bat && p.bat[owner]) || 38, low = bat <= 20;
   const shown = list.filter((m) => !m.draft), draft = list.find((m) => m.draft);
   const typing = (phoneLog[other] || []).some((m) => m.draft && m.other === owner);
@@ -3897,9 +3913,13 @@ function choiceCard(o, m, all, remote) {
 function qCardShow(k) {
   qCardOff();
   const remote = document.body.classList.contains('phonemin'), st = chStyle(remote);
-  if (!chAsk && !(remote ? st === 'U1' : st === 'T3')) return;   // {ask: true} on a choice: always (the question it answers)
+  if (!chAsk && !remote && st !== 'T3') return;   // {ask: true} on a choice: always (the question it answers); (09/11) a TV's phone: always
   const who = lastSpeaker, said = (typingFull || textEl.textContent || '').trim();
-  if (!who || who === k || !said || !castOf(who) || !SPRITES[spriteOf(who)]) return;
+  if (!who || who === k || !said || !castOf(who) || !SPRITES[spriteOf(who)]) {   // nobody asked: on a TV's phone, whose move it is
+    if (!remote || !hostTv || !castOf(k)) return;
+    const el = document.createElement('div'); el.id = 'qCard'; el.className = 'qk'; el.style.setProperty('--c', castOf(k).color || '#fff');
+    el.innerHTML = `<div class="qx"><b>${esc(fill(castOf(k).name || ''))}, your move</b></div>`; choicesEl.before(el); return;
+  }
   const a = actors[who]; let src = null; try { src = poseSrc(who, a ? a.shown || a.pose : 'listen'); } catch { return; }
   const el = document.createElement('div'); el.id = 'qCard'; el.style.setProperty('--c', castOf(who).color || '#8e8e93');
   el.innerHTML = `<div class="qf"><img src="${src}" alt=""></div><div class="qx"><b>${esc(fill(castOf(who).name || ''))}</b><span>${esc(said)}</span></div>`;
@@ -3959,7 +3979,7 @@ function choose(opts, by, ring) {
   const order = ring ? [1, 0] : opts.map((_, i) => i);   // the call: red (decline) on the left, green (answer) on the right
   const remoteNow = document.body.classList.contains('phonemin'), k = seatFor(by), metas = opts.map((o) => optMeta(o, k)); metas.k = k;
   choicesEl.classList.add('cx', 'slide');
-  if (mine && holder === choicesEl && !choicesEl.hidden && !pub) qCardShow(k);
+  if (mine && holder === choicesEl && !choicesEl.hidden && (!pub || (remoteNow && hostTv)) && !document.body.classList.contains('cellon')) qCardShow(k);   // (09/11) a TV's phone: always what it's about
   if (mine && chCue && !TV) try { navigator.vibrate && navigator.vibrate([260, 120, 260]); } catch { /* no vibration */ }   // (09/11) the first choices: the phone buzzes too
   for (const i of order) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
