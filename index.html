@@ -4806,6 +4806,10 @@ function advance() {
   record('a' + tag(laneNow)); waiting = null; hint.hidden = true; next();
 }
 stage.addEventListener('click', (e) => { if (!e.target.closest('.card')) advance(); });
+$('#wait').addEventListener('click', (e) => {   // the TV's waiting room, on a phone: a tap on its screen = Autoplay ▶ (like space)
+  if (!TV || e.target.closest('button, a, input')) return;
+  const a = document.querySelector('#room .wr-opts button[data-o="auto"]'); if (a) a.click();
+});
 addEventListener('paste', (e) => { if (screen === '#deck' && DECK.panel.paste(e)) e.preventDefault(); });
 addEventListener('keydown', (e) => {
   if (screen === '#deck' && DECK.key(e)) { e.preventDefault(); return; }
