@@ -2991,7 +2991,7 @@ async function duoSay(k, who, text, r) {   // a line in that half (under the pic
 }
 function duoChoices(k, opts) {   // the choice, under his phone (the TV); the phone itself shows the remote
   const c = duoNow && duoEl().querySelector(`.dh[data-k="${k}"] .dh-c`); if (!c) return false;
-  c.innerHTML = opts.map((o, i) => `<div class="dc" data-i="${i}">${esc(fill(o.t))}</div>`).join('');
+  c.innerHTML = opts.map((o, i) => `<div class="dc" data-i="${i}">${esc(actOf(o, k).sh)}</div>`).join('');   // (11/11) the short words, as on the phone
   c.onclick = (e) => { const d = e.target.closest('.dc'); const btn = d && [...optionButtons()].find((x) => +x.dataset.i === +d.dataset.i); if (btn) btn.click(); };   // one screen: tap it here
   return true;
 }
@@ -4123,7 +4123,7 @@ function choiceCard(o, m, all, remote) {
   // people (each option toward someone else): that person's
   let to = ''; if (tos.size > 1 && m.to) { try { to = `<span class="cf"><img src="${poseSrc(m.to, 'listen')}" alt=""></span>`; } catch { to = ''; } }
   const cls = [m.idle ? 'idle' : ''].filter(Boolean).join(' '), a = actOf(o, all.k);
-  return { cls, html: `${to || `<span class="cic">${ACT[a.ic] || ACT.act}</span>`}<span class="ctx"><span class="ct">${esc(fill(o.t))}</span></span>` };
+  return { cls, html: `${to || `<span class="cic">${ACT[a.ic] || ACT.act}</span>`}<span class="ctx"><span class="ct">${esc(a.sh)}</span></span>` };   // (11/11) the short words, everywhere
 }
 // T3 (a phone) / N4+N1 (the remote): whom you answer, above the choices: his face in a big circle, his name, his line
 function qCardShow(k) {
@@ -4202,7 +4202,7 @@ function choose(opts, by, ring) {
     const o = opts[i], b = document.createElement('button'); b.type = 'button';
     // (09/11) a peak choice: a half each, no button; behind, faded, what's at stake (o.img); one word: what it's really about (o.w)
     if (peak) { b.innerHTML = `<span class="pk-i"${o.img ? ` style="background-image:url('${o.img}')"` : ''}></span><b class="pk-w">${esc(fill(o.w || o.sh || o.t))}</b>`; b.classList.add('pk'); }
-    else if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span>${TV ? `<span class="ct">${esc(fill(o.t))}</span>` : `<span class="csh">${esc(a.sh)}</span>`}`; b.classList.add('pub'); b.style.setProperty('--pc', (castOf(k) || {}).color || '#ffffff'); }   // in the chooser's colour
+    else if (holder === choicesEl && pub) { const a = actOf(o, k); b.innerHTML = `<span class="cic">${ACT[a.ic] || ACT.act}</span><span class="csh">${esc(a.sh)}</span>`; b.classList.add('pub'); b.style.setProperty('--pc', (castOf(k) || {}).color || '#ffffff'); }   // in the chooser's colour
     else if (holder === choicesEl) { const c = choiceCard(o, metas[i], metas, remoteNow); b.innerHTML = c.html; if (c.cls) b.classList.add(...c.cls.split(' ')); }
     else { const ic = document.createElement('i'); ic.innerHTML = ICON_PHONE; const sp = document.createElement('span'); sp.textContent = fill(o.t); b.append(ic, sp); }
     b.dataset.i = i;
