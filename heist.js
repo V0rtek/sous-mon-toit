@@ -413,23 +413,16 @@
         { t: 'Run for the gondola.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'send', sh: 'Run', intent: 'runs', set: { snipe: 'run' }, then: [] },
       ] },
     ] },
-    // cut on the choice: black, the end of the episode
+    // cut on the choice: straight to the white review screen (the « tadaa »), one question; what could have been below
     { music: null, ms: 0 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
-    ...at('h_black'), { hush: 1600 },
-    // ---- what could have been: the pictures of what they didn't get to (each one a choice that mattered) ----
-    { fn: (f) => {
-      const OUT = [
-        ['h_face_pb', 'Ray shows Amy his face.', f.ray === 'reveal'],
-        ['h_bag_hit', 'The bag in Amy’s face.', f.ray === 'throw'],
-        ['h_amy_join', 'Amy, one of them.', !!f.amyjoin],
-        ['h_wc_shot', 'The guard, shot.', f.guard === 'shot'],
-        ['h_roof_door', 'Ray, stuck in the door.', f.roof === 'stuck'],
-        ['h_roof_shield', 'Amy as a shield.', f.roof === 'snipers' && !!f.amyjoin],
-      ].filter((o) => !o[2]);
-      return [{ titleCard: 'What could have been' }, ...OUT.flatMap(([id, cap], i) => [...at(id), ...(i ? [] : [{ fade: 'in', ms: 500 }]), T(cap)])];
-    } },
-    { fade: 'out', ms: 300 },
-    { end: { kicker: 'To be continued', title: 'Floor 31', lede: '{LEDE}', art: null } },
+    { review: { key: 'suite', q: 'Do you want to see what happens next?', yes: 'Yes!', no: 'No', alts: (f) => [
+      f.ray !== 'reveal' && ['stakes/ray.webp', 'Ray shows Amy his face.'],   // TODO Justin's pictures in place of these
+      f.ray !== 'throw' && ['stakes/amy.webp', 'The bag in Amy’s face.'],
+      !f.amyjoin && ['bg/amy_face.webp', 'Amy, one of them.'],
+      f.guard !== 'shot' && ['bg/wc_shot.webp', 'The guard, shot.'],
+      f.roof !== 'stuck' && ['bg/roof_door.webp', 'Ray, stuck in the door.'],
+      !(f.roof === 'snipers' && f.amyjoin) && ['bg/roof_shield.webp', 'Amy as a shield.'],
+    ] } },
   ], {
     gaze: false, credits: '', title: 'Floor 31', intro: [], preload: 'h_',   // (10/11) its pictures loaded ahead
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },

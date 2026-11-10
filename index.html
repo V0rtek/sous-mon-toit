@@ -193,6 +193,20 @@ body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; ba
 #duo { position: fixed; inset: 0; z-index: 25; display: grid; grid-template-columns: 1fr 1fr; background: #07070a; font-family: var(--ui, system-ui); }
 #duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
 #duo .dh + .dh { border-left: 2px solid rgba(255,255,255,.08); }
+#review { position: fixed; inset: 0; z-index: 90; background: #fff; color: #1d1d1f; overflow-y: auto; font-family: var(--ui, system-ui); animation: rvIn .25s ease-out; }
+#review[hidden] { display: none; }
+#review .rv-top { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vh; padding: 6vh 6vw; text-align: center; }
+#review .rv-top b { font-size: min(7vw, 6vh); font-weight: 800; line-height: 1.15; max-width: 18em; }
+#review .rv-a { display: flex; gap: 3vw; flex-wrap: wrap; justify-content: center; }
+#review .rv-a button { font: inherit; font-size: min(5vw, 3.6vh); font-weight: 800; padding: 1.6vh 6vw; border-radius: 99px; border: .35vh solid #1d1d1f; background: #fff; color: #1d1d1f; cursor: pointer; }
+#review .rv-a button:first-child { background: #1d1d1f; color: #fff; }
+#review .rv-a button.on { outline: .6vh solid #34c759; outline-offset: .4vh; } #review .rv-a button.off { opacity: .3; }
+#review .rv-thx { margin: 0; font-size: min(4.4vw, 2.8vh); font-weight: 700; color: #34c759; }
+#review .rv-more { margin-top: 4vh; font-size: min(4vw, 2.4vh); font-weight: 700; color: #8e8e93; animation: rvBob 1.6s ease-in-out infinite; }
+#review .rv-alts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 3vh 2vw; padding: 2vh 5vw 8vh; }
+#review figure { margin: 0; } #review figure img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1.6vh; background: #eee; }
+#review figcaption { margin-top: 1vh; font-size: min(4vw, 2.4vh); font-weight: 700; text-align: center; }
+@keyframes rvIn { from { opacity: 0; } } @keyframes rvBob { 50% { transform: translateY(.8vh); } }
 #duo .dh:only-child { grid-column: 1 / -1; }   /* (11/11) one phone alone: the whole screen */
 #duo .dp { width: min(22vw, 34vh); aspect-ratio: 9 / 16; border-radius: 3.2vh; background: #0f0f12; border: .9vh solid #26262b; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); display: flex; flex-direction: column; overflow: hidden; }
 #duo .dpic { position: relative; width: min(30vw, 46vh); height: 62vh; border-radius: 2.4vh; background: center 25% / cover no-repeat; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); flex: none; }
@@ -2864,7 +2878,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261111100000"></script>
+<script src="heist.js?v=20261111120000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2881,7 +2895,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <div id="warn" hidden role="alert"><div class="wIcon">🚨</div><p class="wBig">TU DOIS AVOIR UNE DEMO AU PLUS SACRANT</p><p class="wSub">pour le pitch Spark ET pour valider l’idée</p><button class="wOk" type="button">OK, J’Y VAIS</button></div>
 <script src="importer.js?v=20261102260000"></script>
 <script src="deck.js?v=20261103600000"></script>
-<script src="bank.js?v=20261110180000"></script>
+<script src="bank.js?v=20261111120000"></script>
 <script src="place.js?v=20261031540000"></script>
 <script>
 // (10/11) « do I have the latest version? » : at load, what this browser holds (its cache) against what the server serves
@@ -3684,7 +3698,7 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // 5 s: under the "You are" card that opens every story), dragon_arrive (a short epic roar, 3 s), dragon_fire (a long
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
-  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.95, helicopters: 0.32, sirens: 0.2, 'lobby jazz': 0.07 };
+  boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.95, helicopters: 0.32, sirens: 0.2, tadaa: 0.6, 'lobby jazz': 0.07 };
 async function sfx(name, loop = false, rate = 1, ms = 0, peak = 0, lp = 0) {   // lp: heard through a wall (Hz)   // peak: a loop that bursts in that loud, then settles to its level (4 s)   // ms: only that much of it (a long file, a short moment)
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
@@ -3828,6 +3842,24 @@ function buzz() {
     g.gain.setValueAtTime(0.05, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
     o.connect(g).connect(out()); o.start(t); o.stop(t + 0.14);
   }
+}
+// (11/11) {review: {q, yes, no, alts(f) → [[picture, caption]]}}: the end. A white screen, the « tadaa », one question (on every
+// device: each player answers on his own phone, the TV too); below, to scroll to, what could have been (the pictures of the
+// choices they didn't make). The answer is counted with the story's reviews (r.fb[key]: [yes, no])
+function reviewBoard(rv) {
+  let el = $('#review'); if (!el) { el = document.createElement('div'); el.id = 'review'; document.body.appendChild(el); }
+  const alts = (rv.alts ? rv.alts(state.f) : []).filter((a) => a && a[0]);
+  el.innerHTML = `<div class="rv-top"><b>${esc(fill(rv.q))}</b><div class="rv-a"><button type="button" data-v="1">${esc(rv.yes || 'Yes')}</button><button type="button" data-v="0">${esc(rv.no || 'No')}</button></div><p class="rv-thx" hidden>Thank you!</p>
+    ${alts.length ? '<div class="rv-more">What could have been ↓</div>' : ''}</div>
+    ${alts.length ? `<div class="rv-alts">${alts.map(([img, cap]) => `<figure><img src="${img}" alt=""><figcaption>${esc(fill(cap))}</figcaption></figure>`).join('')}</div>` : ''}`;
+  el.hidden = false; el.scrollTop = 0; document.body.classList.add('reviewon');
+  if (!FAST) sfx('tadaa');
+  el.querySelectorAll('.rv-a button').forEach((b) => b.onclick = (e) => {
+    e.stopPropagation(); if (el.dataset.done === state.story) return; el.dataset.done = state.story;
+    const v = +b.dataset.v; el.querySelectorAll('.rv-a button').forEach((x) => x.classList.toggle(x === b ? 'on' : 'off', true)); el.querySelector('.rv-thx').hidden = false;
+    if (!PREVIEW && window.USAGE) USAGE.bump((st) => { st.s = st.s || {}; const r = (st.s[sid(state.story)] = st.s[sid(state.story)] || {}); r.fb = r.fb || {}; const c = (r.fb[rv.key || 'suite'] = r.fb[rv.key || 'suite'] || [0, 0]); c[v ? 0 : 1]++; });
+  });
+  el.onclick = (e) => e.stopPropagation();
 }
 // (10/11) {zoom: {k, x, y, ms}}: the camera pushes in on (x, y) of the picture, k times closer, over ms (not too static)
 function zoomTo(z) {
@@ -4891,6 +4923,7 @@ async function next() {
       if (FAST) { gateNow = null; waiting = 'click'; return; }
       tapNow = true; if (!(TV && own)) gateOn(s); waiting = 'click'; return;   // the TV keeps its picture (the split says who's on his phone)
     }
+    else if (s.review) { reviewBoard(s.review); waiting = 'review'; return; }
     else if (s.zoom) zoomTo(s.zoom);
     else if (s.duo !== undefined) duoSet(s.duo);
     else if (s.duoPic) duoPic(s.duoPic[0], s.duoPic[1]);
@@ -5024,6 +5057,7 @@ function show(id) {
   if (id === '#infos') { $('#infos').scrollTop = 0; const v = $('#valBtn'); v.classList.remove('valcue'); void v.offsetWidth; v.classList.add('valcue'); }   // Valider l'idée: blinks, grows, the arrow points
 }
 function halt() {
+  { const rv = document.getElementById('review'); if (rv) rv.hidden = true; document.body.classList.remove('reviewon'); }   // (11/11) the review board goes with the story
   document.body.classList.remove('choosing', 'privline'); litOff(); qCardOff();
   $('#tvIntro').hidden = true; tvOpen = null; $('#uWait').hidden = true; if (TV) tvPhase = null;
   run++; huOff(); q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
