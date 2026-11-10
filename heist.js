@@ -48,7 +48,8 @@
   // close: Leo on the lock screen, Leo's text on it (Justin's picture, its text changed)
   const pic = (image, front = []) => ({ image, size: PIC, spots: {}, face: {}, ambience: 'crowd', back: [], front });
   // (09/11) the top view: the empty armchairs + the two of them cut out, placed as in Justin's top view
-  const TOP = [{ src: 'marcus_top', x: 430.5, y: 860, w: 481, who: 'pa' }, { src: 'ray_top', x: 1247, y: 883, w: 534, who: 'pb' }];
+  const TOP = [{ src: 'marcus_top2', x: 430.5, y: 860, w: 488, who: 'pa' },   // (10/11) Justin's: Marcus from above, hands clasped, to himself
+     { src: 'ray_top', x: 1247, y: 883, w: 534, who: 'pb' }];
   const topv = (front = []) => ({ ...pic('bg/lobby_top.webp', front), props: TOP });
   SCENES.h_top = topv();
   SCENES.h_top_buzz = topv([R(698, 398, 58, 96, 'rgba(225,238,255,.5)', { r: 10, glow: '0 0 70px 28px rgba(200,225,255,.75)', who: 'pa' })]);
@@ -87,7 +88,7 @@
   SCENES.h_bank = { image: 'bg/bank_open.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
   // (10/11) both turned inward: Marcus worried, to himself (hands clasped); Ray not reacting (chin on his hand, eyes down)
-  SCENES.h_two_w = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, RAY]);
+  SCENES.h_two_w = chairs([{ src: 'marcus_worried', x: 497.5, y: 883, w: 547, who: 'pa' }, RAY]);   // (10/11) Justin's: worried, looking away
   SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
   const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
@@ -272,9 +273,9 @@
     ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
     // ---- 15. (10/11) the last text before going in: on the TV, the screen in two, each one's phone in his half. One thing at a
     // time: Sarah's text, Amy's photo; then Marcus answers, then Ray (two answers each, no clock) ----
-    { duo: { pa: { who: 'Sarah' }, pb: { who: 'Amy', heart: true } } }, { hush: 900 },
+    { duo: { pa: { who: 'Sarah' }, pb: { who: 'Amy', heart: true, hand: { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] } } } },   // (10/11) Ray's hand (Justin's); Marcus's to come { hush: 900 },
     { duoIn: ['pa', { text: 'Where are you?' }] }, { hush: 2200 },
-    { duoIn: ['pb', { img: 'stakes/amy.webp' }] }, { hush: 2800 },   // TODO Justin's picture: Amy's joke selfie in the bathroom
+    { duoIn: ['pb', { img: 'bg/amy_selfie.webp' }] }, { hush: 2800 },   // (10/11) Justin's: her joke selfie in the bathroom mirror
     { by: 'pa', clock: 0, choice: [
       { t: 'I love you.', ic: 'love', sh: 'I love you', intent: 'Text Sarah', set: { sarah: 'love' }, then: [{ duoOut: ['pa', 'I love you.'] }, { hush: 1500 }] },
       { t: 'Kiss Leo for me.', ic: 'love', sh: 'Kiss Leo', intent: 'Text Sarah', set: { sarah: 'kiss' }, then: [{ duoOut: ['pa', 'Kiss Leo for me.'] }, { hush: 1500 }] },
@@ -460,7 +461,7 @@
     // (09/11) a player's own pose sheet, one per character (ref/posesheet_<name>.jpg: every cut-out he has in the story, on green,
     // in a grid read row by row): each cell takes the place of that prop. The first one is his face on the pick
     posesheet: {
-      pa: { sheet: 'ref/posesheet_marcus.jpg', grid: [4, 3], poses: ['marcus_sit', 'marcus_listen', 'marcus_sit2', 'marcus_top', 'marcus_phone', 'marcus_stand', 'marcus_elev', 'marcus_elev2', 'marcus_reach'] },
+      pa: { sheet: 'ref/posesheet_marcus.jpg', grid: [4, 3], poses: ['marcus_sit', 'marcus_listen', 'marcus_worried', 'marcus_sit2', 'marcus_top2', 'marcus_phone', 'marcus_stand', 'marcus_elev', 'marcus_elev2', 'marcus_reach'] },
       pb: { sheet: 'ref/posesheet_ray.jpg', grid: [4, 3], poses: ['ray_sit', 'ray_talk', 'ray_phone', 'ray_top', 'ray_back', 'ray_point', 'ray_call', 'ray_elev', 'ray_case', 'ray_mask'] },
     },
     pick: { pa: { pose: 'listen', desc: '30-year-old dad with money problems' }, pb: { pose: 'listen', desc: '29, owes a lot of money' } },   // (09/11) who they are, instead of a line

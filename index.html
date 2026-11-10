@@ -186,6 +186,10 @@ body.tv #tail::after { display: none; }
 #duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
 #duo .dh + .dh { border-left: 2px solid rgba(255,255,255,.08); }
 #duo .dp { width: min(22vw, 34vh); aspect-ratio: 9 / 16; border-radius: 3.2vh; background: #0f0f12; border: .9vh solid #26262b; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); display: flex; flex-direction: column; overflow: hidden; }
+#duo .dhand { position: relative; height: 66vh; background: center / contain no-repeat; flex: none; }
+#duo .dscreen { position: absolute; border-radius: 3.4vh; overflow: hidden; }
+#duo .dp.in { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; }
+#duo .dh:has(.dhand) .dh-c { position: absolute; left: 50%; bottom: 4vh; transform: translateX(-60%); z-index: 2; }
 #duo .dp-h { padding: 2.4vh 1vh 1.6vh; text-align: center; font-weight: 800; font-size: 2.6vh; color: #fff; border-bottom: 1px solid #222; }
 #duo .dp-h i { font-style: normal; color: #ff375f; }
 #duo .dp-b { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 1.2vh; padding: 1.6vh; }
@@ -2840,7 +2844,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261110140000"></script>
+<script src="heist.js?v=20261110160000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2909,7 +2913,11 @@ const duoEl = () => { let e = document.getElementById('duo'); if (!e) { e = docu
 function duoSet(d) {
   const el = duoEl(); duoNow = d || null; document.body.classList.toggle('duoon', !!d && !(ROLE === 'watch' && hostTv));
   if (!d || (ROLE === 'watch' && hostTv)) { el.hidden = true; el.innerHTML = ''; return; }
-  el.innerHTML = Object.entries(d).map(([k, c]) => `<div class="dh" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="dp"><div class="dp-h">${esc(c.who || '')}${c.heart ? ' <i>❤</i>' : ''}</div><div class="dp-b"></div></div><div class="dh-c"></div></div>`).join('');
+  // c.hand: {img, screen: [left, top, width, height] in fractions of the picture}: his hand holding the phone, the thread in its screen
+  const phone = (c) => `<div class="dp${c.hand ? ' in' : ''}"><div class="dp-h">${esc(c.who || '')}${c.heart ? ' <i>❤</i>' : ''}</div><div class="dp-b"></div></div>`;
+  el.innerHTML = Object.entries(d).map(([k, c]) => `<div class="dh" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}">${c.hand
+    ? `<div class="dhand" style="background-image:url('${c.hand.img}');aspect-ratio:${c.hand.ar || 1}"><div class="dscreen" style="left:${c.hand.screen[0] * 100}%;top:${c.hand.screen[1] * 100}%;width:${c.hand.screen[2] * 100}%;height:${c.hand.screen[3] * 100}%">${phone(c)}</div></div>`
+    : phone(c)}<div class="dh-c"></div></div>`).join('');
   el.hidden = false;
 }
 function duoBubble(k, m, out) {
