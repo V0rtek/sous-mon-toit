@@ -219,8 +219,8 @@
     // ---- 4-7. the briefcase, the three lines ----
     ...at('h_top'), S('pb', 'We’re on in 8 minutes.'),
     ...at('h_two_w'), S('pa', 'Guess there’s no turning back now.'),   // (10/11) to himself, worried
-    { zoom: { k: 1.08, x: 1150, y: 470, ms: 3000 } }, S('pb', 'Yeah…'), { zoom: { k: 1.16, x: 1170, y: 460, ms: 3000 } }, S('pb', 'Can’t afford to miss out on this.'), { zoom: { k: 1.25, x: 1190, y: 450, ms: 3000 } }, S('pb', 'I’ve got bills.'),   // Ray doesn't look at him
-    ...at('h_two_r'), { zoom: { k: 1.18, x: 1150, y: 460, ms: 4000 } }, S('pb', 'And nothing to lose.'),   // now at Marcus, determined
+    S('pb', 'Yeah…'), { zoom: { k: 1.2, x: 1160, y: 460, ms: 0 } }, S('pb', 'Can’t afford to miss out on this.'), { zoom: { k: 1.4, x: 1180, y: 440, ms: 0 } }, S('pb', 'I’ve got bills.'),   // Ray doesn't look at him
+    ...at('h_two_r'), { zoom: { k: 1.25, x: 1150, y: 450, ms: 0 } }, S('pb', 'And nothing to lose.'),   // now at Marcus, determined
     // ---- 8. Marcus's phone: Leo, his kids behind ----
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
@@ -274,7 +274,7 @@
     // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
     // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
-    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 420 },   // (10/11) the other side of a door: muffled { hush: 3600 },
+    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 800 }, { hush: 3600 },   // (10/11) the other side of a door: muffled
     ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
@@ -290,15 +290,15 @@
         lose(1),   // the wait at the door
       ] },
       { t: '“I know you’re in there.”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
-        { zoom: { k: 1.1, x: 1020, y: 330, ms: 3000 } }, S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'), S('pa', 'Send over your weapon!'),
-        { zoom: { k: 1.22, x: 1020, y: 320, ms: 3000 } }, S('guard', 'Come and get it!', { whisper: true }),   // (10/11) muffled, through the door: italic
+        S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'), S('pa', 'Send over your weapon!'),
+        { zoom: { k: 1.3, x: 1000, y: 350, ms: 0 } }, S('guard', 'Come and get it!', { whisper: true }),   // (10/11) muffled, through the door: italic
         { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
           { t: '“Ten seconds.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
             S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },
           { t: '“It’s not your money.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
             S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
-        { zoom: { k: 1.35, x: 1020, y: 310, ms: 3000 } }, S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
+        { zoom: { k: 1.6, x: 1000, y: 340, ms: 0 } }, S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
             S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), { hush: 2400 }] },
