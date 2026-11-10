@@ -254,7 +254,7 @@
       { duoIn: ['pa', { text: 'ok' }] }, { hush: 1800 },
       { duoIn: ['pa', { text: 'mom says we wont have the money to do next season' }] }, { hush: 3200 },
       { by: 'pa', clock: 0, choice: [
-        { t: 'As of tonight, money won’t be an issue anymore.', ic: 'tough', sh: 'No more money issue', intent: 'Text Leo', set: { leo: 'money' }, then: [{ duoOut: ['pa', 'As of tonight, money won’t be an issue anymore.'] }, { hush: 1600 }] },
+        { t: 'Money won’t be an issue.', ic: 'tough', sh: 'No more money issue', intent: 'Text Leo', set: { leo: 'money' }, then: [{ duoOut: ['pa', 'As of tonight, money won’t be an issue anymore.'] }, { hush: 1600 }] },
         { t: 'We’ll figure it out, buddy.', ic: 'love', sh: 'We’ll figure it out', intent: 'Text Leo', set: { leo: 'figure' }, then: [{ duoOut: ['pa', 'We’ll figure it out, buddy.'] }, { hush: 1600 }] },
       ] },
       { duoPic: ['pb', 'bg/call_amy_full.webp'] }, { duoSay: ['pb', 'amy', 'I’ve got a meeting at noon.'] }, { duoSay: ['pb', 'amy', 'A big one.'] },
@@ -320,13 +320,13 @@
         ] },
         lose(1),   // the wait at the door
       ] },
-      { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
-        { zoom: { k: 1.1, x: 1020, y: 330, ms: 3000 } }, S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'),
+      { t: '“I know you’re in there.”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
+        { zoom: { k: 1.1, x: 1020, y: 330, ms: 3000 } }, S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'), S('pa', 'Send over your weapon!'),
         { zoom: { k: 1.22, x: 1020, y: 320, ms: 3000 } }, S('guard', 'Come and get it!', { whisper: true }),   // (10/11) muffled, through the door: italic
         { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
-          { t: '“Ten seconds. Then someone out here pays for it.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
+          { t: '“Ten seconds.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
             S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },
-          { t: '“Nobody dies for the bank’s money. Come out.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
+          { t: '“It’s not your money.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
             S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
         { zoom: { k: 1.35, x: 1020, y: 310, ms: 3000 } }, S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
@@ -362,7 +362,7 @@
     { fn: (g) => [...at(`h_standoff_pa${g.mask === 'off' ? '_off' : ''}`), T('Ray comes back from the vault.'), T('The bags on his shoulder.'), T('The gun on Marcus’s head.')] },
     { by: 'pb', cue: 'Look at your phone', clock: 8000, choice: [
       // (09/11) unmasked: she tells him who's coming for her; then she's with them, or she stays
-      { t: 'Take off your mask: “Amy. It’s me.”', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [
+      { t: 'Take off your mask.', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [
         ...at('h_face_pb'), S('pb', 'Amy.'), S('pb', 'It’s me.'),
         ...at('h_amy_face'), { hush: 900 }, S('amy', '…Ray?'), { hush: 700 },
         S('amy', 'They came to the house.'), S('amy', 'Last night.'), S('amy', 'Two men.'), { hush: 600 },
