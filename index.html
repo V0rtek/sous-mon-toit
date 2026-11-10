@@ -1573,6 +1573,11 @@ html.locked #keyBtn { display: grid; place-items: center; }
 /* in a story: a small menu in the bottom right corner (sound, start the episode over, quit) */
 #menuBtn { position: absolute; right: 4%; bottom: 2.2%; z-index: 30; font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(15,12,20,.45); display: grid; place-items: center; cursor: pointer; padding: 0; opacity: .7; }
 #menuBtn svg { width: 2.8em; height: 2.8em; }
+/* (10/11) the version pill: am I on the latest one? green = yes, orange = pushed but still being published, red = a newer one is out (tap) */
+#verPill { position: absolute; left: 4%; bottom: 2.2%; z-index: 30; font: inherit; font-size: 1.7em; font-weight: 700; color: #e5e5ea; background: rgba(15,12,20,.7); border: 0; border-radius: 2em; padding: .45em 1em; display: flex; align-items: center; gap: .6em; cursor: default; }
+#verPill[hidden], body.instory #verPill, body.tv #verPill, body.preview #verPill, body.playonly #verPill { display: none !important; }
+#verPill i { width: .8em; height: .8em; border-radius: 50%; background: #8e8e93; }
+#verPill.ok i { background: #30d158; } #verPill.wait i { background: #ff9f0a; animation: blink 1.2s ease-in-out infinite; } #verPill.old { cursor: pointer; background: #7a1f2b; } #verPill.old i { background: #ff453a; }
 #menuPop { position: absolute; right: 4%; bottom: calc(2.2% + 7.2em); z-index: 31; display: flex; flex-direction: column; gap: 1.2em; }
 #menuPop[hidden], #menuPop button[hidden] { display: none; }
 #menuPop button { font: inherit; width: 6em; height: 6em; border: 0; border-radius: 50%; background: rgba(28,28,30,.92); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -2827,6 +2832,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   <button id="back" type="button" hidden aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
   <button id="menuBtn" type="button" hidden aria-label="Menu"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   <div id="menuPop" hidden><button type="button" data-m="sound"></button><button type="button" data-m="again"></button><button type="button" data-m="quit"></button></div>
+  <button id="verPill" type="button" hidden><i></i><span></span></button>
   <div id="qrCard" hidden><div id="qrBox"></div></div>
   <div id="tvIntro" hidden></div>
   <div id="tvWho"></div>
@@ -2856,7 +2862,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261110230000"></script>
+<script src="heist.js?v=20261110300000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2875,6 +2881,41 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="deck.js?v=20261103600000"></script>
 <script src="bank.js?v=20261110180000"></script>
 <script src="place.js?v=20261031540000"></script>
+<script>
+// (10/11) « do I have the latest version? » : at load, what this browser holds (its cache) against what the server serves
+// (the ETag of index.html and every script); then every 3 min and when the tab comes back. The pill says it
+(() => {
+  const pill = document.querySelector('#verPill'), txt = pill.querySelector('span'), base = location.pathname.replace(/[^/]*$/, '');
+  const urls = [location.pathname.endsWith('/') ? base : location.pathname, ...[...document.scripts].map((x) => x.src).filter((u) => u && new URL(u).origin === location.origin)];
+  const tag = (r) => r.headers.get('etag') || r.headers.get('last-modified') || '';
+  const set = (cls, t) => { pill.hidden = false; pill.className = cls; txt.textContent = t; };
+  const when = (ms) => new Date(ms).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  let mine = null;
+  const read = (cache, method) => Promise.all(urls.map((u) => fetch(u, { cache, method }).then((r) => ({ t: tag(r), m: Date.parse(r.headers.get('last-modified') || '') || 0 })).catch(() => null)));
+  async function check() {
+    try {
+      const now = await read(mine ? 'no-store' : 'no-cache', mine ? 'HEAD' : 'GET');
+      if (now.some((x) => !x || !x.t)) { if (!mine) return; }
+      if (!mine) { mine = await mineP; }
+      const old = now.some((x, i) => x && mine[i] && x.t && mine[i].t && x.t !== mine[i].t);
+      const served = Math.max(0, ...now.map((x) => (x ? x.m : 0)));
+      if (old) { set('old', 'Nouvelle version · toucher pour recharger'); return; }
+      let pushed = 0;
+      try { const c = await (await fetch('https://api.github.com/repos/V0rtek/sous-mon-toit/commits/main', { cache: 'no-store' })).json(); pushed = Date.parse(c.commit.committer.date) || 0; } catch { /* offline or rate-limited */ }
+      if (pushed && served && pushed > served + 30000) set('wait', 'Publication en cours…'); else set('ok', served ? `À jour · ${when(served)}` : 'À jour');
+    } catch { /* no network: the pill stays hidden */ }
+  }
+  let mineP = null;
+  addEventListener('load', () => {
+    if (location.protocol === 'file:') return;
+    mineP = read('force-cache', 'GET');   // what the cache holds now (before anything revalidates it)
+    mineP.then(() => check());
+    setInterval(check, 180000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+  });
+  pill.onclick = async () => { if (!pill.classList.contains('old')) return; txt.textContent = 'Rechargement…'; await Promise.all(urls.map((u) => fetch(u, { cache: 'reload' }).catch(() => 0))); location.reload(); };
+})();
+</script>
 <script>
 const $ = (s) => document.querySelector(s);
 // Façade (02/11): by default the link shows only Full demo. Infos and Plus (my own stuff) open after the code; the browser
