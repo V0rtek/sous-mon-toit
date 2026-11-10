@@ -181,6 +181,23 @@ body.tv #tail::after { display: none; }
 #choices.peak:has(.picked) > button.pk:not(.picked) { opacity: .2; transition: opacity .5s; }
 #choices.peak > .clock { position: absolute; top: auto; bottom: 4%; left: 25%; right: 25%; z-index: 3; }
 @keyframes pkIn { from { opacity: 0; } }
+/* (10/11) {duo}: two phones, one per half (the TV); under each, its choice when it's his turn */
+#duo { position: fixed; inset: 0; z-index: 25; display: grid; grid-template-columns: 1fr 1fr; background: #07070a; font-family: var(--ui, system-ui); }
+#duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
+#duo .dh + .dh { border-left: 2px solid rgba(255,255,255,.08); }
+#duo .dp { width: min(22vw, 34vh); aspect-ratio: 9 / 16; border-radius: 3.2vh; background: #0f0f12; border: .9vh solid #26262b; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); display: flex; flex-direction: column; overflow: hidden; }
+#duo .dp-h { padding: 2.4vh 1vh 1.6vh; text-align: center; font-weight: 800; font-size: 2.6vh; color: #fff; border-bottom: 1px solid #222; }
+#duo .dp-h i { font-style: normal; color: #ff375f; }
+#duo .dp-b { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 1.2vh; padding: 1.6vh; }
+#duo .db { align-self: flex-start; max-width: 85%; background: #2c2c2e; color: #fff; font-size: 2.3vh; line-height: 1.3; padding: 1.1vh 1.6vh; border-radius: 2.2vh; animation: dbIn .35s ease-out; }
+#duo .db.out { align-self: flex-end; background: #0a84ff; }
+#duo .db.pic { padding: .5vh; background: #2c2c2e; } #duo .db.pic img { display: block; width: 100%; border-radius: 1.8vh; }
+#duo .dh-c { min-height: 15vh; display: flex; flex-direction: column; gap: 1.4vh; width: min(30vw, 46vh); }
+#duo .dc { font-size: 2.8vh; font-weight: 700; color: #fff; padding: 1.4vh 2vh; border-radius: 1.6vh; background: color-mix(in srgb, var(--c) 30%, #1c1c1e); animation: dbIn .4s ease-out backwards; text-align: center; }
+#duo .dc + .dc { animation-delay: .15s; } #duo .dc { cursor: pointer; }
+#duo .dc.picked { background: var(--c); } #duo .dc.off { opacity: .25; }
+@keyframes dbIn { from { opacity: 0; transform: translateY(1vh); } }
+body.duoon #choices { visibility: hidden; }   /* the TV: the choice is under the phone */
 body.peakon #ui { transform: none !important; }   /* the TV moves the choices with a transform: the halves take the whole screen */
 #choices button:nth-child(3) { animation-delay: .12s; }
 #choices button:hover, #choices button:focus-visible { background: var(--choice-hi); outline: none; }
@@ -2823,7 +2840,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261110120000"></script>
+<script src="heist.js?v=20261110140000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2883,6 +2900,31 @@ document.body.classList.add('tb-' + (() => { try { const v = new URLSearchParams
 const TV_ROOM = TV && (s => (/^[a-z0-9]{4,12}$/.test(s || '') ? s : null))(new URLSearchParams(location.search).get('room'));
 const AS = (s => (s && s.trim() ? s.trim().slice(0, 16) : null))(new URLSearchParams(location.search).get('as'));
 let hostTv = false;
+// (10/11) {duo: {pa: {who, heart}, pb: …}}: the screen in two, a phone in each half (each character's), on the TV (not on a
+// player's phone, which stays the remote): {duoIn: [seat, {text} | {img}]} a message comes in, {duoOut: [seat, text]} his
+// answer goes out; a choice by a seat shown in his half appears under his phone (two lines, no clock), one thing at a time.
+// {duo: false} closes it
+let duoNow = null;
+const duoEl = () => { let e = document.getElementById('duo'); if (!e) { e = document.createElement('div'); e.id = 'duo'; e.hidden = true; document.body.appendChild(e); } return e; };
+function duoSet(d) {
+  const el = duoEl(); duoNow = d || null; document.body.classList.toggle('duoon', !!d && !(ROLE === 'watch' && hostTv));
+  if (!d || (ROLE === 'watch' && hostTv)) { el.hidden = true; el.innerHTML = ''; return; }
+  el.innerHTML = Object.entries(d).map(([k, c]) => `<div class="dh" data-k="${k}" style="--c:${(castOf(k) || {}).color || '#ff9a4d'}"><div class="dp"><div class="dp-h">${esc(c.who || '')}${c.heart ? ' <i>❤</i>' : ''}</div><div class="dp-b"></div></div><div class="dh-c"></div></div>`).join('');
+  el.hidden = false;
+}
+function duoBubble(k, m, out) {
+  if (!duoNow) return; const b = duoEl().querySelector(`.dh[data-k="${k}"] .dp-b`); if (!b) return;
+  const d = document.createElement('div'); d.className = 'db' + (out ? ' out' : '') + (m.img ? ' pic' : '');
+  if (m.img) { const i = new Image(); i.src = m.img; i.alt = ''; d.appendChild(i); } else d.textContent = fill(m.text || '');
+  b.appendChild(d); if (!FAST && !out) try { buzz(); } catch { /* no sound */ }
+}
+function duoChoices(k, opts) {   // the choice, under his phone (the TV); the phone itself shows the remote
+  const c = duoNow && duoEl().querySelector(`.dh[data-k="${k}"] .dh-c`); if (!c) return false;
+  c.innerHTML = opts.map((o, i) => `<div class="dc" data-i="${i}">${esc(fill(o.t))}</div>`).join('');
+  c.onclick = (e) => { const d = e.target.closest('.dc'); const btn = d && [...optionButtons()].find((x) => +x.dataset.i === +d.dataset.i); if (btn) btn.click(); };   // one screen: tap it here
+  return true;
+}
+function duoPicked(i) { const c = duoNow && duoEl().querySelector('.dh-c:not(:empty)'); if (!c) return; c.querySelectorAll('.dc').forEach((d) => d.classList.toggle(+d.dataset.i === i ? 'picked' : 'off', true)); setTimeout(() => { c.innerHTML = ''; }, 900); }
 // (10/11) a wait counts only while the story isn't paused (a pause used to let the silences, the texts, the beats run on)
 const sleep = (ms) => new Promise((r) => {
   let left = FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms; if (left <= 0) { setTimeout(r, 0); return; }
@@ -4097,6 +4139,7 @@ function choose(opts, by, ring) {
     if (i === 0 && ROLE === 'host' && mine && holder === choicesEl && matchMedia('(hover: hover)').matches) b.focus({ preventScroll: true });
   }
   if (TV && duo()) { if (textEl.textContent && !ring) { bubble.hidden = false; tail.hidden = true; } }   // the TV: the line it answers stays up
+  if (duoNow && !(ROLE === 'watch' && hostTv)) duoChoices(seatFor(by), opts);   // (10/11) the split phones: under his phone
   clockStop();
   if (mine && holder === choicesEl && !choicesEl.hidden && !isBot(by)) clockStart(opts);
   else if ((waitsFor(by) || (TV && duo())) && !ring && !isBot(by) && !(TV && split)) clockStart(opts, true);
@@ -4138,6 +4181,7 @@ function sendPick(i) {
 // the pick lights up for a moment on the other phones before the story goes on
 function pickChoice(i, afar = false) {
   const o = options && options[i]; if (!o || waiting !== 'choice') return;
+  duoPicked(i);
   clockStop();
   record('c' + i + tag(optionsLane));
   const by = optionsBy;
@@ -4761,6 +4805,9 @@ async function next() {
       if (FAST) { gateNow = null; waiting = 'click'; return; }
       tapNow = true; if (!(TV && own)) gateOn(s); waiting = 'click'; return;   // the TV keeps its picture (the split says who's on his phone)
     }
+    else if (s.duo !== undefined) duoSet(s.duo);
+    else if (s.duoIn) duoBubble(s.duoIn[0], s.duoIn[1], false);
+    else if (s.duoOut) duoBubble(s.duoOut[0], { text: s.duoOut[1] }, true);
     else if (s.titleCard) {   // black, the place appears at once (no fade), the hour under it a beat later
       black.style.transition = 'none'; black.style.opacity = 1; bubble.hidden = true;
       slateEl.innerHTML = `<div class="tc"><b>${esc(fill(s.titleCard))}</b>${s.sub ? `<small>${esc(fill(s.sub))}</small>` : ''}</div>`;

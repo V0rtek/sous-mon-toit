@@ -270,14 +270,20 @@
     ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
     { music: 'double it', vol: .32, lp: 420, ms: 14000 },
     ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
-    // ---- 15. the last text before going in (each his own) ----
-    { split: (f) => ({
-      pa: [{ gate: 'pa', text: 'Your last text before going in' }, { thread: ['pa', 'sarah'] }, sms('sarah', 'pa', 'Where are you?', { dots: 2500 }), { wait: 3000 }, reply('pa', 'sarah', [['I love you.', { sarah: 'love' }, 'I love you.', 'love'], ['Kiss Leo for me.', { sarah: 'kiss' }, 'Kiss Leo for me.', 'love'], ['Put the phone away.', { sarah: 'none' }]])],
-      pb: [{ gate: 'pb', text: 'Your last text before going in' }, { thread: ['pb', 'amy'] }, reply('pb', 'amy', f.amy === 'call'
-        ? [['Good luck at your meeting.', { last: 'luck' }, 'Good luck at your meeting.', 'hope'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]]
-        : [['Can’t talk. Tonight, I promise.', { last: 'tonight' }, 'Can’t talk. Tonight, I promise.', 'calm'], ['I love you.', { last: 'love' }, 'I love you.', 'love'], ['Put the phone away.', { last: 'none' }]])],
-    }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still texting', pb: 'Marcus is still texting' }) },
-    { when: (f) => f.sarah !== 'none' || f.last !== 'none', then: [lose(1, 'crowd'), ...at('h_lift_hall')] },   // a text = a minute
+    // ---- 15. (10/11) the last text before going in: on the TV, the screen in two, each one's phone in his half. One thing at a
+    // time: Sarah's text, Amy's photo; then Marcus answers, then Ray (two answers each, no clock) ----
+    { duo: { pa: { who: 'Sarah' }, pb: { who: 'Amy', heart: true } } }, { hush: 900 },
+    { duoIn: ['pa', { text: 'Where are you?' }] }, { hush: 2200 },
+    { duoIn: ['pb', { img: 'stakes/amy.webp' }] }, { hush: 2800 },   // TODO Justin's picture: Amy's joke selfie in the bathroom
+    { by: 'pa', clock: 0, choice: [
+      { t: 'I love you.', ic: 'love', sh: 'I love you', intent: 'Text Sarah', set: { sarah: 'love' }, then: [{ duoOut: ['pa', 'I love you.'] }, { hush: 1500 }] },
+      { t: 'Kiss Leo for me.', ic: 'love', sh: 'Kiss Leo', intent: 'Text Sarah', set: { sarah: 'kiss' }, then: [{ duoOut: ['pa', 'Kiss Leo for me.'] }, { hush: 1500 }] },
+    ] },
+    { by: 'pb', clock: 0, choice: [
+      { t: 'I’m gonna marry you.', ic: 'love', sh: 'Marry', intent: 'Text Amy', set: { amytext: 'marry' }, then: [{ duoOut: ['pb', 'I’m gonna marry you.'] }, { hush: 1500 }] },
+      { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1500 }] },   // TODO Justin's words
+    ] },
+    { duo: false }, lose(1, 'crowd'), ...at('h_lift_hall'),   // a text = a minute
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
     ...at('h_in_02'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 2 },
