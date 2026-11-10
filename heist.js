@@ -286,19 +286,20 @@
     ...at('h_gun'), { music: 'double it', vol: .8 }, { bars: 2 },
     ...at('h_mask26'), { music: 'double it', vol: .88 }, { bars: 2 },
     ...at('h_masked'), { music: 'double it', vol: .95 },
-    { music: 'double it', lv: 1, vol: 1, ms: 2400, inBars: 2 }, { bars: 1 },
+    { music: 'double it', lv: 1, vol: .7, ms: 2400, inBars: 2 }, { bars: 1 },   // (10/11) the first drop held back; the next ones louder
     { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' },   // the doors crack open, the drop: they open
     ...at('h_bank'), { hush: 1400 },
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
-    ...at('h_rob_out'), { sfx: 'crowd panic', loop: true }, T('“EVERYBODY DOWN.”'),
+    ...at('h_rob_out'), { sfx: 'crowd panic', loop: true, peak: 1.1 }, T('“EVERYBODY DOWN.”'),   // (10/11) the crowd's scream, loud, then it settles
     ...at('h_rob_hands'), { hush: 1800 },
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 2200 },
     S('pb', 'Where’s the security guard??'),
     // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
     // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
-    ...at('h_wc'), { sfx: 'toilet flush', ms: 9000 }, { hush: 2800 },
-    ...at('h_wc_aim'),
+    // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
+    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000 }, { hush: 3600 },
+    ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
         { hush: 1800 }, ...at('h_wc_gun'), { hush: 2400 },
@@ -335,7 +336,7 @@
     // (Ray's player knows her from the call; Marcus's doesn't). No words
     ...at('h_amy_eyes'), { hush: 3200 },
     S('pb', 'Hold the room. I’ve got the vault.'), { set: { watch: 'pa' } },   // the vault: always Ray (Marcus stays with the room, and Amy)
-    { music: 'double it', lv: 2 },
+    { music: 'double it', lv: 2, vol: 1, ms: 3000 },
     // ---- (09/11) Ray in the vault, Marcus alone with the room; Amy takes the guard's gun and holds Marcus ----
     // the vault: behind the steel, no crowd, the alarm far away; back in the room, all of it again
     { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },
@@ -380,7 +381,7 @@
     ...at('h_rob_red'), T('The room starts to move.'), S('pa', 'DOWN!'), S('pa', 'Everybody DOWN!'), T('Marcus fires at the ceiling.'),
     { music: null, ms: 0 }, ...at('h_black'), { hush: 700 }, T('Click.'), { hush: 1400 }, T('Click.'),
     ...at('h_rob_red'), S('guard', 'His gun’s empty!'), { sfx: 'crowd panic', loop: true }, T('Twenty of them get up.'),
-    { music: 'double it', lv: 3, vol: 1, ms: 800 },
+    // (10/11) no music after the click: the crowd, the alarm, nothing else
     ...at('h_stairs'), S('pb', 'THE ROOF!'), T('The stairs.'), T('The crowd right behind them.'),
     // ---- (09/11) the roof, part 1: the shield (Amy in front of Marcus; or Amy offering herself; or nobody) ----
     { fn: (f) => f.amyhost ? [
