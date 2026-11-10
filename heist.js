@@ -138,6 +138,17 @@
   const holds = (x, y, s, color, hostage, o = {}) => [...stand(x - 60 * s, y, s, color, { face: o.face || MASK }), ...stand(x + 20 * s, y + 10 * s, s * .95, hostage),
     R(x - 100 * s, y - 250 * s, 60 * s, 26 * s, color, { r: 13 * s }), C(x - 40 * s, y - 238 * s, 30 * s, SKIN),   // his arm round her
     C(x - 62 * s, y - 286 * s, 26 * s, SKIN), R(x - 52 * s, y - 300 * s, 44 * s, 24 * s, '#0b0b0d', { r: 4 })];   // his hand, the gun at her temple
+  // (11/11) the new middle (shapes until Justin's pictures): Ray over the counter; the vault, two bags; Amy crawling to the
+  // guard, then behind Marcus; Ray back with the bags; Amy up behind Marcus, Ray a bag in his hand; the bag in her face
+  SCENES.h_counter = place({ back: [...BANK, ...lie(400, 1010, GREY), ...lie(1500, 990, GREY), ...stand(1000, 600, 1.4, P2, { face: MASK })] });
+  SCENES.h_bags = place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1400, 480, 700, '#9ca3af', { line: '30px solid #6b7280' }), C(1400, 480, 110, '#6b7280'),
+    ...bust(700, 1080, 2.4, P2, { face: MASK }), bag(980, 900, 2.2), bag(260, 940, 2), R(1050, 980, 240, 60, '#3f6212', { r: 6 }), R(1100, 950, 200, 40, '#4d7c0f', { r: 6 })] });
+  SCENES.h_amy_crawl = place({ back: [...BANK, ...lie(1250, 1010, GUARD), R(1080, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...lie(640, 1000, AMY, 1.3), ...armed(250, 1080, 1.6, P1, -1, { face: MASK })] });
+  SCENES.h_amy_behind = place({ back: [...BANK, ...lie(1500, 1010, GUARD), ...armed(1250, 1080, 2, P1, 1, { face: MASK }), ...lie(680, 1010, AMY, 1.3)] });
+  SCENES.h_ray_rush = place({ back: [R(0, 0, 1920, 1080, '#3b3530'), R(0, 820, 1920, 260, '#2a2622'), ...stand(960, 1080, 2.2, P2, { face: MASK }), bag(700, 760, 2), bag(1110, 780, 2)] });
+  SCENES.h_behind = place({ back: [...BANK, ...lie(1700, 1010, GUARD), ...armed(1450, 1080, 1.8, P1, 1, { face: MASK }), ...armed(900, 1080, 1.8, AMY, 1),
+    ...stand(260, 1080, 1.9, P2, { face: MASK }), bag(130, 560, 2.4), bag(330, 980, 1.6)] });
+  SCENES.h_bag_hit = place({ back: [...BANK, ...lie(900, 1010, AMY, 1.4), bag(1080, 880, 1.8), R(1400, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...stand(300, 1080, 1.9, P2, { face: MASK })] });
   SCENES.h_amy_hurt = place({ back: [...BANK, ...lie(560, 960, GREY), ...lie(1000, 1010, AMY, 1.4), C(1170, 960, 46, '#b91c1c'), ...armed(1560, 1080, 1.9, P2, -1, { face: MASK })] });
   SCENES.h_amy_join = place({ back: [...BANK, ...lie(1000, 1010, GUARD), ...stand(560, 1080, 2, P2, { face: SKIN }), bag(620, 760, 1.3), ...stand(960, 1080, 1.9, AMY), bag(1010, 770, 1.3), ...stand(1380, 1080, 2, P1, { face: MASK })] });
   SCENES.h_grab = place({ back: [...BANK, ...lie(560, 960, GREY), ...holds(960, 1080, 2, P1, AMY), ...stand(1560, 1080, 1.9, P2, { face: MASK }), bag(1420, 980, 1.4), bag(1560, 990, 1.4)] });
@@ -204,8 +215,9 @@
   // (09/11) a plant, no payoff yet: every moment they lose time. f.lost = minutes behind « We're on in 8 minutes »; each time,
   // the clock full screen, the minutes it ate on its hands, a few ticks. amb: the place's sound under it (the lobby's crowd, or none)
   const lose = (min, amb) => ({ fn: (f) => { const m = (f.lost || 0) + min, id = `h_clock_${m}_${amb || ''}`; SCENES[id] = SCENES[id] || clockAt(m, amb);
-    return [{ set: { lost: m } }, ...at(id), { tick: true }, { hush: 2600 }, { tick: false }]; } });
+    return [{ set: { lost: m } }]; } });   // (11/11) no clock on screen, no ticking: only counted
   // a text answer: no timer (clock 0), you take your time
+  const RAY_HAND = { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] };
   const reply = (k, to, opts, o = {}) => ({ by: k, clock: 0, ...o, choice: opts.map(([t, set, text, ic]) => ({ t, ...(ic ? { ic } : {}), intent: text ? `Text ${WHO[to]}` : 'No text', idle: !text, set, then: text ? [sms(k, to, text), { wait: 2600 }] : [] })) });
 
   const story = Object.assign([
@@ -246,7 +258,7 @@
       { t: 'I’m gonna marry you.', ic: 'love', sh: 'Marry', intent: 'Text Amy', set: { amytext: 'marry' }, then: [{ duoOut: ['pb', 'I’m gonna marry you.'] }, { hush: 1600 }] },
       { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1600 }] },   // TODO Justin's words
     ] },
-    { duo: false }, lose(2, 'crowd'),   // the texts ate 2 minutes
+    { duo: false }, lose(2),   // the texts ate 2 minutes
     ...at('h_two'), { hush: 1800 },
     ...at('h_ots_look'), S('pb', 'It’s time.'),   // (09/11) over Ray's shoulder, before the elevators
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
@@ -271,10 +283,22 @@
     ...at('h_rob_hands'), { hush: 1800 },
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 2200 },
     S('pb', 'There’s no security here?!'),
-    // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
-    // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
+    // ---- (11/11) they split up before the guard: Ray takes the vault, Marcus the room ----
+    S('pb', 'Hold the room.'), S('pb', 'I’ve got the vault.'), { set: { watch: 'pa' } },
+    // Ray's side: over the counter, down to the vault, two bags; then Amy's texts: she's here
+    ...at('h_counter'), { hush: 1600 },
+    { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },   // behind the steel: no crowd, the alarm far away
+    ...at('h_bags'), { hush: 2400 },
+    ...at('h_ray_pocket'), BUZZ, { hush: 1200 },
+    { duo: { pb: { who: 'Amy', heart: true, hand: RAY_HAND } } }, { hush: 700 },
+    { duoIn: ['pb', { text: 'ray' }] }, { hush: 1300 },
+    { duoIn: ['pb', { text: 'theres a robbery' }] }, { hush: 1500 },
+    { duoIn: ['pb', { text: 'im at the bank on 31' }] }, { hush: 3200 },   // the selfie: the bank's restroom
+    { duo: false }, ...at('h_bags'), T('Floor 31.'), T('Amy is out there.'),
+    { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
+    // ---- back to Marcus: the guard behind the restroom door ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
-    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 800 }, { hush: 3600 },   // (10/11) the other side of a door: muffled
+    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 800 }, { hush: 3600 },   // the other side of a door: muffled
     ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
@@ -287,7 +311,6 @@
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
             S('pa', 'Gun on the floor! NOW!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), { hush: 2400 }] },
         ] },
-        lose(1),   // the wait at the door
       ] },
       { t: '“I know you’re in there.”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
         S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'), S('pa', 'Send over your weapon!'),
@@ -306,118 +329,104 @@
             S('pa', 'No. Gun first. Across the floor.'), ...at('h_wc_gun'), { hush: 2000 },
             ...at('h_wc_hands'), { hush: 1600 }] },
         ] },
-        { fn: (f) => [lose(f.talk === 'reason' ? 3 : 2)] },   // the talk through the door (reasoning: longer)
       ] },
     ] },
-    // (09/11) a plant: the audience sees Amy, the robbers don't. Her eyes, on the floor among the hostages, in the alarm's red
-    // (Ray's player knows her from the call; Marcus's doesn't). No words
-    ...at('h_amy_eyes'), { hush: 3200 },
-    S('pb', 'Hold the room. I’ve got the vault.'), { set: { watch: 'pa' } },   // the vault: always Ray (Marcus stays with the room, and Amy)
-    { music: 'double it', lv: 2, vol: 1, ms: 3000 },
-    // ---- (09/11) Ray in the vault, Marcus alone with the room; Amy takes the guard's gun and holds Marcus ----
-    // the vault: behind the steel, no crowd, the alarm far away; back in the room, all of it again
-    { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },
-    ...at('h_vault_pb'), T('Ray in the vault with the teller.'), T('Marcus alone with the room.'),
-    { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
-    { fn: (f) => [...at('h_holster'), T('On the floor, Amy’s hand moves.'), T(f.gun === 'holster' ? 'To the guard’s holster.' : 'To the guard’s gun.')] },
+    // ---- (11/11) Amy: her eyes, she crawls to the guard, then behind Marcus; Ray comes back with the bags ----
+    ...at('h_amy_eyes'), { hush: 2600 },
+    { fn: (f) => [...at('h_amy_crawl'), T('Amy crawls to the guard.'), T(f.guard === 'shot' ? 'He doesn’t move.' : f.gun === 'holster' ? 'His gun, still on his hip.' : 'His gun, on the floor.'), T('Her hand closes on it.')] },
+    ...at('h_amy_behind'), T('Behind Marcus.'), T('He doesn’t see her.'),
     { music: 'double it', lv: 3 }, { bars: 'drop' },
-    ...at('h_aim_pa'), T('Amy is up.'), T('The guard’s gun on Marcus’s head.'),
-    // Marcus: show his face or not
-    { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
-      { t: 'Take off the mask.', ic: 'unmask', sh: 'Unmask', intent: 'shows his face', set: { mask: 'off' }, then: [...at('h_face_pa'), S('pa', 'I’ve got a kid.'), S('pa', 'Please.')] },
-      { t: 'Keep it on.', ic: 'mask', sh: 'Keep it on', intent: 'stays masked', idle: true, set: { mask: 'on' }, then: [S('amy', 'Take it off.'), S('amy', 'Now.'), T('Her finger on the trigger.')] },
-    ] },
-    // Ray, back from the vault: the gun on his friend's head, and the one holding it is his wife
-    { fn: (g) => [...at(`h_standoff_pa${g.mask === 'off' ? '_off' : ''}`), T('Ray comes back from the vault.'), T('The bags on his shoulder.'), T('The gun on Marcus’s head.')] },
-    { by: 'pb', cue: 'Look at your phone', clock: 8000, choice: [
-      // (09/11) unmasked: she tells him who's coming for her; then she's with them, or she stays
-      { t: 'Take off your mask.', ic: 'unmask', sh: 'It’s me', intent: 'shows himself', set: { last: 'me' }, then: [
-        ...at('h_face_pb'), S('pb', 'Amy.'), S('pb', 'It’s me.'),
+    ...at('h_ray_rush'), T('Ray, back with the bags.'),
+    ...at('h_behind'), T('Amy, up.'), T('The gun on Marcus’s back.'), T('Ray, a bag in his hand.'),
+    // Ray: show her who he is, or throw the bag in her face
+    { by: 'pb', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
+      { t: 'Take off your mask.', w: 'Amy', img: 'stakes/amy.webp', ic: 'unmask', sh: 'Amy!', intent: 'shows himself', set: { ray: 'reveal', bags: 2 }, then: [
+        ...at('h_face_pb'), S('pb', 'AMY!'), T('In front of everyone.'),
         ...at('h_amy_face'), { hush: 900 }, S('amy', '…Ray?'), { hush: 700 },
-        S('amy', 'They came to the house.'), S('amy', 'Last night.'), S('amy', 'Two men.'), { hush: 600 },
-        S('amy', 'They said Friday.'), S('amy', 'Or they come back for me.'), { hush: 900 },
+        S('amy', 'They came to the house.'), S('amy', 'Last night.'), S('amy', 'They said Friday.'), { hush: 600 },
         S('amy', 'That’s why I’m here.'), S('amy', 'A loan.'), S('amy', 'For your debt.'),
         { by: 'pb', cue: 'Look at your phone', clock: 9000, choice: [
-          { t: '“Come with us.”', ic: 'hand', sh: 'Come with us', intent: 'takes her along', set: { amygo: 'come' }, then: [
-            S('pb', 'Come with us.'), S('pb', 'Now.'), T('She lowers the gun.'),
-            // Marcus: she just had a gun on his head. Trust her with a bag, or take her gun
-            { by: 'pa', cue: 'Look at your phone', clock: 8000, choice: [
-              { t: 'Give her a bag.', ic: 'bags', sh: 'A bag for her', intent: 'trusts her', set: { amyrole: 'bag' }, then: [...at('h_amy_join'), S('pa', 'Take this.'), T('Amy takes a bag.'), T('She’s one of them now.')] },
-              { t: '“The gun. Give it.”', ic: 'tough', sh: 'Her gun', intent: 'takes her gun', set: { amyrole: 'gun' }, then: [S('pa', 'The gun.'), S('pa', 'Give it.'), T('She hands it over.'), T('Marcus has two guns now.')] },
-            ] }] },
-          { t: '“Stay. You’ll be safe.”', ic: 'calm', sh: 'Stay safe', intent: 'leaves her safe', set: { amygo: 'stay' }, then: [
-            S('pb', 'Stay here.'), S('pb', 'You’ll be safe.'), T('She lowers the gun.'), T('She sits back down with the others.')] },
-        ] }] },
-      { t: 'Shoot her.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { last: 'shoot' }, then: [
-        { music: null, ms: 0 }, { sfx: 'gun shot' }, ...at('h_amy_hurt'), T('Amy goes down.'), T('Her hand on her shoulder.'), T('She doesn’t know who shot her.'), { music: 'double it', lv: 3, vol: 1, ms: 1200 }] },
-      // the bags down: she turns to him, Marcus takes her gun, and her. He doesn't know who she is
-      { t: 'Drop the bags.', ic: 'bags', sh: 'Drop it', intent: 'drops the money', set: { last: 'drop', amyhost: true }, then: [
-        T('The bags hit the floor.'), T('Amy turns to Ray.'), ...at('h_grab'), T('Marcus grabs her wrist.'), T('The gun is his.'), T('And so is she.')] },
+          { t: '“Come with us.”', ic: 'hand', sh: 'Come with us', intent: 'asks her to come', set: { amygo: 'come' }, then: [S('pb', 'Come with us.'), S('pb', 'Now.')] },
+          { t: '“Stay. You’ll be safe.”', ic: 'calm', sh: 'Stay safe', intent: 'leaves her safe', set: { amygo: 'stay' }, then: [S('pb', 'Stay here.'), S('pb', 'You’ll be safe.'), T('She lowers the gun.'), T('She sits back down with the others.')] },
+        ] },
+        // she would come, but the other one shot the guard: Marcus has to show his face
+        { fn: (f) => f.amygo !== 'come' ? [] : f.guard !== 'shot' ? [T('She lowers the gun.'), S('amy', 'Okay.'), { set: { amyjoin: true } }] : [
+          ...at('h_amy_face'), S('amy', 'You shot him!'), S('amy', 'I’m not going anywhere with him.'),
+          { by: 'pa', cue: 'Look at your phone', clock: 9000, choice: [
+            { t: 'Take off your mask. “I have a son.”', ic: 'unmask', sh: 'My son', intent: 'shows his face', set: { mface: 'off', amyjoin: true }, then: [
+              ...at('h_face_pa'), S('pa', 'I have a son.'), S('pa', 'He’s nine.'), S('pa', 'I didn’t want any of this.'), T('She lowers the gun.'), S('amy', 'Okay.')] },
+            { t: '“We don’t have time.”', ic: 'tough', sh: 'No time', intent: 'stays masked', set: { mface: 'on' }, then: [
+              S('pa', 'We don’t have time for this.'), T('She backs away.'), T('Back to the others.')] },
+          ] },
+        ] },
+      ] },
+      { t: 'Throw the bag in her face.', w: 'Marcus', img: 'stakes/marcus.webp', ic: 'bags', sh: 'Throw the bag', intent: 'throws the bag', set: { ray: 'throw', bags: 1 }, then: [
+        ...at('h_bag_hit'), T('The bag hits her in the face.'), T('She goes down.'), T('The gun slides away.'), T('So does the bag.'),
+        { by: 'pb', cue: 'Look at your phone', clock: 7000, choice: [
+          { t: 'Run for the exit.', ic: 'send', sh: 'Run', intent: 'runs', set: { back: 'no' }, then: [S('pb', 'GO!'), S('pb', 'Leave it!')] },
+          { t: 'Get the bag back.', ic: 'bags', sh: 'The bag', intent: 'goes back for it', set: { back: 'yes', bags: 2 }, then: [
+            T('Ray goes back for it.'), T('Amy on her knees.'), T('The bag in her arms.'), T('He tears it away from her.'), T('She doesn’t know it’s him.')] },
+        ] },
+      ] },
     ] },
-    // ---- (09/11) the click: Marcus fires to calm the room. His gun is empty. Twenty hostages see it ----
-    ...at('h_rob_red'), T('The room starts to move.'), S('pa', 'DOWN!'), S('pa', 'Everybody DOWN!'), T('Marcus fires at the ceiling.'),
+    // ---- (11/11) the room turns on them. Marcus fires to calm it: his gun is empty ----
+    ...at('h_rob_red'), T('The room starts to move.'),
+    { fn: (f) => [
+      ...(f.talk === 'threat' ? [S('guard', 'He threatened us!')] : [S('hostage', 'He threatened us!')]),
+      ...(f.guard === 'shot' ? [S('hostage', 'He killed the security!')] : []),
+      ...(f.amyjoin ? [S('hostage', 'And she’s with them?!')] : []),
+    ] },
+    S('pa', 'DOWN!'), S('pa', 'Everybody DOWN!'), T('Marcus fires at the ceiling.'),
     { music: null, ms: 0 }, ...at('h_black'), { hush: 700 }, T('Click.'), { hush: 1400 }, T('Click.'),
-    ...at('h_rob_red'), S('guard', 'His gun’s empty!'), { sfx: 'crowd panic', loop: true }, T('Twenty of them get up.'),
-    // (10/11) no music after the click: the crowd, the alarm, nothing else
-    { sfx: 'sirens', loop: true },   // (10/11) the police arriving: several sirens, near and far
+    ...at('h_rob_red'), S('hostage', 'His gun’s empty!'), { sfx: 'crowd panic', loop: true }, T('Twenty of them get up.'),
+    { sfx: 'sirens', loop: true },   // the police arriving: several sirens, near and far
     ...at('h_stairs'), S('pb', 'THE ROOF!'), T('The stairs.'), T('The crowd right behind them.'),
-    // ---- (09/11) the roof, part 1: the shield (Amy in front of Marcus; or Amy offering herself; or nobody) ----
-    { sfx: 'helicopters', loop: true, peak: .7 }, ...at('h_roof_lights'), { hush: 2600 },   // (10/11) three helicopters overhead   // (10/11) up on the roof: the helicopters, the lights
-    { fn: (f) => f.amyhost ? [
-      ...at('h_roof_shield'), T('The roof.'), T('Snipers on the next tower.'), T('Marcus holds the woman in front of him.'), T('He doesn’t know her.'),
-      // Ray, secretly: does Marcus learn who she is
-      { by: 'pb', secret: true, peak: true, cue: 'Look at your phone', clock: 8000, choice: [
-        { t: 'Tell him: “That’s my wife.”', w: 'Amy', img: 'stakes/amy.webp', ic: 'say', sh: 'My wife', intent: 'tells him', set: { told2: 'wife' }, then: [S('pb', 'Marcus.'), S('pb', 'That’s my wife.')] },
-        { t: 'Say nothing.', w: 'Marcus', img: 'stakes/marcus.webp', ic: 'mask', sh: 'Say nothing', idle: true, intent: 'says nothing', set: { told2: 'none' }, then: [{ hush: 1400 }] },
-      ] },
-      { fn: (g) => [{ by: 'pa', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
-        { t: 'Keep her in front of you.', w: 'Freedom', img: 'stakes/leo.webp', ic: 'tough', sh: 'Keep her', intent: 'keeps his shield', set: { shield: 'keep' }, then: [T('The snipers hold their fire.'), T('For now.')] },
-        { t: 'Let her go.', w: g.told2 === 'wife' ? 'Ray' : 'Her', img: 'stakes/amy.webp', ic: 'hand', sh: 'Let her go', intent: 'lets her go', set: { shield: 'free' }, then: [...at('h_amy_runs'), T('Amy runs to the police.'), { sfx: 'gun shot' }, T('A warning shot.'), T('At Marcus’s feet.')] },
-      ] }] },
-    ] : f.amygo === 'come' ? [
-      ...at('h_roof_shield'), T('The roof.'), T('Snipers on the next tower.'), S('amy', 'Hold me in front of you.'), S('amy', 'They won’t shoot.'),
+    // ---- (11/11) the roof: one problem, by what they carry. Two bags = Ray stuck in the door; one = the snipers. The episode
+    // ends on the choice: we never see what it does (they want the next one) ----
+    { sfx: 'helicopters', loop: true, peak: .7 }, ...at('h_roof_lights'), { hush: 2600 },
+    { fn: (f) => f.bags === 2 ? [
+      { set: { roof: 'stuck' } },
+      ...at('h_roof_door'), T('Ray’s bag.'), T('Caught in the door.'), T('The crowd two floors down.'),
+      ...at('h_roof_gondola'), T('Marcus at the gondola.'), T('Twenty meters away.'),
+      { split: () => ({
+        pa: [{ when: () => TV, then: at('h_roof_lights'), else: at('h_roof_gondola') }, { by: 'pa', peak: true, clock: 8000, choice: [
+          { t: 'Get in the gondola.', w: 'Freedom', img: 'stakes/leo.webp', ic: 'send', sh: 'Go', intent: 'goes', set: { ma: 'go' }, then: [] },
+          { t: 'Run back for Ray.', w: 'Ray', img: 'stakes/ray.webp', ic: 'hand', sh: 'Back for Ray', intent: 'goes back for him', set: { ma: 'back' }, then: [] },
+        ] }],
+        pb: [...at('h_roof_door'), { by: 'pb', peak: true, clock: 8000, choice: [
+          { t: 'Pull the bag free.', w: 'Amy', img: 'stakes/amy.webp', ic: 'bags', sh: 'Pull it', intent: 'pulls the bag', set: { ra: 'pull' }, then: [] },
+          { t: 'Let it go.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'hand', sh: 'Let it go', intent: 'lets the money go', set: { ra: 'drop' }, then: [] },
+        ] }],
+      }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is choosing', pb: 'Marcus is choosing' }) },
+    ] : f.amyjoin ? [
+      { set: { roof: 'snipers' } },
+      ...at('h_roof_shield'), T('Snipers on the next tower.'), T('A red dot on Ray’s chest.'), S('amy', 'Hold me in front of you.'), S('amy', 'They won’t shoot.'),
       { by: 'pb', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
-        { t: 'Hold her in front of you.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'tough', sh: 'Hold her', intent: 'holds her as a shield', set: { shield: 'keep' }, then: [T('The snipers hold their fire.'), T('For now.')] },
-        { t: '“Go to them. Hands up.”', w: 'Amy', img: 'stakes/amy.webp', ic: 'hand', sh: 'Send her away', intent: 'sends her to the police', set: { shield: 'free' }, then: [S('pb', 'Go to them.'), S('pb', 'Hands up.'), ...at('h_amy_runs'), { sfx: 'gun shot' }, T('A warning shot.'), T('At Ray’s feet.')] },
+        { t: 'Hold her in front of you.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'tough', sh: 'Hold her', intent: 'holds her as a shield', set: { shield: 'keep' }, then: [] },
+        { t: '“Go to them. Hands up.”', w: 'Amy', img: 'stakes/amy.webp', ic: 'hand', sh: 'Send her away', intent: 'sends her to the police', set: { shield: 'free' }, then: [] },
       ] },
-    ] : [...at('h_roof_lights'), T('The roof.'), T('Snipers on the next tower.'), { sfx: 'gun shot' }, T('A warning shot.'), T('The gravel jumps at Marcus’s feet.')] },
-    // ---- (09/11) the roof, part 2: the doorway. Ray's bag caught in the door, the crowd coming up; Marcus at the gondola.
-    // Both choose at the same time, each on his phone, neither sees the other's choice ----
-    ...at('h_roof_door'), T('Ray’s bag.'), T('Caught in the door.'), T('The crowd two floors down.'),
-    ...at('h_roof_gondola'), T('Marcus at the gondola.'), T('Twenty meters away.'), T('The helicopter’s light on him.'),
-    { split: () => ({
-      pa: [{ when: () => TV, then: at('h_roof_lights'), else: at('h_roof_gondola') }, { by: 'pa', peak: true, clock: 8000, choice: [
-        { t: 'Get in the gondola.', w: 'Freedom', img: 'stakes/leo.webp', ic: 'send', sh: 'Go', intent: 'goes', set: { ma: 'go' }, then: [] },
-        { t: 'Run back for Ray.', w: 'Ray', img: 'stakes/ray.webp', ic: 'hand', sh: 'Back for Ray', intent: 'goes back for him', set: { ma: 'back' }, then: [] },
-      ] }],
-      pb: [...at('h_roof_door'), { by: 'pb', peak: true, clock: 8000, choice: [
-        { t: 'Pull the bag free.', w: 'Amy', img: 'stakes/amy.webp', ic: 'bags', sh: 'Pull it', intent: 'pulls the bag', set: { ra: 'pull' }, then: [] },
-        { t: 'Let it go.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'hand', sh: 'Let it go', intent: 'lets the money go', set: { ra: 'drop' }, then: [] },
-      ] }],
-    }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is choosing', pb: 'Marcus is choosing' }) },
-    // what the two choices make, together
-    { fn: (f) => { const amy = f.shield === 'keep' ? [T('Amy with them.'), T('A gun at her head.')] : [];
-      return ({
-        dropgo: [...at('h_end_broke'), T('Ray lets the bag go.'), T('They reach the gondola.'), T('Together.'), ...amy, T('With nothing.')],
-        pullgo: [...at('h_end_alone'), T('The gondola drops.'), T('Marcus, alone.'), T('Up there, the crowd reaches Ray.'), T('And the money.')],
-        dropback: [...at('h_end_caught'), T('Marcus runs back.'), T('Ray had already let go.'), T('They meet in the light.'), T('“ON YOUR KNEES!”'), ...at('h_phone_broken'), { hush: 3000 }],
-        pullback: [...at('h_end_together'), T('Together, they tear it free.'), T('The gondola drops.'), ...amy, { sfx: 'gun shot' }, T('A bullet through the cabin.'), T('Ray’s shirt is turning red.')],
-      })[f.ra + f.ma] || []; } },
-    T('Outside, the sirens.'),
-    { music: null, ms: 400 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
-    // ---- (09/11) what could have been: the pictures of what they didn't get to (each one a choice that mattered) ----
+    ] : [
+      { set: { roof: 'snipers' } },
+      ...at('h_roof_lights'), T('Snipers on the next tower.'), T('A red dot on Marcus’s chest.'), T('The gondola, twenty meters away.'),
+      { by: 'pa', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
+        { t: 'Hands up.', w: 'Leo', img: 'stakes/leo.webp', ic: 'hand', sh: 'Hands up', intent: 'gives up', set: { snipe: 'up' }, then: [] },
+        { t: 'Run for the gondola.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'send', sh: 'Run', intent: 'runs', set: { snipe: 'run' }, then: [] },
+      ] },
+    ] },
+    // cut on the choice: black, the end of the episode
+    { music: null, ms: 0 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
+    ...at('h_black'), { hush: 1600 },
+    // ---- what could have been: the pictures of what they didn't get to (each one a choice that mattered) ----
     { fn: (f) => {
-      const end = f.ra + f.ma, OUT = [
-        ['h_roof_shield', 'Amy as a shield.', f.shield === 'keep'],
-        ['h_amy_join', 'Amy, one of them.', f.amyrole === 'bag'],
-        ['h_amy_hurt', 'Ray pulls the trigger.', f.last === 'shoot'],
-        ['h_amy_runs', 'Amy runs to the police.', f.shield === 'free'],
-        ['h_end_broke', 'Free. With nothing.', end === 'dropgo'],
-        ['h_end_alone', 'Marcus gets away. Alone.', end === 'pullgo'],
-        ['h_phone_broken', 'Leo’s dad doesn’t come home.', end === 'dropback'],
-        ['h_end_together', 'Together, with the money. And a bullet.', end === 'pullback'],
+      const OUT = [
+        ['h_face_pb', 'Ray shows Amy his face.', f.ray === 'reveal'],
+        ['h_bag_hit', 'The bag in Amy’s face.', f.ray === 'throw'],
+        ['h_amy_join', 'Amy, one of them.', !!f.amyjoin],
+        ['h_wc_shot', 'The guard, shot.', f.guard === 'shot'],
+        ['h_roof_door', 'Ray, stuck in the door.', f.roof === 'stuck'],
+        ['h_roof_shield', 'Amy as a shield.', f.roof === 'snipers' && !!f.amyjoin],
       ].filter((o) => !o[2]);
-      return [{ fade: 'out', ms: 600 }, { titleCard: 'What could have been' }, ...OUT.flatMap(([id, cap], i) => [...at(id), ...(i ? [] : [{ fade: 'in', ms: 500 }]), T(cap)])];
+      return [{ titleCard: 'What could have been' }, ...OUT.flatMap(([id, cap], i) => [...at(id), ...(i ? [] : [{ fade: 'in', ms: 500 }]), T(cap)])];
     } },
     { fade: 'out', ms: 300 },
     { end: { kicker: 'To be continued', title: 'Floor 31', lede: '{LEDE}', art: null } },
@@ -444,20 +453,18 @@
       amy: { name: 'Amy', color: AMY, avatar: 'props/amy_face.webp',   // (09/11) her photo (her initial until the file is there)
         past: [{ day: 'Today', at: '8:02 AM' }, ['in', 'Good luck today ❤️'], ['out', 'You too.']] },   // (09/11) just this morning's: more was too much in your face
       guard: { name: 'Guard', color: '#94a3b8' },
+      hostage: { name: 'A hostage', color: '#a8a29e' },
     },
     words: { LEDE: (f) => [
       f.p1 === 'lose' ? 'Marcus had everything to lose.' : 'Marcus had everything to win.',
-      f.leo === 'money' ? 'Marcus promised Leo money wouldn’t be an issue.' : 'Marcus told Leo they’d figure it out.',
+      f.leo === 'money' ? 'He promised Leo money wouldn’t be an issue.' : 'He told Leo they’d figure it out.',
       f.amytext === 'marry' ? 'Ray told Amy he’d marry her.' : 'Ray made fun of Amy’s photo.',
-      'Amy was in the bank on 31.',
       ({ shot: 'Marcus shot the guard.', drop: 'Marcus made the guard drop his gun.', talk: 'Marcus talked the guard out.' })[f.guard] || '',
-      'Ray took the vault. Amy took the guard’s gun.',
-      f.mask === 'off' ? 'Marcus showed her his face.' : f.mask === 'on' ? 'Marcus kept his mask on.' : '',
-      ({ me: 'Ray showed Amy who he was.', shoot: 'Ray shot Amy.', drop: 'Ray dropped the bags, and Marcus took Amy.' })[f.last] || '',
-      f.amygo === 'come' ? (f.amyrole === 'bag' ? 'She came with them, a bag on her shoulder.' : 'She came with them. Marcus took her gun.') : f.amygo === 'stay' ? 'He told her to stay, safe.' : '',
-      f.told2 === 'wife' ? 'On the roof, Ray told Marcus she was his wife.' : f.told2 === 'none' ? 'On the roof, Ray never told Marcus who she was.' : '',
-      f.shield === 'keep' ? 'Amy was their shield.' : f.shield === 'free' ? 'Amy ran to the police.' : '',
-      ({ dropgo: 'They got away together, with nothing.', pullgo: 'Marcus got away alone. Ray stayed with the money.', dropback: 'They were caught on the roof.', pullback: 'They got away with the money. Ray was bleeding.' })[f.ra + f.ma] || '',
+      'In the vault, Ray learned Amy was in the bank.',
+      f.ray === 'reveal' ? 'He showed her his face, in front of everyone.' : f.ray === 'throw' ? 'He threw a bag in her face.' : '',
+      f.back === 'yes' ? 'Then he went back for the bag.' : '',
+      f.amyjoin ? 'Amy came with them.' : f.amygo ? 'Amy stayed.' : '',
+      f.roof === 'stuck' ? 'On the roof, Ray’s bag got caught in the door.' : f.roof === 'snipers' ? 'On the roof, the snipers.' : '',
     ].filter(Boolean).join(' ') },
   });
   window.DEMO_STORIES = { ...(window.DEMO_STORIES || {}), d_heist: story };

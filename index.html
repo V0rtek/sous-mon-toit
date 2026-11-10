@@ -193,6 +193,7 @@ body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; ba
 #duo { position: fixed; inset: 0; z-index: 25; display: grid; grid-template-columns: 1fr 1fr; background: #07070a; font-family: var(--ui, system-ui); }
 #duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
 #duo .dh + .dh { border-left: 2px solid rgba(255,255,255,.08); }
+#duo .dh:only-child { grid-column: 1 / -1; }   /* (11/11) one phone alone: the whole screen */
 #duo .dp { width: min(22vw, 34vh); aspect-ratio: 9 / 16; border-radius: 3.2vh; background: #0f0f12; border: .9vh solid #26262b; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); display: flex; flex-direction: column; overflow: hidden; }
 #duo .dpic { position: relative; width: min(30vw, 46vh); height: 62vh; border-radius: 2.4vh; background: center 25% / cover no-repeat; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); flex: none; }
 #duo .dcap { position: absolute; left: 4%; right: 4%; bottom: 4%; font-size: 2.6vh; line-height: 1.35; color: #fff; text-align: center; text-shadow: 0 .2vh 1vh #000; background: rgba(0,0,0,.55); border-radius: 1.4vh; padding: 1vh 1.4vh; }
@@ -2863,7 +2864,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261111000000"></script>
+<script src="heist.js?v=20261111100000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
