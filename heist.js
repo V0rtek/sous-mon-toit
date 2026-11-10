@@ -298,16 +298,7 @@
     S('pb', 'Hold the room.'), S('pb', 'I’ve got the vault.'), { set: { watch: 'pa' } },
     // Ray's side: over the counter, down to the vault, two bags; then Amy's texts: she's here
     ...at('h_counter'), { hush: 1600 },
-    { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },   // behind the steel: no crowd, the alarm far away
-    ...at('h_bags'), { hush: 2400 },
-    ...at('h_ray_pocket'), BUZZ, { hush: 1200 },
-    { duo: { pb: { who: 'Amy', heart: true, hand: RAY_HAND } } }, { hush: 700 },
-    { duoIn: ['pb', { text: 'ray' }] }, { hush: 1300 },
-    { duoIn: ['pb', { text: 'theres a robbery' }] }, { hush: 1500 },
-    { duoIn: ['pb', { text: 'im at the bank on 31' }] }, { hush: 3200 },   // the selfie: the bank's restroom
-    { duo: false }, ...at('h_ray_reads'), { hush: 2600 },   // his face: she's out there
-    { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
-    // ---- back to Marcus: the guard behind the restroom door ----
+    // ---- (11/11) Ray over the counter, then straight to Marcus: the guard behind the restroom door ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
     ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 800 }, { hush: 3600 },   // the other side of a door: muffled
     ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
@@ -342,6 +333,16 @@
         ] },
       ] },
     ] },
+    // ---- (11/11) meanwhile, Ray in the vault: two bags, then Amy's texts ----
+    { stop: 'crowd panic' }, { room: { lp: 380, vol: .45, ms: 300 } },   // behind the steel: no crowd, the alarm far away
+    ...at('h_bags'), { hush: 2400 },
+    ...at('h_ray_pocket'), BUZZ, { hush: 1200 },
+    { duo: { pb: { who: 'Amy', heart: true, hand: RAY_HAND } } }, { hush: 700 },
+    { duoIn: ['pb', { text: 'ray' }] }, { hush: 1300 },
+    { duoIn: ['pb', { text: 'theres a robbery' }] }, { hush: 1500 },
+    { duoIn: ['pb', { text: 'im at the bank on 31' }] }, { hush: 3200 },   // the selfie: the bank's restroom
+    { duo: false }, ...at('h_ray_reads'), { hush: 2600 },   // his face: she's out there
+    { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
     // ---- (11/11) Amy: her eyes, she crawls to the guard, then behind Marcus; Ray comes back with the bags ----
     ...at('h_amy_eyes'), { hush: 2600 },
     { fn: (f) => [...at('h_amy_crawl'), T('Amy crawls to the guard.'), T(f.guard === 'shot' ? 'He doesn’t move.' : f.gun === 'holster' ? 'His gun, still on his hip.' : 'His gun, on the floor.'), T('Her hand closes on it.')] },
