@@ -152,10 +152,15 @@
   SCENES.h_amy_behind = { image: 'bg/amy_behind.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .45, amy: .65 } };
   SCENES.h_amy_crawl_shape = place({ back: [...BANK, ...lie(1250, 1010, GUARD), R(1080, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...lie(640, 1000, AMY, 1.3), ...armed(250, 1080, 1.6, P1, -1, { face: MASK })] });
   SCENES.h_amy_behind_shape = place({ back: [...BANK, ...lie(1500, 1010, GUARD), ...armed(1250, 1080, 2, P1, 1, { face: MASK }), ...lie(680, 1010, AMY, 1.3)] });
-  SCENES.h_ray_rush = place({ back: [R(0, 0, 1920, 1080, '#3b3530'), R(0, 820, 1920, 260, '#2a2622'), ...stand(960, 1080, 2.2, P2, { face: MASK }), bag(700, 760, 2), bag(1110, 780, 2)] });
-  SCENES.h_behind = place({ back: [...BANK, ...lie(1700, 1010, GUARD), ...armed(1450, 1080, 1.8, P1, 1, { face: MASK }), ...armed(900, 1080, 1.8, AMY, 1),
+  // (11/11) Justin's: Ray running back with the two bags; Amy up behind Marcus, aiming, Ray (from behind) a bag ready to
+  // throw; the bag in her face, the gun flying
+  SCENES.h_ray_rush = { image: 'bg/ray_rush.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .5 } };
+  SCENES.h_behind = { image: 'bg/amy_standoff.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .3, amy: .63, pa: .8 } };
+  SCENES.h_bag_hit = { image: 'bg/bag_hit.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .2, amy: .7 } };
+  SCENES.h_ray_rush_shape = place({ back: [R(0, 0, 1920, 1080, '#3b3530'), R(0, 820, 1920, 260, '#2a2622'), ...stand(960, 1080, 2.2, P2, { face: MASK }), bag(700, 760, 2), bag(1110, 780, 2)] });
+  SCENES.h_behind_shape = place({ back: [...BANK, ...lie(1700, 1010, GUARD), ...armed(1450, 1080, 1.8, P1, 1, { face: MASK }), ...armed(900, 1080, 1.8, AMY, 1),
     ...stand(260, 1080, 1.9, P2, { face: MASK }), bag(130, 560, 2.4), bag(330, 980, 1.6)] });
-  SCENES.h_bag_hit = place({ back: [...BANK, ...lie(900, 1010, AMY, 1.4), bag(1080, 880, 1.8), R(1400, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...stand(300, 1080, 1.9, P2, { face: MASK })] });
+  SCENES.h_bag_hit_shape = place({ back: [...BANK, ...lie(900, 1010, AMY, 1.4), bag(1080, 880, 1.8), R(1400, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...stand(300, 1080, 1.9, P2, { face: MASK })] });
   SCENES.h_amy_hurt = place({ back: [...BANK, ...lie(560, 960, GREY), ...lie(1000, 1010, AMY, 1.4), C(1170, 960, 46, '#b91c1c'), ...armed(1560, 1080, 1.9, P2, -1, { face: MASK })] });
   SCENES.h_amy_join = place({ back: [...BANK, ...lie(1000, 1010, GUARD), ...stand(560, 1080, 2, P2, { face: SKIN }), bag(620, 760, 1.3), ...stand(960, 1080, 1.9, AMY), bag(1010, 770, 1.3), ...stand(1380, 1080, 2, P1, { face: MASK })] });
   SCENES.h_grab = place({ back: [...BANK, ...lie(560, 960, GREY), ...holds(960, 1080, 2, P1, AMY), ...stand(1560, 1080, 1.9, P2, { face: MASK }), bag(1420, 980, 1.4), bag(1560, 990, 1.4)] });
@@ -424,7 +429,7 @@
     { music: null, ms: 0 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
     { review: { key: 'suite', q: 'Do you want to see what happens next?', yes: 'Yes!', no: 'No', alts: (f) => [
       f.ray !== 'reveal' && ['stakes/ray.webp', 'Ray shows Amy his face.'],   // TODO Justin's pictures in place of these
-      f.ray !== 'throw' && ['stakes/amy.webp', 'The bag in Amy’s face.'],
+      f.ray !== 'throw' && ['bg/bag_hit.webp', 'The bag in Amy’s face.'],
       !f.amyjoin && ['bg/amy_face.webp', 'Amy, one of them.'],
       f.guard !== 'shot' && ['bg/wc_shot.webp', 'The guard, shot.'],
       f.roof !== 'stuck' && ['bg/roof_door.webp', 'Ray, stuck in the door.'],
