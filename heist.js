@@ -140,8 +140,12 @@
     C(x - 62 * s, y - 286 * s, 26 * s, SKIN), R(x - 52 * s, y - 300 * s, 44 * s, 24 * s, '#0b0b0d', { r: 4 })];   // his hand, the gun at her temple
   // (11/11) the new middle (shapes until Justin's pictures): Ray over the counter; the vault, two bags; Amy crawling to the
   // guard, then behind Marcus; Ray back with the bags; Amy up behind Marcus, Ray a bag in his hand; the bag in her face
-  SCENES.h_counter = place({ back: [...BANK, ...lie(400, 1010, GREY), ...lie(1500, 990, GREY), ...stand(1000, 600, 1.4, P2, { face: MASK })] });
-  SCENES.h_bags = place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1400, 480, 700, '#9ca3af', { line: '30px solid #6b7280' }), C(1400, 480, 110, '#6b7280'),
+  // (11/11) Justin's: Ray vaulting the counter; in the vault, filling the two bags; reading Amy's texts, frozen
+  SCENES.h_counter = { image: 'bg/ray_counter.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .6 } };
+  SCENES.h_bags = { image: 'bg/vault_bags.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .45 } };
+  SCENES.h_ray_reads = { image: 'bg/ray_reads.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .45 } };
+  SCENES.h_counter_shape = place({ back: [...BANK, ...lie(400, 1010, GREY), ...lie(1500, 990, GREY), ...stand(1000, 600, 1.4, P2, { face: MASK })] });
+  SCENES.h_bags_shape = place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1400, 480, 700, '#9ca3af', { line: '30px solid #6b7280' }), C(1400, 480, 110, '#6b7280'),
     ...bust(700, 1080, 2.4, P2, { face: MASK }), bag(980, 900, 2.2), bag(260, 940, 2), R(1050, 980, 240, 60, '#3f6212', { r: 6 }), R(1100, 950, 200, 40, '#4d7c0f', { r: 6 })] });
   SCENES.h_amy_crawl = place({ back: [...BANK, ...lie(1250, 1010, GUARD), R(1080, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...lie(640, 1000, AMY, 1.3), ...armed(250, 1080, 1.6, P1, -1, { face: MASK })] });
   SCENES.h_amy_behind = place({ back: [...BANK, ...lie(1500, 1010, GUARD), ...armed(1250, 1080, 2, P1, 1, { face: MASK }), ...lie(680, 1010, AMY, 1.3)] });
@@ -294,7 +298,7 @@
     { duoIn: ['pb', { text: 'ray' }] }, { hush: 1300 },
     { duoIn: ['pb', { text: 'theres a robbery' }] }, { hush: 1500 },
     { duoIn: ['pb', { text: 'im at the bank on 31' }] }, { hush: 3200 },   // the selfie: the bank's restroom
-    { duo: false }, ...at('h_bags'), T('Floor 31.'), T('Amy is out there.'),
+    { duo: false }, ...at('h_ray_reads'), { hush: 2600 },   // his face: she's out there
     { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
     // ---- back to Marcus: the guard behind the restroom door ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
