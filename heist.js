@@ -230,64 +230,33 @@
       { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_ots_lose'), { hush: 700 }, S('pa', 'Ray…'), S('pa', 'I have a son.')] },
       { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_ots_win'), { hush: 700 }, S('pa', 'Money won’t be a problem anymore.')] },
     ] },
-    // ---- 10-11. Ray's phone: Amy (only he sees who) ----
-    ...at('h_ray_pocket'), RING, { hush: 1200 },
-    { by: 'pb', ring: 'Amy', cue: 'Look at your phone', choice: [   // (10/11) the TV doesn't go black
-      { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
-      { t: 'Later', intent: 'later', set: { amy: 'later' }, then: [] },
+    // ---- 10-11. (10/11) the two phones, on the TV: the screen in two, one thing at a time. Marcus's phone with Leo (left), Ray's
+    // with Amy (right, his hand). Two answers each, chosen on each one's own phone, no clock. No call ----
+    ...at('h_ray_pocket'), BUZZ, { hush: 1400 },   // Ray's pocket buzzes too
+    { duo: { pa: { who: 'Leo' }, pb: { who: 'Amy', heart: true, hand: { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] } } } }, { hush: 900 },
+    { duoIn: ['pa', { text: 'dad r u coming to practice tonight?' }] }, { hush: 2200 },
+    { duoIn: ['pb', { img: 'bg/amy_selfie.webp' }] }, { hush: 2800 },   // Justin's: her joke selfie in the bathroom mirror
+    { duoOut: ['pa', 'Sorry buddy, dad’s not going to practice this time.'] }, { hush: 2200 },
+    { duoIn: ['pa', { text: 'mom says we wont have the money to do next season' }] }, { hush: 3200 },
+    { by: 'pa', clock: 0, choice: [
+      { t: 'Money won’t be an issue.', ic: 'tough', sh: 'No more money issue', intent: 'Text Leo', set: { leo: 'money' }, then: [{ duoOut: ['pa', 'As of tonight, money won’t be an issue anymore.'] }, { hush: 1600 }] },
+      { t: 'We’ll figure it out, buddy.', ic: 'love', sh: 'We’ll figure it out', intent: 'Text Leo', set: { leo: 'figure' }, then: [{ duoOut: ['pa', 'We’ll figure it out, buddy.'] }, { hush: 1600 }] },
     ] },
-    HUNG, { room: { lp: 650, vol: .5, ms: 1500 } },   // the vibration stops; the crowd goes far
-    // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
-    { when: (f) => f.amy === 'call', then: [
-      ...at('h_ray_phone'), { hush: 1800 },   // he gets up, his phone in hand, and goes to take it
-      // (10/11) on the TV, the screen in two, one thing at a time: Marcus's phone with Leo (left), Ray's call with Amy (right,
-      // whoever talks, the line under the picture); each answers on his phone, two answers, no clock
-      { duo: { pa: { who: 'Leo' }, pb: { who: 'Amy', heart: true } } }, { duoPic: ['pb', 'bg/call_ray_full.webp'] }, { tick: true },
-      { duoIn: ['pa', { text: 'dad r u coming to practice tonight?' }] }, { hush: 2400 },
-      { duoOut: ['pa', 'Sorry buddy, dad’s not going to practice this time.'] }, { hush: 2200 },
-      { duoPic: ['pb', 'bg/call_amy_full.webp'] }, { duoSay: ['pb', 'amy', 'Hey you.'] }, { duoSay: ['pb', 'amy', 'Are you still downtown?'] },
-      { duoPic: ['pb', 'bg/call_ray_full.webp'] },
-      { by: 'pb', clock: 0, choice: [
-        { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [{ duoSay: ['pb', 'pb', 'Still here, yeah.'] }, { duoSay: ['pb', 'pb', 'Something for work.'] }] },
-        { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [{ duoSay: ['pb', 'pb', 'No, I’m on my way.'] }, { duoSay: ['pb', 'pb', 'Twenty minutes.'] }] },
-      ] },
-      { duoIn: ['pa', { text: 'ok' }] }, { hush: 1800 },
-      { duoIn: ['pa', { text: 'mom says we wont have the money to do next season' }] }, { hush: 3200 },
-      { by: 'pa', clock: 0, choice: [
-        { t: 'Money won’t be an issue.', ic: 'tough', sh: 'No more money issue', intent: 'Text Leo', set: { leo: 'money' }, then: [{ duoOut: ['pa', 'As of tonight, money won’t be an issue anymore.'] }, { hush: 1600 }] },
-        { t: 'We’ll figure it out, buddy.', ic: 'love', sh: 'We’ll figure it out', intent: 'Text Leo', set: { leo: 'figure' }, then: [{ duoOut: ['pa', 'We’ll figure it out, buddy.'] }, { hush: 1600 }] },
-      ] },
-      { duoPic: ['pb', 'bg/call_amy_full.webp'] }, { duoSay: ['pb', 'amy', 'I’ve got a meeting at noon.'] }, { duoSay: ['pb', 'amy', 'A big one.'] },
-      { duoSay: ['pb', 'amy', 'I’ll tell you tonight.'] }, { hush: 600 }, { duoSay: ['pb', 'amy', 'Love you.'] },
-      { duoPic: ['pb', 'bg/call_ray_full.webp'] }, { hush: 1400 }, { tick: false }, { duo: false },
-      lose(4, 'crowd'),   // the call and the texts ate 4 minutes
-      ...at('h_two'), { hush: 1800 },
+    { by: 'pb', clock: 0, choice: [
+      { t: 'I’m gonna marry you.', ic: 'love', sh: 'Marry', intent: 'Text Amy', set: { amytext: 'marry' }, then: [{ duoOut: ['pb', 'I’m gonna marry you.'] }, { hush: 1600 }] },
+      { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1600 }] },   // TODO Justin's words
     ] },
+    { duo: false }, lose(2, 'crowd'),   // the texts ate 2 minutes
+    ...at('h_two'), { hush: 1800 },
     ...at('h_ots_look'), S('pb', 'It’s time.'),   // (09/11) over Ray's shoulder, before the elevators
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
     ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
     { music: 'double it', vol: .32, lp: 420, ms: 14000 },
-    ...at('h_mpocket'), BUZZ, { hush: 1600 },   // Marcus's pocket buzzes: Sarah
-    // ---- 15. (10/11) the last text before going in: on the TV, the screen in two, each one's phone in his half. One thing at a
-    // time: Sarah's text, Amy's photo; then Marcus answers, then Ray (two answers each, no clock) ----
-    { duo: { pa: { who: 'Sarah' }, pb: { who: 'Amy', heart: true, hand: { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] } } } },   // (10/11) Ray's hand (Justin's); Marcus's to come { hush: 900 },
-    { duoIn: ['pa', { text: 'Where are you?' }] }, { hush: 2200 },
-    { duoIn: ['pb', { img: 'bg/amy_selfie.webp' }] }, { hush: 2800 },   // (10/11) Justin's: her joke selfie in the bathroom mirror
-    { by: 'pa', clock: 0, choice: [
-      { t: 'I love you.', ic: 'love', sh: 'I love you', intent: 'Text Sarah', set: { sarah: 'love' }, then: [{ duoOut: ['pa', 'I love you.'] }, { hush: 1500 }] },
-      { t: 'Kiss Leo for me.', ic: 'love', sh: 'Kiss Leo', intent: 'Text Sarah', set: { sarah: 'kiss' }, then: [{ duoOut: ['pa', 'Kiss Leo for me.'] }, { hush: 1500 }] },
-    ] },
-    { by: 'pb', clock: 0, choice: [
-      { t: 'I’m gonna marry you.', ic: 'love', sh: 'Marry', intent: 'Text Amy', set: { amytext: 'marry' }, then: [{ duoOut: ['pb', 'I’m gonna marry you.'] }, { hush: 1500 }] },
-      { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1500 }] },   // TODO Justin's words
-    ] },
-    { duo: false }, lose(1, 'crowd'), ...at('h_lift_hall'),   // a text = a minute
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
     ...at('h_in_02'), { music: 'double it', lp: 480, vol: .3, ms: 6000 }, { bars: 2 },   // (10/11) still far, muffled: it opens with the doors
     // ---- 17. up: a floor every 2 bars; the briefcase; the masks; the doors open on the drop ----
     ...at('h_in_08'), { music: 'double it', lp: 560, vol: .32 },
-    { when: (f) => f.amy === 'later', then: [BUZZ, sms('amy', 'pb', 'Call me back. It’s important.', 'pb')] },
     { bars: 2 },
     ...at('h_case14'), { music: 'double it', lp: 650, vol: .34 }, { bars: 2 },
     ...at('h_gun'), { music: 'double it', lp: 760, vol: .37 }, { bars: 2 },
@@ -478,7 +447,8 @@
     },
     words: { LEDE: (f) => [
       f.p1 === 'lose' ? 'Marcus had everything to lose.' : 'Marcus had everything to win.',
-      f.amy === 'call' ? `Ray picked up for Amy${f.told === 'lie' ? ', and lied to her' : ''}.` : 'Ray let Amy’s call go.',
+      f.leo === 'money' ? 'Marcus promised Leo money wouldn’t be an issue.' : 'Marcus told Leo they’d figure it out.',
+      f.amytext === 'marry' ? 'Ray told Amy he’d marry her.' : 'Ray made fun of Amy’s photo.',
       'Amy was in the bank on 31.',
       ({ shot: 'Marcus shot the guard.', drop: 'Marcus made the guard drop his gun.', talk: 'Marcus talked the guard out.' })[f.guard] || '',
       'Ray took the vault. Amy took the guard’s gun.',
