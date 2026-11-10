@@ -161,8 +161,10 @@ body.tv #bubble #text { font-family: 'Atkinson Hyperlegible', Verdana, sans-seri
 body.tv #bubble.narr { border-color: rgba(255,255,255,.35); }
 body.tv #bubble.narr #text { color: #fff; }
 body.tv #tag { display: none !important; }
-body.tv #tail { top: -2em; width: 2em; height: 2em; margin-left: -1em; border: 0; background: #000; border-left: .16em solid var(--spk, #8e8e93); border-top: .16em solid var(--spk, #8e8e93); transform: rotate(45deg); border-radius: .25em 0 0 0; filter: none; }   /* (10/11) a speech-bubble tip: same black fill and same outline as the box, so the two are one shape; ^ over the one speaking */
-body.tv #tail::after { display: none; }
+body.tv #tail { top: 0; width: 0; height: 0; margin: 0; border: 0; background: none; transform: none; filter: none; }   /* (10/11) a speech-bubble tip: the outline colour triangle + a black one inside, running over the box's top outline so the two are one shape; ^ over the one speaking */
+body.tv #tail::before, body.tv #tail::after { content: ""; position: absolute; top: auto; border: 0; }
+body.tv #tail::before { left: -1.2em; bottom: 0; width: 2.4em; height: 1.4em; background: var(--spk, #8e8e93); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; background: #000; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 #tail::after { content: ""; position: absolute; left: -.75em; top: .45em; border-left: .75em solid transparent; border-right: .75em solid transparent; border-bottom: 1.3em solid var(--paper); }
 #choices { display: flex; flex-direction: column; gap: 1.1em; }
 #choices button { font: inherit; font-size: 2.3em; font-weight: 800; color: #fff; text-align: left; background: var(--choice); border: 0; border-radius: 1.4em; padding: .85em 1.2em; cursor: pointer; box-shadow: 0 .25em .7em rgba(0,0,0,.3); animation: rise .28s ease-out backwards; }
