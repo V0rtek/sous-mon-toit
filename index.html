@@ -4336,7 +4336,6 @@ async function tvIntro(at) {
     lg.classList.add('out');
     if (!(await hold(1300))) return false;
   }
-  tvPhase = 'color'; share();   // (10/11) the logo is gone on the TV: the phones' U_ goes too, and they turn their player's colour at once
   if (!(await slide(`<div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;   // (09/11) the logo just said Unwritten: the title alone
   for (const x of st.intro || []) if (!(await slide(`<div class="ti ti-p">${esc(fill(x))}</div>`, Math.max(4000, 1800 + 55 * x.length)))) return false;
   // who plays whom: each character (the pose of the waiting room), facing the other, and its player — the phones show
@@ -4346,6 +4345,7 @@ async function tvIntro(at) {
     const pose = (pick[s] || {}).pose || 'listen', nat = (FACE[spriteOf(s)] || {})[poseOf(s, pose)] || 'r', flip = nat !== 'f' && nat !== (i === 0 ? 'r' : 'l');
     return `<div class="ti ti-c" style="--c:${(castOf(s) || {}).color || '#ff9a4d'}"><img src="${poseSrc(s, pose)}" alt=""${flip ? ' style="transform:scaleX(-1)"' : ''}><b class="ti-pl">${esc(seatName(s) || '…')}</b><span class="ti-who">is <i>${esc(seatLabel(s))}</i></span><span class="ti-bar"></span></div>`;   // (09/11) the player's name in his colour: his colour for the whole story
   }).join('');
+  tvPhase = 'phone'; share();   // (10/11) « choose on your phone »: the phones drop the U_ and turn their player's colour, at once
   if (!(await slide(`<div class="ti ti-ph">${phoneIco('#fff')}</div><div class="ti ti-h">When it’s your turn, choose on your phone.</div>`, 4200))) return false;   // (09/11) one line, true whatever the setting
   tvPhase = 'cast'; share();
   if (!(await slide(`<div class="ti-cast">${cast}</div>`, 6000))) return false;
@@ -4407,7 +4407,7 @@ $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; $('#uWait').hidden = true; return; }
   const ip = remote && remote.ip;
-  $('#uWait').classList.toggle('me', ip === 'cast' || ip === 'color');   // (09/11) the TV says who's who: the phone turns his colour, as on the TV
+  $('#uWait').classList.toggle('me', ip === 'phone' || ip === 'cast');   // (09/11) the TV says who's who: the phone turns his colour, as on the TV
   if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
   if (!ip && o.cardDone) { tvOpen = null; $('#uWait').hidden = true; next(); }
 }
