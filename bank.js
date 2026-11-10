@@ -25,7 +25,7 @@ window.BANK = {
     ['in the end loop 4 verse', 'Ambiance', 'boucle rock 105 BPM, niveau 4 : le beat (le couplet), 8 mesures'],
     ['in the end loop 5 verse full', 'Ambiance', 'boucle rock 105 BPM, niveau 5 : le couplet plus chargé, 8 mesures'],
     ['in the end loop 6 chorus', 'Ambiance', 'boucle rock 105 BPM, niveau 6 : le refrain, tout à la fois, 8 mesures. Les 6 se suivent sur une mesure'],
-    ['into the elevator', 'Ambiance', 'dans un ascenseur, la montée (35 s, à répéter)'], ['elevator ding', 'Ponctuel', 'le ding de l’ascenseur, les portes s’ouvrent'], ['gun shot', 'Ponctuel', 'un coup de feu'], ['establishment alarm', 'Ambiance', 'l’alarme d’une banque (10 s, à répéter)'], ['crowd panic', 'Ambiance', 'une foule qui panique'], ['toilet flush', 'Ponctuel', 'une chasse d’eau derrière une porte (les 9 premières s)'],
+    ['into the elevator', 'Ambiance', 'dans un ascenseur, la montée (35 s, à répéter)'], ['elevator ding', 'Ponctuel', 'le ding de l’ascenseur, les portes s’ouvrent'], ['gun shot', 'Ponctuel', 'un coup de feu'], ['establishment alarm', 'Ambiance', 'l’alarme d’une banque (10 s, à répéter)'], ['crowd panic', 'Ambiance', 'une foule qui panique'], ['helicopters', 'Ambiance', 'trois hélicoptères de police au-dessus (40 s, à répéter)'], ['sirens', 'Ambiance', 'plusieurs sirènes de police, proches et lointaines (40 s, à répéter)'], ['toilet flush', 'Ponctuel', 'une chasse d’eau derrière une porte (les 9 premières s)'],
     ['reverse cinematic boom', 'Ponctuel', 'une montée à l’envers qui finit en boom, 5 s (la montée avant un impact)'],
     ['wooden ship on water loop', 'Ambiance', 'un bateau en bois sur l’eau'], ['immersive beautiful discovery moment ambient (magic)', 'Ambiance', 'moment de découverte, magique'],
   ],

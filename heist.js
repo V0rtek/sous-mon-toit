@@ -396,9 +396,10 @@
     { music: null, ms: 0 }, ...at('h_black'), { hush: 700 }, T('Click.'), { hush: 1400 }, T('Click.'),
     ...at('h_rob_red'), S('guard', 'His gun’s empty!'), { sfx: 'crowd panic', loop: true }, T('Twenty of them get up.'),
     // (10/11) no music after the click: the crowd, the alarm, nothing else
+    { sfx: 'sirens', loop: true },   // (10/11) the police arriving: several sirens, near and far
     ...at('h_stairs'), S('pb', 'THE ROOF!'), T('The stairs.'), T('The crowd right behind them.'),
     // ---- (09/11) the roof, part 1: the shield (Amy in front of Marcus; or Amy offering herself; or nobody) ----
-    ...at('h_roof_lights'), { hush: 2600 },   // (10/11) up on the roof: the helicopters, the lights
+    { sfx: 'helicopters', loop: true, peak: .7 }, ...at('h_roof_lights'), { hush: 2600 },   // (10/11) three helicopters overhead   // (10/11) up on the roof: the helicopters, the lights
     { fn: (f) => f.amyhost ? [
       ...at('h_roof_shield'), T('The roof.'), T('Snipers on the next tower.'), T('Marcus holds the woman in front of him.'), T('He doesn’t know her.'),
       // Ray, secretly: does Marcus learn who she is
@@ -440,7 +441,7 @@
         pullback: [...at('h_end_together'), T('Together, they tear it free.'), T('The gondola drops.'), ...amy, { sfx: 'gun shot' }, T('A bullet through the cabin.'), T('Ray’s shirt is turning red.')],
       })[f.ra + f.ma] || []; } },
     T('Outside, the sirens.'),
-    { music: null, ms: 400 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' },
+    { music: null, ms: 400 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
     // ---- (09/11) what could have been: the pictures of what they didn't get to (each one a choice that mattered) ----
     { fn: (f) => {
       const end = f.ra + f.ma, OUT = [
