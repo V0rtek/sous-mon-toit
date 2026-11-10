@@ -233,7 +233,7 @@
     // ---- 10-11. (10/11) the two phones, on the TV: the screen in two, one thing at a time. Marcus's phone with Leo (left), Ray's
     // with Amy (right, his hand). Two answers each, chosen on each one's own phone, no clock. No call ----
     ...at('h_ray_pocket'), BUZZ, { hush: 1400 },   // Ray's pocket buzzes too
-    { duo: { pa: { who: 'Leo' }, pb: { who: 'Amy', heart: true, hand: { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] } } } }, { hush: 900 },
+    { duo: { pa: { who: 'Leo', hand: { img: 'props/marcus_hand.webp', ar: 936 / 929, screen: [.0962, .0194, .344, .7115] } }, pb: { who: 'Amy', heart: true, hand: { img: 'props/ray_hand.webp', ar: 865 / 927, screen: [.096, .0173, .3618, .7001] } } } }, { hush: 900 },
     { duoIn: ['pa', { text: 'dad r u coming to practice tonight?' }] }, { hush: 2200 },
     { duoIn: ['pb', { img: 'bg/amy_selfie.webp' }] }, { hush: 2800 },   // Justin's: her joke selfie in the bathroom mirror
     { duoOut: ['pa', 'Sorry buddy, dad’s not going to practice this time.'] }, { hush: 2200 },
