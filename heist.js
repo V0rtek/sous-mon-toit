@@ -147,8 +147,11 @@
   SCENES.h_counter_shape = place({ back: [...BANK, ...lie(400, 1010, GREY), ...lie(1500, 990, GREY), ...stand(1000, 600, 1.4, P2, { face: MASK })] });
   SCENES.h_bags_shape = place({ back: [R(0, 0, 1920, 1080, '#2b2f36'), C(1400, 480, 700, '#9ca3af', { line: '30px solid #6b7280' }), C(1400, 480, 110, '#6b7280'),
     ...bust(700, 1080, 2.4, P2, { face: MASK }), bag(980, 900, 2.2), bag(260, 940, 2), R(1050, 980, 240, 60, '#3f6212', { r: 6 }), R(1100, 950, 200, 40, '#4d7c0f', { r: 6 })] });
-  SCENES.h_amy_crawl = place({ back: [...BANK, ...lie(1250, 1010, GUARD), R(1080, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...lie(640, 1000, AMY, 1.3), ...armed(250, 1080, 1.6, P1, -1, { face: MASK })] });
-  SCENES.h_amy_behind = place({ back: [...BANK, ...lie(1500, 1010, GUARD), ...armed(1250, 1080, 2, P1, 1, { face: MASK }), ...lie(680, 1010, AMY, 1.3)] });
+  // (11/11) Justin's: Amy crawling to the guard's gun; Amy crawling behind Marcus, the gun in her hand
+  SCENES.h_amy_crawl = { image: 'bg/amy_crawl.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { amy: .35 } };
+  SCENES.h_amy_behind = { image: 'bg/amy_behind.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .45, amy: .65 } };
+  SCENES.h_amy_crawl_shape = place({ back: [...BANK, ...lie(1250, 1010, GUARD), R(1080, 1000, 70, 30, '#0b0b0d', { r: 4 }), ...lie(640, 1000, AMY, 1.3), ...armed(250, 1080, 1.6, P1, -1, { face: MASK })] });
+  SCENES.h_amy_behind_shape = place({ back: [...BANK, ...lie(1500, 1010, GUARD), ...armed(1250, 1080, 2, P1, 1, { face: MASK }), ...lie(680, 1010, AMY, 1.3)] });
   SCENES.h_ray_rush = place({ back: [R(0, 0, 1920, 1080, '#3b3530'), R(0, 820, 1920, 260, '#2a2622'), ...stand(960, 1080, 2.2, P2, { face: MASK }), bag(700, 760, 2), bag(1110, 780, 2)] });
   SCENES.h_behind = place({ back: [...BANK, ...lie(1700, 1010, GUARD), ...armed(1450, 1080, 1.8, P1, 1, { face: MASK }), ...armed(900, 1080, 1.8, AMY, 1),
     ...stand(260, 1080, 1.9, P2, { face: MASK }), bag(130, 560, 2.4), bag(330, 980, 1.6)] });
