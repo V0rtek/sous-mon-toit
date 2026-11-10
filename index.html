@@ -1835,7 +1835,8 @@ body.tv:has(#tvIntro:not([hidden])) #tvSides, body:has(#mirrorCard:not([hidden])
 @keyframes uBleed { 0% { opacity: 0; filter: blur(18px); transform: scale(1.25); } 60% { opacity: 1; } 100% { opacity: 1; filter: none; transform: none; } }
 #uWait { position: absolute; inset: 0; z-index: 14; display: grid; place-items: center; background: #000; pointer-events: none; font-size: 14em; }
 #uWait[hidden] { display: none; }
-#uWait.me { background: radial-gradient(circle at 50% 45%, var(--me, #3a3a3c), color-mix(in srgb, var(--me, #3a3a3c) 30%, #000) 85%); transition: background .8s; }
+#uWait.me { background: radial-gradient(circle at 50% 45%, var(--me, #3a3a3c), color-mix(in srgb, var(--me, #3a3a3c) 30%, #000) 85%); }
+#uWait.me .u-mark { display: none; }   /* (10/11) the U_ leaves with the TV's logo; the colour is there straight away */
 #gateCard .gc-u { font-size: 9em; margin-bottom: .15em; }
 @media (prefers-reduced-motion: reduce) { .u-c { animation: none; } #tvIntro .ti-logo.run .lt { animation: none; opacity: 1; } #tvIntro .ti-logo.run .u-c { animation: none; opacity: 1; } }
 /* a player's phone dropped (locked, closed): the story waits for them where it is */
@@ -4293,6 +4294,7 @@ async function tvIntro(at) {
     lg.classList.add('out');
     if (!(await hold(1300))) return false;
   }
+  tvPhase = 'color'; share();   // (10/11) the logo is gone on the TV: the phones' U_ goes too, and they turn their player's colour at once
   if (!(await slide(`<div class="ti ti-t">${esc(storyTitle() || '')}</div>`, 4200))) return false;   // (09/11) the logo just said Unwritten: the title alone
   for (const x of st.intro || []) if (!(await slide(`<div class="ti ti-p">${esc(fill(x))}</div>`, Math.max(4000, 1800 + 55 * x.length)))) return false;
   // who plays whom: each character (the pose of the waiting room), facing the other, and its player — the phones show
@@ -4363,7 +4365,7 @@ $('#skipBtn').onclick = (e) => { e.stopPropagation(); sendIn('skip'); };
 function tvOpenStep() {
   const o = tvOpen; if (!o || run !== o.at) { tvOpen = null; $('#uWait').hidden = true; return; }
   const ip = remote && remote.ip;
-  $('#uWait').classList.toggle('me', ip === 'cast');   // (09/11) the TV says who's who: the phone turns his colour, as on the TV
+  $('#uWait').classList.toggle('me', ip === 'cast' || ip === 'color');   // (09/11) the TV says who's who: the phone turns his colour, as on the TV
   if (o.me && !o.shown && (ip === 'cast' || !ip)) { o.shown = true; introCard(o.me, o.at, () => !!(remote && remote.ip), true).then(() => { o.cardDone = true; tvOpenStep(); }); }
   if (!ip && o.cardDone) { tvOpen = null; $('#uWait').hidden = true; next(); }
 }
