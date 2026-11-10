@@ -271,7 +271,6 @@
       { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1600 }] },   // TODO Justin's words
     ] },
     { duo: false }, lose(2),   // the texts ate 2 minutes
-    ...at('h_two'), { hush: 1800 },
     ...at('h_ots_look'), S('pb', 'It’s time.'),   // (09/11) over Ray's shoulder, before the elevators
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
     ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
