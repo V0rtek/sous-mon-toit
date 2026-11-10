@@ -163,6 +163,10 @@
     ...stand(240, 720, .6, P2, { face: MASK }), swat(1600, 700, .5)]);
   // (10/11) Justin's: the roof at night, three police helicopters, Marcus alone in their lights
   SCENES.h_roof_lights = { image: 'bg/roof_lights.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .5 } };
+  // (10/11) Justin's: Ray stuck in the roof door, the bag's strap caught, the crowd's hands behind; Marcus holding Amy,
+  // the gun at her head, in the helicopters' lights (they replace the shapes)
+  SCENES.h_roof_door = { image: 'bg/roof_door.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .5 } };
+  SCENES.h_roof_shield = { image: 'bg/roof_shield.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .48, amy: .53 } };
   SCENES.h_roof_wide = roof([...door(60), ...stand(250, 720, .8, P2, { face: MASK }), ...gondola(1250, 540), ...stand(1100, 1000, 1.3, P1, { face: MASK }),
     light(1100, 950, 520, 220), swat(1600, 700, .5), swat(1700, 700, .5)]);
   // the ends: down the tower's face in the gondola (two, no bags; one, with his bag); on their knees in the light; two,
