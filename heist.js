@@ -219,8 +219,8 @@
     // ---- 4-7. the briefcase, the three lines ----
     ...at('h_top'), S('pb', 'We’re on in 8 minutes.'),
     ...at('h_two_w'), S('pa', 'Guess there’s no turning back now.'),   // (10/11) to himself, worried
-    S('pb', 'Yeah…'), S('pb', 'Can’t afford to miss out on this.'), S('pb', 'I’ve got bills.'),   // Ray doesn't look at him
-    ...at('h_two_r'), S('pb', 'And nothing to lose.'),   // now at Marcus, determined
+    { zoom: { k: 1.08, x: 1150, y: 470, ms: 3000 } }, S('pb', 'Yeah…'), { zoom: { k: 1.16, x: 1170, y: 460, ms: 3000 } }, S('pb', 'Can’t afford to miss out on this.'), { zoom: { k: 1.25, x: 1190, y: 450, ms: 3000 } }, S('pb', 'I’ve got bills.'),   // Ray doesn't look at him
+    ...at('h_two_r'), { zoom: { k: 1.18, x: 1150, y: 460, ms: 4000 } }, S('pb', 'And nothing to lose.'),   // now at Marcus, determined
     // ---- 8. Marcus's phone: Leo, his kids behind ----
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
@@ -232,7 +232,7 @@
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_ray_pocket'), RING, { hush: 1200 },
-    { by: 'pb', ring: 'Amy', cue: 'Look at your phone', big: true, choice: [
+    { by: 'pb', ring: 'Amy', cue: 'Look at your phone', choice: [   // (10/11) the TV doesn't go black
       { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
       { t: 'Later', intent: 'later', set: { amy: 'later' }, then: [] },
     ] },
@@ -240,33 +240,26 @@
     // ---- 12. picked up: he walks away, the screen splits, a clock ticks. Ray on the call | Marcus texting Leo ----
     { when: (f) => f.amy === 'call', then: [
       ...at('h_ray_phone'), { hush: 1800 },   // he gets up, his phone in hand, and goes to take it
-      // the two at the same time, each on his phone, at his own pace (a split: nobody waits on the other's lines); the TV: the clock
-      { split: () => ({
-        // each one taps his phone and goes in at once (his own gate: nobody waits on the other)
-        pa: [{ when: () => TV, then: at('h_clock'), else: at('h_side_pa') }, { gate: 'pa', text: 'Text Leo back' }, { tick: true },
-          // slow: Leo's text first (there since the lock screen), let it be read; then each answer after his dots
-          { thread: ['pa', 'leo'] }, { wait: 3500 },
-          sms('pa', 'leo', 'Sorry buddy, dad’s not going to practice this time.'), { wait: 3000 },
-          sms('leo', 'pa', 'ok', { dots: 3000 }), { wait: 3000 },
-          sms('leo', 'pa', 'mom says we wont have the money to do next season', { dots: 4500 }), { wait: 5000 },
-          reply('pa', 'leo', [
-            ['As of tonight, money won’t be an issue anymore.', { leo: 'money' }, 'As of tonight, money won’t be an issue anymore.', 'tough'],
-            ['We’ll figure it out, buddy.', { leo: 'figure' }, 'We’ll figure it out, buddy.', 'love'],
-            ['Listen to your mom.', { leo: 'mom' }, 'Listen to your mom.', 'calm'],
-          ]),
-          { tick: false }],
-        // the call back and forth, on his phone: her, him, her
-        pb: [...at('h_call_ray'), { gate: 'pb', text: 'Amy is on the line' }, { tick: true },
-          ...at('h_call_amy'), S('amy', 'Hey you.'), S('amy', 'Are you still downtown?'),
-          ...at('h_call_ray'), { by: 'pb', clock: 15000, choice: [
-            { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [S('pb', 'Still here, yeah.'), S('pb', 'Something for work.')] },
-            { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [S('pb', 'No, I’m on my way.'), S('pb', 'Twenty minutes.')] },
-          ] },
-          ...at('h_call_amy'), S('amy', 'I’ve got a meeting at noon.'), S('amy', 'A big one.'), S('amy', 'I’ll tell you tonight.'),
-          { hush: 700 }, S('amy', 'Love you.'),
-          ...at('h_call_ray'), { hush: 1500 },
-          { tick: false }],
-      }), tv: true, watch: () => 'pa', hold: () => ({ pa: 'Ray is still on the phone', pb: 'Marcus is still texting' }) },
+      // (10/11) on the TV, the screen in two, one thing at a time: Marcus's phone with Leo (left), Ray's call with Amy (right,
+      // whoever talks, the line under the picture); each answers on his phone, two answers, no clock
+      { duo: { pa: { who: 'Leo' }, pb: { who: 'Amy', heart: true } } }, { duoPic: ['pb', 'bg/call_ray_full.webp'] }, { tick: true },
+      { duoIn: ['pa', { text: 'dad r u coming to practice tonight?' }] }, { hush: 2400 },
+      { duoOut: ['pa', 'Sorry buddy, dad’s not going to practice this time.'] }, { hush: 2200 },
+      { duoPic: ['pb', 'bg/call_amy_full.webp'] }, { duoSay: ['pb', 'amy', 'Hey you.'] }, { duoSay: ['pb', 'amy', 'Are you still downtown?'] },
+      { duoPic: ['pb', 'bg/call_ray_full.webp'] },
+      { by: 'pb', clock: 0, choice: [
+        { t: 'Yeah. Work thing.', ic: 'calm', intent: 'tells the truth', set: { told: 'truth' }, then: [{ duoSay: ['pb', 'pb', 'Still here, yeah.'] }, { duoSay: ['pb', 'pb', 'Something for work.'] }] },
+        { t: 'No. Home soon.', ic: 'lie', intent: 'lies', set: { told: 'lie' }, then: [{ duoSay: ['pb', 'pb', 'No, I’m on my way.'] }, { duoSay: ['pb', 'pb', 'Twenty minutes.'] }] },
+      ] },
+      { duoIn: ['pa', { text: 'ok' }] }, { hush: 1800 },
+      { duoIn: ['pa', { text: 'mom says we wont have the money to do next season' }] }, { hush: 3200 },
+      { by: 'pa', clock: 0, choice: [
+        { t: 'As of tonight, money won’t be an issue anymore.', ic: 'tough', sh: 'No more money issue', intent: 'Text Leo', set: { leo: 'money' }, then: [{ duoOut: ['pa', 'As of tonight, money won’t be an issue anymore.'] }, { hush: 1600 }] },
+        { t: 'We’ll figure it out, buddy.', ic: 'love', sh: 'We’ll figure it out', intent: 'Text Leo', set: { leo: 'figure' }, then: [{ duoOut: ['pa', 'We’ll figure it out, buddy.'] }, { hush: 1600 }] },
+      ] },
+      { duoPic: ['pb', 'bg/call_amy_full.webp'] }, { duoSay: ['pb', 'amy', 'I’ve got a meeting at noon.'] }, { duoSay: ['pb', 'amy', 'A big one.'] },
+      { duoSay: ['pb', 'amy', 'I’ll tell you tonight.'] }, { hush: 600 }, { duoSay: ['pb', 'amy', 'Love you.'] },
+      { duoPic: ['pb', 'bg/call_ray_full.webp'] }, { hush: 1400 }, { tick: false }, { duo: false },
       lose(4, 'crowd'),   // the call and the texts ate 4 minutes
       ...at('h_two'), { hush: 1800 },
     ] },
@@ -291,17 +284,17 @@
     { duo: false }, lose(1, 'crowd'), ...at('h_lift_hall'),   // a text = a minute
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
-    ...at('h_in_02'), { music: 'double it', lp: 20000, vol: .55, ms: 6000 }, { bars: 2 },
+    ...at('h_in_02'), { music: 'double it', lp: 480, vol: .3, ms: 6000 }, { bars: 2 },   // (10/11) still far, muffled: it opens with the doors
     // ---- 17. up: a floor every 2 bars; the briefcase; the masks; the doors open on the drop ----
-    ...at('h_in_08'), { music: 'double it', vol: .65 },
+    ...at('h_in_08'), { music: 'double it', lp: 560, vol: .32 },
     { when: (f) => f.amy === 'later', then: [BUZZ, sms('amy', 'pb', 'Call me back. It’s important.', 'pb')] },
     { bars: 2 },
-    ...at('h_case14'), { music: 'double it', vol: .72 }, { bars: 2 },
-    ...at('h_gun'), { music: 'double it', vol: .8 }, { bars: 2 },
-    ...at('h_mask26'), { music: 'double it', vol: .88 }, { bars: 2 },
-    ...at('h_masked'), { music: 'double it', vol: .95 },
+    ...at('h_case14'), { music: 'double it', lp: 650, vol: .34 }, { bars: 2 },
+    ...at('h_gun'), { music: 'double it', lp: 760, vol: .37 }, { bars: 2 },
+    ...at('h_mask26'), { music: 'double it', lp: 900, vol: .4 }, { bars: 2 },
+    ...at('h_masked'), { music: 'double it', lp: 1100, vol: .44 },
     { music: 'double it', lv: 1, vol: .7, ms: 2400, inBars: 2 }, { bars: 1 },   // (10/11) the first drop held back; the next ones louder
-    { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' },   // the doors crack open, the drop: they open
+    { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' }, { music: 'double it', lp: 20000, ms: 400 },   // the doors open: the music too   // the doors crack open, the drop: they open
     ...at('h_bank'), { hush: 1400 },
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
@@ -312,7 +305,7 @@
     // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
     // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
-    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000 }, { hush: 3600 },
+    ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 420 },   // (10/11) the other side of a door: muffled { hush: 3600 },
     ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
     { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
@@ -327,15 +320,15 @@
         lose(1),   // the wait at the door
       ] },
       { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
-        S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'),
-        S('guard', 'Come and get it.'),
+        { zoom: { k: 1.1, x: 1020, y: 330, ms: 3000 } }, S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'),
+        { zoom: { k: 1.22, x: 1020, y: 320, ms: 3000 } }, S('guard', 'Come and get it.'),
         { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
           { t: '“Ten seconds. Then someone out here pays for it.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
             S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },
           { t: '“Nobody dies for the bank’s money. Come out.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
             S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
-        S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
+        { zoom: { k: 1.35, x: 1020, y: 310, ms: 3000 } }, S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
         { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
           { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
             S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), { hush: 2400 }] },

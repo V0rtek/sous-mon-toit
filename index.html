@@ -188,6 +188,9 @@ body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; ba
 #duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
 #duo .dh + .dh { border-left: 2px solid rgba(255,255,255,.08); }
 #duo .dp { width: min(22vw, 34vh); aspect-ratio: 9 / 16; border-radius: 3.2vh; background: #0f0f12; border: .9vh solid #26262b; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); display: flex; flex-direction: column; overflow: hidden; }
+#duo .dpic { position: relative; width: min(30vw, 46vh); height: 62vh; border-radius: 2.4vh; background: center 25% / cover no-repeat; box-shadow: 0 2vh 6vh rgba(0,0,0,.6); flex: none; }
+#duo .dcap { position: absolute; left: 4%; right: 4%; bottom: 4%; font-size: 2.6vh; line-height: 1.35; color: #fff; text-align: center; text-shadow: 0 .2vh 1vh #000; background: rgba(0,0,0,.55); border-radius: 1.4vh; padding: 1vh 1.4vh; }
+#duo .dcap:empty { display: none; } #duo .dcap b { color: var(--sc, #fff); margin-right: .3em; }
 #duo .dhand { position: relative; height: 66vh; background: center / contain no-repeat; flex: none; }
 #duo .dscreen { position: absolute; border-radius: 3.4vh; overflow: hidden; }
 #duo .dp.in { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; }
@@ -2846,7 +2849,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261110180000"></script>
+<script src="heist.js?v=20261110200000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2927,6 +2930,15 @@ function duoBubble(k, m, out) {
   const d = document.createElement('div'); d.className = 'db' + (out ? ' out' : '') + (m.img ? ' pic' : '');
   if (m.img) { const i = new Image(); i.src = m.img; i.alt = ''; d.appendChild(i); } else d.textContent = fill(m.text || '');
   b.appendChild(d); if (!FAST && !out) try { buzz(); } catch { /* no sound */ }
+}
+function duoPic(k, img) {   // that half: a picture instead of a phone (the call: Amy, Ray), the line in it
+  const h = duoNow && duoEl().querySelector(`.dh[data-k="${k}"]`); if (!h) return;
+  let p = h.querySelector('.dpic'); if (!p) { h.querySelector('.dp, .dhand')?.remove(); p = document.createElement('div'); p.className = 'dpic'; p.innerHTML = '<div class="dcap"></div>'; h.prepend(p); }
+  p.style.backgroundImage = `url('${img}')`; p.querySelector('.dcap').textContent = '';
+}
+async function duoSay(k, who, text, r) {   // a line in that half (under the picture), held long enough to read
+  const c = duoNow && duoEl().querySelector(`.dh[data-k="${k}"] .dcap`); if (c) { c.style.setProperty('--sc', (castOf(who) || {}).color || '#fff'); c.innerHTML = `<b>${esc(nameOf(who))}</b> ${esc(fill(text))}`; }
+  await sleep(readMs(text)); return r === run;
 }
 function duoChoices(k, opts) {   // the choice, under his phone (the TV); the phone itself shows the remote
   const c = duoNow && duoEl().querySelector(`.dh[data-k="${k}"] .dh-c`); if (!c) return false;
@@ -3623,14 +3635,15 @@ const loadSfx = (name) => (sfxBuf[name] = sfxBuf[name] || fetch(`sfx/${name}.mp3
 // roar, 8 s: its fire)
 const SFX_VOL = { bar: 0.11, bathroom: 0.1, dark: 0.09, campfire: 0.02, crowd: 0.1, party: 0.1, crickets: 0.08, wrong: 0.09, suspense: 0.09,
   boss: 0.25, moment: 0.2, glitch: 0.25, intro: 0.3, dragon_arrive: 0.35, dragon_fire: 0.3, 'into the elevator': 0.14, 'elevator ding': 0.32, 'gun shot': 0.6, 'establishment alarm': 0.3, 'crowd panic': 0.35, 'toilet flush': 0.95, helicopters: 0.32, sirens: 0.2, 'lobby jazz': 0.07 };
-async function sfx(name, loop = false, rate = 1, ms = 0, peak = 0) {   // peak: a loop that bursts in that loud, then settles to its level (4 s)   // ms: only that much of it (a long file, a short moment)
+async function sfx(name, loop = false, rate = 1, ms = 0, peak = 0, lp = 0) {   // lp: heard through a wall (Hz)   // peak: a loop that bursts in that loud, then settles to its level (4 s)   // ms: only that much of it (a long file, a short moment)
   if (FAST || !audio()) return;
   const buf = await loadSfx(name); if (!buf) return;
   if (loop === 'scene' && (!sc || sc.ambience !== name)) return;   // the scene changed while the file loaded
   if (loop === 'card' && $('#epCard').hidden) return;   // the episode's end card closed while the file loaded
   if (loop) stopSfx(name);
   const src = actx.createBufferSource(), g = actx.createGain(), vol = SFX_VOL[name] ?? 1;
-  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate; src.connect(g).connect(loop ? roomBus() : out());
+  src.buffer = buf; src.loop = !!loop; src.playbackRate.value = rate;
+  if (lp) { const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = lp; f.Q.value = .5; src.connect(f).connect(g).connect(loop ? roomBus() : out()); } else src.connect(g).connect(loop ? roomBus() : out());
   // a loop fades in, so a room's sound arrives with the room instead of cutting in
   if (loop && peak) { const t = actx.currentTime; g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + .08); g.gain.setValueAtTime(peak, t + 1.2); g.gain.linearRampToValueAtTime(vol, t + 5); }
   else if (loop) { g.gain.setValueAtTime(0.0001, actx.currentTime); g.gain.exponentialRampToValueAtTime(vol, actx.currentTime + 1.5); }
@@ -3765,6 +3778,12 @@ function buzz() {
     g.gain.setValueAtTime(0.05, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
     o.connect(g).connect(out()); o.start(t); o.stop(t + 0.14);
   }
+}
+// (10/11) {zoom: {k, x, y, ms}}: the camera pushes in on (x, y) of the picture, k times closer, over ms (not too static)
+function zoomTo(z) {
+  if (!sc) return; const [bw, bh] = sc.size, camH = bh / (z.k || 1), camW = camH * W / H;
+  const left = Math.min(Math.max(0, z.x - camW / 2), Math.max(0, bw - camW)), top = Math.min(Math.max(0, z.y - camH / 2), Math.max(0, bh - camH));
+  applyCam({ ...camNow, frame: { camH, left, top } }, FAST || REDUCED ? 0 : z.ms ?? 2500);
 }
 function setCam(c, ms = 0) { bubble.hidden = true; choicesEl.hidden = true; unOts(); applyCam({ ...c, frame: null }, ms); }
 
@@ -4802,7 +4821,7 @@ async function next() {
     }
     else if (s.sms) { if (!(await sendText(s.sms, r))) return; }
     else if (s.check) { if (!(await readTexts(s.check, r))) return; }
-    else if (s.sfx) sfx(s.sfx, s.loop, 1, s.ms, s.peak);
+    else if (s.sfx) sfx(s.sfx, s.loop, 1, s.ms, s.peak, s.lp);
     else if (s.music !== undefined) music(s);
     else if (s.room) roomSound(s.room);
     else if (s.thread) { const [k, w] = s.thread; if (cellMode() && !FAST && mineTo(k)) { cellWith = w; openCell(k); } }   // the thread with w, open on k's phone
@@ -4815,7 +4834,10 @@ async function next() {
       if (FAST) { gateNow = null; waiting = 'click'; return; }
       tapNow = true; if (!(TV && own)) gateOn(s); waiting = 'click'; return;   // the TV keeps its picture (the split says who's on his phone)
     }
+    else if (s.zoom) zoomTo(s.zoom);
     else if (s.duo !== undefined) duoSet(s.duo);
+    else if (s.duoPic) duoPic(s.duoPic[0], s.duoPic[1]);
+    else if (s.duoSay) { if (!(await duoSay(s.duoSay[0], s.duoSay[1], s.duoSay[2], r))) return; }
     else if (s.duoIn) duoBubble(s.duoIn[0], s.duoIn[1], false);
     else if (s.duoOut) duoBubble(s.duoOut[0], { text: s.duoOut[1] }, true);
     else if (s.titleCard) {   // black, the place appears at once (no fade), the hour under it a beat later
