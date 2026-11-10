@@ -301,7 +301,7 @@
     ...at('h_rob_out'), { sfx: 'crowd panic', loop: true, peak: 1.1 }, T('“EVERYBODY DOWN.”'),   // (10/11) the crowd's scream, loud, then it settles
     ...at('h_rob_hands'), { hush: 1800 },
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 2200 },
-    S('pb', 'Where’s the security guard??'),
+    S('pb', 'There’s no security here?!'),
     // ---- the guard (09/11): a flush behind the restroom door, Marcus aims at it. Wait in silence (and shoot, or shout), or
     // talk him out: threaten the hostages or reason with him; he comes out, but his gun stays on him (or slides to the hostages) ----
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
@@ -313,7 +313,8 @@
         ...at('h_wc_out'), { hush: 700 },
         { by: 'pa', cue: 'Look at your phone', clock: 5000, choice: [
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
-            { sfx: 'gun shot' }, ...at('h_wc_shot'), { hush: 2600 }] },
+            { hush: 1400 }, { sfx: 'gun shot' }, { bang: 1 }, { room: { lp: 500, vol: .3, ms: 60 } }, ...at('h_wc_shot'),
+            { hush: 2200 }, { room: { lp: 20000, vol: 1, ms: 3000 } }, { hush: 1200 }] },   // (10/11) a breath of silence, the shot, the frame jolts and a flash, the ears ring (the room goes dull), then it comes back
           { t: '“DROP IT!”', ic: 'say', sh: 'Drop it!', intent: 'shouts', set: { guard: 'drop', gun: 'floor' }, then: [
             S('pa', 'Gun on the floor! NOW!'), S('guard', 'Okay! Okay!'), ...at('h_wc_hands'), { hush: 2400 }] },
         ] },
@@ -321,7 +322,7 @@
       ] },
       { t: '“I know you’re in there. Send over your weapon!”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
         { zoom: { k: 1.1, x: 1020, y: 330, ms: 3000 } }, S('pa', 'I heard the flush, buddy.'), S('pa', 'Your gun. Under the door. Now.'),
-        { zoom: { k: 1.22, x: 1020, y: 320, ms: 3000 } }, S('guard', 'Come and get it.'),
+        { zoom: { k: 1.22, x: 1020, y: 320, ms: 3000 } }, S('guard', 'Come and get it!', { whisper: true }),   // (10/11) muffled, through the door: italic
         { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
           { t: '“Ten seconds. Then someone out here pays for it.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
             S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },

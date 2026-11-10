@@ -28,6 +28,12 @@
 html, body { height: 100%; margin: 0; background: var(--night); overflow: hidden; }
 [hidden] { display: none !important; }
 body { font-family: var(--ui); color: var(--ink); -webkit-tap-highlight-color: transparent; user-select: none; }
+/* (10/11) {bang}: the frame jolts and a white flash, for a gunshot (it settles in .7 s) */
+@keyframes bang { 0% { transform: translate(-50%,-50%) translate(3%,-2%) scale(1.05); } 12% { transform: translate(-50%,-50%) translate(-3%,2%) scale(1.04); } 25% { transform: translate(-50%,-50%) translate(2.5%,1.5%); } 40% { transform: translate(-50%,-50%) translate(-1.8%,-1%); } 60% { transform: translate(-50%,-50%) translate(1%,.6%); } 80% { transform: translate(-50%,-50%) translate(-.4%,-.2%); } 100% { transform: translate(-50%,-50%); } }
+@keyframes bangFlash { 0% { opacity: .95; } 100% { opacity: 0; } }
+#stage.bang { animation: bang .7s ease-out; }
+#bangFlash { position: absolute; inset: 0; z-index: 40; background: #fff; opacity: 0; pointer-events: none; }
+#bangFlash.on { animation: bangFlash .5s ease-out; }
 #stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: hidden; background: #1a1620; cursor: pointer; }
 #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
 #world > * { position: absolute; }
@@ -4796,6 +4802,12 @@ const silence = (ms) => (ms >= 1200 ? ms : Math.min(250, Math.max(150, ms * 0.2)
 let onlyNow = null;   // the seat the line on screen belongs to, when only that player sees it
 // a player sees a private line if it's his (solo plays both); a spectator sees everything
 const sees = (seat) => !TV && (!seated() || (state.seats[seat] && state.seats[seat].id === myId));
+function bang() {   // {bang: true}: the frame jolts, a white flash
+  if (FAST || REDUCED) return;
+  let f = $('#bangFlash'); if (!f) { f = document.createElement('div'); f.id = 'bangFlash'; stage.appendChild(f); }
+  for (const e of [stage, f]) { e.classList.remove(e === f ? 'on' : 'bang'); void e.offsetWidth; }
+  stage.classList.add('bang'); f.classList.add('on');
+}
 async function next() {
   const r = run;
   slateEl.hidden = true;   // a slate stays until the tap that moves past it (black stays until the next fade in)
@@ -4847,6 +4859,7 @@ async function next() {
     }
     else if (s.bars) { if (FAST || (ROLE === 'watch' && hostTv)) continue; await musBars(s.bars); if (r !== run) return; }   // (09/11) a TV's phone: no music, no waiting on its bars (it fell behind the TV: the choice's clock ran out on the TV before the phone had it)
     else if (s.stop) stopSfx(s.stop, s.ms);
+    else if (s.bang) bang();
     else if (s.hush) { bubble.hidden = true; await sleep(silence(s.hush)); }   // a silence: no bubble, the shot holds
     else if (s.aside) for (const [id, on] of Object.entries(s.aside)) asides[on ? 'add' : 'delete'](id);
     else if (s.slate) { await fade('out', s.ms || 500); if (r !== run) return; slateEl.textContent = fill(s.slate); slateEl.hidden = false; waiting = 'click'; return; }
