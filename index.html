@@ -332,6 +332,7 @@ body.pick-lean .wr-seat:not(.open) .wr-desc { display: none; }
 #sheetCard b { font-size: 2.4em; font-weight: 800; padding-right: 1.6em; }
 #sheetCard .sc-two { display: flex; gap: 1em; }
 #sheetCard .sc-two button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .5em; padding: 1.4em 1em; border: 0; border-radius: 1.2em; background: color-mix(in srgb, var(--c) 22%, #1c1c1e); color: #fff; font: inherit; font-size: 2em; font-weight: 800; cursor: pointer; }
+#sheetCard .sc-two button.sc-del { background: #3a1a20; color: #ff6b7a; }
 #sheetCard .sc-two svg { width: 2.2em; height: 2.2em; }
 #sheetCard .sc-step { display: flex; align-items: center; gap: .8em; font-size: 1.8em; font-weight: 700; color: #d1d1d6; }
 #sheetCard .sc-step i { flex: none; width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: #fff; font-style: normal; font-weight: 900; }
@@ -5138,6 +5139,18 @@ let pickOpen = null;
 // [cols, rows], poses: the props, in reading order}), keyed out of its green on his phone, each cell cut to what's in it,
 // shrunk, and sent to the room; every device puts them in place of those props. The first pose is his face on the pick
 const POSES = {}, POSE_OVR = {};
+// (10/11) delete the uploaded poses: back to the story's own props and his plain face, here and in the room
+function poseRemove(k, name) {
+  const sh = story() && story().posesheet && story().posesheet[k]; if (!sh || !sh.poses.includes(name)) return;
+  if (POSES[k]) delete POSES[k][name];
+  delete POSE_OVR[name]; document.querySelectorAll(`#cast img.prop[data-src="${name}"]`).forEach((i) => { i.src = `props/${name}.webp`; });
+  if (name === sh.poses[0]) { const sp = spriteOf(k); if (MADE[sp]) delete MADE[sp].listen; }
+  if (screen === '#wait') renderWait();
+}
+function poseClear(k) {
+  const sh = story().posesheet[k];
+  for (const name of sh.poses) { poseRemove(k, name); if (live && live.connected) live.publish(`${topic()}/pose/${k}/${name}`, '', { retain: true, qos: 1 }); }
+}
 function poseApply(k, name, url) {
   const sh = story() && story().posesheet && story().posesheet[k]; if (!sh || !sh.poses.includes(name) || !url) return;
   (POSES[k] = POSES[k] || {})[name] = url; preload(url);
@@ -5201,9 +5214,10 @@ function sheetCard(k, step = 'pick') {
   const sh = story().posesheet[k], c = (castOf(k) || {}).color || '#ff9a4d', name = esc(seatLabel(k) || '');
   const UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 20h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const GEN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor"/></svg>';
+  const DEL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   el.style.setProperty('--c', c);
   el.innerHTML = `<div class="sc-box"><input type="file" accept="image/*" hidden>${step === 'pick'
-    ? `<b>${name} · your poses</b><div class="sc-two"><button type="button" data-a="gen">${GEN}<span>Generate</span></button><button type="button" data-a="up">${UP}<span>Upload</span></button></div>`
+    ? `<b>${name} · your poses</b><div class="sc-two"><button type="button" data-a="gen">${GEN}<span>Generate</span></button><button type="button" data-a="up">${UP}<span>Upload</span></button>${(POSES[k] && sh.poses.some((n) => POSES[k][n])) ? `<button type="button" class="sc-del" data-a="del">${DEL}<span>Delete</span></button>` : ''}</div>`
     : `<b>Generate ${name}’s poses</b>
       <div class="sc-step"><i>1</i><span>Save this sheet</span></div><a class="sc-ref" href="${sh.sheet}" download target="_blank"><img src="${sh.sheet}" alt=""></a>
       <div class="sc-step"><i>2</i><span>ChatGPT or Gemini: this sheet + a picture of your character + this prompt</span></div>
@@ -5220,6 +5234,7 @@ function sheetCard(k, step = 'pick') {
     if (a === 'x') el.hidden = true;
     else if (a === 'gen') sheetCard(k, 'gen');
     else if (a === 'up') inp.click();
+    else if (a === 'del') { el.hidden = true; poseClear(k); }
     else if (a === 'copy') {
       const t = poseSheetPrompt(k), done = () => { b.textContent = '✓ Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1800); };
       const fallback = () => { const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch { /* nothing */ } ta.remove(); };
@@ -6210,7 +6225,8 @@ const topic = () => `${NS}/${room}`;
 function posePart(t, buf) {   // a player's pose, sent to the room: <room>/pose/<seat>/<name>
   const pre = `${topic()}/pose/`; if (!t.startsWith(pre)) return false;
   const [k, name] = t.slice(pre.length).split('/'), url = buf.toString();
-  if (/^data:image\/(webp|png|jpeg);base64,/.test(url)) poseDecode(url).then((u) => u && poseApply(k, name, u));
+  if (!url) poseRemove(k, name);
+  else if (/^data:image\/(webp|png|jpeg);base64,/.test(url)) poseDecode(url).then((u) => u && poseApply(k, name, u));
   return true;
 }
 function loadScript(src) {
