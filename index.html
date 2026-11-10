@@ -2823,7 +2823,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261110100000"></script>
+<script src="heist.js?v=20261110120000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -2883,7 +2883,19 @@ document.body.classList.add('tb-' + (() => { try { const v = new URLSearchParams
 const TV_ROOM = TV && (s => (/^[a-z0-9]{4,12}$/.test(s || '') ? s : null))(new URLSearchParams(location.search).get('room'));
 const AS = (s => (s && s.trim() ? s.trim().slice(0, 16) : null))(new URLSearchParams(location.search).get('as'));
 let hostTv = false;
-const sleep = (ms) => new Promise((r) => setTimeout(r, FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms));
+// (10/11) a wait counts only while the story isn't paused (a pause used to let the silences, the texts, the beats run on)
+const sleep = (ms) => new Promise((r) => {
+  let left = FAST ? 0 : REDUCED ? Math.min(ms, 50) : ms; if (left <= 0) { setTimeout(r, 0); return; }
+  let last = performance.now(); const t = setInterval(() => { const now = performance.now(); if (!paused) left -= now - last; last = now; if (left <= 0) { clearInterval(t); r(); } }, 30);
+});
+// (10/11) the story's pictures, loaded and decoded ahead (story().preload: its scenes' prefix): a new scene shows its
+// cut-outs at once, at their place (they used to vanish for a moment, then jump into place)
+const PRE = {};
+function preload(url) { if (!url) return null; if (!PRE[url]) { const i = new Image(); i.src = url; i.decode().catch(() => {}); PRE[url] = i; } return PRE[url]; }
+function preloadStory() {
+  const pre = story() && story().preload; if (!pre) return;
+  for (const [id, s] of Object.entries(SCENES)) if (id.startsWith(pre)) { if (s.image) preload(s.image); for (const p of s.props || []) preload(POSE_OVR[p.src] || `props/${p.src}.webp`); }
+}
 const story = () => STORIES[state.story];
 const seatsOf = (id = state.story) => STORIES[id].seats || [];
 const duo = () => seatsOf().length > 0;
@@ -3236,9 +3248,10 @@ function setScene(id, cast) {
   // objects lying in the decor (props/): {src, x, y = where its bottom touches, w, all in decor px}; in front of whoever
   // stands further back than it (z = its y, like the people's feet)
   for (const p of sc.props || []) {
-    const i = new Image(); i.alt = ''; i.src = POSE_OVR[p.src] || `props/${p.src}.webp`; i.className = 'prop'; i.dataset.src = p.src;
-    i.onload = () => { const h = p.w * i.naturalHeight / i.naturalWidth; Object.assign(i.style, { top: p.y - h + 'px' }); };
+    const url = POSE_OVR[p.src] || `props/${p.src}.webp`, pre = preload(url), i = new Image(); i.alt = ''; i.src = url; i.className = 'prop'; i.dataset.src = p.src;
+    const place = (im) => { const h = p.w * im.naturalHeight / im.naturalWidth; i.style.top = p.y - h + 'px'; i.style.visibility = ''; };
     Object.assign(i.style, { position: 'absolute', left: p.x - p.w / 2 + 'px', top: p.y + 'px', width: p.w + 'px', zIndex: Math.round(p.z ?? p.y) });
+    if (pre.complete && pre.naturalWidth) place(pre); else { i.style.visibility = 'hidden'; i.onload = () => place(i); }   // known: at its place now
     if (p.who) i.dataset.who = p.who;   // a character cut out and placed in the decor: he stays lit when he chooses
     castEl.appendChild(i);
   }
@@ -4922,6 +4935,7 @@ function begin(id = state.story) {
   // a play from Full demo was counted there, when Play was pressed
   if (!fromDemo && !PLAY_ONLY) bump((st) => { st.s = st.s || {}; const k = sid(id), r = (st.s[k] = st.s[k] || {}); if (storyName(id) !== id) r.n = storyName(id); r.plays = (r.plays || 0) + 1; });
   paused = null; showPause(); takenOver.clear();
+  setTimeout(preloadStory, 0);   // (10/11) its pictures, ahead
   run++; huOff(); state.story = id; state.f = {}; state.picks = []; state.isa = ISA_LOOKS[0].sprite; waiting = null; lookDone = null;
   held = []; lastSpeaker = null; waitNote(''); endSplit();
   firstLine = id === 't1' || /^o_/.test(id);   // the "tap to continue" hint: chapter 1's and the onboarding's openings; the 2-player stories have none
@@ -4991,7 +5005,7 @@ let pickOpen = null;
 const POSES = {}, POSE_OVR = {};
 function poseApply(k, name, url) {
   const sh = story() && story().posesheet && story().posesheet[k]; if (!sh || !sh.poses.includes(name) || !url) return;
-  (POSES[k] = POSES[k] || {})[name] = url;
+  (POSES[k] = POSES[k] || {})[name] = url; preload(url);
   POSE_OVR[name] = url; document.querySelectorAll(`#cast img.prop[data-src="${name}"]`).forEach((i) => { i.src = url; });
   if (name === sh.poses[0]) { const sp = spriteOf(k); MADE[sp] = { ...(MADE[sp] || {}), listen: url }; }   // his face on the pick
   if (screen === '#wait') renderWait();
@@ -5081,6 +5095,7 @@ function sheetCard(k, step = 'pick') {
 const tvSeen = new Set();   // the TV: the characters already up (they pull up once)
 function renderWait() {
   show('#wait');
+  preloadStory();   // (10/11) while they pick: the story's pictures load
   const lean = ROLE === 'watch' && hostTv;   // (08/11) a phone on a TV: lean, the two characters and nothing else
   document.body.classList.toggle('pick-lean', lean);
   $('#todoBtn').hidden = !story().todo;

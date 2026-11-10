@@ -86,6 +86,8 @@
   SCENES.h_call_amy = { ...call('bg/call_amy.webp', { src: 'amy_call', x: 488, y: 1671, w: 876 }), spk: { amy: .45 } };
   SCENES.h_bank = { image: 'bg/bank_open.webp', size: PIC, spots: {}, face: {}, back: [], front: [] };
   // Ray talks (his hand out), Marcus listens (hands together): when Ray has the line
+  // (10/11) both turned inward: Marcus worried, to himself (hands clasped); Ray not reacting (chin on his hand, eyes down)
+  SCENES.h_two_w = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, RAY]);
   SCENES.h_two_r = chairs([{ src: 'marcus_listen', x: 497.5, y: 883, w: 547, who: 'pa' }, { src: 'ray_talk', x: 1224.5, y: 876, w: 539, who: 'pb' }]);
   const CLOCK = (x, y) => [C(x, y, 150, '#e5e7eb', { line: '8px solid #111827' }), R(x - 5, y - 55, 10, 55, '#111827', { r: 5, rot: -30, origin: '50% 100%' }), R(x - 4, y - 40, 8, 40, '#111827', { r: 4, rot: -2, origin: '50% 100%' })];
   SCENES.h_side_pa = place({ ambience: 'crowd', back: [R(0, 0, 1920, 1080, '#1b2230'), ...bust(960, 1000, 2.2, P1), glow(1080, 930, 'pa'), R(500, 980, 920, 60, '#5b4636', { r: 8 }), ...CLOCK(960, 150)] });
@@ -158,6 +160,8 @@
     ...stand(960, 1260, 2.8, P2, { face: MASK }), R(1180, 520, 160, 14, '#1a120b', { rot: -18 }), bag(1260, 600, 2.2)] });   // the strap caught
   SCENES.h_roof_gondola = roof([...door(60), ...gondola(1250, 540), light(1040, 900, 560, 260), ...stand(1040, 1010, 1.8, P1, { face: MASK }), bag(1110, 860, 1),
     ...stand(240, 720, .6, P2, { face: MASK }), swat(1600, 700, .5)]);
+  // (10/11) Justin's: the roof at night, three police helicopters, Marcus alone in their lights
+  SCENES.h_roof_lights = { image: 'bg/roof_lights.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .5 } };
   SCENES.h_roof_wide = roof([...door(60), ...stand(250, 720, .8, P2, { face: MASK }), ...gondola(1250, 540), ...stand(1100, 1000, 1.3, P1, { face: MASK }),
     light(1100, 950, 520, 220), swat(1600, 700, .5), swat(1700, 700, .5)]);
   // the ends: down the tower's face in the gondola (two, no bags; one, with his bag); on their knees in the light; two,
@@ -209,21 +213,20 @@
     ...Array.from({ length: 5 }, () => [...at('h_feet_a'), { wait: 320 }, ...at('h_feet_b'), { wait: 320 }]).flat(), ...at('h_feet_a'), { hush: 700 },
     // ---- 4-7. the briefcase, the three lines ----
     ...at('h_top'), S('pb', 'We’re on in 8 minutes.'),
-    ...at('h_two'), S('pa', 'Guess there’s no turning back now.'),
-    ...at('h_two_r'), S('pb', 'Yeah…'),
-    S('pb', 'Nothing to lose.'),
+    ...at('h_two_w'), S('pa', 'Guess there’s no turning back now.'),   // (10/11) to himself, worried
+    S('pb', 'Yeah…'), S('pb', 'Can’t afford to miss out on this.'), S('pb', 'I’ve got bills.'),   // Ray doesn't look at him
+    ...at('h_two_r'), S('pb', 'And nothing to lose.'),   // now at Marcus, determined
     // ---- 8. Marcus's phone: Leo, his kids behind ----
     ...at('h_top_buzz'), BUZZ, { hush: 1400 },   // his phone buzzes on the table
     ...at('h_phone'), sms('leo', 'pa', 'dad r u coming to practice tonight?', { quiet: true }), { hush: 3400 },   // Leo, on the lock screen, and his text (on the TV only: not on the real phone)
     // ---- 9. he looks at Ray: the first choice (the TV says where to look) ----
-    ...at('h_ots_phone'), { hush: 1500 }, ...at('h_ots_look'), S('pb', 'Nothing to lose. Right?'),   // he looks up at Ray   // (09/11) over Ray's shoulder: Marcus on his phone. The line the choice answers
+    ...at('h_ots_phone'), { hush: 1500 }, S('pb', 'Nothing to lose. Right?'),   // (10/11) he keeps his eyes on his phone until he answers   // he looks up at Ray   // (09/11) over Ray's shoulder: Marcus on his phone. The line the choice answers
     { by: 'pa', clock: 0, cue: 'Look at your phone', big: true, ask: true, choice: [   // big: the TV all black (the first choices: so they get it)
       { t: 'I’ve got a lot to lose.', ic: 'worried', sh: 'A lot to lose', intent: 'Everything to lose', set: { p1: 'lose' }, then: [...at('h_ots_lose'), { hush: 700 }, S('pa', 'Ray…'), S('pa', 'I have a son.')] },
-      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_ots_win'), { hush: 700 }, S('pa', 'Speak for yourself.'), S('pa', 'After today, everything changes.')] },
+      { t: 'I’ve got a lot to win.', ic: 'hope', sh: 'A lot to win', intent: 'Everything to win', set: { p1: 'win' }, then: [...at('h_ots_win'), { hush: 700 }, S('pa', 'Money won’t be a problem anymore.')] },
     ] },
     // ---- 10-11. Ray's phone: Amy (only he sees who) ----
     ...at('h_ray_pocket'), RING, { hush: 1200 },
-    { when: (f) => f.p1 === 'lose', then: [S('pa', 'Seems like you’ve got someone to lose as well.')] },
     { by: 'pb', ring: 'Amy', cue: 'Look at your phone', big: true, choice: [
       { t: 'Pick up', intent: 'picks up', set: { amy: 'call' }, then: [] },
       { t: 'Later', intent: 'later', set: { amy: 'later' }, then: [] },
@@ -384,6 +387,7 @@
     // (10/11) no music after the click: the crowd, the alarm, nothing else
     ...at('h_stairs'), S('pb', 'THE ROOF!'), T('The stairs.'), T('The crowd right behind them.'),
     // ---- (09/11) the roof, part 1: the shield (Amy in front of Marcus; or Amy offering herself; or nobody) ----
+    ...at('h_roof_lights'), { hush: 2600 },   // (10/11) up on the roof: the helicopters, the lights
     { fn: (f) => f.amyhost ? [
       ...at('h_roof_shield'), T('The roof.'), T('Snipers on the next tower.'), T('Marcus holds the woman in front of him.'), T('He doesn’t know her.'),
       // Ray, secretly: does Marcus learn who she is
@@ -401,13 +405,13 @@
         { t: 'Hold her in front of you.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'tough', sh: 'Hold her', intent: 'holds her as a shield', set: { shield: 'keep' }, then: [T('The snipers hold their fire.'), T('For now.')] },
         { t: '“Go to them. Hands up.”', w: 'Amy', img: 'stakes/amy.webp', ic: 'hand', sh: 'Send her away', intent: 'sends her to the police', set: { shield: 'free' }, then: [S('pb', 'Go to them.'), S('pb', 'Hands up.'), ...at('h_amy_runs'), { sfx: 'gun shot' }, T('A warning shot.'), T('At Ray’s feet.')] },
       ] },
-    ] : [...at('h_roof_wide'), T('The roof.'), T('Snipers on the next tower.'), { sfx: 'gun shot' }, T('A warning shot.'), T('The gravel jumps at Marcus’s feet.')] },
+    ] : [...at('h_roof_lights'), T('The roof.'), T('Snipers on the next tower.'), { sfx: 'gun shot' }, T('A warning shot.'), T('The gravel jumps at Marcus’s feet.')] },
     // ---- (09/11) the roof, part 2: the doorway. Ray's bag caught in the door, the crowd coming up; Marcus at the gondola.
     // Both choose at the same time, each on his phone, neither sees the other's choice ----
     ...at('h_roof_door'), T('Ray’s bag.'), T('Caught in the door.'), T('The crowd two floors down.'),
     ...at('h_roof_gondola'), T('Marcus at the gondola.'), T('Twenty meters away.'), T('The helicopter’s light on him.'),
     { split: () => ({
-      pa: [{ when: () => TV, then: at('h_roof_wide'), else: at('h_roof_gondola') }, { by: 'pa', peak: true, clock: 8000, choice: [
+      pa: [{ when: () => TV, then: at('h_roof_lights'), else: at('h_roof_gondola') }, { by: 'pa', peak: true, clock: 8000, choice: [
         { t: 'Get in the gondola.', w: 'Freedom', img: 'stakes/leo.webp', ic: 'send', sh: 'Go', intent: 'goes', set: { ma: 'go' }, then: [] },
         { t: 'Run back for Ray.', w: 'Ray', img: 'stakes/ray.webp', ic: 'hand', sh: 'Back for Ray', intent: 'goes back for him', set: { ma: 'back' }, then: [] },
       ] }],
@@ -443,7 +447,7 @@
     { fade: 'out', ms: 300 },
     { end: { kicker: 'To be continued', title: 'Floor 31', lede: '{LEDE}', art: null } },
   ], {
-    gaze: false, credits: '', title: 'Floor 31', intro: [],
+    gaze: false, credits: '', title: 'Floor 31', intro: [], preload: 'h_',   // (10/11) its pictures loaded ahead
     seats: ['pa', 'pb'], solo: { pa: 'Marcus', pb: 'Ray' },
     sides: { pa: .3, pb: .7 },   // (09/11) no one placed in the picture: Marcus left, Ray right (the arrow)
     phone: { time: '9:38', bat: { pa: 64, pb: 21 } },
