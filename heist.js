@@ -381,7 +381,7 @@
     ] },
     S('pa', 'DOWN!'), S('pa', 'Everybody DOWN!'), { hush: 800 },
     { music: null, ms: 0 }, ...at('h_black'), { hush: 700 }, T('Click.'), { hush: 1400 }, T('Click.'),
-    ...at('h_rob_red'), S('hostage', 'His gun’s empty!'), { sfx: 'crowd panic', loop: true }, { hush: 1800 },
+    ...at('h_rob_red'), { sfx: 'crowd panic', loop: true }, { hush: 1800 },
     { sfx: 'sirens', loop: true },   // the police arriving: several sirens, near and far
     ...at('h_stairs'), S('pb', 'THE ROOF!'), { hush: 1800 },
     // ---- (11/11) the roof: one problem, by what they carry. Two bags = Ray stuck in the door; one = the snipers. The episode
