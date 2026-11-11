@@ -301,11 +301,11 @@
     // (10/11) the room goes far (the alarm, the crowd) so the flush behind the door is heard; back after
     ...at('h_wc'), { room: { lp: 700, vol: .25, ms: 500 } }, { sfx: 'toilet flush', ms: 9000, lp: 800 }, { hush: 3600 },   // the other side of a door: muffled
     ...at('h_wc_aim'), { room: { lp: 20000, vol: 1, ms: 2500 } },
-    { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
+    { by: 'pa', nolit: true, cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
         { hush: 1800 }, ...at('h_wc_gun'), { hush: 2400 },
         ...at('h_wc_out'), { hush: 700 },
-        { by: 'pa', cue: 'Look at your phone', clock: 5000, choice: [
+        { by: 'pa', nolit: true, cue: 'Look at your phone', clock: 5000, choice: [
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
             { hush: 1400 }, { sfx: 'gun shot' }, { bang: 1 }, { room: { lp: 500, vol: .3, ms: 60 } }, ...at('h_wc_shot'),
             { hush: 2200 }, { room: { lp: 20000, vol: 1, ms: 3000 } }, { hush: 1200 }] },   // (10/11) a breath of silence, the shot, the frame jolts and a flash, the ears ring (the room goes dull), then it comes back
@@ -314,9 +314,9 @@
         ] },
       ] },
       { t: '“I know you’re in there.”', ic: 'say', sh: 'I know you’re in there', intent: 'talks', set: { guard: 'talk' }, then: [
-        S('pa', 'I know you’re in there!!'), S('pa', 'Come out. Now.'), S('pa', 'Hands in the air!'),
+        S('pa', 'I know you’re in there!!'), S('pa', 'Come out with your hands in the air!'),
         { zoom: { k: 1.3, x: 1000, y: 350, ms: 0 } }, S('guard', 'Come and get it!', { whisper: true }),   // (10/11) muffled, through the door: italic
-        { by: 'pa', cue: 'Look at your phone', clock: 10000, choice: [
+        { by: 'pa', nolit: true, cue: 'Look at your phone', clock: 10000, choice: [
           { t: '“Ten seconds.”', ic: 'tough', sh: 'Threaten them', intent: 'threatens the hostages', set: { talk: 'threat' }, then: [
             S('pa', 'You’ve got ten seconds.'), S('pa', 'After that, it’s one of them.'), S('guard', 'Don’t! Don’t touch them!')] },
           { t: '“It’s not your money.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [

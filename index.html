@@ -4217,7 +4217,7 @@ let chSecret = false;
 const optionButtons = () => ($('#ringCard').hidden ? choicesEl : $('#ringBtns')).children;
 function choose(opts, by, ring) {
   huOff(); musHold(true);
-  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; if (!(TV && split)) litFocus(seatFor(by));   // apart: the TV stays as it is
+  options = opts; optionsBy = by; optionsLane = laneNow; optionsRing = ring; choicesEl.innerHTML = ''; if (!(TV && split) && !chNoLit) litFocus(seatFor(by));   // apart: the TV stays as it is
   document.body.classList.toggle('choosing', mineFor(by)); $('#ringBtns').innerHTML = '';
   choicesEl.classList.remove('nudge');
   const mine = mineFor(by);
@@ -4264,7 +4264,7 @@ function choose(opts, by, ring) {
 }
 // the clock on a choice (smt-timer: off, 6, 10 default, 20 seconds): a line that shrinks above the choices; it stops while the
 // story is paused or someone's gone. At zero the game picks for you, at random (as if you had tapped)
-let clockT = 0, chClock, chCue = '', chBig = false, chAsk = false, chPeak = false;   // chPeak: a peak choice ({peak}): the two halves   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
+let clockT = 0, chClock, chCue = '', chBig = false, chAsk = false, chPeak = false, chNoLit = false;   // chNoLit: {nolit}: the picture stays lit during this choice (no darkening)   // chPeak: a peak choice ({peak}): the two halves   // chClock: the open choice's own clock ({clock: ms}, 0 = none), else the setting
 const clockMs = () => { try { const v = localStorage.getItem('smt-timer'); return v === 'off' ? 0 : (+v || 10) * 1000; } catch { return 10000; } };
 function clockStop() { clearInterval(clockT); const c = choicesEl.querySelector(':scope > .clock'); if (c) c.remove(); $('#waitClock').hidden = true; }
 function clockStart(opts, watching = false) {   // watching: someone else's choice (the TV, the other phone): the line only shows, never picks
@@ -4975,7 +4975,7 @@ async function next() {
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chPeak = !!s.peak; chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chPeak = !!s.peak; chNoLit = !!s.nolit; chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
