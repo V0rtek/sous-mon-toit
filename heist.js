@@ -416,6 +416,21 @@
         { t: 'Run for the gondola.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'send', sh: 'Run', intent: 'runs', set: { snipe: 'run' }, then: [] },
       ] },
     ] },
+    // (11/11) what their choice did, told (pictures to come), then the review
+    { fn: (f) => { const amy = f.amyjoin ? [T('Amy with them.')] : [];
+      const out = f.roof === 'stuck' ? ({
+        dropgo: [...at('h_end_broke'), T('Ray lets the bag go.'), T('He runs.'), T('Marcus waited.'), T('The gondola drops.'), T('Together.'), ...amy, T('With nothing.')],
+        pullgo: [...at('h_end_alone'), T('Marcus jumps in the gondola.'), T('It drops.'), T('Up there, Ray pulls.'), T('The bag tears free.'), T('Too late.'), T('The crowd is on him.')],
+        dropback: [...at('h_end_caught'), T('Marcus runs back for Ray.'), T('Ray had already let it go.'), T('They meet in the light.'), T('“ON YOUR KNEES!”'), T('No money.'), T('No gondola.')],
+        pullback: [...at('h_end_together'), T('Marcus runs back.'), T('Together, they tear the bag free.'), T('They jump in the gondola.'), ...amy, { sfx: 'gun shot' }, T('A bullet through the cabin.'), T('Ray’s shirt is turning red.')],
+      })[f.ra + f.ma] : f.amyjoin ? ({
+        keep: [...at('h_roof_shield'), T('Ray holds Amy in front of him.'), T('The red dot slides off his chest.'), T('The snipers hold their fire.'), T('Step by step, to the gondola.'), T('She’s shaking.'), T('So is he.')],
+        free: [...at('h_amy_runs'), S('pb', 'Go to them.'), S('pb', 'Hands up.'), T('Amy runs to the police.'), T('She doesn’t look back.'), { sfx: 'gun shot' }, T('A warning shot.'), T('At Ray’s feet.')],
+      })[f.shield] : ({
+        up: [...at('h_end_caught'), T('Marcus raises his hands.'), T('The gun falls.'), T('On his knees, in the light.'), T('He thinks of Leo.'), T('Ray runs alone to the gondola.')],
+        run: [...at('h_roof_lights'), T('Marcus runs.'), { sfx: 'gun shot' }, T('A shot.'), T('He falls.'), T('Gets up.'), T('Falls into the gondola.'), T('Ray drops it.'), T('Marcus is bleeding.')],
+      })[f.snipe];
+      return [...(out || []), { hush: 1800 }, ...at('h_black'), { hush: 900 }]; } },
     // cut on the choice: straight to the white review screen (the « tadaa »), one question; what could have been below
     { music: null, ms: 0 }, { stop: 'establishment alarm' }, { stop: 'crowd panic' }, { stop: 'helicopters' }, { stop: 'sirens' },
     { review: { key: 'suite', q: 'Do you want to see what happens next?', yes: 'Yes!', no: 'No', alts: (f) => [
