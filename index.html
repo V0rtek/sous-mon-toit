@@ -182,11 +182,10 @@ body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; ba
 /* (11/11) the picture stays on screen: each half is only a black gradient from its outer edge, the stake faded into it, the word on that side */
 #choices.peak > button.pk + button.pk { place-items: center end; text-align: right; }
 #choices.peak > button.pk + button.pk { animation-delay: .15s; }
-#choices.peak > button.pk .pk-i { position: absolute; inset: 0 25% 0 0; background: center 22% / cover no-repeat; opacity: .55; -webkit-mask-image: linear-gradient(to right, #000 20%, transparent); mask-image: linear-gradient(to right, #000 20%, transparent); transition: opacity .5s, transform 3s ease-out; transform: scale(1.04); }
-#choices.peak > button.pk + button.pk .pk-i { inset: 0 0 0 25%; -webkit-mask-image: linear-gradient(to left, #000 20%, transparent); mask-image: linear-gradient(to left, #000 20%, transparent); }
-#choices.peak > button.pk::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, rgba(0,0,0,.9), rgba(0,0,0,.55) 45%, transparent); }
-#choices.peak > button.pk + button.pk::after { background: linear-gradient(to left, rgba(0,0,0,.9), rgba(0,0,0,.55) 45%, transparent); }
-#choices.peak > button.pk + button.pk::before { content: ''; position: absolute; left: 0; top: 8%; bottom: 8%; width: 2px; z-index: 2; background: linear-gradient(transparent, rgba(255,255,255,.35), transparent); }
+#choices.peak > button.pk .pk-i { position: absolute; inset: 0 60% 0 0; background: center 22% / cover no-repeat; opacity: .5; -webkit-mask-image: linear-gradient(to right, #000 10%, transparent); mask-image: linear-gradient(to right, #000 10%, transparent); transition: opacity .5s, transform 3s ease-out; transform: scale(1.04); }
+#choices.peak > button.pk + button.pk .pk-i { inset: 0 0 0 60%; -webkit-mask-image: linear-gradient(to left, #000 10%, transparent); mask-image: linear-gradient(to left, #000 10%, transparent); }
+#choices.peak > button.pk::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, rgba(0,0,0,.8), transparent 40%); }
+#choices.peak > button.pk + button.pk::after { background: linear-gradient(to left, rgba(0,0,0,.8), transparent 40%); }
 #choices.peak > button.pk .pk-w { position: relative; z-index: 1; font-family: var(--display, Georgia, serif); font-weight: 400; font-size: min(9vw, 15vh); line-height: 1; color: #fff; letter-spacing: .01em; text-shadow: 0 .05em .6em rgba(0,0,0,.9); }
 #choices.peak > button.pk:hover .pk-i, #choices.peak > button.pk:focus-visible .pk-i { opacity: .55; outline: none; }
 #choices.peak > button.pk.picked .pk-i { opacity: .9; transform: scale(1.1); }
