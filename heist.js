@@ -322,14 +322,8 @@
           { t: '“It’s not your money.”', ic: 'calm', sh: 'Reason', intent: 'reasons with him', set: { talk: 'reason' }, then: [
             S('pa', 'Listen. It’s not your money.'), S('pa', 'Nobody has to bleed for it.'), S('guard', '…')] },
         ] },
-        { zoom: { k: 1.6, x: 1000, y: 340, ms: 0 } }, S('guard', 'Okay.'), S('guard', 'I come out.'), S('guard', 'But the gun stays in my holster.'),
-        { by: 'pa', cue: 'Look at your phone', clock: 7000, choice: [
-          { t: '“Fine. On the ground.”', ic: 'calm', sh: 'Fine', intent: 'lets him keep it', set: { gun: 'holster' }, then: [
-            S('pa', 'Okay. Out. Face down.'), ...at('h_wc_hands'), { hush: 2400 }] },
-          { t: '“The gun first. Slide it.”', ic: 'tough', sh: 'The gun first', intent: 'wants the gun', set: { gun: 'floor' }, then: [
-            S('pa', 'No. Gun first. Across the floor.'), ...at('h_wc_gun'), { hush: 2000 },
-            ...at('h_wc_hands'), { hush: 1600 }] },
-        ] },
+        { zoom: { k: 1.6, x: 1000, y: 340, ms: 0 } }, S('guard', 'Okay.'), S('guard', 'I come out.'),
+        ...at('h_wc_hands'), { hush: 2400 },
       ] },
     ] },
     // ---- (11/11) meanwhile, Ray in the vault: two bags, then Amy's texts ----
