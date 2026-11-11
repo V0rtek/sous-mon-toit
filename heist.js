@@ -268,12 +268,12 @@
     ] },
     { by: 'pb', clock: 0, choice: [
       { t: 'I’m gonna marry you.', ic: 'love', sh: 'Marry', intent: 'Text Amy', set: { amytext: 'marry' }, then: [{ duoOut: ['pb', 'I’m gonna marry you.'] }, { hush: 1600 }] },
-      { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1600 }] },   // TODO Justin's words
+      { t: 'Who let you out like that? 😂', ic: 'say', sh: 'Make fun', intent: 'Text Amy', set: { amytext: 'fun' }, then: [{ duoOut: ['pb', 'Who let you out like that? 😂'] }, { hush: 1400 }, { duoIn: ['pb', { text: 'You’re a menace 😂' }] }, { hush: 1800 }] },   // TODO Justin's words
     ] },
     { duo: false }, lose(2),   // the texts ate 2 minutes
     ...at('h_ots_look'), S('pb', 'It’s time.'),   // (09/11) over Ray's shoulder, before the elevators
     // ---- 13-14. the elevators: Ray presses the button; the crowd back, Double It far away, very low and muffled, coming up slowly ----
-    ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 0, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
+    ...at('h_lift_hall'), { stop: 'lobby jazz', ms: 4000 }, { room: { lp: 20000, vol: 1, ms: 1000 } }, { music: 'double it', lv: 1, vol: .12, lp: 260, ms: 6000 }, { hush: 2600 },
     { music: 'double it', vol: .32, lp: 420, ms: 14000 },
     // ---- 16. ding: in. The crowd stays outside, the music comes close ----
     { sfx: 'elevator ding' }, ...at('h_lift_hall'), { hush: 900 },
@@ -285,7 +285,7 @@
     ...at('h_gun'), { music: 'double it', lp: 760, vol: .37 }, { bars: 2 },
     ...at('h_mask26'), { music: 'double it', lp: 900, vol: .4 }, { bars: 2 },
     ...at('h_masked'), { music: 'double it', lp: 1100, vol: .44 },
-    { music: 'double it', lv: 1, vol: .7, ms: 2400, inBars: 2 }, { bars: 1 },   // (10/11) the first drop held back; the next ones louder
+    { music: 'double it', lv: 2, vol: .7, ms: 2400, inBars: 2 }, { bars: 1 },   // (10/11) the first drop held back; the next ones louder
     { sfx: 'elevator ding' }, ...at('h_crack'), { bars: 'drop' }, { music: 'double it', lp: 20000, ms: 400 },   // the doors open: the music too   // the doors crack open, the drop: they open
     ...at('h_bank'), { hush: 1400 },
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
