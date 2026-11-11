@@ -291,11 +291,10 @@
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
     ...at('h_rob_out'), { sfx: 'crowd panic', loop: true, peak: 1.1 }, T('“EVERYBODY DOWN.”'),   // (10/11) the crowd's scream, loud, then it settles
-    ...at('h_rob_hands'), { hush: 1800 },
-    { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 2200 },
-    S('pb', 'There’s no security here?!'),
-    // ---- (11/11) they split up before the guard: Ray takes the vault, Marcus the room ----
-    S('pb', 'Hold the room.'), S('pb', 'I’ve got the vault.'), { set: { watch: 'pa' } },
+    ...at('h_rob_hands'), { hush: 1200 }, T('No security. Anywhere.'), { hush: 600 },   // (11/11) before the alarm turns the room red
+    { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 1600 },
+    // ---- (11/11) Ray takes the vault, Marcus the room: one line, then the picture ----
+    S('pb', 'Heading for the vault.'), { set: { watch: 'pa' } },
     // Ray's side: over the counter, down to the vault, two bags; then Amy's texts: she's here
     ...at('h_counter'), { hush: 1600 },
     // ---- (11/11) Ray over the counter, then straight to Marcus: the guard behind the restroom door ----
@@ -345,11 +344,10 @@
     { room: { lp: 20000, vol: 1, ms: 300 } }, { sfx: 'crowd panic', loop: true },
     // ---- (11/11) Amy: her eyes, she crawls to the guard, then behind Marcus; Ray comes back with the bags ----
     ...at('h_amy_eyes'), { hush: 2600 },
-    { fn: (f) => [...at('h_amy_crawl'), T('Amy crawls to the guard.'), T(f.guard === 'shot' ? 'He doesn’t move.' : f.gun === 'holster' ? 'His gun, still on his hip.' : 'His gun, on the floor.'), T('Her hand closes on it.')] },
-    ...at('h_amy_behind'), T('Behind Marcus.'), T('He doesn’t see her.'),
+    ...at('h_amy_crawl'), { hush: 3000 }, ...at('h_amy_behind'), { hush: 2400 },   // (11/11) show, don't tell
     { music: 'double it', lv: 3 }, { bars: 'drop' },
-    ...at('h_ray_rush'), T('Ray, back with the bags.'),
-    ...at('h_behind'), T('Amy, up.'), T('The gun on Marcus’s back.'), T('Ray, a bag in his hand.'),
+    ...at('h_ray_rush'), { hush: 1800 },
+    ...at('h_behind'), { hush: 2200 },
     // Ray: show her who he is, or throw the bag in her face
     { by: 'pb', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
       { t: 'Take off your mask.', w: 'Amy', img: 'stakes/amy.webp', ic: 'unmask', sh: 'Amy!', intent: 'shows himself', set: { ray: 'reveal', bags: 2 }, then: [
