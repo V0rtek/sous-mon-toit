@@ -304,8 +304,8 @@
     { by: 'pa', nolit: true, cue: 'Look at your phone', clock: 10000, choice: [
       { t: 'Wait. Say nothing.', ic: 'calm', sh: 'Wait', intent: 'waits', idle: true, set: { guard: 'wait' }, then: [
         { hush: 1800 }, ...at('h_wc_gun'), { hush: 2400 },
-        ...at('h_wc_out'), { hush: 700 },
-        { by: 'pa', nolit: true, cue: 'Look at your phone', clock: 5000, choice: [
+        ...at('h_wc_out'),   // (11/11) a reflex: no beat, 2.5 s, the screen pulses red
+        { by: 'pa', nolit: true, urgent: true, cue: 'Look at your phone', clock: 2500, choice: [
           { t: 'Shoot.', ic: 'gun', sh: 'Shoot', intent: 'shoots', set: { guard: 'shot', gun: 'floor' }, then: [
             { hush: 1400 }, { sfx: 'gun shot' }, { bang: 1 }, { room: { lp: 500, vol: .3, ms: 60 } }, ...at('h_wc_shot'),
             { hush: 2200 }, { room: { lp: 20000, vol: 1, ms: 3000 } }, { hush: 1200 }] },   // (10/11) a breath of silence, the shot, the frame jolts and a flash, the ears ring (the room goes dull), then it comes back

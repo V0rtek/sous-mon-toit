@@ -192,6 +192,12 @@ body.tv #tail::after { left: -1em; bottom: -.16em; width: 2em; height: 1.4em; ba
 #choices.peak:has(.picked) > button.pk:not(.picked) { opacity: .2; transition: opacity .5s; }
 #choices.peak > .clock { position: absolute; top: auto; bottom: 4%; left: 25%; right: 25%; z-index: 3; }
 @keyframes pkIn { from { opacity: 0; } }
+/* (11/11) {urgent} on a choice: a reflex. The edges pulse red, the choices shake a little, the clock is short */
+body.urgent::after { content: ''; position: fixed; inset: 0; z-index: 29; pointer-events: none; box-shadow: inset 0 0 0 1vh rgba(255,40,40,.9), inset 0 0 18vh rgba(255,0,0,.55); animation: urgPulse .45s ease-in-out infinite alternate; }
+body.urgent #choices button { animation: urgShake .18s linear infinite; }
+body.urgent #choices > .clock i { background: #ff3b30 !important; }
+@keyframes urgPulse { from { opacity: .45; } to { opacity: 1; } }
+@keyframes urgShake { 0% { transform: translate(0, 0); } 25% { transform: translate(-.15em, .05em); } 50% { transform: translate(.1em, -.05em); } 75% { transform: translate(-.05em, .1em); } 100% { transform: translate(0, 0); } }
 /* (10/11) {duo}: two phones, one per half (the TV); under each, its choice when it's his turn */
 #duo { position: fixed; inset: 0; z-index: 25; display: grid; grid-template-columns: 1fr 1fr; background: #07070a; font-family: var(--ui, system-ui); }
 #duo .dh { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 4vh 2vw; background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--c) 18%, transparent), transparent 70%); }
@@ -2881,7 +2887,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="gen.js?v=20261031490000"></script>
 <script src="demos.js?v=20261102210000"></script>
 <script src="pirate.js?v=20261102250000"></script>
-<script src="heist.js?v=20261111190000"></script>
+<script src="heist.js?v=20261111200000"></script>
 <script src="mini.js?v=20261102260000"></script>
 <script src="onbstories.js?v=20261028143259"></script>
 <script src="episodes.js?v=20261028143259"></script>
@@ -4306,7 +4312,7 @@ function pickChoice(i, afar = false) {
       r.picks = r.picks || {};
       const k = options.map((x) => x.t).join(' | '); r.picks[k] = r.picks[k] || {}; r.picks[k][o.t] = (r.picks[k][o.t] || 0) + 1;
     });
-    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing', 'chpub', 'peakon'); litOff(); qCardOff(); musHold(false);
+    choicesEl.hidden = true; $('#ringCard').hidden = true; ringTone(false); waitNote(''); document.body.classList.remove('choosing', 'chpub', 'peakon', 'urgent'); litOff(); qCardOff(); musHold(false);
     if (cellOpen) { cellRoom(); clearTimeout(closeCell.t); closeCell.t = setTimeout(closeCell, 1600); }   // what he does next may be a text: it opens again
     if (TV) tvSides(null, seatFor(by));
     q.unshift(...held, ...o.then); held = []; waiting = null; next();
@@ -4974,7 +4980,7 @@ async function next() {
       if (isBot(onlyNow) && ROLE === 'host') botTap();
       return;
     }
-    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chPeak = !!s.peak; chNoLit = !!s.nolit; chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
+    else if (s.choice) { chClock = s.clock; chCue = s.cue || ''; chBig = !!(s.cue && s.big); chPeak = !!s.peak; document.body.classList.toggle('urgent', !!s.urgent); chNoLit = !!s.nolit; chAsk = !!s.ask; chSecret = !!s.secret; choose(s.choice, byOf(s), s.ring); waiting = 'choice'; return; }
     else if (s.episode) {
       curEp = s.episode.n + 1;
       // a jump to episode N (Continuer) stops right after episode N-1's end; a joiner skips the ends its host jumped past
@@ -5061,7 +5067,7 @@ function show(id) {
   if (id === '#infos') { $('#infos').scrollTop = 0; const v = $('#valBtn'); v.classList.remove('valcue'); void v.offsetWidth; v.classList.add('valcue'); }   // Valider l'idée: blinks, grows, the arrow points
 }
 function halt() {
-  { const rv = document.getElementById('review'); if (rv) rv.hidden = true; document.body.classList.remove('reviewon'); }   // (11/11) the review board goes with the story
+  { const rv = document.getElementById('review'); if (rv) rv.hidden = true; document.body.classList.remove('reviewon', 'urgent'); }   // (11/11) the review board goes with the story
   document.body.classList.remove('choosing', 'privline'); litOff(); qCardOff();
   $('#tvIntro').hidden = true; tvOpen = null; $('#uWait').hidden = true; if (TV) tvPhase = null;
   run++; huOff(); q = []; held = []; waiting = null; clearInterval(typing); typing = null; bubble.hidden = true; choicesEl.hidden = true;
