@@ -291,7 +291,7 @@
     // ---- the robbery: the key moments one after the other, no transitions (no card saying it's later). The choices are
     // the real ones (their screen, the music holding its breath) ----
     ...at('h_rob_out'), { sfx: 'crowd panic', loop: true, peak: 1.1 }, T('“EVERYBODY DOWN.”'),   // (10/11) the crowd's scream, loud, then it settles
-    ...at('h_rob_hands'), { hush: 1200 }, T('No security. Anywhere.'), { hush: 600 },   // (11/11) before the alarm turns the room red
+    ...at('h_rob_hands'), { hush: 1200 }, T('There’s no security here?!'), { hush: 600 },   // (11/11) before the alarm turns the room red
     { sfx: 'establishment alarm', loop: true }, ...at('h_rob_red'), { hush: 1600 },
     // ---- (11/11) Ray takes the vault, Marcus the room: one line, then the picture ----
     S('pb', 'Heading for the vault.'), { set: { watch: 'pa' } },

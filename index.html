@@ -3021,6 +3021,7 @@ const sleep = (ms) => new Promise((r) => {
 const PRE = {};
 function preload(url) { if (!url) return null; if (!PRE[url]) { const i = new Image(); i.src = url; i.decode().catch(() => {}); PRE[url] = i; } return PRE[url]; }
 function preloadStory() {
+  try { if (!FAST && audio()) loadSfx('tadaa'); } catch { /* sound not ready */ }   // (11/11) the end's « tadaa » decoded ahead: it plays the instant the white screen shows
   const pre = story() && story().preload; if (!pre) return;
   for (const [id, s] of Object.entries(SCENES)) if (id.startsWith(pre)) { if (s.image) preload(s.image); for (const p of s.props || []) preload(POSE_OVR[p.src] || `props/${p.src}.webp`); }
 }
