@@ -212,8 +212,12 @@
   const standoff = (w, off) => { const o = w === 'pa' ? 'pb' : 'pa'; return place({ back: [...BANK, ...lie(1000, 1010, GUARD),
     ...handsUp(380, 1080, 1.8, COL[w], { face: off ? SKIN : MASK }), ...armed(960, 1080, 1.8, AMY, -1),
     ...armed(1600, 1080, 1.8, COL[o], -1, { face: MASK }), R(1700, 760, 160, 120, '#26201b', { r: 12 })] }); };
+  // (12/11) Justin's: Marcus unmasked, crying; Amy one of them (Ray unmasked, Marcus, Amy, the bags); the stairs; the room rising
+  // against them; the roof, the red dot on Marcus
+  const JP = { h_face_pa: { image: 'bg/marcus_unmasked.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .5 } }, h_amy_join: { image: 'bg/amy_join.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pb: .28, pa: .52, amy: .75 } }, h_stairs: { image: 'bg/stairs.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .53, pb: .7 } }, h_mob: { image: 'bg/mob.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { hostage: .3, pa: .62, pb: .82 } }, h_roof_sniper: { image: 'bg/roof_sniper.webp', size: PIC, spots: {}, face: {}, back: [], front: [], spk: { pa: .5 } } };
   for (const k of ['pa', 'pb']) { SCENES['h_aim_' + k] = aim(k); SCENES['h_aim_' + k + '_off'] = aim(k, true); SCENES['h_face_' + k] = face(k);
     SCENES['h_standoff_' + k] = standoff(k); SCENES['h_standoff_' + k + '_off'] = standoff(k, true); }
+  Object.assign(SCENES, JP);   // (12/11) his pictures over the shapes
   SCENES.h_black = place({ back: [R(0, 0, 1920, 1080, '#000')] });
 
   const at = (id) => [scene(id, {}), { cam: 'wide', at: SCENES[id].size[0] / 2 }];   // a place, the camera on all of it
@@ -353,11 +357,11 @@
           { t: '“Stay. You’ll be safe.”', ic: 'calm', sh: 'Stay safe', intent: 'leaves her safe', set: { amygo: 'stay' }, then: [S('pb', 'Stay here.'), S('pb', 'You’ll be safe.'), { hush: 1600 }] },
         ] },
         // she would come, but the other one shot the guard: Marcus has to show his face
-        { fn: (f) => f.amygo !== 'come' ? [] : f.guard !== 'shot' ? [S('amy', 'Okay.'), { set: { amyjoin: true } }] : [
+        { fn: (f) => f.amygo !== 'come' ? [] : f.guard !== 'shot' ? [S('amy', 'Okay.'), { set: { amyjoin: true } }, ...at('h_amy_join'), { hush: 2000 }] : [
           ...at('h_amy_face'), S('amy', 'You shot him!'), S('amy', 'I’m not going anywhere with him.'),
           { by: 'pa', cue: 'Look at your phone', clock: 9000, choice: [
             { t: 'Take off your mask. “I have a son.”', ic: 'unmask', sh: 'My son', intent: 'shows his face', set: { mface: 'off', amyjoin: true }, then: [
-              ...at('h_face_pa'), S('pa', 'I have a son.'), S('pa', 'He’s nine.'), S('pa', 'I didn’t want any of this.'), S('amy', 'Okay.')] },
+              ...at('h_face_pa'), S('pa', 'I have a son.'), S('pa', 'He’s nine.'), S('pa', 'I didn’t want any of this.'), S('amy', 'Okay.'), ...at('h_amy_join'), { hush: 2000 }] },
             { t: '“We don’t have time.”', ic: 'tough', sh: 'No time', intent: 'stays masked', set: { mface: 'on' }, then: [
               S('pa', 'We don’t have time for this.'), { hush: 1600 }] },
           ] },
@@ -373,7 +377,7 @@
       ] },
     ] },
     // ---- (11/11) the room turns on them. Marcus fires to calm it: his gun is empty ----
-    ...at('h_rob_red'), { hush: 1600 },
+    ...at('h_mob'), { hush: 1600 },
     { fn: (f) => [
       ...(f.talk === 'threat' ? [S('guard', 'He threatened us!')] : [S('hostage', 'He threatened us!')]),
       ...(f.guard === 'shot' ? [S('hostage', 'He killed the security!')] : []),
@@ -381,7 +385,7 @@
     ] },
     S('pa', 'DOWN!'), S('pa', 'Everybody DOWN!'), { hush: 800 },
     { music: null, ms: 0 }, ...at('h_black'), { hush: 700 }, T('Click.'), { hush: 1400 }, T('Click.'),
-    ...at('h_rob_red'), { sfx: 'crowd panic', loop: true }, { hush: 1800 },
+    ...at('h_mob'), { sfx: 'crowd panic', loop: true }, { hush: 1800 },
     { sfx: 'sirens', loop: true },   // the police arriving: several sirens, near and far
     ...at('h_stairs'), S('pb', 'THE ROOF!'), { hush: 1800 },
     // ---- (11/11) the roof: one problem, by what they carry. Two bags = Ray stuck in the door; one = the snipers. The episode
@@ -410,7 +414,7 @@
       ] },
     ] : [
       { set: { roof: 'snipers' } },
-      ...at('h_roof_lights'), { hush: 2200 },
+      ...at('h_roof_sniper'), { hush: 2200 },
       { by: 'pa', peak: true, cue: 'Look at your phone', clock: 8000, choice: [
         { t: 'Hands up.', w: 'Leo', img: 'stakes/leo.webp', ic: 'hand', sh: 'Hands up', intent: 'gives up', set: { snipe: 'up' }, then: [] },
         { t: 'Run for the gondola.', w: 'Freedom', img: 'stakes/ray.webp', ic: 'send', sh: 'Run', intent: 'runs', set: { snipe: 'run' }, then: [] },
@@ -436,7 +440,7 @@
     { review: { key: 'suite', q: 'Do you want to see what happens next?', yes: 'Yes!', no: 'No', alts: (f) => [
       f.ray !== 'reveal' && ['stakes/ray.webp', 'Ray shows Amy his face.'],   // TODO Justin's pictures in place of these
       f.ray !== 'throw' && ['bg/bag_hit.webp', 'The bag in Amy’s face.'],
-      !f.amyjoin && ['bg/amy_face.webp', 'Amy, one of them.'],
+      !f.amyjoin && ['bg/amy_join.webp', 'Amy, one of them.'],
       f.guard !== 'shot' && ['bg/wc_shot.webp', 'The guard, shot.'],
       f.roof !== 'stuck' && ['bg/roof_door.webp', 'Ray, stuck in the door.'],
       !(f.roof === 'snipers' && f.amyjoin) && ['bg/roof_shield.webp', 'Amy as a shield.'],
