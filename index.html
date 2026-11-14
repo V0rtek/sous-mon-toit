@@ -1604,7 +1604,7 @@ html.locked #peekBtn { display: none; }
 #menuBtn svg { width: 2.8em; height: 2.8em; }
 /* (10/11) the version pill: am I on the latest one? green = yes, orange = pushed but still being published, red = a newer one is out (tap) */
 #verPill { position: absolute; left: 4%; bottom: 2.2%; z-index: 30; font: inherit; font-size: 1.7em; font-weight: 700; color: #e5e5ea; background: rgba(15,12,20,.7); border: 0; border-radius: 2em; padding: .45em 1em; display: flex; align-items: center; gap: .6em; cursor: default; }
-#verPill[hidden], body.instory #verPill, body.tv #verPill, body.preview #verPill, body.playonly #verPill { display: none !important; }
+#verPill[hidden], html.locked #verPill, body.instory #verPill, body.tv #verPill, body.preview #verPill, body.playonly #verPill { display: none !important; }
 #verPill i { width: .8em; height: .8em; border-radius: 50%; background: #8e8e93; }
 #verPill.ok i { background: #30d158; } #verPill.wait i { background: #ff9f0a; animation: blink 1.2s ease-in-out infinite; } #verPill.old { cursor: pointer; background: #7a1f2b; } #verPill.old i { background: #ff453a; }
 #menuPop { position: absolute; right: 4%; bottom: calc(2.2% + 7.2em); z-index: 31; display: flex; flex-direction: column; gap: 1.2em; }
