@@ -2962,7 +2962,14 @@ const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef
 document.documentElement.classList.toggle('locked', !unlocked());
 // the warning: unlocked = every visit opens on it (and right after the code); a tap closes it
 const warnEl = $('#warn'); warnEl.onclick = (e) => { if (e.target.closest('.wLink')) return; warnEl.hidden = true; };
-if (unlocked()) warnEl.hidden = false;
+// 13/11: at most once every 2 minutes (a reload right after doesn't show it again)
+const warnShow = () => {
+  let last = 0; try { last = +localStorage.getItem('smt-warn-at') || 0; } catch { /* private window */ }
+  if (Date.now() - last < 120000) return;
+  try { localStorage.setItem('smt-warn-at', String(Date.now())); } catch { /* private window */ }
+  warnEl.hidden = false;
+};
+if (unlocked()) warnShow();
 const stage = $('#stage'), world = $('#world'), bgImg = $('#bgimg'), backEl = $('#backdrop'), castEl = $('#cast'), frontEl = $('#front'),
   bubble = $('#bubble'), tagEl = $('#tag'), textEl = $('#text'), tail = $('#tail'), choicesEl = $('#choices'),
   black = $('#black'), caption = $('#caption'), hint = $('#hint'), textsEl = $('#texts'), slateEl = $('#slate'), farEl = $('#far');
@@ -5722,7 +5729,7 @@ $('#keyForm').onsubmit = (e) => {
   e.preventDefault(); const f = $('#keyForm');
   if (keyHash($('#keyIn').value) !== KEY_HASH) { f.classList.remove('no'); void f.offsetWidth; f.classList.add('no'); $('#keyIn').select(); return; }
   try { localStorage.setItem('smt-open', String(KEY_HASH)); } catch { /* private window: open for this visit only */ }
-  keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; warnEl.hidden = false; $('#keyIn').value = '';
+  keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; warnShow(); $('#keyIn').value = '';
 };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
 $('#secWriteBtn').onclick = (e) => { e.stopPropagation(); show('#secWrite'); };
