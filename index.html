@@ -732,7 +732,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
 /* the home: no scroll, its buttons share the height (24em each at most, smaller when there are more) */
 #hub { overflow: hidden; }
-html.locked #hub { padding-bottom: 12em; }   /* room for the lock */
+#hub { padding-bottom: 12em; }   /* room for the lock (locked) or the eye (unlocked) */
 #hub .strips { flex: 1 1 auto; min-height: 0; justify-content: center; margin: 0; }
 #hub .strips > * { height: auto; flex: 0 1 24em; min-height: 0; }
 #fullDemo .oldTag { position: absolute; top: .8em; right: .8em; z-index: 2; font-size: 1.6em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #f5f5f7; background: rgba(0,0,0,.6); padding: .2em .6em; border-radius: .4em; }
@@ -784,6 +784,10 @@ html.locked #infosBtn { display: none !important; }
 #keyBtn { display: none; position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: 5em; height: 5em; border: 0; border-radius: 50%; background: transparent; color: #f5f5f7; opacity: .25; cursor: pointer; padding: 0; }
 #keyBtn svg { width: 2.6em; height: 2.6em; }
 html.locked #keyBtn { display: grid; place-items: center; }
+/* unlocked: an eye at the lock's spot shows the home as a visitor sees it (this visit only); the lock brings it back, no code */
+#peekBtn { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; align-items: center; gap: .6em; border: 0; background: transparent; color: #f5f5f7; opacity: .35; cursor: pointer; font: inherit; font-size: 1.8em; padding: .5em 1em; }
+#peekBtn svg { width: 1.6em; height: 1.6em; }
+html.locked #peekBtn { display: none; }
 #keyForm { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; gap: 1em; }
 #keyForm[hidden] { display: none; }
 #keyForm input { font: inherit; font-size: 2.4em; width: 7em; padding: .4em .7em; border: 0; border-radius: 1em; background: #1c1c1e; color: #f5f5f7; outline: 0; }
@@ -2212,6 +2216,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
+    <button type="button" id="peekBtn" aria-label="Voir en visiteur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Vue visiteur</span></button>
     <button type="button" id="keyBtn" aria-label="Access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
   </div>
@@ -5706,7 +5711,12 @@ $('#showrunner').onclick = (e) => { if (!e.target.closest('.srLink')) return; e.
 window.SPARK_TO_SHOWRUNNER = () => { UP['#showrunner'] = '#deck'; $('#showrunner').scrollTop = 0; show('#showrunner'); };
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#sparkBtn').onclick = (e) => { e.stopPropagation(); UP['#deck'] = '#secSell'; show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
-$('#keyBtn').onclick = (e) => { e.stopPropagation(); $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
+// visitor view (13/11): unlocked, the eye puts the façade back for this visit; the lock then reopens without the code
+let peeking = false;
+$('#peekBtn').onclick = (e) => { e.stopPropagation(); peeking = true; document.documentElement.classList.add('locked'); };
+$('#keyBtn').onclick = (e) => { e.stopPropagation();
+  if (peeking) { peeking = false; document.documentElement.classList.remove('locked'); return; }
+  $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
 $('#keyForm').onclick = (e) => e.stopPropagation();
 $('#keyForm').onsubmit = (e) => {
   e.preventDefault(); const f = $('#keyForm');
