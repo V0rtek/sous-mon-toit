@@ -1897,7 +1897,7 @@ body.tv #pauseCard { padding: 0 calc(50% - 46em); }
 #pauseCard .pc-btns button { flex: 1; font: inherit; font-size: 2.4em; font-weight: 800; border: 0; border-radius: 1em; padding: .8em; cursor: pointer; color: #fff; background: #34c759; }
 #pauseCard .pc-btns button + button { flex: 0 1 auto; background: rgba(255,255,255,.14); }
 #tvBtn .tvHere { position: absolute; z-index: 1; right: 7%; display: flex; align-items: center; gap: .8em; font-size: 2em; font-weight: 700; }
-#tvBtn .tvHere[hidden] { display: none; }
+#tvBtn .tvHere, #tvBtn .tvHere[hidden] { display: none; }   /* 14/11: the button opens the TV now, no « TV nearby » mark */
 #tvBtn .tvHere i { width: .8em; height: .8em; border-radius: 50%; background: #34c759; box-shadow: 0 0 .8em #34c759; }
 #tvBtn .tvHere em { font-style: normal; letter-spacing: .1em; }
 #tvFind { background: radial-gradient(circle at 50% 30%, #1d2238, #000 75%); color: #f5f5f7; justify-content: center; padding: 13em 7% 6em; overflow-y: auto; text-align: center; }
@@ -5493,7 +5493,8 @@ function paintTvs() {
     : '<div class="tf-none" aria-label="Looking for a TV…"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg><i></i></div>';
   box.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); joinRoom(b.dataset.r); });
 }
-$('#tvBtn').onclick = (e) => { e.stopPropagation(); feat('Sur la télé'); show('#tvFind'); };
+// 14/11: TV demo opens the TV itself on the heist (it used to look for a TV to join: #tvFind)
+$('#tvBtn').onclick = (e) => { e.stopPropagation(); feat('Sur la télé'); location.href = `${location.pathname}?tv&story=d_heist`; };
 $('#tvBecome').onclick = (e) => { e.stopPropagation(); location.href = `${location.pathname}?tv`; };
 setInterval(() => { if (screen === '#hub' || screen === '#tvFind') paintTvs(); }, 5000);
 function takeSeat(k, id, n) {
