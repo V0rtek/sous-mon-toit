@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review - Unwritten</title>
+<style>
+/* (14/11) the home's Review strip: ONE question, a white 2008-looking form. The answer goes with the other reviews
+   (usage.js notes, story 'review'): the game's Stats › Derniers avis shows it */
+body { margin: 0; background: #fff; color: #333; font: 13px/1.5 Verdana, Tahoma, Arial, sans-serif; }
+#top { background: linear-gradient(#f7f7f7, #dcdcdc); border-bottom: 1px solid #b5b5b5; padding: 8px 14px; }
+#top a { color: #0645ad; font-size: 12px; }
+#box { max-width: 520px; margin: 28px auto; padding: 0 14px; }
+h1 { margin: 0 0 4px; font: bold 20px Arial, Helvetica, sans-serif; color: #224; }
+.sub { margin: 0 0 16px; color: #777; font-size: 11px; }
+fieldset { border: 1px solid #c8c8c8; background: #fafafa; padding: 12px 14px 14px; margin: 0; }
+legend { padding: 0 4px; font-weight: bold; color: #444; }
+label { display: block; margin-bottom: 6px; font-weight: bold; }
+textarea { box-sizing: border-box; width: 100%; height: 130px; padding: 4px; border: 1px solid; border-color: #7c7c7c #c3c3c3 #ddd; font: 13px Verdana, Tahoma, Arial, sans-serif; background: #fff; resize: vertical; }
+.row { margin-top: 10px; display: flex; align-items: center; gap: 10px; }
+button { font: 12px Verdana, Tahoma, Arial, sans-serif; padding: 3px 14px; border: 1px solid #8a8a8a; border-radius: 3px; background: linear-gradient(#fff, #ddd); color: #000; cursor: pointer; }
+button:active { background: linear-gradient(#ddd, #fff); }
+.req { color: #c00; }
+#ok { display: none; border: 1px solid #9c9; background: #efe; color: #060; padding: 8px 10px; margin-top: 12px; }
+#err { color: #c00; font-size: 11px; display: none; }
+#foot { margin-top: 26px; color: #999; font-size: 10px; text-align: center; }
+</style>
+</head>
+<body>
+<div id="top"><a href="./">&laquo; Back to Unwritten</a></div>
+<div id="box">
+  <h1>Review</h1>
+  <p class="sub">One question. Be honest, it helps more than nice words.</p>
+  <form id="f">
+    <fieldset>
+      <legend>Your feedback</legend>
+      <label for="a">What sucked the most? <span class="req">*</span></label>
+      <textarea id="a" maxlength="2000"></textarea>
+      <div class="row"><button type="submit">Submit</button><span id="err">Please write something first.</span></div>
+      <div id="ok">Thank you! Your review was sent.</div>
+    </fieldset>
+  </form>
+  <div id="foot">&copy; 2008 Unwritten &middot; Best viewed in 1024&times;768</div>
+</div>
+<script src="usage.js"></script>
+<script>
+document.getElementById('f').onsubmit = (e) => {
+  e.preventDefault();
+  const a = document.getElementById('a'), text = a.value.trim();
+  document.getElementById('err').style.display = text ? 'none' : 'inline';
+  if (!text) return;
+  if (window.USAGE) USAGE.bump((st) => { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: 'review', text, n: '' }); st.notes.length = Math.min(st.notes.length, 30); });
+  a.value = ''; document.getElementById('ok').style.display = 'block';
+};
+</script>
+</body>
+</html>

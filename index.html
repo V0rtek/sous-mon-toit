@@ -729,6 +729,10 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .strips .art img { position: absolute; left: 55%; top: 7%; height: 240%; transform: translateX(-50%); }   /* head and shoulders */
 .strips b { position: relative; z-index: 1; font-size: 4em; font-weight: 600; letter-spacing: -.025em; }
 .strips b .lk { width: .62em; height: .62em; margin-left: .35em; vertical-align: -.02em; opacity: .7; }   /* behind the façade's code */
+/* 14/11: Review = green neon borders, to a one-question form (review.html) */
+#reviewBtn { border: .3em solid #39ff14; border-radius: 1.2em; margin: 1.2em 4%; box-shadow: 0 0 1.2em #39ff14, inset 0 0 1.2em rgba(57,255,20,.45); }
+#reviewBtn::after { display: none; }
+#reviewBtn b { color: #39ff14; text-shadow: 0 0 .4em #39ff14; }
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
 /* the home: no scroll, its buttons share the height (24em each at most, smaller when there are more) */
 #hub { overflow: hidden; }
@@ -2221,6 +2225,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b><span class="oldTag">old</span></a>
       <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
       <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
+      <a href="review.html" id="reviewBtn"><b>Review</b></a>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
     <button type="button" id="peekBtn" aria-label="Voir en visiteur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Vue visiteur</span></button>
@@ -5600,7 +5605,7 @@ function sendFb(keepOpen) {
   if (!keepOpen) $('#fbCard').hidden = true;
   $('#fbBtn').textContent = 'Thanks';
 }
-const storyName = (id) => ({ t1: 'UNWRITTEN', play: 'Le café', bar: 'Last call', gen: 'Your story' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
+const storyName = (id) => ({ t1: 'UNWRITTEN', review: 'Review form', play: 'Le café', bar: 'Last call', gen: 'Your story' })[id] || (GAME_LIST.find((g) => g.id === id) || {}).name || (STORIES[id] && STORIES[id].title) || id;
 // ---- Stats and Valider l'idée: every device's tally (usage.js), added up live ----
 function sumUp(devs) {
   const S = {}, F = {}, A = { n: 0, back: 0, play: 0, ep: 0, next: 0, gen: { n: 0, in: 0, out: 0 }, notes: [] };
