@@ -846,11 +846,6 @@ const DEMOS = [
     cast: [['plage', 'stand']], players: 1, byoc: true, live: null, you: -1,
     pitch: "Five years later, you find Maya on the cabin's deck as if nothing had changed. Then the door opens behind her.",
     lines: [[0, "Toi ? Ici ? Ça fait quoi, cinq ans ?"], [0, "T'as pas changé. Enfin… un peu."], [-1, "Elle enlève ses lunettes. Elle te regarde comme avant."], [0, "Tu savais que je serais là, hein ?"], [0, "Personne vient ici par hasard."], [-1, "Derrière elle, quelqu'un sort du chalet. Ton ex-meilleur ami."], [0, "Ah. J'aurais dû te dire."]] },
-  { id: 'verre', title: 'Le dernier verre', by: '@marieb', plays: '12,4 k', bg: 'terrasse', pos: '35% 50%', fx: 'saturate(1.25) brightness(.8)', glow: '#ff8a5c',
-    full: 'd_verre', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'brooke', pose: 'drunk_joke', name: 'Brooke' }, tease: 'Coming soon.' }],
-    cast: [['brooke', 'drunk_talk'], ['cam', 'flirty']], players: 2, byoc: false, live: { strangers: 1 }, you: 0,
-    pitch: "Cam finally dared to sit next to you. Her phone buzzes for the third time — and she won't say who it is.",
-    lines: [[1, "Si je te dis un secret, tu me promets de pas partir ?", "flirty"], [0, "Ça dépend. C'est un beau secret ou un laid ?", "drunk_joke"], [1, "Les deux.", "tipsy_laugh"], [-1, "Son téléphone vibre. Elle le retourne, écran contre la table."], [0, "C'était lui ?", "drunk_listen"], [1, "…Comment tu sais qu'il y a un « lui » ?", "awkward"], [0, "T’as retourné ton téléphone. Personne fait ça pour sa mère.", "drunk_point"], [1, "Il sait que je suis ici. Avec toi.", "worried"], [0, "Et c'est un problème ?", "drunk_talk"], [1, "Ça va le devenir.", "sip"], [-1, "Le téléphone vibre encore. Trois fois."], [1, "Faut que tu partes. Maintenant.", "worried"]] },
   { id: 'table', title: 'Sous la table', by: '@nego_club', plays: '8,1 k', bg: 'salon', pos: '60% 50%', fx: 'hue-rotate(190deg) brightness(.45) saturate(.8)', glow: '#5cc8ff',
     full: 'd_table', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'julian', pose: 'smirk', name: 'Julian' }, tease: 'Coming soon.' }],
     cast: [['suit', 'adjust'], ['julian', 'smirk']], players: 1, byoc: true, live: null, you: 0,
@@ -861,46 +856,6 @@ const DEMOS = [
     cast: [['ruby', 'holding'], ['james', 'thinking'], ['diane', 'explaining']], players: 3, byoc: true, live: { friend: 'Léa', strangers: 1, since: 3 }, you: 0,
     pitch: "Three roommates each get a key, without a word. Behind the door: the room of Sophie, who left without saying goodbye six months ago… except to one of them.",
     lines: [[0, "Qui a mis une clé dans ma boîte aux lettres ?", "holding"], [1, "Moi aussi, j'en ai reçu une.", "surprised"], [2, "Moi aussi. C'est la clé de la chambre de Sophie.", "explaining"], [0, "Sophie est partie il y a six mois.", "angry"], [2, "Elle t'a dit au revoir, à toi, James ?", "angry"], [1, "…Pourquoi tu me regardes comme ça ?", "surprised"], [2, "Parce qu'elle m'a écrit la veille. Elle avait peur de toi.", "explaining"], [1, "C'est faux.", "thinking"], [0, "Alors ouvre la porte en premier.", "listen"], [-1, "Trois clés. Une serrure. James ne bouge pas."]] },
-  { id: 'appel', title: 'Appel manqué', by: '@justin', plays: '5,6 k', bg: 'maison', pos: '30% 50%', fx: 'grayscale(.6) brightness(.45) hue-rotate(180deg)', glow: '#7aa7ff',
-    full: 'd_appel', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'justin_b', pose: 'phone_call', name: 'Justin' }, tease: 'Coming soon.' }],
-    cast: [['justin', 'phone_shock']], players: 1, byoc: false, live: null, you: 0,
-    pitch: "17 missed calls from your brother. When you get to his place, the door is open, the TV is on, and he left you a note: “Don't look for me.”",
-    lines: [[0, "Marco ? Marco, réponds !", "phone_call"], [-1, "Messagerie. Pour la dix-septième fois."], [0, "T'as laissé ta porte ouverte, man…", "surprised"], [-1, "La télé allumée. Le son coupé. Une assiette encore chaude."], [0, "Il était là. Il y a cinq minutes.", "thinking"], [-1, "Sur la table, une note. Son écriture."], [0, "« Ne me cherche pas. Ils écoutent. »", "phone_shock"], [0, "Qui ça, « ils » ?", "listen"], [-1, "Ton téléphone vibre. Numéro inconnu."], [0, "…Allô ?", "phone_call"]] },
-  { id: 'mensonge', title: 'Où étais-tu hier soir ?', by: '@ruby_writes', plays: '9,3 k', bg: 'salon', pos: '40% 50%', fx: 'hue-rotate(320deg) brightness(.6) saturate(1.4)', glow: '#ff5c8a',
-    full: 'd_mensonge', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'james_noir', pose: 'angry', name: 'James' }, tease: 'Coming soon.' }],
-    cast: [['ruby', 'angry'], ['james', 'listen']], players: 2, byoc: false, live: { friend: 'Max', since: 6 }, you: 0,
-    pitch: "A receipt for two, a Tuesday, 10 p.m. James has an explanation. Then a second one. Then his phone buzzes.",
-    lines: [[0, "C'est qui, « Marc », qui commande le tiramisu pour deux ?", "angry"], [1, "Un client.", "explaining"], [0, "Un mardi. À 22 h.", "thinking"], [1, "Les clients sont pas toujours dispos le jour.", "listen"], [0, "Appelle-le. Maintenant. Sur haut-parleur.", "holding"], [1, "Ruby…", "thinking"], [0, "Appelle-le.", "angry"], [-1, "Le téléphone de James vibre dans sa main. « Merci pour hier ❤ »"], [1, "Je peux t’expliquer.", "surprised"], [0, "Non. Lis-le à voix haute.", "explaining"]] },
-  { id: 'nuit', title: 'Nuit blanche', by: '@insomnie', plays: '3,2 k', bg: 'terrasse', pos: '20% 50%', fx: 'hue-rotate(220deg) brightness(.38) saturate(1.5)', glow: '#9b8cff',
-    full: 'd_nuit', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'isa_noir', pose: 'holding', name: 'Isa (braise)' }, tease: 'Coming soon.' }],
-    cast: [['isa_nuit', 'thinking']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "4 a.m., on the roof, a stranger was waiting for you. She knows your real name — and she says you don't have much time left.",
-    lines: [[0, "Enfin. Je pensais que tu viendrais plus tôt.", "listen"], [0, "Fais pas cette tête. On s'est déjà parlé.", "explaining"], [0, "Pas ici. Pas comme ça. Mais souvent.", "thinking"], [0, "Tu te souviens de rien, hein ?", "surprised"], [-1, "Au loin, toutes les lumières de la ville s'éteignent. D'un coup."], [0, "Ok. On a moins de temps que prévu.", "angry"], [0, "Tu me fais confiance ?", "holding"]] },
-  { id: 'gala', title: "Gala d'or", by: '@galanoir', plays: '14 k', bg: 'salon', pos: '55% 50%', fx: 'sepia(.9) saturate(2) brightness(.6) hue-rotate(-10deg)', glow: '#ffd24d',
-    full: 'd_gala', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'isa_or', pose: 'holding', name: 'Isa (or)' }, tease: 'Coming soon.' }],
-    cast: [['isa_or', 'holding'], ['suit', 'adjust'], ['julian', 'cold']], players: 3, byoc: true, live: { strangers: 1, since: 2 }, you: 1,
-    pitch: "The necklace just vanished and the doors are locked. Three guests, three alibis — only one is true.",
-    lines: [[0, "Mon collier était à mon cou il y a dix minutes.", "angry"], [1, "Et vous m'accusez ? Je ne touche pas aux bijoux.", "angry"], [2, "Seulement aux contrats.", "smirk"], [0, "Personne ne sort d'ici avant que je le retrouve.", "holding"], [-1, "Les portes se ferment. Clic. Clic. Clic."], [2, "Je l'ai vu près du vestiaire, lui.", "cold"], [1, "Et vous, on vous a vu près de madame.", "adjust"], [0, "Alors on va jouer à un jeu. Le premier qui ment…", "explaining"], [2, "…perd quoi ?", "listen"], [0, "Tout.", "thinking"]] },
-  { id: 'coloc', title: 'Le colocataire', by: '@amare.stories', plays: '6,7 k', bg: 'maison', pos: '65% 50%', fx: 'brightness(.85) saturate(.7)', glow: '#c8ffd9',
-    full: 'd_coloc', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'amare', pose: 'holding', name: 'Amare' }, tease: 'Coming soon.' }],
-    cast: [['amare', 'listen']], players: 1, byoc: true, live: null, you: -1,
-    pitch: "Your new roommate cooks, cleans and pays in advance. He never sleeps — and he already knows what's waiting for you tomorrow.",
-    lines: [[0, "T'as bien dormi ? Je t'ai entendu rêver.", "listen"], [0, "De la mer. Encore.", "thinking"], [0, "Moi ? Non, je dors jamais vraiment. C'est une condition.", "explaining"], [-1, "Sur le comptoir, ton agenda. Ouvert à demain. Annoté. Pas par toi."], [0, "Demain va être une grosse journée pour toi.", "holding"], [0, "J'ai juste voulu être prêt.", "surprised"], [0, "Toi, t'es prêt ?", "listen"]] },
-  { id: 'feu', title: 'Autour du feu', by: '@campfire', plays: '11,2 k', bg: 'terrasse', pos: '50% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(.4)', glow: '#ff7a2e',
-    full: 'd_feu', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'brooke', pose: 'sit_fire', name: 'Brooke' }, tease: 'Coming soon.' }],
-    cast: [['brooke', 'sit_fire'], ['justin', 'listen']], players: 2, byoc: true, live: { friend: 'Inès', since: 12 }, you: 1,
-    pitch: "A ghost story at the cabin, told by two. Every time someone lies, the fire dies down… and it just did.",
-    lines: [[0, "Tu veux la vraie histoire du lac ou celle qu'on raconte aux enfants ?", "sit_fire"], [1, "La vraie.", "listen"], [0, "Une fille nageait ici toutes les nuits. Un soir, elle est remontée… avec quelqu'un.", "drunk_talk"], [-1, "Le feu baisse d'un coup."], [1, "T'as vu ça ?", "surprised"], [0, "C'est le vent.", "nervous"], [1, "Y a pas de vent.", "angry"], [0, "…Alors quelqu'un vient de mentir.", "nervous"]] },
-  { id: 'candy', title: 'Candy ne ment jamais', by: '@sucre', plays: '4,4 k', bg: 'terrasse', pos: '80% 50%', fx: 'hue-rotate(290deg) saturate(1.6) brightness(.85)', glow: '#ff9ce6',
-    full: 'd_candy', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'candy', pose: 'explaining', name: 'Candy' }, tease: 'Coming soon.' }],
-    cast: [['candy', 'explaining']], players: 1, byoc: false, live: null, you: -1,
-    pitch: "Candy never lies. Never. And she just sat down at brunch between your mom and your boyfriend.",
-    lines: [[0, "J'adore ta mère ! Elle est exactement comme tu l'as décrite.", "explaining"], [0, "Non mais pas dans le mauvais sens. Juste… intense.", "thinking"], [0, "Pis toi, t'es le fameux chum ! Celui du test.", "holding"], [-1, "Ton chum pose sa fourchette. Ta mère aussi."], [0, "Oups. Il savait pas pour le test ?", "surprised"], [0, "Bon. Je mens jamais, alors je vais tout dire.", "explaining"], [0, "Aïe ! Pourquoi tu me donnes des coups de pied ?", "angry"], [0, "Version courte : il a passé. De justesse.", "listen"]] },
-  { id: 'contrat', title: 'Un dernier boulot', by: '@julianfiles', plays: '7,8 k', bg: 'salon', pos: '25% 50%', fx: 'grayscale(1) brightness(.55) contrast(1.2)', glow: '#ffffff',
-    full: 'd_contrat', taps: 8, cut: '0-8', eps: [{ title: 'Episode 1', win: { sprite: 'julian', pose: 'cold', name: 'Julian' }, tease: 'Coming soon.' }],
-    cast: [['julian', 'talk']], players: 1, byoc: false, live: null, you: -1,
-    pitch: "One last job: easy, well paid, no risk. That's exactly what Julian said last time.",
-    lines: [[0, "Un dernier boulot. Après, tu me revois plus jamais.", "talk"], [0, "Je sais. J'ai dit ça la dernière fois.", "hands_up"], [0, "Une enveloppe. Point A, point B. Dix mille.", "offer"], [-1, "L'enveloppe est lourde. Trop pour du papier."], [0, "Pose pas de questions, c'est inclus dans le prix.", "cold"], [0, "Et regarde-moi. Pas l'homme derrière moi.", "cold"], [0, "Alors ? On a un deal ?", "listen"]] },
 ];
 // drawn settings (no photo for these): a beach in full sun, a forest at night
 const pines = (n, y0, h, fill, seed) => Array.from({ length: n }, (_, k) => { const x = (k + .5) * 400 / n + ((seed * (k + 3)) % 17) - 8, t = h * (.7 + ((seed * k) % 5) / 10); return `<path d="M${x} ${y0 - t}l${t * .28} ${t}h${-t * .56}z" fill="${fill}"/>`; }).join('');
@@ -911,17 +866,8 @@ const DECOR = {
 };
 const total = (d) => d.taps || d.lines.length;
 const POSTER = {
-  verre: { bg: 'salon', pos: '30% 50%', fx: 'hue-rotate(200deg) brightness(.45)', cast: [['cam', 'worried'], ['brooke', 'drunk_sad']] },
   table: { bg: 'maison', pos: '80% 50%', fx: 'hue-rotate(200deg) saturate(.6) brightness(.35)', cast: [['suit', 'angry']] },
   cles: { bg: 'salon', pos: '70% 50%', fx: 'hue-rotate(330deg) saturate(1.6) brightness(.4)', cast: [['ruby', 'surprised'], ['james', 'surprised'], ['diane', 'angry']] },
-  appel: { bg: 'salon', pos: '40% 50%', fx: 'grayscale(.5) brightness(.35) hue-rotate(190deg)', cast: [['justin', 'punch']] },
-  mensonge: { bg: 'terrasse', pos: '75% 50%', fx: 'sepia(.6) hue-rotate(-30deg) brightness(.55)', cast: [['james', 'surprised'], ['ruby', 'holding']] },
-  nuit: { bg: 'maison', pos: '50% 50%', fx: 'hue-rotate(300deg) saturate(1.8) brightness(.35)', cast: [['isa_nuit', 'angry']] },
-  gala: { bg: 'terrasse', pos: '30% 50%', fx: 'hue-rotate(220deg) brightness(.35)', cast: [['julian', 'smirk'], ['isa_or', 'angry']] },
-  coloc: { bg: 'salon', pos: '85% 50%', fx: 'hue-rotate(160deg) brightness(.3)', cast: [['amare', 'surprised']] },
-  feu: { bg: 'forest', fx: 'sepia(.5) hue-rotate(-30deg) saturate(1.6)', cast: [['justin', 'surprised'], ['brooke', 'nervous']] },
-  candy: { bg: 'salon', pos: '10% 50%', fx: 'saturate(1.4) brightness(.95)', cast: [['candy', 'angry']] },
-  contrat: { bg: 'terrasse', pos: '90% 50%', fx: 'grayscale(1) brightness(.4)', cast: [['suit', 'offer'], ['julian', 'cold']] },
   beliers: { bg: 'forest', fx: 'hue-rotate(60deg) brightness(.9)', cast: [['belier_noir', 'stand']] },
   ombre: { bg: 'forest', fx: 'hue-rotate(320deg) saturate(3) brightness(.7)', cast: [['ombre', 'stand']] },
   serment: { bg: 'maison', pos: '30% 50%', fx: 'sepia(1) saturate(3) hue-rotate(-30deg) brightness(.4)', cast: [['exile', 'stand']] },
@@ -943,7 +889,8 @@ if (loveAlex) {
 for (const d of DEMOS) if (POSTER[d.id]) d.poster = POSTER[d.id];
 // the onboarding's 4 stories (series.js), in the catalog like the others: their cover is their world, their preview their
 // opening in the game (onbstories.js: full = o_<taste>), their episodes series.js's (placeholders until they're written)
-for (const [k, T] of Object.entries(SERIES.TASTES)) DEMOS.push({ id: 's_' + k, series: k, full: 'o_' + k, title: T.title, by: '@unwritten', plays: '—',
+// 13/11: Justin took them out of the catalog (Regarde-moi bien, Interdite, Personne se souvient, Ouvre pas)
+if (false) for (const [k, T] of Object.entries(SERIES.TASTES)) DEMOS.push({ id: 's_' + k, series: k, full: 'o_' + k, title: T.title, by: '@unwritten', plays: '—',
   glow: T.color, players: 1, byoc: false, live: null, you: -1, taps: 12, pitch: T.hook, cast: [], lines: [], eps: T.eps.map((e) => ({ title: e.title, tease: '' })) });
 // ---- your character: plays the "Ton perso" part of a preview (and stands in the scene when the story says "tu") ----
 const STD = ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'];
@@ -1009,8 +956,8 @@ const actors = (cast, who = -1) => { const fl = flips(cast, who); return cast.ma
 const turn = (imgs, cast, who) => { const fl = flips(cast, who); imgs.forEach((img, k) => img.style.setProperty('--fx', fl[k] ? -1 : 1)); };
 
 // the player's own demos (from the + tab) go first, then the stories of the taste picked at the start (onboarding), then the rest
-const TASTE = { s_desir: 'desir', s_revanche: 'revanche', s_danger: 'danger', s_etrange: 'etrange', verre: 'desir', ete: 'desir', mensonge: 'desir', candy: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
-  lastcall: 'danger', appel: 'danger', cles: 'danger', gala: 'danger', contrat: 'danger', ombre: 'etrange', ile: 'etrange', nuit: 'etrange', coloc: 'etrange', feu: 'etrange' };
+const TASTE = { s_desir: 'desir', s_revanche: 'revanche', s_danger: 'danger', s_etrange: 'etrange', ete: 'desir', serment: 'revanche', table: 'revanche', beliers: 'revanche',
+  lastcall: 'danger', cles: 'danger', ombre: 'etrange', ile: 'etrange' };
 const myTaste = (keep.get('onb', {}) || {}).k;
 const ofMyTaste = (d) => !!myTaste && TASTE[d.id] === myTaste;
 const mine = keep.get('mine', []);
@@ -1018,12 +965,12 @@ const all = () => [...mine, ...DEMOS.filter(ofMyTaste), ...DEMOS.filter((d) => !
 const byId = (id) => all().find((d) => d.id === id);
 const SHELVES = [
   ...(myTaste ? [['For you', ofMyTaste]] : []),
-  ['Trending', ['lastcall', 'ile', 'serment', 'cles', 'verre', 'gala', 'feu', 'mensonge']],
+  ['Trending', ['lastcall', 'ile', 'serment', 'cles']],
   ['Someone is waiting', (d) => d.live],
   ['With friends', (d) => d.players > 1],
   ['Bring your character', (d) => d.byoc],
   ['Solo', (d) => d.players === 1],
-  ['New', ['beliers', 'ombre', 'serment', 'ete', 'candy', 'nuit', 'contrat', 'coloc', 'appel', 'table']],
+  ['New', ['beliers', 'ombre', 'serment', 'ete', 'table']],
 ];
 const shelf = (pick) => typeof pick === 'function' ? all().filter(pick) : pick.map(byId).filter(Boolean);
 
@@ -1199,7 +1146,7 @@ const R = {
       <div class="strip">${a.map((x) => `<div class="card${x.id === d.id ? ' sel' : ''}" data-act="spot" data-id="${x.id}">${cover(x).replace(/<div class="cvt">.*?<\/div>/, '')}</div>`).join('')}</div></div>`;
   },
 };
-const TEST = { id: 'verre' };
+const TEST = { id: 'table' };
 // a demo's colour per character (the bubble's name tag), like the game's
 const TINT = { brooke: '#2a4f8f', cam: '#3b1f6e', justin: '#1f7a74', justin_bar: '#1f7a74', ruby: '#3b1f6e', james: '#6e2b2b', diane: '#5a2a3a', julian: '#6b5a3a', suit: '#26262b' };
 function stageHtml(d, i, mode, feed) {
@@ -1422,8 +1369,8 @@ function saveNote() {
 }
 // a new profile's En cours: its story (the taste picked at the start) first, then one more of its taste and one of another
 // (Last call, the one story fully written, is one of them)
-const SAME = { revanche: 'table', desir: 'verre', etrange: 'nuit', danger: 'lastcall' };
-const OTHER = { revanche: 'lastcall', desir: 'lastcall', etrange: 'lastcall', danger: 'verre' };
+const SAME = { revanche: 'table', desir: 'ete', etrange: 'ombre', danger: 'lastcall' };
+const OTHER = { revanche: 'lastcall', desir: 'lastcall', etrange: 'lastcall', danger: 'ete' };
 function seedHome() {
   const o = SERIES.onb(); if (!o || !SERIES.TASTES[o.k]) return;
   const sid = 's_' + o.k;
