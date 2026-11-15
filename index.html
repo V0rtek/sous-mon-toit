@@ -788,9 +788,10 @@ html.locked #infosBtn { display: none !important; }
 #keyBtn { display: none; position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: 5em; height: 5em; border: 0; border-radius: 50%; background: transparent; color: #f5f5f7; opacity: .25; cursor: pointer; padding: 0; }
 #keyBtn svg { width: 2.6em; height: 2.6em; }
 html.locked #keyBtn { display: grid; place-items: center; }
-/* unlocked: an eye at the lock's spot shows the home as a visitor sees it (this visit only); the lock brings it back, no code */
+/* unlocked: at the lock's spot, a full reset (14/11): forget the code and everything, back to a brand-new visitor (2 taps) */
 #peekBtn { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; align-items: center; gap: .6em; border: 0; background: transparent; color: #f5f5f7; opacity: .35; cursor: pointer; font: inherit; font-size: 1.8em; padding: .5em 1em; }
 #peekBtn svg { width: 1.6em; height: 1.6em; }
+#peekBtn.sure { opacity: 1; color: #ff453a; }
 html.locked #peekBtn { display: none; }
 #keyForm { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); display: flex; gap: 1em; }
 #keyForm[hidden] { display: none; }
@@ -2228,7 +2229,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <a href="review.html" id="reviewBtn"><b>Review</b></a>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
-    <button type="button" id="peekBtn" aria-label="Voir en visiteur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Vue visiteur</span></button>
+    <button type="button" id="peekBtn" aria-label="Reset: new user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Reset · new user</span></button>
     <button type="button" id="keyBtn" aria-label="Access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
   </div>
@@ -5732,11 +5733,18 @@ $('#showrunner').onclick = (e) => { if (!e.target.closest('.srLink')) return; e.
 window.SPARK_TO_SHOWRUNNER = () => { UP['#showrunner'] = '#deck'; $('#showrunner').scrollTop = 0; show('#showrunner'); };
 $('#brainBtn').onclick = (e) => { e.stopPropagation(); $('#brainstorm').scrollTop = 0; show('#brainstorm'); };   // the demos to make, and the picture of it
 $('#sparkBtn').onclick = (e) => { e.stopPropagation(); UP['#deck'] = '#secSell'; show('#deck'); DECK.mount($('#deck')); };   // opens on slide 0: Préparer and the plan
-// visitor view (13/11): unlocked, the eye puts the façade back for this visit; the lock then reopens without the code
-let peeking = false;
-$('#peekBtn').onclick = (e) => { e.stopPropagation(); peeking = true; document.documentElement.classList.add('locked'); };
+// full reset (14/11, replaces the visitor view): this browser forgets the code and everything it kept (progress, profile,
+// stats id, characters made), then reloads as a brand-new visitor. Only the Haiku key (smt-key) stays. A 1st tap arms it
+$('#peekBtn').onclick = async (e) => {
+  e.stopPropagation(); const b = $('#peekBtn');
+  if (!b.classList.contains('sure')) { b.classList.add('sure'); b.querySelector('span').textContent = 'Tap again: wipe everything'; setTimeout(() => { b.classList.remove('sure'); b.querySelector('span').textContent = 'Reset · new user'; }, 4000); return; }
+  b.querySelector('span').textContent = 'Resetting…';
+  try { const k = localStorage.getItem('smt-key'); localStorage.clear(); if (k) localStorage.setItem('smt-key', k); } catch { /* private window */ }
+  try { sessionStorage.clear(); } catch { /* private window */ }
+  try { const dbs = indexedDB.databases ? await indexedDB.databases() : [{ name: 'smt-chars' }]; await Promise.all(dbs.map((d) => new Promise((ok) => { const r = indexedDB.deleteDatabase(d.name); r.onsuccess = r.onerror = r.onblocked = ok; }))); } catch { /* no IndexedDB */ }
+  location.replace(location.pathname);
+};
 $('#keyBtn').onclick = (e) => { e.stopPropagation();
-  if (peeking) { peeking = false; document.documentElement.classList.remove('locked'); return; }
   $('#keyBtn').hidden = true; $('#keyForm').hidden = false; $('#keyIn').focus(); };
 $('#keyForm').onclick = (e) => e.stopPropagation();
 $('#keyForm').onsubmit = (e) => {
