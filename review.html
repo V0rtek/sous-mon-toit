@@ -75,14 +75,9 @@ textarea:focus { border-color: var(--ink); }
 
 <script src="usage.js"></script>
 <script>
-// the simple questions: one per screen, a tap answers and moves on
-const QS = [
-  ['What do you watch the most?', ['TikTok / Reels / Shorts', 'Netflix, series, movies', 'YouTube', 'Video games', 'Not much, honestly']],
-  ['How much a day?', ['Under 30 min', 'About 1 h', '2–3 h', 'More than 3 h']],
-  ['Ever played a story where your choices change it?', ['Yes, loved it', 'Tried it, meh', 'Never']],
-  ['Tonight, you’d rather…', ['Just watch', 'Decide what happens', 'Both']],
-  ['Would you pay for a story that reacts to you?', ['Yes', 'Maybe', 'No']],
-];
+// the simple questions: one per screen, a tap answers and moves on. [question, [answers]]
+// (15/11) EMPTY on purpose: Justin writes them with Claude, never Claude alone
+const QS = [];
 const yapScr = document.getElementById('s-yap'), ans = [];
 QS.forEach(([q, opts], i) => {
   const s = document.createElement('section'); s.className = 'scr'; s.id = 's-q' + i;
