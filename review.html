@@ -2,57 +2,122 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Review - Unwritten</title>
 <style>
-/* (14/11) the home's Review strip: ONE question, a white 2008-looking form. The answer goes with the other reviews
-   (usage.js notes, story 'review'): the game's Stats › Derniers avis shows it */
-body { margin: 0; background: #fff; color: #333; font: 13px/1.5 Verdana, Tahoma, Arial, sans-serif; }
-#top { background: linear-gradient(#f7f7f7, #dcdcdc); border-bottom: 1px solid #b5b5b5; padding: 8px 14px; }
-#top a { color: #0645ad; font-size: 12px; }
-#box { max-width: 520px; margin: 28px auto; padding: 0 14px; }
-h1 { margin: 0 0 4px; font: bold 20px Arial, Helvetica, sans-serif; color: #224; }
-.sub { margin: 0 0 16px; color: #777; font-size: 11px; }
-fieldset { border: 1px solid #c8c8c8; background: #fafafa; padding: 12px 14px 14px; margin: 0; }
-legend { padding: 0 4px; font-weight: bold; color: #444; }
-label { display: block; margin-bottom: 6px; font-weight: bold; }
-textarea { box-sizing: border-box; width: 100%; height: 130px; padding: 4px; border: 1px solid; border-color: #7c7c7c #c3c3c3 #ddd; font: 13px Verdana, Tahoma, Arial, sans-serif; background: #fff; resize: vertical; }
-.row { margin-top: 10px; display: flex; align-items: center; gap: 10px; }
-button { font: 12px Verdana, Tahoma, Arial, sans-serif; padding: 3px 14px; border: 1px solid #8a8a8a; border-radius: 3px; background: linear-gradient(#fff, #ddd); color: #000; cursor: pointer; }
-button:active { background: linear-gradient(#ddd, #fff); }
-.req { color: #c00; }
-#ok { display: none; border: 1px solid #9c9; background: #efe; color: #060; padding: 8px 10px; margin-top: 12px; }
-#err { color: #c00; font-size: 11px; display: none; }
-#foot { margin-top: 26px; color: #999; font-size: 10px; text-align: center; }
+/* (15/11) the home's Review: Justin's face + the why, a few tap questions, an optional yap, then straight to the Demos.
+   The answers go with the other reviews (usage.js notes, story 'review': Stats › Derniers avis) + st.rv (the raw taps) */
+:root { --ink: #1d1d1f; --mute: #86868b; --line: #e5e5ea; --go: #34c759; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: #fff; color: var(--ink); font: 17px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+#bar { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--line); z-index: 5; }
+#bar i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .35s ease; }
+#back { position: fixed; top: 14px; left: 10px; z-index: 5; border: 0; background: none; padding: 8px; color: var(--mute); cursor: pointer; }
+#back svg { width: 24px; height: 24px; display: block; }
+#back[hidden] { display: none; }
+.scr { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 22px; padding: 64px 24px 40px; text-align: center; overflow-y: auto; opacity: 0; transform: translateX(40px); pointer-events: none; transition: opacity .3s ease, transform .3s ease; }
+.scr.on { opacity: 1; transform: none; pointer-events: auto; }
+.scr.out { transform: translateX(-40px); }
+.in { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+h1 { margin: 0; font-size: clamp(28px, 8vw, 40px); line-height: 1.08; font-weight: 800; letter-spacing: -.02em; }
+h2 { margin: 0; font-size: clamp(24px, 6.6vw, 32px); line-height: 1.12; font-weight: 800; letter-spacing: -.015em; }
+p { margin: 0; color: var(--mute); }
+.big { font-size: 19px; color: var(--ink); }
+/* the face: me.jpg when it exists, otherwise the note to put one */
+#face { width: 148px; height: 148px; border-radius: 50%; overflow: hidden; background: #f2f2f7; box-shadow: 0 10px 30px rgba(0,0,0,.12); display: grid; place-items: center; }
+#face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#face .todo { padding: 14px; font-size: 11px; font-weight: 800; line-height: 1.25; color: #ff3b30; border: 2px dashed #ff3b30; border-radius: 50%; width: 100%; height: 100%; display: grid; place-items: center; }
+.deal { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; font-weight: 700; font-size: 15px; color: var(--ink); background: #f2f2f7; border-radius: 99px; padding: 10px 18px; }
+.deal b { color: var(--go); }
+.go { width: 100%; max-width: 420px; font: inherit; font-weight: 700; font-size: 18px; padding: 16px; border-radius: 99px; border: 0; background: var(--ink); color: #fff; cursor: pointer; transition: transform .1s; }
+.go:active { transform: scale(.97); }
+.skip { font: inherit; font-size: 15px; font-weight: 600; border: 0; background: none; color: var(--mute); cursor: pointer; padding: 6px; }
+.opts { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.opts button { font: inherit; font-weight: 600; text-align: left; padding: 15px 18px; border-radius: 16px; border: 2px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; transition: border-color .15s, background .15s, transform .1s; }
+.opts button:active { transform: scale(.98); }
+.opts button.on { border-color: var(--ink); background: var(--ink); color: #fff; }
+.n { font-size: 13px; font-weight: 700; color: var(--mute); letter-spacing: .06em; text-transform: uppercase; }
+textarea { width: 100%; height: 160px; padding: 14px 16px; border-radius: 16px; border: 2px solid var(--line); font: inherit; resize: none; outline: none; color: var(--ink); }
+textarea:focus { border-color: var(--ink); }
+.check { width: 84px; height: 84px; border-radius: 50%; background: var(--go); display: grid; place-items: center; animation: pop .45s cubic-bezier(.2,1.6,.4,1); }
+.check svg { width: 44px; height: 44px; }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 </style>
 </head>
 <body>
-<div id="top"><a href="./">&laquo; Back to Unwritten</a></div>
-<div id="box">
-  <h1>Review</h1>
-  <p class="sub">One question. Be honest, it helps more than nice words.</p>
-  <form id="f">
-    <fieldset>
-      <legend>Your feedback</legend>
-      <label for="a">What sucked the most? <span class="req">*</span></label>
-      <textarea id="a" maxlength="2000"></textarea>
-      <div class="row"><button type="submit">Submit</button><span id="err">Please write something first.</span></div>
-      <div id="ok">Thank you! Your review was sent.</div>
-    </fieldset>
-  </form>
-  <div id="foot">&copy; 2008 Unwritten &middot; Best viewed in 1024&times;768</div>
-</div>
+<div id="bar"><i></i></div>
+<button id="back" type="button" aria-label="Back" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+<section class="scr on" id="s-hi"><div class="in">
+  <!-- TODO Justin: PUT A WHOLESOME PIC OF ME here (save it as me.jpg next to this page, square, smiling) -->
+  <div id="face"><img src="me.jpg" alt="Justin" onerror="this.parentNode.innerHTML='<span class=todo>PUT A WHOLESOME PIC OF ME<br>(me.jpg)</span>'"></div>
+  <h1>Hey, I’m Justin.</h1>
+  <p class="big">I’m trying to create the next leading entertainment platform. Sustainable in a time of AI abundance, built on the new tech that matters.</p>
+  <div class="deal">10 minutes <b>→</b> direct access to our demos</div>
+  <button class="go" type="button" data-next>Let’s go</button>
+</div></section>
+
+<section class="scr" id="s-yap"><div class="in">
+  <h2>Add a yap?</h2>
+  <p>Explain anything. What you love, what bores you, what you’d pay for.</p>
+  <textarea id="yap" maxlength="2000" placeholder="Optional"></textarea>
+  <button class="go" type="button" id="send">Send</button>
+  <button class="skip" type="button" id="noyap">Skip</button>
+</div></section>
+
+<section class="scr" id="s-done"><div class="in">
+  <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <h2>You’re in. Thank you.</h2>
+  <p>The demos are open.</p>
+  <a class="go" href="./#demos" style="text-decoration:none;text-align:center">Open the demos</a>
+</div></section>
+
 <script src="usage.js"></script>
 <script>
-document.getElementById('f').onsubmit = (e) => {
-  e.preventDefault();
-  const a = document.getElementById('a'), text = a.value.trim();
-  document.getElementById('err').style.display = text ? 'none' : 'inline';
-  if (!text) return;
-  if (window.USAGE) USAGE.bump((st) => { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: 'review', text, n: '' }); st.notes.length = Math.min(st.notes.length, 30); });
+// the simple questions: one per screen, a tap answers and moves on
+const QS = [
+  ['What do you watch the most?', ['TikTok / Reels / Shorts', 'Netflix, series, movies', 'YouTube', 'Video games', 'Not much, honestly']],
+  ['How much a day?', ['Under 30 min', 'About 1 h', '2–3 h', 'More than 3 h']],
+  ['Ever played a story where your choices change it?', ['Yes, loved it', 'Tried it, meh', 'Never']],
+  ['Tonight, you’d rather…', ['Just watch', 'Decide what happens', 'Both']],
+  ['Would you pay for a story that reacts to you?', ['Yes', 'Maybe', 'No']],
+];
+const yapScr = document.getElementById('s-yap'), ans = [];
+QS.forEach(([q, opts], i) => {
+  const s = document.createElement('section'); s.className = 'scr'; s.id = 's-q' + i;
+  s.innerHTML = `<div class="in"><span class="n">${i + 1} / ${QS.length}</span><h2></h2><div class="opts"></div></div>`;
+  s.querySelector('h2').textContent = q;
+  const box = s.querySelector('.opts');
+  opts.forEach((o) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = o;
+    b.onclick = () => { box.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); ans[i] = o; setTimeout(next, 260); };
+    box.appendChild(b);
+  });
+  document.body.insertBefore(s, yapScr);
+});
+const scr = [...document.querySelectorAll('.scr')];
+let at = 0;
+function go(to) {
+  scr[at].classList.remove('on'); scr[at].classList.toggle('out', to > at);
+  scr[to].classList.remove('out'); scr[to].classList.add('on'); at = to;
+  document.querySelector('#bar i').style.width = (100 * at / (scr.length - 1)) + '%';
+  document.getElementById('back').hidden = at === 0 || at === scr.length - 1;
+}
+const next = () => go(Math.min(at + 1, scr.length - 1));
+document.querySelector('[data-next]').onclick = next;
+document.getElementById('back').onclick = () => go(Math.max(at - 1, 0));
+function finish(yap) {
+  const text = [...QS.map(([q], i) => ans[i] && `${q} ${ans[i]}`).filter(Boolean), yap && `Yap: ${yap}`].filter(Boolean).join(' · ');
+  if (window.USAGE && text) USAGE.bump((st) => {
+    st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: 'review', text, n: '' }); st.notes.length = Math.min(st.notes.length, 30);
+    st.rv = { at: Date.now(), a: QS.map(([q], i) => [q, ans[i] || null]), yap: yap || '' };
+  });
   try { localStorage.setItem('smt-reviewed', '1'); } catch { /* private window */ }   // the game: account in Demos, no ask before the website
-  a.value = ''; document.getElementById('ok').style.display = 'block';
-};
+  go(scr.length - 1);
+}
+document.getElementById('send').onclick = () => finish(document.getElementById('yap').value.trim());
+document.getElementById('noyap').onclick = () => finish('');
 </script>
 </body>
 </html>

@@ -2246,7 +2246,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
     </div>
   </div>
-  <div id="siteAsk" hidden role="dialog"><div class="saBox"><p class="saBig">Leave a review first?</p><p class="saSub">One question, 20 seconds. It helps a lot.</p><a class="saGo" href="review.html">Do the review</a><a class="saSkip" href="site.html">Go to the website anyway</a></div></div>
+  <div id="siteAsk" hidden role="dialog"><div class="saBox"><p class="saBig">Leave a review first?</p><p class="saSub">A few taps. It helps a lot.</p><a class="saGo" href="review.html">Do the review</a><a class="saSkip" href="site.html">Go to the website anyway</a></div></div>
   <div id="infos" class="card menu" hidden>
     <div class="strips">
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée<svg class="pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></b></button>
@@ -6693,6 +6693,8 @@ else { if (AS) $('#whoName').value = AS; $('#whoForm .pill').click(); }   // str
     else { openAfterName = null; state.name = 'You'; show('#hub'); share(); openFromDemo(o[1]); }   // Full demo never asks your name
   }
 }
+// 15/11: review.html's last button lands straight in Demos
+if (location.hash === '#demos' && ROLE === 'host') { history.replaceState(null, '', location.pathname + location.search); setTimeout(() => show('#demos'), 0); }
 const jump = location.hash.match(/^#([tpb])(\d+)$/);
 if (jump) skipTo(+jump[2], { t: 't1', p: 'play', b: 'bar' }[jump[1]]);
 // warm the cache so cuts never flash (not for a preview: it plays one stretch, and Full demo has several of them)
