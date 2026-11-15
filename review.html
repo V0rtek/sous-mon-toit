@@ -50,6 +50,7 @@ document.getElementById('f').onsubmit = (e) => {
   document.getElementById('err').style.display = text ? 'none' : 'inline';
   if (!text) return;
   if (window.USAGE) USAGE.bump((st) => { st.notes = st.notes || []; st.notes.unshift({ at: Date.now(), story: 'review', text, n: '' }); st.notes.length = Math.min(st.notes.length, 30); });
+  try { localStorage.setItem('smt-reviewed', '1'); } catch { /* private window */ }   // the game: account in Demos, no ask before the website
   a.value = ''; document.getElementById('ok').style.display = 'block';
 };
 </script>

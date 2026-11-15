@@ -720,7 +720,7 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 .tiles .here em { font-style: normal; font-size: 2.2em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tiles > *:focus-visible { outline: .25em solid #fff; }
 /* the menus (home, Infos, Plus): full-width strips, each a picture of its world, black on the words' side (the onboarding's question) */
-#hub, #infos, .sub, #cosmo { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
+#hub, #demos, #infos, .sub, #cosmo { justify-content: flex-start; padding: 13em 0 6em; overflow-y: auto; }
 .strips { display: flex; flex-direction: column; margin: auto 0; }
 .strips > * { font: inherit; position: relative; flex: none; height: 24em; overflow: hidden; display: flex; align-items: center; padding: 0 7%; border: 0; border-top: .25em solid #000; background: #0b0b0d; color: #f5f5f7; text-align: left; text-decoration: none; cursor: pointer; }
 .strips > *::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #000 30%, rgba(0,0,0,.55) 52%, transparent 78%); pointer-events: none; }
@@ -733,6 +733,14 @@ body.watch #ringBtns button.mine { pointer-events: auto; }
 #reviewBtn { border: .3em solid #39ff14; border-radius: 1.2em; margin: 1.2em 4%; box-shadow: 0 0 1.2em #39ff14, inset 0 0 1.2em rgba(57,255,20,.45); }
 #reviewBtn::after { display: none; }
 #reviewBtn b { color: #39ff14; text-shadow: 0 0 .4em #39ff14; }
+/* 14/11: The website without a review yet: a white box asks for it first (Go anyway still goes) */
+#siteAsk { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(0,0,0,.7); }
+#siteAsk[hidden] { display: none; }
+#siteAsk .saBox { width: 80%; background: #fff; color: #1d1d1f; border-radius: 3em; padding: 6em 6%; display: flex; flex-direction: column; align-items: center; gap: 2.4em; text-align: center; }
+#siteAsk .saBig { margin: 0; font-size: 4.4em; font-weight: 800; line-height: 1.1; }
+#siteAsk .saSub { margin: 0; font-size: 2.6em; color: #6e6e73; }
+#siteAsk .saGo { font-size: 3em; font-weight: 800; padding: .6em 1.6em; border-radius: 2em; background: #1d1d1f; color: #39ff14; text-decoration: none; box-shadow: 0 0 .6em #39ff14; }
+#siteAsk .saSkip { font-size: 2.4em; color: #6e6e73; text-decoration: underline; }
 .strips > *:focus-visible { outline: .25em solid #fff; outline-offset: -.25em; }
 /* the home: no scroll, its buttons share the height (24em each at most, smaller when there are more) */
 #hub { overflow: hidden; }
@@ -1635,7 +1643,7 @@ body.playonly #back, body.playonly #qrBtn, body.playonly #eyes, body.playonly #g
 #profile .pfLinks .pill { font-size: 2.2em; background: #1c1c1e; color: #f5f5f7; }
 /* the QR, the spectator count and the gallery live in the menu only (the QR in a waiting room too: Full demo's Play lands
    there, so a friend can scan in and take the other seat) */
-body:not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.home) #galBtn { display: none !important; }
+body:not(.inwait) #qrBtn, body:not(.home) #eyes, body:not(.acct) #galBtn { display: none !important; }
 /* two players: the one whose turn it is not waits on the last shot */
 #waitOther { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 20; padding: .7em 1.4em; border-radius: 2em; background: rgba(15,12,20,.75); color: #fff; font-size: 1.9em; font-weight: 800; white-space: nowrap; pointer-events: none; }
 #waitOther i { font-style: normal; animation: blink 1.2s infinite; }
@@ -2223,16 +2231,22 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="hub" class="card menu" hidden>
     <div class="strips">
-      <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b><span class="oldTag">old</span></a>
-      <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
-      <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
       <a href="review.html" id="reviewBtn"><b>Review</b></a>
+      <button type="button" id="demosBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Demos</b></button>
+      <a href="site.html" id="siteBtn"><span class="art photo" style="background-image:url(ref/brainstorm_couch.webp);background-position:center 35%"></span><b>The website</b></a>
       <button type="button" id="infosBtn"><span class="art" style="--g:#2f6b5a"><img src="chars/brooke/drunk_talk.webp" alt=""></span><b>Outils<svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-label="Avec le code"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></b></button>
     </div>
     <button type="button" id="peekBtn" aria-label="Reset: new user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Reset · new user</span></button>
     <button type="button" id="keyBtn" aria-label="Access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <form id="keyForm" hidden><input id="keyIn" type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Code" aria-label="Code"><button class="pill" type="submit">OK</button></form>
   </div>
+  <div id="demos" class="card menu" hidden>
+    <div class="strips">
+      <a href="demo.html" id="fullDemo"><span class="art photo" style="background-image:url(covers/lastcall.jpg)"></span><b>Phone demo</b><span class="oldTag">old</span></a>
+      <button type="button" id="tvBtn"><span class="art photo" style="background-image:url(covers/lastcall.jpg);background-position:center 60%;filter:hue-rotate(200deg) brightness(.8)"></span><b>TV demo</b><span class="tvHere" hidden><i></i><em></em></span></button>
+    </div>
+  </div>
+  <div id="siteAsk" hidden role="dialog"><div class="saBox"><p class="saBig">Leave a review first?</p><p class="saSub">One question, 20 seconds. It helps a lot.</p><a class="saGo" href="review.html">Do the review</a><a class="saSkip" href="site.html">Go to the website anyway</a></div></div>
   <div id="infos" class="card menu" hidden>
     <div class="strips">
       <button type="button" id="valBtn"><span class="art" style="--g:#8a6bd1"><img src="chars/cam/thinking.webp" alt=""></span><b>Valider l'idée<svg class="pt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></b></button>
@@ -5057,8 +5071,8 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#profile', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
-const UP = { '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#hub', '#profile': '#hub', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
+const SCREENS = ['#placeScreen', '#who', '#hub', '#demos', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#profile', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#bank'];
+const UP = { '#demos': '#hub', '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#demos', '#profile': '#demos', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
   '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
@@ -5082,6 +5096,8 @@ function show(id) {
   screen = id;
   $('#menuBtn').hidden = id !== null; $('#menuPop').hidden = true;   // the story's menu: in a story only
   document.body.classList.toggle('home', id === '#hub');
+  // 14/11: the account (top-left) only in Demos, and only once the review is done (review.html sets smt-reviewed)
+  document.body.classList.toggle('acct', id === '#demos' && (() => { try { return localStorage.getItem('smt-reviewed') === '1'; } catch { return false; } })());
   const wide = id === '#plan' || id === '#acte' || id === '#deck';
   if (document.body.classList.contains('wide') !== wide) { document.body.classList.toggle('wide', wide); fit(); }
   document.body.classList.toggle('inwait', id === '#wait');
@@ -5089,7 +5105,7 @@ function show(id) {
   document.body.classList.toggle('instory', id === null);
   keepAwake(TV || id === null || ['#wait', '#lobby', '#end', '#cover', '#tvPick'].includes(id));
   if (TV && id === '#tvPick') tvHome();
-  if (id === '#tvFind' || id === '#hub') paintTvs();
+  if (id === '#tvFind' || id === '#hub' || id === '#demos') paintTvs();
   if (id !== null) { showPause(); $('#absentBar').hidden = true; }
   if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
@@ -5754,6 +5770,10 @@ $('#keyForm').onsubmit = (e) => {
   keyOk = true; document.documentElement.classList.remove('locked'); f.hidden = true; warnShow(); $('#keyIn').value = '';
 };
 $('#infosBtn').onclick = (e) => { e.stopPropagation(); show('#infos'); };
+$('#demosBtn').onclick = (e) => { e.stopPropagation(); show('#demos'); };   // 14/11: Phone demo and TV demo live there
+// 14/11: The website, before the review is done: ask for it first (a link below still goes to the site)
+$('#siteBtn').onclick = (e) => { let done = false; try { done = localStorage.getItem('smt-reviewed') === '1'; } catch { /* private window */ } if (done) return; e.preventDefault(); e.stopPropagation(); $('#siteAsk').hidden = false; };
+$('#siteAsk').onclick = (e) => { if (e.target.closest('a')) return; e.stopPropagation(); $('#siteAsk').hidden = true; };
 $('#secWriteBtn').onclick = (e) => { e.stopPropagation(); show('#secWrite'); };
 $('#secTestBtn').onclick = (e) => { e.stopPropagation(); show('#secTest'); };
 $('#secSellBtn').onclick = (e) => { e.stopPropagation(); show('#secSell'); };
@@ -6380,7 +6400,7 @@ function goHome() {
 // ---- an invite from a friend's device (PEOPLE): the card rises over the menu, never in the middle of a story ----
 let invNow = null;
 function gotInvite(v) {
-  if (!['#hub', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
+  if (!['#hub', '#demos', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#end', '#lobby', '#labScreen', '#gallery'].includes(screen) && !(screen === '#wait' && !seatsOf().some((k) => state.seats[k] && state.seats[k].id === myId))) return;
   invNow = v;
   $('#invFrom').innerHTML = `${headOf({ n: String(v.n || '?'), ch: SPRITES[v.ch] ? v.ch : null }, false)}${esc(String(v.n || '?').slice(0, 16))} invites you`;
   $('#invTitle').textContent = storyTitle(v.invite.s) || v.invite.s;
