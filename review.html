@@ -115,8 +115,13 @@ textarea:focus { border-color: var(--ink); }
   }
 }
 // the simple questions: one per screen, a tap answers and moves on. [question, [answers]]
-// (15/11) EMPTY on purpose: Justin writes them with Claude, never Claude alone
-const QS = [];
+// (15/11) Justin writes them with Claude, never Claude alone
+const QS = [
+  ['What would you say is the most painful problem here?', [
+    'Picking a show that fits your taste AND your partner’s or family’s on movie night',
+    'After a good show, finding one just as good and similar',
+  ]],
+];
 const yapScr = document.getElementById('s-yap'), ans = [];
 QS.forEach(([q, opts], i) => {
   const s = document.createElement('section'); s.className = 'scr'; s.id = 's-q' + i;
