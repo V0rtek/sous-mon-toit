@@ -40,6 +40,8 @@ p { margin: 0; color: var(--mute); }
 .n { font-size: 13px; font-weight: 700; color: var(--mute); letter-spacing: .06em; text-transform: uppercase; }
 textarea { width: 100%; height: 160px; padding: 14px 16px; border-radius: 16px; border: 2px solid var(--line); font: inherit; resize: none; outline: none; color: var(--ink); }
 textarea:focus { border-color: var(--ink); }
+.tk { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 16px; line-height: 1.4; }
+.tk li::marker { color: var(--mute); font-weight: 700; }
 .check { width: 84px; height: 84px; border-radius: 50%; background: var(--go); display: grid; place-items: center; animation: pop .45s cubic-bezier(.2,1.6,.4,1); }
 .check svg { width: 44px; height: 44px; }
 @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
@@ -49,7 +51,35 @@ textarea:focus { border-color: var(--ink); }
 <div id="bar"><i></i></div>
 <button id="back" type="button" aria-label="Back" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
 
-<section class="scr on" id="s-hi"><div class="in">
+<!-- (15/11) Justin's own first page: the validation takeaways, until the questions are written together. Only with the code
+     (smt-open), a visitor never sees it: the script removes it -->
+<section class="scr on" id="s-notes" style="justify-content:flex-start"><div class="in" style="text-align:left;align-items:stretch">
+  <span class="n">Toi seulement · avant d'écrire les questions</span>
+  <h2>Ce que la review doit trouver</h2>
+  <p class="big"><b>Quelle démo fait poser un geste concret, et chez qui.</b></p>
+  <ol class="tk">
+    <li><b>Qui</b> : ce qu'ils regardent et paient déjà aujourd'hui.</li>
+    <li><b>Quoi</b> : classer les démos de 30 s, après les avoir vues.</li>
+    <li><b>Combien ça vaut</b> : un geste qui coûte (courriel, fake door 8 $), jamais « tu paierais ? ».</li>
+  </ol>
+  <h2 style="margin-top:8px">Les règles</h2>
+  <ul class="tk">
+    <li>Le passé prédit le futur. Demander ce qu'ils <b>ont fait</b>, pas ce qu'ils feraient.</li>
+    <li>« Tu paierais ? » ≈ zéro : dire oui coûte rien, ils gonflent pour être gentils.</li>
+    <li>Seul l'engagement compte : temps, réputation (un nom), argent. Un compliment = rien.</li>
+    <li>Classer marche seulement s'ils ont <b>vu</b> chaque démo. Sinon ils classent ton pitch.</li>
+    <li>Montrer un moment, pas une machine (pitch famille, août).</li>
+  </ul>
+  <h2 style="margin-top:8px">À faire</h2>
+  <ul class="tk">
+    <li>Choisir 3-4 fonctionnalités → une démo de 30 s chacune (Your face in · Stories from prompt · Agency · TV + cells ?)</li>
+    <li>Écrire les questions ensemble avec Claude</li>
+    <li>Photo wholesome (me.jpg)</li>
+  </ul>
+  <button class="go" type="button" data-next>Voir la page visiteur →</button>
+</div></section>
+
+<section class="scr" id="s-hi"><div class="in">
   <!-- TODO Justin: PUT A WHOLESOME PIC OF ME here (save it as me.jpg next to this page, square, smiling) -->
   <div id="face"><img src="me.jpg" alt="Justin" onerror="this.parentNode.innerHTML='<span class=todo>PUT A WHOLESOME PIC OF ME<br>(me.jpg)</span>'"></div>
   <h1>Hey, I’m Justin.</h1>
@@ -75,6 +105,15 @@ textarea:focus { border-color: var(--ink); }
 
 <script src="usage.js"></script>
 <script>
+// Justin's notes page: only with the code (the game's lock, smt-open = its hash); otherwise gone and the face is first
+{
+  let mine = false; try { mine = +localStorage.getItem('smt-open') === 323; } catch { /* private window */ }
+  if (!mine) {
+    document.getElementById('s-notes').remove();
+    const hi = document.getElementById('s-hi'); hi.style.transition = 'none'; hi.classList.add('on');   // there from the start, no slide-in
+    requestAnimationFrame(() => requestAnimationFrame(() => { hi.style.transition = ''; }));
+  }
+}
 // the simple questions: one per screen, a tap answers and moves on. [question, [answers]]
 // (15/11) EMPTY on purpose: Justin writes them with Claude, never Claude alone
 const QS = [];
@@ -100,7 +139,7 @@ function go(to) {
   document.getElementById('back').hidden = at === 0 || at === scr.length - 1;
 }
 const next = () => go(Math.min(at + 1, scr.length - 1));
-document.querySelector('[data-next]').onclick = next;
+document.querySelectorAll('[data-next]').forEach((b) => b.onclick = next);
 document.getElementById('back').onclick = () => go(Math.max(at - 1, 0));
 function finish(yap) {
   const text = [...QS.map(([q], i) => ans[i] && `${q} ${ans[i]}`).filter(Boolean), yap && `Yap: ${yap}`].filter(Boolean).join(' · ');
