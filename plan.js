@@ -543,8 +543,10 @@ THE JSON:
  "links": [{"from": "r4", "to": "r5", "label": "..."}]}
 
 ${act ? act.text : 'The idea: ' + idea}`;
-  const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ x, y, ...c }) => c) };
-    return `You write the dialogue of episode 1 of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
+  // P.story (a plan made by Créer, 15/11): where the whole story stands when this episode starts, so episode 7 is written
+  // knowing what episode 2 said: what the player knows, what is still hidden, the questions in the air, who is dead
+  const prompt2 = () => { const plan = { ...P, chars: undefined, characters: P.chars.map(({ x, y, ...c }) => c) }, SF = P.story && P.story.episode ? P.story : null, epN = SF ? SF.episode : 1;
+    return `You write the dialogue of episode ${epN}${SF && SF.of ? ` of ${SF.of}` : ''} of an interactive story for a phone game, from its plan (at the end). Dialogue only, shown one line at a time over a picture of the characters, with choices. The player plays the main character (id "justin"). Same language as the plan.
 
 HOW TO TRANSLATE THE PLAN:
 - Follow the rectangles of the first box ("ep") in order, every one of them: never skip one, never merge two.
@@ -556,7 +558,12 @@ HOW TO TRANSLATE THE PLAN:
 - A rectangle's "carries" are moments of other techniques it ALSO does, inside its own lines (a seed slipped into a story, a question planted in a joke): they get no line of their own, and nobody points at them.
 - The characters talk with their traits: you know who speaks without the name.
 - The "later" box is not written: it becomes "next", 3 or 4 bullets, each with its "if" ("If he ..., ...").
-
+${SF ? `- "story" is where the whole story stands when this episode starts${epN > 1 ? ' (the player already lived the episodes before)' : ''}:
+  · "known": what the player already knows. Build on it; never explain it again, never contradict it. Someone who was there talks as someone who knows. Flat: "As you know, the ring was stolen last night." -> works: "Still no ring?" / "Still no ring."
+  · "hidden": what is true and not out yet. No line says it, proves it, or makes it impossible; the one who hides it talks around it, and nobody defends themselves before being accused. Flat: "I would never steal from her." (nobody accused him: it gives him away) -> works: "Look at yesterday's customers."
+  · "open": the questions in the air, and "here" = what this episode does with each one. If it gets its answer here: the answer lands in the rectangle that reveals it, and someone reacts. If it moves without an answer: the question gets sharper, never closed. If it does not move: nobody mentions it.
+  · "dead": they never speak or act again; the others can talk about them.
+` : ''}
 TECHNIQUES:
 ${techList()}
 
@@ -580,7 +587,7 @@ I. When a line hurts the main character (the past, a reproach), he answers it: a
 G. Nothing invisible: the player only sees the decor, the characters, their poses and the lines. Never a line about a gesture or an object the screen does not show (counting the lights, flipping a coin, a crate), except what an EXTRA SHOT below shows. If something matters, a line says what it is, plainly, the first time.
 
 THE FIRST AND THE LAST LINE:
-- The first line is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen. The player asks "why?". Flat: "The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?" -> works: Nora: "If he sits at this table, I'm leaving it." / "You kept my seat. Even after what I did?"
+- ${epN > 1 ? 'The first line picks up what the last choice caused (the first rectangle), between two people on screen: a conflict, a surprise or a confession' : 'The first line is understood alone, knowing nothing: a conflict, a surprise or a confession between two people on screen'}. The player asks "why?". Flat: "The seventh light brings luck!" (what is she talking about?) / "Nice night, huh?" -> works: Nora: "If he sits at this table, I'm leaving it." / "You kept my seat. Even after what I did?"
 - The last line announces a precise next moment the player wants to see (who, when, where, what will be settled), or a surprise, or a new question. Flat: "Don't promise what you can't keep." (the choice just made, asked again) / "There will be consequences." (vague) -> works: "See you at the championship tonight. We're gonna have a little talk." / "Saturday, after the game. You tell Dad, or I will." (shapes from other stories: never copy them)
 THE MAIN CHARACTER'S DESIRE: in the rectangle that shows it, justin says it himself, out loud, to someone, with its reason ("One day I'll play a real stage. Not this bar."), and someone reacts. Never in his head, never "tonight".
 THE MAIN CHARACTER (id "justin"): when he talks to someone, "to" = their id and he says it out loud. A thought of his = "to": "justin" (inner voice, first person): rare, at most one line in four of his. Inside a choice he speaks out loud. Never his name in a line, no stage directions, no narration.
@@ -588,11 +595,11 @@ CHOICES: before tapping, the player knows what each option means: an option make
 ${window.COUNTER && COUNTER.on ? COUNTER.posesText() : 'POSES: listen, surprised, thinking, explaining, angry, holding (holding = restrained, arms crossed); a character with its own "poses" in the plan uses only those.'} Lightly. "to" = who they talk to (or "justin"). Only the plan's characters speak: "who" = their "id" in the plan.${window.EXTRAS ? EXTRAS.text((plan.characters || []).map((c) => c.id)) : ''}
 
 THE JSON (exactly this shape):
-{"episode": 1, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",
+{"episode": ${epN}, "title": "${(P.title || '').replace(/"/g, '')}", "scene": "${P.scene || 'maison'}",
  "steps": [ {"who": "<id>", "pose": "<pose>", "to": "<id>", "text": "<one line>"}, {"hush": true}, ..., {"choice": [ {"t": "...", "say": "...", "tone": "...", "then": [ {"who", "pose", "to", "text"}, ... ]}, {...} ]}, ... ],
  "next": ["If ..., ...", "..."]}
 
-CHECK BEFORE YOU REPLY: the branches of a choice differ: no line appears in two options' "then" (the lines both branches share come after the choice, once); no character has more than 2 lines in a row; every rectangle of "ep" is there, in order (none skipped: the one that raises a question is the one the player came for); every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch.
+CHECK BEFORE YOU REPLY: the branches of a choice differ: no line appears in two options' "then" (the lines both branches share come after the choice, once); no character has more than 2 lines in a row; every rectangle of "ep" is there, in order (none skipped: the one that raises a question is the one the player came for); every rectangle has its number of lines; every reveal is in its rectangle; every link's promise is kept; every "t" is 27 characters at most; nothing after the last choice's branch${SF ? '; nothing of "hidden" is said or proved; nobody dead speaks' : ''}.
 
 THE PLAN:
 ${JSON.stringify(plan)}`; };
