@@ -296,6 +296,9 @@
       last = { id: spec.id, name: spec.name, kind: null, cells, sp, from: 'Créer' };
       return cells.map((c) => ({ pose: c.pose, src: c.src }));
     },
+    // Mise en scène (mise.js): a sheet of its own grid, cut into its figures, nothing measured or pushed
+    cells: (file, spec, tell) => cut(file, null, tell, { cut: 'full', ...spec }),
+    commit,
     lastRects: () => last && last.sp.rects,
     // a tap on a pose in the preview moves where its hand is (fx, fy = 0..1 of the picture)
     setGrip(pose, fx, fy) {

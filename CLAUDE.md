@@ -12,3 +12,4 @@ Par défaut le lien montre seulement Full demo (Infos, Plus et leurs écrans cac
 
 # Créer (le moteur d'histoire)
 Avant de toucher à `forge.js`, aux techniques de `plan.js` ou à la graine dans `act.js` : lire `CREER.md` (les principes de Justin, ce que fait le code, ce qui n'est pas fait).
+Avant de toucher à `mise.js` / `mise-data.js` (🎥 un épisode écrit → ce qu'on voit) : la section « Mise en scène » de `CREER.md`.

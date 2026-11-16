@@ -1692,6 +1692,7 @@ Keep it natural, like the reference.`;
       + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
         + `<div data-ledger="${n}" class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
+      + '<button type="button" class="fMise" data-x="mise" data-tip="Un épisode écrit (screenplay) → ce qu’on voit : la mise en scène, les feuilles à déposer, puis ▶">🎥 Mettre en scène un épisode écrit</button>'
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
       + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
@@ -1773,6 +1774,7 @@ Keep it natural, like the reference.`;
     else if (d.x === 'autocut') S.cut = null;
     else if (d.x === 'dice') dice();
     else if (d.x === 'example') { S = PRESET(); sbSel = null; }
+    else if (d.x === 'mise') { save(); return window.MISE && MISE.open(); }
     else if (d.x === 'exep1') { save(); PLAN.add(planOf(0)); return window.PLAN_PLAY(JSON.parse(JSON.stringify(EX_EP1)), EX_EP1.title); }
     else if (d.x === 'copy') { if (!S.cast.length) { msg = '👥 ?'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
       return copy(ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
