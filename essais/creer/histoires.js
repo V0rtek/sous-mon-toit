@@ -24,5 +24,8 @@ T.A1_exemple_2actes = { ...T.T1_exemple_sans_mots, acts: 2 };
 T.A2_meurtre_2actes = { ...T.T2_meurtre, acts: 2, infos: [...T.T2_meurtre.infos, { id: 'spy', x: 'amare', y: 'ruby', a: 2 }] };
 T.A3_menace_2actes = { ...T.T4_menace, acts: 2, ev: [{ k: 'arrive', x: 'amare' }, { k: 'threat', x: 'amare', v: 'ruby', a: 2 }] };
 T.A4_charge_2actes = { ...T.T6_charge, acts: 2, ev: [{ k: 'arrive', x: 'amare' }, { k: 'theft', x: 'james', v: 'melissa', s: null, h: 1 }, { k: 'betray', x: 'amare', v: 'justin', s: null, h: 0, a: 2 }], infos: [{ id: 'villain', x: 'amare', a: 2 }, { id: 'exes', x: 'justin', y: 'ruby' }, { id: 'key', x: 'james' }, { id: 'sick', x: 'melissa' }] };
+// Justin's own draw of 16/11 (the one whose episode 1 read generic): a promise, « the one they look for », a theft nobody on stage suffered, a threat in act 2
+T.J1_isa_amare = { ...base, acts: 2, seed: 1, cast: ['isa', 'amare'], pil: { justin: ['chef', 'mysterieux'], isa: ['protecteur', 'clown'], amare: ['outsider', 'dangereux'] }, flaw: { justin: 'vice' }, want: { justin: { v: 'love', t: 'isa' }, amare: { v: 'love', t: 'isa' } },
+  infos: [{ id: 'villain', x: 'justin' }, { id: 'promise', x: 'amare', y: 'isa' }], ev: [{ k: 'theft', x: 'amare', v: null, s: null, h: 1 }, { k: 'threat', x: 'amare', v: 'justin', a: 2 }], hard: { liked: 1, danger: 1 }, tq: { fig: 0 } };
 T.EX = 'EX';
 module.exports = T;

@@ -402,6 +402,29 @@ window.FILS = (() => {
     if (k === 'justice|protect' && a.t && a.t === b.t) return ['Protège-t-on quelqu’un qui a mal agi ?', 'do you protect someone who did wrong?'];
     return ASK[k] || (a.k === 'hide' || b.k === 'hide' ? ['Un secret vaut-il ce qu’il coûte aux autres ?', 'is a secret worth what it costs the others?'] : ASK.def); };
 
+  // ---- the facts (17/11): what makes a story specific is a few concrete things everything else is tied to. A FIGURE is
+  // someone outside the cast (no picture: never on screen, we hear about him): what he holds, what someone owes him and
+  // by when, why he would be looking for someone. The promise, the theft, the secret of « the one they look for » all
+  // tie to him: one fact, several reasons to react. n / dat / gen = le passeur / au passeur / du passeur ----
+  const FIGS = [
+    { n: 'le passeur', dat: 'au passeur', gen: 'du passeur', nE: 'the ferryman', thing: 'sa bourse', thingOf: 'la bourse du passeur', thingE: 'his purse', thingOfE: 'the ferryman\'s purse',
+      need: (y) => `${y} doit payer le passeur avant l’aube pour faire traverser son frère`, needE: (y) => `${y} must pay the ferryman before dawn to get their brother across`,
+      lost: 'pas de bourse, pas de bateau', lostE: 'no purse, no boat', wanted: 'une dette de jeu', wantedE: 'a gambling debt' },
+    { n: 'l’usurier', dat: 'à l’usurier', gen: 'de l’usurier', nE: 'the moneylender', thing: 'son livre de comptes', thingOf: 'le livre de comptes de l’usurier', thingE: 'his ledger', thingOfE: 'the moneylender\'s ledger',
+      need: (y) => `${y} doit rembourser l’usurier avant demain, ou perd sa maison`, needE: (y) => `${y} must pay the moneylender back before tomorrow, or lose their house`,
+      lost: 'sans son livre, il réclame tout, ce soir', lostE: 'without his ledger he calls in everything, tonight', wanted: 'un prêt jamais rendu', wantedE: 'a loan never paid back' },
+    { n: 'le capitaine de la garde', dat: 'au capitaine', gen: 'du capitaine', nE: 'the captain of the guard', thing: 'son sceau', thingOf: 'le sceau du capitaine', thingE: 'his seal', thingOfE: 'the captain\'s seal',
+      need: (y) => `${y} doit obtenir du capitaine, avant l’aube, la sortie de son frère, en cellule`, needE: (y) => `${y} must get the captain to release their brother from his cell before dawn`,
+      lost: 'sans son sceau, il ne signe aucune sortie', lostE: 'without his seal he signs no release', wanted: 'une désertion', wantedE: 'a desertion' },
+    { n: 'le propriétaire', dat: 'au propriétaire', gen: 'du propriétaire', nE: 'the landlord', thing: 'sa caisse', thingOf: 'la caisse du propriétaire', thingE: 'his cash box', thingOfE: 'the landlord\'s cash box',
+      need: (y) => `${y} doit trois mois de loyer au propriétaire, à payer avant la fermeture`, needE: (y) => `${y} owes the landlord three months of rent, due before closing time`,
+      lost: 'caisse vide : il veut son loyer ce soir', lostE: 'cash box empty: he wants his rent tonight', wanted: 'une ardoise jamais payée', wantedE: 'a tab never paid' },
+  ];
+  // a basic voice, from the pillar: how they talk (it goes in each character of the plan)
+  const VOICE = { chef: 'phrases courtes, des ordres calmes, ne se justifie jamais', charmeur: 'taquine, double sens, répond par une question', dangereux: 'très peu de mots, poli, jamais une menace criée',
+    genie: 'précis, corrige les autres, un temps d’avance', clown: 'répond par une blague, surtout quand ça fait mal', mysterieux: 'répond à côté, laisse les phrases en suspens',
+    outsider: 'direct, maladroit, dit ce qu’il veut trop vite', protecteur: 'parle des autres avant de parler de soi, rassure' };
+
   // the forms become techniques of Plan de scène (one catalogue): the AI reads how each one is done, with its examples.
   // Their flag (clue, false...) keeps them out of the other moments' lists. CT = their words here, by name
   const CT = {}, FLAGS = Object.keys(FORMS);
@@ -409,5 +432,5 @@ window.FILS = (() => {
     for (const [mv, F] of Object.entries(FORMS)) { const G = GS.find((g) => g.id === F.g); if (!G) continue;
       for (const f of F.list) { G.tech.push({ n: f.n, d: f.d, ex: f.ex, [mv]: 1, thread: 1 }); CT[f.n] = [f.fr, f.en]; } } };
   install();
-  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, install, de };
+  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, VOICE, install, de };
 })();
