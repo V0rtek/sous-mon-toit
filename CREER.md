@@ -48,6 +48,7 @@ Les idées, et d'où elles viennent :
 27. **Une montée a des crans** (`FILS.RAISE`, 3 niveaux par désir) : chaque fois qu'un désir pèse plus, c'est un cran au-dessus.
 28. **La question de l'acte** (`FILS.ask`) : tirée des deux désirs du climax (« Dit-on la vérité quand elle détruit celui qu'on aime ? »). Montrée à l'auteur, donnée à l'IA, jamais dite à l'écran.
 29. **Le registre** (`registre()`) : à la fin de chaque épisode, ce que le joueur sait, ce qui est encore caché, qui n'est plus là. Chaque plan d'épisode le porte (`plan.story`) : les répliques de l'épisode 7 s'écrivent en sachant ce que l'épisode 2 a dit.
+30. **Les répliques d'avant** (`plan.story.lines`) : quand Haiku a écrit un épisode (▶), ses répliques sont gardées sur l'appareil (`S.gen`, oubliées si l'histoire change) et le plan des épisodes suivants les porte : le détail semé à l'épisode 2 (un objet, un mot, une heure) est CELUI que l'épisode 4 ramène, pas un autre. Pour l'exemple, l'épisode 1 écrit (`EX_EP1`) joue ce rôle.
 
 Ce qui est à Claude et **à revoir avec Justin** : les noms des pas, les formes (`FILS.FORMS` : nom, comment, exemple plat → ce qui marche), les mobiles, les crans, les questions d'acte. Les formes sont installées dans le catalogue de Plan de scène (un seul catalogue) : elles apparaissent dans sa palette et dans la liste des techniques des prompts.
 
@@ -76,6 +77,7 @@ Ce qui est à Claude et **à revoir avec Justin** : les noms des pas, les formes
 - **L'acte 2 sans rien de caché est mince** : la riposte et les lignes qui montent. Il vaut ce qu'on lui garde (une info en ②, un événement en ②).
 - **Le climax de l'acte 2 ne dépend pas du choix du climax de l'acte 1** : la conséquence montre les deux branches, puis ça se rejoint.
 - **Les fils dans une scène** : le moteur place les pas dans l'épisode ; la micro-boucle d'une scène (une question posée et payée dans la même scène, comme « Coincé devant tous ») n'existe que là où une technique à moments la porte.
+- **Les répliques d'avant ne suivent que sur le même appareil** (elles sont dans `S.gen`) et seulement pour les épisodes joués avec ▶ ; un épisode sauté n'a pas de répliques à porter.
 - **Le mobile ne se change pas encore au tap** (le code lit `S.tq['mot'+k]`, aucun bouton ne l'écrit).
 - **Les fiches de techniques** : seule « Coincé devant tous » est complète. À écrire **avec Justin**, une à la fois (il ne veut pas que je les rédige seul) ; suivantes proposées : Show character positioning, Tell a story. `DETAIL` (instructions, exemple) est vide.
 - **Plan de scène** : allégé (visages, texte sur 2 lignes, icônes), encore loin du storyboard.

@@ -1195,6 +1195,15 @@ window.FORGE = (() => {
   const presentOf = (ev, happened, STq, out) => { const here = [...new Set([J, ...(ev.who || []), ...(ev.rides || []).flatMap((r) => r.who || [])].filter((w) => w && live(w) && !(out && out.has(w))))].slice(0, 4), ok2 = (x) => (!x.from || happened.has(x.from)) && !x.dead && !x.late;
     return here.map((p2) => { const d = (ev.desires || []).find((x) => x.who === p2) || STq.D.find((x) => x.id === ev.line && x.who === p2) || STq.D.filter((x) => x.who === p2 && x.s >= 2 && ok2(x)).sort((a2, b2) => b2.s - a2.s)[0];
       return { id: p2, name: nm(p2), wants: d ? `${DK[d.k].n}${d.t ? ' ' + tName(d) : ''}` : 'observer' }; }); };
+  // ---- the lines of an episode as the player read them (16/11): kept on this phone once Haiku has written it (the
+  // example's episode 1 is the written one). The plans of the next episodes carry them, so the detail planted in episode 2
+  // (an object, a word, an hour) is THE detail episode 4 brings back, not a new one. A change of the story forgets them ----
+  const flatLines = (story) => { const out = [], one = (x, pre = '') => { if (x && x.text && (x.who || x.duo)) out.push(`${pre}${x.who ? nm(x.who) : 'Narration'} : ${x.text}`); };
+    for (const x of (story && story.steps) || []) { if (Array.isArray(x.choice)) x.choice.forEach((o, i) => { out.push(`[choix ${'ABC'[i] || i + 1}] ${o.t || ''}${o.say ? ` → Justin : ${o.say}` : ''}`); (o.then || []).forEach((y) => one(y, '    ')); }); else one(x); }
+    return out; };
+  const genSig = () => JSON.stringify([S.decor, S.cast, S.pil, S.want, S.rel, S.infos, S.ev, S.hard, S.acts, S.climax, S.climax2, S.seed]);
+  const keepLines = (n, story) => { const sig = genSig(); if (!S.gen || S.gen.sig !== sig) S.gen = { sig, eps: {} }; S.gen.eps[n] = flatLines(story); save(); };
+  const linesOf = (n) => { const mine = S.gen && S.gen.sig === genSig() ? S.gen.eps[n] : null; return mine && mine.length ? mine : S.ex && n === 0 ? flatLines(EX_EP1) : null; };
   // ---- le registre (15/11): what the player knows at the end of each episode (and since which one), what is still
   // hidden (never to be said before its moment), who is dead or gone. The board shows it; each episode's plan carries it,
   // so the lines of episode 7 are written knowing what episode 2 said ----
@@ -1272,6 +1281,7 @@ window.FORGE = (() => {
     const storySoFar = { episode: n + 1, of: EP.length, act: ep.act || 1, known: n > 0 && REG[n - 1] ? REG[n - 1].known.map((k2) => k2[0]) : [], hidden: REG[n] ? REG[n].hidden.map((h) => h[0]) : [],
       open: openT.map((t) => { const last = t.steps.filter((x) => x.ep < n).pop(), ends = t.done && t.to === n; return { question: t.fr, state: last ? (MVp[last.mv] || ['', last.mv])[1] : 'ouverte', here: ends ? 'elle reçoit sa réponse dans cet épisode' : t.steps.some((x) => x.ep === n) ? 'elle avance dans cet épisode, sans réponse' : 'elle ne bouge pas : n’en parle pas' }; }),
       dead: [...REGp].filter(([, v]) => v === 'dead').map(([id]) => nm(id)) };
+    const said = Object.fromEntries([...Array(n).keys()].map((k2) => [k2 + 1, linesOf(k2)]).filter(([, v]) => v)); if (Object.keys(said).length) storySoFar.lines = said;
     return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [], story: storySoFar,
       chars: S.cast.filter((id) => REGp.get(id) !== 'dead').map((id) => ({ id, name: nm(id), sprite: sprite(id), poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'].filter((p2) => window.SPRITES && SPRITES[sprite(id)] && SPRITES[sprite(id)].poses[p2]).concat(window.EXTRAS ? EXTRAS.poses(sprite(id)) : []), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
       infos: IL.map((i) => ({ id: iid(i), text: infoFr(i) })),
@@ -1782,6 +1792,7 @@ Keep it natural, like the reference.`;
       const pl = PLAN.add(planOf(n)), used = { in: 0, out: 0 };
       tell(`L’épisode ${n + 1} : Haiku écrit les répliques…`);
       const story = await ACT.haiku(key, PLAN.prompt2(), 8000, (x) => Array.isArray(x.steps), used);
+      keepLines(n, story);
       if (window.GEN_USED) GEN_USED(used); tell(''); msg = '';
       window.PLAN_PLAY(story, pl.title);
     } catch (err) { msg = err.message || 'Ça n’a pas marché.'; btn.disabled = false; render(); }

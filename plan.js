@@ -563,7 +563,8 @@ ${SF ? `- "story" is where the whole story stands when this episode starts${epN 
   · "hidden": what is true and not out yet. No line says it, proves it, or makes it impossible; the one who hides it talks around it, and nobody defends themselves before being accused. Flat: "I would never steal from her." (nobody accused him: it gives him away) -> works: "Look at yesterday's customers."
   · "open": the questions in the air, and "here" = what this episode does with each one. If it gets its answer here: the answer lands in the rectangle that reveals it, and someone reacts. If it moves without an answer: the question gets sharper, never closed. If it does not move: nobody mentions it.
   · "dead": they never speak or act again; the others can talk about them.
-` : ''}
+${SF.lines ? `  · "lines": the episodes before, line by line, as the player read them. What they planted is what comes back: the same object, the same word, the same name, the same hour, never a new one. Flat: episode 2 said "soil on your boots", episode 4 pays with "a torn sleeve" -> works: episode 4 pays with the soil on the boots. The characters talk as people who lived those scenes; nobody repeats them.
+` : ''}` : ''}
 TECHNIQUES:
 ${techList()}
 
