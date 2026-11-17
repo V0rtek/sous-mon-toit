@@ -105,7 +105,10 @@ window.MISE = (() => {
     const t = String(text || ''), a = t.indexOf('{'), b = t.lastIndexOf('}'); if (a < 0 || b < a) return null;
     const raw = t.slice(a, b + 1);
     try { return JSON.parse(raw); } catch { /* next */ }
-    try { return JSON.parse(raw.replace(/[“”]/g, '"').replace(/,\s*([}\]])/g, '$1')); } catch { return null; }
+    // collage depuis un chat/markdown : « \ » en fin de ligne, &#x20;, \_ \[ \* … → on nettoie
+    const clean = raw.replace(/&#x20;|&#32;|&nbsp;| /g, ' ').replace(/&quot;/g, '"').replace(/&amp;/g, '&')
+      .replace(/\\[ \t]*(\r?\n)/g, '$1').replace(/\\([_\[\]*#<>()!.\-+~`|])/g, '$1').replace(/[“”]/g, '"').replace(/,(\s*[}\]])/g, '$1');
+    try { return JSON.parse(clean); } catch { return null; }
   }
   const markOf = (id) => { for (const [p, pl] of Object.entries(SET.plates)) if (pl.marks[id]) return { plate: p, id, ...pl.marks[id], ...((S.marks[p] || {})[id] || {}) }; return null; };
   const plateOf = (p) => ({ ...SET.plates[p], ...(S.marks[p] && S.marks[p]._ ? S.marks[p]._ : {}), up: UP[`pl:${p}`] });
