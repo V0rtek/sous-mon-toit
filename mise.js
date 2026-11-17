@@ -304,7 +304,8 @@ window.MISE = (() => {
     root.innerHTML = `<div class="mzStage"><div class="mzWorld"></div><div class="mzOver"></div><div class="mzVig"></div><div class="mzBub"><b></b><span></span><i class="t"></i></div><div class="mzCap"></div></div><div class="mzHud">${opt.tune ? '' : '<button type="button" data-h="back" title="Reculer">‹</button>'}<button type="button" data-h="close" title="Fermer">✕</button></div>`;
     document.body.appendChild(root);
     const stage = $('.mzStage', root), world = $('.mzWorld', root), over = $('.mzOver', root), bub = $('.mzBub', root), cap = $('.mzCap', root);
-    let vw = 0, vh = 0, cam = { s: 1, x: 0, y: 0 }, cur = null, st = null, i = -1, chunks = [], ci = 0, busy = false, alive = true, drawn = '', after = null;
+    let vw = 0, vh = 0, cam = { s: 1, x: 0, y: 0 }, cur = null, st = null, i = -1, chunks = [], ci = 0, busy = false, alive = true, drawn = '', after = null, paused = false, timer = 0;
+    const ind = document.createElement('div'); ind.textContent = '⏸ Pause · touche pour reprendre'; ind.style.cssText = 'position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:14px;background:rgba(0,0,0,.65);color:#fff;font:600 13px system-ui;pointer-events:none;z-index:9;display:none'; stage.appendChild(ind);
     const els = {};   // cast id → its element
     const size = () => { const W = innerWidth, H = innerHeight; vw = Math.min(W, H * 16 / 9); vh = Math.min(H, vw * 3 / 4); if (opt.tune) vh = Math.min(vh, H - 120); vw = Math.min(vw, vh * 16 / 9); stage.style.width = vw + 'px'; stage.style.height = vh + 'px'; };
     const flat = (list) => list;   // the beats as they play (a choice appends its branch)
@@ -430,15 +431,20 @@ window.MISE = (() => {
       if (!quick && moved) await wait(fx.in.length ? 700 : 380);
       if (!alive) return;
       chunks = cutText(b.text || b.narr); ci = 0; busy = false;
-      if (chunks.length) say(b, chunks[0]); else if (!quick) { await wait(moved ? 150 : 500); if (alive && i === n) next(); }
+      if (chunks.length) { say(b, chunks[0]); auto(); } else if (!quick) { await wait(moved ? 150 : 500); if (alive && i === n) next(); }
     }
+    // lecture automatique : chaque bulle reste le temps de se lire, puis la suivante. Un clic met en pause / reprend.
+    function auto() { clearTimeout(timer); if (opt.tune || !alive || paused || busy) return; const t = chunks[ci] || ''; timer = setTimeout(next, Math.max(1700, 900 + t.length * 55)); }
+    function pause(on) { paused = on === undefined ? !paused : on; clearTimeout(timer); ind.style.display = paused ? 'block' : 'none'; if (!paused) auto(); }
     function next() {
+      clearTimeout(timer);
       if (busy || !alive || opt.tune) return;
-      if (ci + 1 < chunks.length) return say(beats[i], chunks[++ci]);
+      if (ci + 1 < chunks.length) { say(beats[i], chunks[++ci]); return auto(); }
       if (after) { const a = after; after = null; return a(); }
       if (i + 1 < beats.length) show(i + 1); else end();
     }
     function choice(b) {
+      clearTimeout(timer);
       aim({ ...st.frame, type: 'group', ids: null }, 'glide'); over.classList.remove('on');
       const box = document.createElement('div'); box.className = 'mzChoice'; box.innerHTML = b.choice.map((o, k) => `<button type="button" data-o="${k}">${esc(o.t)}</button>`).join('');
       stage.appendChild(box);
@@ -446,16 +452,17 @@ window.MISE = (() => {
         beats = [...beats.slice(0, i + 1), ...(o.narr ? [{ narr: o.narr, react: {} }] : []), ...o.then]; if (i + 1 < beats.length) show(i + 1); else end(); };
     }
     function end() {
+      clearTimeout(timer);
       const d = document.createElement('div'); d.className = 'mzEnd'; d.innerHTML = `<h2>${esc(P.title)}</h2><p style="margin:0;color:#c7c7cc">À suivre…</p><div><button type="button" data-h="again">↺ Rejouer</button> <button type="button" data-h="close">Fermer</button></div>`;
       stage.appendChild(d);
     }
     function start(at = 0) { st = init(P); cur = null; beats = P.beats.slice(); $('.mzEnd', root) && $('.mzEnd', root).remove(); build('table'); drawAll(true); aim({ type: 'wide', plate: 'table' });
       (async () => { for (let k = 0; k < at; k++) { if (beats[k].choice) break; await show(k, true); } show(Math.min(at, beats.length - 1)); })(); }
     function back() { if (busy || i <= 0) return; let k = i - 1; while (k > 0 && !(beats[k].text || beats[k].narr)) k--; start(k); }
-    function close() { alive = false; removeEventListener('resize', onSize); removeEventListener('keydown', onKey); root.remove(); R = null; if (opt.onClose) opt.onClose(); }
+    function close() { alive = false; clearTimeout(timer); removeEventListener('resize', onSize); removeEventListener('keydown', onKey); root.remove(); R = null; if (opt.onClose) opt.onClose(); }
     const onSize = () => { size(); if (st && cur) { aim(st.frame.type === 'insert' ? { type: 'wide', plate: cur } : st.frame); overlay(st.frame); if (!opt.tune && beats[i] && chunks.length) say(beats[i], chunks[ci]); } };
-    const onKey = (e) => { if (e.key === 'Escape') close(); else if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); next(); } else if (e.key === 'ArrowLeft') back(); };
-    root.onclick = (e) => { const h = e.target.dataset && e.target.dataset.h; if (h === 'close') return close(); if (h === 'back') return back(); if (h === 'again') return start(0); if (e.target.closest('.mzChoice,.mzTune')) return; next(); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); else if (e.key === ' ') { e.preventDefault(); pause(); } else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); next(); } else if (e.key === 'ArrowLeft') back(); };
+    root.onclick = (e) => { const h = e.target.dataset && e.target.dataset.h; if (h === 'close') return close(); if (h === 'back') return back(); if (h === 'again') return start(0); if (e.target.closest('.mzChoice,.mzTune,.mzEnd')) return; if (opt.tune) return; pause(); };
     addEventListener('resize', onSize); addEventListener('keydown', onKey);
     size();
     R = { close, next, back, start, get i() { return i; }, get n() { return beats.length; }, get busy() { return busy; }, root, stage, world, redraw() { build(cur); drawAll(true); aim({ type: 'wide', plate: cur }); }, get st() { return st; }, get cam() { return cam; } };
