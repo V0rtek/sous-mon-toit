@@ -424,48 +424,76 @@ window.FORGE = (() => {
   const evsAll = () => { const L = (S.ev || []).filter((e) => EK[e.k] && live(e.x)); if (AUTO_BUSY) return L; AUTO_BUSY = true; try { const a = autoEv(); return a ? [...L, a] : L; } finally { AUTO_BUSY = false; } };
   const evs = () => evsAll().filter((e) => actOf(e) <= CUR_ACT);
   const happened = (e) => !NOW || NOW.hap.has(e);
-  // ---- THE FACTS, TIED (17/11), STORED (le graphe, étape 1): a few concrete things the elements of the plot point to,
-  // so nothing floats. Three lists in the state: S.figs (figures outside the cast: { r: FILS.FIGS index }), S.things (their
-  // things: { f, r: has | need | debt }), S.links ([{ a, k, b }]: p:<id> a person · f:<n> a figure · t:<n> a thing ·
-  // i:<n> an info · e:<n> an event; k = FILS.LINK). weave() draws only what something needs (a crime nobody on stage
-  // suffered, « the one they look for », a promise) and keeps what was chosen: 🎲 (S.seed) draws, a tap on a link = the
-  // next one possible. graph() only READS the links: say = an info's words with its ties; facts = sentences [fr, en] ----
+  // ---- THE FACTS, TIED (17/11), STORED (le graphe): a few concrete things the elements of the plot point to, so nothing
+  // floats. In the state: S.figs (people off screen: { id: 'A', r: FILS.FIGS index } the one the story needs, or { id, c,
+  // by } one added from FILS.FOLK / FIGS), S.things ({ id: has | need | debt, f: 'A', r } the figure's, or { id, c, by }
+  // from FILS.THINGS), S.moments (the past, FILS.MOMENTS), S.places (FILS.PLACES), S.links ([{ a, k, b, both?, by? }]:
+  // p:<id> a person · f:<id> off screen · t:<id> a thing · i:<n> an info · e:<n> an event · m:<id> a moment of the past ·
+  // l:<id> a place · d:<who>:<kind>:<whom> a desire; k = FILS.LINK). weave() draws only what something needs (a crime
+  // nobody on stage suffered, « the one they look for », a promise) and keeps what was chosen; the author adds the rest
+  // (by: 1). graph() READS: say = an info's words with its ties; facts = sentences [fr, en]; more = the links added ----
   const tied = () => { const L = (S.infos || []).map((i, k) => [i, k]).filter(([i]) => IN[i.id] && live(i.x) && (IN[i.id].s < 2 || live(i.y)));
     return { P: L.find(([i]) => i.id === 'promise'), V: L.find(([i]) => i.id === 'villain'), C: (S.ev || []).map((e, k) => [e, k]).find(([e]) => EK[e.k] && EK[e.k].crime && live(e.x) && !(e.v && live(e.v))) }; };
   // who can a secret be hidden from (a tap on « caché à » / « par peur de »): someone alive, not the one it is about, not one who knows it
   const hideTo = (V, knows) => people().filter((p) => p !== V.x && !knows.includes(p));
+  const catOf = (t, c) => (t === 'f' ? [...FILS.FOLK, ...FILS.FIGS.map((R) => [R.k, R.e, R.n, R.nE])] : FILS.CAT[t]).find((x) => x[0] === c);
+  // does a ref point to something that is there (the hand-made lists: those given)
+  const there = (r, H) => { const t = r[0], v = r.slice(2), list = { f: H.figs, t: H.things, m: H.moments, l: H.places }[t];
+    if (t === 'p') return live(v); if (list) return list.some((x) => x.id === v);
+    if (t === 'i') { const i = (S.infos || [])[+v]; return !!i && !!IN[i.id] && live(i.x) && (IN[i.id].s < 2 || live(i.y)); }
+    if (t === 'e') { const e = (S.ev || [])[+v]; return !!e && !!EK[e.k] && live(e.x); }
+    if (t === 'd') { const [w, k, o] = v.split(':'); return !!DK[k] && live(w) && (!o || live(o)); } return false; };
   function weave() {
     const FG = window.FILS && FILS.FIGS; if (!FG) return;
-    const { P, V, C } = tied(), old = S.links || [], was = (a, k, ok = () => true) => old.find((l) => l.a === a && l.k === k && ok(l.b));
+    const { P, V, C } = tied(), old = S.links || [], auto = old.filter((l) => !l.by), was = (a, k, ok = () => true) => auto.find((l) => l.a === a && l.k === k && ok(l.b));
     const figs = [], things = [], links = [], link = (a, k, b) => links.push({ a, k, b });
-    const th = (r) => { let k = things.findIndex((t) => t.r === r); if (k < 0) k = things.push({ f: 0, r }) - 1; return `t:${k}`; };
+    const th = (r) => { if (!things.some((t) => t.id === r)) { things.push({ id: r, f: 'A', r }); if (r !== 'has') link(`t:${r}`, 'toward', 'f:A'); } return `t:${r}`; };
     if (P || V || C) {
-      const n = FG.length, r0 = S.figs && S.figs[0] ? S.figs[0].r : S.tq.fig ?? vary('fig', n); figs.push({ r: ((r0 % n) + n) % n });
+      const n = FG.length, oa = (S.figs || []).find((f) => f.id === 'A' || (f.id == null && f.r != null)), r0 = oa ? oa.r : S.tq.fig ?? vary('fig', n); figs.push({ id: 'A', r: ((r0 % n) + n) % n });
       const pi = P && `i:${P[1]}`, vi = V && `i:${V[1]}`, w = P && was(pi, 'holds');
       // a promise holds what Y owes the figure (the passage to pay before dawn) or, second draw, the secret of the one he looks for
       const quiet = !!(P && V && V[0].x !== P[0].x && (w ? w.b === vi : (S.tq.prom || 0) % 2 === 1));
       if (P) { if (quiet) link(pi, 'holds', vi); else { const t = th('need'); link(pi, 'holds', t); link(`p:${P[0].y}`, 'owes', t); } }
       if (V) { const t = th('debt'), knows = quiet ? [P[0].y, P[0].x] : [], can = hideTo(V[0], knows), ok = (b) => can.includes(b.slice(2));
-        link(vi, 'holds', t); link(`p:${V[0].x}`, 'owes', t); if (quiet) link(vi, 'hidden', 'f:0');
+        link(vi, 'holds', t); link(`p:${V[0].x}`, 'owes', t); if (quiet) link(vi, 'hidden', 'f:A');
         // hidden from the one he wants (afraid of losing them), unless that one knows
         const t0 = (wantOf(V[0].x) || {}).t, h0 = was(vi, 'hidden', (b) => b[0] === 'p' && ok(b)), h = h0 ? h0.b : t0 && can.includes(t0) ? `p:${t0}` : null;
         if (h) { link(vi, 'hidden', h); const f0 = was(vi, 'fear', ok); link(vi, 'fear', f0 ? f0.b : h); }
         for (const k of knows) link(vi, 'known', `p:${k}`); }
-      if (C) { const ci = `e:${C[1]}`; link(ci, 'takes', C[0].k === 'theft' ? th('has') : 'f:0');
+      if (C) { const ci = `e:${C[1]}`; if (C[0].k === 'theft') { const t = th('has'); link('f:A', 'has', t); link(ci, 'takes', t); } else link(ci, 'takes', 'f:A');
         if (C[0].k === 'theft' && P && !quiet && P[0].x === C[0].x) link(ci, 'for', pi); }
     }
-    const nx = { figs, things, links }; if (JSON.stringify(nx) !== JSON.stringify({ figs: S.figs || [], things: S.things || [], links: old })) { Object.assign(S, nx); save(); }
+    // what the author added: kept while both ends are there; what nothing points to anymore goes
+    const H = { figs: [...figs, ...(S.figs || []).filter((x) => x.by)], things: [...things, ...(S.things || []).filter((x) => x.by)], moments: S.moments || [], places: S.places || [] };
+    const hand = old.filter((l) => l.by && FILS.LINK[l.k] && there(l.a, H) && there(l.b, H)), used = new Set(hand.flatMap((l) => [l.a, l.b])), kept = (t, L2) => L2.filter((x) => used.has(`${t}:${x.id}`));
+    const nx = { figs: [...figs, ...kept('f', H.figs.filter((x) => x.by))], things: [...things, ...kept('t', H.things.filter((x) => x.by))], moments: kept('m', H.moments), places: kept('l', H.places), links: [...links, ...hand] };
+    if (JSON.stringify(nx) !== JSON.stringify({ figs: S.figs || [], things: S.things || [], moments: S.moments || [], places: S.places || [], links: old })) { Object.assign(S, nx); save(); }
   }
   // an info or an event gone: the links that point to it go, the others keep pointing to the same element
   const unref = (t, k) => { S.links = (S.links || []).filter((l) => l.a !== `${t}:${k}` && l.b !== `${t}:${k}`)
     .map((l) => { const f = (r) => (r && r[0] === t && +r.slice(2) > k ? `${t}:${+r.slice(2) - 1}` : r); return { ...l, a: f(l.a), b: f(l.b) }; }); };
+  // an end of a link in words, never through graph() (evFr would loop): [fr, en]
+  const EVN = { arrive: ['l’arrivée', 'the arrival'], gone: ['la disparition', 'the disappearance'], murder: ['le meurtre', 'the murder'], theft: ['le vol', 'the theft'], betray: ['la trahison', 'the betrayal'], threat: ['la menace', 'the threat'], revenge: ['la revanche', 'the revenge'] };
+  const nodeTxt = (r) => { const t = r[0], v = r.slice(2);
+    if (t === 'p') return [nm(v), en(v)];
+    if (t === 'f') { const x = (S.figs || []).find((f) => f.id === v); if (x && x.id === 'A') return [FILS.FIGS[x.r].n, FILS.FIGS[x.r].nE]; const c = x && catOf('f', x.c); return c ? [c[2], c[3]] : ['?', '?']; }
+    if (t === 't') { const x = (S.things || []).find((f) => f.id === v); if (!x) return ['?', '?']; if (!x.by) { const T2 = FILS.FIGS[(S.figs.find((f) => f.id === x.f) || { r: 0 }).r].t[x.r]; return [T2[1], T2[2]]; } const c = catOf('t', x.c); return [c[2], c[3]]; }
+    if (t === 'm' || t === 'l') { const x = (t === 'm' ? S.moments : S.places).find((f) => f.id === v), c = x && catOf(t, x.c); return c ? [c[2], c[3]] : ['?', '?']; }
+    if (t === 'i') { const i = S.infos[+v]; return [IN[i.id].fr(nm(i.x), nm(i.y)), IN[i.id].en(en(i.x), en(i.y))]; }
+    if (t === 'd') { const [w, k, o] = v.split(':'); return [`${nm(w)} veut ${DK[k].n}${o ? ' ' + nm(o) : ''}`, `${en(w)} wants ${DK[k].en}${o ? ' ' + en(o) : ''}`]; }
+    const e = S.ev[+v], N2 = EVN[e.k] || [e.k, e.k]; return [`${N2[0]} (${nm(e.x)})`, `${N2[1]} (${en(e.x)})`]; };
+  const linkTxt = (l) => { const K3 = FILS.LINK[l.k], A = nodeTxt(l.a), B = nodeTxt(l.b), two = l.both || K3.dir === 2;
+    return [`${A[0]} ${two ? '↔' : '→'} ${K3.fr} ${two ? '↔' : '→'} ${B[0]}`, `${A[1]} — ${K3.en}${two ? ' (both ways)' : ''} — ${B[1]}`]; };
   function graph() {
-    const G = { fig: null, say: new Map(), facts: [], need: null, prom: null, vil: null, cr: null, keeps: false }; weave();
-    const FG = window.FILS && FILS.FIGS; if (!FG || !(S.figs || []).length) return G;
-    const R = FG[S.figs[0].r], L = S.links, inf = (r) => S.infos[+r.slice(2)], pid = (r) => r.slice(2), from = (a, k) => L.filter((l) => l.a === a && l.k === k);
-    const isT = (b, r) => !!b && b[0] === 't' && (S.things[+b.slice(2)] || {}).r === r;
-    const hv = L.find((l) => l.k === 'holds' && isT(l.b, 'debt')), hp = L.find((l) => l.k === 'holds' && l.a[0] === 'i' && (isT(l.b, 'need') || l.b[0] === 'i'));
-    const tk = L.find((l) => l.k === 'takes'), prom = hp ? inf(hp.a) : null, vil = hv ? inf(hv.a) : null, cr = tk ? S.ev[+tk.a.slice(2)] : null, quiet = !!hp && hp.b[0] === 'i';
+    const G = { fig: null, say: new Map(), facts: [], more: [], need: null, prom: null, vil: null, cr: null, keeps: false }; weave();
+    const FG = window.FILS && FILS.FIGS; if (!FG) return G;
+    // what the author added, for the plan and the AI: each one off screen, then each link
+    for (const f of (S.figs || []).filter((x) => x.by)) { const T2 = nodeTxt(`f:${f.id}`); G.more.push([`${cap(T2[0])} n’est pas à l’écran : on en parle`, `${T2[1]} has no picture: never on screen, never speaks; the others talk about them`]); }
+    for (const l of (S.links || []).filter((x) => x.by)) G.more.push(linkTxt(l));
+    const A0 = (S.figs || []).find((f) => f.id === 'A'); if (!A0) return G;
+    const R = FG[A0.r], L = (S.links || []).filter((l) => !l.by), inf = (r) => S.infos[+r.slice(2)], pid = (r) => r.slice(2), from = (a, k) => L.filter((l) => l.a === a && l.k === k);
+    const hv = L.find((l) => l.k === 'holds' && l.b === 't:debt'), hp = L.find((l) => l.k === 'holds' && l.a[0] === 'i' && (l.b === 't:need' || l.b[0] === 'i'));
+    const tk = L.find((l) => l.k === 'takes' && l.a[0] === 'e'), prom = hp ? inf(hp.a) : null, vil = hv ? inf(hv.a) : null, cr = tk ? S.ev[+tk.a.slice(2)] : null, quiet = !!hp && hp.b[0] === 'i';
     G.fig = R; G.cr = cr;
     if (prom && quiet) { G.prom = prom; const v2 = inf(hp.b); G.say.set(prom, [`${nm(prom.x)} a promis à ${nm(prom.y)} de ne jamais dire ${R.dat} qui est ${nm(v2.x)}`, `${en(prom.x)} promised ${en(prom.y)} never to tell ${R.nE} who ${en(v2.x)} is`]); }
     else if (prom) { G.prom = prom; G.need = pid(L.find((l) => l.k === 'owes' && l.b === hp.b).a);
@@ -481,18 +509,40 @@ window.FORGE = (() => {
     G.facts.unshift([`${cap(R.n)} n’est pas à l’écran : on entend parler de lui`, `${R.nE} has no picture: never on screen, never speaks; the others talk about him`]);
     return G;
   }
-  // a link as the screen shows it: its two ends (a face, an icon) and its words; alts = what a tap can put instead of b
-  const nodeOf = (r) => { const t = r[0], v = r.slice(2), FG = FILS.FIGS;
-    if (t === 'p') return { h: mini(v), fr: nm(v) };
-    if (t === 'f') { const R = FG[S.figs[+v].r]; return { h: `<b>${R.e}</b>`, fr: R.n }; }
-    if (t === 't') { const x = S.things[+v], T2 = FG[S.figs[x.f].r].t[x.r]; return { h: `<b>${T2[0]}</b><small>${esc(T2[1])}</small>`, fr: T2[1] }; }
-    if (t === 'i') { const i = S.infos[+v]; return { h: `<b>${IN[i.id].e}</b>${mini(i.x)}${IN[i.id].s > 1 ? mini(i.y) : ''}`, fr: IN[i.id].fr(nm(i.x), nm(i.y)) }; }
-    const e = S.ev[+v]; return { h: `<b>${EK[e.k].e}</b>${mini(e.x)}`, fr: evFr(e) }; };
+  // a link's end as the screen shows it: a face or an icon, and its words
+  const nodeOf = (r) => { const t = r[0], v = r.slice(2), fr = nodeTxt(r)[0];
+    if (t === 'p') return { h: mini(v), fr };
+    if (t === 'f') { const x = S.figs.find((f) => f.id === v); return { h: `<b>${x.id === 'A' ? FILS.FIGS[x.r].e : catOf('f', x.c)[1]}</b>${x.by ? `<small>${esc(fr)}</small>` : ''}`, fr }; }
+    if (t === 't') { const x = S.things.find((f) => f.id === v); return { h: `<b>${x.by ? catOf('t', x.c)[1] : FILS.FIGS[S.figs.find((f) => f.id === x.f).r].t[x.r][0]}</b><small>${esc(fr)}</small>`, fr }; }
+    if (t === 'm' || t === 'l') { const x = (t === 'm' ? S.moments : S.places).find((f) => f.id === v); return { h: `<b>${catOf(t, x.c)[1]}</b><small>${esc(fr)}</small>`, fr }; }
+    if (t === 'i') { const i = S.infos[+v]; return { h: `<b>${IN[i.id].e}</b>${mini(i.x)}${IN[i.id].s > 1 ? mini(i.y) : ''}`, fr }; }
+    if (t === 'd') { const [w, k, o] = v.split(':'); return { h: `<b>${DK[k].e}</b>${mini(w)}${o ? mini(o) : ''}`, fr }; }
+    const e = S.ev[+v]; return { h: `<b>${EK[e.k].e}</b>${mini(e.x)}`, fr }; };
+  // what a tap can put at the other end of a link the story drew (the author's own: any end of the right type)
   const altsOf = (l) => { const { P, V } = tied();
-    if (l.k === 'holds' && P && l.a === `i:${P[1]}` && V && V[0].x !== P[0].x) return [l.b[0] === 'i' ? 't:new' : `i:${V[1]}`];
-    if (['hidden', 'fear'].includes(l.k) && l.b[0] === 'p' && V) { const knows = (S.links || []).filter((x) => x.a === l.a && x.k === 'known').map((x) => x.b.slice(2)), can = hideTo(V[0], knows);
+    if (l.by) { const all = nodesNow().filter((r) => r !== l.a && FILS.LINK[l.k].b.includes(FILS.END[r[0]])); return all.length > 1 ? [all[(all.indexOf(l.b) + 1) % all.length]] : []; }
+    if (l.k === 'holds' && P && l.a === `i:${P[1]}` && V && V[0].x !== P[0].x) return [l.b[0] === 'i' ? 't:need' : `i:${V[1]}`];
+    if (['hidden', 'fear'].includes(l.k) && l.b[0] === 'p' && V) { const knows = (S.links || []).filter((x) => x.a === l.a && x.k === 'known' && !x.by).map((x) => x.b.slice(2)), can = hideTo(V[0], knows);
       return can.length > 1 ? [`p:${can[(can.indexOf(l.b.slice(2)) + 1) % can.length]}`] : []; }
     return []; };
+  // every end there is now: the people, those off screen, the things, the infos, the events, the past, the places, the desires that matter
+  let DESN = [];   // the desires (set by render: desires() can't be called from graph())
+  const nodesNow = () => [...people().map((p) => `p:${p}`), ...(S.figs || []).map((f) => `f:${f.id}`), ...(S.things || []).map((x) => `t:${x.id}`),
+    ...infos().map((i) => `i:${S.infos.indexOf(i)}`), ...(S.ev || []).map((e, k) => (EK[e.k] && live(e.x) ? `e:${k}` : null)).filter(Boolean),
+    ...(S.moments || []).map((x) => `m:${x.id}`), ...(S.places || []).map((x) => `l:${x.id}`), ...DESN];
+  // a new end from the lists (f t m l): its id; then the link, by the author
+  const addNode = (t, c) => { const id = String((S.nid = (S.nid || 0) + 1)), key = { f: 'figs', t: 'things', m: 'moments', l: 'places' }[t]; (S[key] = S[key] || []).push({ id, c, by: 1 }); return `${t}:${id}`; };
+  const addLink = (a, k, b) => { if (!a || !b || a === b || (S.links || []).some((l) => l.a === a && l.k === k && l.b === b)) return false; (S.links = S.links || []).push({ a, k, b, by: 1 }); return true; };
+  // 🎲 un lien de plus: from any end, one way its chain can grow (FILS.GROW); an event of act 2 is only what something leads to
+  const grow = () => { const N = nodesNow(), deg = (r) => (S.links || []).filter((l) => l.a === r || l.b === r).length, G2 = FILS.GROW, rnd = (n) => Math.floor(Math.random() * n);
+    const tries = N.filter((r) => r[0] !== 'p' || r === `p:${J}` || deg(r)).flatMap((r) => G2.filter((g) => g.on === FILS.END[r[0]]).map((g) => ({ r, g })));
+    for (let n = 0; n < 40 && tries.length; n++) { const { r, g } = tries.splice(rnd(tries.length), 1)[0];
+      let o; if (g.to.startsWith('new:')) { const t = g.to.slice(4), C2 = FILS.CAT[t].filter((c) => !(S[{ f: 'figs', t: 'things', m: 'moments', l: 'places' }[t]] || []).some((x) => x.c === c[0])); if (!C2.length) continue; o = [t, C2[rnd(C2.length)][0]]; }
+      else { const c = N.filter((x) => x !== r && g.to.includes(FILS.END[x[0]]) && !(g.k !== 'leads' && x[0] === 'e' && (S.ev[+x.slice(2)].a || 1) > 1) && !(S.links || []).some((l) => l.k === g.k && ((l.a === r && l.b === x) || (l.a === x && l.b === r)))); if (!c.length) continue; o = c[rnd(c.length)]; }
+      const b = Array.isArray(o) ? addNode(...o) : o, [x, y] = g.rev ? [b, r] : [r, b], K3 = FILS.LINK[g.k];
+      if (!K3.a.includes(FILS.END[x[0]]) || !K3.b.includes(FILS.END[y[0]])) continue;
+      if (addLink(x, g.k, y)) return S.links.length - 1; }
+    return null; };
   const figOf = (e) => { const G = graph(); return G.fig && G.cr === e ? G.fig : null; };
   const vName = (e) => (e.v && live(e.v) ? nm(e.v) : figOf(e) ? figOf(e).n : 'quelqu’un'), vNameE = (e) => (e.v && live(e.v) ? en(e.v) : figOf(e) ? figOf(e).nE : 'someone');
   const ge = (id) => (id === J ? '' : '·e');   // Justin is « il »; the others' gender is not known
@@ -1370,7 +1420,7 @@ window.FORGE = (() => {
       open: openT.map((t) => { const last = t.steps.filter((x) => x.ep < n).pop(), ends = t.done && t.to === n; return { question: t.fr, state: last ? (MVp[last.mv] || ['', last.mv])[1] : 'ouverte', here: ends ? 'elle reçoit sa réponse dans cet épisode' : t.steps.some((x) => x.ep === n) ? 'elle avance dans cet épisode, sans réponse' : 'elle ne bouge pas : n’en parle pas' }; }),
       dead: [...REGp].filter(([, v]) => v === 'dead').map(([id]) => nm(id)) };
     const said = Object.fromEntries([...Array(n).keys()].map((k2) => [k2 + 1, linesOf(k2)]).filter(([, v]) => v)); if (Object.keys(said).length) storySoFar.lines = said;
-    return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [], story: storySoFar, ...(graph().facts.length ? { facts: graph().facts.map((f) => f[0]) } : {}),
+    return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [], story: storySoFar, ...(graph().facts.length + graph().more.length ? { facts: [...graph().facts, ...graph().more].map((f) => f[0]) } : {}),
       chars: S.cast.filter((id) => REGp.get(id) !== 'dead').map((id) => ({ id, name: nm(id), sprite: sprite(id), poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'].filter((p2) => window.SPRITES && SPRITES[sprite(id)] && SPRITES[sprite(id)].poses[p2]).concat(window.EXTRAS ? EXTRAS.poses(sprite(id)) : []), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), ...(window.FILS && FILS.VOICE[pillarsOf(id)[0]] ? { voice: FILS.VOICE[pillarsOf(id)[0]] } : {}), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
       infos: IL.map((i) => ({ id: iid(i), text: infoFr(i) })),
       boxes: [{ id: 'ep', title: `Épisode ${n + 1}`, col: 0, beats: epBeats }, { id: 'later', title: 'Plus tard', col: 1, beats: laterBeats }], links };
@@ -1407,7 +1457,7 @@ window.FORGE = (() => {
     const who = (id) => { const ps = pillarsOf(id), f = S.flaw[id] && F[S.flaw[id]], w = wantOf(id);
       return `- ${id === J ? 'justin (the player)' : `${en(id)} (id "${id}")`}: ${ps.length ? ps.map((p, i) => (i ? `mixed with ${P[p].en}` : P[p].en)).join(', ') : 'free'}${f ? `; flaw: ${f.en}` : ''}${w ? `; ${W[w.v].en(en(w.t))}` : ''}.`; };
     const rels = Object.entries(S.rel).filter(([k, v]) => v && k.split('|').every(live)).map(([k, v]) => `- ${k.split('|').map(en).join(' and ')}: ${R[v].en}`);
-    const facts = [...infos().map((i) => `- ${infoEn(i)}`), ...graph().facts.map((f) => `- ${f[1]}`)];
+    const facts = [...infos().map((i) => `- ${infoEn(i)}`), ...graph().facts.map((f) => `- ${f[1]}`), ...graph().more.map((f) => `- ${f[1]}`)];
     const hard = HARD.filter((h) => S.hard[h.id] && hardOk(h.id)).map((h) => `- ${h.en}`);
     const EP = episodes(), E = EP.map((x) => x.list), epText = EP.map(({ list, led }) => list.map((ev, i) => `- ${evEn(ev, i)}${(ev.rides || []).map((rd) => `\n  + in the same lines, also: ${rd.en}`).join('')}`).join('\n') + `\n- WHAT THIS EPISODE MUST DO: ${[led.eng.length ? `engage the audience in: ${led.eng.map((x) => x[1]).join('; ')}` : '', led.cur.length ? `open the questions: ${led.cur.map((x) => x[1]).join('; ')}` : '', led.stake.length ? `raise the stakes: ${led.stake.map((x) => x[1]).join('; ')}` : '', led.moved.length ? `move the story: ${led.moved.map((x) => x[1]).join('; ')}` : ''].filter(Boolean).join(' / ')}.`);
     const text = [`THE CHARACTERS (their pillar: what we follow them for; it shows in how they talk and act; their want):`, ...people().map(who),
@@ -1746,9 +1796,29 @@ Keep it natural, like the reference.`;
     bdEl.hidden = false; boardDraw();
   }
 
+  // ---- the links, by hand (17/11): a tap on a link = its actions; ＋ = from what → which link → to what ----
+  let selLk = null, addSt = null;
+  const endOf = (r) => (r.startsWith('new:') ? FILS.END[r[4]] : FILS.END[r[0]]);
+  const endH = (r) => { if (!r.startsWith('new:')) return nodeOf(r).h; const [, t, c] = r.split(':'), x = catOf(t, c); return `<b>${x[1]}</b><small>${esc(x[2])}</small>`; };
+  const NEWT = { f: ['👤', 'quelqu’un hors scène'], t: ['📦', 'une chose'], m: ['🕰️', 'un moment du passé'], l: ['📍', 'un lieu'] };
+  const nodePick = (attr, ok, not) => nodesNow().filter((r) => r !== not && ok(endOf(r))).map((r) => `<button type="button" class="fLink" ${attr}="${esc(r)}">${endH(r)}</button>`).join('')
+    + Object.entries(NEWT).filter(([t]) => ok(FILS.END[t])).map(([t, x]) => `<button type="button" class="fLink fLkAdd" data-gnew="${t}">＋ ${x[0]} ${esc(x[1])}</button>`).join('');
+  const linkPanel = () => { const l = selLk != null && S.links[selLk]; if (!l) return ''; const K3 = FILS.LINK[l.k], alt = altsOf(l).length;
+    return `<div class="fLkP"><p>${esc(linkTxt(l)[0])}${l.by ? '' : ' <em>(tiré par l’histoire)</em>'}</p>${alt ? '<button type="button" class="fLink" data-gnext="1">↻ autre bout</button>' : ''}`
+      + `${K3.dir === 0 ? `<button type="button" class="fLink${l.both ? ' on' : ''}" data-gboth="1" data-tip="Ce lien-là va dans les deux sens, ou pas">↔ dans les deux sens</button>` : ''}${l.by ? '<button type="button" class="fLink" data-gdel="1">✕ enlever</button>' : ''}</div>`; };
+  const addPanel = () => { if (!addSt) return ''; const LK = FILS.LINK, x = '<button type="button" class="fLink fLkAdd" data-gcancel="1">✕</button>';
+    if (addSt.cat) return `<div class="fLkP"><p>${NEWT[addSt.cat][0]} Lequel ?</p>${FILS.CAT[addSt.cat === 'f' ? 'f' : addSt.cat] ? (addSt.cat === 'f' ? [...FILS.FOLK, ...FILS.FIGS.map((R) => [R.k, R.e, R.n])] : FILS.CAT[addSt.cat]).map((c) => `<button type="button" class="fLink" data-gcat="${c[0]}"><b>${c[1]}</b><small>${esc(c[2])}</small></button>`).join('') : ''}${x}</div>`;
+    if (!addSt.a) return `<div class="fLkP"><p>1. De quoi part le lien ?</p>${nodePick('data-gpa', () => true)}${x}</div>`;
+    if (!addSt.k) { const t = endOf(addSt.a);
+      return `<div class="fLkP"><p>${endH(addSt.a)} 2. Quel lien ?</p>${FILS.LGROUPS.map(([g, e, n]) => { const ks = Object.entries(LK).filter(([, K3]) => K3.g === g && K3.a.includes(t)); return ks.length ? `<div class="fLkG"><b data-tip="${esc(n)}">${e}</b>${ks.map(([k, K3]) => `<button type="button" class="fLink" data-gk="${k}">${K3.e} ${esc(K3.fr)}${K3.dir === 2 ? ' ↔' : ''}</button>`).join('')}</div>` : ''; }).join('')}${x}</div>`; }
+    const K3 = LK[addSt.k]; return `<div class="fLkP"><p>${endH(addSt.a)} ${K3.e} ${esc(K3.fr)} … 3. Vers quoi ?</p>${nodePick('data-gpb', (t) => K3.b.includes(t), addSt.a)}${x}</div>`; };
+  const realEnd = (r) => (r.startsWith('new:') ? addNode(r[4], r.slice(6)) : r);
+  const addDone = (b) => { const a = realEnd(addSt.a), k = addSt.k; addSt = null; if (addLink(a, k, realEnd(b))) selLk = S.links.length - 1; else msg = 'Ce lien existe déjà'; };
+
   function render() {
     if (!el) return;
     const ST = story(), cs = ST.C, EPS = episodes(), hasKey = !!ls('smt-key');
+    DESN = [...new Set(ST.D.filter((d) => d.s >= 2 && !d.dead && !d.late && live(d.who) && (!d.t || live(d.t))).map((d) => `d:${d.who}:${d.k}:${d.t || ''}`))];
     el.innerHTML = `<div class="fTop"><b>⚡ Créer</b><button type="button" class="fEx" data-x="example" data-tip="L’exemple : une histoire concrète de bout en bout (le voleur de la taverne)">📖</button><button type="button" class="fDice" data-x="dice" aria-label="Au hasard" data-tip="Tout au hasard">🎲</button></div>`
       + (S.ex ? `<div class="fExBar"><b>📖 Le voleur de la taverne</b><span>L’exemple concret : chaque moment a ses vrais mots.</span><button type="button" data-x="exep1" data-tip="Joue l’épisode 1 tel qu’il est écrit (sans IA)">▶ Épisode 1 écrit</button></div>` : '')
       // WHAT
@@ -1768,8 +1838,10 @@ Keep it natural, like the reference.`;
       // HOW
       + (() => { const G = graph(); if (!G.facts.length) return ''; const LK = FILS.LINK;
         return `<section class="fFacts" data-tip="Les faits : ce à quoi le reste est relié. Tirés avec 🎲. Un tap sur la première ligne = une autre figure ; sur la promesse = ce qu’elle contient">${G.facts.map((f, k) => `<button type="button" ${k === 0 ? 'data-gfig="1"' : G.prom && f === G.say.get(G.prom) ? 'data-gprom="1"' : 'disabled'}>🕸️ ${esc(f[0])}</button>`).join('')}`
-          + `<div class="fLinks">${S.links.map((l, k) => { const A = nodeOf(l.a), B = nodeOf(l.b), K3 = LK[l.k], alt = altsOf(l).length;
-            return `<button type="button" class="fLink" ${alt ? `data-glk="${k}"` : 'disabled'} data-tip="${esc(`${A.fr}\n${K3.e} ${K3.fr}\n${B.fr}${alt ? '\nUn tap = le lien suivant possible' : ''}`)}">${A.h}<i>${K3.e} ${esc(K3.fr)}</i>${B.h}</button>`; }).join('')}</div></section>`; })()
+          + `<div class="fLinks">${S.links.map((l, k) => { const A = nodeOf(l.a), B = nodeOf(l.b), K3 = LK[l.k], two = l.both || K3.dir === 2;
+            return `<button type="button" class="fLink${selLk === k ? ' on' : ''}${l.by ? ' by' : ''}" data-glk="${k}" data-tip="${esc(linkTxt(l)[0])}">${A.h}<i>${two ? '↔ ' : ''}${K3.e} ${esc(K3.fr)}</i>${B.h}</button>`; }).join('')}`
+          + `<button type="button" class="fLink fLkAdd${addSt ? ' on' : ''}" data-gadd="1" data-tip="Relier deux choses à la main : de quoi → quel lien → vers quoi">＋ relier</button><button type="button" class="fLink fLkAdd" data-ggrow="1" data-tip="Un lien de plus, tiré au hasard : une chaîne qui s’allonge (une dette → née de quoi → où → avec qui). ✕ pour l’enlever">🎲 un lien de plus</button></div>`
+          + linkPanel() + addPanel() + '</section>'; })()
       + layer('2', 'Comment', '1. Le moteur : ce qui lance et bloque l’histoire. 2. Les techniques de plot.')
       + `<section class="fConf" data-tip="Les conflits : deux désirs qui ne peuvent pas gagner tous les deux (déduits des désirs, des liens, des événements)">${cs.length ? cs.map((c) => `<div>${mini(c.a)}<b>${c.e}</b>${mini(c.b)}<span class="fCt">${esc(c.fr)}</span></div>`).join('') : '<div class="none">⚠️ <span class="fCt">Pas de conflit : donne des 🎯 qui se croisent</span></div>'}</section>`
       + (ST.PL.length ? `<section class="fPls" data-tip="Les plotlines : un désir fort et ses conflits. Celles de Justin sont les lignes principales ; les autres courent « pendant ce temps »">${ST.PL.map((p2, k) => `<div class="${p2.main ? 'main' : ''}" style="--c:${LANE[k % LANE.length]}"><i></i>${mini(p2.d.who)}<b>${DK[p2.d.k].e}</b><span class="fCt">${esc(`${DK[p2.d.k].n}${p2.d.t ? ' ' + tName(p2.d) : ''}`)}</span><em>${p2.cs.map((c) => c.e).join('')}</em></div>`).join('')}</section>` : '')
@@ -1823,6 +1895,7 @@ Keep it natural, like the reference.`;
     const t = e.target.closest('button'); if (!t || !el.contains(t)) return;   // ⬇ is a link: it downloads by itself
     e.stopPropagation();
     const d = t.dataset; msg = '';
+    if (!Object.keys(d).some((k) => /^g(lk|next|both|del|add|cancel|new|cat|pa|k|pb|grow)$/.test(k))) { selLk = null; addSt = null; }
     if (d.decor) S.decor = d.decor;
     else if (d.cast) { const k = S.cast.indexOf(d.cast); if (k >= 0) S.cast.splice(k, 1); else S.cast.push(d.cast); }
     else if (d.pil) { const [id, p] = d.pil.split(':'), a = (S.pil[id] = pillarsOf(id)), k = a.indexOf(p); if (k >= 0) a.splice(k, 1); else { if (a.length >= 2) a.pop(); a.push(p); } }
@@ -1845,7 +1918,18 @@ Keep it natural, like the reference.`;
     else if (d.acts) S.acts = +d.acts;
     else if (d.gfig) S.figs[0].r = (S.figs[0].r + 1) % FILS.FIGS.length;
     else if (d.gprom) { const l = S.links.find((x) => x.k === 'holds' && x.a === `i:${S.infos.indexOf(graph().prom)}`), nx = l && altsOf(l)[0]; if (nx) l.b = nx; }
-    else if (d.glk) { const l = S.links[+d.glk], nx = l && altsOf(l)[0]; if (nx) { const f = l.k === 'hidden' && S.links.find((x) => x.a === l.a && x.k === 'fear' && x.b === l.b); if (f) f.b = nx; l.b = nx; } }
+    else if (d.glk) { selLk = selLk === +d.glk ? null : +d.glk; addSt = null; }
+    else if (d.gnext) { const l = S.links[selLk], nx = l && altsOf(l)[0]; if (nx) { const f = l.k === 'hidden' && !l.by && S.links.find((x) => x.a === l.a && x.k === 'fear' && x.b === l.b && !x.by); if (f) f.b = nx; l.b = nx; } }
+    else if (d.gboth) { const l = S.links[selLk]; if (l) l.both = l.both ? 0 : 1; }
+    else if (d.gdel) { S.links.splice(selLk, 1); selLk = null; }
+    else if (d.gadd) { addSt = addSt ? null : {}; selLk = null; }
+    else if (d.gcancel) addSt = null;
+    else if (d.gnew) addSt.cat = d.gnew;
+    else if (d.gcat) { const r = `new:${addSt.cat}:${d.gcat}`; addSt.cat = null; if (!addSt.a) addSt.a = r; else addDone(r); }
+    else if (d.gpa) addSt.a = d.gpa;
+    else if (d.gk) addSt.k = d.gk;
+    else if (d.gpb) addDone(d.gpb);
+    else if (d.ggrow) { const k = grow(); selLk = k; addSt = null; if (k == null) msg = 'Rien à prolonger pour le moment'; }
     else if (d.eva) { const e = S.ev[+d.eva]; e.a = (e.a || 1) === 2 ? 1 : 2; }
     else if (d.ia) { const i = S.infos[+d.ia]; i.a = (IN[i.id].k === 'object' ? actOf(i) : iAct(i)) === 2 ? 1 : 2; }
     else if (d.x === 'board') { save(); return boardOpen(); }

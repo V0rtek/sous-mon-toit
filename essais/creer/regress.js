@@ -31,8 +31,14 @@ const check = () => { const out = [], EPS = FORGE.episodes(), TH = EPS.threads |
   try { if (/undefined|NaN/.test(FORGE.plotText())) out.push('plotText has undefined'); } catch (e) { out.push('plotText throws ' + e.message); }
   // the graph (step 1, 17/11): every stored link has a known kind and both its ends exist
   const S = JSON.parse(localStorage.getItem('smt-forge2') || '{}'), ok = (r) => { const t = r && r[0], v = r && r.slice(2), n = +v;
-    return t === 'p' ? v === 'justin' || (S.cast || []).includes(v) : t === 'i' ? !!(S.infos || [])[n] : t === 'e' ? !!(S.ev || [])[n] : t === 't' ? !!(S.things || [])[n] : t === 'f' ? !!(S.figs || [])[n] : false; };
-  for (const l of S.links || []) if (!FILS.LINK[l.k] || !ok(l.a) || !ok(l.b)) out.push(`bad link ${l.a} ${l.k} ${l.b}`);
+    const by = (L) => (L || []).some((x) => x.id === v), pp = (id) => id === 'justin' || (S.cast || []).includes(id);
+    return t === 'p' ? pp(v) : t === 'i' ? !!(S.infos || [])[n] : t === 'e' ? !!(S.ev || [])[n] : t === 't' ? by(S.things) : t === 'f' ? by(S.figs) : t === 'm' ? by(S.moments) : t === 'l' ? by(S.places)
+      : t === 'd' ? pp(v.split(':')[0]) : false; };
+  for (const l of S.links || []) { const K = FILS.LINK[l.k]; if (!K || !ok(l.a) || !ok(l.b) || !K.a.includes(FILS.END[l.a[0]]) || !K.b.includes(FILS.END[l.b[0]])) out.push(`bad link ${l.a} ${l.k} ${l.b}`); }
+  // 🎲 un lien de plus, 3 times: the chain grows with links that hold
+  for (let g = 0; g < 3; g++) document.querySelector('#forgeBody [data-ggrow]')?.click();
+  const S2 = JSON.parse(localStorage.getItem('smt-forge2') || '{}'); for (const l of (S2.links || []).filter((x) => x.by)) if (!FILS.LINK[l.k] || !FILS.LINK[l.k].a.includes(FILS.END[l.a[0]]) || !FILS.LINK[l.k].b.includes(FILS.END[l.b[0]])) out.push(`bad grown link ${l.a} ${l.k} ${l.b}`);
+  try { if (/undefined|NaN|\?\s—|— \?/.test(FORGE.seed().text)) out.push('grown links: undefined or ? in the seed'); } catch (e) { out.push('seed throws after 🎲 un lien de plus: ' + e.message); }
   const knots = EPS.reduce((t, e) => t + e.list.filter((b) => new Set([b, ...(b.rides || [])].flatMap((z) => (z.mv || []).map((m) => m[0]))).size >= 3).length, 0);
   return { out, eps: EPS.length, th: TH.length, knots }; };
 (async () => {

@@ -407,37 +407,101 @@ window.FILS = (() => {
   // by when, why he would be looking for someone. The promise, the theft, the secret of « the one they look for » all
   // tie to him: one fact, several reasons to react. n / dat / gen = le passeur / au passeur / du passeur ----
   const FIGS = [
-    { n: 'le passeur', e: '🚣', t: { has: ['👝', 'sa bourse'], need: ['⛵', 'la traversée du frère'], debt: ['🎲', 'une dette de jeu'] }, dat: 'au passeur', gen: 'du passeur', nE: 'the ferryman', thing: 'sa bourse', thingOf: 'la bourse du passeur', thingE: 'his purse', thingOfE: 'the ferryman\'s purse',
+    { n: 'le passeur', k: 'passeur', e: '🚣', t: { has: ['👝', 'sa bourse', 'his purse'], need: ['⛵', 'la traversée du frère', 'the brother\'s crossing'], debt: ['🎲', 'une dette de jeu', 'a gambling debt'] }, dat: 'au passeur', gen: 'du passeur', nE: 'the ferryman', thing: 'sa bourse', thingOf: 'la bourse du passeur', thingE: 'his purse', thingOfE: 'the ferryman\'s purse',
       need: (y) => `${y} doit payer le passeur avant l’aube pour faire traverser son frère`, needE: (y) => `${y} must pay the ferryman before dawn to get their brother across`,
       lost: 'pas de bourse, pas de bateau', lostE: 'no purse, no boat', wanted: 'une dette de jeu', wantedE: 'a gambling debt' },
-    { n: 'l’usurier', e: '🧮', t: { has: ['📒', 'son livre de comptes'], need: ['🏠', 'le remboursement'], debt: ['💰', 'un prêt jamais rendu'] }, dat: 'à l’usurier', gen: 'de l’usurier', nE: 'the moneylender', thing: 'son livre de comptes', thingOf: 'le livre de comptes de l’usurier', thingE: 'his ledger', thingOfE: 'the moneylender\'s ledger',
+    { n: 'l’usurier', k: 'usurier', e: '🧮', t: { has: ['📒', 'son livre de comptes', 'his ledger'], need: ['🏠', 'le remboursement', 'the repayment'], debt: ['💰', 'un prêt jamais rendu', 'a loan never paid back'] }, dat: 'à l’usurier', gen: 'de l’usurier', nE: 'the moneylender', thing: 'son livre de comptes', thingOf: 'le livre de comptes de l’usurier', thingE: 'his ledger', thingOfE: 'the moneylender\'s ledger',
       need: (y) => `${y} doit rembourser l’usurier avant demain, ou perd sa maison`, needE: (y) => `${y} must pay the moneylender back before tomorrow, or lose their house`,
       lost: 'sans son livre, il réclame tout, ce soir', lostE: 'without his ledger he calls in everything, tonight', wanted: 'un prêt jamais rendu', wantedE: 'a loan never paid back' },
-    { n: 'le capitaine de la garde', e: '💂', t: { has: ['🔏', 'son sceau'], need: ['🔓', 'la sortie du frère'], debt: ['🏃', 'une désertion'] }, dat: 'au capitaine', gen: 'du capitaine', nE: 'the captain of the guard', thing: 'son sceau', thingOf: 'le sceau du capitaine', thingE: 'his seal', thingOfE: 'the captain\'s seal',
+    { n: 'le capitaine de la garde', k: 'capitaine', e: '💂', t: { has: ['🔏', 'son sceau', 'his seal'], need: ['🔓', 'la sortie du frère', 'the brother\'s release'], debt: ['🏃', 'une désertion', 'a desertion'] }, dat: 'au capitaine', gen: 'du capitaine', nE: 'the captain of the guard', thing: 'son sceau', thingOf: 'le sceau du capitaine', thingE: 'his seal', thingOfE: 'the captain\'s seal',
       need: (y) => `${y} doit obtenir du capitaine, avant l’aube, la sortie de son frère, en cellule`, needE: (y) => `${y} must get the captain to release their brother from his cell before dawn`,
       lost: 'sans son sceau, il ne signe aucune sortie', lostE: 'without his seal he signs no release', wanted: 'une désertion', wantedE: 'a desertion' },
-    { n: 'le propriétaire', e: '🔑', t: { has: ['🪙', 'sa caisse'], need: ['🏠', 'trois mois de loyer'], debt: ['🍺', 'une ardoise jamais payée'] }, dat: 'au propriétaire', gen: 'du propriétaire', nE: 'the landlord', thing: 'sa caisse', thingOf: 'la caisse du propriétaire', thingE: 'his cash box', thingOfE: 'the landlord\'s cash box',
+    { n: 'le propriétaire', k: 'proprio', e: '🔑', t: { has: ['🪙', 'sa caisse', 'his cash box'], need: ['🏠', 'trois mois de loyer', 'three months of rent'], debt: ['🍺', 'une ardoise jamais payée', 'a tab never paid'] }, dat: 'au propriétaire', gen: 'du propriétaire', nE: 'the landlord', thing: 'sa caisse', thingOf: 'la caisse du propriétaire', thingE: 'his cash box', thingOfE: 'the landlord\'s cash box',
       need: (y) => `${y} doit trois mois de loyer au propriétaire, à payer avant la fermeture`, needE: (y) => `${y} owes the landlord three months of rent, due before closing time`,
       lost: 'caisse vide : il veut son loyer ce soir', lostE: 'cash box empty: he wants his rent tonight', wanted: 'une ardoise jamais payée', wantedE: 'a tab never paid' },
   ];
-  // the THINGS of a figure (t: [icon, short name]): has = what he holds (it can be stolen), need = what someone must pay him
-  // or get from him, by when (a promise can be about it), debt = why he looks for someone. A thing is { f: figure, r: role }
-  // in the story (S.things)
-  // the kinds of LINK (17/11, PREMIER JET : Justin n'a pas tranché le grain). A link { a, k, b } in S.links; a and b are
-  // p:<id> a person · f:<n> a figure · t:<n> a thing · i:<n> an info · e:<n> an event. Used today: owes, holds, takes, for,
-  // hidden, fear, known; the others are named for what comes next (step 2: every secret gets its ties; beliefs)
+  // the THINGS of a figure (t: [icon, short name, english]): has = what he holds (it can be stolen), need = what someone
+  // must pay him or get from him, by when (a promise can be about it), debt = why he looks for someone
+
+  // ---- THE GRAPH (17/11, PREMIER JET, à reprendre avec Justin) : « tout est possible ». A link { a, k, b } (S.links);
+  // most are left empty: only what serves is drawn, the author adds the rest (＋) or grows a chain (🎲 un lien de plus).
+  // Several links of the same kind are fine. The ends: P a person (p: someone in the cast, f: someone off screen), T a
+  // thing (t:), I an info (i:), E something that happened (e: an event of the story, m: a moment of the past), D a desire
+  // (d:who:kind:whom), L a place (l:). dir: 1 one way, 2 both ways by nature, 0 it depends (each link says: both) ----
+  const LGROUPS = [['cause', '⏳', 'Cause et temps'], ['know', '🙈', 'Savoir et secrets'], ['folk', '🤝', 'Entre les gens'], ['thing', '📦', 'Choses et lieux']];
   const LINK = {
-    owes: { e: '💸', fr: 'doit', en: 'owes' },                         // a person → a thing (the passage to pay, a gambling debt)
-    holds: { e: '📦', fr: 'contient', en: 'is about' },                // an info (a promise, a secret) → a thing or another info
-    takes: { e: '✋', fr: 'prend', en: 'takes' },                       // an event → what it hits (what was stolen, who)
-    for: { e: '🎯', fr: 'pour', en: 'to' },                            // an event → what it serves (the promise it keeps)
-    because: { e: '⬅️', fr: 'à cause de', en: 'because of' },
-    hidden: { e: '🙈', fr: 'caché à', en: 'hidden from' },             // a secret → from whom
-    fear: { e: '😨', fr: 'par peur de la réaction de', en: 'for fear of how they would take it:' },
-    known: { e: '👁️', fr: 'su par', en: 'known by' },
-    proves: { e: '🔎', fr: 'prouve', en: 'proves' },
-    wrong: { e: '🌀', fr: 'croit à tort', en: 'wrongly believes' },
+    // cause et temps
+    because: { g: 'cause', e: '⬅️', fr: 'à cause de', en: 'because of', a: 'PTIEDL', b: 'PTIEDL', dir: 1 },
+    for: { g: 'cause', e: '🎯', fr: 'pour', en: 'in order to / for', a: 'PTIE', b: 'PTIEDL', dir: 1 },
+    born: { g: 'cause', e: '🌱', fr: 'née de', en: 'was born of', a: 'TIDP', b: 'E', dir: 1 },
+    leads: { g: 'cause', e: '➡️', fr: 'mène à', en: 'leads to', a: 'E', b: 'E', dir: 1 },
+    same: { g: 'cause', e: '🕰️', fr: 'le même soir que', en: 'happened the same night as', a: 'E', b: 'E', dir: 2 },
+    blocks: { g: 'cause', e: '🚧', fr: 'empêche', en: 'stands in the way of', a: 'PTIE', b: 'PTED', dir: 1 },
+    threat: { g: 'cause', e: '⚠️', fr: 'menace', en: 'threatens', a: 'PTIE', b: 'PTD', dir: 1 },
+    // savoir et secrets
+    hidden: { g: 'know', e: '🙈', fr: 'caché à', en: 'hidden from', a: 'ITE', b: 'P', dir: 1 },
+    known: { g: 'know', e: '👁️', fr: 'su par', en: 'known by', a: 'ITE', b: 'P', dir: 1 },
+    fear: { g: 'know', e: '😨', fr: 'par peur de la réaction de', en: 'kept for fear of how this one would take it:', a: 'I', b: 'P', dir: 1 },
+    keeps: { g: 'know', e: '🫂', fr: 'gardé pour ne pas perdre', en: 'kept so as not to lose', a: 'I', b: 'DP', dir: 1 },
+    wrong: { g: 'know', e: '🌀', fr: 'croit à tort', en: 'wrongly believes', a: 'P', b: 'IEP', dir: 1 },
+    lie: { g: 'know', e: '🎭', fr: 'repose sur un mensonge :', en: 'rests on a lie:', a: 'IDE', b: 'IE', dir: 1 },
+    proves: { g: 'know', e: '🔎', fr: 'prouve', en: 'proves', a: 'TIP', b: 'IE', dir: 1 },
+    saw: { g: 'know', e: '👀', fr: 'a vu', en: 'witnessed', a: 'P', b: 'E', dir: 1 },
+    suspects: { g: 'know', e: '🤨', fr: 'soupçonne', en: 'suspects', a: 'P', b: 'PE', dir: 1 },
+    liesto: { g: 'know', e: '🤥', fr: 'ment à', en: 'lies to', a: 'P', b: 'P', dir: 0 },
+    // entre les gens
+    owes: { g: 'folk', e: '💸', fr: 'doit', en: 'owes', a: 'P', b: 'TP', dir: 1 },
+    toward: { g: 'folk', e: '🧾', fr: 'envers', en: 'owed to', a: 'T', b: 'P', dir: 1 },
+    promised: { g: 'folk', e: '🤞', fr: 'a promis à', en: 'made a promise to', a: 'P', b: 'P', dir: 1 },
+    saved: { g: 'folk', e: '🛟', fr: 'a sauvé', en: 'once saved', a: 'P', b: 'P', dir: 1 },
+    betrayed: { g: 'folk', e: '🐍', fr: 'a trahi', en: 'betrayed', a: 'P', b: 'P', dir: 1 },
+    loves: { g: 'folk', e: '❤️', fr: 'aime', en: 'loves', a: 'P', b: 'P', dir: 0 },
+    grudge: { g: 'folk', e: '😠', fr: 'en veut à', en: 'holds a grudge against', a: 'P', b: 'P', dir: 0 },
+    family: { g: 'folk', e: '🩸', fr: 'même sang que', en: 'is family of', a: 'P', b: 'P', dir: 2 },
+    past: { g: 'folk', e: '📼', fr: 'a un passé avec', en: 'shares a past with', a: 'P', b: 'P', dir: 2 },
+    allies: { g: 'folk', e: '🤝', fr: 'complice de', en: 'is in it together with', a: 'P', b: 'P', dir: 2 },
+    looks: { g: 'folk', e: '🔦', fr: 'cherche', en: 'is looking for', a: 'P', b: 'PT', dir: 1 },
+    protects: { g: 'folk', e: '🛡️', fr: 'protège', en: 'protects', a: 'P', b: 'PT', dir: 1 },
+    uses: { g: 'folk', e: '🪝', fr: 'se sert de', en: 'uses', a: 'P', b: 'PT', dir: 1 },
+    wants: { g: 'folk', e: '🤲', fr: 'veut', en: 'wants', a: 'P', b: 'TPL', dir: 1 },
+    // choses et lieux
+    holds: { g: 'thing', e: '📦', fr: 'contient', en: 'is about', a: 'IT', b: 'TIE', dir: 1 },
+    has: { g: 'thing', e: '✊', fr: 'a', en: 'has', a: 'P', b: 'T', dir: 1 },
+    takes: { g: 'thing', e: '✋', fr: 'prend', en: 'takes', a: 'PE', b: 'TP', dir: 1 },
+    where: { g: 'thing', e: '📍', fr: 'à', en: 'at', a: 'ETP', b: 'L', dir: 1 },
+    with: { g: 'thing', e: '👥', fr: 'avec', en: 'with', a: 'E', b: 'P', dir: 1 },
+    hiddenin: { g: 'thing', e: '🕳️', fr: 'caché dans', en: 'hidden in', a: 'T', b: 'LTP', dir: 1 },
   };
+  // the end types of a ref: p f → P, t → T, i → I, e m → E, d → D, l → L
+  const END = { p: 'P', f: 'P', t: 'T', i: 'I', e: 'E', m: 'E', d: 'D', l: 'L' };
+  // what can be added: people off screen (FOLK, plus the figures above), things, moments of the past, places (never typed)
+  const FOLK = [['frere', '👦', 'le frère', 'the brother'], ['soeur', '👧', 'la sœur', 'the sister'], ['mere', '👵', 'la mère', 'the mother'], ['pere', '👴', 'le père', 'the father'],
+    ['enfant', '🧒', 'l’enfant', 'the child'], ['croupier', '🎰', 'le croupier', 'the dealer'], ['juge', '⚖️', 'le juge', 'the judge'], ['pretre', '⛪', 'le prêtre', 'the priest'],
+    ['associe', '🤝', 'l’ancien associé', 'the old partner'], ['veuve', '🖤', 'la veuve', 'the widow'], ['medecin', '🩺', 'le médecin', 'the healer'], ['marchand', '🧺', 'le marchand', 'the merchant'],
+    ['amour', '💔', 'l’ancien amour', 'the old flame'], ['inconnu', '🎭', 'l’inconnu du port', 'the stranger from the docks']];
+  const THINGS = [['lettre', '✉️', 'une lettre', 'a letter'], ['bague', '💍', 'une bague', 'a ring'], ['cle', '🗝️', 'une clé', 'a key'], ['carte', '🗺️', 'une carte', 'a map'],
+    ['couteau', '🔪', 'un couteau', 'a knife'], ['fiole', '🧪', 'une fiole de poison', 'a vial of poison'], ['portrait', '🖼️', 'un portrait', 'a portrait'], ['registre', '📒', 'un registre', 'a register'],
+    ['des', '🎲', 'des dés pipés', 'loaded dice'], ['acte', '📜', 'un acte de propriété', 'a deed'], ['billet', '🎫', 'un billet pour le dernier bateau', 'a ticket for the last boat'],
+    ['medaille', '🏅', 'une médaille', 'a medal'], ['sang', '🩸', 'une tache de sang', 'a bloodstain'], ['dette', '💸', 'une dette', 'a debt'], ['serment', '🤞', 'un serment', 'an oath'], ['testament', '🪶', 'un testament', 'a will']];
+  const MOMENTS = [['cartes', '🃏', 'une partie de cartes qui a mal tourné', 'a card game that went wrong'], ['incendie', '🔥', 'l’incendie du port', 'the fire at the harbor'],
+    ['naufrage', '🌊', 'le naufrage', 'the shipwreck'], ['desertion', '🏃', 'la nuit de la désertion', 'the night of the desertion'], ['duel', '⚔️', 'un duel à l’aube', 'a duel at dawn'],
+    ['mariage', '💒', 'un mariage', 'a wedding'], ['enterrement', '⚰️', 'un enterrement', 'a funeral'], ['proces', '⚖️', 'le procès', 'the trial'], ['fuite', '🌙', 'une fuite de nuit', 'a flight by night'],
+    ['famine', '❄️', 'l’hiver de la famine', 'the winter of the famine'], ['fete', '🎉', 'la fête du solstice', 'the solstice feast'], ['rencontre', '👀', 'leur première rencontre', 'the first time they met'],
+    ['prison', '⛓️', 'les années de prison', 'the years in prison'], ['guerre', '🛡️', 'la guerre', 'the war'], ['vol', '💰', 'un vieux vol jamais résolu', 'an old theft never solved']];
+  const PLACES = [['tripot', '🎲', 'le tripot du port', 'the gambling den by the harbor'], ['quai', '⚓', 'le quai', 'the dock'], ['prison', '⛓️', 'la prison', 'the prison'], ['chapelle', '⛪', 'la chapelle', 'the chapel'],
+    ['foret', '🌲', 'la forêt', 'the forest'], ['arriere', '🚪', 'l’arrière-salle', 'the back room'], ['maison', '🏚️', 'la maison de famille', 'the family house'], ['bateau', '⛵', 'le bateau', 'the boat'],
+    ['marche', '🧺', 'le marché', 'the market'], ['cimetiere', '🪦', 'le cimetière', 'the graveyard'], ['route', '🛤️', 'la route du nord', 'the north road'], ['cave', '🍷', 'la cave', 'the cellar']];
+  const CAT = { f: FOLK, t: THINGS, m: MOMENTS, l: PLACES };
+  // 🎲 un lien de plus: how a chain grows from what is there (« une dette de jeu : envers qui ? née de quoi ? où ? avec
+  // qui ? ce soir-là, quoi d'autre ? »). on = the end type the chain grows from; k = the link; to = an existing end of these
+  // types, or new:<f|t|m|l> = a new one from the lists; rev = the new end is the link's a (« Isa a vu la partie de cartes »)
+  const GROW = [
+    { on: 'T', k: 'born', to: 'new:m' }, { on: 'T', k: 'toward', to: 'P' }, { on: 'T', k: 'hiddenin', to: 'new:l' }, { on: 'T', k: 'known', to: 'P' }, { on: 'T', k: 'proves', to: 'IE' },
+    { on: 'E', k: 'where', to: 'new:l' }, { on: 'E', k: 'with', to: 'P' }, { on: 'E', k: 'with', to: 'new:f' }, { on: 'E', k: 'same', to: 'new:m' }, { on: 'E', k: 'saw', to: 'P', rev: 1 }, { on: 'E', k: 'leads', to: 'E' },
+    { on: 'I', k: 'keeps', to: 'D' }, { on: 'I', k: 'known', to: 'P' }, { on: 'I', k: 'born', to: 'new:m' }, { on: 'I', k: 'proves', to: 'new:t', rev: 1 }, { on: 'I', k: 'lie', to: 'E' },
+    { on: 'P', k: 'past', to: 'P' }, { on: 'P', k: 'family', to: 'new:f' }, { on: 'P', k: 'owes', to: 'new:t' }, { on: 'P', k: 'saw', to: 'E' }, { on: 'P', k: 'wrong', to: 'I' }, { on: 'P', k: 'grudge', to: 'P' }, { on: 'P', k: 'saved', to: 'P' },
+    { on: 'D', k: 'because', to: 'new:m' }, { on: 'L', k: 'hiddenin', to: 'new:t', rev: 1 },
+  ];
   // a basic voice, from the pillar: how they talk (it goes in each character of the plan)
   const VOICE = { chef: 'phrases courtes, des ordres calmes, ne se justifie jamais', charmeur: 'taquine, double sens, répond par une question', dangereux: 'très peu de mots, poli, jamais une menace criée',
     genie: 'précis, corrige les autres, un temps d’avance', clown: 'répond par une blague, surtout quand ça fait mal', mysterieux: 'répond à côté, laisse les phrases en suspens',
@@ -450,5 +514,5 @@ window.FILS = (() => {
     for (const [mv, F] of Object.entries(FORMS)) { const G = GS.find((g) => g.id === F.g); if (!G) continue;
       for (const f of F.list) { G.tech.push({ n: f.n, d: f.d, ex: f.ex, [mv]: 1, thread: 1 }); CT[f.n] = [f.fr, f.en]; } } };
   install();
-  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, VOICE, install, de };
+  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, VOICE, install, de };
 })();
