@@ -2,7 +2,8 @@
 //   python3 -m http.server 8765      (in the repo)
 //   node essais/creer/regress.js 40  (40 random stories 🎲 after the named ones, half of them in 2 acts)
 // It checks what must hold in any story: nobody dead acts or is « present », no choice with the same side twice, every
-// question and every seed is paid, no text is undefined, planOf / seed / plotText do not throw. It does not READ the
+// question and every seed is paid, no text is undefined, planOf / seed / plotText do not throw, every link of the graph
+// points to something that exists. It does not READ the
 // story: after a change of the engine, read FORGE.plotText() of two or three stories as a screenwriter ----
 const { chromium } = require('playwright'); const T = require('./histoires.js');
 const URL = process.env.SMT_URL || 'http://localhost:8765/index.html';
@@ -28,6 +29,10 @@ const check = () => { const out = [], EPS = FORGE.episodes(), TH = EPS.threads |
   for (const t of TH) { if ((t.kind === 'q' || t.kind === 'seed') && !t.done) out.push(`open at the end: ${t.kind} ${t.fr}`); if (!t.steps.length) out.push(`empty thread ${t.id}`); }
   try { const s = FORGE.seed(); if (!s.text || /undefined/.test(s.text + s.ep1)) out.push('seed has undefined'); } catch (e) { out.push('seed throws ' + e.message); }
   try { if (/undefined|NaN/.test(FORGE.plotText())) out.push('plotText has undefined'); } catch (e) { out.push('plotText throws ' + e.message); }
+  // the graph (step 1, 17/11): every stored link has a known kind and both its ends exist
+  const S = JSON.parse(localStorage.getItem('smt-forge2') || '{}'), ok = (r) => { const t = r && r[0], v = r && r.slice(2), n = +v;
+    return t === 'p' ? v === 'justin' || (S.cast || []).includes(v) : t === 'i' ? !!(S.infos || [])[n] : t === 'e' ? !!(S.ev || [])[n] : t === 't' ? !!(S.things || [])[n] : t === 'f' ? !!(S.figs || [])[n] : false; };
+  for (const l of S.links || []) if (!FILS.LINK[l.k] || !ok(l.a) || !ok(l.b)) out.push(`bad link ${l.a} ${l.k} ${l.b}`);
   const knots = EPS.reduce((t, e) => t + e.list.filter((b) => new Set([b, ...(b.rides || [])].flatMap((z) => (z.mv || []).map((m) => m[0]))).size >= 3).length, 0);
   return { out, eps: EPS.length, th: TH.length, knots }; };
 (async () => {

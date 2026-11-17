@@ -39,7 +39,9 @@ Le moteur planifie des **fonctions** (« un indice », « quelqu'un s'approche d
 
 ## 4. Le travail, dans l'ordre
 
-### Étape 1 : le graphe comme donnée (cœur)
+### Étape 1 : le graphe comme donnée (cœur) — FAIT le 17/11 (principe 32 de `CREER.md`)
+Fait : `S.figs`, `S.things`, `S.links` ; `weave()` (crée ce qui sert, garde ce qui est choisi, enregistre) ; `graph()` ne lit plus que les liens ; puces de liens dans 🕸️ (tap = suivant possible) ; `unref()` quand on supprime une info ou un événement ; `genSig` porte les liens (les répliques gardées avant restent lues). Vérifié : mêmes textes de plot, de plans et de graine qu'avant sur 76 histoires (les 12, J1 et ses 4 variantes `J1b`-`J1e`, l'exemple, 60 tirages 🎲 à hasard fixé) ; `regress.js` contrôle que chaque lien pointe vers quelque chose qui existe. Reste ouvert : les types (premier jet, à valider avec Justin), le contenu de la promesse pas encore tiré au 🎲, une seule figure.
+Ce qui était prévu :
 - Aujourd'hui `graph()` recalcule des liens à partir de l'état ; rien n'est stocké. Passer à des liens stockés dans l'état : `S.links = [{ a, k, b }]` où `a` et `b` sont des références (`p:amare` personne, `f:0` figure hors cast, `i:2` info, `e:1` événement, `d:justin:love:isa` désir, `t:0` chose concrète) et `k` le type.
 - Types proposés (à valider avec Justin, il n'a pas tranché sur le grain) : pour · à cause de · caché à · par peur de la réaction de · su par · contient / prouve · doit à · croit à tort.
 - 🎲 tire les liens (stable par `S.seed`, voir `vary()`), en ne reliant que ce qui sert. Un tap sur un lien = le suivant possible. Montrer les liens dans la section 🕸️ existante.

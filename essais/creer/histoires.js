@@ -27,5 +27,10 @@ T.A4_charge_2actes = { ...T.T6_charge, acts: 2, ev: [{ k: 'arrive', x: 'amare' }
 // Justin's own draw of 16/11 (the one whose episode 1 read generic): a promise, « the one they look for », a theft nobody on stage suffered, a threat in act 2
 T.J1_isa_amare = { ...base, acts: 2, seed: 1, cast: ['isa', 'amare'], pil: { justin: ['chef', 'mysterieux'], isa: ['protecteur', 'clown'], amare: ['outsider', 'dangereux'] }, flaw: { justin: 'vice' }, want: { justin: { v: 'love', t: 'isa' }, amare: { v: 'love', t: 'isa' } },
   infos: [{ id: 'villain', x: 'justin' }, { id: 'promise', x: 'amare', y: 'isa' }], ev: [{ k: 'theft', x: 'amare', v: null, s: null, h: 1 }, { k: 'threat', x: 'amare', v: 'justin', a: 2 }], hard: { liked: 1, danger: 1 }, tq: { fig: 0 } };
+// the same, second draw of the promise (« never tell the ferryman who Justin is »), and the other figures
+T.J1b_promesse_muette = { ...T.J1_isa_amare, tq: { fig: 0, prom: 1 } };
+T.J1c_usurier = { ...T.J1_isa_amare, tq: { fig: 1 } };
+T.J1d_capitaine = { ...T.J1_isa_amare, tq: { fig: 2 } };
+T.J1e_proprio = { ...T.J1_isa_amare, tq: { fig: 3 } };
 T.EX = 'EX';
 module.exports = T;
