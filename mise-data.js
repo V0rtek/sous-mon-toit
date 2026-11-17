@@ -77,7 +77,10 @@ window.MISE_DATA = (() => {
     const r = FRAMES[sh.frame].cell === 'tall' ? (gc * 2) / (gr * 3) : gc / gr; return r > 1.2 ? '3:2, landscape' : r < 0.8 ? '2:3, portrait' : '1:1, square'; };
   const cellText = (c) => { const f = FACES.find((x) => x[0] === c.face), g = c.gest && GESTS.find((x) => x[0] === c.gest);
     return (c.act ? c.act + ' ' : '') + (f ? f[2] : '') + (g ? ` The body: ${g[2]}` : '') + (c.ctx ? ` — THE MOMENT: ${c.ctx}` : ' (no particular moment: a clean version of this expression, for later)'); };
-  const rows = (sh) => { if (sh.cells.length === 1) return cellText(sh.cells[0]); const [gc, gr] = sh.grid, out = []; for (let r = 0; r < gr; r++) out.push(`Row ${r + 1}, left to right:\n` + sh.cells.slice(r * gc, r * gc + gc).map((c, k) => `${r * gc + k + 1}. ${cellText(c)}`).join('\n')); return out.join('\n\n'); };
+  const rows = (sh) => { if (sh.cells.length === 1) return cellText(sh.cells[0]); const [gc, gr] = sh.grid, out = [], many = sh.chars && sh.chars.length > 1, who = (c) => (sh.chars.find((x) => x.sprite === c.sprite) || {}).name;
+    for (let r = 0; r < gr; r++) { const row = sh.cells.slice(r * gc, r * gc + gc), one = many && row.every((c) => c.sprite === row[0].sprite);
+      out.push(`Row ${r + 1}${one ? ` — ${who(row[0]).toUpperCase()} in every cell of this row` : ''}, left to right:\n` + row.map((c, k) => `${r * gc + k + 1}. ${many && !one ? who(c).toUpperCase() + ': ' : ''}${cellText(c)}`).join('\n')); }
+    return out.join('\n\n'); };
   // the sheet's prompt: built from its cells (what the episode needs), its character(s) and the best pictures we have of them
   function sheetPrompt(sh, refs) {
     const [gc, gr] = sh.grid, n = sh.cells.length, grid = n === 1 ? `Format: ${aspectOf(sh)} image, at the highest resolution. ONE single picture (the word « cell » below means this picture). No text, no labels.` : `Format: ${aspectOf(sh)} image, at the highest resolution. An invisible grid of ${n} equal cells, ${gc} column${gc > 1 ? 's' : ''} × ${gr} row${gr > 1 ? 's' : ''}, exactly the same size. NO lines, NO borders, NO frames between them, no text, no labels.`;
@@ -93,9 +96,10 @@ In every cell: A on the LEFT, B on the RIGHT, both from the top of the head down
 ${ACT}
 
 ${rows(sh)}`;
-    const imgs = refs.same ? `Image 1 is the reference: it is the character AND the art style, ALREADY in the framing and the angle this sheet needs: keep exactly that framing, that size and that angle.`
-      : `Image 1 is the reference: it is the character AND the art style.${refs.two ? ' Image 2 shows ANOTHER character, only as a guide for the framing, the size of the head and the angle: copy nothing of their look (face, hair, body, clothes).' : ''}`;
-    return she(`Create a character sheet of THIS EXACT character (${sh.name}): ${n} ${sh.frame === 'cu' ? 'close-ups' : 'shots from the head to mid-thigh'}, each one a moment of a scene. ${imgs} Copy the character exactly: face, hair, skin, body, outfit, colors, line, shading. Nothing added, nothing removed.
+    // a sheet of one or two characters: image k = character k (already in this framing when we have it), then a framing guide
+    const ch = sh.chars, two = ch.length > 1, guide = refs.find((r) => r.guide), imgs = ch.map((c, k) => `Image ${k + 1} is ${c.name}: the character${k ? '' : ' AND the art style'}${refs[k] && refs[k].same ? ', ALREADY in the framing and the angle this sheet needs (keep exactly that framing, that size and that angle)' : ''}.`).join(' ')
+      + (guide ? ` ${guide.label.replace(/ \(guide\)/, '')} shows ANOTHER character, only as a guide for the framing, the size of the head and the angle: copy nothing of their look (face, hair, body, clothes).` : '');
+    return `Create a character sheet of ${two ? `TWO DIFFERENT characters, ${ch[0].name} and ${ch[1].name}` : `THIS EXACT character (${ch[0].name})`}: ${n} ${sh.frame === 'cu' ? 'close-ups' : 'shots from the head to mid-thigh'}, each one a moment of a scene. ${imgs} Copy ${two ? 'each character' : 'the character'} exactly: face, hair, skin, body, outfit, colors, line, shading. Nothing added, nothing removed.${two ? ` Each cell shows ONE character only: the one its line names, never the other one, never a mix of the two. Each keeps their own height and build.` : ''}
 
 ${grid}
 
@@ -107,7 +111,7 @@ Angle, the same in every cell (unless a cell says it is seen from behind): three
 
 ${ACT}
 
-${rows(sh)}`);
+${rows(sh)}`;
   }
 
   // ---- les décors : la même taverne, refaite sous un autre angle (image 1 = la taverne du jeu)

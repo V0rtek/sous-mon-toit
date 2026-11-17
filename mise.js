@@ -523,18 +523,34 @@ window.MISE = (() => {
       if (!sh.cells.some((c) => want.has(c.key))) continue;
       sheets.push({ ...sh, sid, cells: sh.cells.map((c) => ({ ...c, uses: (want.get(c.key) || {}).uses || 0 })) }); sh.cells.forEach((c) => taken.add(c.key));
     }
-    const groups = new Map();
-    for (const n of all) if (!UP[n.key] && !taken.has(n.key)) { const g = n.kind === 'duo' ? 'duo:' + n.sprites.join('|') : `${n.sprite}:${n.frame}`; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(n); }
-    for (const list of groups.values()) {
-      const duo = list[0].kind === 'duo', max = duo ? 4 : 6, parts = Math.ceil(list.length / max), size = Math.ceil(list.length / parts);   // even sheets: few cells left over
-      for (let k = 0; k < list.length; k += size) {
-        const cells = list.slice(k, k + size).map((n) => ({ ...n })), n0 = cells[0];
-        if (!duo) { const target = cells.length <= 4 ? 4 : 6;
-          for (const f of D.EXTRA) { if (cells.length >= target) break; const key = libKey(n0.sprite, n0.frame, f); if (UP[key] || want.has(key) || taken.has(key)) continue;
-            cells.push({ key, kind: 'solo', frame: n0.frame, sprite: n0.sprite, cid: n0.cid, face: f, extra: 1, ctx: '', uses: 0 }); taken.add(key); } }
-        const c = cells.length, grid = c === 4 ? [2, 2] : c > 4 ? [3, 2] : [c, 1];
-        sheets.push(duo ? { kind: 'duo', frame: 'mid', sprites: n0.sprites, cids: n0.cids, names: n0.cids.map(nm), cells, grid }
-          : { kind: 'solo', frame: n0.frame, sprite: n0.sprite, cid: n0.cid, name: nm(n0.cid), she: !!P.cast[n0.cid].she, cells, grid });
+    // the duos: by pair, 4 at most per sheet
+    const duos = new Map();
+    for (const n of all) if (n.kind === 'duo' && !UP[n.key] && !taken.has(n.key)) { const g = n.sprites.join('|'); if (!duos.has(g)) duos.set(g, []); duos.get(g).push(n); }
+    for (const list of duos.values()) { const parts = Math.ceil(list.length / 4), size = Math.ceil(list.length / parts);
+      for (let k = 0; k < list.length; k += size) { const cells = list.slice(k, k + size).map((n) => ({ ...n })), n0 = cells[0], c = cells.length;
+        sheets.push({ kind: 'duo', frame: 'mid', sprites: n0.sprites, cids: n0.cids, names: n0.cids.map(nm), cells, grid: c === 4 || c === 3 ? [2, 2] : [c, 1] }); } }
+    // the others: rows of 3 cells, two rows a sheet. A row is one character (a row can share two leftovers); a sheet has two
+    // characters at most (image 1, image 2). Cells left empty take what will serve later, of that row's character
+    const extra = (n0, k) => { const out = []; for (const f of D.EXTRA) { if (out.length >= k) break; const key = libKey(n0.sprite, n0.frame, f); if (UP[key] || want.has(key) || taken.has(key)) continue;
+      out.push({ key, kind: 'solo', frame: n0.frame, sprite: n0.sprite, cid: n0.cid, face: f, extra: 1, ctx: '', uses: 0 }); taken.add(key); } return out; };
+    const spOf = (row) => [...new Set(row.map((c) => c.sprite))];
+    for (const frame of ['mid', 'cu']) {
+      const by = new Map();
+      for (const n of all) if (n.kind === 'solo' && n.frame === frame && !UP[n.key] && !taken.has(n.key)) { if (!by.has(n.sprite)) by.set(n.sprite, []); by.get(n.sprite).push({ ...n }); }
+      const rows = [], bits = [];
+      for (const list of by.values()) { for (let k = 0; k + 3 <= list.length; k += 3) rows.push(list.slice(k, k + 3)); if (list.length % 3) bits.push(list.slice(list.length - (list.length % 3))); }
+      bits.sort((x, y) => y.length - x.length);
+      while (bits.length) { const a = bits.shift(), j = bits.findIndex((b) => a.length + b.length <= 3); rows.push(j < 0 ? a : [...a, ...bits.splice(j, 1)[0]]); }
+      for (const row of rows) if (row.length < 3) row.push(...extra(row[0], 3 - row.length));
+      rows.sort((x, y) => (x[0].sprite < y[0].sprite ? -1 : x[0].sprite > y[0].sprite ? 1 : 0));
+      while (rows.length) {
+        const a = rows.shift(), sa = spOf(a);
+        let j = rows.findIndex((b) => spOf(b).every((x) => sa.includes(x)));   // the same character(s) first
+        if (j < 0) j = rows.findIndex((b) => new Set([...sa, ...spOf(b)]).size <= 2);
+        const b2 = j < 0 ? extra(a[0], 3) : rows.splice(j, 1)[0], cells = [...a, ...b2].filter(Boolean);
+        if (cells.length < 6) cells.push(...extra(a[0], 6 - cells.length));
+        const sps = spOf(cells), chars = sps.map((sp) => { const c = cells.find((x) => x.sprite === sp); return { sprite: sp, cid: c.cid, name: nm(c.cid) }; });
+        sheets.push({ kind: 'solo', frame, chars, cells, grid: cells.length === 6 ? [3, 2] : [cells.length, 1] });
       }
     }
     // the ones that serve the most first (a sheet already asked of ChatGPT stays on top)
@@ -550,13 +566,15 @@ window.MISE = (() => {
   const refImg = (c) => { const b = body(c, 'neutral'); return b ? b.url : ''; };
   const FR = Object.fromEntries([...D.FACES, ...D.GESTS].map((f) => [f[0], f[1]]));
   const refsOf = (sh) => (sh.kind === 'duo' ? [{ src: refsFor(sh.sprites[0], 'mid').one, label: `Image 1 (${sh.names[0]})` }, { src: refsFor(sh.sprites[1], 'mid').one, label: `Image 2 (${sh.names[1]})` }]
-    : (() => { const r = refsFor(sh.sprite, sh.frame); return [{ src: r.one, label: 'Image 1', why: r.why }, ...(r.two ? [{ src: r.two, label: 'Image 2 (guide)' }] : [])]; })());
+    : (() => { const rs = sh.chars.map((c) => refsFor(c.sprite, sh.frame)), out = rs.map((r, k) => ({ src: r.one, label: `Image ${k + 1}${sh.chars.length > 1 ? ` (${sh.chars[k].name})` : ''}`, why: r.why, same: r.same }));
+      const guide = rs.every((r) => r.same) ? '' : (rs.find((r) => r.two) || {}).two; return guide ? [...out, { src: guide, label: `Image ${out.length + 1} (guide)`, guide: 1 }] : out; })());
+  const nameOf = (c) => (P.cast[c.cid] ? P.cast[c.cid].name : c.sprite);
   function sheetCard(sh, k) {
-    const refs = refsOf(sh), ep = sh.cells.filter((c) => !c.extra).length, col = sh.kind === 'duo' ? '#ff375f' : colorOf(P.cast[sh.cid] || { n: 0 });
+    const refs = refsOf(sh), ep = sh.cells.filter((c) => !c.extra).length, col = sh.kind === 'duo' ? '#ff375f' : colorOf(P.cast[sh.chars[0].cid] || { n: 0 });
     return `<div class="mzCard" style="--c:${col}"><div class="mzRefs">${refs.map((r) => (r.src ? `<div class="mzPic" style="background-image:url('${r.src}')"></div>` : '')).join('')}</div><div class="mzBody">`
-      + `<b>${sh.kind === 'duo' ? `${esc(sh.names[0])} × ${esc(sh.names[1])}<em>à deux, une image</em>` : `${esc(sh.name)}<em>${esc(D.FRAMES[sh.frame].name)}</em>`}</b>`
-      + `<span class="mzDim">sert ${sh.cells.reduce((n, c) => n + (c.uses || 0), 0)} fois · ${sh.cells.length} cases · ${ep} pour cet épisode${ep < sh.cells.length ? `, ${sh.cells.length - ep} en plus pour plus tard` : ''}${sh.sid ? ' · prompt déjà copié' : ''}${refs[0] && refs[0].why ? ` · image 1 : ${esc(refs[0].why)}` : ''}</span>`
-      + `<ol class="mzList">${sh.cells.map((c) => `<li${c.extra ? ' class="x"' : ''}><b>${sh.kind === 'duo' ? esc(c.key.split(':')[2]) : esc(FR[c.face] || c.face)}${c.gest ? ' · ' + esc(FR[c.gest]) : ''}</b> <small>${c.extra ? 'en plus, pour plus tard' : esc(sh.kind === 'duo' ? c.act : c.ctx)}${c.uses > 1 ? ` · ×${c.uses}` : ''}</small></li>`).join('')}</ol>`
+      + `<b>${sh.kind === 'duo' ? `${esc(sh.names[0])} × ${esc(sh.names[1])}<em>à deux, une image</em>` : `${sh.chars.map((c) => esc(c.name)).join(' + ')}<em>${esc(D.FRAMES[sh.frame].name)}</em>`}</b>`
+      + `<span class="mzDim">sert ${sh.cells.reduce((n, c) => n + (c.uses || 0), 0)} fois · ${sh.cells.length} cases · ${ep} pour cet épisode${ep < sh.cells.length ? `, ${sh.cells.length - ep} en plus pour plus tard` : ''}${sh.sid ? ' · prompt déjà copié' : ''}${refs.filter((r) => r.why).map((r) => ` · ${esc(r.label.toLowerCase())} : ${esc(r.why)}`).join('')}</span>`
+      + `<ol class="mzList">${sh.cells.map((c) => `<li${c.extra ? ' class="x"' : ''}><b>${sh.kind === 'solo' && sh.chars.length > 1 ? esc(nameOf(c)) + ' · ' : ''}${sh.kind === 'duo' ? esc(c.key.split(':')[2]) : esc(FR[c.face] || c.face)}${c.gest ? ' · ' + esc(FR[c.gest]) : ''}</b> <small>${c.extra ? 'en plus, pour plus tard' : esc(sh.kind === 'duo' ? c.act : c.ctx)}${c.uses > 1 ? ` · ×${c.uses}` : ''}</small></li>`).join('')}</ol>`
       + `<div class="mzRow"><button type="button" data-sp="${k}">📋 Prompt</button>${refs.map((r) => (r.src ? `<button type="button" data-img="${esc(r.src)}">🖼️ ${esc(r.label)}</button>` : '')).join('')}<label class="mzUp">⬆ Déposer<input type="file" accept="image/*" hidden data-us="${k}"></label></div></div></div>`;
   }
   function render() {
@@ -609,8 +627,8 @@ window.MISE = (() => {
   async function keepSheet(sh, file) {
     if (!window.IMPORT || !IMPORT.cells) throw new Error('La découpe n’est pas chargée.');
     const cells = await IMPORT.cells(file, { grid: sh.grid, poses: sh.cells.map((c) => c.key) }, (t) => say(t));
-    const tall = cells.filter((x, k) => sh.cells[k].gest !== 'lean'), refH = Math.max(...(tall.length ? tall : cells).map((x) => x.h));
-    for (const [k, x] of cells.entries()) { const c = sh.cells[k]; await put(c.key, await toBlob(x.canvas), x.w, x.h, { refH, face: c.face, gest: c.gest || null, moment: c.act || c.ctx || '' }); }
+    const refOf = (sp) => { const mine2 = cells.filter((x, k) => sh.cells[k].sprite === sp || sh.kind === 'duo'), tall = mine2.filter((x, k) => sh.cells[cells.indexOf(x)].gest !== 'lean'); return Math.max(...(tall.length ? tall : mine2).map((x) => x.h)); };
+    for (const [k, x] of cells.entries()) { const c = sh.cells[k], refH = refOf(c.sprite); await put(c.key, await toBlob(x.canvas), x.w, x.h, { refH, face: c.face, gest: c.gest || null, moment: c.act || c.ctx || '' }); }
     delete S.sheets[sh.sid]; save();
     return sh.cells.map((c) => c.key);
   }
@@ -622,8 +640,8 @@ window.MISE = (() => {
     if (d.a === 'haiku') { if (!S.script.trim()) return say('Colle d’abord le script (1).'); say('Haiku met en scène…');
       try { const r = await GEN.ask(ls('smt-key'), [{ role: 'user', content: D.STAGE(S.script.trim(), pool().filter((x) => !/^isa_/.test(x)).concat('isa').join(', ')) }], 'You are a film director. Reply with the JSON only.', 16000); S.play = JSON.stringify(r.json); save(); return say('Mis en scène par Haiku.'); } catch (err) { return say('Haiku : ' + err.message); } }
     if (d.a === 'play') { if (P) { panel.hidden = true; player(P, { onClose: () => { if (panel) { panel.hidden = false; render(); } } }); } return; }
-    if (d.sp) { const sh = pin(N.sheets[+d.sp]), refs = refsOf(sh), r = sh.kind === 'solo' ? refsFor(sh.sprite, sh.frame) : {};
-      return copy(D.sheetPrompt(sh, r), `Prompt copié. Dans ChatGPT : colle ${refs.filter((x) => x.src).map((x) => x.label.toLowerCase()).join(' puis ')}, puis le prompt. Puis ⬆ Déposer sur cette même carte.`); }
+    if (d.sp) { const sh = pin(N.sheets[+d.sp]), refs = refsOf(sh);
+      return copy(D.sheetPrompt(sh, refs), `Prompt copié. Dans ChatGPT : colle ${refs.filter((x) => x.src).map((x) => x.label.toLowerCase()).join(' puis ')}, puis le prompt. Puis ⬆ Déposer sur cette même carte.`); }
     if (d.pp) return copy(D.PLATE_PROMPT[d.pp], `${SET.plates[d.pp].name} : prompt copié. Dans ChatGPT : colle l’image 1 (la taverne), puis le prompt.`);
     if (d.pi) return copy(D.insertPrompt(P.inserts[d.pi] || { id: d.pi }), `Insert « ${d.pi} » : prompt copié.`);
     if (d.img) return copyImg(d.img, t);
@@ -638,7 +656,7 @@ window.MISE = (() => {
     try {
       if (d.upl) { say('Je garde le décor…'); await keepImage(`pl:${d.upl}`, file); say(await share([`pl:${d.upl}`], `décor ${d.upl}`) + (d.upl !== 'salle' ? ' Vérifie les places : 📐 Placer.' : '')); }
       else if (d.upi) { say('Je garde l’insert…'); await keepImage(`in:${d.upi}`, file); say(await share([`in:${d.upi}`], `insert ${d.upi}`)); }
-      else if (d.us) { const sh = pin(N.sheets[+d.us]); say('Découpe…'); const keys = await keepSheet(sh, file); say(`${keys.length} images gardées. ` + await share(keys, sh.kind === 'duo' ? `${sh.names.join(' × ')}, à deux` : `${sh.name}, ${D.FRAMES[sh.frame].name}`)); }
+      else if (d.us) { const sh = pin(N.sheets[+d.us]); say('Découpe…'); const keys = await keepSheet(sh, file); say(`${keys.length} images gardées. ` + await share(keys, sh.kind === 'duo' ? `${sh.names.join(' × ')}, à deux` : `${sh.chars.map((c) => c.name).join(' + ')}, ${D.FRAMES[sh.frame].name}`)); }
     } catch (err) { say(String(err.message || err)); }
   }
   function onInput(e) { const f = e.target.dataset.f; if (!f) return; S[f] = e.target.value; save();
