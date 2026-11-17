@@ -49,6 +49,8 @@ Ce qui était prévu :
 - Garder `S.fig` (figures) et ajouter `S.things` (choses concrètes : une bourse, une traversée, une dette, par décor) dans `fils.js`.
 - Migrer les 4 cas actuels de `graph()` vers ce modèle sans changer leur sortie (l'histoire `J1_isa_amare` de `essais/creer/histoires.js` sert de référence).
 
+### Étapes 2-3, en partie le 17/11 (principe 34)
+Fait : les liens ajoutés jouent (dit en passant / indice → ça sort → chacun réagit), le public dans le graphe pour ces liens (🙈, qui le sait déjà, l'acte), un lien connu finit un désir (`ENDS`), les crans nomment les faits du passeur, 🎲 relie avec du sens (`moves()`). Reste : `motiveOf`, `truth()`, les autres secrets (`INFOS`), le registre entier lu depuis le graphe, plus de cas pour `ENDS`, les choix et la fin d'acte.
 ### Étape 2 : tout le moteur lit le graphe
 - `motiveOf()` (mobile d'un événement) : lire le lien « pour / à cause de » au lieu de `FILS.MOTIVE` seul ; `MOTIVE` devient le repli.
 - `truth()` : ce que tient un objet = lien « contient ».

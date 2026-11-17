@@ -29,6 +29,10 @@ const check = () => { const out = [], EPS = FORGE.episodes(), TH = EPS.threads |
   for (const t of TH) { if ((t.kind === 'q' || t.kind === 'seed') && !t.done) out.push(`open at the end: ${t.kind} ${t.fr}`); if (!t.steps.length) out.push(`empty thread ${t.id}`); }
   try { const s = FORGE.seed(); if (!s.text || /undefined/.test(s.text + s.ep1)) out.push('seed has undefined'); } catch (e) { out.push('seed throws ' + e.message); }
   try { if (/undefined|NaN/.test(FORGE.plotText())) out.push('plotText has undefined'); } catch (e) { out.push('plotText throws ' + e.message); }
+  // the links in the story (17/11): a hidden link's clue comes before it comes out; a chain tied to a secret is told on its reveal, never before
+  const at = {}; EPS.forEach(({ list }, n) => list.forEach((b) => [b, ...(b.rides || [])].forEach((z) => { if (/^(lcl|lrev|tie)\d/.test(z.id)) at[z.id] = { n, b }; })));
+  for (const id of Object.keys(at)) { const k = id.replace(/^\D+/, ''); if (id.startsWith('lcl') && at[`lrev${k}`] && at[id].n >= at[`lrev${k}`].n) out.push(`clue after its reveal: ${id}`);
+    if (id.startsWith('lcl') && !at[`lrev${k}`]) out.push(`clue never paid: ${id}`); }
   // the graph (step 1, 17/11): every stored link has a known kind and both its ends exist
   const S = JSON.parse(localStorage.getItem('smt-forge2') || '{}'), ok = (r) => { const t = r && r[0], v = r && r.slice(2), n = +v;
     const by = (L) => (L || []).some((x) => x.id === v), pp = (id) => id === 'justin' || (S.cast || []).includes(id);

@@ -32,5 +32,10 @@ T.J1b_promesse_muette = { ...T.J1_isa_amare, tq: { fig: 0, prom: 1 } };
 T.J1c_usurier = { ...T.J1_isa_amare, tq: { fig: 1 } };
 T.J1d_capitaine = { ...T.J1_isa_amare, tq: { fig: 2 } };
 T.J1e_proprio = { ...T.J1_isa_amare, tq: { fig: 3 } };
+// J1 + links by hand (17/11): the debt's chain, known (born of a card game at the den, with Amare) and Justin's example:
+// Isa and Amare are family, hidden from the audience AND from both of them (Amare wants Isa), it comes out later
+T.J2_liens = { ...T.J1_isa_amare, moments: [{ id: '1', c: 'cartes', by: 1 }], places: [{ id: '2', c: 'tripot', by: 1 }], nid: 2,
+  links: [{ a: 't:debt', k: 'born', b: 'm:1', by: 1 }, { a: 'm:1', k: 'where', b: 'l:2', by: 1 }, { a: 'm:1', k: 'with', b: 'p:amare', by: 1 }, { a: 'p:isa', k: 'family', b: 'p:amare', by: 1, sh: 'h' }] };
+T.J2b_liens_2actes = { ...T.J2_liens, links: T.J2_liens.links.map((l) => (l.sh ? { ...l, at: 2, kn: ['justin'] } : l)) };
 T.EX = 'EX';
 module.exports = T;

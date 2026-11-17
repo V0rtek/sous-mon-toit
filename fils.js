@@ -435,7 +435,7 @@ window.FILS = (() => {
     for: { g: 'cause', e: '🎯', fr: 'pour', en: 'in order to / for', a: 'PTIE', b: 'PTIEDL', dir: 1 },
     born: { g: 'cause', e: '🌱', fr: 'née de', en: 'was born of', a: 'TIDP', b: 'E', dir: 1 },
     leads: { g: 'cause', e: '➡️', fr: 'mène à', en: 'leads to', a: 'E', b: 'E', dir: 1 },
-    same: { g: 'cause', e: '🕰️', fr: 'le même soir que', en: 'happened the same night as', a: 'E', b: 'E', dir: 2 },
+    same: { pair: ['le même soir', 'happened the same night'], g: 'cause', e: '🕰️', fr: 'le même soir que', en: 'happened the same night as', a: 'E', b: 'E', dir: 2 },
     blocks: { g: 'cause', e: '🚧', fr: 'empêche', en: 'stands in the way of', a: 'PTIE', b: 'PTED', dir: 1 },
     threat: { g: 'cause', e: '⚠️', fr: 'menace', en: 'threatens', a: 'PTIE', b: 'PTD', dir: 1 },
     // savoir et secrets
@@ -448,18 +448,18 @@ window.FILS = (() => {
     proves: { g: 'know', e: '🔎', fr: 'prouve', en: 'proves', a: 'TIP', b: 'IE', dir: 1 },
     saw: { g: 'know', e: '👀', fr: 'a vu', en: 'witnessed', a: 'P', b: 'E', dir: 1 },
     suspects: { g: 'know', e: '🤨', fr: 'soupçonne', en: 'suspects', a: 'P', b: 'PE', dir: 1 },
-    liesto: { g: 'know', e: '🤥', fr: 'ment à', en: 'lies to', a: 'P', b: 'P', dir: 0 },
+    liesto: { pair: ['se mentent', 'lie to each other'], g: 'know', e: '🤥', fr: 'ment à', en: 'lies to', a: 'P', b: 'P', dir: 0 },
     // entre les gens
     owes: { g: 'folk', e: '💸', fr: 'doit', en: 'owes', a: 'P', b: 'TP', dir: 1 },
     toward: { g: 'folk', e: '🧾', fr: 'envers', en: 'owed to', a: 'T', b: 'P', dir: 1 },
     promised: { g: 'folk', e: '🤞', fr: 'a promis à', en: 'made a promise to', a: 'P', b: 'P', dir: 1 },
     saved: { g: 'folk', e: '🛟', fr: 'a sauvé', en: 'once saved', a: 'P', b: 'P', dir: 1 },
     betrayed: { g: 'folk', e: '🐍', fr: 'a trahi', en: 'betrayed', a: 'P', b: 'P', dir: 1 },
-    loves: { g: 'folk', e: '❤️', fr: 'aime', en: 'loves', a: 'P', b: 'P', dir: 0 },
-    grudge: { g: 'folk', e: '😠', fr: 'en veut à', en: 'holds a grudge against', a: 'P', b: 'P', dir: 0 },
-    family: { g: 'folk', e: '🩸', fr: 'même sang que', en: 'is family of', a: 'P', b: 'P', dir: 2 },
-    past: { g: 'folk', e: '📼', fr: 'a un passé avec', en: 'shares a past with', a: 'P', b: 'P', dir: 2 },
-    allies: { g: 'folk', e: '🤝', fr: 'complice de', en: 'is in it together with', a: 'P', b: 'P', dir: 2 },
+    loves: { pair: ['s’aiment', 'love each other'], g: 'folk', e: '❤️', fr: 'aime', en: 'loves', a: 'P', b: 'P', dir: 0 },
+    grudge: { pair: ['s’en veulent', 'resent each other'], g: 'folk', e: '😠', fr: 'en veut à', en: 'holds a grudge against', a: 'P', b: 'P', dir: 0 },
+    family: { pair: ['du même sang', 'are family'], g: 'folk', e: '🩸', fr: 'même sang que', en: 'is family of', a: 'P', b: 'P', dir: 2 },
+    past: { pair: ['un passé ensemble', 'share a past'], g: 'folk', e: '📼', fr: 'a un passé avec', en: 'shares a past with', a: 'P', b: 'P', dir: 2 },
+    allies: { pair: ['complices', 'are in it together'], g: 'folk', e: '🤝', fr: 'complice de', en: 'is in it together with', a: 'P', b: 'P', dir: 2 },
     looks: { g: 'folk', e: '🔦', fr: 'cherche', en: 'is looking for', a: 'P', b: 'PT', dir: 1 },
     protects: { g: 'folk', e: '🛡️', fr: 'protège', en: 'protects', a: 'P', b: 'PT', dir: 1 },
     uses: { g: 'folk', e: '🪝', fr: 'se sert de', en: 'uses', a: 'P', b: 'PT', dir: 1 },
@@ -472,6 +472,13 @@ window.FILS = (() => {
     with: { g: 'thing', e: '👥', fr: 'avec', en: 'with', a: 'E', b: 'P', dir: 1 },
     hiddenin: { g: 'thing', e: '🕳️', fr: 'caché dans', en: 'hidden in', a: 'T', b: 'LTP', dir: 1 },
   };
+  // a link's words in a sentence: « née de » + « une partie » = « née d’une partie », « à » + « le tripot » = « au tripot »
+  const glue = (prep, n) => { const ws = prep.split(' '), w = ws.pop(), pre = ws.length ? ws.join(' ') + ' ' : ''; if (!['de', 'à', 'que'].includes(w)) return `${prep} ${n}`;
+    const x = w === 'de' ? (/^le /i.test(n) ? 'du ' + n.slice(3) : /^les /i.test(n) ? 'des ' + n.slice(4) : /^[aeiouyhéèêà]/i.test(n) ? 'd’' + n : 'de ' + n)
+      : w === 'à' ? (/^le /i.test(n) ? 'au ' + n.slice(3) : /^les /i.test(n) ? 'aux ' + n.slice(4) : 'à ' + n) : /^[aeiouyhéèêà]/i.test(n) ? 'qu’' + n : 'que ' + n;
+    return pre + x; };
+  // a link that, once known, ends a desire between its two people (« du même sang » : plus de romance entre eux)
+  const ENDS = { family: ['love'] };
   // the end types of a ref: p f → P, t → T, i → I, e m → E, d → D, l → L
   const END = { p: 'P', f: 'P', t: 'T', i: 'I', e: 'E', m: 'E', d: 'D', l: 'L' };
   // what can be added: people off screen (FOLK, plus the figures above), things, moments of the past, places (never typed)
@@ -495,12 +502,49 @@ window.FILS = (() => {
   // 🎲 un lien de plus: how a chain grows from what is there (« une dette de jeu : envers qui ? née de quoi ? où ? avec
   // qui ? ce soir-là, quoi d'autre ? »). on = the end type the chain grows from; k = the link; to = an existing end of these
   // types, or new:<f|t|m|l> = a new one from the lists; rev = the new end is the link's a (« Isa a vu la partie de cartes »)
+  // ---- a link IN THE STORY (17/11): a link the audience knows is told once, in passing (🕸️ in a moment where its people
+  // are); a hidden one (sh: 'h': the audience learns it later; kn = who already knows) is a seed: a CLUE rides early, never
+  // explained, then it comes out (its own moment, « soudain ») and each one reacts from what ties them to it. CLUE[k] =
+  // [fr, en] of the hint, from its two ends (a, b: names); « du / de la » are in d(b). PREMIER JET ----
+  const d2 = (n) => (/^le /i.test(n) ? 'du ' + n.slice(3) : /^les /i.test(n) ? 'des ' + n.slice(4) : /^(la |l’|l')/i.test(n) ? 'de ' + n : de(n));
+  const CLUE = {
+    family: [(a, b) => `${a} et ${b} ont le même geste, la même façon de se taire ; personne ne le relève`, (a, b) => `${a} and ${b} share the same gesture, the same way of going quiet; nobody picks it up`],
+    past: [(a, b) => `${a} appelle ${b} par un surnom que personne d’autre ne connaît`, (a, b) => `${a} calls ${b} by a nickname nobody else knows`],
+    saved: [(a, b) => `${b} se tait chaque fois qu’on dit du mal ${d2(a)}`, (a, b) => `${b} goes quiet every time someone speaks ill of ${a}`],
+    betrayed: [(a, b) => `${a} évite le regard ${d2(b)}, toute la soirée`, (a, b) => `${a} avoids ${b}'s eyes all night`],
+    loves: [(a, b) => `${a} regarde ${b} une seconde de trop, et détourne les yeux`, (a, b) => `${a} looks at ${b} a second too long, then looks away`],
+    grudge: [(a, b) => `${a} sourit à ${b}, mais pas des yeux`, (a, b) => `${a} smiles at ${b}, but not with the eyes`],
+    allies: [(a, b) => `${a} et ${b} échangent un signe, trop vite pour qu’on le voie`, (a, b) => `${a} and ${b} exchange a sign, too quick to be seen`],
+    liesto: [(a, b) => `${a} répond à ${b} un peu trop vite`, (a, b) => `${a} answers ${b} a little too fast`],
+    owes: [(a, b) => `${a} change de sujet quand on parle ${d2(b)}`, (a, b) => `${a} changes the subject when ${b} comes up`],
+    toward: [(a, b) => `on parle ${d2(a)} ; ${b} n’est jamais nommé, mais tout le monde baisse la voix`, (a, b) => `${a} comes up; ${b} is never named, but everyone lowers their voice`],
+    saw: [(a, b) => `${a} pâlit quand quelqu’un parle ${d2(b)}`, (a, b) => `${a} goes pale when someone mentions ${b}`],
+    with: [(a, b) => `on parle ${d2(a)} ; ${b} se lève pour remplir les chopes`, (a, b) => `${a} comes up; ${b} gets up to fill the mugs`],
+    where: [(a, b) => `quelqu’un nomme ${b} ; un silence suit, trop long`, (a, b) => `someone names ${b}; a silence follows, too long`],
+    born: [(a, b) => `${a} : personne ne dit d’où ça vient, et ${b} n’est jamais nommé`, (a, b) => `${a}: nobody says where it comes from, and ${b} is never named`],
+    same: [(a, b) => `deux histoires du même soir, racontées par deux personnes, sans lien en apparence`, (a, b) => `two stories from the same night, told by two people, seemingly unrelated`],
+    wrong: [(a, b) => `${a} dit comme une évidence ce qu’il croit (${b}) ; un regard dit le contraire`, (a, b) => `${a} states it as obvious (${b}); someone's look says otherwise`],
+    lie: [(a, b) => `un détail ne colle pas : ${a}`, (a, b) => `a detail doesn't fit: ${a}`],
+    proves: [(a, b) => `${a} est là, à la vue de tous ; personne ne le remarque`, (a, b) => `${a} is there, in plain sight; nobody notices it`],
+    hiddenin: [(a, b) => `quelqu’un tient à ce que personne n’aille voir ${b}`, (a, b) => `someone makes sure nobody goes near ${b}`],
+    suspects: [(a, b) => `${a} observe ${b} quand ${b} ne regarde pas`, (a, b) => `${a} watches ${b} when ${b} isn't looking`],
+    uses: [(a, b) => `${a} est trop gentil avec ${b}`, (a, b) => `${a} is too kind to ${b}`],
+    protects: [(a, b) => `${a} se place entre ${b} et la porte, sans le dire`, (a, b) => `${a} stands between ${b} and the door, without a word`],
+    looks: [(a, b) => `${a} demande, l’air de rien, si quelqu’un a vu ${b}`, (a, b) => `${a} asks, casually, if anyone has seen ${b}`],
+    promised: [(a, b) => `${b} rappelle à ${a} « ce qui était convenu » ; ${a} coupe court`, (a, b) => `${b} reminds ${a} of "what was agreed"; ${a} cuts it short`],
+    def: [(a, b) => `un mot sur ${a} ; quelqu’un se tait trop vite`, (a, b) => `${a} comes up; someone goes quiet too fast`],
+  };
+  // the kinds a 🎲 story hides from the audience first (they make a reveal that changes how we see the people)
+  const SECRET = ['family', 'past', 'saved', 'betrayed', 'loves', 'allies', 'liesto', 'owes', 'saw', 'with', 'born', 'promised', 'uses', 'grudge'];
+  // the flaw in the voice (how it shows when they talk)
+  const FLAWV = { lache: 'fanfaronne, puis recule dès que ça devient sérieux', vice: 'ramène tout à un verre ou à une mise', colere: 'les phrases montent vite ; coupe la parole',
+    menteur: 'trop de détails quand il ment', orgueil: 'ne dit jamais merci ni pardon' };
   const GROW = [
     { on: 'T', k: 'born', to: 'new:m' }, { on: 'T', k: 'toward', to: 'P' }, { on: 'T', k: 'hiddenin', to: 'new:l' }, { on: 'T', k: 'known', to: 'P' }, { on: 'T', k: 'proves', to: 'IE' },
-    { on: 'E', k: 'where', to: 'new:l' }, { on: 'E', k: 'with', to: 'P' }, { on: 'E', k: 'with', to: 'new:f' }, { on: 'E', k: 'same', to: 'new:m' }, { on: 'E', k: 'saw', to: 'P', rev: 1 }, { on: 'E', k: 'leads', to: 'E' },
-    { on: 'I', k: 'keeps', to: 'D' }, { on: 'I', k: 'known', to: 'P' }, { on: 'I', k: 'born', to: 'new:m' }, { on: 'I', k: 'proves', to: 'new:t', rev: 1 }, { on: 'I', k: 'lie', to: 'E' },
-    { on: 'P', k: 'past', to: 'P' }, { on: 'P', k: 'family', to: 'new:f' }, { on: 'P', k: 'owes', to: 'new:t' }, { on: 'P', k: 'saw', to: 'E' }, { on: 'P', k: 'wrong', to: 'I' }, { on: 'P', k: 'grudge', to: 'P' }, { on: 'P', k: 'saved', to: 'P' },
-    { on: 'D', k: 'because', to: 'new:m' }, { on: 'L', k: 'hiddenin', to: 'new:t', rev: 1 },
+    { on: 'E', k: 'where', to: 'new:l' }, { on: 'E', k: 'with', to: 'P' }, { on: 'E', k: 'with', to: 'new:f', only: ['croupier', 'associe', 'inconnu', 'amour', 'veuve', 'marchand', 'frere', 'soeur'] }, { on: 'E', k: 'same', to: 'new:m' }, { on: 'E', k: 'saw', to: 'P', rev: 1 }, { on: 'E', k: 'leads', to: 'E' },
+    { on: 'I', k: 'keeps', to: 'D' }, { on: 'I', k: 'known', to: 'P' }, { on: 'I', k: 'born', to: 'new:m' }, { on: 'I', k: 'proves', to: 'new:t', rev: 1, only: ['lettre', 'bague', 'portrait', 'registre', 'medaille', 'sang', 'testament', 'cle'] }, { on: 'I', k: 'lie', to: 'E' },
+    { on: 'P', k: 'past', to: 'P' }, { on: 'P', k: 'family', to: 'new:f', only: ['frere', 'soeur', 'mere', 'pere', 'enfant'] }, { on: 'P', k: 'owes', to: 'new:t', only: ['dette', 'serment'] }, { on: 'P', k: 'saw', to: 'E' }, { on: 'P', k: 'wrong', to: 'I' }, { on: 'P', k: 'grudge', to: 'P' }, { on: 'P', k: 'saved', to: 'P' },
+    { on: 'D', k: 'because', to: 'new:m' }, { on: 'L', k: 'hiddenin', to: 'new:t', rev: 1, only: ['lettre', 'bague', 'cle', 'carte', 'couteau', 'fiole', 'portrait', 'acte', 'testament'] },
   ];
   // a basic voice, from the pillar: how they talk (it goes in each character of the plan)
   const VOICE = { chef: 'phrases courtes, des ordres calmes, ne se justifie jamais', charmeur: 'taquine, double sens, répond par une question', dangereux: 'très peu de mots, poli, jamais une menace criée',
@@ -514,5 +558,5 @@ window.FILS = (() => {
     for (const [mv, F] of Object.entries(FORMS)) { const G = GS.find((g) => g.id === F.g); if (!G) continue;
       for (const f of F.list) { G.tech.push({ n: f.n, d: f.d, ex: f.ex, [mv]: 1, thread: 1 }); CT[f.n] = [f.fr, f.en]; } } };
   install();
-  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, VOICE, install, de };
+  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, CLUE, SECRET, FLAWV, glue, ENDS, VOICE, install, de };
 })();
