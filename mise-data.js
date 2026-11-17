@@ -25,90 +25,90 @@ window.MISE_DATA = (() => {
     },
   };
 
-  // ---- les visages : 12, en deux feuilles de gros plans. [id, français, la case de la feuille, les poses du jeu qui s'en approchent]
+  // ---- les visages (17/11) : 20, précis. [id, français, ce que la case demande, les poses de base qui s'en approchent, famille]
+  // Une feuille ne contient jamais une liste fixe : seulement les visages que l'épisode joue et qui ne sont pas déjà gardés.
   const FACES = [
-    ['neutral', 'écoute', 'Neutral, listening: relaxed face, attentive eyes, mouth closed and at rest.', ['listen']],
-    ['smile', 'sourire', 'A real small smile: lips closed, the corners up, the cheeks lift a little and the eyes narrow slightly (the eyes smile too).', ['smile', 'listen']],
-    ['amused', 'amusé', 'Amused, teasing: one corner of the mouth higher than the other, one eyebrow slightly raised, a spark in the eyes.', ['explaining', 'smile', 'listen']],
-    ['laugh', 'rit', 'Laughing softly: mouth open just enough to show the upper teeth, eyes creased almost shut, head tipped back a little. A laugh among friends, not a roar.', ['explaining', 'smile', 'listen']],
-    ['tender', 'tendre', 'Tender: a soft, steady gaze that lingers, eyelids slightly lowered, lips barely parted in the hint of a smile. Looking at someone they like and forgetting to look away.', ['listen', 'smile']],
-    ['shy', 'gêné', 'Shy: the eyes lowered and a bit to the side, chin slightly down, a small closed smile they try to hide.', ['thinking', 'hurt', 'listen']],
-    ['serious', 'sérieux', 'Serious: the smile has just left the face. Flat mouth, steady level gaze, brows at rest: unreadable.', ['holding', 'listen']],
-    ['worried', 'inquiet', 'Worried: the inner ends of the eyebrows slightly raised and drawn together, lips pressed, eyes a little wider.', ['thinking', 'hurt', 'listen']],
-    ['surprised', 'surpris', 'Surprised: eyebrows up, eyes open a little wider, lips just parted, head pulled back a touch. Caught off guard, not screaming.', ['surprised', 'listen']],
-    ['doubt', 'hésite', 'Hesitating: the eyes drift away to the side and down, the mouth tightens to one side, a breath held: about to say something and not saying it.', ['thinking', 'listen']],
-    ['angry', 'colère retenue', 'Anger held back: brows low, jaw clenched, nostrils slightly flared, lips pressed thin, a hard stare.', ['angry', 'holding', 'listen']],
-    ['threat', 'menace', 'A quiet threat: chin slightly down, eyes looking up from under the brows, perfectly calm, the ghost of a cold smile.', ['holding', 'angry', 'listen']],
+    ['neutral', 'écoute', 'Listening: a relaxed face, attentive eyes on the other person, mouth closed and at rest.', ['listen'], 'calm'],
+    ['smile', 'sourire', 'A real small smile: lips closed, the corners up, the cheeks lift a little and the eyes narrow slightly (the eyes smile too).', ['smile', 'listen'], 'warm'],
+    ['amused', 'amusé', 'Amused, teasing: one corner of the mouth higher than the other, one eyebrow slightly raised, a spark of mischief in the eyes.', ['smile', 'explaining', 'listen'], 'warm'],
+    ['laugh', 'rit', 'Laughing softly among friends: mouth open just enough to show the upper teeth, eyes creased, head tipped back a little. Not a roar.', ['smile', 'explaining', 'listen'], 'warm'],
+    ['tender', 'tendre', 'Tender: a soft, steady gaze that lingers a second too long, eyelids slightly lowered, lips barely parted in the hint of a smile.', ['smile', 'listen'], 'warm'],
+    ['shy', 'gêné', 'Shy, flattered: the eyes drop and slide to the side, chin slightly down, a small closed smile they try to hide.', ['hurt', 'thinking', 'listen'], 'warm'],
+    ['serious', 'sérieux', 'Serious: the smile has just left the face. Flat mouth, steady level gaze, brows at rest: unreadable.', ['holding', 'listen'], 'cool'],
+    ['cold', 'froid', 'Cold: eyelids slightly lowered, a flat hard stare, the mouth a straight line, the chin a little up. No warmth left in the face.', ['holding', 'angry', 'listen'], 'cool'],
+    ['doubt', 'hésite', 'Hesitating: the eyes drift away to the side and down, the mouth tightens to one side, a breath held: about to say something and not saying it.', ['thinking', 'listen'], 'cool'],
+    ['suspicious', 'méfiant', 'Suspicious: one eye slightly narrowed, the head turned a little away while the eyes stay locked on the other person, lips pressed.', ['thinking', 'holding', 'listen'], 'cool'],
+    ['worried', 'inquiet', 'Worried: the inner ends of the eyebrows raised and drawn together, lips pressed, eyes a little wider, looking for an answer in the other face.', ['thinking', 'hurt', 'listen'], 'low'],
+    ['hurt', 'blessé', 'Hurt, hiding it: the eyes lose their shine and drop for a second, the mouth softens, a forced little smile that does not reach the eyes.', ['hurt', 'thinking', 'listen'], 'low'],
+    ['fear', 'peur', 'Afraid but holding still: eyes wide and fixed, face tense, lips slightly parted, breath held. Not screaming.', ['surprised', 'hurt', 'listen'], 'low'],
+    ['surprised', 'surpris', 'Surprised: eyebrows up, eyes open a little wider, lips just parted, head pulled back a touch. Caught off guard.', ['surprised', 'listen'], 'shock'],
+    ['shocked', 'choqué', 'Shocked: the face goes completely still, eyes wide, mouth slightly open: they just heard something that changes everything.', ['surprised', 'listen'], 'shock'],
+    ['annoyed', 'agacé', 'Annoyed: a small exhale through the nose, the eyes roll slightly aside, the mouth pulled flat.', ['holding', 'thinking', 'listen'], 'hot'],
+    ['angry', 'colère retenue', 'Anger held back: brows low, jaw clenched, nostrils slightly flared, lips pressed thin, a hard stare.', ['angry', 'holding', 'listen'], 'hot'],
+    ['defiant', 'défi', 'Defiant: chin up, a calm steady stare straight into the other\'s eyes, the trace of a provoking half-smile.', ['holding', 'explaining', 'listen'], 'hot'],
+    ['threat', 'menace', 'A quiet threat: chin slightly down, eyes looking up from under the brows, perfectly calm, the ghost of a cold smile.', ['holding', 'angry', 'listen'], 'hot'],
+    ['jealous', 'jaloux', 'Jealous and hiding it: the smile stays on the mouth but the eyes go hard and fixed, the jaw tight.', ['holding', 'angry', 'listen'], 'hot'],
   ];
-  // ce que l'IA écrit quand même → un des 12
+  // ce que l'IA écrit quand même → un des 20
   const FACE_ALIAS = { calm: 'neutral', listening: 'neutral', happy: 'smile', warm: 'smile', kind: 'smile', playful: 'amused', teasing: 'amused', smug: 'amused', flirty: 'amused', ironic: 'amused', laughing: 'laugh',
-    soft: 'tender', loving: 'tender', embarrassed: 'shy', cold: 'serious', flat: 'serious', firm: 'serious', sad: 'worried', hurt: 'worried', afraid: 'worried', scared: 'worried', nervous: 'worried', tense: 'worried',
-    shocked: 'surprised', hesitant: 'doubt', suspicious: 'doubt', thinking: 'doubt', annoyed: 'angry', furious: 'angry', menacing: 'threat', threatening: 'threat' };
-  // les gros plans que Justin a déjà (feuille « Gros plans ») : ils servent tant que ses feuilles Visages ne sont pas là
-  const CU_OLD = { neutral: 'cu_talk', serious: 'cu_talk', smile: 'cu_smile', amused: 'cu_smile', tender: 'cu_smile', shy: 'cu_glance', doubt: 'cu_glance', worried: 'cu_hurt', angry: 'cu_anger', threat: 'cu_anger' };
-  // ---- les gestes : 6, une feuille en pied. [id, français, la case, les poses du jeu qui s'en approchent]
+    soft: 'tender', loving: 'tender', embarrassed: 'shy', flat: 'serious', firm: 'serious', sad: 'hurt', afraid: 'fear', scared: 'fear', nervous: 'worried', tense: 'worried',
+    hesitant: 'doubt', thinking: 'doubt', distrustful: 'suspicious', irritated: 'annoyed', furious: 'angry', provoking: 'defiant', menacing: 'threat', threatening: 'threat', envious: 'jealous' };
+  // les gros plans que Justin a déjà (feuille « Gros plans ») : ils servent tant qu'un gros plan généré n'est pas là
+  const CU_OLD = { neutral: 'cu_talk', serious: 'cu_talk', cold: 'cu_talk', smile: 'cu_smile', amused: 'cu_smile', tender: 'cu_smile', laugh: 'cu_smile', shy: 'cu_glance', doubt: 'cu_glance', suspicious: 'cu_glance',
+    worried: 'cu_hurt', hurt: 'cu_hurt', fear: 'cu_hurt', angry: 'cu_anger', threat: 'cu_anger', annoyed: 'cu_anger', defiant: 'cu_anger', jealous: 'cu_anger' };
+  // ---- les gestes : [id, français, la case, les poses de base qui s'en approchent]
   const GESTS = [
-    ['point', 'désigne', 'Pointing: the arm extended toward the right, a little below shoulder height, index finger out, eyes on what they point at.', ['explaining']],
-    ['hands_up', 'mains levées', 'Both hands raised at shoulder height, palms open toward the right: "easy, I did nothing". A small disarming smile.', ['surprised', 'explaining']],
-    ['lean', 'se penche', 'Leaning in: the upper body bent forward toward the right, head forward, chin low, eyes fixed on someone very close: saying something only they should hear.', ['angry', 'explaining']],
-    ['drink', 'lève sa chope', 'Raising a small wooden tankard with iron bands at chest height toward the right, a toast, relaxed.', ['explaining', 'listen']],
-    ['back', 'de dos', 'From behind: a three-quarter BACK view, their back to the camera, head facing away, standing still, arms at their sides.', ['back_far', 'back_look', 'back_walk', 'listen']],
-    ['turn', 'se retourne', 'Looking back over the shoulder: the body seen from behind (three-quarter back view), the head turned back toward the right so we see the profile, alert: someone just called their name.', ['back_look', 'surprised']],
+    ['point', 'désigne', 'pointing: the arm extended toward the right, a little below shoulder height, index finger out, eyes on what they point at.', ['explaining']],
+    ['hands_up', 'mains levées', 'both hands raised at shoulder height, palms open toward the right: "easy, I did nothing".', ['surprised', 'explaining']],
+    ['lean', 'se penche', 'leaning in: the upper body bent forward toward the right, head forward, chin low, very close to someone: saying something only they should hear.', ['angry', 'explaining']],
+    ['drink', 'lève sa chope', 'raising a small wooden tankard with iron bands at chest height toward the right, a toast.', ['explaining', 'listen']],
+    ['back', 'de dos', 'seen from BEHIND (three-quarter back view): the back to the camera, the head facing away, still.', ['back_far', 'back_look', 'back_walk', 'listen']],
+    ['turn', 'se retourne', 'seen from behind (three-quarter back view), the head turned back over the shoulder toward the right so we see the profile: someone just called their name.', ['back_look', 'surprised']],
   ];
-  const SHEETS = {
-    va: { name: 'Visages · chaleur', kind: 'face', poses: FACES.slice(0, 6).map((f) => f[0]) },
-    vb: { name: 'Visages · tension', kind: 'face', poses: FACES.slice(6).map((f) => f[0]) },
-    g: { name: 'Gestes', kind: 'gest', poses: GESTS.map((g) => g[0]) },
+  // ce qu'on met dans les cases qui restent d'une feuille (une feuille a 4 ou 6 cases) : ce qui servira le plus souvent, pas encore gardé
+  const EXTRA = ['neutral', 'smile', 'serious', 'amused', 'worried', 'surprised', 'tender', 'angry', 'laugh', 'doubt', 'hurt', 'cold', 'annoyed', 'shy', 'suspicious', 'defiant', 'threat', 'shocked', 'fear', 'jealous'];
+  const FRAMES = {
+    cu: { name: 'Gros plans', cell: 'square', how: 'a close-up from the top of the hair down to the middle of the chest, cut by a straight horizontal line that sits exactly on the bottom edge of the cell. The head is the same size and at the same height in every cell (about half of the cell\'s height). Both shoulders inside the cell, a clear margin of green above the hair and on both sides.' },
+    mid: { name: 'En buste (jusqu’à mi-cuisse)', cell: 'tall', how: 'standing, from the top of the head down to MID-THIGH, cut by a straight horizontal line that sits exactly on the bottom edge of the cell. The same size and the head at the same height in every cell. A clear margin of green above the head and on both sides (a hand never touches an edge, nothing crosses into the next cell).' },
   };
+  const GREEN = 'Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no shadow, no floor, no glow. Nobody wears anything green.';
+  const ACT = 'Each cell is ONE precise moment of the scene (the dialogue is in French). Read the moment first, then play it with the face, the way a good film actor plays it in a close-up: exactly that feeling, for that person, at that moment. Real, small, nuanced expressions: the eyes, the eyebrows, the corners of the mouth. No cartoon exaggeration, no wide-open mouth unless the cell asks for it, no manga symbols (no sweat drop, no blush lines, no vein). Someone who knows this person would read each face at once, and no two cells look alike.';
+  const aspectOf = (sh) => { const [gc, gr] = sh.grid; if (sh.kind === 'duo') return gc === 1 ? '1:1, square' : gc === 2 && gr === 1 ? '3:2, landscape' : '1:1, square';
+    const r = FRAMES[sh.frame].cell === 'tall' ? (gc * 2) / (gr * 3) : gc / gr; return r > 1.2 ? '3:2, landscape' : r < 0.8 ? '2:3, portrait' : '1:1, square'; };
+  const cellText = (c) => { const f = FACES.find((x) => x[0] === c.face), g = c.gest && GESTS.find((x) => x[0] === c.gest);
+    return (c.act ? c.act + ' ' : '') + (f ? f[2] : '') + (g ? ` The body: ${g[2]}` : '') + (c.ctx ? ` — THE MOMENT: ${c.ctx}` : ' (no particular moment: a clean version of this expression, for later)'); };
+  const rows = (sh) => { if (sh.cells.length === 1) return cellText(sh.cells[0]); const [gc, gr] = sh.grid, out = []; for (let r = 0; r < gr; r++) out.push(`Row ${r + 1}, left to right:\n` + sh.cells.slice(r * gc, r * gc + gc).map((c, k) => `${r * gc + k + 1}. ${cellText(c)}`).join('\n')); return out.join('\n\n'); };
+  // the sheet's prompt: built from its cells (what the episode needs), its character(s) and the best pictures we have of them
+  function sheetPrompt(sh, refs) {
+    const [gc, gr] = sh.grid, n = sh.cells.length, grid = n === 1 ? `Format: ${aspectOf(sh)} image, at the highest resolution. ONE single picture (the word « cell » below means this picture). No text, no labels.` : `Format: ${aspectOf(sh)} image, at the highest resolution. An invisible grid of ${n} equal cells, ${gc} column${gc > 1 ? 's' : ''} × ${gr} row${gr > 1 ? 's' : ''}, exactly the same size. NO lines, NO borders, NO frames between them, no text, no labels.`;
+    const she = (t) => (sh.she ? t.replace(/\btheir\b/g, 'her').replace(/\bthey\b/g, 'she').replace(/\bthem\b/g, 'her') : t);
+    if (sh.kind === 'duo') return `Create a TWO-CHARACTER sheet. Image 1 is A (${sh.names[0]}), image 2 is B (${sh.names[1]}): they are the characters AND the art style. Copy both exactly: face, hair, skin, body, outfit, colors, line, shading. Nothing added, nothing removed.
 
-  const STYLE_GREEN = 'Background: one flat, pure chroma-key green (#00FF00) everywhere, the same green in every cell. No gradient, no shadow, no floor, no glow. The character wears nothing green.';
-  const she = (t, c) => (c && c.she ? t.replace(/\btheir\b/g, 'her').replace(/\bthey\b/g, 'she').replace(/\bthem\b/g, 'her') : t);
-  // ---- la feuille de visages : 6 gros plans, de vraies petites expressions (ce que Justin demande : réalistes, nuancées, pas exagérées)
-  const facePrompt = (sheet, c) => {
-    const cells = FACES.filter((f) => SHEETS[sheet].poses.includes(f[0]));
-    return she(`Create a character EXPRESSION sheet of THIS EXACT character: 6 close-ups. Image 1 is the reference: it is the character AND the art style. Copy both exactly: face, hair, skin, outfit, colors, line, shading.
+${grid}
 
-Format: LANDSCAPE image, 3:2, at the highest resolution. An invisible grid of 6 equal SQUARE cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames, no text, no labels.
+${GREEN}
 
-${STYLE_GREEN}
+In every cell: A on the LEFT, B on the RIGHT, both from the top of the head down to mid-thigh, cut by a straight horizontal line exactly on the bottom edge of the cell, at the same scale as each other and the same scale in every cell. Three-quarter views, turned toward each other (unless the cell says otherwise). A clear margin of green above the heads and on both sides.
 
-Framing, the same in all 6 cells: a close-up from the top of the hair down to the middle of the chest. The body is cut by a straight horizontal line that sits exactly on the bottom edge of the cell. The head is the same size and at the same height in every cell (about half of the cell's height). Both shoulders inside the cell, a clear margin of green above the hair and on both sides. No hands, no props.
+${ACT}
 
-Angle, the same in all 6 cells: three-quarter view, the body and the face turned toward the RIGHT of the image, eyes looking to the right at someone their own height. Never looking at the camera.
+${rows(sh)}`;
+    const imgs = refs.same ? `Image 1 is the reference: it is the character AND the art style, ALREADY in the framing and the angle this sheet needs: keep exactly that framing, that size and that angle.`
+      : `Image 1 is the reference: it is the character AND the art style.${refs.two ? ' Image 2 shows ANOTHER character, only as a guide for the framing, the size of the head and the angle: copy nothing of their look (face, hair, body, clothes).' : ''}`;
+    return she(`Create a character sheet of THIS EXACT character (${sh.name}): ${n} ${sh.frame === 'cu' ? 'close-ups' : 'shots from the head to mid-thigh'}, each one a moment of a scene. ${imgs} Copy the character exactly: face, hair, skin, body, outfit, colors, line, shading. Nothing added, nothing removed.
 
-THE MOST IMPORTANT RULE: real, small expressions. These are the faces of a film actor in a close-up, not a cartoon. The feeling is in the eyes, the eyebrows and the corners of the mouth: tiny changes. No wide-open mouth, no bulging eyes, no manga symbols (no sweat drop, no blush lines, no vein). Mouth closed unless the cell says otherwise. Someone who knows this person would read each face at once, and the 6 faces are clearly different from each other.
+${grid}
 
-Row 1, left to right:
-1. ${cells[0][2]}
-2. ${cells[1][2]}
-3. ${cells[2][2]}
+${GREEN}
 
-Row 2, left to right:
-4. ${cells[3][2]}
-5. ${cells[4][2]}
-6. ${cells[5][2]}`, c);
-  };
-  const gestPrompt = (c) => she(`Create a character pose sheet of THIS EXACT character, full body: 6 gestures. Image 1 is the reference: it is the character AND the art style. Copy both exactly: face, hair, body, outfit, colors, line, shading.
+Framing, the same in every cell: ${FRAMES[sh.frame].how}
 
-Format: PORTRAIT image, 2:3, at the highest resolution. An invisible grid of 6 equal tall cells, 3 columns × 2 rows, exactly the same size. NO lines, NO borders, NO frames, no text, no labels.
+Angle, the same in every cell (unless a cell says it is seen from behind): three-quarter view, the body and the face turned toward the RIGHT of the image, the eyes on someone their own height standing or sitting to the right, outside the cell. Never looking at the camera.
 
-${STYLE_GREEN}
+${ACT}
 
-In every cell: the same character, full body from head to feet, standing, the same size, feet at the same height, with a clear margin of green on all sides (nothing touches the edge of its cell, nothing crosses into the next cell).
-
-Angle: three-quarter view turned toward the RIGHT of the image, like image 1, camera at chest height (cells 5 and 6 say their own angle). The person they deal with stands to the right, outside the cell.
-
-Row 1, left to right:
-1. ${GESTS[0][2]}
-2. ${GESTS[1][2]}
-3. ${GESTS[2][2]}
-
-Row 2, left to right:
-4. ${GESTS[3][2]}
-5. ${GESTS[4][2]}
-6. ${GESTS[5][2]}
-
-Do not exaggerate. Natural gestures, like an actor on a set: the face stays as readable as the gesture.`, c);
+${rows(sh)}`);
+  }
 
   // ---- les décors : la même taverne, refaite sous un autre angle (image 1 = la taverne du jeu)
   const SAME = 'Image 1 is the tavern. Draw the SAME tavern (same architecture, same stone and wood, same blue banners with the tankard, same lanterns, same art style, same line and shading) at NIGHT: warm lantern light, deep blue night in the windows.';
@@ -166,12 +166,16 @@ The door and the rest of the room are off screen, to the right.
 WHAT THE SCREEN CAN DO
 - Show the people of ONE area at a time (the table, or aside), from wide to close-up. The engine picks the framing: you say who speaks to whom.
 - Sit down, stand up (at a seat), walk in, walk out, walk from one place to another, step closer to someone.
-- Turn someone toward someone. A face among: neutral, smile, amused, laugh, tender, shy, serious, worried, surprised, doubt, angry, threat.
+- Turn someone toward someone. A face, the one that fits THIS moment exactly (choose carefully, the illustrator draws it from your choice):
+  warm: smile, amused (teasing), laugh, tender (a look that lingers), shy (flattered, eyes down) · calm: neutral (listening)
+  cool: serious, cold, doubt (hesitates, holds something back), suspicious · low: worried, hurt (hides it), fear
+  shock: surprised, shocked (everything changes) · hot: annoyed, angry (held back), defiant (provokes), threat (quiet), jealous (hides it)
 - A gesture among: point (at a place or a person), hands_up, lean (toward someone), drink, back (turns their back), turn (looks back over the shoulder).
 - An insert: a detail filling the screen for one beat (an object, an empty chair, a hand).
+- A duo: two people of the same area in ONE picture, for any moment where they touch or are very close (leaning in to whisper, a hand on a shoulder, grabbing a collar, a hug, a kiss). Describe it in "act", in English, precisely: who does what to whom, and both faces.
 
 WHAT THE SCREEN CANNOT DO — never write a beat that needs it; say it in a short "narr" over a close-up instead
-- Two people touching (a kiss, a hug, a grab, a fight, a handshake). Nobody carries, gives or takes an object in view (an insert can show the object alone).
+- Two people touching WITHOUT a duo beat. Nobody carries, gives or takes an object in view (an insert can show the object alone). A fight with blows.
 - A crowd acting. The people of the room are heard, not seen: use "narr".
 - Someone sitting where there is no free seat, two people in one place, someone talking quietly to a person who is in the other area.
 - Lying down, kneeling, running, dancing, anything on the floor. We never see legs or feet.
@@ -181,7 +185,7 @@ RULES OF STAGING
 2. Before a line between two people who are not in the same area, MOVE one of them first — unless it is a call across the room: then add "far": true.
 3. An action line of the screenplay becomes a beat the audience SEES: a "do" with a short "narr" (present tense, 60 characters at most, only what the picture does not already say). A look, a smile that fades, a silence = {"do":"look", ...} with the face: that is a reaction shot, the most useful beat there is.
 4. "to" = the person the line is said TO (the one the speaker looks at), not the person it is about. If it is said to everyone, leave "to" out.
-5. Faces are small and real. Most lines are neutral, smile, amused or serious. Keep angry, threat, surprised and laugh for the moments that earn them. A face stays until you change it.
+5. Faces are small and real, and they follow what is said AND what is meant underneath (someone who lies smiles with cold eyes: "jealous" or "cold", not "smile"). Most lines are neutral, smile, amused or serious. Keep the strong ones for the moments that earn them. A face stays until you change it: change it as soon as the feeling changes, and give the listener's reaction in "react" when it matters.
 6. Keep EVERY line of dialogue, in order, word for word, in its language. Never add a line. Unnamed roles (A CLIENT, THE MAN) are cast members too.
 7. Someone with nothing left to do walks out: {"do":"exit"} with no "narr".
 8. The choice at the end: {"choice":[{"t": the button (4 words at most), "narr": what it means}, ...]}.
@@ -204,6 +208,7 @@ FORMAT
   {"do":"enter","who":"client","to":"d1","face":"worried","narr":"..."}
   {"do":"move","who":["amare","justin"],"to":["a1","a2"],"narr":"..."}     also from the table to aside and back
   {"do":"near","who":"amare","to":"justin","narr":"..."}          steps closer
+  {"duo":"whisper","who":["amare","justin"],"act":"Amare leans in close to Justin's ear and whispers; Justin stares ahead, jaw tight","narr":"..."}
   {"do":"stand","who":"homme","narr":"..."}   {"do":"sit","who":"amare"}   {"do":"exit","who":"client"}
   {"choice":[{"t":"...","narr":"..."},{"t":"...","narr":"..."}]}
  ]
@@ -254,8 +259,8 @@ ${script}`;
       L('isa', 'amare', 'doubt', 'Tu vas encore commencer avec tes histoires ?'),
       L('amare', 'isa', 'amused', 'Quoi ? Je suis simplement curieux.', { gest: 'hands_up' }),
       L('isa', 'justin', 'smile', 'Tu sais, Justin, Amare m’a fait une promesse. Et contrairement à certains, il a toujours tenu parole.'),
-      L('amare', 'isa', 'tender', 'Je n’ai pas oublié.'),
-      L('justin', 'isa', 'amused', 'Une promesse ? Je devrais être jaloux ?'),
+      L('amare', 'isa', 'tender', 'Je n’ai pas oublié.', { react: { justin: 'jealous' } }),
+      L('justin', 'isa', 'jealous', 'Une promesse ? Je devrais être jaloux ?'),
       L('isa', 'justin', 'amused', 'Tu devrais surtout arrêter de poser des questions auxquelles tu n’es pas prêt à entendre les réponses.'),
       { do: 'enter', who: 'client', to: 'd1', face: 'worried', narr: 'Un client arrive à leur table, pressé.' },
       L('client', null, 'angry', 'Quelqu’un a volé ma bourse !'),
@@ -268,8 +273,8 @@ ${script}`;
       L('isa', 'justin', 'doubt', 'On devrait peut-être demander qui était près de lui.'),
       L('client', 'isa', 'worried', 'J’ai vu une silhouette près de ma table. Quelqu’un qui n’avait rien à faire là.'),
       L('amare', 'client', 'neutral', 'Un étranger, probablement. Il y a toujours des gens de passage dans cette taverne.'),
-      L('justin', 'amare', 'amused', 'Pratique. On accuse quelqu’un qu’on ne connaît pas.'),
-      L('amare', 'justin', 'serious', 'Tu as une meilleure explication ?'),
+      L('justin', 'amare', 'defiant', 'Pratique. On accuse quelqu’un qu’on ne connaît pas.'),
+      L('amare', 'justin', 'cold', 'Tu as une meilleure explication ?'),
       L('justin', 'amare', 'neutral', 'Pas encore.'),
       { do: 'exit', who: 'client' },
       { do: 'look', who: 'amare', at: 'justin', face: 'threat', narr: 'Amare fixe Justin. Puis il sourit.' },
@@ -282,7 +287,7 @@ ${script}`;
       L('justin', 'isa', 'amused', 'Et moi qui pensais être celui qui devait te surprendre.'),
       L('isa', 'justin', 'tender', 'Tu as encore le temps.'),
       { do: 'look', who: 'isa', at: 'justin', face: 'shy', react: { justin: 'tender' }, shot: 'two', narr: 'Leurs regards se croisent. Isa sourit.' },
-      { do: 'look', who: 'amare', at: 'justin', face: 'serious', narr: 'Amare les regarde. Son sourire s’efface.' },
+      { do: 'look', who: 'amare', at: 'justin', face: 'jealous', narr: 'Amare les regarde. Son sourire s’efface.' },
       L('amare', 'justin', 'serious', 'Justin. Viens avec moi. Deux minutes.'),
       L('justin', 'amare', 'doubt', 'Pourquoi ?'),
       L('amare', 'justin', 'threat', 'Parce que je te le demande gentiment.'),
@@ -294,7 +299,7 @@ ${script}`;
       L('amare', 'justin', 'serious', 'Isa.'),
       L('justin', 'amare', 'neutral', 'Quoi, Isa ?'),
       L('amare', 'justin', 'angry', 'Ne joue pas à ça avec moi.'),
-      L('justin', 'amare', 'amused', 'Je ne savais pas qu’il fallait te demander la permission pour lui parler.'),
+      L('justin', 'amare', 'defiant', 'Je ne savais pas qu’il fallait te demander la permission pour lui parler.'),
       { do: 'near', who: 'amare', to: 'justin', narr: 'Amare s’approche.' },
       L('amare', 'justin', 'serious', 'Écoute-moi bien. Tout le monde ici m’apprécie. Ils me font confiance. Isa me fait confiance.'),
       L('justin', 'amare', 'amused', 'Et tu comptes utiliser ça pour m’impressionner ?'),
@@ -302,18 +307,18 @@ ${script}`;
       L('justin', 'amare', 'serious', 'C’est une menace ?'),
       L('amare', 'justin', 'threat', 'C’est une faveur. Éloigne-toi d’Isa.'),
       L('justin', 'amare', 'serious', 'Et si je refuse ?'),
-      { do: 'near', who: 'amare', to: 'justin', gest: 'lean', shot: 'two', narr: 'Amare se penche vers lui.' },
+      { duo: 'whisper', who: ['amare', 'justin'], act: 'Amare leans in very close to Justin\'s ear, calm, almost gentle, and whispers; Justin does not move, staring straight ahead, his jaw tight.', narr: 'Amare se penche vers lui.' },
       L('amare', 'justin', 'threat', 'Alors je te tue.', { shot: 'cu' }),
-      { do: 'look', who: 'justin', at: 'amare', face: 'serious', narr: 'Un silence.' },
+      { do: 'look', who: 'justin', at: 'amare', face: 'shocked', narr: 'Un silence.' },
       L('justin', 'amare', 'amused', 'Tu sais, tu devrais travailler sur ta façon de faire connaissance.'),
       L('amare', 'justin', 'angry', 'Tu crois que je plaisante ?'),
-      L('justin', 'amare', 'serious', 'Non. C’est bien ça qui m’inquiète.'),
+      L('justin', 'amare', 'fear', 'Non. C’est bien ça qui m’inquiète.'),
       L('amare', 'justin', 'threat', 'Tu ne sais même pas dans quoi tu t’es embarqué.'),
       { do: 'move', who: 'amare', to: 's1', narr: 'Amare retourne vers la table.' },
       { do: 'look', who: 'justin', at: 'amare', face: 'worried', narr: 'Justin reste seul quelques secondes.' },
       { do: 'move', who: 'isa', to: 'a1' },
       L('isa', 'justin', 'worried', 'Tout va bien ?'),
-      L('justin', 'isa', 'amused', 'Ton ami a un drôle de sens de l’humour.'),
+      L('justin', 'isa', 'hurt', 'Ton ami a un drôle de sens de l’humour.'),
       L('isa', 'justin', 'neutral', 'Amare ? Il est parfois un peu intense, mais il a toujours été là pour moi.'),
       L('justin', 'isa', 'serious', 'Je vois.'),
       L('isa', 'justin', 'tender', 'Tu sais, tu peux me parler si quelque chose te tracasse.'),
@@ -335,7 +340,7 @@ ${script}`;
       L('amare', 'justin', 'threat', 'Que certaines personnes ici ont de bonnes raisons de ne pas vouloir te voir traîner dans les parages.', { far: true }),
       L('isa', 'amare', 'angry', 'Amare, ça suffit.', { far: true }),
       L('amare', 'isa', 'amused', 'Je ne fais que plaisanter.', { far: true }),
-      L('isa', 'amare', 'angry', 'Alors trouve une meilleure plaisanterie.', { far: true }),
+      L('isa', 'amare', 'annoyed', 'Alors trouve une meilleure plaisanterie.', { far: true }),
       { do: 'look', who: 'amare', at: 'isa', gest: 'hands_up', face: 'smile', shot: 'two', narr: 'Amare lève les mains.' },
       L('amare', 'isa', 'smile', 'Comme tu veux.', { far: true }),
       { do: 'sit', who: 'amare', narr: 'Il se rassoit.' },
@@ -348,11 +353,11 @@ ${script}`;
       L('homme', 'justin', 'threat', 'Toi...'),
       { do: 'look', who: 'justin', at: 'homme', face: 'surprised', narr: 'Justin se retourne.' },
       L('justin', 'homme', 'doubt', 'On se connaît ?'),
-      L('homme', 'justin', 'serious', 'Je savais que je finirais par te retrouver.'),
+      L('homme', 'justin', 'cold', 'Je savais que je finirais par te retrouver.'),
       L('isa', 'homme', 'worried', 'Vous connaissez Justin ?'),
       { do: 'look', who: 'homme', at: 'justin', face: 'threat', narr: 'L’homme ignore Isa. Il ne quitte pas Justin des yeux.' },
       L('homme', 'justin', 'threat', 'Tu pensais vraiment pouvoir disparaître comme ça ?'),
-      L('justin', 'homme', 'serious', 'Je crois que vous faites erreur.'),
+      L('justin', 'homme', 'cold', 'Je crois que vous faites erreur.'),
       L('homme', 'justin', 'threat', 'Non. Je ne fais jamais deux fois la même erreur.'),
       { do: 'look', who: 'amare', at: 'justin', face: 'serious', narr: 'Amare observe la scène, sans intervenir.' },
       L('isa', 'justin', 'worried', 'Justin ?'),
@@ -363,5 +368,5 @@ ${script}`;
     ],
   };
 
-  return { SET, FACES, FACE_ALIAS, CU_OLD, GESTS, SHEETS, facePrompt, gestPrompt, PLATE_PROMPT, insertPrompt, STAGE, EX };
+  return { SET, FACES, FACE_ALIAS, CU_OLD, GESTS, EXTRA, FRAMES, sheetPrompt, PLATE_PROMPT, insertPrompt, STAGE, EX };
 })();
