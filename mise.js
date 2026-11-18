@@ -571,13 +571,16 @@ window.MISE = (() => {
     : (() => { const rs = sh.chars.map((c) => refsFor(c.sprite, sh.frame)), out = rs.map((r, k) => ({ src: r.one, label: `Image ${k + 1}${sh.chars.length > 1 ? ` (${sh.chars[k].name})` : ''}`, why: r.why, same: r.same }));
       const guide = rs.every((r) => r.same) ? '' : (rs.find((r) => r.two) || {}).two; return guide ? [...out, { src: guide, label: `Image ${out.length + 1} (guide)`, guide: 1 }] : out; })());
   const nameOf = (c) => (P.cast[c.cid] ? P.cast[c.cid].name : c.sprite);
+  // ✨ made by the OpenAI image API (forge.js's window.OAI: one key, one quality, the prices as an estimate)
+  const genBtn = (id) => (window.OAI ? `<button type="button" class="mzAmber" data-gen="${id}"${gening ? ' disabled' : ''}>✨ Générer ≈ ${OAI.usd(OAI.cost())}</button>` : '');
+  let gening = false;
   function sheetCard(sh, k) {
     const refs = refsOf(sh), ep = sh.cells.filter((c) => !c.extra).length, col = sh.kind === 'duo' ? '#ff375f' : colorOf(P.cast[sh.chars[0].cid] || { n: 0 });
     return `<div class="mzCard" style="--c:${col}"><div class="mzRefs">${refs.map((r) => (r.src ? `<div class="mzPic" style="background-image:url('${r.src}')"></div>` : '')).join('')}</div><div class="mzBody">`
       + `<b>${sh.kind === 'duo' ? `${esc(sh.names[0])} × ${esc(sh.names[1])}<em>à deux, une image</em>` : `${sh.chars.map((c) => esc(c.name)).join(' + ')}<em>${esc(D.FRAMES[sh.frame].name)}</em>`}</b>`
       + `<span class="mzDim">sert ${sh.cells.reduce((n, c) => n + (c.uses || 0), 0)} fois · ${sh.cells.length} cases · ${ep} pour cet épisode${ep < sh.cells.length ? `, ${sh.cells.length - ep} en plus pour plus tard` : ''}${sh.sid ? ' · prompt déjà copié' : ''}${refs.filter((r) => r.why).map((r) => ` · ${esc(r.label.toLowerCase())} : ${esc(r.why)}`).join('')}</span>`
       + `<ol class="mzList">${sh.cells.map((c) => `<li${c.extra ? ' class="x"' : ''}><b>${sh.kind === 'solo' && sh.chars.length > 1 ? esc(nameOf(c)) + ' · ' : ''}${sh.kind === 'duo' ? esc(c.key.split(':')[2]) : esc(FR[c.face] || c.face)}${c.gest ? ' · ' + esc(FR[c.gest]) : ''}</b> <small>${c.extra ? 'en plus, pour plus tard' : esc(sh.kind === 'duo' ? c.act : c.ctx)}${c.uses > 1 ? ` · ×${c.uses}` : ''}</small></li>`).join('')}</ol>`
-      + `<div class="mzRow"><button type="button" data-sp="${k}">📋 Prompt</button>${refs.map((r) => (r.src ? `<button type="button" data-img="${esc(r.src)}">🖼️ ${esc(r.label)}</button>` : '')).join('')}<label class="mzUp">⬆ Déposer<input type="file" accept="image/*" hidden data-us="${k}"></label></div></div></div>`;
+      + `<div class="mzRow"><button type="button" data-sp="${k}">📋 Prompt</button>${refs.map((r) => (r.src ? `<button type="button" data-img="${esc(r.src)}">🖼️ ${esc(r.label)}</button>` : '')).join('')}${genBtn(`s:${k}`)}<label class="mzUp">⬆ Déposer<input type="file" accept="image/*" hidden data-us="${k}"></label></div></div></div>`;
   }
   function render() {
     if (!panel) return;
@@ -592,6 +595,7 @@ window.MISE = (() => {
       + `<p class="${P ? 'mzOk' : 'mzDim'}" data-st>${P ? `✓ ${esc(P.title)} · ${P.beats.length} temps · ${Object.keys(P.cast).length} persos` : S.play.trim() ? 'Pas encore lisible : il faut tout le JSON, de { à }.' : ''}</p>`
       + `<p class="mzMsg">${esc(msg)}</p>`
       + (N ? `<h3 class="mzH"><i>3</i>Ce qui manque${todo ? ` <span class="mzDim">· ${todo} image${todo > 1 ? 's' : ''} à faire (facultatif)</span>` : ' <span class="mzOk">· rien, tout est là</span>'}</h3>`
+        + (window.OAI ? `<div class="mzRow mzOai"><span class="mzDim">✨ ${todo} image${todo > 1 ? 's' : ''} à faire ≈ <b>${OAI.usd(OAI.cost(todo))}</b> (${OAI.usd(OAI.cost())} l’image, ${OAI.quality()}) · estimation, facturé aux tokens</span><select data-oaiq="1">${Object.keys(OAI.prices).map((q) => `<option value="${q}"${q === OAI.quality() ? ' selected' : ''}>${q}</option>`).join('')}</select>${OAI.hasKey() ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-oaikey="1" placeholder="Clé OpenAI (sk-…)">'}</div>` : '')
         + `<p class="mzDim">L’épisode montre ${N.total} images de persos (un visage, un cadrage, un geste, ou deux persos ensemble). ${N.have.length ? `<span class="mzOk">✓ ${N.have.length} déjà gardées</span>, pas redemandées.` : 'Aucune encore gardée.'} Chaque feuille ne contient que ce qui manque, avec le moment exact que chaque case joue. Pour chacune : 📋 le prompt, 🖼️ les images à coller avant, puis ⬆ ce que ChatGPT a fait.</p>`
         + (N.have.length ? `<div class="mzCells">${N.have.slice(0, 40).map((n) => `<img src="${UP[n.key].url}" alt="" title="${esc(n.key)}">`).join('')}</div>` : '')
         + `<h4 class="mzH4">Qui joue qui</h4><div class="mzCast">${Object.values(P.cast).map((c) => { const src = refImg(c), k = S.k[c.sprite] || 1;
@@ -602,9 +606,9 @@ window.MISE = (() => {
         + N.plates.map(({ p, done }) => { const pl = plateOf(p);
           return `<div class="mzCard" style="--c:#5e5ce6"><div class="mzPic wide" style="background-image:url(${pl.up ? pl.up.url : pl.src})"></div><div class="mzBody"><b>🏠 ${esc(pl.name)}<em>${done ? '✓ gardé' : 'par défaut (fait à partir de la taverne du jeu)'}</em></b>`
             + `<span class="mzDim">${p === 'table' ? 'La table vue de face : ils sont assis derrière, on voit tout le monde.' : p === 'aside' ? 'À quelques pas de la table : deux personnes face à face.' : 'La salle de loin, pour ouvrir.'}</span>`
-            + `<div class="mzRow">${done ? '' : `<button type="button" data-pp="${p}">📋 Prompt</button><button type="button" data-img="${SET.ref}">🖼️ Image 1 (la taverne)</button>`}<label class="mzUp">${done ? '↻ Remplacer' : '⬆ Déposer'}<input type="file" accept="image/*" hidden data-upl="${p}"></label>${p !== 'salle' ? `<button type="button" data-tune="${p}">📐 Placer</button>` : ''}${done ? `<button type="button" data-del="pl:${p}">Revenir au défaut</button>` : ''}</div></div></div>`; }).join('')
+            + `<div class="mzRow">${done ? '' : `<button type="button" data-pp="${p}">📋 Prompt</button><button type="button" data-img="${SET.ref}">🖼️ Image 1 (la taverne)</button>`}${genBtn(`p:${p}`)}<label class="mzUp">${done ? '↻ Remplacer' : '⬆ Déposer'}<input type="file" accept="image/*" hidden data-upl="${p}"></label>${p !== 'salle' ? `<button type="button" data-tune="${p}">📐 Placer</button>` : ''}${done ? `<button type="button" data-del="pl:${p}">Revenir au défaut</button>` : ''}</div></div></div>`; }).join('')
         + N.inserts.map((n) => `<div class="mzCard" style="--c:#bf5af2"><div class="mzPic wide" style="background-image:url(${n.done ? UP[`in:${n.id}`].url : n.prop ? `props/${n.prop}.webp` : ''});background-size:${n.done ? 'cover' : 'contain'}"></div><div class="mzBody"><b>🔍 Insert : ${esc(n.id)}<em>${n.done ? '✓ gardé' : n.prop ? 'par défaut : l’objet seul' : 'par défaut : le texte seulement'}</em></b>`
-          + `<span class="mzDim">${esc(n.desc)}</span><div class="mzRow">${n.done ? '' : `<button type="button" data-pi="${n.id}">📋 Prompt</button><button type="button" data-img="${SET.ref}">🖼️ Image 1 (la taverne)</button>`}<label class="mzUp">${n.done ? '↻ Remplacer' : '⬆ Déposer'}<input type="file" accept="image/*" hidden data-upi="${n.id}"></label>${n.done ? `<button type="button" data-del="in:${n.id}">Retirer</button>` : ''}</div></div></div>`).join('')
+          + `<span class="mzDim">${esc(n.desc)}</span><div class="mzRow">${n.done ? '' : `<button type="button" data-pi="${n.id}">📋 Prompt</button><button type="button" data-img="${SET.ref}">🖼️ Image 1 (la taverne)</button>`}${genBtn(`i:${n.id}`)}<label class="mzUp">${n.done ? '↻ Remplacer' : '⬆ Déposer'}<input type="file" accept="image/*" hidden data-upi="${n.id}"></label>${n.done ? `<button type="button" data-del="in:${n.id}">Retirer</button>` : ''}</div></div></div>`).join('')
         : '')
       + `</div><div class="mzPlayBar"><button type="button" class="mzGo" data-a="play"${P ? '' : ' disabled style="opacity:.4"'}>▶ Jouer</button></div>`;
     panel.scrollTop = keep;
@@ -634,6 +638,19 @@ window.MISE = (() => {
     delete S.sheets[sh.sid]; save();
     return sh.cells.map((c) => c.key);
   }
+  // ✨ the same road as ⬆ Déposer: the API's picture is cut / kept exactly as a dropped one
+  async function generate(id) {
+    if (gening) return; if (!OAI.hasKey()) return say('Il faut ta clé OpenAI (en haut de « Ce qui manque »).');
+    const [kd, ...r] = id.split(':'), ref = r.join(':'); let prompt, srcs, size = '1536x1024', run, what;
+    if (kd === 's') { const sh = pin(N.sheets[+ref]), refs = refsOf(sh); prompt = D.sheetPrompt(sh, refs); srcs = refs.map((x) => x.src).filter(Boolean);
+      size = sh.grid[0] === sh.grid[1] ? '1024x1024' : '1536x1024'; what = 'la feuille';
+      run = async (blob) => { const keys = await keepSheet(sh, new File([blob], 'sheet.png', { type: 'image/png' })); return `${keys.length} images gardées. ` + await share(keys, sh.kind === 'duo' ? `${sh.names.join(' × ')}, à deux` : sh.chars.map((c) => c.name).join(' + ')); }; }
+    else if (kd === 'p') { prompt = D.PLATE_PROMPT[ref]; srcs = [SET.ref]; what = `le décor ${ref}`; run = async (blob) => { await keepImage(`pl:${ref}`, blob); return await share([`pl:${ref}`], `décor ${ref}`); }; }
+    else { prompt = D.insertPrompt(P.inserts[ref] || { id: ref }); srcs = [SET.ref]; what = `l’insert ${ref}`; run = async (blob) => { await keepImage(`in:${ref}`, blob); return await share([`in:${ref}`], `insert ${ref}`); }; }
+    gening = true; say(`✨ Je génère ${what} (≈ ${OAI.usd(OAI.cost())}, une minute)…`);
+    try { const blob = await OAI.make(prompt, srcs, size); say('Découpe…'); gening = false; return say(await run(blob)); }
+    catch (err) { gening = false; return say('✨ ' + (err.message || 'Échec de la génération')); }
+  }
   async function onClick(e) {
     const t = e.target.closest('button,[data-a]'); if (!t) return; const d = t.dataset;
     if (d.a === 'close') return close();
@@ -642,6 +659,7 @@ window.MISE = (() => {
     if (d.a === 'haiku') { if (!S.script.trim()) return say('Colle d’abord le script (1).'); say('Haiku met en scène…');
       try { const r = await GEN.ask(ls('smt-key'), [{ role: 'user', content: D.STAGE(S.script.trim(), pool().filter((x) => !/^isa_/.test(x)).concat('isa').join(', ')) }], 'You are a film director. Reply with the JSON only.', 16000); S.play = JSON.stringify(r.json); save(); return say('Mis en scène par Haiku.'); } catch (err) { return say('Haiku : ' + err.message); } }
     if (d.a === 'play') { if (P) { panel.hidden = true; player(P, { onClose: () => { if (panel) { panel.hidden = false; render(); } } }); } return; }
+    if (d.gen) return generate(d.gen);
     if (d.sp) { const sh = pin(N.sheets[+d.sp]), refs = refsOf(sh);
       return copy(D.sheetPrompt(sh, refs), `Prompt copié. Dans ChatGPT : colle ${refs.filter((x) => x.src).map((x) => x.label.toLowerCase()).join(' puis ')}, puis le prompt. Puis ⬆ Déposer sur cette même carte.`); }
     if (d.pp) return copy(D.PLATE_PROMPT[d.pp], `${SET.plates[d.pp].name} : prompt copié. Dans ChatGPT : colle l’image 1 (la taverne), puis le prompt.`);
@@ -666,7 +684,7 @@ window.MISE = (() => {
   async function open() {
     style(); await boot(); if (panel) panel.remove();
     panel = document.createElement('div'); panel.id = 'mz'; document.body.appendChild(panel);
-    panel.addEventListener('click', onClick); panel.addEventListener('change', (e) => { if (e.target.type === 'file') onChange(e); else if (e.target.dataset.f) render(); }); panel.addEventListener('input', onInput);
+    panel.addEventListener('click', onClick); panel.addEventListener('change', (e) => { if (e.target.type === 'file') onChange(e); else if (e.target.dataset.oaiq) { OAI.setQuality(e.target.value); render(); } else if (e.target.dataset.oaikey) { if (OAI.setKey(e.target.value)) render(); } else if (e.target.dataset.f) render(); }); panel.addEventListener('input', onInput);
     msg = ''; render();
   }
   function close() { if (panel) panel.remove(); panel = null; }

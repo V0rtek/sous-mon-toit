@@ -2123,13 +2123,16 @@ Keep it natural, like the reference.`;
   const oaiQ = () => (OAI_PRICE[ls('smt-oai-q')] ? ls('smt-oai-q') : 'medium');
   const oaiCost = (k) => OAI_PRICE[oaiQ()] * (k == null ? 1 : k);
   const usd = (x) => '$' + (x < 0.1 ? x.toFixed(3).replace(/0$/, '') : x.toFixed(2));
+  // shared with Mise en scène (mise.js): the same key, the same quality, the same prices
+  window.OAI = { make: oaiMake, cost: oaiCost, usd, quality: oaiQ, prices: OAI_PRICE, hasKey: () => !!ls('smt-oai'), setKey: (k) => { if (/^sk-/.test((k || '').trim())) { ls('smt-oai', k.trim()); return true; } return false; }, setQuality: (q) => ls('smt-oai-q', q) };
   const GENS = {};   // key -> { url, blob } what the API gave back, this session
   const genBusy = new Set();
-  async function oaiSheet(prompt, srcs, square) {
+  async function oaiSheet(prompt, srcs, square) { return oaiMake(prompt, srcs, square === true ? '1024x1024' : square === false ? '1024x1536' : square); }
+  async function oaiMake(prompt, srcs, size) {
     const key = ls('smt-oai'); if (!key) throw new Error('Il faut ta clé OpenAI (en haut des pose sheets)');
     const fd = new FormData();
     fd.append('model', ls('smt-oai-m') || 'chatgpt-image-latest'); fd.append('prompt', prompt); fd.append('quality', oaiQ());
-    fd.append('size', square ? '1024x1024' : '1024x1536'); fd.append('n', '1');
+    fd.append('size', size); fd.append('n', '1');
     for (const u of srcs) { const b = await (await fetch(u)).blob(); fd.append('image[]', new File([b], 'ref.' + (b.type.split('/')[1] || 'png'), { type: b.type })); }
     const r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: 'Bearer ' + key }, body: fd });
     const j = await r.json().catch(() => ({}));
