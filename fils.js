@@ -539,6 +539,25 @@ window.FILS = (() => {
   // the flaw in the voice (how it shows when they talk)
   const FLAWV = { lache: 'fanfaronne, puis recule dès que ça devient sérieux', vice: 'ramène tout à un verre ou à une mise', colere: 'les phrases montent vite ; coupe la parole',
     menteur: 'trop de détails quand il ment', orgueil: 'ne dit jamais merci ni pardon' };
+  // ---- WHAT A CHOICE COSTS, FOR GOOD (18/11, PREMIER JET): the side Justin gives up at a climax has a FATE, concrete and
+  // irreversible, by the kind of desire lost (w = Justin, t = the one it was about). kill: when a life is at stake, the one
+  // he did not choose dies; gone: they leave and do not come back; else they turn away. The fate is a change of the world
+  // the next act is built on (principle 35) ----
+  const FATE = {
+    kill: [(w, t, x) => `${t} meurt ; ${x} ne bluffait pas`, (w, t, x) => `${t} dies; ${x} was not bluffing`],
+    gone: [(w, t) => `${t} part, et ne reviendra pas`, (w, t) => `${t} leaves, and will not come back`],
+    turn: [(w, t) => `${t} ne lui pardonnera pas`, (w, t) => `${t} will never forgive him`],
+    free: [(w) => `${w} reste ; la porte ne rouvrira plus`, (w) => `${w} stays; that door will never open again`],
+    respect: [(w) => `${w} est déshonoré devant tous`, (w) => `${w} is disgraced in front of everyone`],
+    alive: [(w) => `${w} est blessé, et on sait où le trouver`, (w) => `${w} is wounded, and they know where to find him`],
+    hide: [(w) => `le secret ${de(w)} éclate devant tous`, (w) => `${w}'s secret comes out in front of everyone`],
+    justice: [(w, t) => `${t} s’en tire, et le sait`, (w, t) => `${t} gets away with it, and knows it`],
+    oust: [(w, t) => `${t} prend toute la place`, (w, t) => `${t} takes over`],
+    win: [(w) => `${w} perd sa chance, pour de bon`, (w) => `${w} loses the chance, for good`],
+    find: [(w, t) => `la piste ${de(t)} meurt : on ne reverra plus ${t}`, (w, t) => `${t}'s trail dies: ${t} will not be seen again`],
+  };
+  // the pillar someone takes when they lose what they loved and blame someone for it (the bascule): their voice changes
+  const BASCULE = 'dangereux';
   const GROW = [
     { on: 'T', k: 'born', to: 'new:m' }, { on: 'T', k: 'toward', to: 'P' }, { on: 'T', k: 'hiddenin', to: 'new:l' }, { on: 'T', k: 'known', to: 'P' }, { on: 'T', k: 'proves', to: 'IE' },
     { on: 'E', k: 'where', to: 'new:l' }, { on: 'E', k: 'with', to: 'P' }, { on: 'E', k: 'with', to: 'new:f', only: ['croupier', 'associe', 'inconnu', 'amour', 'veuve', 'marchand', 'frere', 'soeur'] }, { on: 'E', k: 'same', to: 'new:m' }, { on: 'E', k: 'saw', to: 'P', rev: 1 }, { on: 'E', k: 'leads', to: 'E' },
@@ -558,5 +577,5 @@ window.FILS = (() => {
     for (const [mv, F] of Object.entries(FORMS)) { const G = GS.find((g) => g.id === F.g); if (!G) continue;
       for (const f of F.list) { G.tech.push({ n: f.n, d: f.d, ex: f.ex, [mv]: 1, thread: 1 }); CT[f.n] = [f.fr, f.en]; } } };
   install();
-  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, CLUE, SECRET, FLAWV, glue, ENDS, VOICE, install, de };
+  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, CLUE, SECRET, FLAWV, glue, ENDS, FATE, BASCULE, VOICE, install, de };
 })();

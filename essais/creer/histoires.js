@@ -43,5 +43,6 @@ T.J2b_liens_2actes = { ...T.J2_liens, links: T.J2_liens.links.map((l) => (l.sh ?
 T.D1_chevalier = { ...base, acts: 2, seed: 3, cast: ['amare', 'isa', 'james', 'melissa'], pil: { justin: ['mysterieux', 'protecteur'], amare: ['chef', 'protecteur'], isa: ['genie'], james: ['dangereux', 'clown'], melissa: ['protecteur'] },
   flaw: { justin: 'orgueil' }, want: { justin: { v: 'love', t: 'isa' }, amare: { v: 'love', t: 'isa' }, james: { v: 'oust', t: 'amare' } }, rel: { 'amare|isa': 'couple', 'justin|melissa': 'friend', 'isa|justin': 'ex' },
   infos: [{ id: 'name', x: 'justin' }], ev: [{ k: 'arrive', x: 'james' }, { k: 'threat', x: 'james', v: 'amare' }, { k: 'murder', x: 'james', v: 'isa', s: 'amare', h: 0, a: 2 }, { k: 'revenge', x: 'amare', v: 'justin', a: 2 }], hard: { liked: 1, clock: 1 } };
+T.D1b_chevalier_autre_choix = { ...T.D1_chevalier, picked: { pick: 1 } };
 T.EX = 'EX';
 module.exports = T;

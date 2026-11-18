@@ -20,7 +20,7 @@ const check = () => { const out = [], EPS = FORGE.episodes(), TH = EPS.threads |
   EPS.forEach(({ list }, n) => { let plan = null; try { plan = FORGE.planOf(n); } catch (e) { out.push(`planOf(${n}) throws ${e.message}`); }
     if (plan) for (const b of plan.boxes[0].beats) for (const p of b.present || []) if (dead.has(p.id)) out.push(`ep${n + 1}: dead ${p.id} present in "${b.what.slice(0, 50)}"`);
     const load = list.reduce((t, b) => t + 1 + (b.rides || []).length * 0.5, 0); if (load > 14.5) out.push(`ep${n + 1}: load ${load}`);
-    for (const b of list) { if (b.ev && b.ev.k === 'murder' && b.ev.v) dead.add(b.ev.v);
+    for (const b of list) { if (b.ev && b.ev.k === 'murder' && b.ev.v) dead.add(b.ev.v); if (b.kind === 'pick' && b.act === 1 && FORGE.state) for (const t of [...FORGE.state().kill, ...FORGE.state().gone]) dead.add(t);
       for (const z of [b, ...(b.rides || [])]) { if (z.fr == null || /undefined|NaN|\[object/.test(String(z.fr) + String(z.en))) out.push(`ep${n + 1}: bad text ${z.id} [${z.kind}] ${z.fr}`);
         if (['dshow', 'conflict', 'stake', 'easy', 'clue'].includes(z.kind) && !z.choiceOf && (z.who || []).length && dead.has(z.who[0])) out.push(`ep${n + 1}: dead ${z.who[0]} acts in ${z.id}`); }
       if (b.choice) { const [a, c] = b.opts, [d1, d2] = b.desires || []; if (a[0] === c[0]) out.push(`ep${n + 1}: same options "${a[0]}"`); if (!d1 || !d2) out.push(`ep${n + 1}: choice without two desires`);

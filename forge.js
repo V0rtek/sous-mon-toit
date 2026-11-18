@@ -413,6 +413,7 @@ window.FORGE = (() => {
   // act 2 with no event of its own: the one act 1 exposed (or the one against Justin) strikes back. « Le besoin reste, la
   // cible change » : a killer or a dangerous one threatens a life, anyone else wants to make someone pay
   const autoEv = () => { if (ACTS() < 2 || (S.ev || []).some((e) => EK[e.k] && (e.a || 1) === 2 && live(e.x))) return null;
+    const arc = actState().arcs.find((r) => live(r.who) && live(r.x)); if (arc) { if (!AUTO || AUTO.x !== arc.who || AUTO.v !== arc.x || AUTO.k !== 'revenge') AUTO = { k: 'revenge', x: arc.who, v: arc.x, a: 2, auto: 1, s: null, h: 0 }; return AUTO; }
     const cr = (S.ev || []).find((e) => EK[e.k] && EK[e.k].crime && live(e.x) && e.x !== J && (e.a || 1) === 1);
     const x = cr ? cr.x : (() => { const sv = CUR_ACT; CUR_ACT = 1; try { return roles().against; } finally { CUR_ACT = sv; } })();
     if (!x) return null;
@@ -586,7 +587,7 @@ window.FORGE = (() => {
   const dSay = (d) => `${nm(d.who)} veut ${DK[d.k].n}${d.t ? ' ' + tName(d) : ''}`, dSayE = (d) => `${en(d.who)} wants ${DK[d.k].en}${d.t ? ' ' + tNameE(d) : ''}`;
   const lab = (d) => DK[d.k].lab(tName(d)), labE = (d) => DK[d.k].labE(tNameE(d));
   // who a murder kills, who an event takes away: the dead want nothing anymore, and nothing can be asked of them
-  const deadIds = () => evs().filter((e) => e.k === 'murder' && e.v && live(e.v)).map((e) => e.v);
+  const deadIds = () => [...evs().filter((e) => e.k === 'murder' && e.v && live(e.v)).map((e) => e.v), ...(CUR_ACT === 2 ? [...actState().kill, ...actState().gone] : [])];
   function desires() {
     const D = [], ps = people();
     const add = (who, k, t, s, src, from) => { if (!live(who) || (t && (!live(t) || t === who))) return null; const id = `${who}:${k}${t ? ':' + t : ''}`;
@@ -621,6 +622,9 @@ window.FORGE = (() => {
     }
     // someone searched for: the search starts when he disappears, even if it was chosen before
     for (const d of D) if (d.k === 'find' && !d.from) { const g = evs().find((e) => e.k === 'gone' && e.x === d.t); if (g) d.from = g; }
+    // act 2 stands on what act 1 changed: desires born (a bascule, a betrayal, a disgrace) and desires over
+    if (CUR_ACT === 2) { const AS = actState(); for (const a of AS.adds) add(a.who, a.k, a.t, 3, a.src);
+      for (let k = D.length - 1; k >= 0; k--) if (AS.ends.some((x) => x.who === D[k].who && x.k === D[k].k && x.t === D[k].t)) D.splice(k, 1); }
     // the dead: their own desires stop with them (they only feed who looked guilty); a desire about them is over too
     const dead = deadIds();
     for (const d of D) { if (dead.includes(d.who)) d.dead = 1; else if (d.t && dead.includes(d.t) && ['protect', 'love', 'oust', 'find'].includes(d.k)) d.late = 1; }
@@ -698,6 +702,69 @@ window.FORGE = (() => {
   // the story of an act (its events and the ones before); the whole story = the last act's, with act 1's climax (X) and act 2's (X2)
   const storyAt = (a) => { const keep = CUR_ACT; CUR_ACT = a; try { const D = desires(), C = conflictsOf(D), PL = plotlinesOf(D, C); return { D, C, PL, X: climaxOf(D, C, PL, a) }; } finally { CUR_ACT = keep; } };
   const story = () => { if (ACTS() < 2) return storyAt(1); const s1 = storyAt(1), s2 = storyAt(2), same = (d) => d && s2.D.find((x) => x.id === d.id); return { ...s2, X: s1.X.map(same), X2: s2.X }; };
+  // ---- THE WORLD, CHANGED (18/11): what act 1 leaves behind for good, and what act 2 is built on. The climax's lost side
+  // has its fate (FILS.FATE: when a life is at stake the one he did not choose dies; else they leave, or turn away); what
+  // came out changes how people stand (a betrayal: no more love, they want to make him pay); someone who loses who they
+  // loved and blames someone BASCULES: their desire turns to revenge, their pillar to FILS.BASCULE (their voice changes).
+  // The dimensions (Justin's grid): vie · rel (relations) · su (what is known) · statut · désirs · arcs ----
+  // the one who forces the choice: who threatens, else who seeks revenge, in this act or before
+  const forcer = (a) => { const e = (S.ev || []).find((x) => ['threat', 'revenge'].includes(x.k) && (x.a || 1) <= a && live(x.x) && x.x !== J); return e ? e.x : null; };
+  // the fate of a desire Justin gives up at the climax of act a: { kind, t, fr, en }
+  const fateFor = (lost, a) => { const F = window.FILS && FILS.FATE; if (!F || !lost) return null; const t = lost.t, ev2 = (S.ev || []).filter((e) => EK[e.k] && (e.a || 1) > a), later = (p) => ev2.some((e) => [e.x, e.v, e.s].includes(p));
+    let kind, x = null;
+    if (['love', 'protect', 'find'].includes(lost.k) && t && t !== J) {
+      // a death needs someone to give it: the one who forces the choice, else a murderer still free
+      const cares = (p) => storyAt(1).D.some((d) => d.who === p && d.t === t && ['love', 'protect'].includes(d.k));   // nobody kills the one they love to force a choice
+      const fo = forcer(a), mu = (S.ev || []).find((e) => e.k === 'murder' && (e.a || 1) <= a && live(e.x) && e.x !== t && e.x !== J && !cares(e.x));
+      x = fo && fo !== t && !cares(fo) ? fo : mu ? mu.x : null;
+      kind = lost.k === 'find' ? 'find' : x && !later(t) ? 'kill' : !later(t) && lost.k === 'love' ? 'gone' : 'turn'; }
+    else kind = F[lost.k] ? lost.k : 'respect';
+    const W1 = [nm(J), t ? nm(t) : '', x ? nm(x) : ''], WE = [en(J), t ? en(t) : '', x ? en(x) : '']; return { kind, t, x, fr: F[kind][0](...W1), en: F[kind][1](...WE) }; };
+  // why someone wants to make another pay (a revenge, a threat): a death of someone they loved, blamed on the culprit, or on
+  // Justin when he gave that one up at the climax. { v (the dead), why } or null
+  const blameFor = (x, v) => { const st = storyAt(Math.min(2, ACTS())), loved = (t) => !actState().ends.some((z) => z.who === x && z.t === t) && (st.D.some((d) => d.who === x && d.t === t && ['love', 'protect'].includes(d.k)) || storyAt(1).D.some((d) => d.who === x && d.t === t && ['love', 'protect'].includes(d.k)));
+    const AS = actState(), m = (S.ev || []).find((e) => e.k === 'murder' && e.v && live(e.v) && e.v !== x && loved(e.v) && (e.x === v || (v === J && AS.fate && AS.fate.t === e.v)));
+    if (m) return { v: m.v, why: m.x === v ? 'tué' : 'abandonné' };
+    const k = AS.kill.find((t) => t !== x && loved(t)); if (k && v === J) return { v: k, why: 'choix' }; const g = AS.gone.find((t) => t !== x && loved(t)); if (g && v === J) return { v: g, why: 'parti' };
+    if (AS.fate && AS.fate.kind === 'turn' && AS.fate.t === x && v === J) return { v: x, why: 'lâché' };
+    const cr = (S.ev || []).find((e) => EK[e.k] && EK[e.k].crime && e.h && (e.a || 1) === 1 && e.x === x && live(e.x)); return cr ? { v: cr.v && live(cr.v) ? cr.v : null, why: 'démasqué', cr } : null; };
+  let AST = null, AST_BUSY = false;
+  function actState() {
+    const E = { kill: [], gone: [], ch: [], adds: [], ends: [], arcs: [], fate: null, other: null, pick: 0, X: null };
+    if (ACTS() < 2 || !window.FILS || !FILS.FATE) return E;
+    const sig = JSON.stringify([S.cast, S.pil, S.want, S.rel, S.infos, S.ev, S.links, (S.picked || {}).pick, S.acts, S.climax, S.seed, S.hard, S.flaw]);
+    if (AST && AST.sig === sig) return AST.E; if (AST_BUSY) return E;
+    AST_BUSY = true; const sv = CUR_ACT;
+    try { CUR_ACT = 1; const st = storyAt(1), [ca, cb] = st.X, k = (S.picked || {}).pick === 1 ? 1 : 0, D = st.D;
+      const ch = (dim, fr, en2) => E.ch.push({ dim, fr, en: en2 });
+      const near = (t) => D.filter((d) => ['love', 'protect'].includes(d.k) && d.t === t && d.who !== t && !d.dead && !E.ends.some((x) => x.who === d.who && x.k === d.k && x.t === t)).map((d) => d.who);
+      if (ca && cb) { const lost = k ? ca : cb, won = k ? cb : ca, f = fateFor(lost, 1); E.X = [ca, cb]; E.pick = k; E.fate = f; E.won = [lab(won), labE(won)]; E.other = fateFor(won, 1);
+        if (f.kind === 'kill') E.kill.push(f.t); if (f.kind === 'gone' || f.kind === 'find') E.gone.push(f.t);
+        if (f.kind === 'turn') { E.ends.push({ who: f.t, k: 'love', t: J }, { who: f.t, k: 'protect', t: J }); E.adds.push({ who: f.t, k: 'oust', t: J, src: 'rancune' });
+          E.arcs.push({ who: f.t, v: f.t, x: J, why: 'lâché', fr: `${nm(f.t)} : ${pillarsOf(f.t).map((p) => P[p].n).join(' + ')} → rancune. Justin l’a lâché·e au pire moment`, en: `${en(f.t)} turns bitter: justin gave them up when it mattered, and it shows in how they talk` }); }
+        if (f.kind === 'respect') E.adds.push({ who: J, k: 'respect', t: null, src: 'déshonoré' }); if (f.kind === 'alive') E.adds.push({ who: J, k: 'alive', t: null, src: 'blessé' });
+        ch({ kill: 'vie', gone: 'vie', find: 'vie', turn: 'rel', respect: 'statut', alive: 'statut', hide: 'statut' }[f.kind] || 'désirs', `${cap(f.fr)} (Justin a choisi : ${lab(won)})`, `${f.en} (justin chose ${labE(won)})`); }
+      // what came out in act 1 changes how people stand
+      for (const i of infos()) { if (iAct(i) !== 1 || !['secret', 'mask'].includes(IN[i.id].k)) continue; ch('su', `Tout le monde sait : ${IN[i.id].fr(nm(i.x), nm(i.y))}`, `everyone knows now: ${IN[i.id].en(en(i.x), en(i.y))}`);
+        if (['betray', 'pretend', 'cause'].includes(i.id) && i.y && live(i.y) && i.y !== i.x) { E.ends.push({ who: i.y, k: 'love', t: i.x }, { who: i.y, k: 'protect', t: i.x }); if (i.y !== J) E.adds.push({ who: i.y, k: 'oust', t: i.x, src: 'trahi' });
+          ch('rel', `${nm(i.y)} ne fait plus confiance à ${nm(i.x)}`, `${en(i.y)} no longer trusts ${en(i.x)}`); }
+        if (['villain', 'name', 'spy', 'royal'].includes(i.id)) ch('statut', `${nm(i.x)} : démasqué·e`, `${en(i.x)}: unmasked`); }
+      for (const l of (S.links || []).filter((x2) => x2.by && x2.sh === 'h' && x2.at !== 2 && x2.a[0] === 'p' && x2.b[0] === 'p' && FILS.LINK[x2.k])) { const a2 = l.a.slice(2), b2 = l.b.slice(2); if (!live(a2) || !live(b2)) continue;
+        ch('su', `Tout le monde sait : ${linkTxt(l)[0]}`, `everyone knows now: ${linkTxt(l)[1]}`);
+        if (['betrayed', 'liesto', 'uses'].includes(l.k)) { E.ends.push({ who: b2, k: 'love', t: a2 }, { who: b2, k: 'protect', t: a2 }); if (b2 !== J) E.adds.push({ who: b2, k: 'oust', t: a2, src: 'trahi' }); ch('rel', `${nm(b2)} ne fait plus confiance à ${nm(a2)}`, `${en(b2)} no longer trusts ${en(a2)}`); } }
+      for (const e of (S.ev || []).filter((e2) => EK[e2.k] && EK[e2.k].crime && e2.h && (e2.a || 1) === 1 && live(e2.x))) ch('statut', `${nm(e.x)} : démasqué·e (${EVN[e.k][0]})`, `${en(e.x)}: exposed (${EVN[e.k][1]})`);
+      // the dead of act 1 (a murder, the climax), and whoever loved them blames someone: the bascule
+      const deaths = [...(S.ev || []).filter((e) => e.k === 'murder' && (e.a || 1) === 1 && e.v && live(e.v)).map((e) => [e.v, e.x, 'meurtre']), ...E.kill.map((t) => [t, J, 'choix']), ...E.gone.map((t) => [t, J, 'parti'])];
+      for (const [v, x, why] of deaths) { if (why === 'meurtre') ch('vie', `${nm(v)} est mort·e`, `${en(v)} is dead`);
+        for (const b of near(v)) { if (b === J || b === x || (why === 'choix' && E.fate && b === E.fate.x) || E.kill.includes(b) || E.gone.includes(b) || !live(b)) continue;
+          E.adds.push({ who: b, k: 'oust', t: x, src: 'bascule' }); E.ends.push({ who: b, k: 'protect', t: x }, { who: b, k: 'love', t: x });
+          const was = pillarsOf(b).map((p) => P[p].n).join(' + '), B2 = P[FILS.BASCULE];
+          const loss = why === 'parti' ? ['le départ', 'leaving'] : ['la mort', 'death'];
+          E.arcs.push({ who: b, v, x, why, fr: `${nm(b)} : ${was} → ${B2.n}. Depuis ${loss[0]} ${de(nm(v))}, tient ${nm(x)} pour responsable${why !== 'meurtre' ? ' (Justin a choisi l’autre côté)' : ''}`,
+            en: `${en(b)} breaks: since ${en(v)}'s ${loss[1]} they blame ${en(x)}${why !== 'meurtre' ? ' (justin chose the other side)' : ''}, and it shows in how they talk` });
+          ch('désirs', `${nm(b)} veut faire payer ${nm(x)}`, `${en(b)} wants to make ${en(x)} pay`); } }
+    } finally { CUR_ACT = sv; AST_BUSY = false; }
+    AST = { sig, E }; return E; }
   const conflicts = () => story().C;
   const incWho = () => { const e = evs()[0]; return e ? e.x : S.cast[0]; };
   // the people the act's prompt and the old views still ask for: who Justin wants, who's against him, who he'd lose
@@ -713,7 +780,15 @@ window.FORGE = (() => {
   // ---- THE TRUTH (15/11): what really happened, fixed before the first beat. Why each event happened (its motive, from
   // what the one who did it wants: it ties the crime to a desire, to a promise he lets slip, to how it comes out); who
   // looks guilty besides him (a false lead that holds); what each object holds. What is hidden is planted from it ----
-  const motiveOf = (e, k, D) => { const M = window.FILS && FILS.MOTIVE[e.k]; if (!M) return null;
+  const motiveOf = (e, k, D) => { const M = window.FILS && FILS.MOTIVE[e.k];
+    { const vict = e.v && live(e.v) ? e.v : null, mk2 = (fr, en2) => ({ d: null, f: { fr: () => fr, en: () => en2 }, c: {}, info: null, fr, en: en2, n: 1 });
+      const bl0 = ['threat', 'revenge'].includes(e.k) && vict && actOf(e) === 2 ? blameFor(e.x, vict) : null;
+      if (bl0 && bl0.why === 'lâché') return mk2(`${nm(e.x)} ne pardonne pas à ${nm(vict)} de l’avoir lâché·e au pire moment`, `${en(e.x)} never forgave ${en(vict)} for giving them up when it mattered`);
+      if (bl0 && bl0.why === 'démasqué') return mk2(`${nm(e.x)} a tout perdu quand on a su (${EVN[bl0.cr.k][0]}), et en tient ${nm(vict)} pour responsable`, `${en(e.x)} lost everything when it came out (${EVN[bl0.cr.k][1]}), and blames ${en(vict)} for it`);
+      const bl = ['threat', 'revenge'].includes(e.k) && vict && actOf(e) === 2 ? blameFor(e.x, vict) : null;
+      if (bl) { const why = { tué: ['', ''], abandonné: [' : Justin l’a laissé·e tomber au pire moment', ': justin gave them up when it mattered'], choix: [' : Justin a choisi l’autre côté', ': justin chose the other side'], parti: [' : Justin a choisi l’autre côté', ': justin chose the other side'] }[bl.why];
+        return mk2(`${nm(e.x)} tient ${nm(vict)} pour responsable ${bl.why === 'parti' ? 'du départ' : 'de la mort'} ${de(nm(bl.v))}${why[0]}`, `${en(e.x)} blames ${en(vict)} for ${en(bl.v)}'s ${bl.why === 'parti' ? 'leaving' : 'death'}${why[1]}`); } }
+    if (!M) return null;
     const vict = e.v && live(e.v) ? e.v : null, inv = (d) => d.info && [d.info.x, d.info.y].includes(vict);
     const fits = (d) => M[d.k] && !d.from && !d.dead && !(d.k === 'hide' && !d.info)
       && (d.k !== 'oust' ? !(d.t && d.t === vict && e.k !== 'threat') : e.k === 'theft' ? d.t !== vict : d.t === vict)
@@ -728,7 +803,7 @@ window.FORGE = (() => {
         pay: [() => `${x} pose devant ${y} de quoi tenir sa promesse : c’est ${R.thingOf}`, () => `${xE} puts in front of ${yE} what keeps the promise: it is ${R.thingOfE}`] } }); }
     if (e.k === 'threat' && vict) { const T = [wantOf(e.x), wantOf(vict)].every((w) => w && w.v === 'love') && wantOf(e.x).t === wantOf(vict).t ? wantOf(e.x).t : null;
       if (G.vil && G.vil.x === vict && G.fig) return mk2(`${nm(e.x)} sait que ${G.fig.n} cherche ${nm(vict)}, et peut le livrer`, `${en(e.x)} knows ${G.fig.nE} is looking for ${en(vict)}, and can hand him over`);
-      if (T && live(T)) return mk2(`${nm(e.x)} veut ${nm(T)}, et ${nm(vict)} est en travers`, `${en(e.x)} wants ${en(T)}, and ${en(vict)} is in the way`); }
+      if (T && live(T) && !(actOf(e) === 2 && [...actState().kill, ...actState().gone].includes(T))) return mk2(`${nm(e.x)} veut ${nm(T)}, et ${nm(vict)} est en travers`, `${en(e.x)} wants ${en(T)}, and ${en(vict)} is in the way`); }
     const lv = e.k === 'gone' ? kinds('secret').find((i) => i.id === 'leaving' && i.x === e.x) : null;
     const d = lv ? { k: 'free', who: e.x, info: lv } : top.length ? top[(((S.tq[`mot${k}`] || 0) % top.length) + top.length) % top.length] : null, forms = (d && M[d.k]) || M.def, f = forms[vary(`motf${k}`, forms.length)];
     const c = { x: nm(e.x), xE: en(e.x), v: vName(e), vE: vNameE(e), t: d && d.t ? nm(d.t) : '', tE: d && d.t ? en(d.t) : '', i: d && d.info ? infoFr(d.info) : '', iE: d && d.info ? infoEn(d.info) : '' };
@@ -816,6 +891,7 @@ window.FORGE = (() => {
 
     function buildAct(a) {
       CUR_ACT = a;
+      if (a === 2) { const AS = actState(); for (const t of AS.kill) NOW.out.set(t, 'dead'); for (const t of AS.gone) NOW.out.set(t, 'gone'); }
       const st = storyAt(a), { D, C, PL, X } = st, r = roles(st), TR = truth(D), sfx = a === 1 ? '' : String(a), GR = graph();
       const EV = evs().filter((e) => actOf(e) === a), first = a === 1 ? EV[0] : null, x = first ? first.x : EV[0] ? EV[0].x : S.cast[0];
       for (const p of PL) if (a > 1 && p.d.from && actOf(p.d.from) === a && carry.closed.has(p.id)) { carry.closed.delete(p.id); carry.shown.delete(p.id); }
@@ -912,7 +988,8 @@ window.FORGE = (() => {
       if (a === 1) for (const [k, i] of kinds('past').entries()) { const own = (b) => b.kind === 'dshow' && b.desire && b.desire.info === i, both = (b) => b.kind === 'dshow' && [i.x, i.y].every((w) => (b.who || []).includes(w)), oth = [i.x, i.y].filter((w) => w && w !== J), one = (b) => b.part === 'setup' && b.kind !== 'hook' && [b, ...b.rides].some((z) => (z.who || []).some((w) => oth.includes(w))) && b.rides.length < 3;
         ride(at(own) || at(both) || at(one) || at((b) => b.kind === 'dshow') || B0()[0], { id: `past${k}`, kind: 'past', part: 'setup', e: '🕰️', c: ic(i), info: i, who: [i.x, i.y], defN: k ? 'Tell a story' : 'Shared memory' }); }
       const crimesH = EV.filter((e) => EK[e.k].crime && e.h), CRH = allCrH();
-      if (H('liked') && r.against) { const lk = ride(at((b) => b.kind === 'conflict' && b.c.oWho === r.against) || at((b) => b.kind === 'conflict') || B0()[B0().length - 1], { id: `liked${sfx}`, kind: 'liked', part: 'setup', e: '😇', who: [r.against] });
+      // adored by everyone: not anymore once they were unmasked in an act before
+      if (H('liked') && r.against && !(a === 2 && actState().ch.some((c) => c.dim === 'statut' && c.fr.startsWith(`${nm(r.against)} : démasqué`)))) { const lk = ride(at((b) => b.kind === 'conflict' && b.c.oWho === r.against) || at((b) => b.kind === 'conflict') || B0()[B0().length - 1], { id: `liked${sfx}`, kind: 'liked', part: 'setup', e: '😇', who: [r.against] });
         const cr = crimesH.find((e) => e.x === r.against), host = lk && B.find((b) => b.rides.includes(lk)); if (cr && host && evBeat.get(cr) && host.seq > evBeat.get(cr).seq) tagM(lk, qOf(cr), 'block'); }
       // what is hidden and is nobody's motive: the crisis holds two answers at most; the others come out before it, one
       // per episode from the last (a complication right before the choice). Planned first: a seed goes far from its payoff
@@ -1234,6 +1311,10 @@ window.FORGE = (() => {
     if (G.fig) { const R = G.fig, a = nm(d.who), aE = en(d.who), t = d.t && nm(d.t), tE = d.t && en(d.t);
       if (d.k === 'love' && lv === 1 && d.t && G.need === d.t) return [`${t} confie à ${a} ce que ça lui coûte : ${low1(R.need(t))}`, `${tE} tells ${aE} what it costs them: ${R.needE(tE)}`];
       if (d.k === 'alive' && G.vil && d.who === G.vil.x) return [[`${cap(R.n)} est en ville ; quelqu’un lui a donné un nom`, `${R.nE} is in town; someone gave him a name`], [`${cap(R.n)} a fait demander où dort ${a}`, `${R.nE} had someone ask where ${aE} sleeps`], [`${cap(R.n)} attend dehors`, `${R.nE} is waiting outside`]][Math.min(2, lv)];
+    }
+    { const mk3 = d.k === 'respect' && w.rev && [...w.rev].find((i) => i.x === d.who && IN[i.id] && IN[i.id].k === 'mask'); if (mk3 && !(G.vil && G.vil === mk3)) { const a = nm(d.who), aE = en(d.who);
+      return [[`On sait qui est vraiment ${a} ; on le lui fait sentir devant tous`, `everyone knows who ${aE} really is now, and makes him feel it in front of everyone`], [`Plus personne ne veut s’asseoir à côté ${de(a)}`, `nobody wants to sit next to ${aE} anymore`], [`On lui ferme la porte : ${low1(IN[mk3.id].fr(a, nm(mk3.y)))}, et tout le monde le sait`, `doors close on ${aE}: everyone knows that ${IN[mk3.id].en(aE, en(mk3.y))}`]][Math.min(2, lv)]; } }
+    if (G.fig) { const R = G.fig, a = nm(d.who), aE = en(d.who);
       if (d.k === 'respect' && G.vil && d.who === G.vil.x && w.rev && w.rev.has(G.vil)) return [[`On parle de la dette ${de(a)} devant tous : ${R.wanted}`, `${aE}'s debt is talked about in front of everyone: ${R.wantedE}`], [`On rappelle à ${a}, devant la personne qui compte, ce qu’il doit ${R.dat}`, `${aE} is reminded, in front of the one who matters, of what he owes ${R.nE}`], [`Plus personne ne prête un sou à ${a}`, `nobody lends ${aE} a coin anymore`]][Math.min(2, lv)]; }
     if (d.t && w.out.get(d.t) === 'gone' && R2.away[d.k]) return [R2.away[d.k][0](...W1), R2.away[d.k][1](...WE)];
     const set = (d.k === 'protect' && lifeIn([...w.hap], d.t) ? R2.danger : R2[d.k]) || R2.respect, L = set[Math.min(set.length - 1, lv)]; return [L[0](...W1), L[1](...WE)]; };
@@ -1254,7 +1335,7 @@ window.FORGE = (() => {
     const tg = (b, tid, mv) => { if (tid) (b.mv = b.mv || []).push([tid, mv]); return b; }, lineId = (d) => (d && TH.some((t) => t.id === `L:${d.id}`) ? `L:${d.id}` : null), CH = TH.some((t) => t.id === 'C:all') ? 'C:all' : null;
     // the world moves with the beats: an event has happened, someone is dead or gone, someone is found
     SHOWN = new Set();
-    const pass = (b) => { if ((b.kind === 'reveal' || b.kind === 'partial') && b.crime) SHOWN.add(b.crime.x); if (b.kind === 'reveal' && b.info) W.rev.add(b.info); for (const [t, m] of b.mv || []) if (t.startsWith('L:')) { if (m === 'close') W.closed.add(t.slice(2)); else if (m === 'want') W.closed.delete(t.slice(2)); } if (b.ev) { W.hap.add(b.ev); if (b.ev.k === 'murder' && b.ev.v && live(b.ev.v)) W.out.set(b.ev.v, 'dead'); if (b.ev.k === 'gone') W.out.set(b.ev.x, 'gone'); } if (b.kind === 'found') for (const [k, v] of [...W.out]) if (v === 'gone') W.out.delete(k); };
+    const pass = (b) => { if ((b.kind === 'reveal' || b.kind === 'partial') && b.crime) SHOWN.add(b.crime.x); if (b.kind === 'reveal' && b.info) W.rev.add(b.info); if (b.kind === 'pick' && b.act === 1 && ACTS() === 2) { const AS = actState(); for (const t of AS.kill) W.out.set(t, 'dead'); for (const t of AS.gone) W.out.set(t, 'gone'); } for (const [t, m] of b.mv || []) if (t.startsWith('L:')) { if (m === 'close') W.closed.add(t.slice(2)); else if (m === 'want') W.closed.delete(t.slice(2)); } if (b.ev) { W.hap.add(b.ev); if (b.ev.k === 'murder' && b.ev.v && live(b.ev.v)) W.out.set(b.ev.v, 'dead'); if (b.ev.k === 'gone') W.out.set(b.ev.x, 'gone'); } if (b.kind === 'found') for (const [k, v] of [...W.out]) if (v === 'gone') W.out.delete(k); };
     const setStake = (b, sfx = ['', '']) => { const d = b.desires && b.desires[0]; if (!d || b.fixed) return b; lvl[d.id] = (lvl[d.id] || 0) + 1; if (b.concrete) return b;
       const [fr, en2] = stakeText(d, lvl[d.id] - 1, W); b.c = { ...b.c, st: cap(fr) + sfx[0], stE: en2 + sfx[1] }; b.fr = b.c.st; b.en = `${b.c.stE}${b.tech ? `; done with "${b.n}": ${b.tech.d}` : ''}`; return b; };
     const qTag = (b, d) => { const e = d.from, T = e && TH.find((t) => t.ev === e && (t.kind === 'q' ? (d.k === 'find' || d.k === 'justice') : t.kind === 'promise')); return T ? tg(b, T.id, T.kind === 'promise' ? 'approach' : 'clue') : b; };
@@ -1273,11 +1354,13 @@ window.FORGE = (() => {
       // the climax: each side weighs, right before (it hurts the other desire)
       const pick = list.find((x) => x.kind === 'pick');
       if (pick && pick.climax && pick.climax[0] && pick.climax[1]) { const [ca, cb] = pick.climax, at2 = list.indexOf(pick);
+        const fateW = (d) => { const f = fateFor(d, a); return f ? [f.fr, f.en] : [hurtW(d), hurtWE(d)]; };
         if (built.length) { pick.en += `; what his earlier choices built weighs on it (${built.map((b) => b[1]).join(', ')})`; pick.built = built.map((b) => b[0]); }
         const side = (i, dA, dB, defN) => tg(withTech({ id: `${pick.id}${'ab'[i]}`, kind: 'stake', part: 'crisis', e: ['🅰️', '🅱️'][i], lk: 'mais', defN, choiceOf: pick.id, fixed: 1, act: a, rides: [], who: [J, dA.t].filter(Boolean), desires: [dA],
-          c: { st: `Si ${lab(dA)} : ${hurtW(dB)}`, stE: `if he chooses ${labE(dA)}: ${hurtWE(dB)}` } }), lineId(dA), 'raise');
+          c: { st: `Si ${lab(dA)} : ${fateW(dB)[0]}`, stE: `if he chooses ${labE(dA)}: ${fateW(dB)[1]} (for good: it cannot be undone)` } }), lineId(dA), 'raise');
         list.splice(at2, 0, side(0, ca, cb, 'Aveu vulnérable'), side(1, cb, ca, 'Menace : si tu X, je Y'));
-        pick.cq = [[pick.opts[0], cap(hurtW(cb)), hurtWE(cb)], [pick.opts[1], cap(hurtW(ca)), hurtWE(ca)]]; prev = pick; }
+        pick.cq = [[pick.opts[0], cap(fateW(cb)[0]), fateW(cb)[1]], [pick.opts[1], cap(fateW(ca)[0]), fateW(ca)[1]]]; prev = pick;
+        const fo = forcer(a); if (fo && !pick.forced) { pick.forced = fo; pick.fr = `${nm(fo)} force Justin à choisir : ${pick.fr}`; pick.en = `${en(fo)} forces justin to choose, now: ${pick.en}`; } }
       if (!has('crisis') && !has('end')) { ch++;
         const [d1, d2] = chooseFor(evs2, n, st, eps.slice(0, n + 1).flat(), W);
         if (d1 && d2) {
@@ -1445,6 +1528,8 @@ window.FORGE = (() => {
       if ((z.kind === 'reveal' || z.kind === 'partial') && z.crime && !shownC.has(z.crime)) { shownC.add(z.crime); known.push([`C’est ${nm(z.crime.x)} : ${low1(evFr(z.crime))}`, `it was ${en(z.crime.x)}: ${evEnT(z.crime)}`, n]); }
       if (z.kind === 'reveal' || z.kind === 'past') tell(z.info, n); tell(z.tells, n);
       if (z.kind === 'treveal' && !shownL.has(z.tl)) { shownL.add(z.tl); known.push([z.fr, z.en, n]); }
+      if (z.kind === 'pick' && z.act === 1 && ACTS() === 2) { const AS = actState(); for (const t of AS.kill) out.set(t, 'dead'); for (const t of AS.gone) out.set(t, 'gone');
+        if (AS.fate) known.push([`Le prix du choix : ${AS.fate.fr}`, `the price of the choice: ${AS.fate.en}`, n]); for (const r of AS.arcs) known.push([r.fr, r.en, n]); }
       if (z.kind === 'gag' && z.info && !jk.has(z.info)) { jk.add(z.info); known.push([`Justin sait, seul : ${infoFr(z.info)}`, `justin alone knows that ${infoEn(z.info)}`, n]); }
       if (z.choice && S.picked[z.id] != null) known.push([`Justin a choisi : ${z.opts[S.picked[z.id]][0]}`, `justin chose: ${z.opts[S.picked[z.id]][0]}`, n]); }
       R.push({ known: known.slice(), out: new Map(out),
@@ -1454,8 +1539,9 @@ window.FORGE = (() => {
     return R;
   }
   // how someone talks (17/11): the first pillar, a touch of the second, and the flaw when it shows
-  const voiceOf = (id) => { const V = window.FILS && FILS.VOICE; if (!V) return ''; const [p1, p2] = pillarsOf(id), f = S.flaw[id] && FILS.FLAWV[S.flaw[id]];
-    return [V[p1], p2 && V[p2] ? `parfois : ${V[p2]}` : '', f ? `sa faille s’entend : ${f}` : ''].filter(Boolean).join(' ; '); };
+  const voiceOf = (id, a = 1, hap = null) => { const V = window.FILS && FILS.VOICE; if (!V) return ''; const [p1, p2] = pillarsOf(id), f = S.flaw[id] && FILS.FLAWV[S.flaw[id]];
+    const arc = (a === 2 ? actState().arcs.find((r) => r.who === id) : null) || (() => { const m = [...(hap || [])].find((e) => e && e.k === 'murder' && e.v && e.x !== id && live(e.v) && storyAt(1).D.some((d) => d.who === id && d.t === e.v && ['love', 'protect'].includes(d.k))); return m ? { v: m.v } : null; })();
+    return [arc ? `DEPUIS LA MORT ${de(nm(arc.v)).toUpperCase()} : ${V[FILS.BASCULE]} ; avant, c’était : ` : '', V[p1], p2 && V[p2] ? `parfois : ${V[p2]}` : '', f ? `sa faille s’entend : ${f}` : ''].filter(Boolean).join(' ; ').replace(' :  ; ', ' : '); };
   // the facts the AI can say: the story's (graph), the people off screen added by hand, the chains the audience knows (one sentence each)
   const openFacts = () => { const G = graph(); return [...G.facts, ...G.more.filter((f) => /n’est pas à l’écran/.test(f[0])), ...chains().filter((c) => c.open.length).map((c) => c.txt(c.open))]; };
   function planOf(n) {
@@ -1518,7 +1604,7 @@ window.FORGE = (() => {
       dead: [...REGp].filter(([, v]) => v === 'dead').map(([id]) => nm(id)) };
     const said = Object.fromEntries([...Array(n).keys()].map((k2) => [k2 + 1, linesOf(k2)]).filter(([, v]) => v)); if (Object.keys(said).length) storySoFar.lines = said;
     return { title, scene: S.decor, turn: ep.list[ep.list.length - 1].fr, needs: [], story: storySoFar, ...(openFacts().length ? { facts: openFacts().map((f) => f[0]) } : {}),
-      chars: S.cast.filter((id) => REGp.get(id) !== 'dead').map((id) => ({ id, name: nm(id), sprite: sprite(id), poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'].filter((p2) => window.SPRITES && SPRITES[sprite(id)] && SPRITES[sprite(id)].poses[p2]).concat(window.EXTRAS ? EXTRAS.poses(sprite(id)) : []), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), ...(voiceOf(id) ? { voice: voiceOf(id) } : {}), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
+      chars: S.cast.filter((id) => REGp.get(id) !== 'dead').map((id) => ({ id, name: nm(id), sprite: sprite(id), poses: ['listen', 'surprised', 'thinking', 'explaining', 'angry', 'holding'].filter((p2) => window.SPRITES && SPRITES[sprite(id)] && SPRITES[sprite(id)].poses[p2]).concat(window.EXTRAS ? EXTRAS.poses(sprite(id)) : []), traits: pillarsOf(id).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), ...(voiceOf(id, ep.act || 1, happened) ? { voice: voiceOf(id, ep.act || 1, happened) } : {}), infos: IL.filter((i) => i.x === id || i.y === id).map(iid) })),
       player: { id: J, name: 'Justin', traits: pillarsOf(J).map((p) => P[p].n.replace(/^L[ea’] ?/, '')), ...(voiceOf(J) ? { voice: voiceOf(J) } : {}) },
       infos: IL.map((i) => ({ id: iid(i), text: infoFr(i) })),
       boxes: [{ id: 'ep', title: `Épisode ${n + 1}`, col: 0, beats: epBeats }, { id: 'later', title: 'Plus tard', col: 1, beats: laterBeats }], links };
@@ -1544,6 +1630,13 @@ window.FORGE = (() => {
     EPt.forEach(({ list, led, act: a2 }, n) => { if (ACTS() === 2 && (!n || EPt[n - 1].act !== a2)) L.push(`— ACTE ${a2} —`); L.push(`Épisode ${n + 1}`);
       list.forEach((ev, k) => { L.push(`  ${k ? link(ev)[0] + (ev.cause ? ` (← ${ev.cause[0]})` : '') + ' ' : ''}${ev.e} ${ev.choice ? `Choix : ${ev.opts.map((o, i) => `${S.picked[ev.id] === i ? '✓ ' : ''}${o[0]} (→ ${o[1]})`).join(' / ')}` : ev.fr}  (${ev.n})`); for (const rd of ev.rides || []) L.push(`      ↳ ${rd.e} ${rd.fr}  (${rd.n})`); });
       for (const [key, e2] of LED) if (led[key].length) L.push(`  ${e2} ${led[key].map((x) => x[0]).join(' · ')}`); });
+    // what changed for good (18/11): the world at the end of act 1, dimension by dimension (Justin's grid), and the other choice
+    if (ACTS() === 2) { const AS = actState(), DIM = { vie: '🫀 Vie', rel: '🤝 Relations', su: '🧠 Ce qui est su', statut: '👑 Statut', désirs: '🎯 Désirs' };
+      L.push('', `CE QUI A CHANGÉ À LA FIN DE L’ACTE 1${AS.X ? ` (l’acte 2 suit le choix « ${AS.won[0]} » ; tape l’autre option du climax pour voir l’autre suite)` : ''}`);
+      for (const [k, n2] of Object.entries(DIM)) { const xs = AS.ch.filter((c) => c.dim === k); if (xs.length) L.push(`${n2} : ${xs.map((c) => c.fr).join(' · ')}`); }
+      if (AS.arcs.length) L.push(`🔀 Arcs : ${AS.arcs.map((r) => r.fr).join(' · ')}`);
+      if (AS.other) L.push(`↔️ Avec l’autre choix : ${AS.other.fr}`);
+      if (!AS.ch.length) L.push('Rien : l’acte 2 repart du même monde'); }
     L.push('', 'LES FILS (ce que le public porte, et où ça se paie)');
     for (const t of EPt.threads || []) L.push(`${(FILS.KIND[t.kind] || ['·'])[0]} ${t.fr}  [${t.done ? `fermé à l’épisode ${t.to + 1}` : 'reste ouvert'}]\n    ${t.steps.map((x) => `${x.ep + 1}·${(MVt[x.mv] || ['', x.mv])[1]}`).join(' → ')}`);
     return L.join('\n');
@@ -2118,5 +2211,5 @@ Keep it natural, like the reference.`;
     root.oncontextmenu = (e) => { if (e.target.closest('[data-tip]')) e.preventDefault(); };
     const sc = root.closest('#forge'); if (sc) sc.onscroll = tipHide;
   }
-  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains };
+  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains, state: actState };
 })();
