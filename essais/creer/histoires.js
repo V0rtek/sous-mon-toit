@@ -37,5 +37,11 @@ T.J1e_proprio = { ...T.J1_isa_amare, tq: { fig: 3 } };
 T.J2_liens = { ...T.J1_isa_amare, moments: [{ id: '1', c: 'cartes', by: 1 }], places: [{ id: '2', c: 'tripot', by: 1 }], nid: 2,
   links: [{ a: 't:debt', k: 'born', b: 'm:1', by: 1 }, { a: 'm:1', k: 'where', b: 'l:2', by: 1 }, { a: 'm:1', k: 'with', b: 'p:amare', by: 1 }, { a: 'p:isa', k: 'family', b: 'p:amare', by: 1, sh: 'h' }] };
 T.J2b_liens_2actes = { ...T.J2_liens, links: T.J2_liens.links.map((l) => (l.sh ? { ...l, at: 2, kn: ['justin'] } : l)) };
+// 18/11: the shape of The Dark Knight with our people (the test of « haut niveau »): Justin (Bruce) hides his name, loved
+// Isa (his ex), now with Amare (Dent, the hero everyone adores); James (the Joker) arrives and threatens Amare; Melissa
+// (Gordon) is Justin's friend. Act 2: James kills Isa; Amare wants to make Justin pay
+T.D1_chevalier = { ...base, acts: 2, seed: 3, cast: ['amare', 'isa', 'james', 'melissa'], pil: { justin: ['mysterieux', 'protecteur'], amare: ['chef', 'protecteur'], isa: ['genie'], james: ['dangereux', 'clown'], melissa: ['protecteur'] },
+  flaw: { justin: 'orgueil' }, want: { justin: { v: 'love', t: 'isa' }, amare: { v: 'love', t: 'isa' }, james: { v: 'oust', t: 'amare' } }, rel: { 'amare|isa': 'couple', 'justin|melissa': 'friend', 'isa|justin': 'ex' },
+  infos: [{ id: 'name', x: 'justin' }], ev: [{ k: 'arrive', x: 'james' }, { k: 'threat', x: 'james', v: 'amare' }, { k: 'murder', x: 'james', v: 'isa', s: 'amare', h: 0, a: 2 }, { k: 'revenge', x: 'amare', v: 'justin', a: 2 }], hard: { liked: 1, clock: 1 } };
 T.EX = 'EX';
 module.exports = T;

@@ -544,7 +544,9 @@ window.FORGE = (() => {
   // grows from a thing, a moment of the past or a place (the debt → born of what → where → with whom) ----
   const moves = () => { const ST2 = story(), D = ST2.D, cast = S.cast.filter(live), out = [], hasL = (a, k, b) => (S.links || []).some((l) => l.k === k && ((l.a === a && l.b === b) || (l.a === b && l.b === a)));
     const wants = (w, t, ks) => D.some((d) => d.who === w && d.t === t && ks.includes(d.k)), jLoves = (t) => wants(J, t, ['love']);
-    for (const a of cast) for (const b of cast) if (a < b && !hasL(`p:${a}`, 'family', `p:${b}`) && !jLoves(a) && !jLoves(b) && rel(a, b) !== 'family') {
+    // never between two who were or are together (a couple, exes, an old romance): only a love that never happened
+    const were = (a, b) => ['couple', 'ex', 'crush', 'family'].includes(rel(a, b)) || infos().some((i) => ['exes', 'crush', 'sibling', 'parent'].includes(i.id) && [i.x, i.y].includes(a) && [i.x, i.y].includes(b));
+    for (const a of cast) for (const b of cast) if (a < b && !hasL(`p:${a}`, 'family', `p:${b}`) && !jLoves(a) && !jLoves(b) && !were(a, b)) {
       const w = (wants(a, b, ['love']) || wants(b, a, ['love']) ? 4 : 0) + (wants(a, b, ['oust']) || wants(b, a, ['oust']) ? 3 : 0); if (w) out.push({ w, go: () => [{ a: `p:${a}`, k: 'family', b: `p:${b}`, sh: 'h', kn: Math.random() < 0.4 ? [a] : [] }] }); }
     (S.ev || []).forEach((e, k) => { if (!EK[e.k] || !EK[e.k].crime || !live(e.x) || (e.a || 1) > 1) return;
       for (const w of cast) if (w !== e.x && w !== e.v && !hasL(`p:${w}`, 'saw', `e:${k}`)) out.push({ w: wants(w, e.x, ['love', 'protect']) ? 5 : 2, go: () => [{ a: `p:${w}`, k: 'saw', b: `e:${k}`, sh: 'h', kn: [w] }] });
