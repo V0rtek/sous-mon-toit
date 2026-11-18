@@ -544,6 +544,7 @@ window.FILS = (() => {
   // he did not choose dies; gone: they leave and do not come back; else they turn away. The fate is a change of the world
   // the next act is built on (principle 35) ----
   const FATE = {
+    hurt: [(w, t) => `${t} reste, mais quelque chose s’est cassé entre eux`, (w, t) => `${t} stays, but something broke between them`],
     kill: [(w, t, x) => `${t} meurt ; ${x} ne bluffait pas`, (w, t, x) => `${t} dies; ${x} was not bluffing`],
     gone: [(w, t) => `${t} part, et ne reviendra pas`, (w, t) => `${t} leaves, and will not come back`],
     turn: [(w, t) => `${t} ne lui pardonnera pas`, (w, t) => `${t} will never forgive him`],
@@ -558,6 +559,17 @@ window.FILS = (() => {
   };
   // the pillar someone takes when they lose what they loved and blame someone for it (the bascule): their voice changes
   const BASCULE = 'dangereux';
+  // ---- WHO THEY ARE DECIDES WHAT THEY DO (18/11, PREMIER JET) : 7 traits, 0 to 3, from the pillars (the first counts
+  // whole, the second half) and the flaw, over a base of 1. They decide the actions, not only the voice: whether a threat
+  // is carried out, whether a loss turns into revenge, a departure or grief, whether one forgives, how revenge is taken,
+  // what the 🎲 links. A bascule changes them (BASCULE_T), so act 2 decides differently ----
+  const TRAITS = { audace: ['🔥', 'ose', 'dares'], violence: ['🗡️', 'passe à l’acte', 'acts on it, violently'], rancune: ['🧊', 'ne pardonne pas', 'never forgives'],
+    loyaute: ['🤝', 'tient à ses liens', 'stands by their people'], ruse: ['🐍', 'agit en cachette', 'works in secret, lies easily'], peur: ['😰', 'recule', 'backs away from danger'], fierte: ['🦚', 'la face avant tout', 'saving face comes first'] };
+  const PTRAITS = { chef: { audace: 1, fierte: 1, violence: 0.5 }, charmeur: { ruse: 1, audace: 0.5, loyaute: -0.5 }, dangereux: { violence: 2, rancune: 1, audace: 1, peur: -1 },
+    genie: { ruse: 1, fierte: 0.5, violence: -0.5 }, clown: { loyaute: 0.5, peur: 0.5, rancune: -1, violence: -0.5 }, mysterieux: { ruse: 1, rancune: 0.5, loyaute: -0.5 },
+    outsider: { audace: 1, loyaute: 0.5, fierte: -0.5 }, protecteur: { loyaute: 2, violence: 0.5, rancune: -0.5 } };
+  const FTRAITS = { lache: { peur: 2, audace: -1 }, vice: { audace: 1, ruse: 0.5 }, colere: { violence: 1.5, rancune: 1 }, menteur: { ruse: 1.5 }, orgueil: { fierte: 1.5, rancune: 1 } };
+  const BASCULE_T = { violence: 1.5, rancune: 2, loyaute: -1, peur: -1 }, GRUDGE_T = { rancune: 1.5, loyaute: -1 };
   const GROW = [
     { on: 'T', k: 'born', to: 'new:m' }, { on: 'T', k: 'toward', to: 'P' }, { on: 'T', k: 'hiddenin', to: 'new:l' }, { on: 'T', k: 'known', to: 'P' }, { on: 'T', k: 'proves', to: 'IE' },
     { on: 'E', k: 'where', to: 'new:l' }, { on: 'E', k: 'with', to: 'P' }, { on: 'E', k: 'with', to: 'new:f', only: ['croupier', 'associe', 'inconnu', 'amour', 'veuve', 'marchand', 'frere', 'soeur'] }, { on: 'E', k: 'same', to: 'new:m' }, { on: 'E', k: 'saw', to: 'P', rev: 1 }, { on: 'E', k: 'leads', to: 'E' },
@@ -577,5 +589,5 @@ window.FILS = (() => {
     for (const [mv, F] of Object.entries(FORMS)) { const G = GS.find((g) => g.id === F.g); if (!G) continue;
       for (const f of F.list) { G.tech.push({ n: f.n, d: f.d, ex: f.ex, [mv]: 1, thread: 1 }); CT[f.n] = [f.fr, f.en]; } } };
   install();
-  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, CLUE, SECRET, FLAWV, glue, ENDS, FATE, BASCULE, VOICE, install, de };
+  return { MV, KIND, FORMS, MOTIVE, MATTER, RAISE, ASK, ask, CT, FLAGS, FIGS, LINK, LGROUPS, END, FOLK, THINGS, MOMENTS, PLACES, CAT, GROW, CLUE, SECRET, FLAWV, glue, ENDS, FATE, BASCULE, TRAITS, PTRAITS, FTRAITS, BASCULE_T, GRUDGE_T, VOICE, install, de };
 })();

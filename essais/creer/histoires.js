@@ -44,5 +44,15 @@ T.D1_chevalier = { ...base, acts: 2, seed: 3, cast: ['amare', 'isa', 'james', 'm
   flaw: { justin: 'orgueil' }, want: { justin: { v: 'love', t: 'isa' }, amare: { v: 'love', t: 'isa' }, james: { v: 'oust', t: 'amare' } }, rel: { 'amare|isa': 'couple', 'justin|melissa': 'friend', 'isa|justin': 'ex' },
   infos: [{ id: 'name', x: 'justin' }], ev: [{ k: 'arrive', x: 'james' }, { k: 'threat', x: 'james', v: 'amare' }, { k: 'murder', x: 'james', v: 'isa', s: 'amare', h: 0, a: 2 }, { k: 'revenge', x: 'amare', v: 'justin', a: 2 }], hard: { liked: 1, clock: 1 } };
 T.D1b_chevalier_autre_choix = { ...T.D1_chevalier, picked: { pick: 1 } };
+// 18/11: the same story, only who they are changes (traits decide the actions): James threatens Amare; Justin loves Isa,
+// Amare's partner; Melissa is Justin's friend. At the climax Justin lets Isa go (picked: 1 when Isa is side A)
+const PB = { ...base, acts: 2, seed: 5, cast: ['amare', 'isa', 'james', 'melissa'], want: { justin: { v: 'love', t: 'isa' } }, rel: { 'amare|isa': 'couple', 'justin|melissa': 'friend' },
+  ev: [{ k: 'threat', x: 'james', v: 'amare' }], hard: { clock: 1 }, flaw: {}, picked: { pick: 1 } };
+T.P1a_amare_protecteur = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['genie'], james: ['dangereux'], melissa: ['clown'] } };
+T.P1b_amare_colere = { ...PB, pil: { justin: ['chef'], amare: ['chef'], isa: ['genie'], james: ['dangereux'], melissa: ['clown'] }, flaw: { amare: 'colere' } };
+T.P1c_amare_lache = { ...PB, pil: { justin: ['chef'], amare: ['clown'], isa: ['genie'], james: ['dangereux'], melissa: ['clown'] }, flaw: { amare: 'lache' } };
+T.P2a_james_bluffe_isa_fiere = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['chef'], james: ['charmeur'], melissa: ['clown'] } };
+T.P2c_james_bluffe_isa_loyale = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['protecteur'], james: ['charmeur'], melissa: ['clown'] } };
+T.P2b_james_bluffe_isa_rancune = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['mysterieux'], james: ['charmeur'], melissa: ['clown'] }, flaw: { isa: 'colere' } };
 T.EX = 'EX';
 module.exports = T;

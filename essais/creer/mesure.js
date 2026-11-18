@@ -14,7 +14,7 @@ const GEN = ['On rit de', 'un regard qui dure trop', 'Une chaise vide', 'jamais 
     const a2 = t.split('— ACTE 2 —')[1] || '', ev2 = a2.split('\n').find((l) => /soudain (🔥|☠️|🗡️|💰|🐍|👻|⚡)/.test(l)) || '';
     const lines = t.split('CE QUI ARRIVE')[1].split('LES FILS')[0].split('\n').filter((l) => l.trim());
     return { dims: new Set(st.ch.map((c) => c.dim)).size, arcs: st.arcs.length, fate: st.fate ? st.fate.kind : 'aucun',
-      cause: /tient .* pour responsable|ne bluffait|pour tenir|sait que|ne pardonne pas|a tout perdu/.test(ev2), ev2: ev2.trim().slice(0, 140),
+      cause: /tient .* pour responsable|ne bluffait|pour tenir|sait que|ne pardonne pas|a tout perdu|n’en a pas fini|a tué/.test(ev2), ev2: ev2.trim().slice(0, 140),
       gen: lines.filter((l) => GEN.some((g) => l.includes(g))).length, n: lines.length,
       climax: (t.match(/🅰️ Si [^(]*/) || [''])[0].trim() }; }, GEN)); }
   const avg = (f) => (R.reduce((s, r) => s + f(r), 0) / R.length).toFixed(2), pc = (f) => Math.round(100 * R.filter(f).length / R.length) + ' %';
