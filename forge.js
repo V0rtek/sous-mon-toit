@@ -2086,17 +2086,21 @@ Keep it natural, like the reference.`;
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
       + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
+      + (() => { const nPose = people().length, nNeed = needs().filter((x) => !x.done).length;
+        return `<section class="fOai"><span data-tip="Estimation : GPT Image, 1024², au prix publié. Facturé aux tokens (taille, qualité, images en entrée) : vérifie dans le calculateur officiel d’OpenAI">💸 ${nPose} pose sheet${nPose > 1 ? 's' : ''} + ${nNeed} feuille${nNeed > 1 ? 's' : ''} à faire ≈ <b>${usd(oaiCost(nPose + nNeed))}</b> <em>(${usd(oaiCost())} l’image, ${oaiQ()})</em></span>`
+          + `<select data-oaiq="1" data-tip="Qualité de l’image : low ≈ $0.01, medium ≈ $0.025, high ≈ $0.17">${Object.keys(OAI_PRICE).map((q) => `<option value="${q}"${q === oaiQ() ? ' selected' : ''}>${q}</option>`).join('')}</select>`
+          + (ls('smt-oai') ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-oaikey="1" placeholder="Clé OpenAI (sk-…)">') + '</section>'; })()
       + people().map((id) => { const src = img(id), ps = pillarsOf(id);
         return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
           + `<div class="fSheetR"><b>${esc(nm(id))}<em>${esc(tag(id))}</em></b>`
-          + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div></div></section>`; }).join('')
+          + `<div class="fBtns"><button type="button" data-pose="${id}" data-tip="Copie le prompt : ses 6 expressions, à la façon de son archétype">📋 Prompt</button>${src ? `<button type="button" data-gen="pose:${id}" data-tip="Génère la feuille avec l’API OpenAI : son image + ce prompt. ≈ ${usd(oaiCost())}">✨ Générer ≈ ${usd(oaiCost())}</button><button type="button" data-cimg="${src}" data-tip="Copie son image (l’image 1), à coller dans ChatGPT avant le prompt">🖼️ Image</button><a href="${src}" download="${sprite(id)}.webp" data-tip="Télécharge son image">⬇</a>` : ''}</div>${GENS['pose:' + id] ? `<div class="fGen"><img src="${GENS['pose:' + id]}" alt=""><a href="${GENS['pose:' + id]}" download="posesheet_${sprite(id)}.png">⬇ La feuille générée</a></div>` : ''}</div></section>`; }).join('')
       + `<h3 class="fH">🎬 Ce que l’histoire demande</h3><p class="fWhy">Des gestes que le script joue et que les 6 poses de base ne montrent pas. Une feuille de 4 cases (2×2) par besoin.</p>`
       + (needs().map((n) => { const imgs = n.who.map((w, k) => ({ w, src: img(w), k })), M = window.MADE && MADE[n.sprite];
         return `<section class="fSheet fNeed${n.done ? ' done' : ''}" style="--c:${n.done ? '#30d158' : '#ff9f0a'}"><div class="fPics">${imgs.map((m) => `<div class="fPic">${m.src ? `<img src="${m.src}" alt="">` : ''}<i>${m.k + 1}</i></div>`).join('')}</div>`
           + `<div class="fSheetR"><b>${n.e} ${esc(n.title)}${n.done ? ' ✓' : ''}</b><p class="fWhy">${esc(n.why)}</p>`
           + (n.done && M ? `<div class="fCells">${n.cells.map((c) => M[c[0]] ? `<img src="${M[c[0]]}" alt="" data-tip="${esc(c[0])} : ${esc(c[1])}">` : '').join('')}</div>` : '')
           + `<div class="fBtns"><button type="button" data-need="${esc(n.key)}" data-tip="Copie le prompt de cette feuille 2×2">📋 Prompt</button>${imgs.map((m) => m.src ? `<button type="button" data-cimg="${m.src}" data-tip="Copie l’image ${m.k + 1} (${esc(nm(m.w))}), à coller dans ChatGPT avant le prompt">🖼️ ${imgs.length > 1 ? m.k + 1 : 'Image'}</button>` : '').join('')}`
-          + `<label class="fUp" data-tip="Dépose la feuille faite par ChatGPT : elle est coupée en 4 poses et le jeu s’en sert">${n.done ? '↻ Remplacer' : '⬆ Déposer la feuille'}<input type="file" accept="image/*" hidden data-up="${esc(n.key)}"></label></div></div></section>`; }).join('')
+          + `<button type="button" data-gen="need:${esc(n.key)}" data-tip="Génère la feuille avec l’API OpenAI et la met dans le jeu. ≈ ${usd(oaiCost())}">✨ ${n.done ? 'Regénérer' : 'Générer'} ≈ ${usd(oaiCost())}</button><label class="fUp" data-tip="Dépose la feuille faite par ChatGPT : elle est coupée en 4 poses et le jeu s’en sert">${n.done ? '↻ Remplacer' : '⬆ Déposer la feuille'}<input type="file" accept="image/*" hidden data-up="${esc(n.key)}"></label></div></div></section>`; }).join('')
         || '<p class="fWhy">Rien : l’histoire n’a ni meurtre, vol, trahison, menace, couple/attirance ni objet qui demande une pose de plus.</p>');
     // the storyboard's links are drawn once the cards are laid out (and again when the faces have loaded)
     requestAnimationFrame(sbDraw); setTimeout(sbDraw, 500);
@@ -2111,6 +2115,43 @@ Keep it natural, like the reference.`;
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       const was = btn.textContent; btn.textContent = '✓ Copiée'; setTimeout(() => (btn.textContent = was), 1400);
     } catch { window.open(src, '_blank'); }
+  }
+  // ---- ✨ generate a sheet with the OpenAI image API (18/11): the reference picture(s) + the sheet's prompt -> the sheet.
+  // Cost: an estimate per image (1024², the published prices move and are billed by tokens: check the official calculator).
+  // A 🎬 sheet goes straight into the game (same road as ⬆ Déposer) ; a 🧍 sheet is shown, to save ----
+  const OAI_PRICE = { low: 0.01, medium: 0.025, high: 0.17 };
+  const oaiQ = () => (OAI_PRICE[ls('smt-oai-q')] ? ls('smt-oai-q') : 'medium');
+  const oaiCost = (k) => OAI_PRICE[oaiQ()] * (k == null ? 1 : k);
+  const usd = (x) => '$' + (x < 0.1 ? x.toFixed(3).replace(/0$/, '') : x.toFixed(2));
+  const GENS = {};   // key -> { url, blob } what the API gave back, this session
+  const genBusy = new Set();
+  async function oaiSheet(prompt, srcs, square) {
+    const key = ls('smt-oai'); if (!key) throw new Error('Il faut ta clé OpenAI (en haut des pose sheets)');
+    const fd = new FormData();
+    fd.append('model', ls('smt-oai-m') || 'chatgpt-image-latest'); fd.append('prompt', prompt); fd.append('quality', oaiQ());
+    fd.append('size', square ? '1024x1024' : '1024x1536'); fd.append('n', '1');
+    for (const u of srcs) { const b = await (await fetch(u)).blob(); fd.append('image[]', new File([b], 'ref.' + (b.type.split('/')[1] || 'png'), { type: b.type })); }
+    const r = await fetch('https://api.openai.com/v1/images/edits', { method: 'POST', headers: { Authorization: 'Bearer ' + key }, body: fd });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || 'OpenAI ' + r.status);
+    const b64 = j.data && j.data[0] && j.data[0].b64_json; if (!b64) throw new Error('Pas d’image dans la réponse');
+    const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    return new Blob([u8], { type: 'image/png' });
+  }
+  async function generate(kind, id) {
+    const k = kind + ':' + id; if (genBusy.has(k)) return;
+    const n = kind === 'need' ? needs().find((x) => x.key === id) : null;
+    const srcs = kind === 'need' ? n.who.map((w) => img(w)).filter(Boolean) : [img(id)].filter(Boolean);
+    if (!srcs.length) { msg = 'Pas d’image de référence'; return render(); }
+    genBusy.add(k); msg = `✨ ${kind === 'need' ? n.title : nm(id)} : génération (≈ ${usd(oaiCost())}, une minute)…`; render();
+    try {
+      const blob = await oaiSheet(kind === 'need' ? needSheet(n) : sheet(id), srcs, kind === 'need');
+      if (kind === 'need') {
+        if (!window.IMPORT) throw new Error('Importer pas chargé');
+        await IMPORT.extra(blob, n.spec, (t) => { msg = t; render(); }); msg = await IMPORT.add();
+      } else { if (GENS[k]) URL.revokeObjectURL(GENS[k]); GENS[k] = URL.createObjectURL(blob); msg = `✨ ${nm(id)} : feuille prête (⬇ pour l’enregistrer, puis Nouveau perso).`; }
+    } catch (err) { msg = '✨ ' + (err.message || 'Échec de la génération'); }
+    genBusy.delete(k); render();
   }
   function onClick(e) {
     const hit = e.target.closest('[data-li]'); if (hit && el.contains(hit)) { e.stopPropagation(); const i2 = +hit.dataset.li; sbSel = sbSel === i2 ? null : i2; sbDraw(); return; }
@@ -2174,6 +2215,7 @@ Keep it natural, like the reference.`;
     else if (d.pickopt) { const [id, i] = d.pickopt.split(':'); S.picked[id] = S.picked[id] === +i ? null : +i; }
     else if (d.det) { const ev = allEv().find((x) => x.id === d.det); if (ev) details(ev); return; }
     else if (d.x === 'plot') return copy(plotText(), '📄 Plot copié');
+    else if (d.gen) { const [kd, ...r] = d.gen.split(':'); save(); generate(kd, r.join(':')); return; }
     else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
     else if (d.need) { const n = needs().find((x) => x.key === d.need); if (n) { save(); return copy(needSheet(n), `${n.e} ${n.title} : prompt copié. Dans ChatGPT : ${n.obj ? 'l’image 1' : 'les images 1 et 2'} + le prompt.`); } }
     else if (d.cimg) return copyImg(d.cimg, t);
@@ -2233,7 +2275,9 @@ Keep it natural, like the reference.`;
     root.onclick = (e) => { if (held) { held = false; e.stopPropagation(); return; } tipHide();
       const t = e.target.closest('[data-tip]'), say = lastTouch && t && el.contains(t) ? t.dataset.tip : ''; onClick(e); if (say) toast(say); };
     el = root; msg = ''; render();
-    root.onchange = onUpload;
+    root.onchange = (e) => { const q = e.target.closest && e.target.closest('[data-oaiq]'); if (q) { ls('smt-oai-q', q.value); return render(); }
+      const k = e.target.closest && e.target.closest('[data-oaikey]'); if (k) { if (/^sk-/.test(k.value.trim())) { ls('smt-oai', k.value.trim()); return render(); } return; }
+      onUpload(e); };
     root.onmouseover = (e) => { if (e.pointerType === 'touch') return; const t = e.target.closest('[data-tip]'); if (t && el.contains(t)) tipShow(t); else tipHide(); };
     root.onmouseleave = tipHide;
     root.onpointerdown = (e) => { if (e.pointerType !== 'touch') return; held = false; clearTimeout(holdT); const t = e.target.closest('[data-tip]');
