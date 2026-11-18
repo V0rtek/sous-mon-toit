@@ -519,6 +519,8 @@ window.MISE = (() => {
     const all = [...want.values()], have = all.filter((n) => UP[n.key]), taken = new Set(), sheets = [];
     // a sheet whose prompt was copied keeps its cells until it is uploaded (what was asked of ChatGPT is what gets cut)
     for (const [sid, sh] of Object.entries(S.sheets || {})) {
+      // (18/11) a sheet kept by an older version (no chars / sprites / cells): forget it, it is worked out again below
+      if (!sh || !Array.isArray(sh.cells) || (sh.kind === 'duo' ? !sh.sprites || !sh.names : !Array.isArray(sh.chars))) { delete S.sheets[sid]; continue; }
       if (sh.cells.every((c) => UP[c.key])) { delete S.sheets[sid]; continue; }
       if (!sh.cells.some((c) => want.has(c.key))) continue;
       sheets.push({ ...sh, sid, cells: sh.cells.map((c) => ({ ...c, uses: (want.get(c.key) || {}).uses || 0 })) }); sh.cells.forEach((c) => taken.add(c.key));
