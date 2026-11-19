@@ -595,7 +595,7 @@ window.MISE = (() => {
       + `<p class="${P ? 'mzOk' : 'mzDim'}" data-st>${P ? `✓ ${esc(P.title)} · ${P.beats.length} temps · ${Object.keys(P.cast).length} persos` : S.play.trim() ? 'Pas encore lisible : il faut tout le JSON, de { à }.' : ''}</p>`
       + `<p class="mzMsg">${esc(msg)}</p>`
       + (N ? `<h3 class="mzH"><i>3</i>Ce qui manque${todo ? ` <span class="mzDim">· ${todo} image${todo > 1 ? 's' : ''} à faire (facultatif)</span>` : ' <span class="mzOk">· rien, tout est là</span>'}</h3>`
-        + (window.OAI ? `<div class="mzRow mzOai"><span class="mzDim">✨ ${todo} image${todo > 1 ? 's' : ''} à faire ≈ <b>${OAI.usd(OAI.cost(todo))}</b> (${OAI.usd(OAI.cost())} l’image, ${OAI.quality()}) · estimation, facturé aux tokens</span><select data-oaiq="1">${Object.keys(OAI.prices).map((q) => `<option value="${q}"${q === OAI.quality() ? ' selected' : ''}>${q}</option>`).join('')}</select>${OAI.hasKey() ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-oaikey="1" placeholder="Clé OpenAI (sk-…)">'}</div>` : '')
+        + (window.OAI ? `<div class="mzRow mzOai"><span class="mzDim">✨ ${todo} image${todo > 1 ? 's' : ''} à faire ≈ <b>${OAI.usd(OAI.cost(todo))}</b> (${OAI.usd(OAI.cost())} l’image, ${OAI.quality()}) · estimation, facturé aux tokens</span><select data-oaiq="1">${Object.keys(OAI.prices).map((q) => `<option value="${q}"${q === OAI.quality() ? ' selected' : ''}>${q}</option>`).join('')}</select></div>` : '')
         + `<p class="mzDim">L’épisode montre ${N.total} images de persos (un visage, un cadrage, un geste, ou deux persos ensemble). ${N.have.length ? `<span class="mzOk">✓ ${N.have.length} déjà gardées</span>, pas redemandées.` : 'Aucune encore gardée.'} Chaque feuille ne contient que ce qui manque, avec le moment exact que chaque case joue. Pour chacune : 📋 le prompt, 🖼️ les images à coller avant, puis ⬆ ce que ChatGPT a fait.</p>`
         + (N.have.length ? `<div class="mzCells">${N.have.slice(0, 40).map((n) => `<img src="${UP[n.key].url}" alt="" title="${esc(n.key)}">`).join('')}</div>` : '')
         + `<h4 class="mzH4">Qui joue qui</h4><div class="mzCast">${Object.values(P.cast).map((c) => { const src = refImg(c), k = S.k[c.sprite] || 1;
@@ -641,7 +641,7 @@ window.MISE = (() => {
   }
   // ✨ the same road as ⬆ Déposer: the API's picture is cut / kept exactly as a dropped one
   async function generate(id) {
-    if (gening) return; lastErr = ''; if (!OAI.hasKey()) { lastErr = 'Il faut ta clé OpenAI.'; return say('Il faut ta clé OpenAI (en haut de « Ce qui manque »).'); }
+    if (gening) return; lastErr = ''; if (!OAI.hasKey()) { lastErr = 'Clé ChatGPT manquante : en bas du menu Écrire.'; return say(lastErr); }
     const [kd, ...r] = id.split(':'), ref = r.join(':'); let prompt, srcs, size = '1536x1024', run, what;
     if (kd === 's') { const sh = pin(N.sheets[+ref]), refs = refsOf(sh); prompt = D.sheetPrompt(sh, refs); srcs = refs.map((x) => x.src).filter(Boolean);
       size = sh.grid[0] === sh.grid[1] ? '1024x1024' : '1536x1024'; what = 'la feuille';

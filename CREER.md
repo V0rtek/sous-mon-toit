@@ -96,7 +96,7 @@ Pas fait / à revoir avec Justin :
 - La pièce ne vient pas encore de Créer (▶) : on colle un script. Les branches d'un choix (`then`) se jouent, mais l'exemple s'arrête au choix.
 
 ## Créer v2 (19/11) : 4 écrans simples (`creer2.js`, Outils › Écrire › ⚡ Créer v2)
-Demandé par Justin : un parcours **dead simple pour des utilisateurs**, au-dessus des mêmes moteurs. Les clés (Claude, ChatGPT, GitHub) sont **au même endroit, en bas de chaque écran** (🔑), pas ailleurs.
+Demandé par Justin : un parcours **dead simple pour des utilisateurs**, au-dessus des mêmes moteurs. Les clés (Claude, ChatGPT, GitHub) sont **en bas du menu Écrire** (`#wKeys`, `CREER2.keys`), jamais dans Créer v2 ni dans les écrans Créer / Mise en scène (ils disent seulement où elles sont). Les écrans sont minimaux : presque pas de texte.
 1. **Ton histoire** : une phrase → ⚡ Haiku ou 📋 copier le prompt + coller la réponse = la base de l'histoire (`FORGE.v2.basePrompt` / `load`). 🎲 au hasard. ⚙️ Avancé = l'ancien Créer (Quoi / Comment / Ce qui arrive ; ‹ revient ici).
 2. **L'histoire est montée** (sans IA : `overview()`) : ⚡ Haiku ou 📋 copier + coller l'épisode 1 (`epPrompt(0)` / `epKeep`, le prompt 2 de Plan de scène).
 3. **Les images** : l'épisode écrit devient un script (`scriptOf`) pour 🎥 ; ✨ Tout générer et jouer = mise en scène (Haiku, ou copier + coller), puis chaque image qui manque via OpenAI (`MISE.auto.generateAll`), puis ▶. 🎥 Avancé = « Mettre en scène un épisode écrit ».

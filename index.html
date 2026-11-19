@@ -1131,6 +1131,7 @@ html.locked #peekBtn { display: none; }
 #planSheet[hidden], #actSheet[hidden] { display: none; }
 /* Créer (forge.js): the story by taps: a row = an icon + its chips; a person = his face, 8 pillars (full = his, ring =
    mixed in), 5 flaws, 🧍 his pose sheet; then ▶ / 📋 */
+#secWrite { overflow-y: auto; justify-content: flex-start; padding-top: 13em !important; padding-bottom: 8em; }   /* 7 strips + the keys at the bottom: it scrolls */
 #forge { justify-content: flex-start; overflow-y: auto; padding: 13em 6% 8em; scroll-snap-type: none; }
 #forgeBody { gap: 1.8em; }
 .fTop { display: flex; align-items: center; justify-content: space-between; }
@@ -2340,6 +2341,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
       <button type="button" id="planBtn"><span class="art" style="--g:#a3561a"><img src="chars/cam/thinking.webp" alt=""></span><b>Plan de scène</b></button>
       <button type="button" id="actBtn"><span class="art" style="--g:#2f6b4f"><img src="chars/james/thinking.webp" alt=""></span><b>Acte</b></button>
     </div>
+    <div id="wKeys"></div>
   </div>
   <div id="secTest" class="card menu sub" hidden>
     <div class="strips">
@@ -5191,6 +5193,7 @@ function show(id) {
   if (id !== null) { showPause(); $('#absentBar').hidden = true; }
   if (id !== '#wait') document.body.classList.remove('roomfull');
   $('#back').hidden = !UP[id] || (ROLE !== 'host' && !['#lobby', '#wait', '#end'].includes(id));
+  if (id === '#secWrite' && window.CREER2) CREER2.keys($('#wKeys'));   // the 3 keys: bottom of the Écrire menu
   if (id === '#infos') { $('#infos').scrollTop = 0; const v = $('#valBtn'); v.classList.remove('valcue'); void v.offsetWidth; v.classList.add('valcue'); }   // Valider l'idée: blinks, grows, the arrow points
 }
 function halt() {

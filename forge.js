@@ -2081,7 +2081,7 @@ Keep it natural, like the reference.`;
       + `<div class="fViews"><button type="button" class="${sbAct ? 'on' : ''}" data-sbact="1" data-tip="Le storyboard de l’acte : une carte par moment, les liens setup → payoff, question → réponse, enjeu → choix, choix → conséquence">🎞️ Storyboard</button><button type="button" class="${braid ? 'on' : ''}" data-braid="1" data-tip="La tresse : une ligne par plotline, les épisodes en colonnes">🧵 Tresse</button></div>` + (sbAct ? sbHtml(EPS) : '') + (braid ? braidHtml(ST, EPS) : '')
       + `<section class="fOut">${EPS.map(({ list, led }, n) => `${n ? `<button type="button" class="fCut" data-uncut="${EPS[n - 1].list.filter((ev) => ev.i != null).pop().i}" data-tip="✂️ Une coupe d’épisode. Un tap = recoller">✂️</button>` : ''}<div class="fEp"><div class="fEpH"><i>${n + 1}</i><button type="button" data-plan="${n}" data-tip="Ouvre le plan de cet épisode dans Plan de scène : rectangles, objectifs, liens. Sans IA">🎬</button><button type="button" data-playep="${n}" data-tip="Joue cet épisode : son plan (sans IA), puis Haiku écrit les répliques">▶</button></div><div>${list.map((ev, k) => evHtml(ev, k, list)).join('')}`
         + `<div data-ledger="${n}" class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
-      + `<section class="fGo">${hasKey ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="1" placeholder="Clé API (sk-ant-…)">'}`
+      + `<section class="fGo">`
       + '<button type="button" class="fMise" data-x="mise" data-tip="Un épisode écrit (screenplay) → ce qu’on voit : la mise en scène, les feuilles à déposer, puis ▶">🎥 Mettre en scène un épisode écrit</button>'
       + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
@@ -2089,7 +2089,7 @@ Keep it natural, like the reference.`;
       + (() => { const nPose = people().length, nNeed = needs().filter((x) => !x.done).length;
         return `<section class="fOai"><span data-tip="Estimation : GPT Image, 1024², au prix publié. Facturé aux tokens (taille, qualité, images en entrée) : vérifie dans le calculateur officiel d’OpenAI">💸 ${nPose} pose sheet${nPose > 1 ? 's' : ''} + ${nNeed} feuille${nNeed > 1 ? 's' : ''} à faire ≈ <b>${usd(oaiCost(nPose + nNeed))}</b> <em>(${usd(oaiCost())} l’image, ${oaiQ()})</em></span>`
           + `<select data-oaiq="1" data-tip="Qualité de l’image : low ≈ $0.01, medium ≈ $0.025, high ≈ $0.17">${Object.keys(OAI_PRICE).map((q) => `<option value="${q}"${q === oaiQ() ? ' selected' : ''}>${q}</option>`).join('')}</select>`
-          + (ls('smt-oai') ? '' : '<input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-oaikey="1" placeholder="Clé OpenAI (sk-…)">') + '</section>'; })()
+          + '</section>'; })()
       + people().map((id) => { const src = img(id), ps = pillarsOf(id);
         return `<section class="fSheet" style="--c:${(P[ps[0]] || { c: '#3a3a3c' }).c}"><div class="fPic">${src ? `<img src="${src}" alt="">` : ''}<i>1</i></div>`
           + `<div class="fSheetR"><b>${esc(nm(id))}<em>${esc(tag(id))}</em></b>`
@@ -2129,7 +2129,7 @@ Keep it natural, like the reference.`;
   const genBusy = new Set();
   async function oaiSheet(prompt, srcs, square) { return oaiMake(prompt, srcs, square === true ? '1024x1024' : square === false ? '1024x1536' : square); }
   async function oaiMake(prompt, srcs, size) {
-    const key = ls('smt-oai'); if (!key) throw new Error('Il faut ta clé OpenAI (en haut des pose sheets)');
+    const key = ls('smt-oai'); if (!key) throw new Error('Clé ChatGPT manquante : en bas du menu Écrire');
     const fd = new FormData();
     fd.append('model', ls('smt-oai-m') || 'chatgpt-image-latest'); fd.append('prompt', prompt); fd.append('quality', oaiQ());
     fd.append('size', size); fd.append('n', '1');
@@ -2239,7 +2239,7 @@ Keep it natural, like the reference.`;
   async function play(btn, n = 0) {
     if (!S.cast.length) { msg = '👥 ?'; return render(); }
     const inp = el.querySelector('[data-key]'); if (inp && /^sk-ant-/.test(inp.value.trim())) ls('smt-key', inp.value.trim());
-    const key = ls('smt-key'); if (!key) { msg = 'Il faut ta clé Haiku (en bas, au-dessus de ▶ Jouer)'; render(); const k = el.querySelector('[data-key]'); if (k) k.focus(); return; }
+    const key = ls('smt-key'); if (!key) { msg = 'Clé Claude manquante : en bas du menu Écrire'; render(); return; }
     save(); btn.disabled = true;
     const tell = (t) => { const m = el.querySelector('.fMsg'); if (m) m.textContent = t; };
     try {

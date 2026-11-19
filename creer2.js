@@ -13,7 +13,7 @@ window.CREER2 = (() => {
   let C = { step: 1, premise: '', based: false, story: null, script: '', title: '', ready: false };
   try { C = { ...C, ...(JSON.parse(ls(KEY)) || {}) }; } catch { /* first time */ }
   const save = () => ls(KEY, JSON.stringify(C));
-  let el = null, msg = '', busy = false, keysOpen = false, ask1 = false, ask2 = false, askS = false, todo = null;
+  let el = null, msg = '', busy = false, ask1 = false, ask2 = false, askS = false, todo = null;
   const paste = { 1: '', 2: '', s: '' };
   const reach = () => (!C.based ? 1 : !C.story ? 2 : !C.ready ? 3 : 4);
 
@@ -34,17 +34,20 @@ window.CREER2 = (() => {
   // ---- the keys, in one place (Claude · ChatGPT · GitHub) ----
   const KEYS = [['smt-key', 'Claude (Haiku)', 'sk-ant-…', (v) => /^sk-ant-/.test(v)], ['smt-oai', 'ChatGPT (images)', 'sk-…', (v) => /^sk-/.test(v) && !/^sk-ant-/.test(v)], ['smt-gh-token', 'GitHub (partager)', 'github_pat_…', (v) => /^(github_pat_|ghp_)/.test(v)]];
   const keysHtml = () => { const ok = KEYS.map(([k]) => !!ls(k));
-    return `<details class="c2Keys"${keysOpen || !ok[0] ? ' open' : ''}><summary>🔑 Clés <small>${KEYS.map(([, l], i) => `${l.split(' ')[0]} ${ok[i] ? '✓' : '—'}`).join(' · ')}</small></summary>`
+    return `<div class="c2Keys"><b>🔑</b>`
       + KEYS.map(([k, l, ph], i) => `<label><span>${l}</span><input type="text" class="secret" autocomplete="off" autocapitalize="off" spellcheck="false" data-key="${k}" placeholder="${ph}" value="${ok[i] ? '••••••••' : ''}"></label>`).join('')
-      + '<p>Gardées dans ce navigateur seulement. Claude écrit, ChatGPT dessine, GitHub partage.</p></details>'; };
+      + '</div>'; };
   function saveKey(k, v) {
     v = v.trim(); const def = KEYS.find((x) => x[0] === k); if (!def || /^•+$/.test(v)) return;
-    if (v && !def[3](v)) { say('Cette clé n’a pas la bonne forme.'); return; }
+    if (v && !def[3](v)) return keys();
     if (k === 'smt-gh-token' && window.BANK && BANK.keySave) BANK.keySave(k, v); else ls(k, v || null);
-    say(v ? 'Clé gardée.' : 'Clé retirée.'); render();
+    keys();
   }
-  const needKey = (k, what) => { keysOpen = true; msg = `Il faut ta clé ${what} (en bas).`; render(); const i = $(`[data-key="${k}"]`, el); if (i) { i.scrollIntoView({ block: 'center' }); i.focus(); } };
+  const needKey = (k, what) => { msg = `Clé ${what} manquante : en bas du menu Écrire.`; render(); };
 
+  // the keys live at the bottom of the Écrire menu (index.html), nowhere else
+  let keysEl = null;
+  function keys(root) { style(); if (root) { keysEl = root; root.onchange = (e) => { const k = e.target.dataset.key; if (k) saveKey(k, e.target.value); }; } if (keysEl) keysEl.innerHTML = keysHtml(); }
   // ---- the screen ----
   const say = (t) => { msg = t; const m = el && $('.c2Msg', el); if (m) m.textContent = t; };
   const steps = () => `<nav class="c2Steps">${[1, 2, 3, 4].map((n) => `<button type="button" data-go="${n}" class="${C.step === n ? 'on' : ''}${n <= reach() ? '' : ' off'}"${n > reach() ? ' disabled' : ''}>${n <= reach() && n < C.step ? '✓' : n}</button>`).join('<i></i>')}</nav>`;
@@ -52,48 +55,39 @@ window.CREER2 = (() => {
   const both = (a, b, a2, b2) => `<div class="c2Row"><button type="button" class="c2Big" data-a="${a}"${busy ? ' disabled' : ''}>${a2}</button><button type="button" data-a="${b}"${busy ? ' disabled' : ''}>${b2}</button></div>`;
 
   function s1() {
-    return `<h2>Ton histoire</h2><p class="c2Sub">Une phrase suffit. Claude choisit les persos, ce qu’ils veulent, ce qui se cache.</p>`
-      + ta('premise', 'Ex. Le barman est amoureux d’une cliente. Son meilleur ami vient d’arriver, et quelqu’un a volé la bague…', C.premise)
-      + both('haiku1', 'copy1', '⚡ Haiku', '📋 Copier le prompt')
-      + (ask1 ? `<p class="c2Sub">Colle le prompt dans ChatGPT ou Claude, puis colle sa réponse ici.</p>${ta('p1', 'La réponse (le JSON)', paste[1])}<div class="c2Row"><button type="button" class="c2Big" data-a="use1">Utiliser</button></div>` : '')
-      + `<div class="c2Row"><button type="button" data-a="dice"${busy ? ' disabled' : ''}>🎲 Au hasard</button><button type="button" data-a="adv1">⚙️ Avancé</button></div>`
-      + (C.based ? '<div class="c2Row"><button type="button" class="c2Next" data-go="2">Continuer →</button></div>' : '');
+    return ta('premise', 'Ton idée…', C.premise) + both('haiku1', 'copy1', '⚡ Haiku', '📋 Prompt')
+      + (ask1 ? ta('p1', 'Colle la réponse', paste[1]) + '<div class="c2Row"><button type="button" class="c2Big" data-a="use1">OK</button></div>' : '')
+      + `<div class="c2Row"><button type="button" data-a="dice"${busy ? ' disabled' : ''}>🎲</button><button type="button" data-a="adv1">⚙️ Avancé</button></div>`
+      + (C.based ? '<div class="c2Row"><button type="button" class="c2Next" data-go="2">→</button></div>' : '');
   }
   function s2() {
     const o = FORGE.v2.overview();
-    return `<h2>L’histoire est montée</h2><p class="c2Sub">Fait sans IA : ${o.eps} épisodes, ce que chacun veut, ce qui se cache.</p>`
-      + `<div class="c2Cast">${o.people.map((p) => `<div><span>${p.src ? `<img src="${p.src}" alt="">` : ''}</span><b>${esc(p.name)}</b><small>${esc(p.tag)}</small></div>`).join('')}</div>`
-      + `<p class="c2Sub">${o.decor.e} ${esc(o.decor.n)}${o.ask ? ` · 🧭 ${esc(o.ask)}` : ''}</p>`
-      + `<h3>Épisode 1</h3>`
-      + (C.story ? `<p class="c2Ok">✓ « ${esc(C.title)} » · ${countLines(C.story)} répliques</p>` : '')
-      + both('haiku2', 'copy2', C.story ? '⚡ Haiku : une autre version' : '⚡ Haiku écrit l’épisode 1', '📋 Copier le prompt')
-      + (ask2 ? `<p class="c2Sub">Colle le prompt dans ChatGPT ou Claude, puis colle sa réponse ici.</p>${ta('p2', 'La réponse (le JSON)', paste[2])}<div class="c2Row"><button type="button" class="c2Big" data-a="use2">Utiliser</button></div>` : '')
-      + (C.story ? '<div class="c2Row"><button type="button" class="c2Next" data-go="3">Continuer →</button></div>' : '');
+    return `<div class="c2Cast">${o.people.map((p) => `<div><span>${p.src ? `<img src="${p.src}" alt="">` : ''}</span><b>${esc(p.name)}</b></div>`).join('')}</div>`
+      + (C.story ? `<p class="c2Ok">✓ ${esc(C.title)}</p>` : '')
+      + both('haiku2', 'copy2', '⚡ Épisode 1', '📋 Prompt')
+      + (ask2 ? ta('p2', 'Colle la réponse', paste[2]) + '<div class="c2Row"><button type="button" class="c2Big" data-a="use2">OK</button></div>' : '')
+      + (C.story ? '<div class="c2Row"><button type="button" class="c2Next" data-go="3">→</button></div>' : '');
   }
   function s3() {
-    const staged = window.MISE && MISE.auto.has(), n = todo, oai = window.OAI;
-    const price = oai && n != null ? ` ≈ ${OAI.usd(OAI.cost(n))}` : '';
-    let h = `<h2>Les images</h2><p class="c2Sub">« ${esc(C.title)} » est écrit. Il reste à le mettre en scène, puis à dessiner ce qui manque.</p>`;
+    const staged = window.MISE && MISE.auto.has(), n = todo, price = window.OAI && n ? ` ≈ ${OAI.usd(OAI.cost(n))}` : '';
+    let h = '';
     if (!staged) {
-      h += `<p class="c2Sub">1 · La mise en scène : qui parle à qui, qui regarde qui, qui bouge.</p>` + both('stage', 'copyS', '⚡ Haiku met en scène', '📋 Copier le prompt');
-      if (askS) h += `<p class="c2Sub">Colle le prompt dans ChatGPT ou Claude, puis colle sa réponse ici.</p>${ta('ps', 'La réponse (le JSON)', paste.s)}<div class="c2Row"><button type="button" class="c2Big" data-a="useS">Utiliser</button></div>`;
+      h += both('stage', 'copyS', '⚡ Mise en scène', '📋 Prompt');
+      if (askS) h += ta('ps', 'Colle la réponse', paste.s) + '<div class="c2Row"><button type="button" class="c2Big" data-a="useS">OK</button></div>';
       h += `<div class="c2Row"><button type="button" class="c2Big c2Go" data-a="all"${busy ? ' disabled' : ''}>✨ Tout générer et jouer</button></div>`;
     } else {
-      h += `<p class="c2Ok">✓ Mise en scène faite · ${n == null ? '…' : n ? `${n} image${n > 1 ? 's' : ''} à dessiner` : 'rien à dessiner, tout est là'}</p>`
-        + (n && oai ? `<div class="c2Row c2Q"><span>Qualité</span><select data-q="1">${Object.keys(OAI.prices).map((q) => `<option value="${q}"${q === OAI.quality() ? ' selected' : ''}>${q}</option>`).join('')}</select><small>estimation, facturé aux tokens</small></div>` : '')
-        + `<div class="c2Row"><button type="button" class="c2Big c2Go" data-a="all"${busy ? ' disabled' : ''}>${n ? `✨ Tout générer et jouer${price}` : '▶ Jouer'}</button></div>`
-        + (n ? '<div class="c2Row"><button type="button" data-a="play">▶ Jouer sans générer</button></div>' : '');
+      h += `<div class="c2Row"><button type="button" class="c2Big c2Go" data-a="all"${busy ? ' disabled' : ''}>${n ? `✨ Tout générer et jouer${price}` : '▶ Jouer'}</button></div>`
+        + (n ? '<div class="c2Row"><button type="button" data-a="play">▶ Sans générer</button></div>' : '');
     }
     return h + '<div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button></div>';
   }
   function s4() {
-    return `<h2>C’est prêt</h2><p class="c2Sub">« ${esc(C.title)} »</p><div class="c2Row"><button type="button" class="c2Big c2Go c2Huge" data-a="play">▶ Jouer</button></div>`
-      + '<div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button><button type="button" data-a="again">↩ Une autre histoire</button></div>';
+    return '<div class="c2Row"><button type="button" class="c2Big c2Go c2Huge" data-a="play">▶ Jouer</button></div><div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button><button type="button" data-a="again">↩</button></div>';
   }
   function render() {
     if (!el) return; const keep = el.closest('#creer2') ? el.closest('#creer2').scrollTop : 0;
     if (C.step === 3 && window.MISE) MISE.auto.setScript(C.script);
-    el.innerHTML = steps() + [s1, s2, s3, s4][C.step - 1]() + `<p class="c2Msg">${esc(msg)}</p>` + keysHtml();
+    el.innerHTML = steps() + [s1, s2, s3, s4][C.step - 1]() + `<p class="c2Msg">${esc(msg)}</p>`;
     if (el.closest('#creer2')) el.closest('#creer2').scrollTop = keep;
   }
   const go = (n) => { C.step = Math.max(1, Math.min(reach(), n)); save(); msg = ''; if (C.step === 3) refreshTodo(); render(); };
@@ -120,7 +114,7 @@ window.CREER2 = (() => {
   async function all() {
     if (!window.MISE) return say('La mise en scène n’est pas chargée.');
     MISE.auto.setScript(C.script);
-    if (!MISE.auto.has()) { const k = ls('smt-key'); if (!k) { askS = true; ask1 = false; msg = 'Sans clé Claude : copie le prompt, puis colle sa réponse (ou ajoute la clé en bas).'; keysOpen = true; render(); return; }
+    if (!MISE.auto.has()) { const k = ls('smt-key'); if (!k) { askS = true; ask1 = false; msg = 'Clé Claude manquante : en bas du menu Écrire. Ou 📋 Prompt.'; render(); return; }
       busy = true; say('⚡ Haiku met en scène…'); render();
       try { await MISE.auto.stage(k); } catch (err) { busy = false; say('Haiku : ' + (err.message || 'ça n’a pas marché')); return render(); }
       busy = false; }
@@ -165,7 +159,6 @@ window.CREER2 = (() => {
     style(); el = root; msg = ''; busy = false; if (C.step > reach()) C.step = reach();
     root.onclick = onClick;
     root.oninput = (e) => { const f = e.target.dataset.f; if (f === 'premise') { C.premise = e.target.value; save(); } else if (f === 'p1') paste[1] = e.target.value; else if (f === 'p2') paste[2] = e.target.value; else if (f === 'ps') paste.s = e.target.value; };
-    root.onchange = (e) => { const t = e.target; if (t.dataset.key) saveKey(t.dataset.key, t.value); else if (t.dataset.q && window.OAI) { OAI.setQuality(t.value); render(); } };
     render(); if (C.step === 3) refreshTodo();
   }
   let styled = false;
@@ -188,10 +181,10 @@ window.CREER2 = (() => {
 .c2Cast { display: flex; flex-wrap: wrap; gap: 1em; } .c2Cast div { display: flex; flex-direction: column; align-items: center; width: 7.5em; font-size: 1.6em; text-align: center; }
 .c2Cast span { width: 4.2em; height: 4.2em; border-radius: 50%; overflow: hidden; background: #2c2c2e; } .c2Cast img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
 .c2Cast small { font-size: .7em; color: #98989d; }
-.c2Keys { margin-top: 2em; padding-top: 1em; border-top: .1em solid #2c2c2e; font-size: 1.6em; color: #98989d; } .c2Keys summary { cursor: pointer; } .c2Keys small { opacity: .8; }
-.c2Keys label { display: flex; align-items: center; gap: .8em; margin-top: .6em; } .c2Keys label span { flex: none; width: 8em; }
-.c2Keys input { flex: 1; min-width: 0; font: inherit; padding: .5em .8em; border-radius: 1em; border: 0; background: #1c1c1e; color: #f5f5f7; } .c2Keys p { margin: .8em 0 0; font-size: .8em; }`;
+.c2Keys { display: flex; flex-direction: column; gap: .6em; margin: 2em 7% 0; font-size: 1.6em; color: #98989d; }
+.c2Keys label { display: flex; align-items: center; gap: .8em; } .c2Keys label span { flex: none; width: 8.5em; }
+.c2Keys input { flex: 1; min-width: 0; font: inherit; padding: .5em .8em; border-radius: 1em; border: 0; background: #1c1c1e; color: #f5f5f7; }`;
     document.head.appendChild(st);
   }
-  return { mount, scriptOf };
+  return { mount, keys, scriptOf };
 })();
