@@ -8,7 +8,8 @@
 // a JSON answer pasted from a chat: from its first { to its last }; a chat that copies as Markdown escapes [ ] _ * with a
 // backslash (\[), which JSON refuses: those backslashes go (JSON's own escapes stay), then curly quotes as a last try
 window.LOOSE_JSON = (v) => {
-  const t = String(v || ''), j = t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1);
+  // a chat copied as HTML turns spaces into &#x20; (and &nbsp;): back to characters first
+  const t = String(v || '').replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCharCode(parseInt(h, 16))).replace(/&#(\d+);/g, (m, d) => String.fromCharCode(+d)).replace(/&nbsp;/g, ' '), j = t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1);
   // a chat copied as Markdown escapes [ ] with a \ and doubles the \ of a quote inside a string (\\" for \")
   const md = (x) => x.replace(/\\\\"/g, '\\"').replace(/\\(?!["\\/bfnrtu])/g, '');
   for (const f of [(x) => x, md, (x) => md(x).replace(/[“”]/g, '"')]) {
