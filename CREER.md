@@ -95,6 +95,17 @@ Pas fait / à revoir avec Justin :
 - Les autres angles de la table (par-dessus l'épaule, de côté) : il faudrait les persos de dos ou de profil assis. Le comptoir (`bar`) n'est pas une place. Une variante de décor (« des gardes partout ») passe aujourd'hui par un insert.
 - La pièce ne vient pas encore de Créer (▶) : on colle un script. Les branches d'un choix (`then`) se jouent, mais l'exemple s'arrête au choix.
 
+## Créer v2 (19/11) : 4 écrans simples (`creer2.js`, Outils › Écrire › ⚡ Créer v2)
+Demandé par Justin : un parcours **dead simple pour des utilisateurs**, au-dessus des mêmes moteurs. Les clés (Claude, ChatGPT, GitHub) sont **au même endroit, en bas de chaque écran** (🔑), pas ailleurs.
+1. **Ton histoire** : une phrase → ⚡ Haiku ou 📋 copier le prompt + coller la réponse = la base de l'histoire (`FORGE.v2.basePrompt` / `load`). 🎲 au hasard. ⚙️ Avancé = l'ancien Créer (Quoi / Comment / Ce qui arrive ; ‹ revient ici).
+2. **L'histoire est montée** (sans IA : `overview()`) : ⚡ Haiku ou 📋 copier + coller l'épisode 1 (`epPrompt(0)` / `epKeep`, le prompt 2 de Plan de scène).
+3. **Les images** : l'épisode écrit devient un script (`scriptOf`) pour 🎥 ; ✨ Tout générer et jouer = mise en scène (Haiku, ou copier + coller), puis chaque image qui manque via OpenAI (`MISE.auto.generateAll`), puis ▶. 🎥 Avancé = « Mettre en scène un épisode écrit ».
+4. **Prêt** : ▶ Jouer (`MISE.auto.play`).
+- `load()` lit la réponse de l'IA **sans rien bloquer** : un id inconnu est ignoré ou remplacé (CLAUDE.md : pas de validateur qui liste des erreurs ; un défaut se règle dans le prompt).
+- Un seul épisode (le 1) pour l'instant ; les suivants passent encore par l'ancien Créer.
+- Testé avec de fausses réponses d'API (Haiku et OpenAI), pas avec de vraies clés : **jamais lu de vraie sortie Haiku pour `basePrompt`**.
+- Piège : `ACT` tout seul est la table des poses de `index.html` ; l'Acte est `window.ACT` (c'est ce qui cassait ▶ dans l'ancien Créer).
+
 ## Ce que fait le code (forge.js, fils.js)
 - **Quoi** : lieu, persos (pool = tous ceux qui ont les 6 poses de la feuille de base), piliers (8 archétypes, mélangeables) et faille, 🎯 ce que chacun veut, 🔗 liens, 🗂️ infos (liste fixe), 💥 événements (arrive, disparaît, meurtre, vol, trahison, menace ; cases au tap ; 🙈 coupable caché).
 - **Moteur** : `desires()` → `conflictsOf()` → `plotlinesOf()` → `climaxOf()` (= `storyAt(acte)` ; `story()` = l'histoire entière, `X` le climax de l'acte 1, `X2` celui de l'acte 2). `roles()` traduit ça pour les vieux écrans et la graine de l'acte (A ≠ B). Les morts (`d.dead`, `d.late`) et les partis ne font ni conflit ni ligne.

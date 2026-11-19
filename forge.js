@@ -1625,7 +1625,7 @@ window.FORGE = (() => {
       chain.push(ids[ev.id]);
       for (let q = 0; q < chain.length - 1; q++) if (chain[q] !== chain[q + 1]) links.push({ from: chain[q], to: chain[q + 1], label: `${ev.n} : ${(parts.filter((pt) => pt.at !== 'now')[q] || parts[parts.length - 1]).n}` });
     }
-    const title = `${(ACT.get && ACT.get().seed && ACT.get().title) || 'Créer'} · épisode ${n + 1}`;
+    const title = `${((window.ACT.get() || {}).seed && window.ACT.get().title) || 'Créer'} · épisode ${n + 1}`;
     // what the story already holds when this episode starts: what the player knows, what is still hidden at its end
     // (never said in it), the questions in the air (and where each one stands), who is dead
     const MVp = (window.FILS && FILS.MV) || {}, openT = (EP.threads || []).filter((t) => (t.kind === 'q' || t.kind === 'promise') && t.from < n && (!t.done || t.to >= n));
@@ -2230,7 +2230,7 @@ Keep it natural, like the reference.`;
     else if (d.x === 'mise') { save(); return window.MISE && MISE.open(); }
     else if (d.x === 'exep1') { save(); PLAN.add(planOf(0)); return window.PLAN_PLAY(JSON.parse(JSON.stringify(EX_EP1)), EX_EP1.title); }
     else if (d.x === 'copy') { if (!S.cast.length) { msg = '👥 ?'; return render(); } const s = seed(); ls('smt-act-seed', JSON.stringify(s)); save();
-      return copy(ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
+      return copy(window.ACT.promptSeed(s), '📋 Copié · la réponse se colle dans Acte › Générer › 1'); }
     else if (d.x === 'acte') { save(); return window.FORGE_TO_ACT && FORGE_TO_ACT(); }
     else if (d.x === 'play') return play(t);
     save(); const y = el.closest('#forge') ? el.closest('#forge').scrollTop : 0; render(); if (el.closest('#forge')) el.closest('#forge').scrollTop = y;
@@ -2246,7 +2246,7 @@ Keep it natural, like the reference.`;
       if (window.COUNTER) COUNTER.on = false;
       const pl = PLAN.add(planOf(n)), used = { in: 0, out: 0 };
       tell(`L’épisode ${n + 1} : Haiku écrit les répliques…`);
-      const story = await ACT.haiku(key, PLAN.prompt2(), 8000, (x) => Array.isArray(x.steps), used);
+      const story = await window.ACT.haiku(key, PLAN.prompt2(), 8000, (x) => Array.isArray(x.steps), used);
       keepLines(n, story);
       if (window.GEN_USED) GEN_USED(used); tell(''); msg = '';
       window.PLAN_PLAY(story, pl.title);
@@ -2289,5 +2289,69 @@ Keep it natural, like the reference.`;
     root.oncontextmenu = (e) => { if (e.target.closest('[data-tip]')) e.preventDefault(); };
     const sc = root.closest('#forge'); if (sc) sc.onscroll = tipHide;
   }
-  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains, state: actState };
+
+  // ---- Créer v2 (creer2.js): the same engine behind 4 simple screens. A sentence → the baseline (Haiku, or a chat: copy the
+  // prompt, paste the answer) · 🎲 draws one · what the AI gives is read leniently (an unknown id is skipped, never an error) ----
+  const catalog = () => {
+    const cast = POOL().map((id) => `${id} (${nm(id)})`).join(', ');
+    return `PLACES: ${DECORS.map((d) => `${d.id} (${d.d})`).join(' · ')}
+CAST (justin, the player, is always there and is NOT in this list): ${cast}
+PILLARS (what we follow someone for; 1 or 2 per person, the first is the main one): ${PILLARS.map((p) => `${p.id} (${p.en})`).join(' · ')}
+FLAWS (optional, one per person): ${FLAWS.map((f) => `${f.id} (${f.en})`).join(' · ')}
+WANTS (what someone wants; "t" = toward whom, only for the ones marked [t]): ${WANTS.map((w) => `${w.id}${w.t ? ' [t]' : ''} (${w.en('X')})`).join(' · ')}
+RELATIONS (between two people; key = their two ids in alphabetical order joined by "|"): ${RELS.filter((r) => r.id).map((r) => `${r.id} (${r.en})`).join(' · ')}
+INFOS (chosen from this list only; "x" and "y" are people, "y" only for the ones marked [x,y]): ${INFOS.map((i) => `${i.id}${i.s > 1 ? ' [x,y]' : ' [x]'} (${i.en('X', 'Y')})`).join(' · ')}
+EVENTS (the first one opens the story; "x" = who does it / who arrives, "v" = the victim, "h": 1 = the culprit stays hidden): ${EVK.map((e) => `${e.id} (${e.d})`).join(' · ')}
+HARD (why it is hard, optional): liked (everyone adores the one against justin) · clock (a time limit)`;
+  };
+  const basePrompt = (premise) => `You are the story editor of an interactive story for a phone game. The player plays JUSTIN. From the IDEA, choose the baseline of the story: the place, who is in it, what each one wants, how they are tied, what is hidden, what happens. Choose ONLY from the lists below (never invent an id). Make the wants collide: two people who want the same person, or one who wants to leave and one who wants to keep them. Reply with ONE JSON object and nothing else.
+
+IDEA:
+${(premise || '').trim() || '(none: surprise me)'}
+
+${catalog()}
+
+REPLY SHAPE:
+{"decor": "taverne", "cast": ["ruby", "amare", "melissa"], "pil": {"justin": ["charmeur", "genie"], "ruby": ["mysterieux"], "amare": ["chef"], "melissa": ["protecteur"]}, "flaw": {"justin": "lache"}, "want": {"justin": {"v": "love", "t": "ruby"}, "amare": {"v": "love", "t": "ruby"}, "melissa": {"v": "protect", "t": "justin"}}, "rel": {"amare|ruby": "couple", "justin|melissa": "friend"}, "infos": [{"id": "villain", "x": "amare"}, {"id": "crush", "x": "melissa", "y": "justin"}], "ev": [{"k": "theft", "x": "amare", "v": "melissa", "h": 1}], "hard": {"liked": 1}}`;
+  const num = (n) => Math.floor(Math.random() * n);
+  // the AI's answer → the state. Lenient: whatever does not fit the lists is dropped or replaced, the rest is kept
+  function load(j) {
+    if (!j || typeof j !== 'object') return false;
+    const pool = POOL(), has = (a, x) => Array.isArray(a) && a.includes(x), obj = (o) => (o && typeof o === 'object' && !Array.isArray(o) ? o : {});
+    let cast = [...new Set((Array.isArray(j.cast) ? j.cast : []).filter((x) => pool.includes(x)))].slice(0, 4);
+    if (cast.length < 2) cast = cast.concat(pool.filter((x) => !cast.includes(x)).sort(() => Math.random() - 0.5)).slice(0, 2);
+    const all = [J, ...cast], isP = (x) => all.includes(x), pl = obj(j.pil), fl = obj(j.flaw), wn = obj(j.want), rl = obj(j.rel);
+    const N = { ...BASE(), decor: DECORS.some((d) => d.id === j.decor) ? j.decor : 'taverne', cast, pil: {}, flaw: {}, want: {}, rel: {}, infos: [], ev: [], hard: {}, tq: {}, picked: {}, inc: undefined,
+      seed: 1 + num(99999) };
+    all.forEach((id) => { const a = (Array.isArray(pl[id]) ? pl[id] : [pl[id]]).filter((p) => P[p]).slice(0, 2); N.pil[id] = a.length ? [...new Set(a)] : [PILLARS[num(PILLARS.length)].id];
+      N.flaw[id] = F[fl[id]] ? fl[id] : null; });
+    all.forEach((id) => { const w = obj(wn[id]); if (!W[w.v]) return; if (!W[w.v].t) { N.want[id] = { v: w.v, t: null }; return; }
+      const t = isP(w.t) && w.t !== id ? w.t : all.find((o) => o !== id); N.want[id] = { v: w.v, t }; });
+    Object.entries(rl).forEach(([k, v]) => { const [a, b] = String(k).split('|'); if (isP(a) && isP(b) && a !== b && R[v] && v) N.rel[pk(a, b)] = v; });
+    (Array.isArray(j.infos) ? j.infos : []).slice(0, 4).forEach((i) => { const it = i && IN[i.id]; if (!it || !isP(i.x)) return; let y = i.y;
+      if (it.s > 1) { if (!isP(y) || y === i.x) y = all.find((o) => o !== i.x); N.infos.push({ id: i.id, x: i.x, y }); } else N.infos.push({ id: i.id, x: i.x }); });
+    (Array.isArray(j.ev) ? j.ev : []).slice(0, 3).forEach((e) => { const K2 = e && EK[e.k]; if (!K2 || !isP(e.x)) return; const out = { k: e.k, x: e.x };
+      if (K2.slots.includes('v')) out.v = isP(e.v) && e.v !== e.x ? e.v : null;
+      if (K2.slots.includes('s')) out.s = isP(e.s) && e.s !== e.x ? e.s : null;
+      if (K2.crime) out.h = e.h === 0 ? 0 : 1;
+      N.ev.push(out); });
+    if (!N.ev.length) N.ev.push({ k: 'arrive', x: cast[0] });
+    ['liked', 'clock'].forEach((h) => { if (obj(j.hard)[h]) N.hard[h] = 1; });
+    ['hook1', 'hook2', 'want', 'expect', 'tease', 'c0', 'c1', 'past0', 'plant1', 'plant2', 'liked', 'easy', 'rev0', 'twist', 'pick', 'cost'].forEach((id) => { N.tq[id] = num(6); });
+    delete N.inc; S = N; DESN = []; save();
+    try { graph(); grow(); } catch { /* the facts are a bonus */ }
+    save(); return true;
+  }
+  // what the second screen shows: who, where, the question of the act, how many episodes
+  function overview() {
+    const ST = story(); let ask = ''; try { ask = ST.X[0] && ST.X[1] && window.FILS ? FILS.ask(ST.X[0], ST.X[1])[0] : ''; } catch { /* none */ }
+    return { decor: DECORS.find((d) => d.id === S.decor) || DECORS[0], people: people().map((id) => ({ id, name: nm(id), tag: tag(id), src: img(id) })), ask, eps: episodes().length };
+  }
+  // an episode's prompt (its plan, made here without AI, then the dialogue prompt) and, once written, its lines are kept
+  const epPrompt = (n) => { PLAN.add(planOf(n)); return PLAN.prompt2(); };
+  const epKeep = (n, story) => { keepLines(n, story); return PLAN.get().title; };
+  const hasStory = () => S.cast.length > 0;
+  const rollAll = () => { dice(); save(); render(); };
+
+  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains, state: actState, v2: { dice: rollAll, basePrompt, load, overview, epPrompt, epKeep, hasStory } };
 })();

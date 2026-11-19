@@ -613,7 +613,8 @@ window.MISE = (() => {
       + `</div><div class="mzPlayBar"><button type="button" class="mzGo" data-a="play"${P ? '' : ' disabled style="opacity:.4"'}>▶ Jouer</button></div>`;
     panel.scrollTop = keep;
   }
-  const say = (t) => { msg = t; render(); };
+  let hook = null, lastErr = '';
+  const say = (t) => { msg = t; if (hook) hook(t); render(); };
   const copy = (text, then) => (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => say(then), () => say('Copie impossible ici.'));
   async function copyImg(src, btn) {
     try { const im = new Image(); im.src = src; await im.decode(); const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext('2d').drawImage(im, 0, 0);
@@ -640,7 +641,7 @@ window.MISE = (() => {
   }
   // ✨ the same road as ⬆ Déposer: the API's picture is cut / kept exactly as a dropped one
   async function generate(id) {
-    if (gening) return; if (!OAI.hasKey()) return say('Il faut ta clé OpenAI (en haut de « Ce qui manque »).');
+    if (gening) return; lastErr = ''; if (!OAI.hasKey()) { lastErr = 'Il faut ta clé OpenAI.'; return say('Il faut ta clé OpenAI (en haut de « Ce qui manque »).'); }
     const [kd, ...r] = id.split(':'), ref = r.join(':'); let prompt, srcs, size = '1536x1024', run, what;
     if (kd === 's') { const sh = pin(N.sheets[+ref]), refs = refsOf(sh); prompt = D.sheetPrompt(sh, refs); srcs = refs.map((x) => x.src).filter(Boolean);
       size = sh.grid[0] === sh.grid[1] ? '1024x1024' : '1536x1024'; what = 'la feuille';
@@ -649,7 +650,7 @@ window.MISE = (() => {
     else { prompt = D.insertPrompt(P.inserts[ref] || { id: ref }); srcs = [SET.ref]; what = `l’insert ${ref}`; run = async (blob) => { await keepImage(`in:${ref}`, blob); return await share([`in:${ref}`], `insert ${ref}`); }; }
     gening = true; say(`✨ Je génère ${what} (≈ ${OAI.usd(OAI.cost())}, une minute)…`);
     try { const blob = await OAI.make(prompt, srcs, size); say('Découpe…'); gening = false; return say(await run(blob)); }
-    catch (err) { gening = false; return say('✨ ' + (err.message || 'Échec de la génération')); }
+    catch (err) { gening = false; lastErr = err.message || 'Échec de la génération'; return say('✨ ' + lastErr); }
   }
   async function onClick(e) {
     const t = e.target.closest('button,[data-a]'); if (!t) return; const d = t.dataset;
@@ -689,5 +690,37 @@ window.MISE = (() => {
   }
   function close() { if (panel) panel.remove(); panel = null; }
 
-  return { open, close, play: async (j, opt) => { await boot(); const p = norm(typeof j === 'string' ? loose(j) : j); return p && player(p, opt); }, norm, loose, needs, UP, put, get R() { return R; }, data: D };
+
+  // ---- Créer v2 (creer2.js): the same road without the panel: a script, its play (Haiku, or a pasted answer), what is
+  // missing, everything generated one after the other, then ▶ ----
+  const refresh = () => { P = norm(loose(S.play)); N = P && needs(P); return N; };
+  const todoOf = () => (N ? N.sheets.length + N.plates.filter((x) => !x.done).length + N.inserts.filter((x) => !x.done).length : 0);
+  const stagePrompt = () => D.STAGE(S.script.trim(), pool().filter((x) => !/^isa_/.test(x)).concat('isa').join(', '));
+  const auto = {
+    async ready() { await boot(); refresh(); },
+    setScript(t) { if (S.script !== t) { S.script = t; S.play = ''; S.sheets = {}; save(); } },
+    script: () => S.script,
+    setPlay(t) { S.play = typeof t === 'string' ? t : JSON.stringify(t); save(); return !!refresh(); },
+    has: () => !!norm(loose(S.play)),
+    prompt: stagePrompt,
+    async stage(key) { const r = await GEN.ask(key, [{ role: 'user', content: stagePrompt() }], 'You are a film director. Reply with the JSON only.', 16000); return auto.setPlay(JSON.stringify(r.json)); },
+    async todo() { await boot(); refresh(); return todoOf(); },
+    async generateAll(tell) {
+      await boot(); hook = tell || null; let done = 0;
+      try {
+        for (;;) {
+          refresh(); const left = todoOf(); if (!N || !left) return { done, left: 0, err: '' };
+          if (done > 60) return { done, left, err: 'Trop d’images : je m’arrête.' };
+          const pl = N.plates.find((x) => !x.done), ins = N.inserts.find((x) => !x.done), id = N.sheets.length ? 's:0' : pl ? `p:${pl.p}` : `i:${ins.id}`;
+          if (tell) tell(`✨ Image ${done + 1} sur ${done + left}…`);
+          await generate(id); if (lastErr) return { done, left, err: lastErr };
+          refresh(); if (todoOf() >= left) return { done, left: todoOf(), err: 'Cette image ne s’est pas gardée.' };
+          done++;
+        }
+      } finally { hook = null; }
+    },
+    async play(opt) { await boot(); if (!refresh()) return null; return player(P, opt || {}); },
+  };
+
+  return { auto, open, close, play: async (j, opt) => { await boot(); const p = norm(typeof j === 'string' ? loose(j) : j); return p && player(p, opt); }, norm, loose, needs, UP, put, get R() { return R; }, data: D };
 })();
