@@ -27,6 +27,8 @@ window.BANK = {
     ['in the end loop 6 chorus', 'Ambiance', 'boucle rock 105 BPM, niveau 6 : le refrain, tout à la fois, 8 mesures. Les 6 se suivent sur une mesure'],
     ['into the elevator', 'Ambiance', 'dans un ascenseur, la montée (35 s, à répéter)'], ['elevator ding', 'Ponctuel', 'le ding de l’ascenseur, les portes s’ouvrent'], ['gun shot', 'Ponctuel', 'un coup de feu'], ['establishment alarm', 'Ambiance', 'l’alarme d’une banque (10 s, à répéter)'], ['crowd panic', 'Ambiance', 'une foule qui panique'], ['tadaa', 'Ponctuel', 'le « tadaa » de fin (l’écran blanc de l’avis)'], ['helicopters', 'Ambiance', 'trois hélicoptères de police au-dessus (40 s, à répéter)'], ['sirens', 'Ambiance', 'plusieurs sirènes de police, proches et lointaines (40 s, à répéter)'], ['toilet flush', 'Ponctuel', 'une chasse d’eau derrière une porte (les 9 premières s)'],
     ['reverse cinematic boom', 'Ponctuel', 'une montée à l’envers qui finit en boom, 5 s (la montée avant un impact)'],
+    ['dark tense pulsing', 'Ambiance', 'une atmosphère sombre et tendue qui pulse (24 s, à répéter)'], ['deep booming', 'Ambiance', 'une atmosphère profonde, des grondements (39 s, à répéter)'],
+    ['epic cinematic heartbeat transition', 'Ponctuel', 'une transition épique, battements de cœur (39 s)'],
     ['wooden ship on water loop', 'Ambiance', 'un bateau en bois sur l’eau'], ['immersive beautiful discovery moment ambient (magic)', 'Ambiance', 'moment de découverte, magique'],
   ],
   // sounds worth adding (not made yet)
