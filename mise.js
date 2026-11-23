@@ -453,7 +453,7 @@ window.MISE = (() => {
     }
     function end() {
       clearTimeout(timer);
-      const d = document.createElement('div'); d.className = 'mzEnd'; d.innerHTML = `<h2>${esc(P.title)}</h2><p style="margin:0;color:#c7c7cc">À suivre…</p><div><button type="button" data-h="again">↺ Rejouer</button> <button type="button" data-h="close">Fermer</button></div>`;
+      const d = document.createElement('div'); d.className = 'mzEnd'; d.innerHTML = `<h2>${esc(P.title)}</h2><p style="margin:0;color:#c7c7cc">À suivre…</p><div>${opt.next ? '<button type="button" data-h="next">▶ La suite</button> ' : ''}<button type="button" data-h="again">↺ Rejouer</button> <button type="button" data-h="close">Fermer</button></div>`;
       stage.appendChild(d);
     }
     function start(at = 0) { st = init(P); cur = null; beats = P.beats.slice(); $('.mzEnd', root) && $('.mzEnd', root).remove(); build('table'); drawAll(true); aim({ type: 'wide', plate: 'table' });
@@ -462,7 +462,7 @@ window.MISE = (() => {
     function close() { alive = false; clearTimeout(timer); removeEventListener('resize', onSize); removeEventListener('keydown', onKey); root.remove(); R = null; if (opt.onClose) opt.onClose(); }
     const onSize = () => { size(); if (st && cur) { aim(st.frame.type === 'insert' ? { type: 'wide', plate: cur } : st.frame); overlay(st.frame); if (!opt.tune && beats[i] && chunks.length) say(beats[i], chunks[ci]); } };
     const onKey = (e) => { if (e.key === 'Escape') close(); else if (e.key === ' ') { e.preventDefault(); pause(); } else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); next(); } else if (e.key === 'ArrowLeft') back(); };
-    root.onclick = (e) => { const h = e.target.dataset && e.target.dataset.h; if (h === 'close') return close(); if (h === 'back') return back(); if (h === 'again') return start(0); if (e.target.closest('.mzChoice,.mzTune,.mzEnd')) return; if (opt.tune) return; pause(); };
+    root.onclick = (e) => { const h = e.target.dataset && e.target.dataset.h; if (h === 'close') return close(); if (h === 'next' && opt.next) { const nx = opt.next; opt.onClose = null; close(); return nx(); } if (h === 'back') return back(); if (h === 'again') return start(0); if (e.target.closest('.mzChoice,.mzTune,.mzEnd')) return; if (opt.tune) return; pause(); };
     addEventListener('resize', onSize); addEventListener('keydown', onKey);
     size();
     R = { close, next, back, start, get i() { return i; }, get n() { return beats.length; }, get busy() { return busy; }, root, stage, world, redraw() { build(cur); drawAll(true); aim({ type: 'wide', plate: cur }); }, get st() { return st; }, get cam() { return cam; } };

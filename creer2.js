@@ -62,7 +62,9 @@ window.CREER2 = (() => {
   }
   function s2() {
     const o = FORGE.v2.overview();
+    const sm = window.ORCH ? ORCH.summary() : null;
     return `<div class="c2Cast">${o.people.map((p) => `<div><span>${p.src ? `<img src="${p.src}" alt="">` : ''}</span><b>${esc(p.name)}</b></div>`).join('')}</div>`
+      + (sm && sm.q ? `<p class="c2Sub">${esc(sm.recipe)} · ${esc(sm.q)} · ${sm.eps} épisodes</p><div class="c2Row"><button type="button" data-a="read">📖 Lire toute l’histoire</button></div>` : '')
       + (C.story ? `<p class="c2Ok">✓ ${esc(C.title)}</p>` : '')
       + both('haiku2', 'copy2', '⚡ Épisode 1', '📋 Prompt')
       + (ask2 ? ta('p2', 'Colle la réponse', paste[2]) + '<div class="c2Row"><button type="button" class="c2Big" data-a="use2">OK</button></div>' : '')
@@ -82,7 +84,7 @@ window.CREER2 = (() => {
     return h + '<div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button></div>';
   }
   function s4() {
-    return '<div class="c2Row"><button type="button" class="c2Big c2Go c2Huge" data-a="play">▶ Jouer</button></div><div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button><button type="button" data-a="again">↩</button></div>';
+    return '<div class="c2Row"><button type="button" class="c2Big c2Go c2Huge" data-a="play">▶ Jouer</button></div><div class="c2Row"><button type="button" data-a="more">▶ La suite</button><button type="button" data-a="read">📖 Tout lire</button></div><div class="c2Row"><button type="button" data-a="adv3">🎥 Avancé</button><button type="button" data-a="again">↩</button></div>';
   }
   function render() {
     if (!el) return; const keep = el.closest('#creer2') ? el.closest('#creer2').scrollTop : 0;
@@ -103,6 +105,8 @@ window.CREER2 = (() => {
     C.title = FORGE.v2.epKeep(0, j); C.story = j; C.script = scriptOf(j); C.ready = false; todo = null; ask2 = false; paste[2] = ''; MISE.auto.setScript(C.script); go(3);
   }
   const parse = (t) => { try { return LOOSE_JSON(t); } catch { return null; } };
+  // episode 1 = the opening the orchestration designed (passive: the characters choose); without orch.js, the old plan
+  const ep1Prompt = () => (window.ORCH ? ORCH.epPrompt() : FORGE.v2.epPrompt(0));
   async function ai(what, run) {
     const k = ls('smt-key'); if (!k) return needKey('smt-key', 'Claude');
     busy = true; say(what); render();
@@ -124,7 +128,9 @@ window.CREER2 = (() => {
       if (r.err) { say(`${r.err} ${todo ? `Il reste ${todo} image${todo > 1 ? 's' : ''} : retape pour continuer.` : ''}`); return render(); } }
     C.ready = true; C.step = 4; save(); say(''); render(); play();
   }
-  async function play() { if (!window.MISE) return; if (!(await MISE.auto.play({ onClose: () => { if (el) render(); } }))) say('Il faut d’abord la mise en scène.'); }
+  // ▶ episode 1 (played), then « ▶ La suite » = the black screens, episode 2 to the end (orch.js)
+  const more = () => { if (window.ORCH) ORCH.slides(2, { onClose: () => { if (el) render(); } }); };
+  async function play() { if (!window.MISE) return; if (!(await MISE.auto.play({ onClose: () => { if (el) render(); }, next: window.ORCH ? more : null }))) say('Il faut d’abord la mise en scène.'); }
   // the old screens, one tap away; coming back lands here
   function advanced(kind) {
     if (kind === 1) { if (window.C2_FORGE) C2_FORGE(); return; }
@@ -143,8 +149,10 @@ window.CREER2 = (() => {
       case 'use1': return baseIn(parse(paste[1]));
       case 'dice': premise(); FORGE.v2.dice(); fresh(); C.based = true; return go(2);
       case 'adv1': premise(); if (!C.based) { FORGE.v2.dice(); C.based = true; fresh(); } save(); return advanced(1);
-      case 'haiku2': return ai('⚡ Haiku écrit l’épisode 1…', async (k) => { const u = used(), j = await window.ACT.haiku(k, FORGE.v2.epPrompt(0), 8000, (x) => Array.isArray(x.steps), u); spent(u); storyIn(j); });
-      case 'copy2': ask2 = true; return copy(FORGE.v2.epPrompt(0), 'Prompt copié.').then(render);
+      case 'haiku2': return ai('⚡ Haiku écrit l’épisode 1…', async (k) => { const u = used(), j = await window.ACT.haiku(k, ep1Prompt(), 8000, (x) => Array.isArray(x.steps), u); spent(u); storyIn(j); });
+      case 'copy2': ask2 = true; return copy(ep1Prompt(), 'Prompt copié.').then(render);
+      case 'read': if (window.ORCH) ORCH.read({ onClose: () => { if (el) render(); } }); return;
+      case 'more': return more();
       case 'use2': return storyIn(parse(paste[2]));
       case 'stage': return ai('⚡ Haiku met en scène…', async (k) => { MISE.auto.setScript(C.script); await MISE.auto.stage(k); await refreshTodo(); say(''); });
       case 'copyS': MISE.auto.setScript(C.script); askS = true; return copy(MISE.auto.prompt(), 'Prompt copié.').then(render);

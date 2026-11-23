@@ -124,8 +124,8 @@ window.FORGE = (() => {
   const INFO_K = [{ id: 'secret', e: '🤫', n: 'Secret', d: 'Ce qu’un perso cache. Sort en épisode 3.' }, { id: 'mask', e: '🎭', n: 'Faux visage', d: 'Il n’est pas ce qu’il montre. Tombe en épisode 3.' },
     { id: 'past', e: '🕰️', n: 'Passé', d: 'Ce qui s’est passé entre eux. Raconté tôt.' }, { id: 'object', e: '📦', n: 'Objet', d: 'Un objet qu’on voit tôt, qu’on ouvre en épisode 3.' }];
   const INFOS = [
-    { k: 'secret', id: 'sibling', e: '🧬', s: 2, fr: (x, y) => `${x} est de la famille de ${y}, en cachette`, en: (x, y) => `${x} is ${y}'s hidden sibling (or close family); ${y} does not know` },
-    { k: 'secret', id: 'parent', e: '👶', s: 2, fr: (x, y) => `${x} est le parent de ${y}`, en: (x, y) => `${x} is ${y}'s parent, and ${y} does not know` },
+    { k: 'secret', id: 'sibling', e: '🧬', s: 2, fr: (x, y) => `${x} est de la famille ${de(y)}, en cachette`, en: (x, y) => `${x} is ${y}'s hidden sibling (or close family); ${y} does not know` },
+    { k: 'secret', id: 'parent', e: '👶', s: 2, fr: (x, y) => `${x} est le parent ${de(y)}`, en: (x, y) => `${x} is ${y}'s parent, and ${y} does not know` },
     { k: 'secret', id: 'betray', e: '🗡️', s: 2, fr: (x, y) => `${x} a trahi ${y}`, en: (x, y) => `${x} betrayed ${y} in the past, and ${y} does not know` },
     { k: 'secret', id: 'crush', e: '💌', s: 2, fr: (x, y) => `${x} aime ${y} en secret`, en: (x, y) => `${x} is secretly in love with ${y}` },
     { k: 'secret', id: 'cause', e: '🔥', s: 2, fr: (x, y) => `${x} a causé ce que ${y} a perdu`, en: (x, y) => `${x} caused what ${y} lost most, and hides it` },
@@ -2083,7 +2083,7 @@ Keep it natural, like the reference.`;
         + `<div data-ledger="${n}" class="fLed${LED.some(([key]) => led[key].length) ? '' : ' none'}">${LED.filter(([key]) => led[key].length).map(([key, e2, tip]) => `<p data-tip="${esc(tip)}"><b>${e2}</b>${led[key].map((x) => esc(x[0])).join(' · ')}</p>`).join('')}</div></div></div>`).join('')}${S.cut ? '<button type="button" class="fAuto" data-x="autocut" data-tip="Remettre les coupes automatiques">↺ Coupes auto</button>' : ''}</section>`
       + `<section class="fGo">`
       + '<button type="button" class="fMise" data-x="mise" data-tip="Un épisode écrit (screenplay) → ce qu’on voit : la mise en scène, les feuilles à déposer, puis ▶">🎥 Mettre en scène un épisode écrit</button>'
-      + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
+      + '<button type="button" class="go" data-x="play" data-tip="Joue l’épisode 1 : son plan (sans IA), puis Haiku écrit les répliques">▶ Jouer</button><button type="button" data-x="plot" data-tip="Copie le plot : Quoi, Comment, Ce qui arrive, en texte">📄 Copier le plot</button><button type="button" data-x="orch" data-tip="L’orchestration (FORGE) : ce qui est vrai, ce qui s’oppose et comment, le choix et son prix, le parcours du public, chaque moment (cause, acteur, désir, ce qui change), les épisodes">🧭 Orchestration</button><button type="button" data-x="orchread" data-tip="Lire l’histoire comme le spectateur : l’ouverture, puis chaque épisode en quelques diapos, jusqu’à la fin">📖 Lire</button><button type="button" data-x="copy" data-tip="Copie le prompt de l’acte pour un chat (la route par l’Acte) ; la réponse se colle dans Acte › Générer › 1">📋 Prompt de l’acte</button><button type="button" data-x="acte" data-tip="Ouvre l’acte : ses 5 épisodes, les plans">Acte ›</button></section>'
       + `<p class="pMsg fMsg">${esc(msg)}</p>`
       + `<h3 class="fH">🧍 Prompts des pose sheets</h3>`
       + (() => { const nPose = people().length, nNeed = needs().filter((x) => !x.done).length;
@@ -2215,9 +2215,11 @@ Keep it natural, like the reference.`;
     else if (d.plan) { save(); const pl = planOf(+d.plan); PLAN.add(pl); return window.FORGE_TO_PLAN && FORGE_TO_PLAN(); }
     else if (d.playep) return play(t, +d.playep);
     else if (d.sb) { const k2 = +d.sb; if (sbOpen.has(k2)) sbOpen.delete(k2); else sbOpen.add(k2); }
-    else if (d.pickopt) { const [id, i] = d.pickopt.split(':'); S.picked[id] = S.picked[id] === +i ? null : +i; }
+    else if (d.pickopt) { const [id, i] = d.pickopt.split(':'); S.picked[id] = S.picked[id] === +i ? null : +i; if (id === 'pick') delete S.pickAuto; }
     else if (d.det) { const ev = allEv().find((x) => x.id === d.det); if (ev) details(ev); return; }
     else if (d.x === 'plot') return copy(plotText(), '📄 Plot copié');
+    else if (d.x === 'orch' && window.ORCH) return copy(ORCH.text(), '🧭 Orchestration copiée');
+    else if (d.x === 'orchread' && window.ORCH) { ORCH.read(); return; }
     else if (d.gen) { const [kd, ...r] = d.gen.split(':'); save(); generate(kd, r.join(':')); return; }
     else if (d.pose) { save(); return copy(sheet(d.pose), `🧍 ${nm(d.pose)} : prompt copié. Dans ChatGPT : l’image + le prompt.`); }
     else if (d.need) { const n = needs().find((x) => x.key === d.need); if (n) { save(); return copy(needSheet(n), `${n.e} ${n.title} : prompt copié. Dans ChatGPT : ${n.obj ? 'l’image 1' : 'les images 1 et 2'} + le prompt.`); } }
@@ -2353,5 +2355,10 @@ REPLY SHAPE:
   const hasStory = () => S.cast.length > 0;
   const rollAll = () => { dice(); save(); render(); };
 
-  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains, state: actState, v2: { dice: rollAll, basePrompt, load, overview, epPrompt, epKeep, hasStory } };
+  // ---- the world model, for the orchestration (orch.js, 23/11): what is true, what each one wants, who they are, what a
+  // choice costs. orch.js builds the story on it (truth → drive → destination → the audience's journey → moments → episodes) ----
+  const core = () => ({ S, J, people, live, nm, en, cap, de, pillarsOf, P, F, traitsOf, traitTxt, voiceOf, story, storyAt, truth, evs: () => evsAll(), EK, EVN, evFr, evEnT,
+    vName, vNameE, infos, kinds, IN, infoFr, infoEn, iAct, graph, chains, clueOf, DK, lab, labE, tName, tNameE, dSay, dSayE, fateFor, forcer, actState, LQ, QEV, rel, R, wantOf,
+    ACTS, actOf, sprite, img, POOL, lifeAtStake, sameSide, DECORS, low1, keepLines, linesOf, save });
+  return { mount, PILLARS, FLAWS, sheet, seed, events, episodes, conflicts, planOf, plotText, line, chains, state: actState, core, v2: { dice: rollAll, basePrompt, load, overview, epPrompt, epKeep, hasStory } };
 })();
