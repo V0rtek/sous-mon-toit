@@ -2332,6 +2332,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
     </div>
   </div>
   <div id="secWrite" class="card menu sub" hidden>
+    <button type="button" id="histoireBtn" style="display:block;width:100%;margin:0 0 14px;padding:22px 18px;border-radius:16px;border:0;background:#30d158;color:#000;font:inherit;font-size:24px;font-weight:800;text-align:left;cursor:pointer">▶ Tester une histoire<span style="display:block;font-size:16px;font-weight:600;opacity:.75;margin-top:4px">Une idée → l’histoire → l’épisode 1 joué</span></button>
     <div class="strips">
       <button type="button" id="forgeBtn"><span class="art" style="--g:#ff375f"><img src="chars/ruby/explaining.webp" alt=""></span><b>⚡ Créer</b></button>
       <button type="button" id="creer2Btn"><span class="art" style="--g:#30d158"><img src="chars/ruby/explaining.webp" alt=""></span><b>⚡ Créer v2</b></button>
@@ -2448,6 +2449,9 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
   </div>
   <div id="forge" class="card menu" hidden>
     <div class="step" id="forgeBody"></div>
+  </div>
+  <div id="histoire" class="card menu" hidden>
+    <div class="step" id="histoireBody"></div>
   </div>
   <div id="creer2" class="card menu" hidden>
     <div class="step" id="creer2Body"></div>
@@ -3024,6 +3028,7 @@ body.watch #choices button, body.watch .looks button { pointer-events: none; }
 <script src="mise-data.js?v=20261116210000"></script>
 <script src="mise.js?v=20261123120000"></script>
 <script src="creer2.js?v=20261123120000"></script>
+<script src="histoire.js?v=20261124200000"></script>
 <script src="deck.js?v=20261103600000"></script>
 <script src="bank.js?v=20261111120000"></script>
 <script src="place.js?v=20261031540000"></script>
@@ -3071,7 +3076,7 @@ let keyOk = false;   // entered this visit (a private window can't remember it)
 // its own slot (smt-open): smt-key is the Haiku key. A code kept in smt-key before (02/11) moves there
 try { if (+localStorage.getItem('smt-key') === KEY_HASH) { localStorage.setItem('smt-open', String(KEY_HASH)); localStorage.removeItem('smt-key'); } } catch { /* private window */ }
 const unlocked = () => { if (keyOk) return true; try { return +localStorage.getItem('smt-open') === KEY_HASH; } catch { return false; } };
-const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#creer2', '#investors', '#brainstorm', '#showrunner', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
+const PRIVATE = new Set(['#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#creer2', '#histoire', '#investors', '#brainstorm', '#showrunner', '#statsScreen', '#labScreen', '#placeScreen', '#bank', '#about3d', '#video3d']);
 document.documentElement.classList.toggle('locked', !unlocked());
 // the warning: unlocked = every visit opens on it (and right after the code); a tap closes it
 const warnEl = $('#warn'); warnEl.onclick = (e) => { if (e.target.closest('.wLink')) return; warnEl.hidden = true; };
@@ -5156,9 +5161,9 @@ addEventListener('keydown', (e) => {
 
 // ---- screens: name -> home (4 tiles) -> a story (the Playthrough through its waiting room);
 // a joiner: name -> lobby -> the host's waiting room / story ----
-const SCREENS = ['#placeScreen', '#who', '#hub', '#demos', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#profile', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#creer2', '#bank'];
+const SCREENS = ['#placeScreen', '#who', '#hub', '#demos', '#tvPick', '#tvFind', '#lobby', '#wait', '#about3d', '#video3d', '#gallery', '#profile', '#charView', '#newChar', '#genScreen', '#genHist', '#genPrompt', '#statsScreen', '#cover', '#end', '#labScreen', '#investors', '#brainstorm', '#showrunner', '#infos', '#secWrite', '#secTest', '#secSell', '#secRef', '#marketing', '#pitch', '#aiv', '#validate', '#deck', '#system', '#cosmo', '#cosmoOP', '#cosmoCites', '#tech', '#techCard', '#plan', '#acte', '#forge', '#creer2', '#histoire', '#bank'];
 const UP = { '#demos': '#hub', '#tvFind': '#hub', '#placeScreen': '#labScreen', '#bank': '#secWrite', '#wait': '#hub', '#about3d': '#secRef', '#video3d': '#secRef', '#gallery': '#demos', '#profile': '#demos', '#charView': '#gallery', '#newChar': '#gallery', '#genScreen': '#secWrite', '#genHist': '#genScreen', '#genPrompt': '#genScreen', '#statsScreen': '#secRef', '#cover': '#hub', '#end': '#hub', '#lobby': '#hub', '#labScreen': '#secTest', '#investors': '#secSell', '#brainstorm': '#secSell', '#showrunner': '#secRef',
-  '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite', '#creer2': '#secWrite' };   // where ‹ goes
+  '#infos': '#hub', '#secWrite': '#infos', '#secTest': '#infos', '#secSell': '#infos', '#secRef': '#infos', '#marketing': '#secSell', '#pitch': '#secSell', '#aiv': '#pitch', '#validate': '#infos', '#deck': '#secSell', '#system': '#secRef', '#cosmo': '#secRef', '#cosmoOP': '#cosmo', '#cosmoCites': '#cosmo', '#tech': '#secWrite', '#techCard': '#tech', '#plan': '#secWrite', '#acte': '#secWrite', '#forge': '#secWrite', '#creer2': '#secWrite', '#histoire': '#secWrite' };   // where ‹ goes
 let screen = '#who';
 // in game (a story, the waiting room, the lobby, the TV), the screen stays on: the Screen Wake Lock, taken back when the
 // page comes back to the front (the phone drops it when hidden). Where it's not supported, nothing changes.
@@ -5932,6 +5937,10 @@ $('#planBtn').onclick = (e) => { e.stopPropagation(); UP['#plan'] = '#secWrite';
 // ---- Infos · Acte (act.js): one act of 5 episodes, each one's prompt 1 copied from its column ----
 $('#actBtn').onclick = (e) => { e.stopPropagation(); UP['#acte'] = '#secWrite'; show('#acte'); ACT.mount($('#acteBody')); };
 // ---- Écrire · Créer (forge.js): the story by taps, then ▶ (Haiku: act, plan, story) or 📋 (the act's prompt) ----
+// ▶ Tester une histoire (histoire.js): the simplest way, also by the direct link index.html#histoire
+const openHistoire = () => { show('#histoire'); $('#histoire').scrollTop = 0; HISTOIRE.mount($('#histoireBody')); };
+$('#histoireBtn').onclick = (e) => { e.stopPropagation(); openHistoire(); };
+if (location.hash === '#histoire' && unlocked()) setTimeout(openHistoire, 0);
 $('#creer2Btn').onclick = (e) => { e.stopPropagation(); show('#creer2'); $('#creer2').scrollTop = 0; CREER2.mount($('#creer2Body')); };
 window.C2_FORGE = () => { UP['#forge'] = '#creer2'; show('#forge'); $('#forge').scrollTop = 0; FORGE.mount($('#forgeBody')); };   // Créer v2 › Avancé: the old Créer, ‹ comes back
 $('#forgeBtn').onclick = (e) => { e.stopPropagation(); UP['#forge'] = '#secWrite'; show('#forge'); $('#forge').scrollTop = 0; FORGE.mount($('#forgeBody')); };
