@@ -749,10 +749,12 @@ window.FORGE = (() => {
   function actState() {
     const E = { kill: [], gone: [], ch: [], adds: [], ends: [], arcs: [], fate: null, other: null, pick: 0, X: null };
     if (ACTS() < 2 || !window.FILS || !FILS.FATE) return E;
-    const sig = JSON.stringify([S.cast, S.pil, S.want, S.rel, S.infos, S.ev, S.links, (S.picked || {}).pick, S.acts, S.climax, S.seed, S.hard, S.flaw]);
+    const sig = JSON.stringify([S.cast, S.pil, S.want, S.rel, S.infos, S.ev, S.links, (S.picked || {}).pick, S.pickAuto, !!window.ORCH, S.acts, S.climax, S.seed, S.hard, S.flaw]);
     if (AST && AST.sig === sig) return AST.E; if (AST_BUSY) return E;
     AST_BUSY = true; const sv = CUR_ACT;
-    try { CUR_ACT = 1; const st = storyAt(1), [ca, cb] = st.X, k = (S.picked || {}).pick === 1 ? 1 : 0, D = st.D;
+    // the climax of act 1: the author's tap (old Créer), else what Justin decides from who he is (orch.js, 24/11: one source
+    // for both engines; nothing is written)
+    try { CUR_ACT = 1; const st = storyAt(1), [ca, cb] = st.X, hand = S.picked && S.picked.pick != null && !S.pickAuto, k = (hand ? S.picked.pick : window.ORCH && ORCH.pickOf ? ORCH.pickOf() : 0) === 1 ? 1 : 0, D = st.D;
       const ch = (dim, fr, en2) => E.ch.push({ dim, fr, en: en2 });
       const near = (t) => [...new Set(D.filter((d) => ['love', 'protect'].includes(d.k) && d.t === t && d.who !== t && !d.dead && !E.ends.some((x) => x.who === d.who && x.k === d.k && x.t === t)).map((d) => d.who))];
       if (ca && cb) { const lost = k ? ca : cb, won = k ? cb : ca, f = fateFor(lost, 1); E.X = [ca, cb]; E.pick = k; E.fate = f; E.won = [lab(won), labE(won)]; E.other = fateFor(won, 1);
@@ -1820,8 +1822,20 @@ Keep it natural, like the reference.`;
       infos: (() => { const out = [], two = (k) => { const c = INFOS.filter((i) => i.k === k), i = pick(c), x = pick([J, ...cast]); let y; do y = pick([J, ...cast]); while (y === x && cast.length);
         out.push({ id: i.id, x, y }); }; if (coin(0.7)) two(pick(['secret', 'mask'])); if (coin(0.5)) two('past'); if (coin(0.3)) two('object'); return out; })(), ev: [{ k, x: k === 'gone' ? T : O || T, v: ['murder', 'theft', 'betray'].includes(k) ? (C || null) : null, s: null, h: 1 }], hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
       seed: 1 + Math.floor(Math.random() * 99999), picked: {}, tq: Object.fromEntries(['hook1', 'hook2', 'want', 'expect', 'tease', 'c0', 'c1', 'past0', 'plant1', 'plant2', 'liked', 'easy', 'rev0', 'twist', 'pick', 'cost'].map((id) => [id, Math.floor(Math.random() * 6)])) };
+    bloodFix(S);
     // the graph: two story moves (a secret between people on stage, a witness, a debt and where it was born…)
     DESN = []; graph(); grow(); grow();
+  }
+
+  // a blood tie (sibling, parent: x knows, y does not) next to a romance (24/11, Justin: « watch out not to cut too much »):
+  // the one who KNOWS cannot be the one in love (incoherent); the one who does not know can (Oldboy, Luke and Leia: a twist).
+  // Lenient: swap who knows when that solves it, else move the tie to two other people, else drop it
+  function bloodFix(N) {
+    const ppl = [J, ...N.cast], lov = (a, b) => (N.want[a] && N.want[a].v === 'love' && N.want[a].t === b) || ['couple', 'crush', 'ex'].includes(N.rel[pk(a, b)] || '') || (N.infos || []).some((i) => ['crush', 'exes'].includes(i.id) && ((i.x === a && i.y === b) || (i.id === 'exes' && i.x === b && i.y === a)));
+    N.infos = (N.infos || []).filter((i) => { if (!['sibling', 'parent'].includes(i.id) || !i.y || !lov(i.x, i.y)) return true;
+      if (!lov(i.y, i.x)) { [i.x, i.y] = [i.y, i.x]; return true; }
+      const pairs = ppl.flatMap((x) => ppl.filter((y) => y !== x && !lov(x, y) && !lov(y, x)).map((y) => [x, y])); if (!pairs.length) return false;
+      [i.x, i.y] = pairs[Math.floor(Math.random() * pairs.length)]; return true; });
   }
 
   // ---- the screen ----
@@ -2338,6 +2352,7 @@ REPLY SHAPE:
       if (K2.crime) out.h = e.h === 0 ? 0 : 1;
       N.ev.push(out); });
     if (!N.ev.length) N.ev.push({ k: 'arrive', x: cast[0] });
+    bloodFix(N);
     ['liked', 'clock'].forEach((h) => { if (obj(j.hard)[h]) N.hard[h] = 1; });
     ['hook1', 'hook2', 'want', 'expect', 'tease', 'c0', 'c1', 'past0', 'plant1', 'plant2', 'liked', 'easy', 'rev0', 'twist', 'pick', 'cost'].forEach((id) => { N.tq[id] = num(6); });
     delete N.inc; S = N; DESN = []; save();
