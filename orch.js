@@ -88,7 +88,7 @@ window.ORCH = (() => {
   const SEED = {
     sibling: [(x, y) => `${x} et ${y} ont le même geste quand ils mentent.`, (x, y) => `${x} connaît le nom de la mère ${deN(y)}.`, (x, y) => `Un médaillon : ${x} et ${y}, enfants, côte à côte.`],
     parent: [(x, y) => `${x} regarde ${y} comme on regarde quelqu’un qu’on a perdu.`, (x, y) => `${x} connaît une cicatrice que ${y} n’a montrée à personne.`, (x, y) => `Une vieille lettre : ${x} y parle ${deN(y)}, enfant.`],
-    betray: [(x, y) => `${x} change de sujet dès qu’on parle du passé ${deN(y)}.`, (x, y) => `${x} sait à quelle heure ${y} a été trahi. Personne ne l’a jamais dit.`, (x, y) => `Une vieille lettre de la main ${deN(x)} : c’est ${x} qui a vendu ${y}.`],
+    betray: [(x, y) => `${x} change de sujet dès qu’on parle du passé ${deN(y)}.`, (x, y) => `${x} connaît le nom du bateau où ${y} a été vendu. Personne ne l’a jamais dit.`, (x, y) => `Une vieille lettre de la main ${deN(x)} : c’est ${x} qui a vendu ${y}.`],
     crush: [(x, y) => `${x} regarde ${y} quand personne ne voit.`, (x, y) => `${x} garde sur soi un mouchoir que ${y} a perdu.`, (x, y) => `${x} le dit enfin : c’est ${y}, depuis le début.`],
     cause: [(x, y) => `${x} ne supporte pas qu’on parle de ce que ${y} a perdu.`, (x) => `${x} était là, ce jour-là.`, (x, y) => `${x} l’avoue : c’est à cause ${deN(x)} que ${y} a tout perdu.`],
     leaving: [(x) => `${x} a payé sa chambre jusqu’à demain seulement.`, (x) => `Un sac prêt sous l’escalier : celui ${deN(x)}.`, (x) => `Le billet du bateau de l’aube, au nom ${deN(x)}.`],
@@ -326,7 +326,7 @@ window.ORCH = (() => {
       const learn = (p, fid) => { if (!W.knows.has(p)) W.knows.set(p, new Set()); W.knows.get(p).add(fid); };
       const goPublic = (fid) => { W.pub.add(fid); for (const p of K.people()) learn(p, fid); };
       const D2 = (who, k, t) => D.find((d) => d.who === who && d.k === k && (t === undefined || d.t === t)) || null;
-      const want = (who) => { const d = D.filter((x) => x.who === who && !x.dead && !x.late && x.s >= 2).sort((x, y) => y.s - x.s)[0]; return d ? K.dSay(d) : `${K.nm(who)} veut s’en sortir`; };
+      const want = (who) => { const d = D.filter((x) => x.who === who && !x.late && x.s >= 2 && x.k !== 'alive').sort((x, y) => y.s - x.s)[0] || D.filter((x) => x.who === who && x.s >= 2).sort((x, y) => y.s - x.s)[0]; return d ? K.dSay(d) : `${K.nm(who)} veut sa place ici`; };
       const cast = () => K.S.cast.filter(live), J_ = 'Justin';
       const [XA, XB] = X, won = dec.won, lost = dec.lost;
       const lineOf = (d) => (d ? `${K.DK[d.k].e} ${K.dSay(d)}` : '');
@@ -796,7 +796,8 @@ window.ORCH = (() => {
     const L = ledger(W.loops); eps.forEach((E, n) => { E.n = n + 1; for (const m of E.M) { L.apply(m); m.ep = n + 1; }
       E.changes = E.M.flatMap((m) => m.world).filter(Boolean); E.turn = E.M[E.M.length - 1]; E.aud = L.snap();
       E.circle = [...new Set(E.M.map((m) => m.circle))].sort((x, y) => x - y).map((c) => CIRCLE[c][0]); E.big = [...new Set(E.M.map((m) => m.big))].sort((x, y) => x - y).map((c) => CIRCLE[c][0]);
-      E.slides = E.M.map((m) => ({ fr: [m.slide, ...m.also.filter((x) => !/^Le public/.test(x.fr)).map((x) => x.fr)].join(' '), who: m.who, id: m.id })); });
+      // a slide shows the faces of who it names (the one who acts first)
+      E.slides = E.M.map((m) => { const fr = [m.slide, ...m.also.filter((x) => !/^Le public/.test(x.fr)).map((x) => x.fr)].join(' '); return { fr, who: [...new Set([...m.who, ...K.people().filter((p) => fr.includes(K.nm(p)))])].slice(0, 3), id: m.id }; }); });
     return eps;
   }
   // the audience, moment by moment: what it knows, what it suspects (theories), what it wonders, what it believes wrongly,
@@ -855,7 +856,9 @@ window.ORCH = (() => {
   // ---- episode 1 as a plan (the format of Plan de scène): prompt2 writes its lines, passive (the characters choose) ----
   function openingPlan() {
     const v = movie(), E = v.eps[0], ids = {}; let n = 0;
-    const present = (m) => [...new Set([J, ...m.who])].filter((p) => p === J || K.S.cast.includes(p)).map((p) => ({ id: p, name: K.nm(p), wants: p === m.actor ? m.desire : (() => { const d = K.storyAt(1).D.filter((x) => x.who === p && x.s >= 2).sort((x, y) => y.s - x.s)[0]; return d ? K.dSay(d) : ''; })() }));
+    const gone = new Set(); const present = (m) => { for (const x of E.M.filter((y) => y.id < m.id && y.kind === 'event' && y.ev && y.ev.k === 'murder' && y.ev.v)) gone.add(x.ev.v); if (m.kind === 'event' && m.ev && m.ev.k === 'murder' && m.ev.v) gone.add(m.ev.v);
+      const D1 = K.storyAt(1).D, wantOf = (p) => { const d = D1.filter((x) => x.who === p && x.s >= 2 && x.k !== 'alive' && !gone.has(x.t)).sort((x, y) => y.s - x.s)[0]; return d ? K.dSay(d) : ''; };
+      return [...new Set([m.actor, ...m.who, J, ...K.S.cast.filter(K.live)])].filter((p) => p && (p === J || K.S.cast.includes(p)) && !gone.has(p)).map((p) => ({ id: p, name: K.nm(p), wants: p === m.actor ? m.desire : wantOf(p) })); };
     const beats = E.M.map((m) => { const id = `r${++n}`; ids[m.id] = id; const pre = m.link === 'mais' ? 'Mais : ' : m.link === 'soudain' ? 'Soudain : ' : '';
       return { id, goals: m.goal ? [m.goal] : [], tech: m.tech || '', lines: m.kind === 'event' || m.kind === 'turn' ? 4 : 3, what: `${pre}${m.fr}${m.also.length ? ` En même temps : ${m.also.map((x) => x.fr).join(' ')}` : ''}${m.actor && m.desire ? ` (${N(m.actor)} : ${m.desire})` : ''}`,
         present: present(m), ...(m.kind === 'decide' ? { decides: m.actor } : {}) }; });
@@ -884,7 +887,7 @@ window.ORCH = (() => {
     let i = -1; const shown = [];
     const draw = () => { const s = steps[i];
       if (s.title) { shown.length = 0; el.innerHTML = `<button type="button" class="orX" data-x="1">✕</button><div class="orT"><h1>${esc(s.title)}</h1>${s.sub ? `<p>${esc(s.sub)}</p>` : ''}</div><small class="orH">touche pour continuer</small>`; return; }
-      if (s.k === 0) shown.length = 0; shown.push(s.part);
+      if (s.k % 3 === 0) shown.length = 0; shown.push(s.part);   // never more than 3 sentences at once (CLAUDE.md: never a lot of words at once)
       const faces = (s.slide.who || []).filter((p) => K.img(p)).slice(0, 3).map((p) => `<img src="${K.img(p)}" alt="">`).join('');
       el.innerHTML = `<button type="button" class="orX" data-x="1">✕</button><div class="orS">${faces ? `<div class="orF">${faces}</div>` : ''}${shown.map((p, k) => `<p class="${k === shown.length - 1 ? 'new' : ''}">${esc(p)}</p>`).join('')}</div>`; };
     const close = () => { el.remove(); stEl = null; removeEventListener('keydown', key); if (opt.onClose) opt.onClose(); };
