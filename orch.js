@@ -1025,25 +1025,114 @@ window.ORCH = (() => {
   // ==== G · EPISODES. Episode 1 = the opening (played, ~2 minutes). Then one episode per part of the circle (each search
   // round, then « il trouve + il paie », the return, the end): 2 to 5 slides each; a longer one is cut at its turn ====
   function allocate(W) {
-    const eps = [], segOrder = ['open', 'r1', 'r2', 'r3', 'mid', 'take', 'crisis', 'end'];
-    for (const ACT of W.acts) { const Ms = W.M.slice(ACT.from, ACT.to), by = new Map();
-      for (const m of Ms) { const s = m.seg === 'mid' ? 'take' : m.seg; if (!by.has(s)) by.set(s, []); by.get(s).push(m); }
-      const parts = segOrder.filter((s) => by.has(s)).map((s) => ({ seg: s, M: by.get(s) }));
-      // too short: joins the next part; too long (not the opening): cut in two
-      const out = []; for (const p of parts) { const prev = out[out.length - 1];
-        if (prev && prev.seg !== 'open' && prev.M.length < 2) { prev.M.push(...p.M); prev.seg = p.seg; continue; } out.push({ ...p, M: p.M.slice() }); }
-      if (out.length > 1 && out[out.length - 1].M.length < 2) { const z = out.pop(); out[out.length - 1].M.push(...z.M); }
-      for (const p of out) { if (p.seg === 'open' && ACT.a === 1) { eps.push({ act: ACT.a, seg: p.seg, M: p.M, open: true }); continue; }
-        if (p.M.length <= 5) { eps.push({ act: ACT.a, seg: p.seg, M: p.M }); continue; }
-        const h = Math.ceil(p.M.length / 2); eps.push({ act: ACT.a, seg: p.seg, M: p.M.slice(0, h) }, { act: ACT.a, seg: p.seg, M: p.M.slice(h) }); } }
+    const eps = [], SC = scenesOf(W), END = ['force', 'decide', 'answerJ', 'suspJ', 'reveal', 'turn', 'deed', 'event', 'price', 'expose'];
+    for (const ACT of W.acts) { let cur = null; const flush = () => { if (cur && cur.M.length) eps.push(cur); cur = null; };
+      for (const sc of SC.filter((x) => x.act === ACT.a)) {
+        if (sc.open) { if (!cur || !cur.open) { flush(); cur = { act: ACT.a, M: [], scenes: [], open: true }; } cur.M.push(...sc.M); cur.scenes.push(sc); continue; }
+        const last = cur && cur.M[cur.M.length - 1];
+        if (cur && (cur.open || cur.M.length + sc.M.length > 5 || (cur.M.length >= 3 && last && END.includes(last.kind)))) flush();
+        if (!cur) cur = { act: ACT.a, M: [], scenes: [] };
+        cur.M.push(...sc.M); cur.scenes.push(sc); }
+      flush();
+      // a last episode of one moment joins the one before (when it fits)
+      const mine = eps.filter((E) => E.act === ACT.a); if (mine.length > 1) { const z = mine[mine.length - 1], y = mine[mine.length - 2]; if (z.M.length < 2 && !y.open && y.M.length + z.M.length <= 5) { y.M.push(...z.M); y.scenes.push(...z.scenes); eps.splice(eps.indexOf(z), 1); } } }
+    W.scenes = SC;
     // what each episode does (Phase G): what changes, its turn, what stays open, what is kept for later; and the audience at its end
-    const L = ledger(W.loops); eps.forEach((E, n) => { E.n = n + 1; for (const m of E.M) { L.apply(m); m.ep = n + 1; }
+    const L = ledger(W.loops); eps.forEach((E, n) => { E.n = n + 1; for (const sc of E.scenes) sc.ep = n + 1; for (const m of E.M) { L.apply(m); m.ep = n + 1; }
       E.changes = E.M.flatMap((m) => m.world).filter(Boolean); E.turn = E.M[E.M.length - 1]; E.aud = L.snap();
       E.circle = [...new Set(E.M.map((m) => m.circle))].sort((x, y) => x - y).map((c) => CIRCLE[c][0]); E.big = [...new Set(E.M.map((m) => m.big))].sort((x, y) => x - y).map((c) => CIRCLE[c][0]);
       // a slide shows the faces of who it names (the one who acts first)
       E.slides = E.M.map((m) => { const fr = [m.slide, ...m.also.filter((x) => !/^Le public/.test(x.fr)).map((x) => x.fr)].join(' '); return { fr, who: [...new Set([...m.who, ...K.people().filter((p) => fr.includes(K.nm(p)))])].slice(0, 3), id: m.id }; }); });
+    cards(W);
+    // the scene's question is its choice; it ends on the next scene's question (Swain: the decision sets the next goal)
+    const SC2 = W.scenes || []; for (const sc of SC2) { const c = sc.choice; sc.q = c ? `${K.nm(c.who)} : ${inf(c.a)}, ou ${inf(c.b)} ?` : ''; }
+    SC2.forEach((sc, k) => { const nx = SC2[k + 1] && SC2[k + 1].act === sc.act ? SC2[k + 1] : null; sc.qNext = nx ? nx.q : ''; });
     return eps;
   }
+
+  // ==== H · THE SCENES (25/11, Justin: « build it, see what problems it causes »; the theory: REFERENCE-THEORIE-RECIT.md § 4,
+  // « The Micro-Engine of a Scene »). A moment is the smallest change; a SCENE is 1-5 moments in one continuous place and time,
+  // around one question, ending on a turn. Its card says who wants what here, against whom, the object the debate is about, the
+  // CHOICE (who holds it, option A or B, what was chosen), the state before → after, what the viewer knows that someone in the
+  // room does not, and the question it leaves open. The writer writes scenes from cards, not sentences ====
+  const RIDER = (m) => m.kind === 'seed' || m.force === 'clock';
+  const OBJ_RE = /(meilleure place|foulard|bourse|écrin|boîte|lettre|bague|clé|carte|photo|sac|billet|bateau|chope|couteau|pièce|coffre|recette|livre de comptes|sceau|mouchoir|tache|porte de la cour|corps)/;
+  // where a moment happens: an explicit place in its line (« dans la cour », « sous l'escalier »), the deed at its spot, else the room
+  function placeOf(m, FX) { const t = [m.fr, ...m.also.map((x) => x.fr)].join(' ');
+    if (m.kind === 'deed') { const f = FX.get(m.fact); if (f && f.spot) return { p: f.spot, hard: true }; }
+    for (const sp of SPOTS) if (t.includes(`dans ${sp}`)) return { p: sp, hard: true };
+    if (/(sous|près de) l’escalier/.test(t) && !/escalier de derrière/.test(t)) return { p: 'l’escalier', hard: true };
+    return { p: /tout bas|à l’écart|à part|seul à seul/.test(t) ? 'à l’écart' : 'la salle', hard: false }; }
+  function scenesOf(W) { const FX = new Map(W.acts.flatMap((A) => A.facts.map((f) => [f.id, f]))), out = [];
+    for (const ACT of W.acts) { const Ms = W.M.slice(ACT.from, ACT.to), evAt = (Ms.find((m) => m.seg === 'open' && (m.kind === 'deed' || (m.kind === 'event' && m.ev && ((K.EK[m.ev.k] || {}).crime || m.ev.k === 'gone')))) || {}).id || Infinity;
+      const timeOf = (m) => `${ACT.a > 1 ? 'le lendemain, ' : ''}${({ open: m.id <= evAt ? 'le soir' : 'la nuit', r1: 'la nuit', r2: 'la nuit', r3: 'tard dans la nuit', mid: 'tard dans la nuit', take: 'tard dans la nuit', crisis: 'avant l’aube', end: 'à l’aube' })[m.seg] || 'la nuit'}`;
+      let sc = null; const mk = (m, pl, tm, open) => { sc = { act: ACT.a, M: [], place: pl.p, hard: pl.hard, time: tm, open, facts: new Set(), lines: new Set() }; out.push(sc); };
+      for (const m of Ms) { const pl = RIDER(m) ? { p: 'la salle', hard: false } : placeOf(m, FX), tm = timeOf(m), open = ACT.a === 1 && m.seg === 'open', rider = RIDER(m), beats = sc ? sc.M.filter((x) => !RIDER(x)).length : 0;
+        const ppl = new Set(m.who.filter((p) => p !== J)), cont = !!sc && sc.M.some((x) => x.who.some((p) => p !== J && ppl.has(p)));
+        const same = !!sc && ((m.fact && sc.facts.has(m.fact)) || (m.line && sc.lines.has(m.line)));
+        const brk = !sc || sc.open !== open || (!rider && ((pl.hard && pl.p !== sc.place) || (!pl.hard && sc.hard && !cont) || tm !== sc.time || (beats >= 4 && m.seg !== 'crisis') || sc.M.length >= 5
+          || m.kind === 'deed' || (sc.M.some((x) => x.kind === 'deed') && !cont) || (beats >= 2 && !cont && !same && m.seg !== 'crisis')));
+        if (brk) mk(m, pl, tm, open); else if (pl.hard && !sc.hard) { sc.place = pl.p; sc.hard = true; }
+        sc.M.push(m); m.place = sc.place; if (m.fact) sc.facts.add(m.fact); if (m.line) sc.lines.add(m.line); } }
+    for (let k = out.length - 2; k >= 0; k--) { const z = out[k], y = out[k + 1]; if (z.M.every(RIDER) && y.act === z.act && y.open === z.open && y.M.length + z.M.length <= 5) { y.M.unshift(...z.M); for (const m of z.M) m.place = y.place; out.splice(k, 1); } }
+    for (let k = out.length - 2; k >= 0; k--) { const z = out[k], y = out[k + 1], m0 = z.M[0];
+      if (z.M.length === 1 && !BIG.includes(m0.kind) && m0.kind !== 'deed' && new Set(m0.who).size <= 1 && y.act === z.act && y.open === z.open && y.M.length < 5) { y.M.unshift(m0); m0.place = y.place; m0.insert = 1; out.splice(k, 1); } }
+    // the choice of the climax never stands alone: it joins what forced it
+    for (let k = out.length - 1; k > 0; k--) { const z = out[k], y = out[k - 1]; if (z.M.length === 1 && z.M[0].kind === 'decide' && y.act === z.act && y.M.length < 5) { y.M.push(z.M[0]); z.M[0].place = y.place; out.splice(k, 1); } }
+    // a scene of one moment (not the deed, not somewhere special) joins the one before, in the same time
+    for (let k = out.length - 1; k > 0; k--) { const z = out[k], y = out[k - 1]; if (z.M.filter((x) => !RIDER(x)).length <= 1 && !z.hard && !z.M.some((x) => x.kind === 'deed') && y.act === z.act && y.open === z.open && y.time === z.time && y.M.length + z.M.length <= 5) { y.M.push(...z.M); for (const m of z.M) m.place = y.place; out.splice(k, 1); } }
+    out.forEach((x, k) => { x.n = k + 1; }); return out; }
+  // the choice of a scene: who holds it, what was done (A), what else could have been done (B). Most dramatic first
+  const CHOICE_ORDER = ['decide', 'answerJ', 'deed', 'coverJ', 'costJ', 'keep', 'silence', 'expose', 'misread', 'fail', 'lie', 'cover', 'theory', 'suspJ', 'offer', 'react', 'confront', 'matter', 'attempt', 'force', 'move'];
+  const BIG = ['decide', 'answerJ', 'deed', 'coverJ', 'costJ', 'keep', 'silence', 'expose', 'misread', 'offer'];
+  const FLAWCH = { menteur: ['mentir', 'dire la vérité'], lache: ['reculer', 'tenir tête'], colere: ['exploser', 'se contenir'], orgueil: ['refuser l’aide', 'accepter l’aide'], vice: ['boire', 'rester lucide'], none: ['hésiter', 'agir'] };
+  const ALT = { 'a compris': ['se taire et observer', 'l’accuser tout de suite'], interroge: ['interroger la salle', 'attendre'], 'trouve un détail': ['chercher encore', 'laisser tomber'], 'pose une échéance': ['poser une échéance', 'laisser faire'],
+    'met Justin au pied du mur': ['le mettre au pied du mur', 'se taire'], 'jure de trouver': ['jurer de trouver', 'laisser faire'], 'fixe l’heure': ['partir à l’aube, avec ou sans lui', 'rester'], 'prépare son départ': ['préparer son départ', 'rester'] };
+  const ELSE = { coverJ: 'dire la vérité', lie: 'avouer', cover: 'avouer', theory: 'se taire', deed: 'ne rien faire', costJ: 'le dire', keep: 'le dire', silence: 'parler', expose: 'se taire', misread: 'attendre d’être sûr',
+    suspJ: 'chercher encore', react: 'laisser passer', attempt: 'renoncer', move: 'attendre', force: 'laisser faire', offer: 'se taire', confront: 'se taire' };
+  function choiceOf(sc, A) { const big = BIG.map((k) => sc.M.filter((x) => x.kind === k && x.actor).pop()).find(Boolean), m = big || sc.M.filter((x) => x.actor && CHOICE_ORDER.includes(x.kind)).pop();
+    if (!m) { const mo = sc.M.find((x) => x.kind === 'motive'), f = mo && A.facts.find((x) => x.id === mo.fact);   // before the deed: he chooses to act
+      return f ? { who: J, a: ({ murder: `suivre ${f.v} dehors`, theft: 'attendre que la salle se vide', betray: 'parler à l’inconnu' })[f.ev.k] || 'agir', b: 'laisser faire', id: mo.id } : null; }
+    if (ALT[m.action]) return { who: m.actor, a: ALT[m.action][0], b: ALT[m.action][1], id: m.id };
+    if (m.kind === 'fail' && !['retenu par l’autre côté', 'y va quand même'].includes(m.action)) { const fl = FLAWCH[K.S.flaw[J]] || FLAWCH.none; return { who: m.actor, a: fl[0], b: fl[1], id: m.id }; }
+    if (m.kind === 'attempt') return { who: m.actor, a: K.low1(m.fr.replace(/^Justin /, '').replace(/\.$/, '')), b: 'renoncer', id: m.id };
+    if (m.kind === 'decide') return { who: m.actor, a: K.lab(A.dest.dec.won), b: A.dest.dec.lost ? K.lab(A.dest.dec.lost) : 'l’autre côté', id: m.id };
+    if (m.kind === 'fail') return { who: m.actor, a: m.action === 'retenu par l’autre côté' ? 'rester' : m.action === 'y va quand même' ? 'y aller quand même' : m.action, b: m.action === 'retenu par l’autre côté' ? 'y aller' : m.action === 'y va quand même' ? 'rester' : 'tenir bon', id: m.id };
+    if (m.kind === 'answerJ') return { who: m.actor, a: m.action, b: m.action === 'avoue' ? 'se taire' : m.action === 'se tait' ? 'parler' : 'laisser tomber', id: m.id };
+    return { who: m.actor, a: m.action, b: ELSE[m.kind] || 'ne pas le faire', id: m.id }; }
+  // the actions said as choices (« va-t-il mentir, ou dire la vérité ? »)
+  const INF = { ment: 'mentir', 'ment encore': 'mentir encore', avoue: 'avouer', 'se tait': 'se taire', 'passe à l’acte': 'passer à l’acte', 'fait disparaître la preuve': 'faire disparaître la preuve', 'fait accuser quelqu’un': 'faire accuser quelqu’un',
+    'fait taire un témoin': 'faire taire un témoin', 'prépare sa fuite': 'préparer sa fuite', 'laisse payer un innocent': 'laisser payer un innocent', 'lâche celle qu’il protège': 'lâcher celle qu’il protège', 'détourne les soupçons': 'détourner les soupçons',
+    soupçonne: 'soupçonner', 'le dit devant tous': 'le dire devant tous', 'le dit, en vain': 'le dire, même en vain', renonce: 'renoncer', 'se tait pour lui': 'se taire pour lui', 'voit quelque chose': 'le voir', 'se trompe, et agit': 'agir sur ce qu’il croit',
+    'vend ce qu’il sait': 'vendre ce qu’il sait', riposte: 'riposter', 'se retire': 'se retirer', 'exige des excuses': 'exiger des excuses', 'en appelle à Justin': 'en appeler à Justin', 'invente un coupable': 'inventer un coupable', 'pousse la fausse piste': 'pousser une fausse piste',
+    'garde pour lui': 'garder ça pour lui', 'le dit à Justin, seul': 'le dire à Justin', 'force le choix': 'forcer le choix', 'pose une échéance': 'poser une échéance', 'fait chasser': 'le faire chasser', frappe: 'frapper', 'menace pour s’en sortir': 'menacer pour s’en sortir',
+    'supplie Justin de se taire': 'supplier Justin de se taire', 'menace de tout dire': 'menacer de tout dire', 's’enfuit': 's’enfuir', 'demande grâce': 'demander grâce', 'détourne Justin de la vérité': 'détourner Justin de la vérité', 'retourne la salle': 'retourner la salle contre Justin',
+    'se moque': 'se moquer', menace: 'menacer', 'revendique Justin': 'revendiquer Justin', 'sape Justin': 'saper Justin', 'humilie Justin': 'humilier Justin', 'montre sa force': 'montrer sa force', 'ferme la sortie': 'fermer la sortie', part: 'partir', esquive: 'esquiver', 'fait taire': 'faire taire' };
+  const inf = (t) => INF[t] || t;
+  // the object a scene's debate turns around: one of the story's own (a gun on the wall fires: never a new one), else a prop of the room
+  const PROP = { 'la salle': 'les chopes sur le comptoir', 'à l’écart': 'une bougie qui baisse', 'la cour': 'la porte de la cour', 'l’écurie': 'une lanterne', 'la cave': 'une lanterne', 'la réserve': 'les tonneaux', 'l’escalier': 'le sac sous l’escalier', 'l’escalier de derrière': 'une lanterne' };
+  function objectOf(sc, A, all) { const ob = all.match(OBJ_RE); if (ob) return { o: ob[1], own: true };
+    for (const m of sc.M) { const f = m.fact && A.facts.find((x) => x.id === m.fact); if (!f) continue; if (f.kind === 'crime' && ['deed', 'coverJ', 'cover', 'clue2', 'proof', 'keep', 'event'].includes(m.kind)) return { o: f.ev.k === 'theft' && f.thing ? f.thing : itemOf(f), own: true }; if (f.kind === 'object' && f.info) return { o: K.low1(K.infoFr(f.info)), own: true }; }
+    const io = K.infos().find((i) => K.IN[i.id].k === 'object' && sc.who.includes(i.x)); if (io) return { o: K.low1(K.infoFr(io)), own: true };
+    return { o: PROP[sc.place] || PROP['la salle'], own: false }; }
+  // the cards, with what the viewer carries in and out of each scene
+  function cards(W) { const L = ledger(W.loops);
+    for (const sc of W.scenes || []) { const A = W.acts.find((x) => x.a === sc.act), wIn = L.snap().wonders, irIn = L.snap().irony; for (const m of sc.M) L.apply(m); const sn = L.snap();
+      const all = sc.M.map((m) => [m.fr, ...m.also.map((x) => x.fr)].join(' ')).join(' '), ch = choiceOf(sc, A);
+      const who = [...new Set([...sc.M.flatMap((m) => m.who), ...K.people().filter((p) => all.includes(K.nm(p)) && !(W.deadAt.has(p) && W.deadAt.get(p) < sc.M[0].id))])].filter((p) => p && p !== 'clock'), holder = ch ? ch.who : (sc.M.find((m) => m.actor === J) ? J : (sc.M.find((m) => m.actor) || {}).actor);
+      const hm = sc.M.find((m) => m.actor === holder && m.desire) || sc.M.find((m) => m.desire) || {}, opp = sc.M.find((m) => m.actor && m.actor !== holder && (m.link === 'mais' || m.force || m.hostile))
+        || sc.M.find((m) => m.actor && m.actor !== holder) || { actor: sc.M.map((m) => m.target).find((p) => p && p !== holder && p !== 'clock') || who.find((p) => p !== holder && p !== J) || null };
+      sc.who = who; const OB = objectOf(sc, A, all);
+      const fear = sc.M.flatMap((m) => m.aud.filter((x) => x.k === 'fear').map((x) => x.fr))[0];
+      const change = [...new Set(sc.M.flatMap((m) => m.world))].filter(Boolean), knows = [...new Set(sc.M.flatMap((m) => m.aud.filter((x) => ['learn', 'answer', 'suspect', 'clear'].includes(x.k)).map((x) => x.fr)))].filter((x) => !change.includes(x));
+      Object.assign(sc, { who, holder, want: hm.desire || '', opp: opp ? opp.actor : null, object: OB.o, objOwn: OB.own, choice: ch, stakes: fear || ((W.loops.find((L) => sc.M.some((m) => m.id === L.open)) || {}).fr || ''), epilogue: !ch && sc.M.every((m) => m.seg === 'end'),
+        change, knows, qIn: wIn, qOut: sn.wonders.filter((q) => !wIn.includes(q)).concat(sn.wonders.filter((q) => wIn.includes(q))).slice(0, 2), irony: irIn.slice(-1)[0] || '',
+        heading: `${['la cour', 'l’écurie'].includes(sc.place) ? 'EXT.' : 'INT.'} ${String(K.S.decor || 'taverne').toUpperCase()}${sc.place === 'la salle' ? '' : `, ${sc.place.toUpperCase()}`} — ${sc.time.toUpperCase()}` }); } }
+  // what a screenwriter would see in the scenes (25/11): how many hold a choice, an object, an opponent, a real change
+  function sceneStats() { const v = movie(), S2 = v.W.scenes || [], n = S2.length || 1, pc = (f) => Math.round((100 * S2.filter(f).length) / n);
+    return { scenes: S2.length, moments: v.W.M.length, eps: v.eps.length, perScene: +(v.W.M.length / n).toFixed(1), single: pc((x) => x.M.filter((m) => !RIDER(m)).length <= 1),
+      choice: pc((x) => !!x.choice || x.epilogue), justinChooses: pc((x) => x.choice && x.choice.who === J), object: pc((x) => !!x.object), opponent: pc((x) => !!x.opp), change: pc((x) => x.change.length || x.knows.length),
+      newQuestion: pc((x) => !!x.qNext || x.epilogue || (x.qOut.length && x.qOut.some((q) => !x.qIn.includes(q)))), storyObject: pc((x) => x.objOwn), places: [...new Set(S2.map((x) => x.place))] }; }
   // the audience, moment by moment: what it knows, what it suspects (theories), what it wonders, what it believes wrongly,
   // what only it knows (irony), whom it cares for
   // the loops the audience waits on (what it does not consciously carry, a seed, a key, a hidden hand, stays out)
@@ -1089,6 +1178,16 @@ window.ORCH = (() => {
         L.push(`      monde : ${m.world.join(' ; ') || '—'} · public : ${m.aud.map((x) => `${({ q: '❓', learn: '💡', suspect: '🤨', clear: '✖', answer: '✅', care: '❤️', fear: '😨', irony: '🙈', reframe: '🔄', hope: '🤞' })[x.k] || ''} ${x.fr}`).filter((s) => s.trim()).join(' ; ') || '—'}`);
         L.push(`      intrigue : ${m.plot} · ensuite : ${m.next || '—'} · rôles : ${m.jobs.map((j) => JOB[j] || j).join(', ')}`); } });
     const lo = v.W.loops; L.push('', `LES BOUCLES (ce que le public porte) : ${lo.length} ouvertes, ${lo.filter((x) => x.paid).length} fermées${lo.some((x) => !x.paid) ? ` — restent : ${lo.filter((x) => !x.paid).map((x) => x.fr).join(' · ')}` : ''}`);
+    L.push('', 'H · LES SCÈNES (un épisode = des scènes ; une scène = un lieu, un moment, une question, un choix, un changement)');
+    for (const sc of v.W.scenes || []) { const c = sc.choice;
+      L.push('', `Scène ${sc.n} · ép. ${sc.ep} · ${sc.heading} · ${sc.who.map((p) => K.nm(p)).join(', ')}`);
+      L.push(dash(`Porte la scène : ${sc.holder ? K.nm(sc.holder) : '—'}${sc.want ? ` (${sc.want})` : ''}${sc.opp ? ` · contre : ${K.nm(sc.opp)}` : ' · contre : —'}`));
+      L.push(dash(`La question : ${sc.q || '—'}`));
+      L.push(dash(`L’objet : ${sc.object || '—'}${sc.objOwn ? '' : ' (du décor)'} · l’enjeu : ${sc.stakes || '—'}${sc.irony ? ` · le public sait : ${sc.irony}` : ''}`));
+      L.push(dash(c ? `Le choix (${K.nm(c.who)}) : ${c.a} ✓ / ou : ${c.b}` : sc.epilogue ? 'Le choix : — (l’épilogue : le nouvel état)' : 'Le choix : — (aucun)'));
+      L.push(dash(`Les temps : ${sc.M.map((m) => `#${m.id}`).join(' ')} · ce qui change : ${sc.change.concat(sc.knows).slice(0, 3).join(' ; ') || '— (rien)'}`));
+      L.push(dash(`En sortant : ${[sc.qNext, ...sc.qOut].filter(Boolean).slice(0, 2).join(' · ') || '—'}`)); }
+    const st = sceneStats(); L.push('', `  ${st.scenes} scènes pour ${st.moments} moments (${st.perScene} par scène) · avec un choix : ${st.choice} % (Justin : ${st.justinChooses} %) · un objet : ${st.object} % · quelqu’un contre : ${st.opponent} % · un changement : ${st.change} % · une seule action : ${st.single} %`);
     L.push('', 'G · LES ÉPISODES');
     for (const E of v.eps) { L.push('', `Épisode ${E.n}${E.open ? ' (l’ouverture : 2 minutes, jouée)' : ` (${E.slides.length} diapos)`} · acte ${E.act} · ${E.circle.join(' → ')}${v.acts.length > 1 ? ` · grand cercle : ${E.big.join(' → ')}` : ''}`);
       L.push(dash(`Ce qui change : ${E.changes.slice(0, 4).join(' ; ') || '—'}`), dash(`Le tournant : #${E.turn.id} ${E.turn.fr}`));
@@ -1104,7 +1203,8 @@ window.ORCH = (() => {
       const D1 = K.storyAt(1).D, wantOf = (p) => { const d = D1.filter((x) => x.who === p && x.s >= 2 && x.k !== 'alive' && !gone.has(x.t)).sort((x, y) => y.s - x.s)[0]; return d ? K.dSay(d) : ''; };
       return [...new Set([m.actor, ...m.who, J, ...K.S.cast.filter(K.live)])].filter((p) => p && (p === J || K.S.cast.includes(p)) && !gone.has(p)).map((p) => ({ id: p, name: K.nm(p), wants: p === m.actor ? m.desire : wantOf(p) })); };
     const beats = E.M.map((m) => { const id = `r${++n}`; ids[m.id] = id; const pre = m.link === 'mais' ? 'Mais : ' : m.link === 'soudain' ? 'Soudain : ' : '';
-      return { id, goals: m.goal ? [m.goal] : [], tech: m.tech || '', lines: m.kind === 'event' || m.kind === 'turn' ? 4 : 3, what: `${pre}${m.fr}${m.also.length ? ` En même temps : ${m.also.map((x) => x.fr).join(' ')}` : ''}${m.actor && m.desire ? ` (${N(m.actor)} : ${m.desire})` : ''}`,
+      const sc = (v.W.scenes || []).find((x) => x.M[0] === m), head = sc ? `[Scène ${sc.n} · ${sc.place}, ${sc.time}${sc.choice ? ` · ${K.nm(sc.choice.who)} choisit : ${sc.choice.a} (ou : ${sc.choice.b})` : ''}${sc.object ? ` · l’objet : ${sc.object}` : ''}] ` : '';
+      return { id, goals: m.goal ? [m.goal] : [], tech: m.tech || '', lines: m.kind === 'event' || m.kind === 'turn' ? 4 : 3, what: `${head}${pre}${m.fr}${m.also.length ? ` En même temps : ${m.also.map((x) => x.fr).join(' ')}` : ''}${m.actor && m.desire ? ` (${N(m.actor)} : ${m.desire})` : ''}`,
         present: present(m), ...(m.kind === 'decide' ? { decides: m.actor } : {}) }; });
     const links = []; for (const m of E.M) if (m.cause && ids[m.cause] && ids[m.cause] !== ids[m.id] && ['clue', 'cover', 'reveal', 'react', 'clear'].includes(m.kind)) links.push({ from: ids[m.cause], to: ids[m.id], label: 'cause → effet' });
     const next = v.eps[1] ? v.eps[1].M.slice(0, 2).map((m, k) => ({ id: `f${k + 1}`, goals: [], tech: '', lines: 1, what: m.fr })) : [];
@@ -1186,10 +1286,11 @@ window.ORCH = (() => {
     for (const p of K.people()) { const fl = S.flaw && S.flaw[p] && K.F[S.flaw[p]] ? ` Faille : ${K.F[S.flaw[p]].n.toLowerCase()}.` : '', wd = K.storyAt(1).D.filter((d) => d.who === p && d.s >= 2 && !d.from).map((d) => K.dSay(d))[0];
       out.push(`${K.nm(p).toUpperCase()}. ${K.pillarsOf(p).map((x, k) => (k ? K.low1(K.P[x].n) : K.P[x].n)).join(', ')}.${fl}${wd ? ` ${up(wd)}.` : ''}`); }
     const ep1 = K.linesOf(0);
-    for (const E of v.eps) { out.push('', '', `ÉPISODE ${E.n}${E.act > 1 && E === v.eps.find((x) => x.act === E.act) ? ` · ACTE ${E.act}` : ''}`, '', place, '');
-      if (E.n === 1 && ep1 && ep1.length) { for (const l of ep1) { const m = l.match(/^(\s*)(.+?) : (.*)$/); if (!m) { out.push(l); continue; } if (m[2] === 'Narration') out.push(m[3]); else out.push(`            ${m[2].toUpperCase()}`, `      ${m[3]}`, ''); } continue; }
+    for (const E of v.eps) { out.push('', '', `ÉPISODE ${E.n}${E.act > 1 && E === v.eps.find((x) => x.act === E.act) ? ` · ACTE ${E.act}` : ''}`, '');
+      if (E.n === 1 && ep1 && ep1.length) { out.push(place, ''); for (const l of ep1) { const m = l.match(/^(\s*)(.+?) : (.*)$/); if (!m) { out.push(l); continue; } if (m[2] === 'Narration') out.push(m[3]); else out.push(`            ${m[2].toUpperCase()}`, `      ${m[3]}`, ''); } continue; }
       if (E.n === 1) out.push('(Épisode 1 pas encore écrit : voici ce qui doit s’y passer.)', '');
-      for (const sl of E.slides) out.push(...spBeat(sl.fr), ''); }
+      const sl = new Map(E.slides.map((x) => [x.id, x]));
+      for (const sc of E.scenes || []) { out.push(sc.heading, ''); for (const m of sc.M) if (sl.get(m.id)) out.push(...spBeat(sl.get(m.id).fr), ''); } }
     out.push('', 'FIN'); return out.join('\n').replace(/\n{3,}/g, '\n\n'); }
   // what the idea became (the base), as text
   function base() { const S = K.S, D = K.storyAt(1).D, L = [];
@@ -1214,8 +1315,15 @@ window.ORCH = (() => {
     const chars = K.people().map((p) => `- ${K.nm(p)}: ${K.pillarsOf(p).map((x) => K.P[x].n).join(', ')}; ${K.traitTxt(K.traitsOf(p, 1)).map((x) => x[1]).join(', ') || 'nothing extreme'}${S.flaw && S.flaw[p] && K.F[S.flaw[p]] ? `; flaw: ${K.F[S.flaw[p]].n}` : ''}. Voice: ${K.voiceOf(p, p === J ? undefined : 1) || '-'}. Wants: ${D.filter((d) => d.who === p && d.s >= 2).map((d) => K.dSay(d)).join(' / ') || '-'}.`);
     const secrets = v.acts.flatMap((A) => A.facts.filter((f) => f.hidden).map((f) => { const at = v.W.M.filter((m) => m.fact === f.id && ['deed', 'reveal', 'notice', 'answerJ', 'glimpse', 'expose', 'seed'].includes(m.kind)).map((m) => `#${m.id} (${m.kind === 'deed' || m.kind === 'glimpse' || m.kind === 'seed' ? 'the viewer sees it' : 'it comes out'})`);
       return `- ${f.truth}. Known at the start only by: ${(f.knowers || [f.by]).filter(Boolean).map((p) => K.nm(p)).join(', ')}.${at.length ? ` Beats: ${at.join(', ')}.` : ''} Before its beat, nobody else says it, asks it straight or guesses it.`; }));
+    const nm2 = (p) => (p ? K.nm(p) : '—'), card = (sc) => [`  SCENE ${sc.n} — ${sc.heading} — present: ${sc.who.map(nm2).join(', ')}`,
+      `    carried by ${nm2(sc.holder)}${sc.want ? ` (wants: ${sc.want})` : ''}${sc.opp ? `, against ${nm2(sc.opp)}` : ''}`,
+      sc.choice ? `    THE CHOICE, held by ${nm2(sc.choice.who)}: « ${sc.choice.a} » or « ${sc.choice.b} » → chosen: « ${sc.choice.a} ». The dialogue is the debate over this choice.` : '    (no choice in the beats: make one person hold a decision here, between two bad options, without changing what happens)',
+      `    the object the debate turns around: ${sc.object}${sc.objOwn ? '' : ' (a prop of the place: it must not become a new clue)'}`, sc.q ? `    the scene's question: ${sc.q}` : '',
+      sc.irony ? `    the viewer knows, someone here does not: ${sc.irony}` : '',
+      ...sc.M.map((m) => `    #${m.id} ${nm2(m.actor)}${m.desire ? ` (wants: ${m.desire})` : ''} → ${m.fr}${m.also.length ? ` [also: ${m.also.map((x) => x.fr).join(' ')}]` : ''}`),
+      `    state after: ${sc.change.concat(sc.knows).slice(0, 3).join(' ; ') || '-'} · it ends on: ${[sc.qNext, ...sc.qOut].filter(Boolean).slice(0, 2).join(' · ') || '-'}`].filter(Boolean).join('\n');
     const eps = v.eps.map((E) => [`EPISODE ${E.n}${E.act > 1 ? ` (act ${E.act})` : ''}${E.n === 1 && ep1 && ep1.length ? ' — already written, keep these lines as they are:' : ''}`,
-      ...(E.n === 1 && ep1 && ep1.length ? ep1.map((l) => `  ${l}`) : E.M.map((m) => `  #${m.id} ${m.actor ? K.nm(m.actor) : '—'}${m.desire ? ` (wants: ${m.desire})` : ''} → ${m.fr}${m.also.length ? ` [also: ${m.also.map((x) => x.fr).join(' ')}]` : ''}`)),
+      ...(E.n === 1 && ep1 && ep1.length ? ep1.map((l) => `  ${l}`) : (E.scenes || []).map(card)),
       `  At its end the viewer wonders: ${(E.aud.wonders || []).join(' · ') || '—'}`].join('\n'));
     return `You are the screenwriter of a short TV series, in French. Write the WHOLE series as a screenplay from the bible below. The story is decided: you only make it play as scenes.
 
@@ -1228,7 +1336,7 @@ ${chars.join('\n')}
 WHAT IS TRUE, AND WHO KNOWS IT:
 ${secrets.join('\n') || '- nothing hidden'}
 
-THE EPISODES, BEAT BY BEAT (#n = a beat; each one must happen on screen, in this order):
+THE EPISODES, SCENE BY SCENE (a scene = one place, one time; #n = a beat; each beat must happen on screen, in this order):
 ${eps.join('\n\n')}
 
 RULES:
@@ -1236,7 +1344,10 @@ RULES:
 - Nothing important is added: no new subplot, no new character with lines, no new secret. What a beat does not say, you may show with a gesture, an object, a look.
 - Knowledge: a character only says what they know at that point. A secret stays unsaid until its beat (see above). The viewer may know more than the characters: play on it.
 - Concrete: say things by their name (the stained scarf, the dawn boat, the courtyard door), never « something », « a problem », « the thing ».
-- People talk around what they want (subtext); short lines: never more than 2 short sentences in a row by the same person.
+- A scene is a debate over its CHOICE: every line pushes option A or option B; the one who holds the choice may say little while the others try to move them; the scene ends on the choice made and a new state (nothing ends where it started).
+- Anchor the debate to the scene's object (the purse on the counter, the bag under the stairs): people fight over the thing instead of naming the feeling.
+- People talk around what they want (subtext, « 2 + 2 », never « 4 »: never « I'm angry », « I'm scared »); information goes through who they are (their habits, their fear), never raw; no question asked only so that someone can explain. Short lines: never more than 2 short sentences in a row by the same person.
+- Every scene enters late and leaves early, and ends on a question the viewer wants answered.
 - Episode 1 runs about 2 minutes (it is written already if given above: keep it). Every other episode: 1 or 2 short scenes, about 1 minute, ending on its last beat.
 - Format, plain text: ÉPISODE N, then a scene heading (INT. TAVERNE — NUIT, or the courtyard, the stable…), action lines in the present tense, then NAME in capitals on its own line, (a short note) if needed, the line under it.
 Reply with the screenplay only.`; }
@@ -1261,5 +1372,5 @@ Reply with the screenplay only.`; }
 
   // what Créer v2 shows: the recipe, the question, how many episodes
   function summary() { const v = movie(), o = v.opening; return { recipe: o ? o.n : '', engage: o ? o.engage : '', q: o ? o.q : '', eps: v.eps.length, open: v.eps[0] ? v.eps[0].M.length : 0 }; }
-  return { movie, text, openingPlan, epPrompt, slides, read, summary, pickOf, RECIPES, CIRCLE, screenplay, screenplayPrompt, base, allText, showScreenplay, showText, copyText };
+  return { movie, text, openingPlan, epPrompt, slides, read, summary, pickOf, RECIPES, CIRCLE, sceneStats, screenplay, screenplayPrompt, base, allText, showScreenplay, showText, copyText };
 })();

@@ -7,6 +7,9 @@ Pas de validateur qui bloque ou liste des erreurs (demandé par Justin le 30/10)
 # Orchestration FORGE (traitée le 23/11)
 Le texte `FORGE-ORCHESTRATION.md` (gardé tel quel) est traité : réponse ligne par ligne et 6 questions à Justin dans `FORGE-ORCHESTRATION-REPONSE.md`, la revue (problèmes mesurés, causes, exemples de films) dans `FORGE-ORCHESTRATION-REVUE.md`, le code dans `orch.js`, les notes dans `CREER.md` § « L'orchestration ». Ce qui est gardé pour plus tard : `FORGE-LONG-TERME.md` (le tenir à jour). Le 25/11, après son test (« je n'ai pas compris ») : `FORGE-ECRAN.md` (le système de bout en bout, ce qu'une scène demande, ce qui manque pour une vraie série, le plan). Pour la suite de ce chantier : modèle le plus fort, effort le plus haut (demandé par Justin le 19/11).
 
+# Théorie du récit
+Quand Justin parle de théorie (structure, scène, personnage, dialogue, continuité) : la référence est `REFERENCE-THEORIE-RECIT.md` (son document, gardé tel quel, donné le 25/11). S'en servir pour répondre et pour construire ; dire quand on s'en écarte et pourquoi.
+
 # Écriture
 Jamais beaucoup de mots d'un coup : une réplique ou une narration longue se coupe en 2-3 bulles (« Okay. » / « I come out. » / « But the gun stays in my holster. ») (demandé par Justin le 09/11).
 

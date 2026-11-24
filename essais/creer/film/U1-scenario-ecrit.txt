@@ -1,0 +1,325 @@
+LE SECRET DE JUSTIN — le scénario écrit depuis les fiches de scène (25/11)
+Histoire : essais/creer/histoires.js › U1_test_justin (refaite depuis le test de Justin du 24/11).
+Écrit par Claude en suivant UNIQUEMENT le prompt ORCH.screenplayPrompt() (le même que reçoit « ✍️ Claude l'écrit pour de vrai »),
+comme le test filmé de l'épisode 1 : ce n'est pas une sortie de Haiku.
+
+
+ÉPISODE 1
+
+INT. TAVERNE — LE SOIR
+
+Le feu. Devant, une seule place libre, la meilleure. Justin y pose son foulard quand un client s'en approche. Le client
+s'éloigne.
+
+            RUBY
+      Elle est à qui, cette place ?
+
+            JUSTIN
+      À Melissa.
+
+            RUBY
+      Et toi, t'as quoi, à part une chaise ?
+
+            JUSTIN
+      J'ai Melissa.
+      C'est tout ce qui me reste.
+
+La porte s'ouvre sur la neige. Melissa entre, voit la place, sourit. Elle s'assoit sans un mot. Justin reprend son foulard,
+le noue à son cou.
+
+Plus tard. Melissa va payer au comptoir. Amare lui attrape le poignet, la pousse contre le mur, près de l'escalier.
+
+            AMARE (tout bas)
+      La prochaine fois, je ne serai pas aussi gentil.
+
+Il la lâche. Sourit à Ruby comme si de rien n'était. Sort par la porte de la cour.
+
+Justin a tout vu. Il pose sa chope.
+
+            MELISSA
+      Laisse.
+
+            JUSTIN
+      Il t'a fait mal ?
+
+            MELISSA
+      Laisse, Justin.
+
+Justin se lève. Il sort par la porte de la cour.
+
+
+EXT. TAVERNE, LA COUR — LE SOIR
+
+La neige. Le puits. Amare fume, dos tourné.
+
+            JUSTIN
+      Tu ne la touches plus.
+
+            AMARE
+      Retourne à ton comptoir.
+
+            JUSTIN
+      Tu ne la touches plus.
+
+            AMARE (il rit)
+      Sinon quoi ?
+      Tu vas me tuer ?
+
+Justin le pousse. Amare glisse, sa tête heurte la margelle. Il ne se relève pas.
+
+Justin s'agenouille. Du sang sur son foulard. Il l'arrache de son cou, le fourre sous son manteau.
+
+Ses mains tremblent encore.
+
+
+EXT. TAVERNE, LA COUR — LA NUIT
+
+Une lanterne. Ruby, dans la neige, à genoux près du puits.
+
+            RUBY
+      Amare ?
+
+Justin, dans l'encadrement de la porte. Il ne bouge pas.
+
+            RUBY
+      De la lumière. Justin !
+
+Il rentre. Ruby reste seule avec le corps. Elle lui ferme les yeux.
+
+            RUBY (les yeux rouges)
+      Je trouverai qui a fait ça.
+
+
+INT. TAVERNE — LA NUIT
+
+Tout le monde debout. Ruby, au milieu. Justin, derrière le comptoir, la main sur son manteau.
+
+            RUBY
+      Où étais-tu ?
+
+            JUSTIN
+      Au comptoir. Toute la soirée.
+      Douze chopes. Trois soupes. Le vin du marchand, deux fois.
+
+            RUBY
+      Je sais. Je t'ai vu.
+
+Elle se détourne. Regarde la salle, chaque visage.
+
+            RUBY
+      Personne n'est entré. Personne n'est sorti cette nuit.
+      C'est l'un de nous.
+
+
+ÉPISODE 2
+
+INT. TAVERNE, L'ESCALIER — LA NUIT
+
+Sous l'escalier, un sac. Fermé, prêt. Celui de Melissa. Justin le regarde.
+
+Il jette un œil à la porte de la cour. Pousse la poignée : elle s'ouvre. Au cas où.
+
+Melissa descend, reprend le sac.
+
+            JUSTIN
+      Tu pars ?
+
+            MELISSA
+      Tu étais où, tout à l'heure ?
+
+            JUSTIN
+      Au comptoir.
+
+            MELISSA
+      Je t'ai cherché.
+      Tu n'étais pas au comptoir.
+
+Silence. Dans la salle, la voix de Ruby.
+
+            RUBY (hors champ)
+      Tout le monde ici. Où était chacun, cette nuit ?
+
+Ruby passe la tête. Voit Melissa. Voit le sac.
+
+
+EXT. TAVERNE, LA COUR — LA NUIT
+
+Le puits. Justin sort le foulard de son manteau. Le laisse tomber dedans. On ne l'entend même pas toucher l'eau.
+
+Une minute plus tard : la lanterne de Ruby dans l'escalier de la cour.
+
+            RUBY
+      Qu'est-ce que tu fais dehors ?
+
+            JUSTIN
+      La porte battait.
+
+Ruby lève sa lanterne vers le puits. Longtemps. Puis rentre.
+
+
+ÉPISODE 3
+
+INT. TAVERNE — LA NUIT
+
+Melissa, au bout du comptoir, tourne un billet entre ses doigts.
+
+            MELISSA
+      Tu as déjà vu la mer, toi ?
+
+            JUSTIN
+      Une fois.
+
+            MELISSA
+      Moi jamais.
+      Loin d'ici, ça doit sentir autre chose que la bière.
+
+L'horloge. Plus que quelques heures avant le bateau de l'aube.
+
+            JUSTIN
+      Reste.
+      Demain, j'arrange tout. Je te le promets.
+
+Elle pose le billet entre eux, sur le comptoir. Le bateau de l'aube.
+
+            MELISSA
+      Le bateau de l'aube.
+      Avec ou sans toi.
+
+
+ÉPISODE 4
+
+INT. TAVERNE, LA SALLE — LA NUIT
+
+Ruby renverse la bourse d'Amare sur le comptoir. Les pièces roulent jusqu'à Justin.
+
+            RUBY
+      Pleine.
+      On ne l'a pas tué pour ça.
+
+Justin rattrape une pièce. La pose. Essuie un verre déjà sec.
+
+            RUBY
+      Amare menaçait Melissa.
+      Qui d'autre avait une raison ?
+
+Personne ne répond. Les regards glissent, un par un, vers Melissa.
+
+            RUBY
+      Et elle part à l'aube. Son sac est sous l'escalier.
+
+            RUBY (à Justin)
+      Toi, tu étais au comptoir.
+      Elle était où ?
+
+Un temps. Justin regarde Melissa. Melissa attend.
+
+            JUSTIN
+      Je ne sais pas.
+      Il y avait du monde.
+
+Melissa baisse les yeux.
+
+Plus tard, dans l'escalier. Melissa le retient par la manche. Une tache brune, sèche.
+
+            MELISSA
+      C'est quoi, ça ?
+
+            JUSTIN
+      Le vin du marchand.
+
+Elle lâche la manche. Elle ne le croit pas, et il le sait.
+
+
+ÉPISODE 5
+
+INT. TAVERNE — TARD DANS LA NUIT
+
+Justin aligne les chopes sur le comptoir. Ruby, en face, sur un tabouret.
+
+            RUBY
+      Le juge arrive à midi.
+      Pour celui qui a fait ça, ce sera la corde.
+
+            JUSTIN
+      Il faisait si froid dehors, vers onze heures.
+      Il n'a pas dû souffrir.
+
+Personne n'avait dit onze heures.
+
+Ruby ne répond pas. Elle le regarde. Longtemps.
+
+Justin baisse les yeux le premier.
+
+
+INT. TAVERNE, À L'ÉCART — TARD DANS LA NUIT
+
+Une bougie qui baisse. Melissa et Justin, contre le mur du fond.
+
+            MELISSA (tout bas)
+      Dis-leur que j'étais avec toi.
+
+            JUSTIN
+      Melissa…
+
+            MELISSA
+      Juste ça. Une phrase.
+
+Il recule vers la porte de la cour. La main sur la poignée.
+
+            MELISSA
+      Justin.
+
+Il reste.
+
+
+ÉPISODE 6
+
+INT. TAVERNE — AVANT L'AUBE
+
+Toute la salle. Le ciel pâlit derrière les vitres.
+
+            RUBY (devant tous)
+      À l'aube, on emmène Melissa.
+      Sauf si quelqu'un a quelque chose à dire.
+
+Ruby regarde Justin.
+
+La porte de la cour, entrouverte. Le froid entre. Il pourrait partir maintenant, et ne jamais revenir.
+
+            MELISSA
+      Tu sais que ce n'est pas moi.
+      Tu le sais.
+
+Justin regarde la porte. Puis Melissa.
+
+Il traverse la salle, et ferme la porte de la cour.
+
+
+ÉPISODE 7
+
+INT. TAVERNE — À L'AUBE
+
+            JUSTIN (devant tous)
+      C'est moi.
+      J'ai tué Amare.
+
+Il regarde Melissa. Il ne mentira plus.
+
+            RUBY (à Melissa)
+      Pardon.
+
+            MELISSA (à Justin)
+      Tu m'as menti.
+
+Puis elle prend sa main.
+
+Dehors, la cloche du port. Melissa ramasse son sac. Elle est libre. Elle prend le bateau de l'aube. Sans Justin.
+
+
+INT. TAVERNE — À L'AUBE (PLUS TARD)
+
+On emmène Justin.
+
+Au comptoir, sa place reste vide. Par la vitre, le bateau de l'aube est déjà loin.
+
+FIN

@@ -259,3 +259,43 @@ fuite devient une preuve) → « Elle était où ? » (le dilemme, en public) �
 5. Ce que ça coûte : le regroupement et les fiches, moyen (le lieu, le temps et le choix à ajouter aux moments) ; le prompt de
    l'auteur par fiche, petit ; le lecteur à froid, petit à moyen. L'ordre conseillé : le lecteur à froid d'abord (pour mesurer
    avant / après), puis les fiches, puis l'auteur.
+
+## 7. Construit (25/11, Justin : « sur papier c'est excellent ; concrètement, construis-le et voyons les problèmes »)
+
+**Ce qui tourne** (`orch.js` › `scenesOf`, `cards`, `sceneStats` ; la théorie : `REFERENCE-THEORIE-RECIT.md` § 4) :
+- les moments sont regroupés en **scènes** (le lieu, le moment de la nuit, les gens, le fil) ; les **épisodes sont coupés sur le
+  tournant d'une scène**, jamais au milieu ;
+- chaque scène a sa **fiche** : qui la porte et ce qu'il veut, qui est contre, **l'objet** (un de l'histoire, sinon un objet du
+  décor marqué « neutre » pour ne pas planter un fusil qui ne tire jamais), **le choix** (qui le tient, A ou B, ce qui est
+  choisi), ce qui change, ce que le public sait de plus, **la question de la scène** (son choix) et celle **en sortant** (le choix
+  de la scène suivante : Swain, la décision donne le but suivant) ;
+- 🧭 montre les fiches (« H · LES SCÈNES ») ; 📜 le scénario a les en-têtes de scène (INT. TAVERNE, LA COUR — LA NUIT) ; ✍️ Claude
+  écrit **depuis les fiches** (le dialogue = le débat sur le choix, l'objet comme ancre, 2 + 2, pas de question-tremplin) ;
+  l'épisode 1 reçoit l'en-tête et le choix de chaque scène.
+
+**Mesuré** (70 histoires : toutes celles de test + 40 tirages) : 13 scènes par histoire, 2,9 moments par scène, 9 épisodes ;
+un choix dans **87 %** des scènes (+ les épilogues), tenu par Justin dans 51 % ; quelqu'un contre : **97 %** ; un objet : 100 %,
+dont **44 %** de l'histoire elle-même ; une question en sortant : **86 %** ; une seule action : 11 %. Tests : tout passe.
+
+**L'essai d'écriture** : l'histoire de Justin (U1) écrite depuis les fiches, en suivant seulement le prompt de ✍️ :
+`essais/creer/film/U1-scenario-ecrit.txt` (13 scènes, 7 épisodes).
+
+**Les problèmes que ça cause** (trouvés en construisant, en mesurant et en écrivant ; du plus grave au moins grave) :
+
+| Problème | Exemple | La cause exacte | Ce qu'il faudrait | Taille |
+|---|---|---|---|---|
+| **Des scènes fourre-tout** | U1 scène 5 : le sac, la porte de la cour, le mensonge à Melissa, Ruby qui interroge : 4 fils ; la fiche dit que Ruby tient le choix, la scène parle de Justin et Melissa | le regroupement suit les gens (quelqu'un en commun = même scène), pas **la question** | regrouper d'abord par fil (le fait, le désir, la force), puis par lieu | moyen |
+| **Des temps-étiquettes au lieu d'actions** | « Justin choisit Melissa, au risque de sa vie » (fin de l'ép. 6), puis l'aveu à l'ép. 7 ; en écrivant, j'ai dû inventer l'action (il ferme la porte de la cour) | `decide` est une étiquette du moteur ; l'action réelle (avouer / se taire) vient après, dans une autre scène | le choix du climax porte son action, dans la même scène que l'acte | petit |
+| **Des temps intérieurs sans corps** | « Pour celui qui a fait ça, ce sera la corde. Justin le sait. » ; « Melissa compte plus (2/3) » | les « pèse plus » sont des états d'esprit ; personne ne les dit ni ne les montre | chaque temps intérieur a quelqu'un qui le dit ou un objet qui le montre | moyen |
+| **L'auteur est poussé à inventer** | pour que la corde existe, j'ai écrit « Le juge arrive à midi » : un fait nouveau, contre la règle | conséquence des deux problèmes d'avant | idem : le moteur donne le corps du temps | — |
+| **Des scènes à une personne** | Ruby seule avec le corps : pas de débat possible ; j'ai mis Justin, muet, à la porte | la découverte et le serment sont des réactions (la « suite » de Swain), pas des scènes | une scène de réaction a un témoin (la règle : quelqu'un dans la pièce) | petit |
+| **Des raisons qui manquent** | pourquoi Amare menace Melissa ? Le moteur ne le sait pas : la confrontation reste mince (« Retourne à ton comptoir ») | le mobile est une étiquette (« Amare menaçait Melissa ») sans son pourquoi à lui | les détails vécus (§ 3.4) : une dette, une histoire, un objet | moyen |
+| **Ce que les persos savent, hors crime** | Ruby dit « elle part à l'aube » : comment le sait-elle ? J'ai dû le planter (Ruby voit le sac à l'ép. 2) | `W.knows` ne suit que les crimes, pas les autres secrets | étendre qui-sait-quoi à tous les faits | moyen |
+| **Le comment du crime** | « Justin tue Amare » : prémédité ou une poussée de colère ? J'ai choisi la poussée : ça change le poids moral | le moteur ne choisit pas la façon | la tirer des traits (colère/violence → dans la colère ; ruse → prévu) | petit |
+| **Des choix-épouvantails** | « Ruby : jurer de trouver, ou laisser faire ? », « mentir, ou dire la vérité ? » à chaque couverture | l'option B est générique ; le guide demande des choix vrais (« 50/50 ») | B = la vraie tentation de la scène (pour la couverture : faire accuser quelqu'un / fuir) | moyen |
+| **Le bruit dans la bible** | « Ruby veut rester en vie / protéger Amare » après la mort d'Amare | les désirs ne sont pas filtrés par le moment | ne donner que les désirs vivants à ce moment | petit |
+| **La longueur des épisodes** | 7 épisodes d'une minute ; le guide (mobile) dit ~5 min, l'acte 1 entier dans l'épisode 1 | on coupe à 1-2 scènes par épisode (≤ 5 diapos) | décider avec Justin : garder 2 min + écrans noirs, ou 3-4 scènes par épisode | décision |
+
+**Ce que je conseille ensuite** : les trois petits (le choix porte son action ; un témoin dans les scènes de réaction ; le comment
+du crime), puis le regroupement par fil (le plus grave), puis qui-sait-quoi pour tous les faits. Et le lecteur à froid pour
+mesurer avant / après, au lieu de lire moi-même.
