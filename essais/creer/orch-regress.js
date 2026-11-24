@@ -10,6 +10,7 @@ const { chromium } = require('playwright'); const T = require('./histoires.js');
 const check = () => { const out = [], v = ORCH.movie(), M = v.W.M, dead = new Set();
   const txt = ORCH.text(); if (/undefined|NaN|\[object/.test(txt)) out.push('text has undefined: ' + (txt.match(/.{40}(undefined|NaN|\[object).{20}/) || [''])[0]);
   for (const m of M) { if (!m.fr || /undefined|NaN|\$\{/.test(m.fr + m.slide)) out.push(`#${m.id} bad text ${m.fr}`);
+    { const nm2 = FORGE.core().people().map(FORGE.core().nm).find((n) => [m.fr, ...(m.also || []).map((x) => x.fr)].join(' ').includes(`${n} et ${n}`)); if (nm2) out.push(`#${m.id} « ${nm2} et ${nm2} »: ${m.fr}`); }
     if (!m.actor && !['move', 'force', 'turn'].includes(m.kind)) out.push(`#${m.id} [${m.kind}] no actor`);
     if (m.id > 1 && m.cause == null && !(m.kind === 'want' && m.id === M.find((x) => x.act === m.act).id)) out.push(`#${m.id} [${m.kind}] no cause`);
     if (!m.world.length && !m.aud.length) out.push(`#${m.id} [${m.kind}] changes nothing`);

@@ -1,6 +1,7 @@
 // Tester une histoire (24/11, demandé par Justin : « un endroit super simple : j'ouvre, je choisis clé API ou copier le prompt,
 // ça m'envoie au bon endroit, le moins de junk possible »). Une idée → l'histoire (FORGE + ORCH) → l'épisode 1 écrit (passif)
-// → ▶ Regarder (épisode 1 joué dans le vrai lecteur, puis les écrans noirs jusqu'à la fin) ou 📖 Lire.
+// → ▶ Regarder (épisode 1 joué dans le vrai lecteur, puis les écrans noirs jusqu'à la fin) ou 📖 Lire ; 📜 Scénario (le texte, sans
+// image ; ✍️ Claude l'écrit pour de vrai) ; 📋 Tout copier (l'idée → la base → l'histoire → l'épisode 1 → le scénario) (25/11).
 //   🔑 avec la clé Claude : tout se fait seul (la base, l'épisode 1, la mise en scène).
 //   📋 en copiant : deux allers-retours avec Claude (la base, l'épisode 1) ; la mise en scène se fait sans IA (tout le monde à
 //      table, les visages tirés des poses) pour ne pas en demander un troisième.
@@ -41,11 +42,11 @@ window.HISTOIRE = (() => {
     } catch (err) { msg = `Ça n’a pas marché : ${err.message || err}. Réessaie, ou passe par 📋.`; } finally { busy = false; render(); } }
   // ▶ Regarder: episode 1 played (staged by the AI with a key, else without AI), then the black screens to the end
   async function watch() {
-    if (!H.story) return ORCH.read({ onClose: render });
+    if (!H.story) return ORCH.read({ onClose: render, idea: H.idea });
     const script = CREER2.scriptOf(H.story); MISE.auto.setScript(script); let staged = false; const k = ls('smt-key');
     if (H.path === 'cle' && k) { busy = true; say('🎬 Claude met en scène…'); try { staged = await MISE.auto.stage(k); } catch { staged = false; } busy = false; msg = ''; }
     if (!staged) MISE.auto.setPlay(quickPlay(H.story));
-    render(); await MISE.auto.play({ onClose: () => render(), next: () => ORCH.slides(2, { onClose: render }) }); }
+    render(); await MISE.auto.play({ onClose: () => render(), next: () => ORCH.slides(2, { onClose: render, idea: H.idea }) }); }
   const copy = (t) => (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => say('✓ Copié. Colle-le dans Claude.'), () => say('Copie impossible ici : sélectionne le texte à la main.'));
 
   // ---- the screen ----
@@ -64,7 +65,7 @@ window.HISTOIRE = (() => {
           + (n === 2 ? `<div class="hRow">${big('read', '📖 Lire sans l’épisode 1', 'sm')}${big('back', '↩ Recommencer', 'sm')}</div>` : `<div class="hRow">${big('back', '‹ Retour', 'sm')}</div>`); }
       case 'ecrit': return `<h2>L’épisode 1</h2>${sm ? `<p class="hS">✓ ${esc(sm.recipe)} · ${esc(sm.q)}</p>` : ''}` + big('cle', '🔑 Avec ma clé Claude', 'go') + big('copie', '📋 En copiant dans Claude') + `<div class="hRow">${big('read', '📖 Lire sans l’épisode 1', 'sm')}${big('back', '↩ Recommencer', 'sm')}</div>`;
       case 'pret': return `<h2>Prête.</h2>${sm ? `<p class="hS">${esc(sm.recipe)} · ${esc(sm.q)} · ${sm.eps} épisodes</p>` : ''}` + big('watch', '▶ Regarder', 'go huge')
-        + `<div class="hRow">${big('read', '📖 Lire', 'sm')}${big('back', '↩ Une autre', 'sm')}</div>`;
+        + `<div class="hRow">${big('read', '📖 Lire', 'sm')}${big('sp', '📜 Scénario', 'sm')}${big('all', '📋 Tout copier', 'sm')}${big('back', '↩ Une autre', 'sm')}</div>`;
       default: H.step = 'idee'; return view(); }
   }
   function render() { if (!el) return; style(); el.innerHTML = view() + `<p class="hM">${esc(msg)}</p>`; }
@@ -78,7 +79,9 @@ window.HISTOIRE = (() => {
       case 'key': { const v = (el.querySelector('[data-f="key"]') || {}).value || ''; if (!/^sk-ant-/.test(v.trim())) return say('Une clé Claude commence par sk-ant-.'); ls('smt-key', v.trim()); H.step = 'idee'; save(); return viaKey(); }
       case 'cp': return copy(H.step === 'copie1' ? prompt1() : prompt2());
       case 'use': return H.step === 'copie1' ? baseIn(parse(paste)) : epIn(parse(paste));
-      case 'read': return ORCH.read({ onClose: render });
+      case 'read': return ORCH.read({ onClose: render, idea: H.idea });
+      case 'sp': return ORCH.showScreenplay({ key: H.path === 'cle' ? ls('smt-key') : '' });
+      case 'all': return (navigator.clipboard ? navigator.clipboard.writeText(ORCH.allText({ idea: H.idea })) : Promise.reject()).then(() => say('✓ Tout est copié : l’idée, la base, l’histoire, l’épisode 1, le scénario.'), () => { ORCH.showText('Tout', ORCH.allText({ idea: H.idea })); });
       case 'watch': return watch();
       case 'back': H.step = 'idee'; H.story = null; paste = ''; save(); return render();
     }
@@ -98,5 +101,5 @@ window.HISTOIRE = (() => {
 #histoire .hB.sm { font-size: 1.8em; font-weight: 600; padding: .6em .9em; } #histoire .hB:disabled { opacity: .4; }
 #histoire .hRow { display: flex; flex-wrap: wrap; gap: .8em; }`;
     document.head.appendChild(st); }
-  return { mount, quickPlay };
+  return { mount, quickPlay, idea: () => H.idea };
 })();

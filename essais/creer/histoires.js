@@ -63,5 +63,9 @@ T.I2_justin_vole = { ...base, seed: 8, cast: ['amare', 'isa', 'melissa'], pil: {
 T.I3_justin_tue_2actes = { ...T.I1_justin_tue, acts: 2, ev: [...T.I1_justin_tue.ev, { k: 'revenge', x: 'amare', v: 'justin', a: 2 }] };
 // the antihero (Joker, Walter White, Match Point): the same night, a cold Justin (cunning and violent more than loyal) keeps his secret
 T.I4_justin_sen_tire = { ...T.I1_justin_tue, pil: { ...T.I1_justin_tue.pil, justin: ['dangereux', 'mysterieux'] }, flaw: { justin: 'menteur' } };
+// 25/11: close to Justin's own test of 24/11 (rebuilt from his episode 1: he killed Amare, the body in the stable; he protects
+// Melissa, who wants to leave before dawn; her brother is in the captain's cell). His read: « I didn't understand »
+T.U1_test_justin = { ...base, seed: 11, cast: ['ruby', 'amare', 'melissa'], pil: { justin: ['protecteur', 'mysterieux'], ruby: ['charmeur'], amare: ['chef', 'dangereux'], melissa: ['outsider'] }, flaw: { justin: 'menteur' },
+  want: { justin: { v: 'protect', t: 'melissa' }, melissa: { v: 'free' } }, rel: { 'amare|ruby': 'couple', 'justin|melissa': 'friend' }, infos: [{ id: 'leaving', x: 'melissa' }], ev: [{ k: 'murder', x: 'justin', v: 'amare', s: 'ruby', h: 1 }], hard: { clock: 1 }, tq: { fig: 2 } };
 T.EX = 'EX';
 module.exports = T;

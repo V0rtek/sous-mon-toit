@@ -8,6 +8,13 @@ réponses qui montent, l'antihéros qui garde son secret, les canaux d'info comm
 lecture, le signe, le tiers qui a son agenda, le public d'abord), le coupable qui sent que l'autre sait, ce qu'il aime qui le
 retient « parfois ».
 
+## Vers une vraie série (25/11, le plan de `FORGE-ECRAN.md` § 4, dans cet ordre)
+- **Le lecteur à froid** : Claude, sans la bible, lit une histoire et répond à 6 questions (qui veut quoi, que s'est-il passé, qui sait quoi, l'enjeu, pourquoi le choix, ce que ça coûte) ; comparé à la vérité du moteur, sur toutes les histoires de test.
+- **Un seul auteur** : le scénario écrit par Claude pour toute la série (premier jet : ✍️ dans 📜), relu par le lecteur à froid, puis joué (chaque scène → `mise.js`).
+- **Les détails vécus** : 2-3 détails concrets par perso (un métier, un objet, quelqu'un hors champ, une habitude) + les détails libres de l'idée, portés par le moteur et utilisés par les temps forts.
+- **Les scènes comme données** : regrouper les moments en scènes (lieu, qui est là, ce que chacun veut et cache dans cette scène, le tournant).
+- **Les buts concrets** : chaque désir a un objet, un lieu, une heure ; le climax est une action (fait pour le détective inversé).
+
 ## Le choix et la fin
 - **Les deux côtés du choix coûtent** (Justin, 24/11). Aujourd'hui seul le côté lâché a un prix ; le côté gagné devrait aussi coûter quelque chose (*The Godfather* : Michael gagne la famille, perd Kay et lui-même).
 - **La tragédie** : un Justin froid peut maintenant garder son crime (l'antihéros), mais il ne perd jamais *tout* (*Macbeth*, *Breaking Bad* fin) : quand, et comment le décider.
@@ -49,5 +56,5 @@ de monde et d'endroits.
 ## Le rendu et la mesure
 - **Les diapos restent les phrases du moteur** (Justin, 24/11) : pas de passe IA.
 - **Une vraie sortie Haiku** du prompt passif de l'épisode 1, puis les feuilles d'expressions générées (aujourd'hui : les poses de base).
-- **Mesurer « compris / engageant »** : demander la question après l'épisode 1, noter le temps de chaque tap dans les diapos.
+- **Mesurer « engageant »** (« compris » : le lecteur à froid, plus haut) : demander la question après l'épisode 1, noter le temps de chaque tap dans les diapos.
 - **Le genre des persos** : on ne le connaît pas (« seul·e », comme forge.js) ; une donnée par perso réglerait l'accord.
