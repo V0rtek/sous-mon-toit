@@ -126,3 +126,136 @@ Pour écrire une bonne scène, un auteur (humain ou Claude) a besoin de recevoir
   moteur → l'épisode 1 écrit → le scénario. Envoie-le-moi quand une histoire ne marche pas : je verrai exactement ce que tu as vu.
 - **📜 Le scénario** : la même histoire, sans images, en mise en page de scénariste ; **✍️ Claude l'écrit pour de vrai** (avec la
   clé : tout seul ; sans : le prompt est copié).
+
+## 6. Les scènes (25/11, Justin : « Chaque moment devient une scène ? Comment on s'assure qu'elles engagent ? Tyler Mowery : une scène, c'est des choix et des changements ; elle doit créer un engagement constant »)
+
+**Non : un moment ≠ une scène.** Un moment est la plus petite unité de changement (« Justin ment à Melissa sur sa soirée »).
+Une **scène** regroupe **2 à 5 moments** autour d'**une seule question**, dans un lieu et un temps continus, et finit sur
+un **tournant**. Un **épisode** = 1 à 3 scènes, et il finit toujours sur le tournant d'une scène.
+
+### Ce qui fait une scène, et ce qui la rend engageante
+Mowery dit : une scène, c'est des choix et des changements. La forme qui le rend concret, c'est celle de Dwight Swain
+(« scene & sequel », reprise par à peu près tous les manuels) :
+- **la scène** : quelqu'un veut quelque chose **maintenant** (le but) → quelque chose ou quelqu'un s'y oppose (le conflit) → ça
+  tourne autrement que prévu (le tournant) ;
+- **la suite** : il encaisse → il n'a que deux mauvaises options (le dilemme) → **il choisit**, et ce choix devient le but de la
+  scène suivante.
+
+C'est ça, l'engagement constant : il y a **toujours une question ouverte** que le public comprend (« sur qui Ruby va-t-elle
+tomber ? »), et elle ne se ferme que pour en ouvrir une plus forte (« va-t-il la laisser payer ? »). Le choix sous pression
+montre qui sont les gens ; le changement est la preuve que la scène a servi.
+
+**La fiche d'une scène** (ce que l'auteur reçoit, au lieu des phrases du moteur) :
+
+| Champ | Exemple : la scène 7 de l'histoire de Justin |
+|---|---|
+| Où, quand, qui est là | la salle, tard dans la nuit ; Ruby, Justin, Melissa, les clients |
+| Qui la porte | Justin |
+| Ce qu'il veut, **ici**, en concret | que Ruby ne regarde pas vers lui |
+| Ce qui s'y oppose | Ruby veut un nom, cette nuit |
+| L'enjeu | s'il est soupçonné : la corde |
+| La question du public | sur qui Ruby va-t-elle tomber ? |
+| Ce que le public sait de plus (ou de moins) | il a vu Justin tuer : chaque phrase de Justin est un mensonge |
+| Les temps (3 à 5 changements) | la bourse est pleine → « Amare a coincé quelqu'un » → les regards vers Melissa → « Elle était où ? » |
+| **Le choix** (deux mauvaises options) | défendre Melissa (et attirer les regards sur lui) ou se taire (et la lâcher) : il se tait |
+| Le tournant (ce qui a changé) | Melissa : tranquille → soupçonnée ; Justin : celui qui la protège → celui qui la lâche |
+| La question de sortie | va-t-il la laisser payer ? |
+
+**Les règles d'engagement** (dans le prompt de l'auteur, avec un exemple plat → ce qui marche ; puis mesurées par le lecteur à
+froid, jamais un validateur qui bloque) :
+1. On comprend ce que quelqu'un veut dans les 3 premières répliques.
+2. Chaque temps change quelque chose (ce qu'on sait, ce qu'on croit, ce qu'on a, avec qui on est) ; un temps qui ne change rien
+   est coupé.
+3. Il y a toujours au moins une question ouverte, et la scène finit sur une question plus forte que celle du début.
+4. Un choix sous pression par scène, entre deux mauvaises options (le héros ou son adversaire : le choix de Ruby d'attendre en
+   est un).
+5. Entrer tard, sortir tôt : pas de « bonsoir », pas d'« après ».
+6. Le public sait plus que quelqu'un dans la scène (ironie) ou moins (mystère), jamais exactement autant.
+
+### L'histoire de Justin (U1) : 34 moments → 12 scènes → 6 épisodes
+
+| Ép. | Scène | Moments | Le but contre l'obstacle | Le choix | Le tournant → la question de sortie |
+|---|---|---|---|---|---|
+| 1 | 1 · La meilleure place | #1-3 | Justin veut garder Melissa près de lui ; Amare la menace | Justin pose sa chope et suit Amare dans la cour | Melissa est menacée → que va faire Justin ? |
+| 1 | 2 · La cour | #4 | Justin veut qu'Amare la laisse tranquille ; Amare rit | Justin frappe | Amare est mort → on va le trouver |
+| 1 | 3 · C'est l'un de nous | #5-8 | Justin veut ne pas être soupçonné ; Ruby veut un nom | Justin ment (au comptoir toute la soirée) | Ruby ferme la salle → va-t-elle trouver ? |
+| 2 | 4 · Le sac sous l'escalier | #9, 11, 14 | Justin veut savoir si Melissa part ; elle veut partir sans rien dire | il lui ment sur sa soirée | elle le prend sur le fait, et elle part → qu'est-ce qu'elle sait ? |
+| 2 | 5 · Une minute | #10, 12, 13 | Justin doit faire disparaître le foulard ; Ruby interroge la salle, puis descend | détruire la preuve plutôt que fuir par la porte qu'il vient de vérifier | la preuve est partie, à une minute près → Ruby a-t-elle vu quelque chose ? |
+| 3 | 6 · Avec ou sans toi | #15-17 | Justin veut qu'elle reste ; le bateau part à l'aube | Melissa pose l'ultimatum | elle partira → va-t-il fuir avec elle ? |
+| 3 | 7 · Qui d'autre avait une raison ? | #18-20 | (la fiche ci-dessus) | il se tait | Melissa soupçonnée, lâchée → va-t-il la laisser payer ? |
+| 4 | 8 · La tache | #21-22 | Melissa veut comprendre ; Justin veut qu'elle ne sache pas | il ment encore | elle a vu → va-t-elle parler ? |
+| 4 | 9 · L'heure exacte | #23-24 | Justin veut paraître normal ; Ruby écoute | Ruby ne dit rien (elle attend) | Ruby a compris → que va-t-elle faire ? |
+| 5 | 10 · La porte de la cour | #25, 26, 28 | Justin veut fuir ; Melissa : « Dis-leur que j'étais avec toi » | il reste | il ne fuira pas → va-t-il parler ? |
+| 5 | 11 · À l'aube | #27, 29-31 | Ruby : « On emmène Melissa, sauf si… » ; Justin veut se sauver ET la sauver | il avoue | Justin est pris, Melissa est libre |
+| 6 | 12 · Le bateau | #32-34 | Melissa veut partir ; Justin est emmené | Melissa prend le bateau | la place vide |
+
+Ce que la table montre : certains moments ne sont pas des scènes mais un temps à l'intérieur d'une scène (une graine, une
+confidence, l'horloge) ; certains choix n'existent pas encore dans le moteur (« il suit Amare dans la cour », « détruire plutôt
+que fuir ») : l'auteur les tire du moment d'après (le **comment**, jamais le **quoi**) ; l'acte de Justin (scène 2) a besoin d'une
+vraie confrontation avant le coup, pas d'une phrase.
+
+### La scène 7, écrite
+
+```
+ÉPISODE 3 · « Qui d'autre avait une raison ? »
+INT. TAVERNE, LA SALLE — TARD DANS LA NUIT
+
+Ruby renverse la bourse d'Amare sur le comptoir. Les pièces roulent jusqu'à Justin.
+
+            RUBY
+      Pleine.
+      On ne l'a pas tué pour ça.
+
+Justin rattrape une pièce. La pose. Essuie un verre déjà sec.
+
+            RUBY
+      Hier soir, Amare a coincé quelqu'un contre le mur.
+      Tout le monde a vu.
+
+Personne ne répond. Les regards glissent, un par un, vers Melissa.
+
+            MELISSA
+      Il coinçait tout le monde.
+
+            RUBY
+      Toi, tu pars à l'aube.
+      Ton sac est sous l'escalier.
+
+Melissa cherche Justin des yeux.
+
+            RUBY (à Justin)
+      T'étais au comptoir toute la soirée.
+      Elle était où ?
+
+Un temps. Justin regarde Melissa. Melissa attend.
+
+            JUSTIN
+      Je sais pas.
+      Il y avait du monde.
+
+Melissa baisse les yeux. Ruby, elle, regarde le verre que Justin essuie depuis tout à l'heure.
+```
+
+Sept changements en une minute : la bourse (ce n'était pas un vol) → la pièce rattrapée (le public voit sa nervosité, Ruby pas
+encore) → « Amare a coincé quelqu'un » (la scène 1 revient, le danger se tourne vers Melissa) → Melissa se défend → le sac (sa
+fuite devient une preuve) → « Elle était où ? » (le dilemme, en public) → « Je sais pas » (le choix) → le verre (Ruby commence
+à regarder du bon côté). Le public sait tout du long ce que personne d'autre ne sait : c'est l'ironie qui tient la scène.
+
+### Comment le moteur le ferait
+1. **Regrouper** (`orch.js`, une fonction `scenes()`) : une nouvelle scène quand le **lieu** change (la cour, l'escalier, la
+   salle), quand le **temps** saute, quand la **question** change, ou quand celui qui porte la scène change. Les graines, les
+   confidences et l'horloge vont **dans** une scène, jamais seules. Les épisodes sont alloués par scènes (un épisode finit sur le
+   tournant d'une scène).
+2. **Remplir la fiche** avec ce qu'on a déjà : qui agit et pourquoi (le moment), la cause, ce que le public sait et se demande
+   (`ledger`), ce que chacun sait (`W.knows`), l'enjeu (la boucle ouverte). **Ce qui manque** dans les données : le **lieu** de
+   chaque moment (aujourd'hui il est seulement dans le texte : « dans la cour »), le **temps** (le début de la nuit, tard, l'aube),
+   et le **choix** comme un champ (qui choisit, entre quoi et quoi). Quand une scène n'a pas de choix, le moteur le tire de son
+   moment-tournant : l'acteur aurait pu faire autrement, on écrit les deux options.
+3. **L'auteur** (Claude) écrit chaque scène **depuis sa fiche**, avec les 6 règles ; le prompt corrige ce qui sort mal (technique +
+   exemple plat → ce qui marche), comme le reste.
+4. **Le lecteur à froid** lit la scène écrite, sans la fiche, et répond : que veut-il ici ? qu'est-ce qui l'en empêche ? qui a
+   choisi quoi ? qu'est-ce qui a changé ? qu'as-tu envie de savoir maintenant ? Ses réponses comparées à la fiche = la mesure de
+   l'engagement, scène par scène.
+5. Ce que ça coûte : le regroupement et les fiches, moyen (le lieu, le temps et le choix à ajouter aux moments) ; le prompt de
+   l'auteur par fiche, petit ; le lecteur à froid, petit à moyen. L'ordre conseillé : le lecteur à froid d'abord (pour mesurer
+   avant / après), puis les fiches, puis l'auteur.

@@ -12,7 +12,7 @@ retient « parfois ».
 - **Le lecteur à froid** : Claude, sans la bible, lit une histoire et répond à 6 questions (qui veut quoi, que s'est-il passé, qui sait quoi, l'enjeu, pourquoi le choix, ce que ça coûte) ; comparé à la vérité du moteur, sur toutes les histoires de test.
 - **Un seul auteur** : le scénario écrit par Claude pour toute la série (premier jet : ✍️ dans 📜), relu par le lecteur à froid, puis joué (chaque scène → `mise.js`).
 - **Les détails vécus** : 2-3 détails concrets par perso (un métier, un objet, quelqu'un hors champ, une habitude) + les détails libres de l'idée, portés par le moteur et utilisés par les temps forts.
-- **Les scènes comme données** : regrouper les moments en scènes (lieu, qui est là, ce que chacun veut et cache dans cette scène, le tournant).
+- **Les scènes comme données** : regrouper les moments en scènes (lieu, qui est là, ce que chacun veut et cache dans cette scène, le choix, le tournant) ; la méthode, la fiche, les 6 règles d'engagement et l'exemple complet (34 moments → 12 scènes) : `FORGE-ECRAN.md` § 6.
 - **Les buts concrets** : chaque désir a un objet, un lieu, une heure ; le climax est une action (fait pour le détective inversé).
 
 ## Le choix et la fin
