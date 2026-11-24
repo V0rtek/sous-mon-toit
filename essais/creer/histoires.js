@@ -54,5 +54,14 @@ T.P1c_amare_lache = { ...PB, pil: { justin: ['chef'], amare: ['clown'], isa: ['g
 T.P2a_james_bluffe_isa_fiere = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['chef'], james: ['charmeur'], melissa: ['clown'] } };
 T.P2c_james_bluffe_isa_loyale = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['protecteur'], james: ['charmeur'], melissa: ['clown'] } };
 T.P2b_james_bluffe_isa_rancune = { ...PB, pil: { justin: ['chef'], amare: ['protecteur'], isa: ['mysterieux'], james: ['charmeur'], melissa: ['clown'] }, flaw: { isa: 'colere' } };
+// 24/11: the inverted detective (Columbo, Breaking Bad, Joker): Justin did it, the audience sees it. I1: he kills James, the
+// man who threatened Ruby; Melissa, his friend, wants the truth (Hank hunting Walt). I2: he steals from Amare to pay a debt
+T.I1_justin_tue = { ...base, seed: 7, cast: ['ruby', 'james', 'melissa', 'amare'], pil: { justin: ['protecteur', 'mysterieux'], ruby: ['charmeur'], james: ['dangereux'], melissa: ['genie'], amare: ['chef'] }, flaw: { justin: 'colere' },
+  want: { justin: { v: 'love', t: 'ruby' } }, rel: { 'justin|melissa': 'friend', 'justin|ruby': 'crush' }, ev: [{ k: 'threat', x: 'james', v: 'ruby' }, { k: 'murder', x: 'justin', v: 'james', s: 'melissa', h: 1 }], hard: { clock: 1 } };
+T.I2_justin_vole = { ...base, seed: 8, cast: ['amare', 'isa', 'melissa'], pil: { justin: ['charmeur', 'mysterieux'], amare: ['chef'], isa: ['protecteur'], melissa: ['clown'] }, flaw: { justin: 'vice' },
+  want: { justin: { v: 'love', t: 'isa' } }, rel: { 'amare|isa': 'family', 'justin|isa': 'couple' }, infos: [], ev: [{ k: 'theft', x: 'justin', v: 'amare', s: 'amare', h: 1 }], hard: {} };
+T.I3_justin_tue_2actes = { ...T.I1_justin_tue, acts: 2, ev: [...T.I1_justin_tue.ev, { k: 'revenge', x: 'amare', v: 'justin', a: 2 }] };
+// the antihero (Joker, Walter White, Match Point): the same night, a cold Justin (cunning and violent more than loyal) keeps his secret
+T.I4_justin_sen_tire = { ...T.I1_justin_tue, pil: { ...T.I1_justin_tue.pil, justin: ['dangereux', 'mysterieux'] }, flaw: { justin: 'menteur' } };
 T.EX = 'EX';
 module.exports = T;

@@ -721,7 +721,8 @@ window.FORGE = (() => {
     for (const k of Object.keys(o)) o[k] = Math.max(0, Math.min(3, Math.round(o[k]))); return o; };
   const traitTxt = (o, min = 2) => Object.entries(o).filter(([, v]) => v >= min).sort((x, y) => y[1] - x[1]).map(([k, v]) => [`${FILS.TRAITS[k][0]} ${FILS.TRAITS[k][1]} (${v})`, `${FILS.TRAITS[k][2]} (${v}/3)`]);
   // the one who forces the choice: who threatens, else who seeks revenge, in this act or before
-  const forcer = (a) => { const e = (S.ev || []).find((x) => ['threat', 'revenge'].includes(x.k) && (x.a || 1) <= a && live(x.x) && x.x !== J); return e ? e.x : null; };
+  const murdered = (p, a) => (S.ev || []).some((m) => m.k === 'murder' && m.v === p && (m.a || 1) <= a);
+  const forcer = (a) => { const e = (S.ev || []).find((x) => ['threat', 'revenge'].includes(x.k) && (x.a || 1) <= a && live(x.x) && x.x !== J && !murdered(x.x, a - 1)); return e ? e.x : null; };
   // the fate of a desire Justin gives up at the climax of act a: { kind, t, fr, en }
   const fateFor = (lost, a) => { const F = window.FILS && FILS.FATE; if (!F || !lost) return null; const t = lost.t, ev2 = (S.ev || []).filter((e) => EK[e.k] && (e.a || 1) > a), later = (p) => ev2.some((e) => [e.x, e.v, e.s].includes(p));
     let kind, x = null;
@@ -729,7 +730,7 @@ window.FORGE = (() => {
       // a death needs someone to give it: the one who forces the choice, else a murderer still free
       const cares = (p) => storyAt(1).D.some((d) => d.who === p && d.t === t && ['love', 'protect'].includes(d.k));   // nobody kills the one they love to force a choice
       const fo = forcer(a), mu = (S.ev || []).find((e) => e.k === 'murder' && (e.a || 1) <= a && live(e.x) && e.x !== t && e.x !== J && !cares(e.x));
-      x = fo && fo !== t && !cares(fo) ? fo : mu ? mu.x : null;
+      x = fo && fo !== t && !cares(fo) && !murdered(fo, a) ? fo : mu && !murdered(mu.x, a) ? mu.x : null;
       if (x && traitsOf(x, a).violence < 2) x = null;   // a threat from someone who does not act on it was a bluff
       // the one let down answers from who they are: fear or pride make them leave, a grudge makes them turn, loyalty makes them stay, hurt
       const tt = traitsOf(t, a);
@@ -1815,12 +1816,14 @@ Keep it natural, like the reference.`;
     const pool = [...POOL()].sort(() => Math.random() - 0.5), cast = pool.slice(0, Math.min(pool.length, 2 + Math.floor(Math.random() * 2)));
     const [T, O, C] = cast, pl = () => { const a = pick(PILLARS).id; if (coin(0.5)) return [a]; let b; do b = pick(PILLARS).id; while (b === a); return [a, b]; };
     const k = pick(['arrive', 'gone', 'murder', 'theft', 'betray']), want = {}, rl = {};
+    // sometimes Justin did it (24/11, the inverted detective: Columbo, Breaking Bad), to his rival in love
+    const mine = ['murder', 'theft', 'betray'].includes(k) && O && coin(0.15);
     if (k === 'gone') { want[J] = { v: 'find', t: T }; if (O) want[O] = coin(0.5) ? { v: 'protect', t: T } : { v: 'oust', t: J }; if (coin(0.5)) want[T] = { v: 'free' }; }
     else { want[J] = { v: 'love', t: T }; if (O) { want[O] = { v: 'love', t: T }; if (coin(0.5)) rl[pk(O, T)] = 'couple'; } }
     if (C) rl[pk(J, C)] = pick(['friend', 'family', 'mentor']);
     S = { decor: pick(DECORS).id, cast, pil: Object.fromEntries([J, ...cast].map((id) => [id, pl()])), flaw: { [J]: coin(0.6) ? pick(FLAWS).id : null }, want, rel: rl,
       infos: (() => { const out = [], two = (k) => { const c = INFOS.filter((i) => i.k === k), i = pick(c), x = pick([J, ...cast]); let y; do y = pick([J, ...cast]); while (y === x && cast.length);
-        out.push({ id: i.id, x, y }); }; if (coin(0.7)) two(pick(['secret', 'mask'])); if (coin(0.5)) two('past'); if (coin(0.3)) two('object'); return out; })(), ev: [{ k, x: k === 'gone' ? T : O || T, v: ['murder', 'theft', 'betray'].includes(k) ? (C || null) : null, s: null, h: 1 }], hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
+        out.push({ id: i.id, x, y }); }; if (coin(0.7)) two(pick(['secret', 'mask'])); if (coin(0.5)) two('past'); if (coin(0.3)) two('object'); return out; })(), ev: [mine ? { k, x: J, v: O, s: null, h: 1 } : { k, x: k === 'gone' ? T : ['murder', 'theft', 'betray'].includes(k) && O && coin(0.35) ? T : O || T, v: ['murder', 'theft', 'betray'].includes(k) ? (C || null) : null, s: null, h: 1 }], hard: { liked: coin(0.5) ? 1 : 0, clock: coin(0.4) ? 1 : 0, danger: 1, gag: 1 },
       seed: 1 + Math.floor(Math.random() * 99999), picked: {}, tq: Object.fromEntries(['hook1', 'hook2', 'want', 'expect', 'tease', 'c0', 'c1', 'past0', 'plant1', 'plant2', 'liked', 'easy', 'rev0', 'twist', 'pick', 'cost'].map((id) => [id, Math.floor(Math.random() * 6)])) };
     bloodFix(S);
     // the graph: two story moves (a secret between people on stage, a witness, a debt and where it was born…)
@@ -2317,7 +2320,7 @@ FLAWS (optional, one per person): ${FLAWS.map((f) => `${f.id} (${f.en})`).join('
 WANTS (what someone wants; "t" = toward whom, only for the ones marked [t]): ${WANTS.map((w) => `${w.id}${w.t ? ' [t]' : ''} (${w.en('X')})`).join(' · ')}
 RELATIONS (between two people; key = their two ids in alphabetical order joined by "|"): ${RELS.filter((r) => r.id).map((r) => `${r.id} (${r.en})`).join(' · ')}
 INFOS (chosen from this list only; "x" and "y" are people, "y" only for the ones marked [x,y]): ${INFOS.map((i) => `${i.id}${i.s > 1 ? ' [x,y]' : ' [x]'} (${i.en('X', 'Y')})`).join(' · ')}
-EVENTS (the first one opens the story; "x" = who does it / who arrives, "v" = the victim, "h": 1 = the culprit stays hidden): ${EVK.map((e) => `${e.id} (${e.d})`).join(' · ')}
+EVENTS (the first one opens the story; "x" = who does it / who arrives, "v" = the victim, "h": 1 = the culprit stays hidden; "x" can be "justin" himself when the IDEA says he did it: then the audience sees him do it and the story asks « will he be caught? »): ${EVK.map((e) => `${e.id} (${e.d})`).join(' · ')}
 HARD (why it is hard, optional): liked (everyone adores the one against justin) · clock (a time limit)`;
   };
   const basePrompt = (premise) => `You are the story editor of an interactive story for a phone game. The player plays JUSTIN. From the IDEA, choose the baseline of the story: the place, who is in it, what each one wants, how they are tied, what is hidden, what happens. Choose ONLY from the lists below (never invent an id). Make the wants collide: two people who want the same person, or one who wants to leave and one who wants to keep them. Reply with ONE JSON object and nothing else.

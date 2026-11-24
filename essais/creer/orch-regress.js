@@ -14,9 +14,16 @@ const check = () => { const out = [], v = ORCH.movie(), M = v.W.M, dead = new Se
     if (m.id > 1 && m.cause == null && !(m.kind === 'want' && m.id === M.find((x) => x.act === m.act).id)) out.push(`#${m.id} [${m.kind}] no cause`);
     if (!m.world.length && !m.aud.length) out.push(`#${m.id} [${m.kind}] changes nothing`);
     if (m.actor && dead.has(m.actor) && !['price', 'gain'].includes(m.kind)) out.push(`#${m.id} dead ${m.actor} acts: ${m.fr}`);
-    if (m.kind === 'event' && m.ev && m.ev.k === 'murder' && m.ev.v) dead.add(m.ev.v); if (m.kind === 'price' && /meurt/.test(m.fr) && m.target) dead.add(m.target); }
+    if (m.kind === 'event' && m.ev && m.ev.k === 'murder' && m.ev.v) dead.add(m.ev.v); if (m.kind === 'deed' && m.target && /tue /.test(m.fr)) dead.add(m.target); if (m.kind === 'price' && /meurt/.test(m.fr) && m.target) dead.add(m.target); }
   for (const A of v.acts) { for (const p of A.dest.pre) if (!p.at) out.push(`acte ${A.a}: prérequis manquant: ${p.fr}`);
-    for (const f of A.facts.filter((x) => x.kind === 'crime' && x.hidden)) { const rv = M.find((m) => ['reveal', 'notice'].includes(m.kind) && m.fact === f.id);   // the audience's answer: in front of all, or with Justin alone if (!rv) { out.push(`acte ${A.a}: ${f.q} never answered`); continue; }
+    // Justin's own crime (the inverted detective, 24/11): the audience sees it before it is found, the hunter acts, he covers
+    // at least twice, and « will he be caught? » gets its answer
+    for (const f of A.facts.filter((x) => x.kind === 'crime' && x.hidden && x.by === 'justin')) { const dd = M.find((m) => m.kind === 'deed' && m.fact === f.id), ev = M.find((m) => m.kind === 'event' && m.fact === f.id);
+      if (!dd || !ev || dd.id > ev.id) out.push(`acte ${A.a}: Justin's crime not seen before it is found`);
+      if (M.filter((m) => m.kind === 'coverJ' && m.fact === f.id).length < 2) out.push(`acte ${A.a}: Justin covers less than twice`);
+      if (!M.some((m) => m.force === 'hunter' && m.fact === f.id)) out.push(`acte ${A.a}: nobody hunts Justin`);
+      if (!M.some((m) => m.kind === 'answerJ' && m.fact === f.id)) out.push(`acte ${A.a}: « will he be caught? » never answered`); }
+    for (const f of A.facts.filter((x) => x.kind === 'crime' && x.hidden && x.by !== 'justin')) { const rv = M.find((m) => ['reveal', 'notice'].includes(m.kind) && m.fact === f.id);   // the audience's answer: in front of all, or with Justin alone if (!rv) { out.push(`acte ${A.a}: ${f.q} never answered`); continue; }
       // the fair-play pointers: a clue found, the proof that vanished, the alibi that will collapse, the culprit's « arrête de chercher », a seed of the motive
       const cl = M.filter((m) => m.id < rv.id && ((m.fact === f.id && ['clue', 'clue2', 'cover', 'lie'].includes(m.kind)) || (m.actor === f.by && /Arrête de chercher|a peur de quelque chose/.test(m.fr)) || (m.also || []).some((x) => /^semé/.test(x.why || '')))).length; if (cl < 2) out.push(`${f.q}: ${cl} clue(s) before the answer`);
       const bad = M.find((m) => m.id < rv.id && m.fact !== f.id && new RegExp(`C’était ${FORGE.core().nm(f.by)}`).test(m.fr)); if (bad) out.push(`culprit named early #${bad.id}`); } }

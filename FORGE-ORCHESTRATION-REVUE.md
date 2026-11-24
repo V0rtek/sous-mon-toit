@@ -153,3 +153,42 @@ Suspects'* last minute: the coffee cup, « Kobayashi », everything returns.
 - **Neutral, to watch**: the stories are coherent and specific now, but they read like a precise summary, not like a writer —
   that is the slides' nature (you chose to keep them) and Haiku's job in episode 1. The decision rule (« he overcomes his flaw »)
   makes every Justin a positive arc: variety will need tragedy and both-sides-cost (listed).
+
+## 7. Second pass (24/11, later): what was listed is now built
+
+You asked: « you didn't fix what I addressed, you only noted it in FORGE-LONG-TERME? » For part of it, yes. This pass builds it.
+
+- **The pull is possible, not automatic.** `held()`: loyal or afraid, what he loves holds him (« Ruby l'appelle. Il reste. »);
+  bold or proud, he goes anyway, and the other side pays (a debt the end closes, or his choice at the climax answers).
+- **One « who believes what » system, not niche channels.** Every mind (each character, and the audience) knows things, believes
+  some wrongly, and a belief changes only through a channel we see. The channels are how information travels in life: deduce,
+  the key (*Vertigo*), the body's tell (*Knives Out*: Marta), the misread true trace that someone acts on (*Mystic River*: Jimmy
+  kills Dave), the third party who knows and sells it, the audience first (mystery → suspense), the confession. Chosen from the
+  story (who loves whom, who is afraid, who knows); the author can force one.
+- **The inverted detective, complete** (recipe 🩸 *Le secret de Justin*). Real test, « Justin tue James » (I1), read as a
+  screenwriter:
+  > James threatens Ruby with a knife. · In the storeroom, Justin kills James; his hands still shake. · The body is found. ·
+  > Melissa (his friend): « I'll find who did this. » · Justin swears he served at the bar all evening; Melissa believes him. ·
+  > « Nobody came in, nobody left. It's one of us. » · … Justin slips the bloody scarf into Amare's things; everyone turns to
+  > Amare. · Ruby sees a stain on his sleeve; he lies to her too. · Justin mentions the exact hour of the crime; nobody had said
+  > it. · Melissa looks at him a long time; he looks down first. · « Tell me I'm wrong. » · He chooses Ruby over his own safety:
+  > « It was me. » · Amare gets an apology; Ruby: « You lied to me. » then takes his hand: « I'll wait for you. »
+
+  The same night with a cold Justin (I4): he keeps the secret; Melissa says it in front of everyone and nobody believes her (the
+  proof accuses Amare); Amare stays accused; Ruby never knows; Ruby leaves. That is *Match Point*. Which ending comes is decided
+  by who he is, not by a coin.
+- **Why it is built this way** (*Columbo*: we see the murder in the first minutes, the pleasure is the closing net and the
+  killer's slip; *Breaking Bad*: Hank closing in, Walt's covers growing worse, each one costing someone — Skyler, Jesse; *Joker*:
+  each blow answered harder). So: the deed shown first, a hunter who climbs (questions → a detail → the slip), covers that
+  escalate by traits, a cost per cover, and the answer to « will he be caught? » from his choice.
+- **Found while reading random draws, fixed at the source**: Justin swearing to find his own victim's killer (the oath is the
+  hunter's); the woman he loves as the witness he threatens (if she saw, she keeps quiet for him: complicity); every Justin
+  confessing (the decision rule had no antihero); a man killed in act 1 still « forcing » act 2 in forge.js (`murdered()`); a
+  person cleared by an alibi accused again when the proof burned (the narrowing skips the cleared one, and falls on Justin
+  himself when nobody is left); « Isa ouvre enfin la clé » (each object has its verb).
+- **Other intrigue types**: a map of what each needs (identity, con, heist, conspiracy) in `FORGE-LONG-TERME.md`. Honest size:
+  identity is small (it is the same hunt on a mask); con and heist are medium; conspiracy needs factions and more people.
+- **Measured**: 29 test stories (4 new) + 60 random draws: no invariant broken (`orch-regress.js`, now also: the deed is seen
+  before it is found, ≥ 2 covers, a hunter acts, « will he be caught? » is answered); `regress.js` 30 draws clean; audit over
+  89 stories: hidden hands never shown, accused never cleared, unanswered questions: 0 on the named stories. Still there:
+  an adversary absent for an episode in ~30 % of stories (a rival's plan is shorter than a long act: listed).

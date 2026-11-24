@@ -30,6 +30,7 @@ window.ORCH = (() => {
   const aN = (n) => (/^le /i.test(n) ? 'au ' + n.slice(3) : /^les /i.test(n) ? 'aux ' + n.slice(4) : 'à ' + n);
   const figName = () => { const G = K.graph(); return G.fig ? G.fig.n : 'quelqu’un'; };
   const list = (L) => (L.length < 2 ? L.join('') : `${L.slice(0, -1).join(', ')} et ${L[L.length - 1]}`);
+  const ge = (id) => (id === J ? '' : '·e');   // Justin is « il »; the others' gender is not known (as in forge.js)
   const que = (s) => (/^[aeiouyhéèêà]/i.test(s) ? 'qu’' : 'que ') + s;   // « qu’Amare », « que Ruby »
 
   // ==== THE DATA (premier jet de Claude, à revoir avec Justin) : the concrete things moments are made of ====
@@ -84,6 +85,37 @@ window.ORCH = (() => {
       slip: (c) => `${c.x}, sans y penser : « Pas ce soir. La chapelle, c’est trop loin. » Personne ne lui a parlé de la chapelle.`,
       proof: (c) => `La lettre a brûlé dans l’âtre. Sans elle, c’est la parole de ${c.k} contre celle ${deN(c.x)}.`, item: 'la lettre', echo: 'la chapelle' },
   };
+  // THE INFORMATION SYSTEM (24/11). A fact only reaches a mind (a character, or the audience) through an EXPOSURE: a trace
+  // meets someone, in a scene. Why it happens is one of a few CHANNELS, and the belief it makes can be right OR WRONG; the
+  // one who now believes acts from what they want. search · encounter (KEY above) · tell · third party · misread · what the
+  // crime bought (consequence) · the cover that leaves a trace. The audience is a mind too: it can learn before Justin
+  // (mystery becomes suspense). Premier jet, data below.
+  // TELL: who the culprit is shows, when the crime comes up (Knives Out: Marta cannot lie without vomiting)
+  const TELL = [[(t) => t.peur >= 2, (c) => `${c.x} renverse sa chope quand on prononce le nom ${deN(c.v)}.`], [(t) => t.ruse >= 2, (c) => `${c.x} raconte sa soirée une deuxième fois. Avec les mêmes mots, exactement.`],
+    [(t, f) => f === 'colere' || (t.violence >= 2 && t.rancune >= 2), (c) => `${c.x} frappe la table quand on parle ${deN(c.v)}, puis s’excuse trop vite.`], [(t, f) => f === 'vice', (c) => `${c.x} boit plus que d’habitude, et rit trop fort quand on parle ${deN(c.v)}.`],
+    [(t) => t.fierte >= 2, (c) => `${c.x} ne supporte pas qu’on doute de sa parole, et quitte la table.`], [() => true, (c) => `${c.x} évite de regarder la place ${deN(c.v)}.`]];
+  // MISREAD: a true trace, read wrong by a mind in fear or anger, and what it makes them do (Mystic River)
+  const MISREAD = { seen: (c) => `${c.m} a vu les mains abîmées ${deN(c.r)}, cette nuit-là.`, out: (c) => `${c.m} a vu ${c.r} sortir dans la cour, cette nuit-là.`,
+    act: { hit: (c) => `${c.m} se jette sur ${c.r} : « C’est toi ! » Il faut les séparer.`, warn: (c) => `${c.m}, à Justin, tout bas : « C’est ${c.r}. J’en suis sûr. »`, say: (c) => `${c.m} accuse ${c.r}, devant tous.` } };
+  // THIRD PARTY: someone who knows, and uses it for what THEY want (a price for Justin)
+  const THIRD = { love: (c) => `${c.t3} prend Justin à part : « J’ai vu qui. Je te le dis… si tu ne t’approches plus ${deN(c.l)}. »`, oust: (c) => `${c.t3} prend Justin à part : « Je sais qui. Mais c’est toi qui le diras, pas moi. »`,
+    def: (c) => `${c.t3} prend Justin à part : « J’ai vu qui. Ça te coûtera une faveur. N’importe laquelle. »` };
+  // the audience learns before Justin (the mystery becomes suspense: Vertigo's letter): the culprit, alone
+  const GLIMPSE = { murder: (c) => `À l’abri des regards, dans la réserve, ${c.x} brûle une lettre ${deN(c.v)}. Ses mains tremblent.`, theft: (c) => `À l’abri des regards, ${c.x} regarde ${c.thing}. Puis tout disparaît sous le plancher.`,
+    betray: (c) => `À l’abri des regards, dans la cour, ${c.x} compte l’argent de la trahison. Puis regarde vers la salle.` };
+  // THE INVERTED DETECTIVE (24/11: Columbo, Breaking Bad, Joker): Justin did it. The audience sees it; the question is not
+  // « who? » but « will he be caught? ». Whoever wants the truth hunts him; he covers by who he is, and it escalates, and each
+  // cover costs him someone's trust
+  const DEED = { murder: (c) => `Dans ${c.spot}, loin des regards, Justin tue ${c.v}. Ses mains tremblent encore.`, theft: (c) => `Quand la salle se vide, Justin ouvre le coffre et prend ${c.thing || 'la recette'}. Personne ne l’a vu.`,
+    betray: (c) => `Justin glisse un mot à un inconnu : l’heure, et le lieu. On va vendre ${c.v}, et c’est lui.` };
+  const CONFESS = { murder: (c) => `J’ai tué ${c.v}.`, theft: (c) => `C’est moi qui ai pris ${c.thing || 'la recette'}.`, betray: (c) => `C’est moi qui ai vendu ${c.v}.` };
+  // what it costs him with the one he loves: he lies to them too
+  const BLOOD = { murder: (b) => `${b} voit une tache sur la manche de Justin. Justin ment, à ${b} aussi.`, theft: (b) => `${b} demande à Justin d’où vient tout cet argent. Justin ment, à ${b} aussi.`,
+    betray: (b) => `${b} demande à Justin où il était, la veille. Justin ment, à ${b} aussi.` };
+  // the hunter's « it is one of us » and what waits for whoever did it
+  const ONEOF = { murder: 'Personne n’est entré, personne n’est sorti cette nuit. C’est l’un de nous.', theft: 'Seuls ceux de la maison savaient où était la clé. C’est l’un de nous.', betray: 'Seuls ceux de cette salle savaient. C’est l’un de nous.' };
+  const DOOM = { murder: 'la corde', theft: 'la prison', betray: 'la corde' };
+  const RAISEJ = [(c) => `Pour celui qui a fait ça, ce sera ${c.doom}. Justin le sait.`, () => 'Justin se lave les mains, encore et encore.', () => 'La porte de la cour est ouverte. Justin pourrait partir, maintenant, et ne jamais revenir.'];
   // the seeds of a secret (2) and its proof, by info: x, y = the people of the info
   const SEED = {
     sibling: [(x, y) => `${x} et ${y} ont le même geste quand ils mentent.`, (x, y) => `${x} connaît le nom de la mère ${deN(y)}.`, (x, y) => `Un médaillon : ${x} et ${y}, enfants, côte à côte.`],
@@ -183,9 +215,10 @@ window.ORCH = (() => {
       if (!K.live(od.who)) continue; const kd = KIND_OF[c.e] || 'rival'; if (kd === 'culprit') continue;   // a hidden culprit is added below; a known one defies (ouster)
       add({ who: od.who, kind: kd, d: od, vs: jd, why: c.fr }); }
     for (const c of C.filter((x) => x.e === '🔍')) { const jd = [c.da, c.db].find((d) => d.who === J), od = jd && (jd === c.da ? c.db : c.da);
-      if (jd && od && K.live(od.who) && !facts.some((f) => f.kind === 'crime' && f.hidden && f.by === od.who)) add({ who: od.who, kind: 'ouster', d: D.find((d) => d.who === od.who && d.k === 'oust' && d.t === J) || { id: `${od.who}:oust:${J}`, who: od.who, k: 'oust', t: J, s: 2 }, vs: jd, why: `${K.nm(od.who)} ne se cache pas` }); }
+      if (jd && od && K.live(od.who) && !facts.some((f) => f.kind === 'crime' && f.hidden && (f.by === od.who || (f.by === J && od.k === 'justice' && od.from === f.ev))) && !(od.k === 'justice' && od.from && od.from.x === J)) add({ who: od.who, kind: 'ouster', d: D.find((d) => d.who === od.who && d.k === 'oust' && d.t === J) || { id: `${od.who}:oust:${J}`, who: od.who, k: 'oust', t: J, s: 2 }, vs: jd, why: `${K.nm(od.who)} ne se cache pas` }); }
     // a protector of someone Justin goes after (🛡️ where Justin is the one he protects from): his opposition too
     for (const f of facts.filter((x) => x.kind === 'crime' && x.hidden && K.live(x.by) && x.by !== J)) { add({ who: f.by, kind: 'culprit', d: D.find((d) => d.who === f.by && d.k === 'hide') || null, vs: D.find((d) => d.who === J && d.k === 'justice') || null, fact: f, why: f.q }); }
+    for (const f of facts.filter((x) => x.kind === 'crime' && x.hidden && x.by === J)) for (const d of D.filter((x) => x.k === 'justice' && x.from === f.ev && x.who !== J && K.live(x.who))) if (!out.some((x) => x.who === d.who && x.kind === 'hunter')) out.push({ at: 0, who: d.who, kind: 'hunter', d, vs: D.find((x) => x.who === J && x.k === 'hide') || null, fact: f, why: `${K.nm(d.who)} cherche qui a fait ça` });
     for (const e of K.evs().filter((x) => x.k === 'threat' && K.actOf(x) === a && x.x !== J && K.live(x.x))) { const o = out.find((x) => x.who === e.x); if (o && o.kind !== 'culprit') { o.kind = 'threat'; o.ev = e; } else if (!o) add({ who: e.x, kind: 'threat', ev: e, d: D.find((d) => d.who === e.x && d.k === 'oust') || null, vs: D.find((d) => d.who === J && d.t === e.v) || D.find((d) => d.who === J && d.k === 'alive') || null, why: `${K.nm(e.x)} menace ${e.v && K.live(e.v) ? K.nm(e.v) : 'quelqu’un'}` }); }
     for (const f of facts.filter((x) => x.kind === 'secret' && K.live(x.by) && x.by !== J && !x.motive)) { const o = out.find((x) => x.who === f.by); if (!o) add({ who: f.by, kind: 'keeper', d: D.find((d) => d.who === f.by && d.k === 'hide') || null, vs: null, fact: f, why: `${K.nm(f.by)} cache quelque chose` }); }
     const G = K.graph(); if (G.fig && G.vil && G.vil.x === J && a === 1) add({ who: 'f:A', kind: 'figure', d: null, vs: D.find((d) => d.who === J && d.k === 'hide') || D.find((d) => d.who === J && d.k === 'alive'), why: `${G.fig.n} cherche Justin` });
@@ -204,6 +237,8 @@ window.ORCH = (() => {
     const blood = (d) => d.k === 'love' && d.t && facts.find((f) => f.kind === 'secret' && f.info && ['sibling', 'parent'].includes(f.info.id) && [f.info.x, f.info.y].includes(d.t) && [f.info.x, f.info.y].includes(J));
     const bA = broke(A) || blood(A), bB = broke(B) || blood(B); if (!!bA !== !!bB) { const won = bA ? B : A, f = bA || bB; return { won, lost: won === A ? B : A, why: `${up(K.infoFr(f.info))} : tout ce que Justin croyait se retourne.`, broke: f.id }; }
     const fl = K.S.flaw[J], easy = (FLAW[fl] || FLAW.none).easy, tr = K.traitsOf(J, a), ez = (d) => easy.includes(d.k) || SELF.includes(d.k);
+    const own = (d) => ['hide', 'alive'].includes(d.k) && d.from && d.from.x === J && K.EK[d.from.k] && K.EK[d.from.k].crime, cold = tr.loyaute < Math.max(tr.ruse, tr.violence);
+    if (!!own(A) !== !!own(B) && cold) { const won = own(A) ? A : B; return { won, lost: won === A ? B : A, why: 'Justin a franchi la ligne. Il ne reviendra pas en arrière.', dark: 1 }; }
     let won;
     if (ez(A) !== ez(B)) won = ez(A) ? B : A;   // he overcomes his flaw: the side it pushed him away from
     else if (['love', 'protect'].includes(A.k) && ['love', 'protect'].includes(B.k) && A.k !== B.k) won = (tr.loyaute >= tr.audace) === (A.k === 'protect') ? A : B;
@@ -224,7 +259,7 @@ window.ORCH = (() => {
   // toward, clues, the answer); twist = the audience does not know there is a question (seeds, then it turns everything);
   // irony = the audience knows, someone on screen does not (we fear the moment they learn). Justin's own secret is irony;
   // a hidden crime, a disappearance, a box nobody opens are mysteries; a motive comes out with its crime; the rest are twists ====
-  const modeOf = (f) => (f.kind === 'crime' ? (f.hidden ? 'mystery' : 'public') : f.kind === 'gone' || f.kind === 'object' ? 'mystery' : f.by === J ? 'irony' : f.motive ? 'motive' : 'twist');
+  const modeOf = (f) => (f.kind === 'crime' ? (f.hidden ? (f.by === J ? 'irony' : 'mystery') : 'public') : f.kind === 'gone' || f.kind === 'object' ? 'mystery' : f.by === J ? 'irony' : f.motive ? 'motive' : 'twist');
 
   // ==== THE OPENING : which recipe the story supports (scored on what it has), its material, its spine ====
   const RECIPES = {
@@ -234,6 +269,8 @@ window.ORCH = (() => {
       spine: ['want', 'care', 'event', 'pressure', 'raiseA', 'raiseB', 'turn'] },
     opportunity: { n: '🚪 Occasion', engage: 'l’espoir et la peur : va-t-il l’avoir', need: 'un objectif désirable, une occasion immédiate, un vrai obstacle',
       spine: ['want', 'chance', 'obstacle', 'attempt', 'fail', 'raise', 'turn'] },
+    secret: { n: '🩸 Le secret de Justin', engage: 'le suspense : sera-t-il pris ?', need: 'Justin a fait quelque chose de grave, le public le voit, quelqu’un cherche',
+      spine: ['want', 'care', 'deed', 'event', 'cover', 'matter', 'turn'] },
   };
   function openingOf(st, facts, forces, dest) {
     const { D, X } = st, mainD = X[0] || D.find((d) => d.who === J && d.s >= 2), first = K.evs().filter((e) => K.EK[e.k] && K.actOf(e) === 1)[0];
@@ -254,9 +291,13 @@ window.ORCH = (() => {
       const ob = forces.filter((f) => ['rival', 'ouster', 'leaver'].includes(f.kind) && f.vs && f.vs.id === jw.id); if (ob.length) plus('opportunity', 1, `un vrai obstacle (${ob.map((f) => K.nm(f.who)).join(', ')})`);
       if (K.S.hard && K.S.hard.liked) plus('opportunity', 1, 'tout le monde adore celui d’en face'); }
     else why.opportunity.push('pas d’objectif à saisir');
-    const order = ['mystery', 'dilemma', 'opportunity'], forced = K.S.open && RECIPES[K.S.open] && sc[K.S.open] > 0 ? K.S.open : null;
-    const r = forced || order.reduce((b, k) => (sc[k] > sc[b] ? k : b), 'mystery');
-    const o = { r, ...RECIPES[r], scores: sc, why, forced: !!forced };
+    const mine0 = facts.find((f) => f.kind === 'crime' && f.hidden && f.by === J); if (mine0) { sc.secret = 6; why.secret = ['+6 Justin a fait quelque chose de grave : on le voit, personne d’autre'];
+      if (myst === mine0) { sc.mystery = 0; why.mystery = ['le public sait qui : ce n’est plus un mystère']; } }
+    const order = ['secret', 'mystery', 'dilemma', 'opportunity'], forced = K.S.open && RECIPES[K.S.open] && sc[K.S.open] > 0 ? K.S.open : null;
+    const r = forced || order.reduce((b, k) => ((sc[k] || 0) > (sc[b] || 0) ? k : b), 'mystery');
+    const o = { r, ...RECIPES[r], scores: sc, why: { secret: [], ...why }, forced: !!forced };
+    if (r === 'secret') { const hu = forces.find((f) => f.kind === 'hunter'); o.fact = mine0; o.q = 'Justin sera-t-il pris ?'; o.hook = DEED[mine0.ev.k](ctxT(mine0));
+      o.personal = hu ? `${K.nm(hu.who)} veut savoir` : 'tout le monde cherche'; o.clue = 'ce que Justin fait pour se couvrir'; o.unknown = 'personne ne sait, sauf Justin… et nous'; }
     if (r === 'mystery' && myst) { o.fact = myst; o.q = myst.q; o.hook = myst.kind === 'crime' ? TRACE[myst.ev.k].open(ctxT(myst)) : `${K.nm(myst.by)} sort « deux minutes » et ne revient pas.`;
       o.personal = myst.vid ? `${myst.v}, qu’on aura vu vivant juste avant` : myst.seek !== J ? `${K.nm(myst.seek)} veut savoir` : 'Justin veut savoir';
       o.clue = myst.kind === 'crime' ? TRACE[myst.ev.k].t1(ctxT(myst)) : 'ses affaires sont encore là'; o.unknown = myst.kind === 'crime' ? `que c’est ${K.nm(myst.by)}${myst.mot ? ', et pourquoi' : ''}` : 'où, et pourquoi'; }
@@ -288,7 +329,7 @@ window.ORCH = (() => {
     for (let a = 1; a <= A; a++) {
       const st = K.storyAt(a), { D, X } = st, T = K.truth(D), EV = K.evs().filter((e) => K.EK[e.k] && K.actOf(e) === a && K.live(e.x));
       if (a === 2) { const AS = K.actState(); for (const t of AS.kill) { W.out.set(t, 'dead'); W.deadAt.set(t, 0); } for (const t of AS.gone) W.out.set(t, 'gone'); }
-      W.lvl = {}; W.exposed = null; W.named = null; W.narrow = null; W.seer = null; W.cleared = null;   // each act climbs from the bottom again
+      W.lvl = {}; W.exposed = null; W.named = null; W.narrow = null; W.seer = null; W.cleared = null; W.hk = 0; W.cj = 0; W.framed = null; W.confessed = 0;   // each act climbs from the bottom again
       const facts = factsOf(a, D, T, EV, G), forces = forcesOf(a, st, facts).filter((f) => f.who === J || f.who === 'clock' || f.who === 'f:A' || live(f.who));
       const foes0 = K.evs().filter((e) => ['threat', 'revenge'].includes(e.k) && K.actOf(e) === a).map((e) => e.x);
       let dec = decide(X[0], X[1], a, factsOf(a, D, T, EV, G).filter((f) => f.kind === 'secret'), foes0); const hand = a === 1 && K.S.picked && K.S.picked.pick != null && !K.S.pickAuto;
@@ -319,6 +360,7 @@ window.ORCH = (() => {
           if (m.fact && L.fact === m.fact && ['reveal', 'notice'].includes(m.kind) && ['q', 'sus2', 'seed', 'obj', 'iro', 'key', 'wit'].includes(L.k)) pay(m, L.id);
           if (m.kind === 'clear' && L.k === 'sus' && L.who === m.actor) pay(m, L.id);
           if (m.kind === 'decide' && ['kept', 'climax'].includes(L.k)) pay(m, L.id);
+          if (m.kind === 'decide' && L.k === 'owe' && L.to === J && won && won.t === L.who) pay(m, L.id);
           if (m.kind === 'price' && L.k === 'thr' && m.actor === L.who) pay(m, L.id);
           if (L.k === 'thr' && m.actor === L.who && ((m.kind === 'event' && m.ev && ['murder', 'revenge', 'threat'].includes(m.ev.k) && m.id !== L.open && m.act > L.act) || (m.kind === 'force' && /pour de bon|s’en prend/.test(m.fr)))) pay(m, L.id); }
         return m; };
@@ -336,8 +378,22 @@ window.ORCH = (() => {
         return cast().find((p) => no(p) && (D2(p, 'protect', J) || D2(J, 'protect', p))) || cast().find((p) => no(p) && !(XA && XA.t === p)) || cast().find((p) => !hard.has(p) && !(d && d.t === p) && (D2(p, 'love', J) || D2(p, 'protect', J) || D2(J, 'protect', p)))
           || cast().find((p) => !hard.has(p) && !(d && d.t === p)) || cast().find((p) => !(d && d.t === p)) || cast()[0]; };
       const flawF = forces.find((f) => f.kind === 'inner'), FL = FLAW[flawF ? flawF.flaw : 'none'];
-      const myst = facts.find((f) => f.kind === 'crime' && f.hidden && live(f.by)) || facts.find((f) => f.kind === 'gone');
-      const mf = () => forces.find((f) => f.who !== J && f.kind !== 'clock' && !(f.kind === 'culprit' && f.fact && !W.hap.has(f.fact.ev))) || null;
+      // does what he loves on the other side hold him back? Loyal or afraid: yes, he stays. Bold or proud: no, he goes, and the
+      // other side pays for it (« possible, not always », Justin 24/11)
+      const held = () => { const tr = K.traitsOf(J, a); return tr.loyaute + (tr.peur >= 2 ? 1 : 0) >= tr.audace + (tr.fierte >= 2 ? 1 : 0); };
+      const myst = facts.find((f) => f.kind === 'crime' && f.hidden && live(f.by) && f.by !== J) || facts.find((f) => f.kind === 'gone');
+      // THE INVERTED DETECTIVE (24/11): Justin did it and the audience sees it. Whoever wants the truth hunts him (the hunter);
+      // he answers each step with a cover from who he is, and each one costs him (a lie to the one he loves, an innocent
+      // accused, a witness scared). « Will he be caught? » is answered by what he chooses at the climax
+      const mine = facts.find((f) => f.kind === 'crime' && f.hidden && f.by === J);
+      let HF = mine ? forces.find((f) => f.kind === 'hunter' && live(f.who)) : null;
+      if (mine && !HF) { const h = [mine.seek, ...cast()].find((p) => p && p !== J && p !== mine.vid && live(p)); if (h) { HF = { at: 0, who: h, kind: 'hunter', d: { id: `${h}:justice`, who: h, k: 'justice', t: J, s: 2 }, vs: null, fact: mine, why: `${K.nm(h)} cherche qui a fait ça` }; forces.push(HF); } }
+      const H = HF ? HF.who : null, Hn = H ? K.nm(H) : '';
+      const closeH = () => !!H && !!(D2(H, 'love', J) || D2(H, 'protect', J) || D2(J, 'love', H) || D2(J, 'protect', H) || ['friend', 'family', 'couple', 'crush'].includes(K.rel(H, J)));
+      const B0 = mine ? [won, lost, XA, XB, ...D.filter((d) => d.who === J)].map((d) => (d && d.who === J && ['love', 'protect'].includes(d.k) ? d.t : null)).find((p) => p && p !== H && live(p)) || null : null;
+      const S0 = mine ? [mine.sus && mine.sus.id, ...cast()].find((p) => p && p !== J && p !== H && p !== mine.vid && p !== B0 && live(p) && !D2(J, 'love', p) && !D2(J, 'protect', p)) || null : null;
+      const thirdOf0 = (f) => K.S.cast.filter(live).find((p) => p !== f.by && p !== f.vid && (D2(p, 'oust', f.by) || [XA, XB].some((d) => d && d.t && D2(p, 'love', d.t) && d.t !== p)));
+      const mf = () => forces.find((f) => f.who !== J && f.kind !== 'clock' && f.kind !== 'hunter' && !(f.kind === 'culprit' && f.fact && !W.hap.has(f.fact.ev))) || null;
       // ---- the generators (each returns the moment or null) ----
       const g = {};
       g.want = (d, seg = 'open') => { if (!d) return null; const c = conf(d), fe = d.from && facts.find((f) => f.ev === d.from), hidden = !fe || fe.hidden;
@@ -349,10 +405,11 @@ window.ORCH = (() => {
           aud: [{ k: 'care', fr: `on s’attache à ${K.nm(b1)}${a1 !== J ? ` et à ${K.nm(a1)}` : ''}` }], plot: 'un lien qu’on va mettre en jeu', next: `perdre ${K.nm(b1)} fera mal`, jobs: ['rel'], tech: 'Show care', goal: 'rel' }); };
       // the event: what happens, discovered by the one it hurts
       g.event = (e, seg = 'open') => { if (!e) return null; const f = facts.find((x) => x.ev === e), c = f ? ctxT(f) : {}, circle = 3;
-        if (f && f.kind === 'crime') { const disc = f.vid && e.k !== 'murder' ? f.vid : f.seek && live(f.seek) ? f.seek : J, Tt = TRACE[e.k];
-          if (e.k === 'murder' && f.vid) { W.out.set(f.vid, 'dead'); W.deadAt.set(f.vid, W.n + 1); } W.hap.add(e);
+        if (f && f.kind === 'crime' && f.by === J && f.hidden && W.deed !== f.id) g.deed(f, seg);
+        if (f && f.kind === 'crime') { const disc = f.vid && e.k !== 'murder' ? f.vid : f.seek && live(f.seek) ? f.seek : f.by === J && H ? H : J, Tt = TRACE[e.k];
+          if (e.k === 'murder' && f.vid && W.out.get(f.vid) !== 'dead') { W.out.set(f.vid, 'dead'); W.deadAt.set(f.vid, W.n + 1); } W.hap.add(e);
           return put({ seg, circle, kind: 'event', actor: disc, desire: f.vid && disc !== f.vid ? `${K.nm(disc)} tenait à ${f.v}` : want(disc), action: 'découvre', link: 'soudain', ev: e, fact: f.id,
-            fr: f.hidden ? Tt.open(c) : `${Tt.open(c)} C’est ${K.nm(f.by)}, et ${K.nm(f.by)} ne s’en cache pas.`, world: [e.k === 'murder' ? `${f.v} est mort` : e.k === 'theft' ? `${f.thing} a disparu` : `${f.v} a été vendu`], aud: f.hidden ? [{ k: 'q', ref: f.id, fr: f.q }] : [{ k: 'learn', fr: f.truth }], open: f.hidden ? [{ id: `q:${f.id}`, k: 'q', fact: f.id, fr: f.q }] : [],
+            fr: f.hidden ? Tt.open(c) : `${Tt.open(c)} C’est ${K.nm(f.by)}, et ${K.nm(f.by)} ne s’en cache pas.`, world: [e.k === 'murder' ? `${f.v} est mort` : e.k === 'theft' ? `${f.thing} a disparu` : `${f.v} a été vendu`], aud: f.hidden && f.by !== J ? [{ k: 'q', ref: f.id, fr: f.q }] : f.hidden ? [{ k: 'fear', fr: 'on va chercher qui' }] : [{ k: 'learn', fr: f.truth }], open: f.hidden && f.by !== J ? [{ id: `q:${f.id}`, k: 'q', fact: f.id, fr: f.q }] : [],
             plot: `${f.e} le crime : ouvert`, next: `${K.nm(f.by)} devra se cacher ; quelqu’un voudra savoir`, jobs: ['info', 'force'], tech: 'Demande qui révèle', goal: 'info' }); }
         if (e.k === 'gone') { W.out.set(e.x, 'gone'); W.hap.add(e); return put({ seg, circle, kind: 'event', actor: e.x, desire: want(e.x), action: 'disparaît', link: 'soudain', ev: e, fact: f && f.id,
           fr: `${K.nm(e.x)} sort « deux minutes » et ne revient pas. Ses affaires sont encore là.`, world: [`${K.nm(e.x)} n’est plus là`], aud: [{ k: 'q', ref: f && f.id, fr: f ? f.q : `Où est ${K.nm(e.x)} ?` }], open: f ? [{ id: `q:${f.id}`, k: 'q', fact: f.id, fr: f.q }] : [],
@@ -362,11 +419,62 @@ window.ORCH = (() => {
           plot: `⚡ l’arrivée ${deN(K.nm(e.x))}`, next: d ? `${K.nm(e.x)} va vouloir ${K.nm(d.t)}` : 'l’équilibre change', jobs: ['force'], tech: 'Entrée qui fait taire', goal: 'char' }); }
         if (e.k === 'threat' || e.k === 'revenge') { W.hap.add(e); const v = e.v && live(e.v) ? e.v : J, mo = T.ev.get(e), dl = pick(`dl${e.x}`, ['Avant l’aube', 'Avant la fermeture', 'Au dernier bateau']);
           return put({ seg, circle, kind: 'event', actor: e.x, desire: mo ? mo.fr : want(e.x), action: e.k === 'threat' ? 'menace' : 'veut faire payer', target: v, link: 'soudain', ev: e,
-            fr: e.k === 'threat' ? `${K.nm(e.x)} plante son couteau dans la table, devant ${K.nm(v)} : « ${dl}, tu paies. »` : `${K.nm(e.x)}, à ${K.nm(v)}, devant tous : « Tu vas me le payer. »`,
+            fr: e.k === 'threat' ? `${K.nm(e.x)} plante son couteau dans la table, devant ${K.nm(v)} : « ${dl}, tu paies. »` : v === J && W.loops.some((L) => L.k === 'acc' && L.who === e.x && L.act < a) ? `${K.nm(e.x)}, à Justin, devant tous : « La cave. Tu m’y as laissé. Tu vas me le payer. »` : `${K.nm(e.x)}, à ${K.nm(v)}, devant tous : « Tu vas me le payer. »`,
             world: [`${K.nm(v)} est menacé`], aud: [{ k: 'fear', fr: `peur pour ${K.nm(v)}` }, { k: 'q', ref: `thr${e.x}`, fr: `${K.nm(e.x)} ira-t-il jusqu’au bout ?` }], open: [{ id: `thr:${e.x}`, k: 'thr', who: e.x, to: v, fr: `${K.nm(e.x)} ira-t-il jusqu’au bout ?` }], plot: `☠️ la menace contre ${K.nm(v)}`, next: `ceux qui tiennent à ${K.nm(v)} vont s’interposer`, jobs: ['force', 'harder'], tech: 'Menace : si tu X, je Y', goal: 'stakes', dl }); }
         return null; };
+      // Justin's crime, shown: the audience sees it, nobody else (dramatic irony). « Will he be caught? » opens here
+      g.deed = (f, seg) => { const c = ctxT(f), k = f.ev.k; if (k === 'murder' && f.vid) { W.out.set(f.vid, 'dead'); W.deadAt.set(f.vid, W.n + 1); } learn(J, f.id); W.deed = f.id;
+        const m = put({ seg, circle: 3, kind: 'deed', actor: J, desire: f.mot && !f.whyLater ? up(f.mot.fr) : lineOf(D2(J, 'hide')) || 'Justin veut s’en sortir', action: 'passe à l’acte', target: f.vid || null, link: 'soudain', fact: f.id,
+          fr: DEED[k](c), world: [up(f.truth)], aud: [{ k: 'irony', fr: 'le public a vu ce que Justin a fait ; personne d’autre' }], plot: `${f.e} Justin passe à l’acte`, next: 'on va le découvrir ; Justin devra se cacher', jobs: ['force', 'info'], tech: 'Ironie dramatique', goal: 'stakes',
+          open: [{ id: `caught:${f.id}`, k: 'caught', fact: f.id, fr: 'Justin sera-t-il pris ?' }] });
+        if (f.vid) pay(m, `thr:${f.vid}`); return m; };
+      // his covers, one per step of the hunt, and they escalate: the alibi, then the proof (planted on someone if he is cunning,
+      // destroyed if not), then what he is (violent: he scares the one who saw; afraid: he gets ready to run; else he lets an
+      // innocent pay, or lies to his friend's face)
+      const didJ = (kind) => W.M.some((m) => m.act === a && m.kind === kind && mine && m.fact === mine.id);
+      g.coverJ = (seg, cause) => { if (!mine || W.pub.has(mine.id) || (W.cj || 0) >= 3) return null; const n = W.cj = (W.cj || 0) + 1, f = mine, k = f.ev.k, c = ctxT(f), tr = K.traitsOf(J, a), Tt = TRACE[k] || TRACE.murder, item = itemOf(f), S = S0 && live(S0) ? K.nm(S0) : null;
+        const base = { seg, circle: 4, kind: 'coverJ', actor: J, desire: lineOf(D2(J, 'hide')) || 'Justin veut garder son crime caché', fact: f.id, cause, link: 'donc', plot: `${f.e} Justin se couvre (${n})`, jobs: ['harder'], goal: 'stakes' };
+        if (n === 1) return put({ ...base, action: 'ment', fr: `${Tt.lie({ ...c, x: 'Justin' })}${H ? ` ${Hn} le croit.` : ''}`, world: H ? [`${Hn} croit Justin`] : ['Justin a un alibi'], aud: [{ k: 'irony', fr: 'le public sait que Justin ment' }], next: 'le mensonge tiendra-t-il ?', tech: 'La réponse trop parfaite' });
+        if (n === 2) { if (tr.ruse >= 2 && S) { W.framed = S0; return put({ ...base, action: 'fait accuser quelqu’un', target: S0, fr: `Justin glisse ${item} dans les affaires ${deN(S)}. Le lendemain, on l’y trouve. Tous les regards vont vers ${S}.`,
+            world: [`on accuse ${S}`], aud: [{ k: 'irony', fr: `${S} est innocent, et le public le sait` }], next: `${S} paiera pour Justin`, tech: 'Ça se retourne', open: [{ id: `acc:${S0}`, k: 'acc', who: S0, fact: f.id, fr: `${S} accusé à la place de Justin` }] }); }
+          return put({ ...base, action: 'fait disparaître la preuve', fr: `Justin fait disparaître ${item}. Une minute plus tard, ${H ? Hn : 'quelqu’un'} descend dans ${f.spot}.`, world: [`${item.replace(/^un /, 'le ').replace(/^une /, 'la ')} a disparu`], aud: [{ k: 'fear', fr: 'il s’en est fallu d’une minute' }], next: 'il n’y a plus de preuve… presque', tech: 'Un objet pas à sa place' }); }
+        const wit = (f.saw || []).find((p) => live(p) && p !== H && p !== B0) || cast().find((p) => live(p) && ![H, f.vid, S0, B0, J].includes(p)), Wn = wit ? K.nm(wit) : '';
+        if (tr.violence >= 2 && wit) return put({ ...base, action: 'fait taire un témoin', target: wit, fr: `${Wn} a vu Justin remonter ${deN(f.spot)}. Justin coince ${Wn} dans la cour : « Tu n’as rien vu. »`, world: [`${Wn} a peur de Justin`], aud: [{ k: 'fear', fr: 'Justin devient quelqu’un d’autre' }], next: `${Wn} se taira… pour l’instant`, tech: 'Le témoin se tait',
+          open: [{ id: `wit:${wit}`, k: 'wit', who: wit, fact: f.id, fr: `ce que ${Wn} a vu` }] });
+        if (tr.peur >= 2) return put({ ...base, action: 'prépare sa fuite', fr: 'La nuit, Justin prépare son sac. S’il le faut, il partira avant l’aube.', world: ['Justin est prêt à fuir'], aud: [{ k: 'fear', fr: 'il pourrait tout laisser derrière lui' }], next: 'partir, ou rester ?', tech: 'Ça se prépare' });
+        if (S && W.framed !== S0 && tr.ruse >= 1) { W.framed = S0; return put({ ...base, action: 'détourne les soupçons', target: S0, fr: `Justin, l’air de rien, rappelle à tous où était ${S} cette nuit-là. Les regards se tournent vers ${S}.`, world: [`on soupçonne ${S}`], aud: [{ k: 'irony', fr: `${S} est innocent, et le public le sait` }], next: `${S} paiera pour Justin`, tech: 'Ça se retourne',
+          open: [{ id: `acc:${S0}`, k: 'acc', who: S0, fact: f.id, fr: `${S} accusé à la place de Justin` }] }); }
+        if (S && W.framed === S0) return put({ ...base, action: 'laisse payer un innocent', target: S0, fr: `On enferme ${S} à la cave pour l’interroger. Justin se tait.`, world: [`${S} paie pour Justin`], aud: [{ k: 'fear', fr: `${S} paie pour Justin` }], next: 'jusqu’où ira-t-il ?', tech: 'Ça se retourne' });
+        return H ? put({ ...base, action: 'ment encore', target: H, fr: `Justin regarde ${Hn} dans les yeux, et ment encore.`, world: ['Justin s’enfonce'], aud: [{ k: 'fear', fr: 'chaque mensonge le lie un peu plus' }], next: `${Hn} le croira-t-il encore ?`, tech: 'La réponse trop parfaite' }) : null; };
+      // what it costs him: the one he loves sees something, and he lies to them too
+      g.costJ = (seg, cause) => { if (!mine || !B0 || !live(B0) || B0 === H || didJ('costJ')) return null; const B = K.nm(B0);
+        if ((mine.saw || []).includes(B0)) return put({ seg, circle: 5, kind: 'costJ', actor: B0, target: J, desire: want(B0), action: 'se tait pour lui', fact: mine.id, cause, link: 'mais', fr: `${B} a vu Justin remonter ${deN(mine.spot)}. ${B} ne dit rien. Pour lui.`, world: [`${B} se tait pour Justin`],
+          aud: [{ k: 'fear', fr: `${B} porte le secret de Justin` }], plot: `${mine.e} ce que ça lui coûte : ${B} devient complice`, next: 'le secret est entre eux', jobs: ['rel', 'harder'], tech: 'Le témoin se tait', goal: 'rel', open: [{ id: `lied:${B0}`, k: 'lied', who: B0, fact: mine.id, knew: 1, fr: `${B} se tait pour Justin` }] });
+        return put({ seg, circle: 5, kind: 'costJ', actor: B0, target: J, desire: want(B0), action: 'voit quelque chose', fact: mine.id, cause, link: 'mais', fr: BLOOD[mine.ev.k](B), world: [`Justin a menti à ${B}`], aud: [{ k: 'fear', fr: `si ${B} apprend, Justin perd ${B}` }],
+          plot: `${mine.e} ce que ça lui coûte`, next: `le mensonge est entre eux`, jobs: ['rel', 'harder'], tech: 'Petit mensonge démasqué', goal: 'rel', open: [{ id: `lied:${B0}`, k: 'lied', who: B0, fact: mine.id, fr: `Justin a menti à ${B}` }] }); };
+      // he gives himself away (the culprit's slip, seen from his side), and the hunter sees it
+      g.slipJ = (seg) => { if (!mine || didJ('slipJ')) return null; const c = { ...ctxT(mine), x: 'Justin' }, Tt = TRACE[mine.ev.k] || TRACE.murder;
+        return put({ seg, circle: 5, kind: 'slipJ', actor: J, desire: lineOf(D2(J, 'hide')) || 'Justin veut garder son crime caché', action: 'se trahit', fact: mine.id, link: 'mais', fr: Tt.slip(c), world: [], aud: [{ k: 'fear', fr: 'il vient de se trahir' }],
+          plot: `${mine.e} il se trahit`, next: H ? `${Hn} l’a-t-il remarqué ?` : 'quelqu’un l’a-t-il remarqué ?', jobs: ['info'], tech: 'Une trace sur lui', goal: 'stakes' }); };
+      // the answer to « will he be caught? », from his choice: if he let his own safety go for what he loves, he confesses;
+      // if he kept it, he is not caught, and it costs (the friend who knows walks away, the innocent still pays); if the
+      // choice was elsewhere, the hunter names him
+      g.answerJ = (seg) => { if (!mine || !opened(`caught:${mine.id}`)) return null; const SELFK = ['alive', 'hide', 'free'], sL = lost && lost.who === J && SELFK.includes(lost.k), sW = won && won.who === J && SELFK.includes(won.k), c = ctxT(mine);
+        let o;
+        if (W.pub.has(mine.id)) o = { actor: J, act: 'est pris', fr: 'Tout le monde sait, maintenant.', world: ['Justin est pris'] };
+        else if (sL) { goPublic(mine.id); W.exposed = J; W.confessed = 1; o = { actor: J, act: 'avoue', fr: `Justin, devant tous : « C’est moi. ${CONFESS[mine.ev.k](c)} »${won && won.t && live(won.t) ? ` Il regarde ${K.nm(won.t)}. Il ne mentira plus.` : ''}`, world: ['tout le monde sait'] }; }
+        else if (sW || !H || !live(H)) { if (H) learn(H, mine.id); const th = H ? K.traitsOf(H, a) : {}, gone = W.M.some((m) => m.kind === 'coverJ' && m.fact === mine.id && /disparaître|glisse/.test(m.fr));
+          // the one who knows: silent for love (and gone from his life), or saying it to a room that no longer has the proof
+          o = !H || !live(H) ? { actor: J, act: 's’en tire', fr: 'Personne ne saura jamais. Justin, si.', world: ['Justin s’en tire'] }
+            : closeH() && th.loyaute >= 2 ? { actor: H, act: 'se tait', fr: `${Hn} sait. ${Hn} ne dira rien. Mais ${Hn} ne parlera plus jamais à Justin.`, world: [`${Hn} sait, et se tait`] }
+              : gone ? { actor: H, act: 'le dit, en vain', target: J, fr: `${Hn} le dit devant tous. Personne ne croit ${Hn} : ${W.framed && live(W.framed) ? `tout accuse ${K.nm(W.framed)}` : 'il n’y a plus de preuve'}.`, world: ['Justin s’en tire'] }
+                : { actor: H, act: 'renonce', fr: `${Hn} n’a pas de preuve. Justin n’est pas pris. Pas cette fois.`, world: ['Justin s’en tire'] }; }
+        else { goPublic(mine.id); W.exposed = J; o = { actor: H, act: 'le dit devant tous', target: J, fr: `${Hn}, devant tous : « C’est Justin. » Personne ne le défend.`, world: ['tout le monde sait'] }; }
+        const m = put({ seg, circle: 8, kind: 'answerJ', actor: o.actor, target: o.target || null, desire: o.actor === J ? lineOf(won) : lineOf(HF && HF.d), action: o.act, fact: mine.id, link: 'donc', fr: o.fr, world: o.world,
+          aud: [{ k: 'answer', ref: 'caught', fr: o.world[0] }], plot: `${mine.e} sera-t-il pris ? ${W.pub.has(mine.id) ? 'oui' : 'non'}`, next: 'ce que ça coûte', jobs: ['payoff'], tech: 'Il l’obtient, et ça coûte', goal: 'conseq' });
+        pay(m, `caught:${mine.id}`); settle(m, ['acc', 'wit', 'lied']); return m; };
       // the crime matters to someone present: they commit
-      g.matter = (f, seg = 'open') => { if (!f || !live(f.seek)) return null; const w = f.seek, R = K.graph().fig;
+      g.matter = (f, seg = 'open') => { const w = f && f.by === J ? H : f && f.seek; if (!f || !live(w)) return null; const R = K.graph().fig;
         if (f.needer && live(f.needer) && R) return put({ seg, circle: 2, kind: 'matter', actor: f.needer, desire: up(R.need(K.nm(f.needer))), action: 'comprend ce que ça lui coûte', fact: f.id,
           fr: `${K.nm(f.needer)} : « ${up(R.lost)}. »`, world: [`${K.nm(f.needer)} risque de tout perdre`], aud: [{ k: 'care', fr: `la réponse compte pour ${K.nm(f.needer)}` }], plot: `${f.e} la question compte`, next: `${K.nm(f.needer)} a besoin de la vérité, vite`, jobs: ['want', 'harder'], tech: 'Mention consequences', goal: 'stakes' });
         const say = f.kind === 'crime' ? (f.vid || e2v(f) ? `« Je trouverai qui a fait ça. »` : '« Je trouverai qui. »') : `« Je retrouverai ${K.nm(f.by)}. »`;
@@ -376,7 +484,7 @@ window.ORCH = (() => {
           fr: `${K.nm(w)}${w === J ? '' : ', les yeux rouges'} : ${say}`, world: [`${K.nm(w)} cherche`], aud: [{ k: 'care', fr: `la réponse compte pour ${K.nm(w)}` }], plot: `${f.e} la question compte`, next: `${K.nm(w)} va fouiller, interroger`, jobs: ['want'], tech: 'Direct confession', goal: 'desire' }); };
       const e2v = (f) => f.ev && f.ev.v;
       // the other name when it narrows to two: someone Justin cares about (it hurts), never the culprit, the victim, the one cleared
-      const narrowTo = (f) => [won && won.t, lost && lost.t, ...D.filter((d) => d.who === J && ['love', 'protect'].includes(d.k)).map((d) => d.t), ...cast()].find((p) => p && p !== f.by && p !== J && live(p) && p !== (f.sus && f.sus.id) && p !== f.vid) || cast().find((p) => p !== f.by && p !== f.vid) || J;
+      const narrowTo = (f) => [won && won.t, lost && lost.t, ...D.filter((d) => d.who === J && ['love', 'protect'].includes(d.k)).map((d) => d.t), ...cast()].find((p) => p && p !== f.by && p !== J && live(p) && p !== (f.sus && f.sus.id) && p !== f.vid && p !== W.cleared) || J;   // with nobody else left, it is Justin himself the room looks at
       // the false lead: pushed by the culprit himself (an action, not a coincidence)
       g.theory = (f, seg) => { if (!f || f.kind !== 'crime') return null; const x = f.by, s = f.sus && live(f.sus.id) ? f.sus : null, tr = K.traitsOf(x, a);
         const fr = s ? (tr.ruse >= 1 ? `${K.nm(x)} rappelle à tous ${que(K.low1(f.sus.why))}. Les regards se tournent vers ${K.nm(s.id)}.` : `Tous les regards vont vers ${K.nm(s.id)} : ${K.low1(f.sus.why)}. ${K.nm(x)} ne dit rien.`)
@@ -410,6 +518,40 @@ window.ORCH = (() => {
           fr: Tt.gone({ ...ctxT(f), o: K.nm(o) }), world: [`${itemOf(f)} n’existe plus`, `il ne reste que deux noms : ${K.nm(x)} et ${K.nm(o)}`],
           aud: [{ k: 'suspect', ref: f.id, fr: `${K.nm(x)} ou ${K.nm(o)}` }], open: [{ id: `hand:cover:${f.id}`, k: 'hand', who: x, fact: f.id, how: 'cover', fr: `qui a fait disparaître ${itemOf(f)}` }, { id: `sus2:${f.id}`, k: 'sus2', who: o, fact: f.id, fr: `${K.nm(x)} ou ${K.nm(o)}` }],
           plot: `${f.e} la preuve disparaît, ça se resserre`, next: `un autre indice devient le seul espoir`, jobs: ['harder', 'info'], tech: 'La preuve disparaît', goal: 'stakes' }); };
+      // a TELL: who the culprit is shows; the one who notices is whoever knows them (Justin, or someone close to them). If that
+      // one loves the culprit, they keep it (and the answer will say so); else they tell Justin
+      g.tell = (f, seg) => { const x = f.by, tr = K.traitsOf(x, a), T0 = TELL.find(([ok]) => ok(tr, K.S.flaw[x]))[1]({ x: K.nm(x), v: f.v });
+        const n = [J, ...cast()].find((p) => p !== x && p !== f.vid && live(p) && (D2(p, 'love', x) || D2(p, 'protect', x))) || J, cares = n !== J && (D2(n, 'love', x) || D2(n, 'protect', x));
+        const after = n === J ? 'Justin le remarque.' : cares ? `${K.nm(n)} le remarque. ${K.nm(n)} ne dit rien.` : `${K.nm(n)} le remarque, et le dit à Justin.`;
+        return put({ seg, circle: 4, kind: 'tell', actor: x, desire: `${K.nm(x)} veut garder son crime caché`, action: 'se trahit par qui il est', fact: f.id, link: 'mais', who: [n],
+          fr: `${T0} ${after}`, world: [cares ? `${K.nm(n)} doute ${deN(K.nm(x))}, et se tait` : 'Justin doute'], aud: [{ k: 'suspect', ref: f.id, fr: `${K.nm(x)} (un signe)` }],
+          plot: `${f.e} un signe`, next: cares ? `${K.nm(n)} savait, et s’est tu` : 'Justin regarde autrement', jobs: ['info'], tech: 'Une trace sur lui', goal: 'curiosity',
+          open: cares ? [{ id: `hand:knew:${f.id}`, k: 'hand', who: n, to: x, fact: f.id, how: 'knew', fr: `${K.nm(n)} avait vu, et s’est tu` }] : [] }); };
+      // a MISREAD: a mind in fear or anger reads a true trace wrong, believes an innocent did it, and acts on it (an accusation,
+      // a blow, a warning): a wrong belief that costs someone, until the truth corrects it
+      g.misread = (f, seg) => { const rx = W.M.filter((m) => m.act === a && m.kind === 'react' && /attrape/.test(m.fr)).pop(), r = rx ? rx.actor : f.sus && live(f.sus.id) ? f.sus.id : null; if (!r || r === f.by) return null;
+        const m0 = [J, ...cast()].find((p) => p !== r && p !== f.by && p !== f.vid && live(p) && (K.traitsOf(p, a).peur >= 2 || K.traitsOf(p, a).rancune >= 2 || K.traitsOf(p, a).loyaute >= 3)) || null; if (!m0) return null;
+        const tr = K.traitsOf(m0, a), how = tr.violence >= 2 ? 'hit' : m0 !== J && tr.loyaute >= 2 ? 'warn' : 'say', c = { m: K.nm(m0), r: K.nm(r) }, W2 = W.M.slice(-1)[0];
+        return put({ seg, circle: 4, kind: 'misread', actor: m0, desire: m0 === J ? lineOf(D2(J, 'justice')) || 'Justin veut la vérité' : `${K.nm(m0)} ${tr.peur >= 2 ? 'a peur' : 'veut faire payer'}`, action: 'se trompe, et agit', target: r, fact: f.id, link: 'donc',
+          fr: `${(rx ? MISREAD.seen : MISREAD.out)(c)} ${MISREAD.act[how](c)}`, world: [`${K.nm(m0)} croit que c’est ${K.nm(r)} : c’est faux`], aud: [{ k: 'suspect', ref: f.id, fr: `${K.nm(r)} (${K.nm(m0)} en est sûr)` }],
+          plot: `${f.e} une croyance fausse`, next: `${K.nm(r)} paie pour une erreur`, jobs: ['harder', 'reverse'], tech: 'Ça se retourne', goal: 'stakes',
+          open: [{ id: `acc:${r}`, k: 'acc', who: r, fact: f.id, fr: `${K.nm(r)} accusé à tort par ${K.nm(m0)}` }, ...(how === 'hit' ? [{ id: `owe:${r}:${m0}`, k: 'owe', who: r, to: m0, hot: true, fact: f.id, fr: `${K.nm(r)} frappé à tort` }] : [])] }); };
+      // a THIRD PARTY: someone who knows and wants something for it; Justin pays (he learns, alone, and owes) or refuses (they
+      // use it themselves, at the worst moment)
+      const thirdOf = (f) => cast().find((p) => p !== f.by && p !== f.vid && live(p) && (D2(p, 'oust', f.by) || [XA, XB].some((d) => d && d.t && D2(p, 'love', d.t) && d.t !== p)));
+      g.offer = (f, seg) => { const t3 = thirdOf(f); if (!t3) return null; const l = [XA, XB].find((d) => d && d.k === 'love' && d.t && D2(t3, 'love', d.t)), kind = l ? 'love' : D2(t3, 'oust', f.by) ? 'oust' : 'def';
+        const pays = K.traitsOf(J, a).audace >= K.traitsOf(J, a).loyaute || [XA, XB].some((d) => d && d.k === 'justice'); W.third = { who: t3, pays, kind, l: l && l.t };
+        const m = put({ seg, circle: 5, kind: 'offer', actor: t3, desire: want(t3), action: 'vend ce qu’il sait', target: J, fact: f.id, link: 'mais', fr: THIRD[kind]({ t3: K.nm(t3), l: l ? K.nm(l.t) : '' }),
+          world: [`${K.nm(t3)} sait qui`], aud: [{ k: 'hope', fr: 'quelqu’un sait' }], plot: `${f.e} quelqu’un sait, et le vend`, next: pays ? 'Justin va payer' : 'Justin refuse', jobs: ['force', 'info'], tech: 'Il force la main', goal: 'stakes' });
+        if (pays) { learn(J, f.id); W.thirdPaid = true; return put({ seg, circle: 5, kind: 'notice', actor: t3, desire: want(t3), action: 'le dit à Justin, seul', target: J, fact: f.id, link: 'donc',
+          fr: `Justin accepte. ${K.nm(t3)}, tout bas : « C’est ${K.nm(f.by)}. »`, world: ['Justin sait. Seul.', `Justin doit quelque chose ${aN(K.nm(t3))}`], aud: [{ k: 'answer', ref: f.id, fr: f.truth }],
+          plot: `${f.e} la réponse, achetée`, next: `${K.nm(t3)} viendra réclamer`, jobs: ['payoff', 'conseq'], tech: 'Pas sans aide', goal: 'info',
+          open: [{ id: `kept:${f.id}`, k: 'kept', fact: f.id, fr: 'ce que Justin fera de ce qu’il sait' }, { id: `fav:${t3}`, k: 'fav', who: t3, fr: `ce que Justin doit ${aN(K.nm(t3))}` }] }); }
+        open(m, { id: `use:${t3}`, k: 'use', who: t3, fact: f.id, fr: `ce que ${K.nm(t3)} fera de ce qu’il sait` }); return m; };
+      // the audience learns first (the mystery becomes suspense): the culprit alone, the hand we now see
+      g.glimpse = (f, seg) => { const c = { ...ctxT(f), e: '' }; return put({ seg, circle: 5, kind: 'glimpse', actor: f.by, desire: `${K.nm(f.by)} veut garder son crime caché`, action: 'seul, se trahit pour nous', fact: f.id, link: 'pendant',
+        fr: (GLIMPSE[f.ev.k] || GLIMPSE.murder)(c), world: [], aud: [{ k: 'answer', ref: f.id, fr: f.truth }, { k: 'irony', fr: `le public sait ; Justin, pas encore` }], plot: `${f.e} le public sait avant Justin`, next: 'quand Justin va-t-il comprendre ?', jobs: ['info', 'reverse'], tech: 'Ironie dramatique', goal: 'info',
+        open: [{ id: `iro:${f.id}`, k: 'iro', fact: f.id, fr: `quand Justin saura que c’est ${K.nm(f.by)}` }] }); };
       // the culprit's alibi, when someone asks (a lie the answer will re-read)
       g.lie = (f, seg, cause) => { if (!f || !f.fact || !live(f.who)) return null; const ff = f.fact, Tt = TRACE[ff.ev.k] || TRACE.murder;
         return put({ seg, circle: 4, kind: 'lie', actor: f.who, desire: `${K.nm(f.who)} veut garder son crime caché`, action: 'ment', fact: ff.id, link: 'mais', cause, fr: Tt.lie(ctxT(ff)), world: [`${K.nm(f.who)} a un alibi`],
@@ -439,7 +581,7 @@ window.ORCH = (() => {
           const names = h.crime && h.crime.h && live(h.crime.x) && !W.exposed; if (names) W.named = h.crime.x;
           const t = h.crime ? (names ? (h.side === 'v' ? `${up(victimOf(h.crime, K.graph()))} y avait écrit : « S’il m’arrive quelque chose, méfiez-vous ${deN(K.nm(h.crime.x))}. »` : `Dedans : ce qu’on a pris. Et un nom : ${K.nm(h.crime.x)}.`) : `${up(K.infoFr(i))} : ${h.side === 'v' ? `${victimOf(h.crime, K.graph())} y disait de qui se méfier` : 'ce qu’on cherchait est dedans'}.`) : h.secret ? `La preuve : ${K.low1(K.infoFr(h.secret))}.` : h.gone ? `Elle montre où est ${K.nm(h.gone.x)}.` : 'Dedans, rien de ce qu’on croyait.';
           const op2 = [i.y, i.x].find((p) => p && live(p)) || (crimeF && live(crimeF.seek) ? crimeF.seek : J);
-          return put({ seg, circle: 7, kind: 'reveal', actor: op2, desire: W.narrow && W.narrow[1] === op2 ? `${K.nm(op2)} veut laver son nom` : want(op2), action: 'l’ouvre', fact: f.id, fr: `${K.nm(op2)} ouvre enfin ${K.low1(K.infoFr(i))}. ${t}`, world: ['ce qu’il contenait est su'], aud: [{ k: 'answer', ref: f.id, fr: t }], plot: `${f.e} ouvert`, next: 'ce qu’il contient change le choix', jobs: ['payoff', 'info'], tech: 'Demande qui révèle', goal: 'info' }); }
+          return put({ seg, circle: 7, kind: 'reveal', actor: op2, desire: W.narrow && W.narrow[1] === op2 ? `${K.nm(op2)} veut laver son nom` : want(op2), action: 'l’ouvre', fact: f.id, fr: `${K.nm(op2)} ${({ key: 'trouve enfin la porte qu’ouvre', map: 'déplie enfin', photo: 'retourne enfin', ring: 'regarde enfin l’intérieur de' })[i.id] || 'ouvre enfin'} ${K.low1(K.infoFr(i))}. ${t}`, world: ['ce qu’il contenait est su'], aud: [{ k: 'answer', ref: f.id, fr: t }], plot: `${f.e} ouvert`, next: 'ce qu’il contient change le choix', jobs: ['payoff', 'info'], tech: 'Demande qui révèle', goal: 'info' }); }
         if (f.kind === 'link') { const re = W.M.filter((m) => m.fact === f.id).map((m) => m.id);
           const ac = f.ch.ppl.find(live) || J;
           return put({ seg, circle: 7, kind: 'reveal', actor: ac, desire: want(ac), action: 'ça sort', fact: f.id, link: 'soudain', who: f.ch.ppl, fr: `Ça sort : ${K.low1(f.truth)}.`, world: [`tout le monde sait : ${f.truth}`],
@@ -466,16 +608,21 @@ window.ORCH = (() => {
         const say = L[Math.min(L.length - 1, r - 1)](c), fr0 = c.o === 'tout le monde' && /tout le monde/.test(say) && NO[d.k] ? NO[d.k](c) : say;
         return put({ seg, circle: 4, kind: 'attempt', actor: J, desire: lineOf(d), action: 'tente', target: d.t || null, line: d.id, fr: fr0, cause, world: [], aud: [{ k: 'hope', fr: `Justin avance vers ${K.lab(d)}` }],
           plot: `${lineOf(d)} : il tente`, next: 'on va lui résister', jobs: ['want'], tech: 'Show character positioning', goal: 'stakes' }); };
-      g.fail = (d, worst, seg) => { let opp = forces.find((x) => d && x.vs && x.vs.id === d.id && x.who !== J && live(x.who)) || mf();
+      g.fail = (d, worst, seg) => { let opp = forces.find((x) => d && x.vs && x.vs.id === d.id && x.who !== J && live(x.who)) || (mine && HF && live(H) ? HF : null) || mf();
         const culp = new Set([...facts.filter((f) => f.kind === 'crime').map((f) => f.by), ...D.filter((x) => x.who === J && ['justice', 'oust'].includes(x.k)).map((x) => x.t)]), b = (W.narrow && W.narrow[1] !== J && live(W.narrow[1]) ? W.narrow[1] : null) || [lost && lost.t, won && won.t, conf()].find((p) => p && live(p) && !culp.has(p)) || conf();
         if (worst && W.narrow && b === W.narrow[1] && !W.exposed) return put({ seg, circle: 6, kind: 'fail', actor: J, desire: lineOf(d), action: 'retombe dans sa faille', line: d && d.id, link: 'mais',
           fr: `${(FL.worst({ o: '', c: K.nm(conf()), b: K.nm(b) }).split('.')[0])}. Toute la salle accuse ${K.nm(b)}.`, world: [`on accuse ${K.nm(b)}, à tort`], aud: [{ k: 'suspect', ref: crimeF.id, fr: K.nm(b) }, { k: 'fear', fr: `${K.nm(b)} paie pour l’hésitation de Justin` }], open: [{ id: `acc:${b}`, k: 'acc', who: b, fact: crimeF.id, fr: `${K.nm(b)} accusé à tort` }],
           plot: '🪞 sa faille agit contre lui', next: `il devra sauver ${K.nm(b)}`, jobs: ['fail', 'harder'], tech: 'Ça se retourne', goal: 'stakes' });
         const other = [XA, XB].find((x) => x && d && x.id !== d.id);
         if (worst && other && d && (other.t || d.t) && live(other.t || d.t)) { const act0 = K.low1(K.DK[d.k].act(K.tName(d))).replace(/^([A-ZÀ-Ü])/, (m) => m.toLowerCase());
-          const fr = other.t && live(other.t) && ['love', 'protect', 'find'].includes(other.k) ? `Justin s’apprête à ${act0}. ${K.nm(other.t)} l’appelle. Il reste.` : `Justin s’apprête à ${act0}. Il pense à ${K.lab(other)}, et s’arrête.`;
-          return put({ seg, circle: 6, kind: 'fail', actor: J, desire: lineOf(d), action: 'retenu par l’autre côté', line: d.id, link: 'mais', fr, world: [`${up(K.lab(d))} s’éloigne`], aud: [{ k: 'fear', fr: 'il ne pourra pas tout garder' }],
-            plot: '⇄ ce qu’il aime le retient', next: 'il devra choisir', jobs: ['fail', 'harder'], tech: 'Ça se retourne', goal: 'stakes' }); }
+          const pers = other.t && live(other.t) && ['love', 'protect', 'find'].includes(other.k);
+          if (held()) { const fr = pers ? `Justin s’apprête à ${act0}. ${K.nm(other.t)} l’appelle. Il reste.` : `Justin s’apprête à ${act0}. Il pense à ${K.lab(other)}, et s’arrête.`;
+            return put({ seg, circle: 6, kind: 'fail', actor: J, desire: lineOf(d), action: 'retenu par l’autre côté', line: d.id, link: 'mais', fr, world: [`${up(K.lab(d))} s’éloigne`], aud: [{ k: 'fear', fr: 'il ne pourra pas tout garder' }],
+              plot: '⇄ ce qu’il aime le retient', next: 'il devra choisir', jobs: ['fail', 'harder'], tech: 'Ça se retourne', goal: 'stakes' }); }
+          const fr = pers ? `Justin va ${act0}, sans se retourner. Pendant ce temps, ${K.nm(other.t)} reste seul${ge(other.t)} face à tout.` : `Justin va ${act0}, sans se retourner. ${up(K.lab(other))} lui échappe un peu plus.`;
+          return put({ seg, circle: 6, kind: 'fail', actor: J, desire: lineOf(d), action: 'y va quand même', line: d.id, link: 'mais', target: pers ? other.t : null, fr, world: [pers ? `${K.nm(other.t)} a été lâché` : `${up(K.lab(other))} s’éloigne`], aud: [{ k: 'fear', fr: 'ce que ça va coûter de l’autre côté' }],
+            plot: '⇄ il choisit déjà, et l’autre côté paie', next: pers ? `${K.nm(other.t)} s’en souviendra` : 'il devra choisir', jobs: ['conseq', 'harder'], tech: 'Ça se retourne', goal: 'stakes',
+            open: pers ? [{ id: `owe:${other.t}:${J}`, k: 'owe', who: other.t, to: J, fr: `${K.nm(other.t)} lâché par Justin` }] : [] }); }
         if (opp && opp.kind === 'culprit' && W.exposed !== opp.who) opp = opp.fact && opp.fact.sus && live(opp.fact.sus.id) ? { who: opp.fact.sus.id } : null;   // the hidden culprit is never named before the answer
         const c = { o: opp && live(opp.who) ? K.nm(opp.who) : 'la salle', c: K.nm(conf()), b: K.nm(b) };
         return put({ seg, circle: worst ? 6 : 4, kind: 'fail', actor: J, desire: lineOf(d), action: worst ? 'retombe dans sa faille' : 'échoue', line: d && d.id, link: 'mais', fr: (worst ? FL.worst : FL.fail)(c),
@@ -489,13 +636,13 @@ window.ORCH = (() => {
           dr ? `${T0} avoue à Justin rêver de partir d’ici, loin de tout.` : null, pr ? `${T0} confie à Justin ${que(K.nm(pr.t))} est tout ce qui compte.` : null].filter(Boolean);
         return L2[lv - 1] || null; };
       // a desire weighs more: someone acts (the one it is about)
-      g.raise = (d, seg, cause) => { if (!d) return null; const lv = lvlUp(d), L = RAISE[d.k] || RAISE.respect, f = facts.find((x) => x.kind === 'crime'), G2 = K.graph();
+      g.raise = (d, seg, cause) => { if (!d) return null; const own = mine && d.who === J && ['alive', 'hide'].includes(d.k), lv = lvlUp(d), L = own ? RAISEJ : RAISE[d.k] || RAISE.respect, f = facts.find((x) => x.kind === 'crime'), G2 = K.graph();
         const needs = f && f.sus && live(f.sus.id) && !W.cleared ? f.sus.id : f && live(f.seek) && f.seek !== J ? f.seek : conf();
-        const c = { t: d.t ? (W.exposed === d.t ? K.nm(d.t) : K.tName(d)) : '', w2: K.nm(needs), f: G2.fig && !(G2.cr && G2.cr.k === 'murder') ? G2.fig.n : myst && myst.kind === 'crime' && myst.ev.k === 'murder' ? 'celui qui a tué' : 'celui qui le cherche' };
-        const actor = d.k === 'justice' ? (lv === 1 ? needs : J) : d.t && live(d.t) ? d.t : J, mine = actor !== J && (D2(actor, 'love', J) || D2(actor, 'protect', J));
+        const c = { doom: mine ? DOOM[mine.ev.k] : '', h: Hn || 'Quelqu’un', t: d.t ? (W.exposed === d.t ? K.nm(d.t) : K.tName(d)) : '', w2: K.nm(needs), f: G2.fig && !(G2.cr && G2.cr.k === 'murder') ? G2.fig.n : myst && myst.kind === 'crime' && myst.ev.k === 'murder' ? 'celui qui a tué' : 'celui qui le cherche' };
+        const actor = d.k === 'justice' ? (lv === 1 ? needs : J) : d.t && live(d.t) ? d.t : J, fond = actor !== J && (D2(actor, 'love', J) || D2(actor, 'protect', J));
         const known = d.k === 'justice' && d.t && !facts.some((f) => f.kind === 'crime' && f.hidden && f.by === d.t);
-        const fr = d.k === 'justice' && W.exposed ? `Toute la salle attend que Justin parle.` : d.k === 'justice' && lv === 1 ? (known ? `${c.w2} supplie Justin de ne pas laisser ${K.nm(d.t)} s’en tirer.` : `${c.w2} supplie Justin de trouver le vrai coupable.`) : (lv <= 2 && confide(d, lv)) || L[Math.min(L.length - 1, lv - 1)](c);
-        return put({ seg, circle: lv >= 3 ? 7 : 5, kind: 'raise', actor, desire: actor === J ? lineOf(d) : mine ? lineOf(mine) : d.k === 'justice' && actor === needs && f && f.sus && actor === f.sus.id ? `${K.nm(actor)} veut laver son nom` : want(actor), action: 'pèse plus', target: actor === J ? null : J, line: d.id, cause,
+        const fr = own ? L[Math.min(L.length - 1, lv - 1)](c) : d.k === 'justice' && W.exposed ? `Toute la salle attend que Justin parle.` : d.k === 'justice' && lv === 1 ? (known ? `${c.w2} supplie Justin de ne pas laisser ${K.nm(d.t)} s’en tirer.` : `${c.w2} supplie Justin de trouver le vrai coupable.`) : (lv <= 2 && confide(d, lv)) || L[Math.min(L.length - 1, lv - 1)](c);
+        return put({ seg, circle: lv >= 3 ? 7 : 5, kind: 'raise', actor, desire: actor === J ? lineOf(d) : fond ? lineOf(fond) : d.k === 'justice' && actor === needs && f && f.sus && actor === f.sus.id ? `${K.nm(actor)} veut laver son nom` : want(actor), action: 'pèse plus', target: actor === J ? null : J, line: d.id, cause,
           fr, world: [`${up(K.lab(d))} compte plus (${lv}/3)`], aud: [{ k: 'care', fr: `${K.lab(d)} pèse plus lourd` }],
           plot: `${lineOf(d)} : pèse plus (${lv})`, next: `perdre ${K.lab(d)} coûterait plus`, jobs: ['harder'], tech: lv >= 3 ? 'Aveu vulnérable' : 'Mention consequences', goal: 'stakes' }); };
       // a force acts (its next move): the answer to what Justin just did
@@ -526,6 +673,12 @@ window.ORCH = (() => {
               : { fr: `${X0} prend la porte de la cour. Si Justin ne fait rien, personne ne saura jamais.`, act: 's’enfuit', jobs: ['force'], tech: 'Il force la main', world: [`${X0} s’enfuit`] })
             : k === 1 ? { fr: Tt.lie(ctxT(ff)), act: 'ment', jobs: ['info'], tech: 'La réponse trop parfaite', world: [`${X0} a un alibi`], kind: 'lie' }
             : { fr: `${X0} retourne la salle contre Justin : « Tu accuses tout le monde, maintenant ? »`, act: 'retourne la salle', jobs: ['harder'], tech: 'On fait barrage', world: ['la salle se méfie de Justin'] }; }
+        if (f.kind === 'hunter' && f.fact) { const ff = f.fact, c = { ...ctxT(ff), w: X0 }, Tt = TRACE[ff.ev.k] || TRACE.murder;
+          o = final ? (W.pub.has(ff.id) ? null : closeH() ? { fr: `${X0} prend Justin à l’écart : « Dis-moi que je me trompe. »`, act: 'met Justin au pied du mur', jobs: ['force'], tech: 'Il force la main', world: [`${X0} attend la vérité de Justin`] }
+            : { fr: `${X0}, devant tous : « Celui qui a fait ça est dans cette salle. À l’aube, je dirai son nom. »`, act: 'pose une échéance', jobs: ['force'], tech: 'Une annonce datée', world: ['à l’aube, un nom'] })
+            : k === 1 ? { fr: `${X0} interroge la salle : où était chacun cette nuit-là ?`, act: 'interroge', jobs: ['harder'], tech: 'Show character positioning', world: [`${X0} cherche`], aud: [{ k: 'fear', fr: `${X0} cherche, et Justin est dans la salle` }] }
+              : k === 2 ? { fr: Tt.t1(c), act: 'trouve un détail', jobs: ['info', 'harder'], tech: 'Le mobile évident', world: [`${X0} se rapproche`], aud: [{ k: 'learn', fr: Tt.t1a }, { k: 'fear', fr: `${X0} se rapproche` }] }
+                : { fr: `${X0} regarde Justin, longtemps. Justin baisse les yeux le premier.`, act: 'a compris', jobs: ['harder'], tech: 'Le regard qui sait', world: [`${X0} soupçonne Justin`], aud: [{ k: 'fear', fr: `${X0} a compris ; et Justin sait qu’on sait` }] }; }
         if (f.kind === 'keeper' && f.fact) o = final ? null : k === 1 ? { fr: `On demande à ${X0} d’où vient ${pick(`kp${x}`, ['sa cicatrice', 'son accent', 'cette bague'])}. ${X0} rit, et répond à côté.`, act: 'esquive', jobs: ['info'], tech: 'Question esquivée', world: [] }
           : { fr: `${X0} prend ${T0 || 'Justin'} à part : « Ne pose plus de questions. »`, act: 'fait taire', jobs: ['harder'], tech: 'Le témoin se tait', world: [`${T0 || 'Justin'} a été averti`] };
         if (f.kind === 'ouster') { const y = f.d && f.d.t && live(f.d.t) ? K.nm(f.d.t) : 'Justin';
@@ -570,17 +723,20 @@ window.ORCH = (() => {
       g.turn = (seg) => { if (a < A) { const e2 = K.evs().find((e) => K.EK[e.k] && K.actOf(e) === a + 1 && K.live(e.x)); const AS = K.actState(), arc = AS.arcs.find((r) => live(r.who) && r.mode !== 'deuil');
         const fr = arc ? arcText(arc) : e2 && live(e2.x) ? `${K.nm(e2.x)} n’en a pas fini.` : 'Rien n’est fini.';
         return put({ seg, circle: 8, kind: 'turn', actor: arc ? arc.who : e2 ? e2.x : J, desire: arc ? arc.en : '', action: 'la suite', link: 'donc', fr, world: [], aud: [{ k: 'q', ref: 'next', fr: 'Que va-t-il se passer maintenant ?' }], plot: '❔ l’acte suivant', next: 'l’acte 2', jobs: ['force'], tech: 'Qui, quand, où', goal: 'curiosity' }); }
+        if (W.confessed) { const ct2 = won && won.t && live(won.t) ? K.nm(won.t) : null; return put({ seg, circle: 8, kind: 'turn', actor: ct2 ? won.t : J, desire: lineOf(won), action: 'garde sa place', link: 'donc', fr: ct2 ? `Au comptoir, ${ct2} garde la place de Justin.` : 'Au comptoir, la place de Justin reste vide.', world: [], aud: [{ k: 'care', fr: 'ce que ça a coûté' }], plot: '💔 la dernière image', next: '', jobs: ['conseq'], tech: 'Chaise vide', goal: 'conseq' }); }
         const seat = lost && lost.t ? K.nm(lost.t) : null;
         return put({ seg, circle: 8, kind: 'turn', actor: J, desire: lineOf(won), action: 'reste avec ce qu’il a choisi', link: 'donc', fr: seat ? `Au comptoir, la place ${deN(seat)} reste vide.` : 'Justin reste seul au comptoir. Il a choisi.', world: [], aud: [{ k: 'care', fr: 'ce que ça a coûté' }], plot: '💔 la dernière image', next: '', jobs: ['conseq'], tech: 'Chaise vide', goal: 'conseq' }); };
 
       // ======== THE ACT, in its story circle ========
-      const crimeF = myst, plansAll = facts.filter((f) => ['twist', 'irony', 'motive'].includes(f.mode) || f.kind === 'object' || f.kind === 'link');
+      const crimeF = myst, plansAll = facts.filter((f) => f !== mine && (['twist', 'irony', 'motive'].includes(f.mode) || f.kind === 'object' || f.kind === 'link'));
       const sideOf = (r) => { const sides = [XA, XB].filter(Boolean); if (crimeF && crimeF.kind === 'crime' && sides.some((d) => d.k === 'justice') && r === 1) return sides.find((d) => d.k === 'justice'); return sides[(r + 1) % sides.length] || sides[0] || D.find((d) => d.who === J && d.s >= 2); };
       // HOW THE DECISIVE CLUE COMES (24/11). « search »: someone investigates, the culprit covers, the cover narrows it, the
       // culprit gives himself away in front of all. « encounter » (Vertigo, Breaking Bad's toilet book): when Justin loves the
       // culprit, he holds a detail nobody else has (the key), and the culprit, in a love scene, says the thing that only fits
       // it; he was not investigating them. He knows, alone: what he does with it is the story
-      const chan = crimeF && crimeF.kind === 'crime' && crimeF.hidden && live(crimeF.by) && KEY[crimeF.ev.k] && (D2(J, 'love', crimeF.by) || D2(J, 'protect', crimeF.by)) ? 'encounter' : 'search';
+      const chan0 = crimeF && crimeF.kind === 'crime' && crimeF.hidden && live(crimeF.by);
+      const canEnc = chan0 && KEY[crimeF.ev.k] && (D2(J, 'love', crimeF.by) || D2(J, 'protect', crimeF.by)), canThird = chan0 && !!thirdOf0(crimeF), want0 = K.S.chan;
+      const chan = !chan0 ? 'search' : want0 === 'search' ? 'search' : want0 === 'third' && canThird ? 'third' : want0 === 'encounter' && canEnc ? 'encounter' : canEnc ? 'encounter' : canThird && pv(`ch${crimeF.id}`, 2) === 0 ? 'third' : 'search';
       ACT.channel = crimeF && crimeF.kind === 'crime' && crimeF.hidden ? chan : null;
       const keyC = (f) => ({ ...ctxT(f), k: 'Justin', o0: f.vid ? K.nm(f.vid) : 'Le patron', g: ctxT(f).gift });
       const plant = (f, host) => { if (!host || chan !== 'encounter' || opened(`key:${f.id}`) || W.loops.some((L) => L.id === `key:${f.id}`)) return; const t = KEY[f.ev.k].hold(keyC(f));
@@ -600,19 +756,22 @@ window.ORCH = (() => {
           fr: KEY[f.ev.k].proof(c), world: ['plus de preuve'], aud: [{ k: 'learn', fr: `${K.nm(x)} a senti que Justin sait` }], plot: `${f.e} la preuve disparaît`, next: 'il ne reste que la parole de Justin', jobs: ['harder'], tech: 'La preuve disparaît', goal: 'stakes' }); };
       // the room turns on an innocent while Justin keeps silent (his bond holds him: the inner pull)
       g.silence = (f, seg) => { const o = narrowTo(f), x = f.by;
+        if (!held()) return put({ seg, circle: 6, kind: 'confront', actor: J, desire: lineOf(D2(J, 'justice')) || 'Justin veut la vérité', action: 'met le coupable au pied du mur, seul à seul', target: x, link: 'mais', fact: f.id,
+          fr: `Justin attend ${K.nm(x)} dans la cour, seul à seul : « ${up(KEY[f.ev.k].echo)}. Tu étais là. » ${K.nm(x)} ne répond pas.`, world: [`${K.nm(x)} sait que Justin sait`], aud: [{ k: 'fear', fr: `ce que ${K.nm(x)} va faire, maintenant` }],
+          plot: '⇄ il la met au pied du mur', next: `${K.nm(x)} va jouer sa dernière carte`, jobs: ['force', 'harder'], tech: 'Menace : si tu X, je Y', goal: 'stakes' });
         return put({ seg, circle: 6, kind: 'fail', actor: J, desire: lineOf(D2(J, 'love', x) || D2(J, 'protect', x)), action: 'se tait', link: 'mais', fact: f.id,
           fr: `Justin va parler. Il croise le regard ${deN(K.nm(x))}. Il se tait. Toute la salle accuse ${K.nm(o)}.`, world: [`on accuse ${K.nm(o)}, à tort`], aud: [{ k: 'fear', fr: `${K.nm(o)} paie pour le silence de Justin` }],
           plot: '⇄ ce qu’il aime le fait taire', next: `il devra sauver ${K.nm(o)}, ou ${K.nm(x)}`, jobs: ['fail', 'harder'], tech: 'Ça se retourne', goal: 'stakes', open: [{ id: `acc:${o}`, k: 'acc', who: o, fact: f.id, fr: `${K.nm(o)} accusé à tort` }] }); };
       // the truth in front of all, as the outcome of his choice (encounter): it clears who was accused, it settles the debts
-      g.expose = (f, seg) => { const x = f.by, c = keyC(f); goPublic(f.id); W.exposed = x;
-        const m = put({ seg, circle: 8, kind: 'reveal', actor: J, desire: lineOf(D2(J, 'justice')) || 'Justin veut la vérité', action: 'dit tout, devant tous', target: x, fact: f.id, link: 'donc',
-          fr: `Justin dit tout, devant tous : ${KEY[f.ev.k].echo}, l’alibi, ${K.nm(x)}. ${K.nm(x)} ne nie pas.${f.mot && !f.whyLater ? ` ${up(f.mot.fr)}.` : ''}`, world: [`tout le monde sait : ${f.truth}`], aud: [{ k: 'learn', fr: `tout le monde sait : ${f.truth}` }],
+      g.expose = (f, seg) => { const x = f.by, c = keyC(f); goPublic(f.id); W.exposed = x; const said = opened(`key:${f.id}`) || W.loops.some((L) => L.id === `key:${f.id}`) ? KEY[f.ev.k].echo : 'ce qu’il a appris';
+        const m = put({ seg, circle: seg === 'end' ? 8 : 7, kind: 'reveal', actor: J, desire: lineOf(D2(J, 'justice')) || 'Justin veut la vérité', action: 'dit tout, devant tous', target: x, fact: f.id, link: 'donc',
+          fr: `Justin dit tout, devant tous : ${said}, l’alibi, ${K.nm(x)}. ${K.nm(x)} ne nie pas.${f.mot && !f.whyLater ? ` ${up(f.mot.fr)}.` : ''}`, world: [`tout le monde sait : ${f.truth}`], aud: [{ k: 'learn', fr: `tout le monde sait : ${f.truth}` }],
           plot: `${f.e} la vérité, devant tous`, next: '', jobs: ['payoff', 'conseq'], tech: 'Demande qui révèle', goal: 'info' });
-        settle(m, ['acc', 'owe', 'obj', 'sus', 'wit']); return m; };
+        hands(f, m); settle(m, ['acc', 'owe', 'obj', 'sus', 'wit']); pay(m, `kept:${f.id}`); return m; };
       // HIDDEN HANDS, shown (24/11: « relire » made concrete): when the truth is known, what the culprit did in the dark comes
       // back as short lines — the alibi was false, the false lead was theirs, the proof vanished by their hand
       const ECHO = { theory: (L) => `C’est ${K.nm(L.who)} qui avait lancé les soupçons${L.to ? ` sur ${K.nm(L.to)}` : ''}.`, lie: (L, f) => (TRACE[f.ev.k] || TRACE.murder).lieOut(ctxT(f)),
-        cover: (L, f) => `C’est ${K.nm(L.who)} qui avait fait disparaître ${itemOf(f)}.`, scare: (L) => `C’est ${K.nm(L.who)} qui faisait peur ${aN(K.nm(L.to))}.` };
+        cover: (L, f) => `C’est ${K.nm(L.who)} qui avait fait disparaître ${itemOf(f)}.`, scare: (L) => `C’est ${K.nm(L.who)} qui faisait peur ${aN(K.nm(L.to))}.`, knew: (L) => `${K.nm(L.who)} avait vu, et s’était tu pour ${K.nm(L.to)}.` };
       const hands = (f, host) => { for (const L of W.loops.filter((x) => !x.paid && x.k === 'hand' && x.fact === f.id)) { host.also.push({ fr: ECHO[L.how](L, f), why: 'ce qui change de sens', pays: L.id }); pay(host, L.id); }
         if (W.seduced === f.by) { host.also.push({ fr: `« Arrête de chercher. Pour nous. » : ${K.nm(f.by)} se protégeait.`, why: 'ce qui change de sens' }); W.seduced = null; }
         const mi = f.mot && f.mot.info && facts.find((x) => x.info === f.mot.info); if (mi) pay(host, `seed:${mi.id}`); };
@@ -624,11 +783,16 @@ window.ORCH = (() => {
         obj: (L) => { const f = facts.find((x) => x.id === L.fact), i = f && f.info; if (!i) return null; const h = f.obj || {}, cr = h.crime && facts.find((x) => x.ev === h.crime);
           return cr && W.pub.has(cr.id) ? `${up(K.infoFr(i))}, enfin ouverte : ${h.side === 'v' ? `${victimOf(h.crime, K.graph())} y avait écrit le nom ${deN(K.nm(h.crime.x))}` : 'tout y était'}.` : cr ? `Justin jette ${K.low1(K.infoFr(i))} au feu, sans l’ouvrir.` : `${up(K.infoFr(i))} : personne ne l’ouvrira.`; },
         sus: (L) => `Ce n’était pas ${K.nm(L.who)}.`,
-        wit: (L) => { const f = facts.find((x) => x.id === L.fact); return `${K.nm(L.who)} parle enfin : ${K.nm(L.who)} avait vu ${K.nm(f.by)}, cette nuit-là.`; },
+        wit: (L) => { const f = facts.find((x) => x.id === L.fact); return f.by === J && !W.pub.has(f.id) ? `${K.nm(L.who)} n’a jamais rien dit. Mais ${K.nm(L.who)} ne regarde plus Justin.` : `${K.nm(L.who)} parle enfin : ${K.nm(L.who)} avait vu ${K.nm(f.by)}, cette nuit-là.`; },
+        lied: (L) => (L.knew ? (!W.pub.has(L.fact) ? `${K.nm(L.who)} ne dira jamais rien. C’est leur secret, maintenant.` : W.confessed && won && won.t === L.who ? `${K.nm(L.who)} savait depuis le début. ${K.nm(L.who)} prend sa main.` : `${K.nm(L.who)} savait depuis le début, et n’avait rien dit.`)
+          : !W.pub.has(L.fact) ? `${K.nm(L.who)} ne saura jamais. Justin, si.` : W.confessed && won && won.t === L.who ? `${K.nm(L.who)} : « Tu m’as menti. » Puis ${K.nm(L.who)} prend sa main.` : `${K.nm(L.who)}, à Justin : « Tu m’as menti, à moi aussi. »`),
+        caught: () => null,
         clock: () => 'L’aube se lève.', dl: (L) => (W.exposed === L.who || facts.some((f) => f.kind === 'crime' && f.by === L.who && W.pub.has(f.id)) ? `${L.to ? K.nm(L.to) : 'Personne'} ne répondra jamais ${aN(K.nm(L.who))}.` : `Le jour est venu : ${L.to ? K.nm(L.to) : 'il'} doit répondre ${aN(K.nm(L.who))}.`),
         arr: (L) => `On sait maintenant ce que ${K.nm(L.who)} venait chercher : ${K.low1(want(L.who)).replace(/^[^ ]+ veut /, '')}.`,
-        thr: (L) => (W.M.some((m) => m.actor === L.who && m.id > L.open && (m.hostile || m.kind === 'force')) ? `${K.nm(L.who)} est allé jusqu’au bout.` : won && won.t && won.t === L.to ? `${K.nm(L.who)} recule devant Justin. Personne ne mourra ce soir.` : `${K.nm(L.who)} quitte la ville. Ce n’était qu’une menace.`),
+        thr: (L) => (W.M.some((m) => m.actor === L.who && m.id > L.open && (m.hostile || m.kind === 'force')) ? `${K.nm(L.who)} est allé${ge(L.who)} jusqu’au bout.` : won && won.t && won.t === L.to ? `${K.nm(L.who)} recule devant Justin. Personne ne mourra ce soir.` : `${K.nm(L.who)} quitte la ville. Ce n’était qu’une menace.`),
         iro: (L) => { const f = facts.find((x) => x.id === L.fact); return f && f.info ? `Ce que Justin cachait finit par se savoir : ${K.low1(K.infoFr(f.info))}.` : null; },
+        fav: (L) => (W.third && W.third.kind === 'love' && W.third.l && live(W.third.l) ? `${K.nm(L.who)} réclame son dû : Justin ne s’approche plus ${deN(K.nm(W.third.l))}.` : `${K.nm(L.who)} réclame sa faveur. Justin paie, sans un mot.`),
+        use: (L) => `${K.nm(L.who)} n’a jamais rien dit de ce qui s’était passé.`,
         seed: () => null, key: () => null, q: () => null, sus2: () => null, kept: () => null, hand: (L) => { const f = facts.find((x) => x.id === L.fact); return f ? ECHO[L.how](L, f) : null; },
       };
       const settle = (host, kinds) => { for (const L of W.loops.filter((x) => !x.paid && (x.act === a || x.carry) && kinds.includes(x.k))) {
@@ -636,12 +800,19 @@ window.ORCH = (() => {
         const t = PAYER[L.k] && PAYER[L.k](L); if (!t) { pay(host, L.id); continue; } host.also.push({ fr: t, why: 'ce qui se ferme', pays: L.id }); pay(host, L.id); } };
       // the force with a plan of its own (24/11: not only an answer to Justin): a threat, a rival, someone who leaves, the
       // one off screen. It acts each round; what Justin does next is caused by it
-      const agent = () => forces.find((f) => !['clock', 'culprit', 'inner', 'keeper'].includes(f.kind) && f.who !== J && (f.who === 'f:A' || live(f.who)) && f.who === dest.forcer)
+      const agent = () => forces.find((f) => !['clock', 'culprit', 'inner', 'keeper', 'hunter'].includes(f.kind) && f.who !== J && (f.who === 'f:A' || live(f.who)) && f.who === dest.forcer)
         || forces.find((f) => ['threat', 'rival', 'leaver', 'figure', 'ouster'].includes(f.kind) && (f.who === 'f:A' || live(f.who)));
       // 1-3 · the opening (act 1: the recipe's spine) / act 2: what the last act changed, then its event
       if (a === 1) {
         const r = op.r, first = EV[0], care0 = (d) => d && d.t && live(d.t) ? g.care(J, d.t, d.k === 'love' ? 'love' : 'protect') : null;
-        if (r === 'mystery' && crimeF && crimeF.kind === 'crime') { const f = crimeF, jw = [XA, XB].find((d) => d && d.k !== 'justice' && !(d.from === f.ev)) || D.find((d) => d.who === J && d.s >= 2 && d.k !== 'justice' && d.k !== 'alive');
+        if (r === 'secret' && mine) { const f = mine, jw = [XA, XB].find((d) => d && d.who === J && !['hide', 'alive'].includes(d.k)) || D.find((d) => d.who === J && d.s >= 2 && !['hide', 'alive', 'justice'].includes(d.k));
+          const pre = EV.filter((e) => e !== f.ev && EV.indexOf(e) < EV.indexOf(f.ev));
+          g.want(jw); if (!pre.some((e) => e.v && jw && e.v === jw.t)) care0(jw);
+          for (const e of pre) g.event(e);
+          g.event(f.ev); g.matter(f); g.coverJ('open');
+          ACT.turn = (H ? put({ seg: 'open', circle: 3, kind: 'turn', actor: H, desire: lineOf(HF.d) || `${Hn} veut la vérité`, action: 'resserre', link: 'mais', fact: f.id, fr: `${Hn} : « ${ONEOF[f.ev.k]} »`,
+            world: ['le coupable est dans la salle'], aud: [{ k: 'fear', fr: `${Hn} va chercher parmi eux` }], plot: `${f.e} ça se resserre`, next: `${Hn} va chercher ; Justin devra se couvrir`, jobs: ['force'], tech: 'Personne n’est entré ni sorti', goal: 'stakes' }) : W.last).id; }
+        else if (r === 'mystery' && crimeF && crimeF.kind === 'crime') { const f = crimeF, jw = [XA, XB].find((d) => d && d.k !== 'justice' && !(d.from === f.ev)) || D.find((d) => d.who === J && d.s >= 2 && d.k !== 'justice' && d.k !== 'alive');
           const pre = EV.filter((e) => e !== f.ev && EV.indexOf(e) < EV.indexOf(f.ev));
           g.want(jw);
           if (f.vid) { const pal = D.find((d) => ['protect', 'love'].includes(d.k) && d.t === f.vid && d.who !== f.by && live(d.who)); g.care(pal ? pal.who : J, f.vid, 'alive');
@@ -670,10 +841,10 @@ window.ORCH = (() => {
           if (ob) g.move(ob, 'open'); g.attempt(jw, 1, 'open'); g.fail(jw, false, 'open'); g.raise(jw, 'open');
           ACT.turn = ((ob && ob.kind !== 'inner' ? g.move(ob, 'open') : null) || W.last).id; }
         // the twists and what Justin hides: planted in the opening, riding in a moment that is already there (one line, two jobs)
-        const hosts = W.M.filter((m) => m.act === 1 && ['care', 'want', 'matter'].includes(m.kind)), mine = (f) => crimeF && ((f.mode === 'motive' && crimeF.mot && crimeF.mot.info === f.info) || (f.obj && f.obj.crime === crimeF.ev));
+        const hosts = W.M.filter((m) => m.act === 1 && ['care', 'want', 'matter'].includes(m.kind)), ofCrime = (f) => crimeF && ((f.mode === 'motive' && crimeF.mot && crimeF.mot.info === f.info) || (f.obj && f.obj.crime === crimeF.ev));
         plansAll.filter((f) => f.mode === 'irony').forEach((f) => g.seed(f, 1, 'open', W.M.find((m) => m.act === 1 && m.who.includes(f.by)) || W.M.find((m) => m.act === 1)));
-        plansAll.filter((f) => f.mode !== 'irony' && mine(f)).forEach((f, k) => g.seed(f, 1, 'open', hosts.find((m) => m.who.includes(f.by)) || hosts[k % Math.max(1, hosts.length)] || null));
-        ACT.late = plansAll.filter((f) => f.mode !== 'irony' && !mine(f));
+        plansAll.filter((f) => f.mode !== 'irony' && ofCrime(f)).forEach((f, k) => g.seed(f, 1, 'open', hosts.find((m) => m.who.includes(f.by)) || hosts[k % Math.max(1, hosts.length)] || null));
+        ACT.late = plansAll.filter((f) => f.mode !== 'irony' && !ofCrime(f));
       } else {
         const AS = K.actState(), arc = AS.arcs.find((r) => live(r.who));
         const m0 = arc ? put({ seg: 'open', circle: 1, kind: 'arc', actor: arc.who, desire: arc.mode === 'vengeance' ? `${K.nm(arc.who)} veut faire payer ${K.nm(arc.x)}` : arc.fr, action: { vengeance: 'bascule', deuil: 'porte son deuil', fuite: 's’en va', rancune: 'garde rancune' }[arc.mode] || 'change',
@@ -693,7 +864,7 @@ window.ORCH = (() => {
       const R = Math.max(2, Math.min(3, forces.filter((f) => f.who !== J && f.kind !== 'clock').length + (crimeOn ? 1 : 0)));
       let failed = W.M.some((m) => m.act === a && m.kind === 'fail');
       const did = (kind) => W.M.some((m) => m.act === a && m.kind === kind && (!crimeF || m.fact === crimeF.id));
-      const answerer = (d) => forces.find((f) => f.who !== J && f.kind !== 'clock' && live(f.who) && !(f.kind === 'culprit' && (W.exposed === f.who || !W.hap.has(f.fact.ev))) && ((f.vs && d && f.vs.id === d.id && f.kind !== 'culprit') || (f.kind === 'culprit' && d && d.t === f.who && ['love', 'protect'].includes(d.k))));
+      const answerer = (d) => forces.find((f) => f.who !== J && f.kind !== 'clock' && f.kind !== 'hunter' && live(f.who) && !(f.kind === 'culprit' && (W.exposed === f.who || !W.hap.has(f.fact.ev))) && ((f.vs && d && f.vs.id === d.id && f.kind !== 'culprit') || (f.kind === 'culprit' && d && d.t === f.who && ['love', 'protect'].includes(d.k))));
       const sk = crimeOn ? (live(crimeF.seek) ? crimeF.seek : J) : null, skD = crimeOn ? (D2(sk, 'justice') || { id: `${sk}:justice`, who: sk, k: 'justice', t: crimeF.by }) : null;
       const culF = crimeOn ? forces.find((x) => x.kind === 'culprit' && x.who === crimeF.by) : null;
       const search = (lv, seg) => { if (sk === J && lv === 2 && W.seer === J) return put({ seg, circle: 4, kind: 'attempt', actor: J, desire: lineOf(skD), action: 'cherche', fact: crimeF.id, fr: `Justin redescend dans ${crimeF.spot}, chercher ${itemOf(crimeF).replace(/^un /, 'le ').replace(/^une /, 'la ')}.`, aud: [{ k: 'hope', fr: 'la preuve est à portée' }], plot: `${crimeF.e} on cherche`, next: `${K.nm(crimeF.by)} va devoir se couvrir`, jobs: ['want'], tech: 'Show character positioning', goal: 'stakes' });
@@ -709,14 +880,21 @@ window.ORCH = (() => {
         if (!did('lie')) { const th = W.M.filter((m) => m.fact === crimeF.id && m.kind === 'theory').pop(); if (th && !did('react')) g.react(th, seg);
           const at = search(1, seg); if (at && sk === J && !failed) { g.fail(at.line ? D.find((x) => x.id === at.line) : skD, false, seg); failed = true; }
           g.lie(culF, seg, at && at.id); if (!did('clue')) plant(crimeF, g.clue(crimeF, 1, seg)); return true; }
+        // after the lie: who the culprit is may show (a tell); a frightened or angry mind may read a true trace wrong (a misread)
+        if (!did('tell') && TELL.length && pv(`tell${crimeF.id}`, 3) !== 0) { if (g.tell(crimeF, seg)) return true; }
+        if (!did('misread') && pv(`mis${crimeF.id}`, 2) === 0) { if (g.misread(crimeF, seg)) return true; }
         if (chan === 'encounter') { if (crimeF.sus && live(crimeF.sus.id) && !did('clear')) { g.clear(crimeF, seg); return true; } return false; }
+        if (chan === 'third') { if (crimeF.sus && live(crimeF.sus.id) && !did('clear')) { g.clear(crimeF, seg); return true; } if (!did('offer')) { g.offer(crimeF, seg); return true; } return false; }
         if (!did('clue2')) { if (crimeF.sus && live(crimeF.sus.id) && !did('clear')) g.clear(crimeF, seg); g.clue(crimeF, 2, seg); return true; }
         const at = search(2, seg); g.cover(crimeF, seg, at && at.id); return true; };
+      const hunt = (seg) => { if (!mine || !HF || !live(H) || W.pub.has(mine.id) || !W.hap.has(mine.ev) || W.hk >= 3) return false; const n = ++W.hk;
+        if (n === 3) { const sl = g.slipJ(seg); const lk = g.move(HF, seg, sl ? sl.id : undefined); g.coverJ(seg, lk ? lk.id : undefined); return true; }
+        const hm = g.move(HF, seg); const cv = g.coverJ(seg, hm ? hm.id : undefined); if (n === 2) g.costJ(seg, cv ? cv.id : undefined); return true; };
       const toward = crimeOn && chan === 'encounter' ? [XA, XB].find((x) => x && x.t === crimeF.by && ['love', 'protect'].includes(x.k)) || D2(J, 'love', crimeF.by) || D2(J, 'protect', crimeF.by) : null;
-      const sides = [XA, XB].filter((x) => x && !(crimeOn && sk === J && x.k === 'justice'));
+      const sides = [XA, XB].filter((x) => x && !(crimeOn && sk === J && x.k === 'justice') && !(mine && x.who === J && x.k === 'hide'));
       for (let r = 1; r <= R; r++) { const seg = `r${r}`, d = sides.length ? sides[(r - 1) % sides.length] : null;
         // something else happens (« soudain »): an event of the act not placed yet
-        const ev2 = later.shift(); if (ev2) { g.event(ev2, seg); const f2 = facts.find((x) => x.ev === ev2); if (f2 && f2 === crimeF) { plant(f2, W.last); ladder(seg); } }
+        const ev2 = later.shift(); if (ev2) { g.event(ev2, seg); const f2 = facts.find((x) => x.ev === ev2); if (f2 && f2 === crimeF) { plant(f2, W.last); ladder(seg); } if (f2 && f2 === mine) { g.matter(f2, seg); g.coverJ(seg); } }
         const ag = agent(), F0 = d ? answerer(d) : null, agm = ag && ag !== F0 ? g.move(ag, seg) : null;
         let mv = agm;
         if (d) { const at = g.attempt(d, r, seg, agm ? agm.id : undefined); if (!failed && !(crimeOn && sk === J && !did('lie'))) { g.fail(d, false, seg); failed = true; }
@@ -724,6 +902,7 @@ window.ORCH = (() => {
           else { const m2 = F0 ? g.move(F0, seg, at && at.id, false, d) : null; if (m2) mv = m2; if (m2 && m2.target && m2.target !== J && r <= 2) g.react(m2, seg); } }
         ladder(seg);
         // the other secrets: planted in round 1, in a moment where their keeper is; a second seed, far from the first
+        hunt(seg);
         if (r === 1) for (const f of ACT.late || []) g.seed(f, 1, seg, W.M.filter((m) => m.seg === seg && m.act === a && m.kind !== 'seed').find((m) => m.who.includes(f.by)) || null);
         if (r === 2) plansAll.filter((f) => f.mode === 'twist' || f.mode === 'motive').forEach((f) => g.seed(f, 2, seg, W.M.filter((m) => m.seg === seg && m.act === a && m.kind !== 'seed')[0] || null));
         if (r === 2 || R === 2) { const can = [XA, XB].filter((x) => x && !(crimeOn && x.k === 'justice' && (W.lvl[x.id] || 0) >= 1)).sort((x, y) => (W.lvl[x.id] || 0) - (W.lvl[y.id] || 0) || (x === d) - (y === d)); if (can[0]) g.raise(can[0], seg, mv ? mv.id : undefined); }
@@ -735,6 +914,9 @@ window.ORCH = (() => {
         if (!did('notice') && toward) { const rz = g.raise(toward, 'mid'); if (!opened(`key:${crimeF.id}`)) plant(crimeF, rz); g.notice(crimeF, 'mid', rz && rz.id); g.keep(crimeF, 'mid'); }
         if (did('notice')) { const kp = W.M.filter((m) => m.act === a && m.kind === 'keep').pop(); g.proof(crimeF, 'mid', kp ? kp.id : undefined); } }
       else if (crimeOn) { for (let k = 0; k < 3 && ladder('mid'); k++); }
+      for (let k = 0; k < 3 && hunt('mid'); k++);
+      // the audience learns before Justin when the opening was not a mystery (curiosity was not the hook: suspense is)
+      if (crimeOn && op && op.r !== 'mystery' && !knows(J, crimeF.id) && !W.pub.has(crimeF.id) && !did('glimpse')) g.glimpse(crimeF, 'mid');
       else { const fd = won || XA; if (fd && (W.lvl[fd.id] || 0) < 2) g.raise(fd, 'mid'); }
       const attached = (d) => W.M.some((m) => m.act === a && ['care', 'raise', 'move', 'want'].includes(m.kind) && (m.target === d.t || m.actor === d.t || (m.kind === 'want' && m.line === d.id)));
       for (const d of [XA, XB]) if (d && d.t && live(d.t) && !attached(d)) g.care(J, d.t, d.k === 'love' ? 'love' : 'protect', 'mid');
@@ -746,21 +928,31 @@ window.ORCH = (() => {
       const dueReveal = facts.filter((f) => (f.mode === 'mystery' || f.mode === 'twist' || f.mode === 'irony' || f.kind === 'object' || f.kind === 'link') && f.act === a);
       const isPrice = (f) => f.by === J && [XA, XB].some((d) => d && d.k === 'hide' && d.who === J);
       const heldObj = (f) => chan === 'encounter' && f.kind === 'object' && f.obj && crimeF && f.obj.crime === crimeF.ev;   // the box that names the culprit is his proof, for after his choice
-      for (const f of dueReveal.filter((x) => x !== crimeF && x.kind !== 'object' && !isPrice(x))) g.reveal(f, 'crisis');
+      for (const f of dueReveal.filter((x) => x !== crimeF && x !== mine && x.kind !== 'object' && !isPrice(x))) g.reveal(f, 'crisis');
       for (const f of dueReveal.filter((x) => x.kind === 'object' && !heldObj(x))) g.reveal(f, 'crisis');
       const truthSide = [XA, XB].some((x) => x && x.k === 'justice');
-      if (crimeF && (crimeF.kind === 'gone' || (crimeOn && chan === 'search'))) { const rv = g.reveal(crimeF, 'crisis', crimeF.kind === 'crime' && truthSide);
+      if (crimeOn && chan === 'third' && W.third && !W.third.pays && !knows(J, crimeF.id)) { const t3 = W.third.who; goPublic(crimeF.id); W.exposed = crimeF.by;
+        const m = put({ seg: 'crisis', circle: 7, kind: 'reveal', actor: t3, desire: want(t3), action: 'le dit devant tous, pour lui', target: crimeF.by, fact: crimeF.id, link: 'soudain',
+          fr: `${K.nm(t3)}, devant tous, au pire moment : « C’est ${K.nm(crimeF.by)}. Je l’ai vu. »${crimeF.mot && !crimeF.whyLater ? ` ${up(crimeF.mot.fr)}.` : ''}`, world: [`tout le monde sait : ${crimeF.truth}`], aud: [{ k: 'answer', ref: crimeF.id, fr: crimeF.truth }],
+          plot: `${crimeF.e} la vérité, au service ${deN(K.nm(t3))}`, next: `${K.nm(t3)} y gagne`, jobs: ['payoff', 'reverse'], tech: 'Pas sans aide', goal: 'info' });
+        pay(m, `use:${t3}`); hands(crimeF, m); settle(m, ['acc', 'owe', 'sus', 'wit']); }
+      if (crimeF && (crimeF.kind === 'gone' || (crimeOn && (chan === 'search' || (chan === 'third' && !knows(J, crimeF.id) && !W.pub.has(crimeF.id)))))) { const rv = g.reveal(crimeF, 'crisis', crimeF.kind === 'crime' && truthSide);
         if (rv && crimeF.kind === 'crime') { hands(crimeF, rv); if (!truthSide) { goPublic(crimeF.id); settle(rv, ['acc', 'owe', 'sus', 'wit']); } else { learn(J, crimeF.id); open(rv, { id: `kept:${crimeF.id}`, k: 'kept', fact: crimeF.id, fr: 'ce que Justin fera de ce qu’il sait' }); } } }
-      const fx = forces.find((f) => f.who === dest.forcer && live(f.who)) || forces.find((f) => f.kind === 'culprit' && f.who === (crimeF && crimeF.by) && live(f.who) && (W.pub.has(crimeF.id) || knows(J, crimeF.id))) || forces.find((f) => f.who !== J && f.kind !== 'clock' && live(f.who)) || forces.find((f) => f.kind === 'clock');
+      if (crimeOn && knows(J, crimeF.id) && !W.pub.has(crimeF.id) && !truthSide && !(D2(J, 'love', crimeF.by) || D2(J, 'protect', crimeF.by))) g.expose(crimeF, 'crisis');
+      const fx = (mine && HF && live(H) && !W.pub.has(mine.id) ? HF : null) || forces.find((f) => f.who === dest.forcer && live(f.who)) || forces.find((f) => f.kind === 'culprit' && f.who === (crimeF && crimeF.by) && live(f.who) && (W.pub.has(crimeF.id) || knows(J, crimeF.id))) || forces.find((f) => f.who !== J && f.kind !== 'clock' && live(f.who)) || forces.find((f) => f.kind === 'clock');
       const force = fx ? g.move(fx, 'crisis', undefined, true) : null; if (force) { dest.forced = force.id; settle(force, ['clock', 'dl']); }
       for (const d of [XA, XB]) if (d && (W.lvl[d.id] || 0) < 3 && !(force && d.t && force.actor === d.t)) { W.lvl[d.id] = 2; g.raise(d, 'crisis'); }
       const dm = g.decide('crisis'); if (dm) { dest.decided = dm.id; settle(dm, ['clock', 'dl']); }
       // 8 · what he got, what it cost, what is still owed (each loop closes where the audience sees it), the last image
       const told = crimeOn && won && won.k === 'justice' && !W.pub.has(crimeF.id) && knows(J, crimeF.id);
       if (told) g.expose(crimeF, 'end');
-      const gm = told ? null : g.gain('end'), pm = g.price('end');
+      g.answerJ('end');
+      const conf2 = W.confessed && lost && lost.who === J, ct = won && won.t && live(won.t) ? K.nm(won.t) : null;
+      const gm = told ? null : conf2 && ct && won.k === 'love' ? put({ seg: 'end', circle: 8, kind: 'gain', actor: won.t, desire: want(won.t), action: 'reste', link: 'donc', fr: `${ct} : « Je t’attendrai. »`, world: [`${ct} attendra Justin`], aud: [{ k: 'learn', fr: `${ct} attendra` }], plot: `${K.DK[won.k].e} ${K.lab(won)} : gagné`, next: '', jobs: ['conseq'], tech: 'Il l’obtient, et ça coûte', goal: 'conseq' }) : g.gain('end');
+      const pm = conf2 ? put({ seg: 'end', circle: 8, kind: 'price', actor: J, desire: lineOf(lost), action: 'paie', link: 'donc', fr: a < A ? 'Tout le monde sait, désormais. Justin ne pourra plus jamais se cacher ici.' : 'À l’aube, on emmène Justin.', world: ['Justin paie'], aud: [{ k: 'learn', fr: 'le prix : il paie pour ce qu’il a fait' }], plot: `💔 le prix de ${K.lab(lost)}`, next: a < A ? 'l’acte suivant part de là' : 'c’est fini', jobs: ['conseq'], tech: 'Il l’obtient, et ça coûte', goal: 'conseq' }) : g.price('end');
       if (pm && lost && lost.k === 'hide') for (const L of W.loops.filter((x) => !x.paid && x.k === 'iro')) pay(pm, L.id);
-      settle(pm || gm || W.last, ['acc', 'owe', 'obj', 'sus', 'wit', 'arr', 'thr', 'iro', 'hand', 'clock', 'dl', 'seed', 'key', 'q', 'sus2', 'kept']);
+      if (conf2 && pm) dest.price = { kind: 'caught', fr: K.low1(pm.fr.replace(/\.$/, '')) };
+      settle(pm || gm || W.last, ['acc', 'owe', 'obj', 'sus', 'wit', 'arr', 'thr', 'iro', 'hand', 'clock', 'dl', 'seed', 'key', 'q', 'sus2', 'kept', 'fav', 'use', 'lied', 'caught']);
       const tm = g.turn('end'); if (tm && a < A) open(tm, { id: `next:${a}`, k: 'next', fr: 'la suite' });
       ACT.to = W.M.length;
       // what had to come before the climax (Phase D), and where it is
@@ -773,6 +965,8 @@ window.ORCH = (() => {
       for (const d of [XA, XB]) if (d && d.k === 'justice' && crimeF) dest.pre.push({ fr: `Justin sait la vérité (${crimeF.q.replace(/ \?$/, '')})`, at: before((m) => ['reveal', 'notice'].includes(m.kind) && m.fact === crimeF.id) });
       if (lost && lost.t) dest.pre.push({ fr: `On s’est attaché à ${K.nm(lost.t)} (sinon le prix ne coûte rien)`, at: before((m) => ['care', 'raise', 'move', 'want'].includes(m.kind) && (m.target === lost.t || m.actor === lost.t || (m.kind === 'want' && m.line === lost.id))) });
       for (const f of facts.filter((x) => x.mode === 'mystery' && x.kind === 'crime' && x.hidden)) dest.pre.push({ fr: `Deux vrais indices avant la réponse à « ${f.q} »`, at: W.M.filter((m) => m.fact === f.id && ['clue', 'clue2', 'cover', 'lie', 'notice'].includes(m.kind)).length >= 2 ? W.M.filter((m) => m.fact === f.id && ['clue', 'clue2', 'cover', 'lie', 'notice'].includes(m.kind))[1].id : null });
+      if (mine) { dest.pre.push({ fr: 'Le public a vu ce que Justin a fait (sans ça, pas de suspense)', at: before((m) => m.kind === 'deed') });
+        if (H) dest.pre.push({ fr: `${Hn} se rapproche (un détail, puis Justin se trahit)`, at: before((m) => m.kind === 'slipJ') || before((m) => m.actor === H && m.force === 'hunter' && /détail|regarde/.test(m.action + m.fr)) }); }
       dest.hidden = facts.filter((f) => f.act > a).map((f) => f.truth);
     }
     return W;
@@ -803,7 +997,7 @@ window.ORCH = (() => {
   // the audience, moment by moment: what it knows, what it suspects (theories), what it wonders, what it believes wrongly,
   // what only it knows (irony), whom it cares for
   // the loops the audience waits on (what it does not consciously carry, a seed, a key, a hidden hand, stays out)
-  const WAIT = ['q', 'arr', 'thr', 'obj', 'wit', 'kept', 'clock', 'dl', 'acc', 'owe', 'next'];
+  const WAIT = ['q', 'arr', 'thr', 'obj', 'wit', 'kept', 'clock', 'dl', 'acc', 'owe', 'next', 'caught', 'lied'];
   function ledger(loops = []) {
     const K2 = { knows: [], th: new Map(), wrong: [], irony: [], cares: [], open: new Map() }, byId = new Map(loops.map((L) => [L.id, L]));
     return { apply(m) { for (const x of m.aud) { if (x.k === 'learn') K2.knows.push(x.fr); if (x.k === 'suspect') K2.th.set(x.ref, x.fr);
@@ -877,12 +1071,17 @@ window.ORCH = (() => {
 
   // ---- the black screens: « Épisode 2 », then its slides, one sentence at a time (never a lot of words at once), until the end ----
   let stEl = null;
+  // one sentence per tap, but a quote stays whole (« C’est moi. J’ai tué James. » is one step, never cut across two screens)
+  const sentences = (t) => { const out = []; let cur = '', q = 0; const str = String(t);
+    for (let i = 0; i < str.length; i++) { const ch = str[i]; cur += ch; if (ch === '«') q++; if (ch === '»') q = Math.max(0, q - 1);
+      if (!q && /[.!?»]/.test(ch) && (i + 1 >= str.length || str[i + 1] === ' ') && !(ch !== '»' && str.slice(i + 1).trim().startsWith('»'))) { if (cur.trim()) out.push(cur.trim()); cur = ''; } }
+    if (cur.trim()) out.push(cur.trim()); return out.length ? out : [str]; };
   function slides(from = 2, opt = {}) {
     const v = movie(), eps = v.eps.filter((E) => E.n >= from); if (!eps.length) return null; style();
     if (stEl) stEl.remove(); const el = document.createElement('div'); el.id = 'orSl'; document.body.appendChild(el); stEl = el;
     // the steps: a title card per episode, then each slide cut in its sentences (each tap adds the next one)
     const steps = []; for (const E of eps) { steps.push({ title: `Épisode ${E.n}`, sub: E.act > 1 && E === eps.find((x) => x.act === E.act) ? `Acte ${E.act}` : '' });
-      for (const s of E.slides) { const parts = String(s.fr).match(/[^.!?»]+[.!?]+(?:\s*»)?|[^.!?]+$/g) || [s.fr]; parts.map((p) => p.trim()).filter(Boolean).forEach((p, k, all) => steps.push({ slide: s, part: p, k, of: all.length })); } }
+      for (const s of E.slides) sentences(s.fr).forEach((p, k, all) => steps.push({ slide: s, part: p, k, of: all.length })); }
     steps.push({ title: 'Fin', sub: '' });
     let i = -1; const shown = [];
     const draw = () => { const s = steps[i];
