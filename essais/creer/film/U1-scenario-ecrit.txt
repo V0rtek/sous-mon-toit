@@ -1,3 +1,6 @@
+⚠️ CONTRE-EXEMPLE (Justin, 25/11 : « c'est de la merde ») : pas de thème, pas de raisons, rien de surprenant, des répliques-tremplins.
+Pourquoi, et ce qu'il faut à la place : FORGE-CAP.md (§ 2 et § 3, la même scène d'ouverture refaite avec ses intentions).
+
 LE SECRET DE JUSTIN — le scénario écrit depuis les fiches de scène (25/11)
 Histoire : essais/creer/histoires.js › U1_test_justin (refaite depuis le test de Justin du 24/11).
 Écrit par Claude en suivant UNIQUEMENT le prompt ORCH.screenplayPrompt() (le même que reçoit « ✍️ Claude l'écrit pour de vrai »),
