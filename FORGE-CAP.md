@@ -1,5 +1,7 @@
 # Le cap (25/11) : ce qu'on fabrique, pourquoi ça sort plat, comment on le fait ensemble
 
+> **Corrigé par Justin le 25/11 : lire d'abord le § 10.** Les § 5 (« tu juges, j'encode », le « corpus d'or »), 8 (des lois trop simples) et l'exemple de conflit du § 3 (« lame ») sont remplacés.
+
 Réponse à Justin, après « ce scénario c'est de la merde » (`essais/creer/film/U1-scenario-ecrit.txt`) : pas de sens, rien de
 surprenant, pas de raisons, générique, du plus probable ; un vrai film aurait dit pourquoi Amare fait ça et l'aurait relié à
 plus grand ; le dialogue sonne faux (« Et toi, t'as quoi, à part une chaise ? » / « J'ai Melissa. C'est tout ce qui me reste. »).
@@ -236,3 +238,19 @@ faut le même pour ces bases, et que le moteur s'en serve à chaque couche.
 7. **Seulement après : le mettre en scène** (couche 5).
 
 Ce qu'on arrête d'ici là : plus d'actes, plus d'épisodes automatiques, polir les diapos.
+
+## 10. Les corrections de Justin (25/11, sa réponse)
+
+- **La méthode** : lui fait le breakdown d'une vraie scène → on l'implémente concrètement dans un système clair → je teste avec un
+  output réel qu'il voit → il dit si j'ai compris. Pas « tu juges, j'encode ».
+- **Pas de corpus de scènes à imiter** : des techniques et des recettes qui s'imbriquent (sous-techniques), au format de
+  `techniques.js`.
+- **Le terme** : « conflit philosophique » (croyance contre croyance : `REFERENCE-THEORIE-RECIT.md` § 1), pas « thème ».
+  « Aimer, est-ce retenir ? » : refusé (« lame »).
+- **Les lois du dialogue (§ 8) sont trop simples** : il faut beaucoup plus spécifique, tiré d'exemples réels qu'il découpe.
+- **Le visuel compte dès l'écriture** : ce qui est écrit doit tenir dans ce que le lecteur sait montrer. La référence d'une bonne
+  scène jouée : la première scène de Last Call (`bar.js`). Ma scène réécrite du § 3 a des gestes que le lecteur ne sait pas
+  montrer (prendre les mains, la neige sur les épaules).
+- **Les diapos restent.**
+- **Le matériau réel** : analyser des scènes de vrais films. Exemple donné : *Stranger's Pawn* (Christian Jaramillo, 2025), deux
+  hommes, une partie d'échecs, une conversation.

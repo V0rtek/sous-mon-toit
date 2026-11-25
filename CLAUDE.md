@@ -10,6 +10,9 @@ Le texte `FORGE-ORCHESTRATION.md` (gardé tel quel) est traité : réponse ligne
 # Théorie du récit
 Quand Justin parle de théorie (structure, scène, personnage, dialogue, continuité) : la référence est `REFERENCE-THEORIE-RECIT.md` (son document, gardé tel quel, donné le 25/11). S'en servir pour répondre et pour construire ; dire quand on s'en écarte et pourquoi.
 
+# Travailler l'histoire avec Justin (25/11)
+Sa méthode : il fait un breakdown (ce qu'il voit dans une vraie scène) → on l'implémente concrètement, dans un système clair et aligné → je teste avec un output réel qu'il peut voir (une scène au format de Last Call, `bar.js` : plans, silences, poses) → il dit si j'ai compris. Poser des questions et suggérer au fur et à mesure ; pas de grosse réponse. Ce qu'il sait devient des **techniques imbriquées** (le format de `techniques.js` : nom, comment, plat → ce qui marche, sous-techniques), pas un corpus de scènes à imiter. Dire « conflit philosophique » (croyance contre croyance, `REFERENCE-THEORIE-RECIT.md` § 1), pas « thème ». Ce qui est écrit doit tenir dans ce que le lecteur sait montrer.
+
 # Écriture
 Jamais beaucoup de mots d'un coup : une réplique ou une narration longue se coupe en 2-3 bulles (« Okay. » / « I come out. » / « But the gun stays in my holster. ») (demandé par Justin le 09/11).
 
