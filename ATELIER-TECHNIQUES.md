@@ -116,3 +116,6 @@ What I want you to notice here is what scene agenda and realistic characters pro
 
 ## Tour 1 — mes lectures et variantes (26/11), en attente de Justin
 (dans la réponse du chat du 26/11 ; ses réactions viendront ici)
+
+## Tour 2 — l'exemple complet (26/11)
+Les 3 techniques appliquées à une scène de l'histoire, de l'entrée du moteur au visuel : `essais/creer/exemple-3-techniques.md` (personnes complètes, journal du choix des techniques, suivi temps par temps, scénario, ce que le visuel perd). En attente de la critique de Justin.
