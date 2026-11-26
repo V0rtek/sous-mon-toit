@@ -406,3 +406,12 @@ const TECH_LVL = (() => {
     'relEngaging', 'empathy', 'communityWin', 'triesGood', 'unexpected', 'sexDrive', 'whereIsX', 'whoIsX', 'whatIsInX'];
   const m = {}; for (const id of Object.keys(TECH)) m[id] = P.includes(id) ? 'plot' : B.includes(id) ? 'both' : 'scene'; return m;
 })();
+
+// ---- 🗂 the table (26/11, Justin: « a database of techniques, an excel-like viewer, columns with options and colours, e.g.
+// opener: only · good · ok · never (blue, green, yellow, red) »). TECH_COLS = the columns (a new one = a line here);
+// TECH_DB = his values, one object per technique ({ opener: 'good' }). Only he decides them: the table lets him tap a cell, keeps
+// it on this browser, and « 📋 Copier mes choix » gives them to Claude to write here ----
+const TECH_COLS = [
+  { id: 'opener', n: 'Ouverture', d: 'Bonne pour ouvrir une histoire ou un épisode ?', opts: [['only', 'seulement', '#0a84ff'], ['good', 'bon', '#30d158'], ['ok', 'ok', '#ffd60a'], ['never', 'jamais', '#ff453a']] },
+];
+const TECH_DB = {};

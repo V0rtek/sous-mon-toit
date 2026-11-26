@@ -34,14 +34,17 @@ jamais le mot final : c'est moi qui décide.** Tu ne rédiges pas de carte tant 
    - la situation (à la taverne).
    Pour chacune : le moment (2 à 4 répliques ou gestes), comment c'est joué (visage, rythme, silence), ce que le public
    comprend, et ✓ jouable / ~ alternative / ✗ pas jouable.
+   **Mets aussi 1 ou 2 variantes où elle risque de NE PAS marcher** (le mauvais perso, le mauvais moment, trop tôt, déjà
+   utilisée) : je te réponds « oui », « non » ou « oui, seulement si … ». C'est ce qui remplit le « quand » et le « quand pas »
+   de la carte.
 4. **Les expansions** (tes suggestions) : les sous-techniques cachées dedans ; le contraire (quand elle rate : le même geste joué
    autrement change de sens) ; les combinaisons avec une autre technique ; la version plantée puis payée plus tard ; les signes
    qu'on l'utilise trop.
 5. **1 à 3 questions** pour aller plus loin.
 
 Après ma réaction (✓ / ✗ / pourquoi), tu refais un tour sur ce que j'ai gardé. Quand je dis « carte », tu rédiges la carte
-**dans mes mots** : nom · comment · les intentions qu'elle sert · plat → ce qui marche · les variantes rangées par axe ·
-sous-techniques · mène à (SI …) · ce qui n'est pas jouable.
+**dans mes mots** : nom · comment · les intentions qu'elle sert · quand · quand pas · plat → ce qui marche · les variantes
+rangées par axe · sous-techniques · mène à (SI …) · ce qui n'est pas jouable.
 
 **À la fin de chaque tour**, un bloc à recopier :
 ```

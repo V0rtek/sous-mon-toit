@@ -119,3 +119,43 @@ What I want you to notice here is what scene agenda and realistic characters pro
 
 ## Tour 2 — l'exemple complet (26/11)
 Les 3 techniques appliquées à une scène de l'histoire, de l'entrée du moteur au visuel : `essais/creer/exemple-3-techniques.md` (personnes complètes, journal du choix des techniques, suivi temps par temps, scénario, ce que le visuel perd). En attente de la critique de Justin.
+
+### Ce que Justin en a dit (26/11)
+- « Tu as bien intégré les techniques dans ton exemple. » · « Le visuel est le genre de trucs que je recherchais. Très cool !!
+  Souviens-toi de ce format. C'est notre base pour la suite (autre chat ou pas). »
+- La partie personne : « excellent, le genre de trucs que je recherche. Mais sur plusieurs épisodes il faudra encore plus
+  remplir les sections. Et aussi les personnes peuvent changer / évoluer selon les events (trauma ?). »
+- « On va devoir adresser timing et expressions (souvent en lien avec les techniques). »
+- « Pour les techniques, on devrait probablement tester quand les utiliser et quand NE PAS (tu me donnes plusieurs exemples et
+  je te dis oui / non / oui mais seulement si x). »
+- Ses doutes : je suis reparti d'une histoire qui existait (pas de zéro) ; j'avais tous les critères en tête, le système non ; le
+  contexte de la conversation me biaise ; je suis Opus, le système c'est Haiku ; peur de recommencer sans direction dans un autre
+  chat ; peur que la sortie du système déçoive à côté de celle-ci.
+
+---
+
+## Le bord du vide — technique de Justin (26/11, gardée telle quelle)
+
+# Techniques. What kind / what level idk :
+
+When want to show unusually strong trust bond between 2 characters. Make them both sit on an extremely high edge (building / cliff / fortress walls) and have a conversation. Can be a good opener.
+Engage even more if convo is about death. Or if it turns into a conflict. They just cant look away cause they wonder if one gon fall).
+Powerful : "Ever tought about giving up?", before (stakes) : "How high do u think this is?"
+Variant :
+Only 1 char (headphones) on edge.
+Other one come, they have a small chat.
+At the end : the other : "Alright you coming? I'm / we're waiting for you"
+And only then we see what's happening behind (surpising) :
+- An immense crowd (ceremony?? Sect? Partners? In cobra kai they bring the crew on a rooftop)
+- A dead body getting putted into a bag.
+- If fantasy : an immense dead monster? Whale??
+- A task or an event ig.
+
+Opener potential is high ^
+
+Playing musics?
+
+Task or events = a plug / ref to a next technique (that's what I mean when I say inbricates techniques)
+
+### Tour 1 — mes lectures et variantes (26/11), en attente de Justin
+(dans la réponse du chat du 26/11)

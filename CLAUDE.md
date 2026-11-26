@@ -13,6 +13,13 @@ Quand Justin parle de théorie (structure, scène, personnage, dialogue, continu
 # Travailler l'histoire avec Justin (25/11)
 Sa méthode : il fait un breakdown (ce qu'il voit dans une vraie scène) → on l'implémente concrètement, dans un système clair et aligné → je teste avec un output réel qu'il peut voir (une scène au format de Last Call, `bar.js` : plans, silences, poses) → il dit si j'ai compris. Poser des questions et suggérer au fur et à mesure ; pas de grosse réponse. Ce qu'il sait devient des **techniques imbriquées** (le format de `techniques.js` : nom, comment, plat → ce qui marche, sous-techniques), pas un corpus de scènes à imiter. **Je ne fais pas les techniques à sa place** (26/11) : il en parle ; je reformule de plusieurs façons et je propose plusieurs variantes, jamais le mot final ; il dit ce qu'il en fait. Ses breakdowns (mot pour mot), les essais et ses réactions : `ATELIER-TECHNIQUES.md` ; seul ce qu'il valide entre dans `techniques.js`. Le processus de chaque tour (lectures, variantes par axe, expansions, questions, RÉCAP), aussi pour les autres chats : `ATELIER-PROTOCOLE.md`. Dire « conflit philosophique » (croyance contre croyance, `REFERENCE-THEORIE-RECIT.md` § 1), pas « thème ». Ce qui est écrit doit tenir dans ce que le lecteur sait montrer.
 
+# Où on en est (26/11) — lire avant de reprendre
+- **La sortie de référence** (« notre base pour la suite », Justin) : la scène « Les piles » — `essais/creer/exemple-3-techniques.md` (les personnes complètes, le journal du choix des techniques, le suivi temps par temps de ce que chacun fait / veut vraiment / ressent, le scénario) + `essais/creer/film/exemple-3-techniques-mise.json` (jouée dans le vrai lecteur). Toute nouvelle scène se fait dans ce format.
+- **Honnête** : « Les piles » a été faite par Claude (Opus) avec tout le contexte de la conversation. Le système (Haiku, des prompts) ne sait pas encore la faire. Le but : que le système l'atteigne à partir de **données** (fiches de personnes, techniques avec quand / quand pas, fiche de scène avec le suivi), testé **en partant de zéro**, côte à côte avec « Les piles ».
+- **Les personnes évoluent** d'un épisode à l'autre (ce qui leur arrive, un trauma) : la fiche est vivante, elle se remplit à chaque épisode.
+- **À faire** : le timing et les expressions (souvent liés aux techniques).
+- **Les techniques** : Infos › Techniques › 🗂 Tableau (`TECH_COLS` = les colonnes, `TECH_DB` = les valeurs de Justin, lui seul les décide).
+
 # Écriture
 Jamais beaucoup de mots d'un coup : une réplique ou une narration longue se coupe en 2-3 bulles (« Okay. » / « I come out. » / « But the gun stays in my holster. ») (demandé par Justin le 09/11).
 
