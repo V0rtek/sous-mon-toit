@@ -10,6 +10,16 @@ Le texte `FORGE-ORCHESTRATION.md` (gardé tel quel) est traité : réponse ligne
 # Théorie du récit
 Quand Justin parle de théorie (structure, scène, personnage, dialogue, continuité) : la référence est `REFERENCE-THEORIE-RECIT.md` (son document, gardé tel quel, donné le 25/11). S'en servir pour répondre et pour construire ; dire quand on s'en écarte et pourquoi.
 
+# Ses notes d'histoire : `histoire/` (26/11)
+Venues du vault (Torilyn), une seule copie, gardées telles quelles (format Obsidian : `[[liens]]`, images dans `histoire/media/`).
+- `📑 Theory/` : ses notes longues (conflit, arcs, story circle, scène, dialogue, court métrage, logline, framework). `REFERENCE-THEORIE-RECIT.md` reste la référence ; ces notes en sont la version longue, à ouvrir quand elle ne suffit pas.
+- `🪸 Breakdowns/` : ses décorticages de films (12 Angry Men, Parasite, Shawshank, Dark Knight, Godfather, Detroit, Barber, Stranger's Pawn, Life is Strange).
+- `_ Banks/Surprises.md` (surprises) · `_TO ADRESS 🫪🫶 chars dy.md` (voix et dynamiques ; la chaîne de prompts de Torilyn la lit ici : ne pas la renommer).
+- `_ 💘Episodes - Pocket Gem.md`, `… Pocket Gem 2.md`, `_ episode startup.md` : le modèle Episode sur lequel le jeu est bâti.
+- `_Techniques.md`, `_Assets.md` : liens vers ses Claude Docs.
+Les liens vers `_Equation`, `_FeuilleDeCommande`, `_Depth`, `📊 annexe`… pointent vers l'archive Torilyn, pas dans ce dépôt.
+Aussi arrivés du vault : `source/` (images de départ des persos), `stock/` (photos Wikimedia des premiers décors), `tools/` (découpe des planches : `cut.py`, `cutbg.py`, `recolor.py`…, du 24/10 : `manifest.py` réécrit `chars.js`, comparer avant de le lancer), les `.png` d'origine dans `chars/`. `resultats/` = résultats d'onboarding réécrits aux 15 min par le PC : hors git.
+
 # Travailler l'histoire avec Justin (25/11)
 Sa méthode : il fait un breakdown (ce qu'il voit dans une vraie scène) → on l'implémente concrètement, dans un système clair et aligné → je teste avec un output réel qu'il peut voir (une scène au format de Last Call, `bar.js` : plans, silences, poses) → il dit si j'ai compris. Poser des questions et suggérer au fur et à mesure ; pas de grosse réponse. Ce qu'il sait devient des **techniques imbriquées** (le format de `techniques.js` : nom, comment, plat → ce qui marche, sous-techniques), pas un corpus de scènes à imiter. **Je ne fais pas les techniques à sa place** (26/11) : il en parle ; je reformule de plusieurs façons et je propose plusieurs variantes, jamais le mot final ; il dit ce qu'il en fait. Ses breakdowns (mot pour mot), les essais et ses réactions : `ATELIER-TECHNIQUES.md` ; seul ce qu'il valide entre dans `techniques.js`. Le processus de chaque tour (lectures, variantes par axe, expansions, questions, RÉCAP), aussi pour les autres chats : `ATELIER-PROTOCOLE.md`. Dire « conflit philosophique » (croyance contre croyance, `REFERENCE-THEORIE-RECIT.md` § 1), pas « thème ». Ce qui est écrit doit tenir dans ce que le lecteur sait montrer.
 
